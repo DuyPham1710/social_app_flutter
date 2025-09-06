@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/config/theme/app_theme.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:social_app_fe/features/auth/presentation/pages/login_page.dart';
+import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
   await initializeDependencies();
-  runApp(MyApp());
+
+  final authBloc = s1<AuthBloc>();
+
+  runApp(
+    MultiBlocProvider(
+      providers: [BlocProvider.value(value: authBloc)],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,6 +25,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Namer App', theme: theme(), home: Container());
+    return ScreenUtilInit(
+      designSize: const Size(375, 812), // iPhone X design size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'Namer App',
+          debugShowCheckedModeBanner: false,
+          theme: theme(),
+          home: LoginPage(),
+          routes: <String, WidgetBuilder>{
+            '/login': (BuildContext context) => const LoginPage(),
+            '/home': (BuildContext context) => const HomePage(),
+          },
+        );
+      },
+    );
   }
 }
