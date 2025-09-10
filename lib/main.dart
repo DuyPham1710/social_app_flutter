@@ -5,6 +5,7 @@ import 'package:social_app_fe/config/theme/app_theme.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/login_page.dart';
+import 'package:social_app_fe/features/auth/presentation/pages/register_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
           routes: <String, WidgetBuilder>{
             '/login': (BuildContext context) => const LoginPage(),
             '/home': (BuildContext context) => const HomePage(),
+            '/signup': (BuildContext context) => const RegisterPage(),
           },
         );
       },
