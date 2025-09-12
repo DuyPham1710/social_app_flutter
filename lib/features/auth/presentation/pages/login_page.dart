@@ -5,6 +5,8 @@ import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/shared/component/button_custom.dart';
+import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -38,42 +42,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Widget _buildTextFormField({
-    required String label,
-    required bool isPassword,
-    required TextEditingController controller,
-    required FocusNode focusNode,
-    String? Function(String?)? validator,
-    Widget? suffixIcon,
-  }) {
-    return TextFormField(
-      controller: controller,
-      focusNode: focusNode,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.grey),
-        floatingLabelStyle: WidgetStateTextStyle.resolveWith((states) {
-          if (states.contains(WidgetState.focused)) {
-            return const TextStyle(color: AppColors.primary);
-          }
-          return const TextStyle(color: Colors.grey); // khi không focus
-        }),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-        suffixIcon: suffixIcon,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5.r),
-          borderSide: BorderSide(width: 1.w, color: Colors.grey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5.r),
-          borderSide: BorderSide(width: 2.w, color: AppColors.primary),
-        ),
-      ),
-      validator: validator,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -81,11 +49,7 @@ class _LoginPageState extends State<LoginPage> {
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthLoaded) {
-              Navigator.pushReplacementNamed(
-                context,
-                '/home',
-                arguments: state.user,
-              );
+              Navigator.pushNamed(context, '/home', arguments: state.user);
             } else if (state is AuthError) {
               final errorMsg = state.error?.message ?? 'Login failed';
               ScaffoldMessenger.of(
@@ -134,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       SizedBox(height: 20.h),
 
-                      _buildTextFormField(
+                      TextformfieldCustom(
                         label: 'Email',
                         isPassword: false,
                         controller: _emailController,
@@ -149,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       SizedBox(height: 20.h),
 
-                      _buildTextFormField(
+                      TextformfieldCustom(
                         label: 'Password',
                         isPassword: true,
                         controller: _passwordController,
@@ -238,30 +202,9 @@ class _LoginPageState extends State<LoginPage> {
 
                       state is AuthLoading
                           ? CircularProgressIndicator(color: AppColors.primary)
-                          : SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  backgroundColor: AppColors.primary,
-                                ),
-
-                                onPressed: () => _onLoginPressed(context),
-
-                                child: Text(
-                                  "Sign In",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                          : ButtonCustom(
+                              onPressed: () => _onLoginPressed(context),
+                              text: "Sign In",
                             ),
 
                       SizedBox(height: 24.h),
@@ -273,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                             "Do not have an Account? ",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 16.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -285,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                               "Sign up",
                               style: TextStyle(
                                 color: AppColors.primary,
-                                fontSize: 16.sp,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
