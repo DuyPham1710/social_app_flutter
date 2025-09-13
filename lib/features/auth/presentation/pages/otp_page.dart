@@ -19,6 +19,12 @@ class _OtpPageState extends State<OtpPage> {
   int _secondsRemaining = 60; // 1 phút
   Timer? _timer;
 
+  @override
+  void initState() {
+    super.initState();
+    _startCountdown();
+  }
+
   final defaultPinTheme = PinTheme(
     width: 50.w,
     height: 50.h,
@@ -35,8 +41,8 @@ class _OtpPageState extends State<OtpPage> {
 
   void _verifyOtp(BuildContext context) {
     if (otpCode.length == 6) {
-      _startCountdown();
-      // Navigator.pushNamed(context, '/personal-info');
+      // _startCountdown();
+      Navigator.pushNamed(context, '/personal-info');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid 6-digit OTP')),
@@ -138,7 +144,7 @@ class _OtpPageState extends State<OtpPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        //  Navigator.pushNamed(context, '/login');
+                        // call API gửi lại OTP
                       },
                       child: Text(
                         _secondsRemaining > 0
