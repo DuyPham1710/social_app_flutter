@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           title: 'Namer App',
           debugShowCheckedModeBanner: false,
           theme: theme(),
-          home: LoginPage(),
+          initialRoute: '/login',
           routes: <String, WidgetBuilder>{
             '/login': (BuildContext context) => const LoginPage(),
             '/home': (BuildContext context) => const HomePage(),

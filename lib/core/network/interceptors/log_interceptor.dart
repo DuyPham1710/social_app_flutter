@@ -21,6 +21,11 @@ class AppLogInterceptor extends Interceptor {
     print("[Error] [${err.response?.statusCode}] ${err.requestOptions.uri}");
     print("Message: ${err.message}");
     print("Data: ${err.response?.data}");
+    // Nếu response.data là Map và có trường 'message', log riêng message
+    final data = err.response?.data;
+    if (data is Map<String, dynamic> && data['message'] != null) {
+      print("Error message from response: ${data['message']}");
+    }
     super.onError(err, handler);
   }
 }

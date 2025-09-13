@@ -22,15 +22,15 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$UserModel {
   String get userId => throw _privateConstructorUsedError;
-  String get fullName => throw _privateConstructorUsedError;
-  String get phoneNumber => throw _privateConstructorUsedError;
-  String get bio => throw _privateConstructorUsedError;
-  String get avatarUrl => throw _privateConstructorUsedError;
-  String get dateOfBirth => throw _privateConstructorUsedError;
-  String get gender => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
-  String get username => throw _privateConstructorUsedError;
-  bool get isActive => throw _privateConstructorUsedError;
+  String? get fullName => throw _privateConstructorUsedError;
+  String? get phoneNumber => throw _privateConstructorUsedError;
+  String? get bio => throw _privateConstructorUsedError;
+  String? get avatarUrl => throw _privateConstructorUsedError;
+  String? get dateOfBirth => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+  String? get username => throw _privateConstructorUsedError;
+  bool? get isActive => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
@@ -50,15 +50,15 @@ abstract class $UserModelCopyWith<$Res> {
   @useResult
   $Res call({
     String userId,
-    String fullName,
-    String phoneNumber,
-    String bio,
-    String avatarUrl,
-    String dateOfBirth,
-    String gender,
-    String email,
-    String username,
-    bool isActive,
+    String? fullName,
+    String? phoneNumber,
+    String? bio,
+    String? avatarUrl,
+    String? dateOfBirth,
+    String? gender,
+    String? email,
+    String? username,
+    bool? isActive,
     DateTime? createdAt,
   });
 }
@@ -79,15 +79,15 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   @override
   $Res call({
     Object? userId = null,
-    Object? fullName = null,
-    Object? phoneNumber = null,
-    Object? bio = null,
-    Object? avatarUrl = null,
-    Object? dateOfBirth = null,
-    Object? gender = null,
-    Object? email = null,
-    Object? username = null,
-    Object? isActive = null,
+    Object? fullName = freezed,
+    Object? phoneNumber = freezed,
+    Object? bio = freezed,
+    Object? avatarUrl = freezed,
+    Object? dateOfBirth = freezed,
+    Object? gender = freezed,
+    Object? email = freezed,
+    Object? username = freezed,
+    Object? isActive = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -96,42 +96,42 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
                       as String,
-            fullName: null == fullName
+            fullName: freezed == fullName
                 ? _value.fullName
                 : fullName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            phoneNumber: null == phoneNumber
+                      as String?,
+            phoneNumber: freezed == phoneNumber
                 ? _value.phoneNumber
                 : phoneNumber // ignore: cast_nullable_to_non_nullable
-                      as String,
-            bio: null == bio
+                      as String?,
+            bio: freezed == bio
                 ? _value.bio
                 : bio // ignore: cast_nullable_to_non_nullable
-                      as String,
-            avatarUrl: null == avatarUrl
+                      as String?,
+            avatarUrl: freezed == avatarUrl
                 ? _value.avatarUrl
                 : avatarUrl // ignore: cast_nullable_to_non_nullable
-                      as String,
-            dateOfBirth: null == dateOfBirth
+                      as String?,
+            dateOfBirth: freezed == dateOfBirth
                 ? _value.dateOfBirth
                 : dateOfBirth // ignore: cast_nullable_to_non_nullable
-                      as String,
-            gender: null == gender
+                      as String?,
+            gender: freezed == gender
                 ? _value.gender
                 : gender // ignore: cast_nullable_to_non_nullable
-                      as String,
-            email: null == email
+                      as String?,
+            email: freezed == email
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
-                      as String,
-            username: null == username
+                      as String?,
+            username: freezed == username
                 ? _value.username
                 : username // ignore: cast_nullable_to_non_nullable
-                      as String,
-            isActive: null == isActive
+                      as String?,
+            isActive: freezed == isActive
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
-                      as bool,
+                      as bool?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -153,15 +153,15 @@ abstract class _$$UserModelImplCopyWith<$Res>
   @useResult
   $Res call({
     String userId,
-    String fullName,
-    String phoneNumber,
-    String bio,
-    String avatarUrl,
-    String dateOfBirth,
-    String gender,
-    String email,
-    String username,
-    bool isActive,
+    String? fullName,
+    String? phoneNumber,
+    String? bio,
+    String? avatarUrl,
+    String? dateOfBirth,
+    String? gender,
+    String? email,
+    String? username,
+    bool? isActive,
     DateTime? createdAt,
   });
 }
@@ -181,15 +181,15 @@ class __$$UserModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? userId = null,
-    Object? fullName = null,
-    Object? phoneNumber = null,
-    Object? bio = null,
-    Object? avatarUrl = null,
-    Object? dateOfBirth = null,
-    Object? gender = null,
-    Object? email = null,
-    Object? username = null,
-    Object? isActive = null,
+    Object? fullName = freezed,
+    Object? phoneNumber = freezed,
+    Object? bio = freezed,
+    Object? avatarUrl = freezed,
+    Object? dateOfBirth = freezed,
+    Object? gender = freezed,
+    Object? email = freezed,
+    Object? username = freezed,
+    Object? isActive = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -198,42 +198,42 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
                   as String,
-        fullName: null == fullName
+        fullName: freezed == fullName
             ? _value.fullName
             : fullName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        phoneNumber: null == phoneNumber
+                  as String?,
+        phoneNumber: freezed == phoneNumber
             ? _value.phoneNumber
             : phoneNumber // ignore: cast_nullable_to_non_nullable
-                  as String,
-        bio: null == bio
+                  as String?,
+        bio: freezed == bio
             ? _value.bio
             : bio // ignore: cast_nullable_to_non_nullable
-                  as String,
-        avatarUrl: null == avatarUrl
+                  as String?,
+        avatarUrl: freezed == avatarUrl
             ? _value.avatarUrl
             : avatarUrl // ignore: cast_nullable_to_non_nullable
-                  as String,
-        dateOfBirth: null == dateOfBirth
+                  as String?,
+        dateOfBirth: freezed == dateOfBirth
             ? _value.dateOfBirth
             : dateOfBirth // ignore: cast_nullable_to_non_nullable
-                  as String,
-        gender: null == gender
+                  as String?,
+        gender: freezed == gender
             ? _value.gender
             : gender // ignore: cast_nullable_to_non_nullable
-                  as String,
-        email: null == email
+                  as String?,
+        email: freezed == email
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
-                  as String,
-        username: null == username
+                  as String?,
+        username: freezed == username
             ? _value.username
             : username // ignore: cast_nullable_to_non_nullable
-                  as String,
-        isActive: null == isActive
+                  as String?,
+        isActive: freezed == isActive
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
-                  as bool,
+                  as bool?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -248,15 +248,15 @@ class __$$UserModelImplCopyWithImpl<$Res>
 class _$UserModelImpl implements _UserModel {
   const _$UserModelImpl({
     required this.userId,
-    required this.fullName,
-    required this.phoneNumber,
-    required this.bio,
-    required this.avatarUrl,
-    required this.dateOfBirth,
-    required this.gender,
-    required this.email,
-    required this.username,
-    required this.isActive,
+    this.fullName,
+    this.phoneNumber,
+    this.bio,
+    this.avatarUrl,
+    this.dateOfBirth,
+    this.gender,
+    this.email,
+    this.username,
+    this.isActive,
     this.createdAt,
   });
 
@@ -266,23 +266,23 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String userId;
   @override
-  final String fullName;
+  final String? fullName;
   @override
-  final String phoneNumber;
+  final String? phoneNumber;
   @override
-  final String bio;
+  final String? bio;
   @override
-  final String avatarUrl;
+  final String? avatarUrl;
   @override
-  final String dateOfBirth;
+  final String? dateOfBirth;
   @override
-  final String gender;
+  final String? gender;
   @override
-  final String email;
+  final String? email;
   @override
-  final String username;
+  final String? username;
   @override
-  final bool isActive;
+  final bool? isActive;
   @override
   final DateTime? createdAt;
 
@@ -350,15 +350,15 @@ class _$UserModelImpl implements _UserModel {
 abstract class _UserModel implements UserModel {
   const factory _UserModel({
     required final String userId,
-    required final String fullName,
-    required final String phoneNumber,
-    required final String bio,
-    required final String avatarUrl,
-    required final String dateOfBirth,
-    required final String gender,
-    required final String email,
-    required final String username,
-    required final bool isActive,
+    final String? fullName,
+    final String? phoneNumber,
+    final String? bio,
+    final String? avatarUrl,
+    final String? dateOfBirth,
+    final String? gender,
+    final String? email,
+    final String? username,
+    final bool? isActive,
     final DateTime? createdAt,
   }) = _$UserModelImpl;
 
@@ -368,23 +368,23 @@ abstract class _UserModel implements UserModel {
   @override
   String get userId;
   @override
-  String get fullName;
+  String? get fullName;
   @override
-  String get phoneNumber;
+  String? get phoneNumber;
   @override
-  String get bio;
+  String? get bio;
   @override
-  String get avatarUrl;
+  String? get avatarUrl;
   @override
-  String get dateOfBirth;
+  String? get dateOfBirth;
   @override
-  String get gender;
+  String? get gender;
   @override
-  String get email;
+  String? get email;
   @override
-  String get username;
+  String? get username;
   @override
-  bool get isActive;
+  bool? get isActive;
   @override
   DateTime? get createdAt;
 

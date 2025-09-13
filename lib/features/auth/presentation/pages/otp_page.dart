@@ -87,7 +87,10 @@ class _OtpPageState extends State<OtpPage> {
                 SizedBox(height: 20.h),
 
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => Navigator.popUntil(
+                    context,
+                    ModalRoute.withName('/signup'),
+                  ),
                   child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
                 ),
 

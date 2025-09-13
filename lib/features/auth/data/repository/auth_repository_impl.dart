@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
-import 'package:social_app_fe/features/auth/data/models/auth_response.dart';
+import 'package:social_app_fe/features/auth/data/models/register_request.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import 'package:social_app_fe/features/auth/domain/repository/auth_repository.dart';
 
@@ -22,8 +22,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<DataState<UserModel>> register() {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future<DataState<UserModel>> register(RegisterRequest request) async {
+    try {
+      final response = await authService.register(request);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
   }
 }

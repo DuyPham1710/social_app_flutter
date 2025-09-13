@@ -199,7 +199,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
                   TextformfieldCustom(
                     label: "Bio",
-                    isPassword: true,
+                    isPassword: false,
                     controller: bioController,
                     focusNode: bioFocusNode,
                   ),

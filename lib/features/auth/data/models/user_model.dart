@@ -8,15 +8,15 @@ part 'user_model.g.dart';
 class UserModel extends UserEntity with _$UserModel {
   const factory UserModel({
     required String userId,
-    required String fullName,
-    required String phoneNumber,
-    required String bio,
-    required String avatarUrl,
-    required String dateOfBirth,
-    required String gender,
-    required String email,
-    required String username,
-    required bool isActive,
+    String? fullName,
+    String? phoneNumber,
+    String? bio,
+    String? avatarUrl,
+    String? dateOfBirth,
+    String? gender,
+    String? email,
+    String? username,
+    bool? isActive,
     DateTime? createdAt,
   }) = _UserModel;
 

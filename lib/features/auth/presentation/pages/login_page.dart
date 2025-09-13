@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
@@ -21,6 +23,16 @@ class _LoginPageState extends State<LoginPage> {
   final FocusNode emailFocusNode = FocusNode();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode passwordFocusNode = FocusNode();
+  bool _isPasswordVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Reset AuthBloc state when entering login page
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      BlocProvider.of<AuthBloc>(context).add(AuthReset());
+    });
+  }
 
   @override
   void dispose() {
@@ -49,12 +61,10 @@ class _LoginPageState extends State<LoginPage> {
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthLoaded) {
-              Navigator.pushNamed(context, '/home', arguments: state.user);
+              Navigator.pushNamed(context, '/home');
             } else if (state is AuthError) {
-              final errorMsg = state.error?.message ?? 'Login failed';
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(errorMsg)));
+              final errorMsg = state.errorMessage ?? 'Đăng nhập thất bại';
+              UIUtils.showErrorMessage(context, errorMsg);
             }
           },
 
@@ -115,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       TextformfieldCustom(
                         label: 'Password',
-                        isPassword: true,
+                        isPassword: _isPasswordVisible,
                         controller: _passwordController,
                         focusNode: passwordFocusNode,
                         validator: (value) {
@@ -124,6 +134,20 @@ class _LoginPageState extends State<LoginPage> {
                           }
                           return null;
                         },
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                          child: Icon(
+                            _isPasswordVisible
+                                ? CupertinoIcons.eye_fill
+                                : CupertinoIcons.eye_slash_fill,
+                            size: 22.sp,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ),
 
                       SizedBox(height: 14.h),
