@@ -142,8 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Icon(
                             _isPasswordVisible
-                                ? CupertinoIcons.eye_fill
-                                : CupertinoIcons.eye_slash_fill,
+                                ? CupertinoIcons.eye_slash_fill
+                                : CupertinoIcons.eye_fill,
                             size: 22.sp,
                             color: Colors.grey[600],
                           ),

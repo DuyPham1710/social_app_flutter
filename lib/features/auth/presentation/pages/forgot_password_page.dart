@@ -87,16 +87,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     },
                   ),
 
-                  
-
-                  SizedBox(height: 500.h),
+                  SizedBox(height: 320.h),
 
                   ButtonCustom(
                     onPressed: () => _onForgotPasswordPressed(context),
                     text: "Next",
                   ),
 
-                  
                   SizedBox(height: 24.h),
 
                   Row(

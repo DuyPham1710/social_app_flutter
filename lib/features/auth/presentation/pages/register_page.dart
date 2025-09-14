@@ -179,8 +179,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                           child: Icon(
                             _isPasswordVisible
-                                ? CupertinoIcons.eye_fill
-                                : CupertinoIcons.eye_slash_fill,
+                                ? CupertinoIcons.eye_slash_fill
+                                : CupertinoIcons.eye_fill,
                             size: 22.sp,
                             color: Colors.grey[600],
                           ),
@@ -209,8 +209,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           },
                           child: Icon(
                             _isConfirmPasswordVisible
-                                ? CupertinoIcons.eye_fill
-                                : CupertinoIcons.eye_slash_fill,
+                                ? CupertinoIcons.eye_slash_fill
+                                : CupertinoIcons.eye_fill,
                             size: 22.sp,
                             color: Colors.grey[600],
                           ),

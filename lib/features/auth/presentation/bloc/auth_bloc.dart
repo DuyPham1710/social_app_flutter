@@ -3,22 +3,63 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/error_utils.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
 import 'package:social_app_fe/features/auth/data/models/register_request.dart';
+import 'package:social_app_fe/features/auth/data/models/verify_otp_request.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/register_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUsecase loginUsecase;
   final RegisterUsecase registerUsecase;
+  final VerifyOtpUsecase verifyOtpUsecase;
+  final ResendOtpUsecase resendOtpUsecase;
 
-  AuthBloc({required this.loginUsecase, required this.registerUsecase})
-    : super(AuthInitial()) {
+  AuthBloc({
+    required this.loginUsecase,
+    required this.registerUsecase,
+    required this.verifyOtpUsecase,
+    required this.resendOtpUsecase,
+  }) : super(AuthInitial()) {
     on<LoginEvent>(_login);
     on<RegisterEvent>(_register);
+    on<VerifyOtpEvent>(_verifyOtp);
+    on<ResendOtpEvent>(_resendOtp);
     on<AuthReset>((event, emit) {
       emit(AuthInitial());
     });
+  }
+
+  void _resendOtp(ResendOtpEvent event, Emitter<AuthState> emit) async {
+    emit(OtpResendLoading());
+
+    final dataState = await resendOtpUsecase(params: event.email);
+
+    if (dataState is DataStateSuccess && dataState.data != null) {
+      emit(OtpResendSuccess(dataState.data!));
+    } else {
+      final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+      emit(AuthError(dataState.error!, errorMessage: errorMessage));
+      return;
+    }
+  }
+
+  void _verifyOtp(VerifyOtpEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    final dataState = await verifyOtpUsecase(
+      params: VerifyOtpRequest(email: event.email, otp: event.otp),
+    );
+
+    if (dataState is DataStateSuccess && dataState.data != null) {
+      emit(AuthLoaded(dataState.data!));
+    } else {
+      final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+      emit(AuthError(dataState.error!, errorMessage: errorMessage));
+      return;
+    }
   }
 
   void _login(LoginEvent event, Emitter<AuthState> emit) async {

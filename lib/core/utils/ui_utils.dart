@@ -21,7 +21,7 @@ class UIUtils {
         SnackBar(
           content: Text(message),
           backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
     }

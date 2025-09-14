@@ -5,6 +5,7 @@ import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_response.dart';
 import 'package:social_app_fe/features/auth/data/models/register_request.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
+import 'package:social_app_fe/features/auth/data/models/verify_otp_request.dart';
 
 part 'auth_service.g.dart';
 
@@ -17,4 +18,10 @@ abstract class AuthService {
 
   @POST('/auth/register')
   Future<UserModel> register(@Body() RegisterRequest request);
+
+  @PATCH('/auth/verify-account')
+  Future<UserModel> verifyOtp(@Body() VerifyOtpRequest request);
+
+  @PATCH('/auth/resend-otp')
+  Future<Map<String, dynamic>> resendOtp(@Body() Map<String, dynamic> email);
 }

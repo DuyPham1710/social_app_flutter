@@ -22,6 +22,22 @@ class AuthLoaded extends AuthState {
 }
 
 class AuthError extends AuthState {
-  const AuthError(DioException error, {String? errorMessage}) 
-      : super(error: error, errorMessage: errorMessage);
+  const AuthError(DioException error, {super.errorMessage})
+    : super(error: error);
+}
+
+// OTP Resend States
+class OtpResendLoading extends AuthState {}
+
+class OtpResendSuccess extends AuthState {
+  final String message;
+  const OtpResendSuccess(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class OtpResendError extends AuthState {
+  final String message;
+  const OtpResendError(this.message);
 }
