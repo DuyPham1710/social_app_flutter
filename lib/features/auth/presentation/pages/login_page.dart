@@ -79,21 +79,13 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 40.h),
 
                       // Logo
-                      Container(
-                        height: 100.h,
-                        width: 100.w,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.person,
-                          size: 60.0,
-                          color: Colors.white,
-                        ),
+                      Image.asset(
+                        'assets/icons/logo.jpg',
+                        height: 120.h,
+                        width: 120.w,
                       ),
 
-                      SizedBox(height: 50.h),
+                      SizedBox(height: 40.h),
 
                       Align(
                         alignment: Alignment.centerLeft,

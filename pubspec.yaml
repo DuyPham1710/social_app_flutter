@@ -35,6 +35,12 @@ dev_dependencies:
   freezed: ^2.5.7
   json_serializable: ^6.8.0
   retrofit_generator: ^9.7.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/logo.jpg"
 
 flutter:
   uses-material-design: true
