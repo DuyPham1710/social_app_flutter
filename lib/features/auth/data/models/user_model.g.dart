@@ -26,14 +26,15 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
     <String, dynamic>{
       'userId': instance.userId,
-      'fullName': instance.fullName,
-      'phoneNumber': instance.phoneNumber,
-      'bio': instance.bio,
-      'avatarUrl': instance.avatarUrl,
-      'dateOfBirth': instance.dateOfBirth,
-      'gender': instance.gender,
-      'email': instance.email,
-      'username': instance.username,
-      'isActive': instance.isActive,
-      'createdAt': instance.createdAt?.toIso8601String(),
+      if (instance.fullName case final value?) 'fullName': value,
+      if (instance.phoneNumber case final value?) 'phoneNumber': value,
+      if (instance.bio case final value?) 'bio': value,
+      if (instance.avatarUrl case final value?) 'avatarUrl': value,
+      if (instance.dateOfBirth case final value?) 'dateOfBirth': value,
+      if (instance.gender case final value?) 'gender': value,
+      if (instance.email case final value?) 'email': value,
+      if (instance.username case final value?) 'username': value,
+      if (instance.isActive case final value?) 'isActive': value,
+      if (instance.createdAt?.toIso8601String() case final value?)
+        'createdAt': value,
     };

@@ -9,10 +9,7 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Home"),
-          leading: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Icon(Icons.arrow_back),
-          ),
+          automaticallyImplyLeading: false, // Loại bỏ nút back mặc định
         ),
         body: SingleChildScrollView(
           child: Column(children: [Text("Home Page")]),

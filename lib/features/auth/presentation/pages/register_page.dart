@@ -85,7 +85,10 @@ class _RegisterPageState extends State<RegisterPage> {
               Navigator.pushNamed(
                 context,
                 '/otp',
-                arguments: {'email': state.user!.email!.trim()},
+                arguments: {
+                  'email': state.user!.email!.trim(),
+                  'id': state.user!.userId,
+                },
               );
             } else if (state is AuthError) {
               final message = state.errorMessage ?? 'Đăng ký thất bại';

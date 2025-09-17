@@ -7,6 +7,7 @@ import 'package:social_app_fe/features/auth/data/models/verify_otp_request.dart'
 import 'package:social_app_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/register_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -16,20 +17,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUsecase registerUsecase;
   final VerifyOtpUsecase verifyOtpUsecase;
   final ResendOtpUsecase resendOtpUsecase;
+  final UpdatePersonalInfoUsecase updatePersonalInfoUsecase;
 
   AuthBloc({
     required this.loginUsecase,
     required this.registerUsecase,
     required this.verifyOtpUsecase,
     required this.resendOtpUsecase,
+    required this.updatePersonalInfoUsecase,
   }) : super(AuthInitial()) {
     on<LoginEvent>(_login);
     on<RegisterEvent>(_register);
     on<VerifyOtpEvent>(_verifyOtp);
     on<ResendOtpEvent>(_resendOtp);
+    on<UpdatePersonalInfoEvent>(_updatePersonalInfo);
     on<AuthReset>((event, emit) {
       emit(AuthInitial());
     });
+  }
+
+  void _updatePersonalInfo(
+    UpdatePersonalInfoEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    final dataState = await updatePersonalInfoUsecase(params: event.user);
+
+    if (dataState is DataStateSuccess && dataState.data != null) {
+      emit(AuthLoaded(dataState.data!));
+    } else {
+      final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+      emit(AuthError(dataState.error!, errorMessage: errorMessage));
+      return;
+    }
   }
 
   void _resendOtp(ResendOtpEvent event, Emitter<AuthState> emit) async {

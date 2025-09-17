@@ -59,12 +59,11 @@ class _OtpPageState extends State<OtpPage> {
 
   void _resendOtp(BuildContext context, String email) {
     BlocProvider.of<AuthBloc>(context).add(ResendOtpEvent(email: email));
-    _startCountdown();
   }
 
   void _startCountdown() {
     _timer?.cancel(); // hủy timer cũ nếu có
-    _secondsRemaining = 60;
+    _secondsRemaining = OTP_DURATION;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
         setState(() {
@@ -93,9 +92,16 @@ class _OtpPageState extends State<OtpPage> {
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthLoaded) {
-              Navigator.pushNamed(context, '/personal-info');
+              Navigator.pushReplacementNamed(
+                context,
+                '/personal-info',
+                arguments: {
+                  'id': args['id'], // lấy id đã truyền từ RegisterPage
+                },
+              );
             } else if (state is OtpResendSuccess) {
               UIUtils.showSuccessMessage(context, state.message);
+              _startCountdown();
             } else if (state is AuthError) {
               final message = state.errorMessage ?? 'xác thực thất bại';
               UIUtils.showErrorMessage(context, message);
@@ -115,10 +121,7 @@ class _OtpPageState extends State<OtpPage> {
                     SizedBox(height: 20.h),
 
                     GestureDetector(
-                      onTap: () => Navigator.popUntil(
-                        context,
-                        ModalRoute.withName('/signup'),
-                      ),
+                      onTap: () => Navigator.pop(context),
                       child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
                     ),
 

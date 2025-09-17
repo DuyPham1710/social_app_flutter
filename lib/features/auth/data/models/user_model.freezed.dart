@@ -22,15 +22,25 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$UserModel {
   String get userId => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get fullName => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get phoneNumber => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get bio => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get avatarUrl => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get dateOfBirth => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get gender => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get email => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   String? get username => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   bool? get isActive => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
@@ -50,16 +60,16 @@ abstract class $UserModelCopyWith<$Res> {
   @useResult
   $Res call({
     String userId,
-    String? fullName,
-    String? phoneNumber,
-    String? bio,
-    String? avatarUrl,
-    String? dateOfBirth,
-    String? gender,
-    String? email,
-    String? username,
-    bool? isActive,
-    DateTime? createdAt,
+    @JsonKey(includeIfNull: false) String? fullName,
+    @JsonKey(includeIfNull: false) String? phoneNumber,
+    @JsonKey(includeIfNull: false) String? bio,
+    @JsonKey(includeIfNull: false) String? avatarUrl,
+    @JsonKey(includeIfNull: false) String? dateOfBirth,
+    @JsonKey(includeIfNull: false) String? gender,
+    @JsonKey(includeIfNull: false) String? email,
+    @JsonKey(includeIfNull: false) String? username,
+    @JsonKey(includeIfNull: false) bool? isActive,
+    @JsonKey(includeIfNull: false) DateTime? createdAt,
   });
 }
 
@@ -153,16 +163,16 @@ abstract class _$$UserModelImplCopyWith<$Res>
   @useResult
   $Res call({
     String userId,
-    String? fullName,
-    String? phoneNumber,
-    String? bio,
-    String? avatarUrl,
-    String? dateOfBirth,
-    String? gender,
-    String? email,
-    String? username,
-    bool? isActive,
-    DateTime? createdAt,
+    @JsonKey(includeIfNull: false) String? fullName,
+    @JsonKey(includeIfNull: false) String? phoneNumber,
+    @JsonKey(includeIfNull: false) String? bio,
+    @JsonKey(includeIfNull: false) String? avatarUrl,
+    @JsonKey(includeIfNull: false) String? dateOfBirth,
+    @JsonKey(includeIfNull: false) String? gender,
+    @JsonKey(includeIfNull: false) String? email,
+    @JsonKey(includeIfNull: false) String? username,
+    @JsonKey(includeIfNull: false) bool? isActive,
+    @JsonKey(includeIfNull: false) DateTime? createdAt,
   });
 }
 
@@ -248,16 +258,16 @@ class __$$UserModelImplCopyWithImpl<$Res>
 class _$UserModelImpl implements _UserModel {
   const _$UserModelImpl({
     required this.userId,
-    this.fullName,
-    this.phoneNumber,
-    this.bio,
-    this.avatarUrl,
-    this.dateOfBirth,
-    this.gender,
-    this.email,
-    this.username,
-    this.isActive,
-    this.createdAt,
+    @JsonKey(includeIfNull: false) this.fullName,
+    @JsonKey(includeIfNull: false) this.phoneNumber,
+    @JsonKey(includeIfNull: false) this.bio,
+    @JsonKey(includeIfNull: false) this.avatarUrl,
+    @JsonKey(includeIfNull: false) this.dateOfBirth,
+    @JsonKey(includeIfNull: false) this.gender,
+    @JsonKey(includeIfNull: false) this.email,
+    @JsonKey(includeIfNull: false) this.username,
+    @JsonKey(includeIfNull: false) this.isActive,
+    @JsonKey(includeIfNull: false) this.createdAt,
   });
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -266,24 +276,34 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String userId;
   @override
+  @JsonKey(includeIfNull: false)
   final String? fullName;
   @override
+  @JsonKey(includeIfNull: false)
   final String? phoneNumber;
   @override
+  @JsonKey(includeIfNull: false)
   final String? bio;
   @override
+  @JsonKey(includeIfNull: false)
   final String? avatarUrl;
   @override
+  @JsonKey(includeIfNull: false)
   final String? dateOfBirth;
   @override
+  @JsonKey(includeIfNull: false)
   final String? gender;
   @override
+  @JsonKey(includeIfNull: false)
   final String? email;
   @override
+  @JsonKey(includeIfNull: false)
   final String? username;
   @override
+  @JsonKey(includeIfNull: false)
   final bool? isActive;
   @override
+  @JsonKey(includeIfNull: false)
   final DateTime? createdAt;
 
   @override
@@ -350,16 +370,16 @@ class _$UserModelImpl implements _UserModel {
 abstract class _UserModel implements UserModel {
   const factory _UserModel({
     required final String userId,
-    final String? fullName,
-    final String? phoneNumber,
-    final String? bio,
-    final String? avatarUrl,
-    final String? dateOfBirth,
-    final String? gender,
-    final String? email,
-    final String? username,
-    final bool? isActive,
-    final DateTime? createdAt,
+    @JsonKey(includeIfNull: false) final String? fullName,
+    @JsonKey(includeIfNull: false) final String? phoneNumber,
+    @JsonKey(includeIfNull: false) final String? bio,
+    @JsonKey(includeIfNull: false) final String? avatarUrl,
+    @JsonKey(includeIfNull: false) final String? dateOfBirth,
+    @JsonKey(includeIfNull: false) final String? gender,
+    @JsonKey(includeIfNull: false) final String? email,
+    @JsonKey(includeIfNull: false) final String? username,
+    @JsonKey(includeIfNull: false) final bool? isActive,
+    @JsonKey(includeIfNull: false) final DateTime? createdAt,
   }) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -368,24 +388,34 @@ abstract class _UserModel implements UserModel {
   @override
   String get userId;
   @override
+  @JsonKey(includeIfNull: false)
   String? get fullName;
   @override
+  @JsonKey(includeIfNull: false)
   String? get phoneNumber;
   @override
+  @JsonKey(includeIfNull: false)
   String? get bio;
   @override
+  @JsonKey(includeIfNull: false)
   String? get avatarUrl;
   @override
+  @JsonKey(includeIfNull: false)
   String? get dateOfBirth;
   @override
+  @JsonKey(includeIfNull: false)
   String? get gender;
   @override
+  @JsonKey(includeIfNull: false)
   String? get email;
   @override
+  @JsonKey(includeIfNull: false)
   String? get username;
   @override
+  @JsonKey(includeIfNull: false)
   bool? get isActive;
   @override
+  @JsonKey(includeIfNull: false)
   DateTime? get createdAt;
 
   /// Create a copy of UserModel

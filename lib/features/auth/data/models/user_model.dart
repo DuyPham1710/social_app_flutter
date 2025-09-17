@@ -8,16 +8,16 @@ part 'user_model.g.dart';
 class UserModel extends UserEntity with _$UserModel {
   const factory UserModel({
     required String userId,
-    String? fullName,
-    String? phoneNumber,
-    String? bio,
-    String? avatarUrl,
-    String? dateOfBirth,
-    String? gender,
-    String? email,
-    String? username,
-    bool? isActive,
-    DateTime? createdAt,
+    @JsonKey(includeIfNull: false) String? fullName,
+    @JsonKey(includeIfNull: false) String? phoneNumber,
+    @JsonKey(includeIfNull: false) String? bio,
+    @JsonKey(includeIfNull: false) String? avatarUrl,
+    @JsonKey(includeIfNull: false) String? dateOfBirth,
+    @JsonKey(includeIfNull: false) String? gender,
+    @JsonKey(includeIfNull: false) String? email,
+    @JsonKey(includeIfNull: false) String? username,
+    @JsonKey(includeIfNull: false) bool? isActive,
+    @JsonKey(includeIfNull: false) DateTime? createdAt,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

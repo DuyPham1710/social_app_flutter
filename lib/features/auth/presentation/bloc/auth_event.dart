@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -51,6 +52,15 @@ class ResendOtpEvent extends AuthEvent {
 
   @override
   List<Object?> get props => [email];
+}
+
+class UpdatePersonalInfoEvent extends AuthEvent {
+  final UserEntity? user;
+
+  const UpdatePersonalInfoEvent({this.user});
+
+  @override
+  List<Object?> get props => [user];
 }
 
 class AuthReset extends AuthEvent {}

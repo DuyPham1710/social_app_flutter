@@ -9,4 +9,6 @@ abstract class AuthRepository {
   Future<DataState<UserEntity>> register(RegisterRequest request);
   Future<DataState<UserEntity>> verifyOtp(VerifyOtpRequest request);
   Future<DataState<String>> resendOtp(String email);
+
+  Future<DataState<UserEntity>> updatePersonalInfo(UserEntity user);
 }

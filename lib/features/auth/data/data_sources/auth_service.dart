@@ -24,4 +24,7 @@ abstract class AuthService {
 
   @PATCH('/auth/resend-otp')
   Future<Map<String, dynamic>> resendOtp(@Body() Map<String, dynamic> email);
+
+  @PUT('/user')
+  Future<UserModel> updatePersonalInfo(@Body() UserModel user);
 }
