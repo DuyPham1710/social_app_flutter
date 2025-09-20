@@ -60,9 +60,10 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded) {
+            // Chỉ xử lý state từ login flow
+            if (state is AuthLoaded && state.flowType == 'login') {
               Navigator.pushNamed(context, '/home');
-            } else if (state is AuthError) {
+            } else if (state is AuthError && state.flowType == 'login') {
               final errorMsg = state.errorMessage ?? 'Đăng nhập thất bại';
               UIUtils.showErrorMessage(context, errorMsg);
             }

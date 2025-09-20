@@ -68,10 +68,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded) {
+            // Chỉ xử lý state từ reset_password flow
+            if (state is AuthLoaded && state.flowType == 'reset_password') {
               showDialogSuccess(context, "Reset Password");
               //   BlocProvider.of<AuthBloc>(context).add(AuthReset());
-            } else if (state is AuthError) {
+            } else if (state is AuthError && state.flowType == 'reset_password') {
               final message = state.errorMessage ?? 'Reset password thất bại';
               UIUtils.showErrorMessage(context, message);
             }

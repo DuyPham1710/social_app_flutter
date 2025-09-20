@@ -29,6 +29,10 @@ class _OtpPageState extends State<OtpPage> {
   void initState() {
     super.initState();
     _startCountdown();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthBloc>().add(AuthReset());
+    });
   }
 
   final defaultPinTheme = PinTheme(
@@ -92,26 +96,29 @@ class _OtpPageState extends State<OtpPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded && isForgotPassword) {
-              print("check email $email and check otp $otpCode");
-              Navigator.pushNamed(
-                context,
-                '/reset-password',
-                arguments: {'email': email, 'otp': otpCode},
-              );
-            } else if (state is AuthLoaded && !isForgotPassword) {
-              BlocProvider.of<AuthBloc>(context).add(AuthReset());
-              Navigator.pushReplacementNamed(
-                context,
-                '/personal-info',
-                arguments: {
-                  'id': args['id'], // lấy id đã truyền từ RegisterPage
-                },
-              );
-            } else if (state is OtpResendSuccess) {
+            // Chỉ xử lý state từ verify_otp flow
+            if (state is AuthLoaded && state.flowType == 'verify_otp') {
+              context.read<AuthBloc>().add(AuthReset());
+
+              if (isForgotPassword) {
+                Navigator.pushNamed(
+                  context,
+                  '/reset-password',
+                  arguments: {'email': email, 'otp': otpCode},
+                );
+              } else {
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/personal-info',
+                  arguments: {'id': args['id']},
+                );
+              }
+            } else if (state is OtpResendSuccess &&
+                state.flowType == 'resend_otp') {
+              // Chỉ hiện message khi user thực sự resend OTP từ OTP page
               UIUtils.showSuccessMessage(context, state.message);
               _startCountdown();
-            } else if (state is AuthError) {
+            } else if (state is AuthError && state.flowType == 'verify_otp') {
               final message = state.errorMessage ?? 'xác thực thất bại';
               UIUtils.showErrorMessage(context, message);
               BlocProvider.of<AuthBloc>(

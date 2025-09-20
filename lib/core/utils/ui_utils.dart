@@ -29,6 +29,7 @@ class UIUtils {
 
   /// Show success message in SnackBar
   static void showSuccessMessage(BuildContext context, String message) {
+    print('>>>Resend OTP success: $message');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),

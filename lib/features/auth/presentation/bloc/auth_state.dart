@@ -6,11 +6,12 @@ abstract class AuthState extends Equatable {
   final UserEntity? user;
   final DioException? error;
   final String? errorMessage;
+  final String? flowType; // 'register', 'login', 'verify_otp', 'reset_password'
 
-  const AuthState({this.user, this.error, this.errorMessage});
+  const AuthState({this.user, this.error, this.errorMessage, this.flowType});
 
   @override
-  List<Object?> get props => [user, error, errorMessage];
+  List<Object?> get props => [user, error, errorMessage, flowType];
 }
 
 class AuthInitial extends AuthState {}
@@ -18,11 +19,11 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthLoaded extends AuthState {
-  const AuthLoaded(UserEntity user) : super(user: user);
+  const AuthLoaded(UserEntity user, {super.flowType}) : super(user: user);
 }
 
 class AuthError extends AuthState {
-  const AuthError(DioException error, {super.errorMessage})
+  const AuthError(DioException error, {super.errorMessage, super.flowType})
     : super(error: error);
 }
 
@@ -31,21 +32,13 @@ class OtpResendLoading extends AuthState {}
 
 class OtpResendSuccess extends AuthState {
   final String message;
-  const OtpResendSuccess(this.message);
+  const OtpResendSuccess(this.message, {super.flowType});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, flowType];
 }
 
 class OtpResendError extends AuthState {
   final String message;
   const OtpResendError(this.message);
 }
-
-// class ResetPasswordSuccess extends AuthState {
-//   final String message;
-//   const ResetPasswordSuccess(this.message);
-
-//   @override
-//   List<Object?> get props => [message];
-// }

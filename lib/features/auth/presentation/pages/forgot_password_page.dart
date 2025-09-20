@@ -43,7 +43,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is OtpResendSuccess) {
+            if (state is OtpResendSuccess && state.flowType == 'resend_otp') {
+              // Reset state trước khi navigate để tránh state cũ trigger ở OTP page
+              BlocProvider.of<AuthBloc>(context).add(AuthReset());
               Navigator.pushNamed(
                 context,
                 '/otp',
@@ -52,8 +54,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   'isForgotPassword': true,
                 },
               );
-            } else if (state is AuthError) {
-              final message = state.errorMessage ?? 'Đăng ký thất bại';
+            } else if (state is AuthError && state.flowType == 'resend_otp') {
+              final message = state.errorMessage ?? 'Gửi OTP thất bại';
               UIUtils.showErrorMessage(context, message);
               BlocProvider.of<AuthBloc>(context).add(AuthReset());
             }

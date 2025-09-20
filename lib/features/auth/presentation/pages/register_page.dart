@@ -81,7 +81,8 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded) {
+            // Chỉ xử lý state từ register flow
+            if (state is AuthLoaded && state.flowType == 'register') {
               Navigator.pushNamed(
                 context,
                 '/otp',
@@ -90,7 +91,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   'id': state.user!.userId,
                 },
               );
-            } else if (state is AuthError) {
+            } else if (state is AuthError && state.flowType == 'register') {
               final message = state.errorMessage ?? 'Đăng ký thất bại';
               UIUtils.showErrorMessage(context, message);
             }

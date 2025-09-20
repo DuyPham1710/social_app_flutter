@@ -94,10 +94,10 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded) {
+            if (state is AuthLoaded && state.flowType == 'update_personal_info') {
               BlocProvider.of<AuthBloc>(context).add(AuthReset());
               showDialogSuccess(context, "Registration");
-            } else if (state is AuthError) {
+            } else if (state is AuthError && state.flowType == 'update_personal_info') {
               final message = state.errorMessage ?? 'Đăng ký thất bại';
               UIUtils.showErrorMessage(context, message);
             }
