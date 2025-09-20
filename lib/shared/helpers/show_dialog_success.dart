@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-Future<dynamic> showDialogSuccess(BuildContext context) {
+Future<dynamic> showDialogSuccess(BuildContext parentContext, String message) {
   return showDialog(
     barrierDismissible: false,
-    context: context,
-    builder: (context) {
+    context: parentContext,
+    builder: (dialogContext) {
       Future.delayed(Duration(seconds: 3), () {
-        Navigator.of(context).pop(); // đóng dialog
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.of(dialogContext).pop(); // đóng dialog
+        Navigator.pushReplacementNamed(parentContext, '/login');
         // Navigator.pushNamed(context, '/login');
       });
 
@@ -28,7 +28,7 @@ Future<dynamic> showDialogSuccess(BuildContext context) {
               ),
               SizedBox(height: 10),
               Text(
-                "Registration Successful!",
+                '$message Successful!',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

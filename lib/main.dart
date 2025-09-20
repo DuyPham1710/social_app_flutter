@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/login_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/otp_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/personal_info_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/register_page.dart';
+import 'package:social_app_fe/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
@@ -49,6 +50,8 @@ class MyApp extends StatelessWidget {
             '/otp': (BuildContext context) => const OtpPage(),
             '/personal-info': (BuildContext context) =>
                 const PersonalInfoPage(),
+            '/reset-password': (BuildContext context) =>
+                const ResetPasswordPage(),
           },
         );
       },

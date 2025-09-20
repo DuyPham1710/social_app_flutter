@@ -95,7 +95,8 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
             if (state is AuthLoaded) {
-              showDialogSuccess(context);
+              BlocProvider.of<AuthBloc>(context).add(AuthReset());
+              showDialogSuccess(context, "Registration");
             } else if (state is AuthError) {
               final message = state.errorMessage ?? 'Đăng ký thất bại';
               UIUtils.showErrorMessage(context, message);

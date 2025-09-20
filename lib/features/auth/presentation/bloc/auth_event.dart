@@ -63,4 +63,21 @@ class UpdatePersonalInfoEvent extends AuthEvent {
   List<Object?> get props => [user];
 }
 
+class ResetPasswordEvent extends AuthEvent {
+  final String email;
+  final String otp;
+  final String newPassword;
+  final String confirmNewPassword;
+
+  const ResetPasswordEvent({
+    required this.email,
+    required this.otp,
+    required this.newPassword,
+    required this.confirmNewPassword,
+  });
+
+  @override
+  List<Object?> get props => [email, otp, newPassword, confirmNewPassword];
+}
+
 class AuthReset extends AuthEvent {}

@@ -86,12 +86,21 @@ class _OtpPageState extends State<OtpPage> {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final email = args['email'] as String;
+    final isForgotPassword = args['isForgotPassword'] as bool? ?? false;
 
     return SafeArea(
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded) {
+            if (state is AuthLoaded && isForgotPassword) {
+              print("check email $email and check otp $otpCode");
+              Navigator.pushNamed(
+                context,
+                '/reset-password',
+                arguments: {'email': email, 'otp': otpCode},
+              );
+            } else if (state is AuthLoaded && !isForgotPassword) {
+              BlocProvider.of<AuthBloc>(context).add(AuthReset());
               Navigator.pushReplacementNamed(
                 context,
                 '/personal-info',

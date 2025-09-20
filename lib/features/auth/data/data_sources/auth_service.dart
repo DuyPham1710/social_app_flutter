@@ -4,6 +4,7 @@ import 'package:social_app_fe/core/constants/constants.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_response.dart';
 import 'package:social_app_fe/features/auth/data/models/register_request.dart';
+import 'package:social_app_fe/features/auth/data/models/reset_password_request.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import 'package:social_app_fe/features/auth/data/models/verify_otp_request.dart';
 
@@ -27,4 +28,7 @@ abstract class AuthService {
 
   @PUT('/user')
   Future<UserModel> updatePersonalInfo(@Body() UserModel user);
+
+  @PATCH('/auth/reset-password')
+  Future<UserModel> resetPassword(@Body() ResetPasswordRequest request);
 }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/constants/constants.dart';
 import 'package:social_app_fe/core/network/interceptors/auth_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/log_interceptor.dart';
+import 'package:social_app_fe/core/network/interceptors/response_interceptor.dart';
 
 class DioClient {
   static Dio? _dio;
@@ -24,7 +25,11 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.addAll([AuthInterceptor(), AppLogInterceptor()]);
+    dio.interceptors.addAll([
+      AuthInterceptor(),
+      AppLogInterceptor(),
+      ResponseInterceptor(),
+    ]);
 
     return dio;
   }
