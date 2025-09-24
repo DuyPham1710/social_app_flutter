@@ -24,6 +24,8 @@ class _OtpPageState extends State<OtpPage> {
   String otpCode = '';
   int _secondsRemaining = OTP_DURATION; // 1 phút
   Timer? _timer;
+  String? _email; // Lưu email vào biến local
+  bool? _isForgotPassword;
 
   @override
   void initState() {
@@ -33,6 +35,18 @@ class _OtpPageState extends State<OtpPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthBloc>().add(AuthReset());
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Lấy args một lần và lưu vào biến local
+    if (_email == null) {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      _email = args['email'] as String;
+      _isForgotPassword = args['isForgotPassword'] as bool? ?? false;
+    }
   }
 
   final defaultPinTheme = PinTheme(
@@ -49,11 +63,11 @@ class _OtpPageState extends State<OtpPage> {
     ),
   );
 
-  void _verifyOtp(BuildContext context, String email) {
+  void _verifyOtp(BuildContext context) {
     if (otpCode.length == 6) {
       BlocProvider.of<AuthBloc>(
         context,
-      ).add(VerifyOtpEvent(email: email, otp: otpCode));
+      ).add(VerifyOtpEvent(email: _email!, otp: otpCode));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid 6-digit OTP')),
@@ -61,8 +75,8 @@ class _OtpPageState extends State<OtpPage> {
     }
   }
 
-  void _resendOtp(BuildContext context, String email) {
-    BlocProvider.of<AuthBloc>(context).add(ResendOtpEvent(email: email));
+  void _resendOtp(BuildContext context) {
+    BlocProvider.of<AuthBloc>(context).add(ResendOtpEvent(email: _email!));
   }
 
   void _startCountdown() {
@@ -87,11 +101,6 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final email = args['email'] as String;
-    final isForgotPassword = args['isForgotPassword'] as bool? ?? false;
-
     return SafeArea(
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
@@ -100,13 +109,16 @@ class _OtpPageState extends State<OtpPage> {
             if (state is AuthLoaded && state.flowType == 'verify_otp') {
               context.read<AuthBloc>().add(AuthReset());
 
-              if (isForgotPassword) {
+              if (_isForgotPassword ?? false) {
                 Navigator.pushNamed(
                   context,
                   '/reset-password',
-                  arguments: {'email': email, 'otp': otpCode},
+                  arguments: {'email': _email, 'otp': otpCode},
                 );
               } else {
+                final args =
+                    ModalRoute.of(context)!.settings.arguments
+                        as Map<String, dynamic>;
                 Navigator.pushReplacementNamed(
                   context,
                   '/personal-info',
@@ -157,7 +169,7 @@ class _OtpPageState extends State<OtpPage> {
                     SizedBox(height: 10.h),
 
                     Text(
-                      "Enter the OTP sent to $email",
+                      "Enter the OTP sent to ${_email ?? ''}",
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: Colors.grey[600],
@@ -199,7 +211,7 @@ class _OtpPageState extends State<OtpPage> {
                         GestureDetector(
                           onTap: _secondsRemaining > 0
                               ? null
-                              : () => _resendOtp(context, email),
+                              : () => _resendOtp(context),
                           child: Text(
                             state is OtpResendLoading
                                 ? 'Resending...'
@@ -227,7 +239,7 @@ class _OtpPageState extends State<OtpPage> {
                             ),
                           )
                         : ButtonCustom(
-                            onPressed: () => _verifyOtp(context, email),
+                            onPressed: () => _verifyOtp(context),
                             text: "Verify",
                           ),
 

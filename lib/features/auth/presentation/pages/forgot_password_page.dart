@@ -146,7 +146,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(context, '/SignUp');
+                              Navigator.pushNamed(context, '/signup');
                             },
                             child: Text(
                               "Sign up",
