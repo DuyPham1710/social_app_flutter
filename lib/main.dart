@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/config/theme/app_theme.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/app/presentation/pages/main_page.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/login_page.dart';
@@ -40,8 +41,9 @@ class MyApp extends StatelessWidget {
           title: 'Namer App',
           debugShowCheckedModeBanner: false,
           theme: theme(),
-          initialRoute: '/login',
+          initialRoute: '/main',
           routes: <String, WidgetBuilder>{
+            '/main': (BuildContext context) => const MainPage(),
             '/login': (BuildContext context) => const LoginPage(),
             '/home': (BuildContext context) => const HomePage(),
             '/signup': (BuildContext context) => const RegisterPage(),
