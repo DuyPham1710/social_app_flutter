@@ -11,6 +11,11 @@ import 'package:social_app_fe/features/auth/domain/usecases/reset_password_useca
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
+import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
+import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
+import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
 
 final s1 = GetIt.instance;
 
@@ -21,9 +26,13 @@ Future<void> initializeDependencies() async {
   // Dependencies
   // DataSources
   s1.registerLazySingleton<AuthService>(() => AuthService(s1()));
+  s1.registerLazySingleton<PostRemoteDataSource>(
+    () => PostRemoteDataSource(s1()),
+  );
 
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
+  s1.registerLazySingleton<PostRepository>(() => PostRepositoryImpl(s1()));
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
@@ -37,6 +46,10 @@ Future<void> initializeDependencies() async {
     () => UpdatePersonalInfoUsecase(s1()),
   );
 
+  s1.registerLazySingleton<GetHomePostsUseCase>(
+    () => GetHomePostsUseCase(s1()),
+  );
+
   // Blocs
   s1.registerFactory<AuthBloc>(
     () => AuthBloc(
@@ -48,4 +61,6 @@ Future<void> initializeDependencies() async {
       updatePersonalInfoUsecase: s1(),
     ),
   );
+
+  s1.registerFactory<HomeBloc>(() => HomeBloc(getHomePostsUseCase: s1()));
 }

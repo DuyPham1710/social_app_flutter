@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/otp_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/personal_info_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/register_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
@@ -18,10 +19,14 @@ Future<void> main() async {
   await initializeDependencies();
 
   final authBloc = s1<AuthBloc>();
+  final homeBloc = s1<HomeBloc>();
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider.value(value: authBloc)],
+      providers: [
+        BlocProvider.value(value: authBloc),
+        BlocProvider.value(value: homeBloc),
+      ],
       child: MyApp(),
     ),
   );
@@ -41,7 +46,7 @@ class MyApp extends StatelessWidget {
           title: 'Namer App',
           debugShowCheckedModeBanner: false,
           theme: theme(),
-          initialRoute: '/main',
+          initialRoute: '/login',
           routes: <String, WidgetBuilder>{
             '/main': (BuildContext context) => const MainPage(),
             '/login': (BuildContext context) => const LoginPage(),

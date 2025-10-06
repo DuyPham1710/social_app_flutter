@@ -2,12 +2,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostItem extends StatelessWidget {
-  const PostItem({super.key});
+  final PostEntity post;
+  const PostItem({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
+    final user = post.user;
+    final urls = post.urls;
+    final firstImageUrl = urls.isNotEmpty
+        ? urls.first.url
+        : "https://via.placeholder.com/300";
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8.h),
       padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -25,10 +34,11 @@ class PostItem extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 20,
                   backgroundImage: NetworkImage(
-                    "https://randomuser.me/api/portraits/men/1.jpg",
+                    user.avatarUrl ??
+                        "https://randomuser.me/api/portraits/men/1.jpg",
                   ),
                 ),
 
@@ -39,14 +49,16 @@ class PostItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Duy Pham",
+                        user.fullName ?? "Unknown",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14.sp,
                         ),
                       ),
                       Text(
-                        "1h ago",
+                        post.createdAt != null
+                            ? timeago.format(post.createdAt!)
+                            : "Unknown date",
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: Colors.grey[600],
@@ -63,10 +75,7 @@ class PostItem extends StatelessWidget {
           // Caption
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: Text(
-              "Trời hôm nay nóng ghê, cũng may là có sự lạnh lùng của em :))",
-              style: TextStyle(fontSize: 13.sp),
-            ),
+            child: Text(post.caption, style: TextStyle(fontSize: 13.sp)),
           ),
 
           SizedBox(height: 8.h),
@@ -78,7 +87,8 @@ class PostItem extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Image.network(
-                  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+                  firstImageUrl,
+                  //    "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
                   width: double.infinity,
                   height: 220.h,
                   fit: BoxFit.cover,
