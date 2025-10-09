@@ -27,6 +27,7 @@ mixin _$PostModel {
   @JsonKey(name: 'userId')
   UserModel get user => throw _privateConstructorUsedError;
   List<PostUrlModel> get urls => throw _privateConstructorUsedError;
+  String get layout => throw _privateConstructorUsedError;
   @JsonKey(name: 'privacy_type')
   PrivacyType get privacyType => throw _privateConstructorUsedError;
   @JsonKey(name: 'friends_except')
@@ -56,6 +57,7 @@ abstract class $PostModelCopyWith<$Res> {
     String caption,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
+    String layout,
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'friends_except') List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
@@ -85,6 +87,7 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
     Object? caption = null,
     Object? user = null,
     Object? urls = null,
+    Object? layout = null,
     Object? privacyType = null,
     Object? friendsExcept = null,
     Object? friendsDetail = null,
@@ -109,6 +112,10 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
                 ? _value.urls
                 : urls // ignore: cast_nullable_to_non_nullable
                       as List<PostUrlModel>,
+            layout: null == layout
+                ? _value.layout
+                : layout // ignore: cast_nullable_to_non_nullable
+                      as String,
             privacyType: null == privacyType
                 ? _value.privacyType
                 : privacyType // ignore: cast_nullable_to_non_nullable
@@ -159,6 +166,7 @@ abstract class _$$PostModelImplCopyWith<$Res>
     String caption,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
+    String layout,
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'friends_except') List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
@@ -188,6 +196,7 @@ class __$$PostModelImplCopyWithImpl<$Res>
     Object? caption = null,
     Object? user = null,
     Object? urls = null,
+    Object? layout = null,
     Object? privacyType = null,
     Object? friendsExcept = null,
     Object? friendsDetail = null,
@@ -212,6 +221,10 @@ class __$$PostModelImplCopyWithImpl<$Res>
             ? _value._urls
             : urls // ignore: cast_nullable_to_non_nullable
                   as List<PostUrlModel>,
+        layout: null == layout
+            ? _value.layout
+            : layout // ignore: cast_nullable_to_non_nullable
+                  as String,
         privacyType: null == privacyType
             ? _value.privacyType
             : privacyType // ignore: cast_nullable_to_non_nullable
@@ -245,6 +258,7 @@ class _$PostModelImpl implements _PostModel {
     required this.caption,
     @JsonKey(name: 'userId') required this.user,
     required final List<PostUrlModel> urls,
+    required this.layout,
     @JsonKey(name: 'privacy_type') this.privacyType = PrivacyType.public,
     @JsonKey(name: 'friends_except')
     final List<String> friendsExcept = const [],
@@ -275,6 +289,8 @@ class _$PostModelImpl implements _PostModel {
     return EqualUnmodifiableListView(_urls);
   }
 
+  @override
+  final String layout;
   @override
   @JsonKey(name: 'privacy_type')
   final PrivacyType privacyType;
@@ -310,6 +326,7 @@ class _$PostModelImpl implements _PostModel {
             (identical(other.caption, caption) || other.caption == caption) &&
             (identical(other.user, user) || other.user == user) &&
             const DeepCollectionEquality().equals(other._urls, _urls) &&
+            (identical(other.layout, layout) || other.layout == layout) &&
             (identical(other.privacyType, privacyType) ||
                 other.privacyType == privacyType) &&
             const DeepCollectionEquality().equals(
@@ -334,6 +351,7 @@ class _$PostModelImpl implements _PostModel {
     caption,
     user,
     const DeepCollectionEquality().hash(_urls),
+    layout,
     privacyType,
     const DeepCollectionEquality().hash(_friendsExcept),
     const DeepCollectionEquality().hash(_friendsDetail),
@@ -361,6 +379,7 @@ abstract class _PostModel implements PostModel {
     required final String caption,
     @JsonKey(name: 'userId') required final UserModel user,
     required final List<PostUrlModel> urls,
+    required final String layout,
     @JsonKey(name: 'privacy_type') final PrivacyType privacyType,
     @JsonKey(name: 'friends_except') final List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') final List<String> friendsDetail,
@@ -381,6 +400,8 @@ abstract class _PostModel implements PostModel {
   UserModel get user;
   @override
   List<PostUrlModel> get urls;
+  @override
+  String get layout;
   @override
   @JsonKey(name: 'privacy_type')
   PrivacyType get privacyType;

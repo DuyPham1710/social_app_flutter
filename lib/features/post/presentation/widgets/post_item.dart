@@ -3,19 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
+import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
+import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
+import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PostItem extends StatelessWidget {
   final PostEntity post;
   const PostItem({super.key, required this.post});
 
+  Widget _buildMediaLayout(List<dynamic> urls) {
+    switch (post.layout.toLowerCase()) {
+      case 'classic':
+        return LayoutPostClassic(urls: urls);
+      case 'column':
+        return LayoutPostColumn(urls: urls);
+      case 'frame':
+        return LayoutPostFrame(urls: urls);
+      default:
+        return LayoutPostClassic(urls: urls);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = post.user;
     final urls = post.urls;
-    final firstImageUrl = urls.isNotEmpty
-        ? urls.first.url
-        : "https://via.placeholder.com/300";
+    // final firstImageUrl = urls.isNotEmpty
+    //     ? urls.first.url
+    //     : "https://via.placeholder.com/300";
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8.h),
@@ -80,35 +96,21 @@ class PostItem extends StatelessWidget {
 
           SizedBox(height: 8.h),
 
-          // Media (image/video)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.network(
-                  firstImageUrl,
-                  //    "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-                  width: double.infinity,
-                  height: 220.h,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: EdgeInsets.all(8.w),
-                  child: Icon(
-                    Icons.play_arrow,
-                    size: 36.sp,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Media (images)
+          if (urls.isNotEmpty) _buildMediaLayout(urls) else SizedBox.shrink(),
 
+          //   Padding(
+          //     padding: EdgeInsets.symmetric(horizontal: 12.w),
+          //     child: ClipRRect(
+          //       borderRadius: BorderRadius.circular(8.r),
+          //       child: Image.network(
+          //         "https://via.placeholder.com/300",
+          //         width: double.infinity,
+          //         height: 220.h,
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //   ),
           SizedBox(height: 8.h),
 
           // Likes info

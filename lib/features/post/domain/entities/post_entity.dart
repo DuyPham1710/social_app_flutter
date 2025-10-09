@@ -7,6 +7,7 @@ class PostEntity extends PrivacyBase {
   final String caption;
   final UserEntity user;
   final List<PostUrlEntity> urls;
+  final String layout;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -15,6 +16,7 @@ class PostEntity extends PrivacyBase {
     required this.caption,
     required this.user,
     required this.urls,
+    required this.layout,
     required super.privacyType,
     super.friendsExcept,
     super.friendsDetail,
@@ -24,6 +26,6 @@ class PostEntity extends PrivacyBase {
 
   @override
   String toString() {
-    return 'PostEntity(id: $id, caption: $caption, user: $user, urls: $urls, privacyType: $privacyType)';
+    return 'PostEntity(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, privacyType: $privacyType)';
   }
 }

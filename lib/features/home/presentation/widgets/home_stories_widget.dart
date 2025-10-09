@@ -26,45 +26,45 @@ class HomeStoriesWidget extends StatelessWidget {
       Story(
         name: "Lam",
         imageUrl:
-            "https://images.pexels.com/photos/432059/pexels-photo-432059.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         avatarUrl:
-            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         isLive: true,
       ),
       Story(
         name: "Luân",
         imageUrl:
-            "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         avatarUrl:
-            "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
       ),
       Story(
         name: "Hiếu",
         imageUrl:
-            "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         avatarUrl:
-            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
       ),
       Story(
         name: "Hiếu",
         imageUrl:
-            "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         avatarUrl:
-            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
       ),
       Story(
         name: "Hiếu",
         imageUrl:
-            "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         avatarUrl:
-            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
       ),
       Story(
         name: "Hiếu",
         imageUrl:
-            "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
         avatarUrl:
-            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+            "https://i.pinimg.com/736x/58/2f/03/582f03132adc48e597cd56a6e946f1d0.jpg",
       ),
     ];
 

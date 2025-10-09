@@ -14,6 +14,7 @@ class PostModel extends PostEntity with _$PostModel {
     required String caption,
     @JsonKey(name: 'userId') required UserModel user,
     required List<PostUrlModel> urls,
+    required String layout,
     @JsonKey(name: 'privacy_type')
     @Default(PrivacyType.public)
     PrivacyType privacyType,

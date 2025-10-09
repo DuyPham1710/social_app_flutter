@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     // load post lần đầu khi vào trang
-    context.read<HomeBloc>().add(LoadPosts(page: 1, limit: 10));
+    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 10));
   }
 
   @override
@@ -35,11 +36,11 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Future<void> _onRefresh() async {
-    // TODO: call API reload posts
-    //context.read<HomeBloc>().add(RefreshPosts());
-    await Future.delayed(const Duration(seconds: 2));
-    _refreshController.refreshCompleted();
+  void _onRefresh() async {
+    // Load lại posts từ đầu (page 1)
+    await Future.delayed(const Duration(milliseconds: 1000));
+    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 10));
+    // Listener sẽ tự động complete refresh khi state thay đổi
   }
 
   @override
@@ -48,21 +49,23 @@ class _HomePageState extends State<HomePage> {
       child: BlocConsumer<HomeBloc, HomeState>(
         listener: (context, state) {
           if (state is HomeLoaded || state is HomeError) {
-            _refreshController.refreshCompleted();
+            // Hoàn thành refresh ngay lập tức
+            _refreshController.refreshCompleted(resetFooterState: true);
           }
         },
 
         builder: (context, state) {
           return SmartRefresher(
-            // add RefreshStyle
             controller: _refreshController,
             enablePullDown: true,
+            // Tắt hiệu ứng đàn hồi
+            physics: const AlwaysScrollableScrollPhysics(),
             header: const CustomRefreshHeader(
               icon: Icon(CupertinoIcons.house_fill, color: Colors.grey),
             ),
             onRefresh: _onRefresh,
             child: ListView(
-              physics: const BouncingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               children: [
                 HomeHeaderWidget(),
                 HomeStoriesWidget(),
@@ -70,7 +73,11 @@ class _HomePageState extends State<HomePage> {
                 if (state is HomeLoading)
                   const Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
 
                 if (state is HomeError)

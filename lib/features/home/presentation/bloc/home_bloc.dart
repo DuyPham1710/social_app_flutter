@@ -9,11 +9,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetHomePostsUseCase getHomePostsUseCase;
 
   HomeBloc({required this.getHomePostsUseCase}) : super(HomeInitial()) {
-    on<LoadPosts>(_onLoadPosts);
-    on<RefreshPosts>(_onRefreshPosts);
+    on<LoadPostsEvent>(_onLoadPosts);
   }
 
-  Future<void> _onLoadPosts(LoadPosts event, Emitter<HomeState> emit) async {
+  Future<void> _onLoadPosts(
+    LoadPostsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
     emit(HomeLoading());
     final dataState = await getHomePostsUseCase(
       params: GetHomePostsParams(page: event.page, limit: event.limit),
@@ -26,19 +28,5 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeError(dataState.error!, errorMessage: errorMessage));
       return;
     }
-  }
-
-  Future<void> _onRefreshPosts(
-    RefreshPosts event,
-    Emitter<HomeState> emit,
-  ) async {
-    // try {
-    //   emit(HomeRefreshing());
-    //   await Future.delayed(const Duration(milliseconds: 800));
-    //   final posts = List.generate(10, (index) => 'post-refreshed-$index');
-    //   emit(HomeLoaded(posts));
-    // } catch (e) {
-    //   emit(HomeError('Failed to refresh posts'));
-    // }
   }
 }

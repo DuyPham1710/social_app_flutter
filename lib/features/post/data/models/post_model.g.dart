@@ -14,6 +14,7 @@ _$PostModelImpl _$$PostModelImplFromJson(Map<String, dynamic> json) =>
       urls: (json['urls'] as List<dynamic>)
           .map((e) => PostUrlModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      layout: json['layout'] as String,
       privacyType:
           $enumDecodeNullable(_$PrivacyTypeEnumMap, json['privacy_type']) ??
           PrivacyType.public,
@@ -41,6 +42,7 @@ Map<String, dynamic> _$$PostModelImplToJson(_$PostModelImpl instance) =>
       'caption': instance.caption,
       'userId': instance.user,
       'urls': instance.urls,
+      'layout': instance.layout,
       'privacy_type': _$PrivacyTypeEnumMap[instance.privacyType]!,
       'friends_except': instance.friendsExcept,
       'friends_detail': instance.friendsDetail,
