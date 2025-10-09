@@ -1,21 +1,22 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_list_entity.dart';
 import 'post_model.dart';
 
-part 'post_list_response.freezed.dart';
-part 'post_list_response.g.dart';
+part 'post_list_model.freezed.dart';
+part 'post_list_model.g.dart';
 
 @freezed
-class PostListResponse with _$PostListResponse {
-  const factory PostListResponse({
+class PostListModel extends PostListEntity with _$PostListModel {
+  const factory PostListModel({
     required List<PostModel> data,
     int? page,
     int? limit,
     int? total,
     bool? hasNext,
-  }) = _PostListResponse;
+  }) = _PostListModel;
 
-  factory PostListResponse.fromJson(Map<String, dynamic> json) =>
-      _$PostListResponseFromJson(json);
+  factory PostListModel.fromJson(Map<String, dynamic> json) =>
+      _$PostListModelFromJson(json);
 }
 
 // @freezed

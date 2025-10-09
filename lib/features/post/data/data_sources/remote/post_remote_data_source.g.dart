@@ -10,7 +10,7 @@ part of 'post_remote_data_source.dart';
 
 class _PostRemoteDataSource implements PostRemoteDataSource {
   _PostRemoteDataSource(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'http://192.168.0.158:3000/';
+    baseUrl ??= 'http://192.168.100.218:3000/';
   }
 
   final Dio _dio;
@@ -18,12 +18,12 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
   String? baseUrl;
 
   @override
-  Future<PostListResponse> getHomePosts(int page, int limit) async {
+  Future<PostListModel> getHomePosts(int page, int limit) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<PostListResponse>(
+    final _options = _setStreamType<PostListModel>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -34,9 +34,9 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late PostListResponse _value;
+    late PostListModel _value;
     try {
-      _value = PostListResponse.fromJson(_result.data!);
+      _value = PostListModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       rethrow;
     }

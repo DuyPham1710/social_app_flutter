@@ -16,3 +16,7 @@ class LoadPostsEvent extends HomeEvent {
   @override
   List<Object?> get props => [page, limit];
 }
+
+class LoadMorePostsEvent extends HomeEvent {
+  const LoadMorePostsEvent();
+}

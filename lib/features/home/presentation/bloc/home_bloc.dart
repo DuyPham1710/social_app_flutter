@@ -10,6 +10,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeBloc({required this.getHomePostsUseCase}) : super(HomeInitial()) {
     on<LoadPostsEvent>(_onLoadPosts);
+    on<LoadMorePostsEvent>(_onLoadMorePosts);
   }
 
   Future<void> _onLoadPosts(
@@ -22,11 +23,71 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
 
     if (dataState is DataStateSuccess && dataState.data != null) {
-      emit(HomeLoaded(dataState.data!));
+      final postListEntity = dataState.data!;
+      emit(HomeLoaded(
+        postListEntity.data,
+        currentPage: postListEntity.page,
+        limit: postListEntity.limit,
+        hasNext: postListEntity.hasNext,
+      ));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
       emit(HomeError(dataState.error!, errorMessage: errorMessage));
       return;
+    }
+  }
+
+  Future<void> _onLoadMorePosts(
+    LoadMorePostsEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    final currentState = state;
+    
+    // Chỉ load more nếu đang ở trạng thái HomeLoaded và hasNext = true
+    if (currentState is! HomeLoaded || 
+        currentState.hasNext != true || 
+        currentState.isLoadingMore) {
+      return;
+    }
+
+    // Emit state với isLoadingMore = true để hiển thị loading indicator
+    emit(HomeLoaded(
+      currentState.posts!,
+      currentPage: currentState.currentPage,
+      limit: currentState.limit,
+      hasNext: currentState.hasNext,
+      isLoadingMore: true,
+    ));
+
+    final nextPage = (currentState.currentPage ?? 1) + 1;
+    final dataState = await getHomePostsUseCase(
+      params: GetHomePostsParams(
+        page: nextPage,
+        limit: currentState.limit ?? 10,
+      ),
+    );
+
+    if (dataState is DataStateSuccess && dataState.data != null) {
+      final postListEntity = dataState.data!;
+      // Append data mới vào danh sách hiện tại
+      final updatedPosts = [...currentState.posts!, ...postListEntity.data];
+      
+      emit(HomeLoaded(
+        updatedPosts,
+        currentPage: postListEntity.page,
+        limit: postListEntity.limit,
+        hasNext: postListEntity.hasNext,
+        isLoadingMore: false,
+      ));
+    } else {
+      // Nếu load more fail, giữ nguyên state cũ nhưng tắt loading
+      emit(HomeLoaded(
+        currentState.posts!,
+        currentPage: currentState.currentPage,
+        limit: currentState.limit,
+        hasNext: currentState.hasNext,
+        isLoadingMore: false,
+      ));
     }
   }
 }

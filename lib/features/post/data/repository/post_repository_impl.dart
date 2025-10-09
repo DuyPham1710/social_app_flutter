@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
-import 'package:social_app_fe/features/post/data/models/post_model.dart';
+import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_list_entity.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 
 class PostRepositoryImpl implements PostRepository {
@@ -10,14 +11,23 @@ class PostRepositoryImpl implements PostRepository {
   PostRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<DataState<List<PostModel>>> getHomePosts({
+  Future<DataState<PostListModel>> getHomePosts({
     int page = 1,
     int limit = 10,
   }) async {
     try {
       final response = await remoteDataSource.getHomePosts(page, limit);
-      print('>>> check posts: ${response.data}');
-      return DataStateSuccess(response.data);
+
+      // Map PostListResponse (data layer) sang PostListEntity (domain layer)
+      // final postListEntity = PostListEntity(
+      //   data: response.data,
+      //   page: response.page,
+      //   limit: response.limit,
+      //   total: response.total,
+      //   hasNext: response.hasNext,
+      // );
+
+      return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);
     }

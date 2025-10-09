@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'post_list_response.dart';
+part of 'post_list_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,34 +15,34 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-PostListResponse _$PostListResponseFromJson(Map<String, dynamic> json) {
-  return _PostListResponse.fromJson(json);
+PostListModel _$PostListModelFromJson(Map<String, dynamic> json) {
+  return _PostListModel.fromJson(json);
 }
 
 /// @nodoc
-mixin _$PostListResponse {
+mixin _$PostListModel {
   List<PostModel> get data => throw _privateConstructorUsedError;
   int? get page => throw _privateConstructorUsedError;
   int? get limit => throw _privateConstructorUsedError;
   int? get total => throw _privateConstructorUsedError;
   bool? get hasNext => throw _privateConstructorUsedError;
 
-  /// Serializes this PostListResponse to a JSON map.
+  /// Serializes this PostListModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of PostListResponse
+  /// Create a copy of PostListModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PostListResponseCopyWith<PostListResponse> get copyWith =>
+  $PostListModelCopyWith<PostListModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $PostListResponseCopyWith<$Res> {
-  factory $PostListResponseCopyWith(
-    PostListResponse value,
-    $Res Function(PostListResponse) then,
-  ) = _$PostListResponseCopyWithImpl<$Res, PostListResponse>;
+abstract class $PostListModelCopyWith<$Res> {
+  factory $PostListModelCopyWith(
+    PostListModel value,
+    $Res Function(PostListModel) then,
+  ) = _$PostListModelCopyWithImpl<$Res, PostListModel>;
   @useResult
   $Res call({
     List<PostModel> data,
@@ -54,16 +54,16 @@ abstract class $PostListResponseCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$PostListResponseCopyWithImpl<$Res, $Val extends PostListResponse>
-    implements $PostListResponseCopyWith<$Res> {
-  _$PostListResponseCopyWithImpl(this._value, this._then);
+class _$PostListModelCopyWithImpl<$Res, $Val extends PostListModel>
+    implements $PostListModelCopyWith<$Res> {
+  _$PostListModelCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PostListResponse
+  /// Create a copy of PostListModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -103,12 +103,12 @@ class _$PostListResponseCopyWithImpl<$Res, $Val extends PostListResponse>
 }
 
 /// @nodoc
-abstract class _$$PostListResponseImplCopyWith<$Res>
-    implements $PostListResponseCopyWith<$Res> {
-  factory _$$PostListResponseImplCopyWith(
-    _$PostListResponseImpl value,
-    $Res Function(_$PostListResponseImpl) then,
-  ) = __$$PostListResponseImplCopyWithImpl<$Res>;
+abstract class _$$PostListModelImplCopyWith<$Res>
+    implements $PostListModelCopyWith<$Res> {
+  factory _$$PostListModelImplCopyWith(
+    _$PostListModelImpl value,
+    $Res Function(_$PostListModelImpl) then,
+  ) = __$$PostListModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
@@ -121,15 +121,15 @@ abstract class _$$PostListResponseImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$PostListResponseImplCopyWithImpl<$Res>
-    extends _$PostListResponseCopyWithImpl<$Res, _$PostListResponseImpl>
-    implements _$$PostListResponseImplCopyWith<$Res> {
-  __$$PostListResponseImplCopyWithImpl(
-    _$PostListResponseImpl _value,
-    $Res Function(_$PostListResponseImpl) _then,
+class __$$PostListModelImplCopyWithImpl<$Res>
+    extends _$PostListModelCopyWithImpl<$Res, _$PostListModelImpl>
+    implements _$$PostListModelImplCopyWith<$Res> {
+  __$$PostListModelImplCopyWithImpl(
+    _$PostListModelImpl _value,
+    $Res Function(_$PostListModelImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of PostListResponse
+  /// Create a copy of PostListModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -141,7 +141,7 @@ class __$$PostListResponseImplCopyWithImpl<$Res>
     Object? hasNext = freezed,
   }) {
     return _then(
-      _$PostListResponseImpl(
+      _$PostListModelImpl(
         data: null == data
             ? _value._data
             : data // ignore: cast_nullable_to_non_nullable
@@ -169,8 +169,8 @@ class __$$PostListResponseImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$PostListResponseImpl implements _PostListResponse {
-  const _$PostListResponseImpl({
+class _$PostListModelImpl implements _PostListModel {
+  const _$PostListModelImpl({
     required final List<PostModel> data,
     this.page,
     this.limit,
@@ -178,8 +178,8 @@ class _$PostListResponseImpl implements _PostListResponse {
     this.hasNext,
   }) : _data = data;
 
-  factory _$PostListResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PostListResponseImplFromJson(json);
+  factory _$PostListModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PostListModelImplFromJson(json);
 
   final List<PostModel> _data;
   @override
@@ -200,14 +200,14 @@ class _$PostListResponseImpl implements _PostListResponse {
 
   @override
   String toString() {
-    return 'PostListResponse(data: $data, page: $page, limit: $limit, total: $total, hasNext: $hasNext)';
+    return 'PostListModel(data: $data, page: $page, limit: $limit, total: $total, hasNext: $hasNext)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$PostListResponseImpl &&
+            other is _$PostListModelImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.page, page) || other.page == page) &&
             (identical(other.limit, limit) || other.limit == limit) &&
@@ -226,34 +226,31 @@ class _$PostListResponseImpl implements _PostListResponse {
     hasNext,
   );
 
-  /// Create a copy of PostListResponse
+  /// Create a copy of PostListModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$PostListResponseImplCopyWith<_$PostListResponseImpl> get copyWith =>
-      __$$PostListResponseImplCopyWithImpl<_$PostListResponseImpl>(
-        this,
-        _$identity,
-      );
+  _$$PostListModelImplCopyWith<_$PostListModelImpl> get copyWith =>
+      __$$PostListModelImplCopyWithImpl<_$PostListModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PostListResponseImplToJson(this);
+    return _$$PostListModelImplToJson(this);
   }
 }
 
-abstract class _PostListResponse implements PostListResponse {
-  const factory _PostListResponse({
+abstract class _PostListModel implements PostListModel {
+  const factory _PostListModel({
     required final List<PostModel> data,
     final int? page,
     final int? limit,
     final int? total,
     final bool? hasNext,
-  }) = _$PostListResponseImpl;
+  }) = _$PostListModelImpl;
 
-  factory _PostListResponse.fromJson(Map<String, dynamic> json) =
-      _$PostListResponseImpl.fromJson;
+  factory _PostListModel.fromJson(Map<String, dynamic> json) =
+      _$PostListModelImpl.fromJson;
 
   @override
   List<PostModel> get data;
@@ -266,10 +263,10 @@ abstract class _PostListResponse implements PostListResponse {
   @override
   bool? get hasNext;
 
-  /// Create a copy of PostListResponse
+  /// Create a copy of PostListModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PostListResponseImplCopyWith<_$PostListResponseImpl> get copyWith =>
+  _$$PostListModelImplCopyWith<_$PostListModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

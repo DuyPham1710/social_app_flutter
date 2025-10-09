@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
@@ -22,24 +23,43 @@ class _HomePageState extends State<HomePage> {
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
   );
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     // load post lần đầu khi vào trang
-    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 10));
+    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 2));
+
+    // Lắng nghe sự kiện scroll để load more
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _refreshController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<HomeBloc>().add(const LoadMorePostsEvent());
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    // Trigger khi còn 200px nữa là tới cuối
+    return currentScroll >= (maxScroll - 200);
   }
 
   void _onRefresh() async {
     // Load lại posts từ đầu (page 1)
     await Future.delayed(const Duration(milliseconds: 1000));
-    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 10));
+    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 2));
     // Listener sẽ tự động complete refresh khi state thay đổi
   }
 
@@ -65,6 +85,7 @@ class _HomePageState extends State<HomePage> {
             ),
             onRefresh: _onRefresh,
             child: ListView(
+              controller: _scrollController,
               physics: const ClampingScrollPhysics(),
               children: [
                 HomeHeaderWidget(),
@@ -91,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                if (state is HomeLoaded)
+                if (state is HomeLoaded) ...[
                   ListView.builder(
                     physics:
                         NeverScrollableScrollPhysics(), // tránh scroll lồng nhau
@@ -101,6 +122,30 @@ class _HomePageState extends State<HomePage> {
                       return PostItem(post: state.posts![index]);
                     },
                   ),
+
+                  // Loading indicator khi đang load more
+                  if (state.isLoadingMore)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+
+                  // Hiển thị thông báo khi hết data
+                  if (state.hasNext == false && !state.isLoadingMore)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Center(
+                        child: Text(
+                          "Đã hiển thị hết bài viết",
+                          style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                        ),
+                      ),
+                    ),
+                ],
               ],
             ),
           );
