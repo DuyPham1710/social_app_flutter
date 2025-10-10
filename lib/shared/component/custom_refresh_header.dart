@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -35,7 +34,11 @@ class CustomRefreshHeader extends StatelessWidget {
           body = const SizedBox.shrink();
         }
 
-        return SizedBox(height: 60.0, child: Center(child: body));
+        return Container(
+          height: 60.0,
+          alignment: Alignment.center,
+          child: body,
+        );
       },
     );
   }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
@@ -18,6 +19,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<DataState<UserModel>> login(AuthRequest request) async {
     try {
       final response = await authService.login(request);
+
+      // Save token to local storage
+      await TokenStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      );
+
       return DataStateSuccess(response.user);
     } on DioException catch (e) {
       return DataStateError(e);
