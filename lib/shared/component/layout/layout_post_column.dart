@@ -3,8 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LayoutPostColumn extends StatelessWidget {
   final List<dynamic> urls;
+  final Function(int) onImageTap;
 
-  const LayoutPostColumn({super.key, required this.urls});
+  const LayoutPostColumn({
+    super.key,
+    required this.urls,
+    required this.onImageTap,
+  });
 
   List<dynamic> get sortedUrls {
     final List<dynamic> sorted = List.from(urls);
@@ -23,14 +28,17 @@ class LayoutPostColumn extends StatelessWidget {
 
     if (orderedUrls.length == 1) {
       // 1 hình: hiển thị bình thường
-      return AspectRatio(
-        aspectRatio: 1.0,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.r),
-          child: Image.network(
-            orderedUrls[0].url,
-            width: double.infinity,
-            fit: BoxFit.cover,
+      return GestureDetector(
+        onTap: () => onImageTap(0),
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Image.network(
+              orderedUrls[0].url,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       );
@@ -75,14 +83,17 @@ class LayoutPostColumn extends StatelessWidget {
       }
     }
 
-    Widget imageWidget = SizedBox(
-      height: 250.h, // Chiều cao cố định cho ảnh, ảnh sẽ to và có thể bị cắt
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.r),
-        child: Image.network(
-          orderedUrls[index].url,
-          fit: BoxFit.cover,
-          width: double.infinity,
+    Widget imageWidget = GestureDetector(
+      onTap: () => onImageTap(index),
+      child: SizedBox(
+        height: 250.h, // Chiều cao cố định cho ảnh, ảnh sẽ to và có thể bị cắt
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.r),
+          child: Image.network(
+            orderedUrls[index].url,
+            fit: BoxFit.cover,
+            width: double.infinity,
+          ),
         ),
       ),
     );
@@ -90,36 +101,39 @@ class LayoutPostColumn extends StatelessWidget {
     // Nếu là ảnh thứ 4 và còn nhiều hơn 4 ảnh => overlay
     if (index == 3 && orderedUrls.length > 4) {
       final remaining = orderedUrls.length - 4;
-      imageWidget = SizedBox(
-        height: 250.h, // Giống kích thước ảnh bình thường
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                orderedUrls[index].url,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-            ),
-
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+      imageWidget = GestureDetector(
+        onTap: () => onImageTap(index),
+        child: SizedBox(
+          height: 250.h, // Giống kích thước ảnh bình thường
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '+$remaining',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
+                child: Image.network(
+                  orderedUrls[index].url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
                 ),
               ),
-            ),
-          ],
+
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '+$remaining',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
