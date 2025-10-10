@@ -1,13 +1,19 @@
 import 'package:dio/dio.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 // import LocalStorage hoặc TokenRepository gì đó để lấy token, refresh token
 
 class AuthInterceptor extends Interceptor {
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // final token = "YOUR_ACCESS_TOKEN"; // vd: LocalStorage.getToken()
-    // if (token.isNotEmpty) {
-    //   options.headers['Authorization'] = 'Bearer $token';
-    // }
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final token = await TokenStorage.getAccessToken();
+
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+
     super.onRequest(options, handler);
   }
 
