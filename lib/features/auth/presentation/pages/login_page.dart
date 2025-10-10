@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) {
             // Chỉ xử lý state từ login flow
             if (state is AuthLoaded && state.flowType == 'login') {
-              Navigator.pushNamed(context, '/home');
+              Navigator.pushNamed(context, '/main');
             } else if (state is AuthError && state.flowType == 'login') {
               final errorMsg = state.errorMessage ?? 'Đăng nhập thất bại';
               UIUtils.showErrorMessage(context, errorMsg);
