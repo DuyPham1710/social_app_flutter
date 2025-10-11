@@ -20,10 +20,17 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await authService.login(request);
 
-      // Save token to local storage
+      // Save token and user data to local storage
       await TokenStorage.saveTokens(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        userData: {
+          'id': response.user.userId,
+          'fullName': response.user.fullName,
+          'email': response.user.email,
+          'username': response.user.username,
+          'avatarUrl': response.user.avatarUrl,
+        },
       );
 
       return DataStateSuccess(response.user);

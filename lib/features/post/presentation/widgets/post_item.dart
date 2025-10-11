@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/Post_action.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
@@ -12,7 +12,13 @@ import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 
 class PostItem extends StatelessWidget {
   final PostEntity post;
-  const PostItem({super.key, required this.post});
+  final int commentCount;
+  
+  const PostItem({
+    super.key,
+    required this.post,
+    this.commentCount = 0,
+  });
 
   Widget _buildMediaLayout(BuildContext context, List<dynamic> urls) {
     late final Widget layout;
@@ -142,7 +148,7 @@ class PostItem extends StatelessWidget {
 
           SizedBox(height: 20.h),
 
-          PostAction(),
+          PostAction(commentCount: commentCount),
         ],
       ),
     );

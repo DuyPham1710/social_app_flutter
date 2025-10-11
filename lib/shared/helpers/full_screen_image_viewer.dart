@@ -5,11 +5,13 @@ import 'package:photo_view/photo_view_gallery.dart';
 class FullScreenImageViewer extends StatefulWidget {
   final List<String> imageUrls;
   final int initialIndex;
+  final Function(int)? onImageChanged;
 
   const FullScreenImageViewer({
     super.key,
     required this.imageUrls,
     required this.initialIndex,
+    this.onImageChanged,
   });
 
   @override
@@ -40,7 +42,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
 
     // Vuốt dọc hoặc xéo (lên/xuống hoặc xéo) -> thoát
     if (dy.abs() > 80 && dx.abs() < 100 || (dy.abs() > 80 && dx.abs() > 80)) {
-      Navigator.of(context).pop(currentIndex);
+      Navigator.of(context).pop();
       return;
     }
   }
@@ -75,7 +77,9 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             },
             onPageChanged: (index) {
               setState(() => currentIndex = index);
+              widget.onImageChanged?.call(index);
             },
+
             scrollPhysics: const BouncingScrollPhysics(),
           ),
           // Page indicator

@@ -3,7 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 
 class PostAction extends StatelessWidget {
-  const PostAction({super.key});
+  final int commentCount;
+  
+  const PostAction({
+    super.key,
+    this.commentCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +29,16 @@ class PostAction extends StatelessWidget {
                 size: 20.sp,
               ),
               SizedBox(width: 4.w),
-              Text("57", style: TextStyle(fontSize: 12.sp)),
+              Text("$commentCount", style: TextStyle(fontSize: 12.sp)),
             ],
           ),
 
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Text(
-              "View all 57 comments",
+              commentCount > 0
+                  ? "View all $commentCount comment${commentCount > 1 ? 's' : ''}"
+                  : "No comments yet",
               style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
             ),
           ),

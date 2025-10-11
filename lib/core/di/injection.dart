@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:social_app_fe/core/network/dio_client.dart';
+import 'package:social_app_fe/core/network/websocket/comment_socket_service.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
 import 'package:social_app_fe/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:social_app_fe/features/auth/domain/repository/auth_repository.dart';
@@ -22,6 +23,9 @@ final s1 = GetIt.instance;
 Future<void> initializeDependencies() async {
   // Dio
   s1.registerSingleton<Dio>(DioClient.instance);
+
+  // WebSocket
+  s1.registerSingleton<CommentSocketService>(CommentSocketService());
 
   // Dependencies
   // DataSources
@@ -62,5 +66,10 @@ Future<void> initializeDependencies() async {
     ),
   );
 
-  s1.registerFactory<HomeBloc>(() => HomeBloc(getHomePostsUseCase: s1()));
+  s1.registerFactory<HomeBloc>(
+    () => HomeBloc(
+      getHomePostsUseCase: s1(),
+      commentSocketService: s1(),
+    ),
+  );
 }
