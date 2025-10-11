@@ -3,8 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LayoutPostClassic extends StatelessWidget {
   final List<dynamic> urls;
+  final Function(int) onImageTap;
 
-  const LayoutPostClassic({super.key, required this.urls});
+  const LayoutPostClassic({
+    super.key,
+    required this.urls,
+    required this.onImageTap,
+  });
 
   List<dynamic> get sortedUrls {
     final List<dynamic> sorted = List.from(urls);
@@ -20,14 +25,17 @@ class LayoutPostClassic extends StatelessWidget {
 
     if (orderedUrls.length == 1) {
       // 1 hình: hiển thị bình thường
-      return AspectRatio(
-        aspectRatio: 1.0,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.r),
-          child: Image.network(
-            orderedUrls[0].url,
-            width: double.infinity,
-            fit: BoxFit.cover,
+      return GestureDetector(
+        onTap: () => onImageTap(0),
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Image.network(
+              orderedUrls[0].url,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       );
@@ -40,7 +48,10 @@ class LayoutPostClassic extends StatelessWidget {
             // Ảnh cũ (ảnh đầu tiên) bị đẩy sang trái
             Expanded(
               flex: 1,
-              child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+              child: GestureDetector(
+                onTap: () => onImageTap(0),
+                child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+              ),
             ),
 
             SizedBox(width: 4.w),
@@ -48,7 +59,10 @@ class LayoutPostClassic extends StatelessWidget {
             // Ảnh mới (ảnh thứ hai)
             Expanded(
               flex: 1,
-              child: Image.network(orderedUrls[1].url, fit: BoxFit.cover),
+              child: GestureDetector(
+                onTap: () => onImageTap(1),
+                child: Image.network(orderedUrls[1].url, fit: BoxFit.cover),
+              ),
             ),
           ],
         ),
@@ -68,11 +82,17 @@ class LayoutPostClassic extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+                child: GestureDetector(
+                  onTap: () => onImageTap(0),
+                  child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+                ),
               ),
               SizedBox(width: 4.w),
               Expanded(
-                child: Image.network(orderedUrls[1].url, fit: BoxFit.cover),
+                child: GestureDetector(
+                  onTap: () => onImageTap(1),
+                  child: Image.network(orderedUrls[1].url, fit: BoxFit.cover),
+                ),
               ),
             ],
           ),
@@ -104,32 +124,40 @@ class LayoutPostClassic extends StatelessWidget {
         final remaining = orderedUrls.length - 4;
         images.add(
           Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.network(orderedUrls[i].url, fit: BoxFit.cover),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    //          borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '+$remaining',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
+            child: GestureDetector(
+              onTap: () => onImageTap(i),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(orderedUrls[i].url, fit: BoxFit.cover),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      //          borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '+$remaining',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       } else {
         images.add(
-          Expanded(child: Image.network(orderedUrls[i].url, fit: BoxFit.cover)),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onImageTap(i),
+              child: Image.network(orderedUrls[i].url, fit: BoxFit.cover),
+            ),
+          ),
         );
       }
     }

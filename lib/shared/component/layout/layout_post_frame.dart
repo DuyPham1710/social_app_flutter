@@ -3,8 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LayoutPostFrame extends StatelessWidget {
   final List<dynamic> urls;
+  final Function(int) onImageTap;
 
-  const LayoutPostFrame({super.key, required this.urls});
+  const LayoutPostFrame({
+    super.key,
+    required this.urls,
+    required this.onImageTap,
+  });
 
   List<dynamic> get sortedUrls {
     final List<dynamic> sorted = List.from(urls);
@@ -50,11 +55,14 @@ class LayoutPostFrame extends StatelessWidget {
       return Container(
         color: frameColor,
         padding: EdgeInsets.all(12.w),
-        child: AspectRatio(
-          aspectRatio: 1.0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+        child: GestureDetector(
+          onTap: () => onImageTap(0),
+          child: AspectRatio(
+            aspectRatio: 1.0,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.r),
+              child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+            ),
           ),
         ),
       );
@@ -69,14 +77,17 @@ class LayoutPostFrame extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: SizedBox(
-                  height: 250.h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
-                      orderedUrls[0].url,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+                child: GestureDetector(
+                  onTap: () => onImageTap(0),
+                  child: SizedBox(
+                    height: 250.h,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        orderedUrls[0].url,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
                     ),
                   ),
                 ),
@@ -85,14 +96,17 @@ class LayoutPostFrame extends StatelessWidget {
               SizedBox(width: 10.h),
 
               Expanded(
-                child: SizedBox(
-                  height: 250.h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
-                      orderedUrls[1].url,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+                child: GestureDetector(
+                  onTap: () => onImageTap(1),
+                  child: SizedBox(
+                    height: 250.h,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        orderedUrls[1].url,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
                     ),
                   ),
                 ),
@@ -135,28 +149,34 @@ class LayoutPostFrame extends StatelessWidget {
   Widget _buildColumn1(List<dynamic> orderedUrls) {
     return Column(
       children: [
-        SizedBox(
-          height: 250.h,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(
-              orderedUrls[0].url,
-              fit: BoxFit.cover,
-              width: double.infinity,
+        GestureDetector(
+          onTap: () => onImageTap(0),
+          child: SizedBox(
+            height: 250.h,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.r),
+              child: Image.network(
+                orderedUrls[0].url,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
             ),
           ),
         ),
 
         SizedBox(height: 10.h),
 
-        SizedBox(
-          height: 250.h,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(
-              orderedUrls[1].url,
-              fit: BoxFit.cover,
-              width: double.infinity,
+        GestureDetector(
+          onTap: () => onImageTap(1),
+          child: SizedBox(
+            height: 250.h,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.r),
+              child: Image.network(
+                orderedUrls[1].url,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
             ),
           ),
         ),
@@ -170,39 +190,48 @@ class LayoutPostFrame extends StatelessWidget {
     return Column(
       children: [
         if (orderedUrls.length == 3)
-          SizedBox(
-            height: 300.h,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                orderedUrls[2].url,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          GestureDetector(
+            onTap: () => onImageTap(2),
+            child: SizedBox(
+              height: 300.h,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Image.network(
+                  orderedUrls[2].url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
           )
         else if (maxImages >= 3)
-          SizedBox(
-            height: 180.h,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                orderedUrls[2].url,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          GestureDetector(
+            onTap: () => onImageTap(2),
+            child: SizedBox(
+              height: 180.h,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Image.network(
+                  orderedUrls[2].url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
           ),
         if (maxImages >= 4) ...[
           SizedBox(height: 10.h),
-          SizedBox(
-            height: 180.h,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                orderedUrls[3].url,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          GestureDetector(
+            onTap: () => onImageTap(3),
+            child: SizedBox(
+              height: 180.h,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Image.network(
+                  orderedUrls[3].url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
           ),
@@ -211,14 +240,17 @@ class LayoutPostFrame extends StatelessWidget {
           SizedBox(height: 10.h),
           orderedUrls.length > 5
               ? _buildOverlayImage(orderedUrls[4].url, orderedUrls.length - 5)
-              : SizedBox(
-                  height: 180.h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
-                      orderedUrls[4].url,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+              : GestureDetector(
+                  onTap: () => onImageTap(4),
+                  child: SizedBox(
+                    height: 180.h,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        orderedUrls[4].url,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
                     ),
                   ),
                 ),
@@ -228,38 +260,42 @@ class LayoutPostFrame extends StatelessWidget {
   }
 
   Widget _buildOverlayImage(String imageUrl, int remaining) {
-    return SizedBox(
-      height: 180.h,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          SizedBox(
-            height: 180.h,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
+    return GestureDetector(
+      onTap: () => onImageTap(4),
+      child: SizedBox(
+        height: 180.h,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            SizedBox(
+              height: 180.h,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              '+$remaining',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
+
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                '+$remaining',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
