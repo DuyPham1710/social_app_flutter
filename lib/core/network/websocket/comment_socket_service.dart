@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:social_app_fe/core/constants/constants.dart';
-import 'package:social_app_fe/features/post/data/models/comment_model.dart';
+import 'package:social_app_fe/features/comment/data/models/comment_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class CommentSocketService {
@@ -13,6 +13,7 @@ class CommentSocketService {
       StreamController<CommentDeletedEvent>.broadcast();
   final _commentCountController =
       StreamController<Map<String, int>>.broadcast();
+  final _typingController = StreamController<TypingEvent>.broadcast();
 
   // Map để lưu số comment của mỗi post
   final Map<String, int> _commentCounts = {};
@@ -23,6 +24,7 @@ class CommentSocketService {
       _commentDeletedController.stream;
   Stream<Map<String, int>> get commentCountStream =>
       _commentCountController.stream;
+  Stream<TypingEvent> get typingStream => _typingController.stream;
 
   bool get isConnected => _socket?.connected ?? false;
 
@@ -205,6 +207,28 @@ class CommentSocketService {
       }
     });
 
+    // Lắng nghe khi có người đang typing
+    _socket!.on('userTyping', (data) {
+      developer.log('User typing: $data', name: 'CommentSocket');
+      try {
+        final userId = data['userId'] as String;
+        final username = data['username'] as String?;
+        final isTyping = data['isTyping'] as bool;
+        final postId = data['postId'] as String;
+
+        _typingController.add(
+          TypingEvent(
+            userId: userId,
+            username: username,
+            isTyping: isTyping,
+            postId: postId,
+          ),
+        );
+      } catch (e) {
+        developer.log('Error parsing userTyping: $e', name: 'CommentSocket');
+      }
+    });
+
     _socket!.on('error', (data) {
       developer.log('Socket error: $data', name: 'CommentSocket');
     });
@@ -294,6 +318,23 @@ class CommentSocketService {
     _socket!.emit('deleteComment', {'commentId': commentId, 'postId': postId});
   }
 
+  // Emit typing event
+  void emitTyping({required String postId, required bool isTyping}) {
+    if (_socket == null || !_socket!.connected) {
+      developer.log(
+        'Socket not connected. Cannot emit typing.',
+        name: 'CommentSocket',
+      );
+      return;
+    }
+
+    developer.log(
+      'Emitting typing: $isTyping for post: $postId',
+      name: 'CommentSocket',
+    );
+    _socket!.emit('typing', {'postId': postId, 'isTyping': isTyping});
+  }
+
   // Get current comment count for a post
   int getCommentCount(String postId) {
     return _commentCounts[postId] ?? 0;
@@ -311,6 +352,7 @@ class CommentSocketService {
     _commentAddedController.close();
     _commentDeletedController.close();
     _commentCountController.close();
+    _typingController.close();
     _commentCounts.clear();
   }
 }
@@ -337,5 +379,19 @@ class CommentDeletedEvent {
     required this.commentId,
     required this.postId,
     required this.count,
+  });
+}
+
+class TypingEvent {
+  final String userId;
+  final String? username;
+  final bool isTyping;
+  final String postId;
+
+  TypingEvent({
+    required this.userId,
+    required this.username,
+    required this.isTyping,
+    required this.postId,
   });
 }

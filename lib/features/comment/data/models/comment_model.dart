@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
-import 'package:social_app_fe/features/post/domain/entities/comment_entity.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 
 part 'comment_model.freezed.dart';
 part 'comment_model.g.dart';

@@ -5,7 +5,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
@@ -138,7 +137,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
                   // Reaction Buttons
                   SizedBox(height: 20.h),
-                  PostAction(),
+                  //   PostAction(),
                 ],
               );
             }

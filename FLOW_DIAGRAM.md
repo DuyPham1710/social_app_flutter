@@ -16,7 +16,7 @@
 └───────────────────────────────┼──────────────────────────────────┘
                                 │
                           WebSocket (socket.io)
-                          ws://192.168.43.137:3000/comment
+                          ws://192.168.100.218:3000/comment
                                 │
 ┌───────────────────────────────┼──────────────────────────────────┐
 │                               ▼                                   │
@@ -104,7 +104,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 ```dart
 void connect(String userId) {
   // Tạo WebSocket URL
-  final baseUrl = 'http://192.168.43.137:3000';
+  final baseUrl = 'http://192.168.100.218:3000';
   
   _socket = IO.io(
     '$baseUrl/comment', // ← Namespace /comment

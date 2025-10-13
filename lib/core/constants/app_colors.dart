@@ -7,4 +7,6 @@ class AppColors {
   static const Color iconPrimary = Color(0xFF000000);
   static const Color background = Color(0xFFFFFFFF);
   static Color unselectedIcon = Colors.black.withOpacity(0.5);
+  static Color divider = Colors.grey[300]!;
+  static const Color backgroundCommentItem = Color(0xfff3f2f7);
 }

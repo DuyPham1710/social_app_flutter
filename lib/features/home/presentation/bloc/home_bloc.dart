@@ -2,21 +2,28 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
-import 'package:social_app_fe/core/network/websocket/comment_socket_service.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/core/usecase/usecase.dart';
 import 'package:social_app_fe/core/utils/error_utils.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/connect_comment_socket_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetHomePostsUseCase getHomePostsUseCase;
-  final CommentSocketService commentSocketService;
+  final ConnectCommentSocketUseCase connectCommentSocketUseCase;
+  final ListenCommentCountUseCase listenCommentCountUseCase;
+  final LoadCommentsUseCase loadCommentsUseCase;
   StreamSubscription? _commentCountSubscription;
 
   HomeBloc({
     required this.getHomePostsUseCase,
-    required this.commentSocketService,
+    required this.connectCommentSocketUseCase,
+    required this.listenCommentCountUseCase,
+    required this.loadCommentsUseCase,
   }) : super(HomeInitial()) {
     on<LoadPostsEvent>(_onLoadPosts);
     on<LoadMorePostsEvent>(_onLoadMorePosts);
@@ -31,14 +38,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       // Lấy userId từ token storage
       final userData = await TokenStorage.getUserData();
       final userId = userData?['id'];
+      final username = userData?['username'];
 
       if (userId != null) {
-        // Kết nối WebSocket
-        commentSocketService.connect(userId);
+        // Kết nối WebSocket qua UseCase
+        connectCommentSocketUseCase(
+          params: ConnectCommentSocketParams(userId, username),
+        );
 
-        // Lắng nghe stream comment count updates
-        _commentCountSubscription = commentSocketService.commentCountStream
-            .listen((commentCounts) {
+        // Lắng nghe stream comment count updates qua UseCase
+        _commentCountSubscription =
+            listenCommentCountUseCase(params: const NoParams()).listen((
+              commentCounts,
+            ) {
+              // Khi nhận được cập nhật, thêm sự kiện để cập nhật state
               add(UpdateCommentCountsEvent(commentCounts));
             });
       }
@@ -84,9 +97,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (dataState is DataStateSuccess && dataState.data != null) {
       final postListEntity = dataState.data!;
 
-      // Load comment counts cho tất cả posts
+      // Load comment counts cho tất cả posts qua UseCase
       for (final post in postListEntity.data) {
-        commentSocketService.loadComments(post.id);
+        loadCommentsUseCase(params: LoadCommentsParams(post.id));
       }
 
       emit(
@@ -143,9 +156,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       // Append data mới vào danh sách hiện tại
       final updatedPosts = [...currentState.posts!, ...postListEntity.data];
 
-      // Load comment counts cho posts mới
+      // Load comment counts cho posts mới qua UseCase
       for (final post in postListEntity.data) {
-        commentSocketService.loadComments(post.id);
+        loadCommentsUseCase(params: LoadCommentsParams(post.id));
       }
 
       emit(

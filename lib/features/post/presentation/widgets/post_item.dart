@@ -13,12 +13,8 @@ import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 class PostItem extends StatelessWidget {
   final PostEntity post;
   final int commentCount;
-  
-  const PostItem({
-    super.key,
-    required this.post,
-    this.commentCount = 0,
-  });
+
+  const PostItem({super.key, required this.post, this.commentCount = 0});
 
   Widget _buildMediaLayout(BuildContext context, List<dynamic> urls) {
     late final Widget layout;
@@ -148,7 +144,7 @@ class PostItem extends StatelessWidget {
 
           SizedBox(height: 20.h),
 
-          PostAction(commentCount: commentCount),
+          PostAction(postId: post.id, commentCount: commentCount),
         ],
       ),
     );
