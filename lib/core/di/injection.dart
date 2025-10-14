@@ -11,6 +11,16 @@ import 'package:social_app_fe/features/auth/domain/usecases/reset_password_useca
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:social_app_fe/features/friend/data/data_sources/friend_service.dart';
+import 'package:social_app_fe/features/friend/data/repository/friend_repository_impl.dart';
+import 'package:social_app_fe/features/friend/domain/repository/friend_repository.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/accept_friend_request_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friend_requests_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friend_suggestions_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_request_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/send_friend_request_usecase.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
@@ -26,12 +36,14 @@ Future<void> initializeDependencies() async {
   // Dependencies
   // DataSources
   s1.registerLazySingleton<AuthService>(() => AuthService(s1()));
+  s1.registerLazySingleton<FriendService>(() => FriendService(s1()));
   s1.registerLazySingleton<PostRemoteDataSource>(
     () => PostRemoteDataSource(s1()),
   );
 
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
+  s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
   s1.registerLazySingleton<PostRepository>(() => PostRepositoryImpl(s1()));
 
   // Usecases
@@ -50,6 +62,14 @@ Future<void> initializeDependencies() async {
     () => GetHomePostsUseCase(s1()),
   );
 
+  // Friend Usecases
+  s1.registerLazySingleton<GetFriendsUseCase>(() => GetFriendsUseCase(s1()));
+  s1.registerLazySingleton<GetFriendRequestsUseCase>(() => GetFriendRequestsUseCase(s1()));
+  s1.registerLazySingleton<GetFriendSuggestionsUseCase>(() => GetFriendSuggestionsUseCase(s1()));
+  s1.registerLazySingleton<SendFriendRequestUseCase>(() => SendFriendRequestUseCase(s1()));
+  s1.registerLazySingleton<AcceptFriendRequestUseCase>(() => AcceptFriendRequestUseCase(s1()));
+  s1.registerLazySingleton<RejectFriendRequestUseCase>(() => RejectFriendRequestUseCase(s1()));
+
   // Blocs
   s1.registerFactory<AuthBloc>(
     () => AuthBloc(
@@ -63,4 +83,15 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<HomeBloc>(() => HomeBloc(getHomePostsUseCase: s1()));
+
+  s1.registerFactory<FriendBloc>(
+    () => FriendBloc(
+      getFriendsUseCase: s1(),
+      getFriendRequestsUseCase: s1(),
+      getFriendSuggestionsUseCase: s1(),
+      sendFriendRequestUseCase: s1(),
+      acceptFriendRequestUseCase: s1(),
+      rejectFriendRequestUseCase: s1(),
+    ),
+  );
 }
