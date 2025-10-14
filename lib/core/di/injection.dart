@@ -18,12 +18,14 @@ import 'package:social_app_fe/features/comment/domain/repository/comment_reposit
 import 'package:social_app_fe/features/comment/domain/usecases/connect_comment_socket_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/get_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/get_comments_loaded_data_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_service.dart';
 import 'package:social_app_fe/features/friend/data/repository/friend_repository_impl.dart';
 import 'package:social_app_fe/features/friend/domain/repository/friend_repository.dart';
@@ -104,13 +106,27 @@ Future<void> initializeDependencies() async {
     () => LoadCommentsUseCase(s1()),
   );
 
+  s1.registerLazySingleton<GetCommentsLoadedDataUseCase>(
+    () => GetCommentsLoadedDataUseCase(s1()),
+  );
+
   // Friend Usecases
   s1.registerLazySingleton<GetFriendsUseCase>(() => GetFriendsUseCase(s1()));
-  s1.registerLazySingleton<GetFriendRequestsUseCase>(() => GetFriendRequestsUseCase(s1()));
-  s1.registerLazySingleton<GetFriendSuggestionsUseCase>(() => GetFriendSuggestionsUseCase(s1()));
-  s1.registerLazySingleton<SendFriendRequestUseCase>(() => SendFriendRequestUseCase(s1()));
-  s1.registerLazySingleton<AcceptFriendRequestUseCase>(() => AcceptFriendRequestUseCase(s1()));
-  s1.registerLazySingleton<RejectFriendRequestUseCase>(() => RejectFriendRequestUseCase(s1()));
+  s1.registerLazySingleton<GetFriendRequestsUseCase>(
+    () => GetFriendRequestsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetFriendSuggestionsUseCase>(
+    () => GetFriendSuggestionsUseCase(s1()),
+  );
+  s1.registerLazySingleton<SendFriendRequestUseCase>(
+    () => SendFriendRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<AcceptFriendRequestUseCase>(
+    () => AcceptFriendRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<RejectFriendRequestUseCase>(
+    () => RejectFriendRequestUseCase(s1()),
+  );
 
   // Blocs
   s1.registerFactory<AuthBloc>(
@@ -140,6 +156,10 @@ Future<void> initializeDependencies() async {
       emitTypingUseCase: s1(),
       listenTypingUseCase: s1(),
     ),
+  );
+
+  s1.registerFactory<CommentDetailsBloc>(
+    () => CommentDetailsBloc(getCommentsLoadedDataUseCase: s1()),
   );
 
   s1.registerFactory<FriendBloc>(

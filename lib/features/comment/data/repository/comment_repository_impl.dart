@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
+import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
 
@@ -43,6 +46,28 @@ class CommentRepositoryImpl implements CommentRepository {
   @override
   Stream<Map<String, int>> get commentCountStream =>
       _remoteDataSource.commentCountStream;
+
+  @override
+  Future<DataState<CommentsLoadedModel?>> getCommentsLoadedData(
+    String postId,
+  ) async {
+    try {
+      final commentsLoadedModel = _remoteDataSource.getCommentsLoadedData(
+        postId,
+      );
+      if (commentsLoadedModel == null ||
+          commentsLoadedModel.comments.isEmpty ||
+          commentsLoadedModel.count == 0) {
+        return const DataStateSuccess(null);
+      }
+
+      return DataStateSuccess(commentsLoadedModel);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
 
   @override
   void disconnect() {

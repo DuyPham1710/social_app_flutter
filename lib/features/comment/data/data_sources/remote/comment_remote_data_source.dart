@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
+import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
 import 'package:social_app_fe/features/comment/data/models/typing_event_model.dart';
 
 class CommentRemoteDataSource {
@@ -10,16 +11,23 @@ class CommentRemoteDataSource {
   // StreamControllers cho các events
   final _commentCountController =
       StreamController<Map<String, int>>.broadcast();
+  final _commentsLoadedController =
+      StreamController<CommentsLoadedModel>.broadcast();
   final _typingController = StreamController<TypingEventModel>.broadcast();
 
   // Map để lưu số comment của mỗi post
   final Map<String, int> _commentCounts = {};
+
+  // Map để lưu comments loaded data của mỗi post
+  final Map<String, CommentsLoadedModel> _commentsLoadedData = {};
 
   CommentRemoteDataSource(this._socketClient);
 
   // Getters
   Stream<Map<String, int>> get commentCountStream =>
       _commentCountController.stream;
+  Stream<CommentsLoadedModel> get commentsLoadedStream =>
+      _commentsLoadedController.stream;
   Stream<TypingEventModel> get typingStream => _typingController.stream;
 
   /// Connect đến comment namespace
@@ -44,14 +52,25 @@ class CommentRemoteDataSource {
         name: 'CommentDataSource',
       );
       try {
-        final postId = data['postId'] as String;
-        final count = data['count'] as int;
+        // Parse toàn bộ dữ liệu comments loaded
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+        final postId = commentsLoadedModel.postId;
+        final count = commentsLoadedModel.count;
 
         // Cập nhật số lượng comment cho post này
         _commentCounts[postId] = count;
 
-        // Emit stream để UI cập nhật
+        // Lưu trữ dữ liệu comments loaded đầy đủ
+        _commentsLoadedData[postId] = commentsLoadedModel;
+
+        // Emit cả hai streams
         _commentCountController.add(Map.from(_commentCounts));
+        _commentsLoadedController.add(commentsLoadedModel);
+
+        developer.log(
+          'Stored comments loaded data for post $postId: ${commentsLoadedModel.comments.length} comments at ${commentsLoadedModel.timestamp}',
+          name: 'CommentDataSource',
+        );
       } catch (e) {
         developer.log(
           'Error parsing commentsLoaded: $e',
@@ -194,6 +213,11 @@ class CommentRemoteDataSource {
     return _commentCounts[postId] ?? 0;
   }
 
+  /// Get comments loaded data for a post
+  CommentsLoadedModel? getCommentsLoadedData(String postId) {
+    return _commentsLoadedData[postId];
+  }
+
   /// Disconnect
   void disconnect() {
     _socketClient.disconnect();
@@ -203,7 +227,9 @@ class CommentRemoteDataSource {
   void dispose() {
     disconnect();
     _commentCountController.close();
+    _commentsLoadedController.close();
     _typingController.close();
     _commentCounts.clear();
+    _commentsLoadedData.clear();
   }
 }

@@ -13,6 +13,7 @@ import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  bool _isWebSocketInitialized = false;
   final GetHomePostsUseCase getHomePostsUseCase;
   final ConnectCommentSocketUseCase connectCommentSocketUseCase;
   final ListenCommentCountUseCase listenCommentCountUseCase;
@@ -25,12 +26,36 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
   }) : super(HomeInitial()) {
+    on<InitializeWebSocketEvent>(_onInitializeWebSocket);
+    on<WebSocketInitializedEvent>(_onWebSocketInitialized);
     on<LoadPostsEvent>(_onLoadPosts);
     on<LoadMorePostsEvent>(_onLoadMorePosts);
     on<UpdateCommentCountsEvent>(_onUpdateCommentCounts);
 
     // Kết nối WebSocket khi khởi tạo HomeBloc
-    _initializeWebSocket();
+    // _initializeWebSocket();
+  }
+
+  void _onInitializeWebSocket(
+    InitializeWebSocketEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    if (!_isWebSocketInitialized) {
+      emit(HomeInitializing()); // Emit trạng thái đang khởi tạo
+      await _initializeWebSocket();
+      _isWebSocketInitialized = true;
+
+      // Sau khi WebSocket khởi tạo xong, emit event để load posts
+      add(const WebSocketInitializedEvent());
+    }
+  }
+
+  void _onWebSocketInitialized(
+    WebSocketInitializedEvent event,
+    Emitter<HomeState> emit,
+  ) {
+    // WebSocket đã sẵn sàng, bây giờ load posts
+    add(const LoadPostsEvent(page: 1, limit: 2));
   }
 
   Future<void> _initializeWebSocket() async {

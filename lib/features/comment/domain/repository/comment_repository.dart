@@ -1,3 +1,5 @@
+import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 
 abstract class CommentRepository {
@@ -23,6 +25,9 @@ abstract class CommentRepository {
 
   /// Stream để lắng nghe comment count updates
   Stream<Map<String, int>> get commentCountStream;
+
+  /// Get comments loaded data cho một post
+  Future<DataState<CommentsLoadedEntity?>> getCommentsLoadedData(String postId);
 
   /// Disconnect
   void disconnect();
