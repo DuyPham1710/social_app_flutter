@@ -4,10 +4,13 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_request_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_suggestion_entity.dart';
+import 'package:social_app_fe/features/friend/domain/entities/sent_friend_request_entity.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/accept_friend_request_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/cancel_friend_request_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_suggestions_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_sent_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_request_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/send_friend_request_usecase.dart';
 
@@ -17,25 +20,31 @@ part 'friend_state.dart';
 class FriendBloc extends Bloc<FriendEvent, FriendState> {
   final GetFriendsUseCase getFriendsUseCase;
   final GetFriendRequestsUseCase getFriendRequestsUseCase;
+  final GetSentFriendRequestsUseCase getSentFriendRequestsUseCase;
   final GetFriendSuggestionsUseCase getFriendSuggestionsUseCase;
   final SendFriendRequestUseCase sendFriendRequestUseCase;
   final AcceptFriendRequestUseCase acceptFriendRequestUseCase;
   final RejectFriendRequestUseCase rejectFriendRequestUseCase;
+  final CancelFriendRequestUseCase cancelFriendRequestUseCase;
 
   FriendBloc({
     required this.getFriendsUseCase,
     required this.getFriendRequestsUseCase,
+    required this.getSentFriendRequestsUseCase,
     required this.getFriendSuggestionsUseCase,
     required this.sendFriendRequestUseCase,
     required this.acceptFriendRequestUseCase,
     required this.rejectFriendRequestUseCase,
+    required this.cancelFriendRequestUseCase,
   }) : super(FriendInitial()) {
     on<LoadFriends>(_onLoadFriends);
     on<LoadFriendRequests>(_onLoadFriendRequests);
+    on<LoadSentFriendRequests>(_onLoadSentFriendRequests);
     on<LoadFriendSuggestions>(_onLoadFriendSuggestions);
     on<SendFriendRequest>(_onSendFriendRequest);
     on<AcceptFriendRequest>(_onAcceptFriendRequest);
     on<RejectFriendRequest>(_onRejectFriendRequest);
+    on<CancelSentFriendRequest>(_onCancelSentFriendRequest);
     on<SortFriendRequests>(_onSortFriendRequests);
     on<FilterFriendRequests>(_onFilterFriendRequests);
   }
@@ -102,28 +111,40 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   }
 
   Future<void> _onSendFriendRequest(SendFriendRequest event, Emitter<FriendState> emit) async {
-    emit(FriendActionLoading());
+    final currentState = state;
     
     final dataState = await sendFriendRequestUseCase(event.receiverId);
     
     if (dataState is DataStateSuccess) {
-      emit(FriendActionSuccess(message: 'Đã gửi lời mời kết bạn'));
+      // Thêm userId vào danh sách đã gửi lời mời
+      if (currentState is FriendSuggestionsLoaded) {
+        final updatedSentIds = Set<String>.from(currentState.sentRequestUserIds)
+          ..add(event.receiverId);
+        
+        emit(currentState.copyWith(
+          sentRequestUserIds: updatedSentIds,
+        ));
+      }
     } else if (dataState is DataStateError) {
       emit(FriendActionError(message: dataState.error?.message ?? 'Lỗi không xác định'));
     }
   }
 
   Future<void> _onAcceptFriendRequest(AcceptFriendRequest event, Emitter<FriendState> emit) async {
-    emit(FriendActionLoading());
+    final currentState = state;
     
     final dataState = await acceptFriendRequestUseCase(event.requestId);
     
     if (dataState is DataStateSuccess) {
-      emit(FriendActionSuccess(message: 'Đã chấp nhận lời mời kết bạn'));
-      
-      // Reload friend requests after accepting với delay ngắn
-      await Future.delayed(const Duration(milliseconds: 500));
-      add(LoadFriendRequests(received: true));
+      // Thêm requestId vào danh sách accepted
+      if (currentState is FriendRequestsLoaded) {
+        final updatedAcceptedIds = Set<String>.from(currentState.acceptedRequestIds)
+          ..add(event.requestId);
+        
+        emit(currentState.copyWith(
+          acceptedRequestIds: updatedAcceptedIds,
+        ));
+      }
     } else if (dataState is DataStateError) {
       final errorMessage = _getErrorMessage(dataState.error);
       emit(FriendActionError(message: errorMessage));
@@ -131,16 +152,22 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   }
 
   Future<void> _onRejectFriendRequest(RejectFriendRequest event, Emitter<FriendState> emit) async {
-    emit(FriendActionLoading());
+    final currentState = state;
     
     final dataState = await rejectFriendRequestUseCase(event.requestId);
     
     if (dataState is DataStateSuccess) {
-      emit(FriendActionSuccess(message: 'Đã từ chối lời mời kết bạn'));
+      // Thêm requestId vào danh sách rejected
+      if (currentState is FriendRequestsLoaded) {
+        final updatedRejectedIds = Set<String>.from(currentState.rejectedRequestIds)
+          ..add(event.requestId);
+        
+        emit(currentState.copyWith(
+          rejectedRequestIds: updatedRejectedIds,
+        ));
+      }
       
-      // Reload friend requests after rejecting với delay ngắn
-      await Future.delayed(const Duration(milliseconds: 500));
-      add(LoadFriendRequests(received: true));
+      // Không reload lại trang, chỉ giữ nguyên state đã cập nhật
     } else if (dataState is DataStateError) {
       final errorMessage = _getErrorMessage(dataState.error);
       emit(FriendActionError(message: errorMessage));
@@ -239,5 +266,48 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
       
       return true;
     }).toList();
+  }
+
+  Future<void> _onLoadSentFriendRequests(LoadSentFriendRequests event, Emitter<FriendState> emit) async {
+    // Không emit loading nếu đang có dữ liệu (để tránh flicker)
+    final currentState = state;
+    if (currentState is! SentFriendRequestsLoaded) {
+      emit(SentFriendRequestsLoading());
+    }
+    
+    final dataState = await getSentFriendRequestsUseCase();
+    
+    if (dataState is DataStateSuccess) {
+      emit(SentFriendRequestsLoaded(
+        sentRequests: dataState.data!,
+      ));
+    } else if (dataState is DataStateError) {
+      final errorMessage = _getErrorMessage(dataState.error);
+      emit(FriendError(message: errorMessage));
+    }
+  }
+
+  Future<void> _onCancelSentFriendRequest(CancelSentFriendRequest event, Emitter<FriendState> emit) async {
+    final currentState = state;
+    
+    // Sử dụng cancelFriendRequest cho sent requests
+    final dataState = await cancelFriendRequestUseCase(event.requestId);
+    
+    if (dataState is DataStateSuccess) {
+      // Thêm requestId vào danh sách cancelled
+      if (currentState is SentFriendRequestsLoaded) {
+        final updatedCancelledIds = Set<String>.from(currentState.cancelledRequestIds)
+          ..add(event.requestId);
+        
+        emit(currentState.copyWith(
+          cancelledRequestIds: updatedCancelledIds,
+        ));
+      }
+      
+      // Không reload lại trang, chỉ giữ nguyên state đã cập nhật
+    } else if (dataState is DataStateError) {
+      final errorMessage = _getErrorMessage(dataState.error);
+      emit(FriendActionError(message: errorMessage));
+    }
   }
 }

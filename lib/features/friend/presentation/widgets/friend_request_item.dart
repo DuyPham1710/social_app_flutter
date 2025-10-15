@@ -11,6 +11,8 @@ class FriendRequestItem extends StatelessWidget {
   final List<String>? mutualFriendAvatars;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
+  final bool isAccepted;
+  final bool isRejected;
 
   const FriendRequestItem({
     super.key,
@@ -21,6 +23,8 @@ class FriendRequestItem extends StatelessWidget {
     this.mutualFriendAvatars,
     this.onAccept,
     this.onReject,
+    this.isAccepted = false,
+    this.isRejected = false,
   });
 
   @override
@@ -97,28 +101,87 @@ class FriendRequestItem extends StatelessWidget {
                     ],
                   ),
                 SizedBox(height: 16.h),
-                // Nút hành động
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildActionButton(
-                        label: 'Chấp nhận',
-                        background: AppColors.primary,
-                        foreground: Colors.white,
-                        onTap: onAccept ?? () {},
-                      ),
+                // Nút hành động hoặc thông báo
+                if (isAccepted)
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: Colors.green[200]!, width: 1),
                     ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: _buildActionButton(
-                        label: 'Xóa',
-                        background: const Color(0xFFE7E7E7),
-                        foreground: Colors.black,
-                        onTap: onReject ?? () {},
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green[700],
+                          size: 16.r,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          'Các bạn đã trở thành bạn bè',
+                          style: TextStyle(
+                            color: Colors.green[700],
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                )
+                  )
+                else if (isRejected)
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: Colors.grey[300]!, width: 1),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.close,
+                          color: Colors.grey[700],
+                          size: 16.r,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          'Đã gỡ lời mời',
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildActionButton(
+                          label: 'Chấp nhận',
+                          background: AppColors.primary,
+                          foreground: Colors.white,
+                          onTap: onAccept ?? () {},
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: _buildActionButton(
+                          label: 'Xóa',
+                          background: const Color(0xFFE7E7E7),
+                          foreground: Colors.black,
+                          onTap: onReject ?? () {},
+                        ),
+                      ),
+                    ],
+                  )
               ],
             ),
           )

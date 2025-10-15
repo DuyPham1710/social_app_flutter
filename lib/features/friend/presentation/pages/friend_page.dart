@@ -29,6 +29,7 @@ class _FriendPageState extends State<FriendPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Friend'),
         actions: [
           IconButton(
@@ -198,12 +199,16 @@ class _FriendPageState extends State<FriendPage> {
               ),
               child: Column(
                 children: state.friendRequests.take(3).map((request) {
+                  final isAccepted = state.acceptedRequestIds.contains(request.requestId);
+                  final isRejected = state.rejectedRequestIds.contains(request.requestId);
                   return FriendRequestItem(
                     name: request.displayName,
                     mutualFriends: request.displayMutualFriends,
                     timeAgo: request.formattedTimeAgo,
                     avatarUrl: request.displayAvatarUrl,
                     mutualFriendAvatars: request.mutualFriendAvatars,
+                    isAccepted: isAccepted,
+                    isRejected: isRejected,
                     onAccept: () {
                       context.read<FriendBloc>().add(
                         AcceptFriendRequest(requestId: request.requestId),
@@ -311,11 +316,13 @@ class _FriendPageState extends State<FriendPage> {
         } else if (state is FriendSuggestionsLoaded) {
           return Column(
             children: state.friendSuggestions.map((suggestion) {
+              final isSent = state.sentRequestUserIds.contains(suggestion.userId);
               return FriendSuggestionItem(
                 name: suggestion.fullName ?? 'Người dùng',
                 mutualFriends: suggestion.mutualFriends ?? 0,
                 avatarUrl: suggestion.avatarUrl ?? 'https://i.pravatar.cc/150?img=30',
                 mutualFriendAvatars: suggestion.mutualFriendAvatars,
+                isSent: isSent,
                 onAddFriend: () {
                   context.read<FriendBloc>().add(
                     SendFriendRequest(receiverId: suggestion.userId),

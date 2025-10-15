@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_request_item.dart';
+import 'package:social_app_fe/features/friend/presentation/pages/sent_friend_requests_page.dart';
 
 class FriendRequestsPage extends StatefulWidget {
   const FriendRequestsPage({super.key});
@@ -46,10 +47,10 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         actions: [
           IconButton(
             onPressed: () {
-              _showSearchDialog(context);
+              _showMoreOptions(context);
             },
             icon: const Icon(
-              CupertinoIcons.search,
+              Icons.more_vert,
               color: Colors.black,
             ),
           ),
@@ -73,6 +74,10 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
 
   Widget _buildHeaderSection() {
     return BlocBuilder<FriendBloc, FriendState>(
+      buildWhen: (previous, current) {
+        // Chỉ rebuild khi state liên quan đến friend requests thay đổi
+        return current is FriendRequestsLoaded;
+      },
       builder: (context, state) {
         int requestCount = 0;
         
@@ -182,6 +187,12 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         }
       },
       child: BlocBuilder<FriendBloc, FriendState>(
+        buildWhen: (previous, current) {
+          // Chỉ rebuild khi state liên quan đến friend requests (received) thay đổi
+          return current is FriendRequestsLoading ||
+                 current is FriendRequestsLoaded ||
+                 (current is FriendError && previous is FriendRequestsLoading);
+        },
         builder: (context, state) {
           if (state is FriendRequestsLoading) {
             return _buildLoadingState();
@@ -201,7 +212,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 separatorBuilder: (context, index) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
                   final request = state.friendRequests[index];
-                  return _buildFriendRequestCard(request);
+                  return _buildFriendRequestCard(request, state.acceptedRequestIds, state.rejectedRequestIds);
                 },
               ),
             );
@@ -294,7 +305,10 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
     );
   }
   
-  Widget _buildFriendRequestCard(dynamic request) {
+  Widget _buildFriendRequestCard(dynamic request, Set<String> acceptedRequestIds, Set<String> rejectedRequestIds) {
+    final isAccepted = acceptedRequestIds.contains(request.requestId);
+    final isRejected = rejectedRequestIds.contains(request.requestId);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -313,6 +327,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         timeAgo: request.formattedTimeAgo,
         avatarUrl: request.displayAvatarUrl,
         mutualFriendAvatars: request.mutualFriendAvatars,
+        isAccepted: isAccepted,
+        isRejected: isRejected,
         onAccept: () {
           context.read<FriendBloc>().add(
             AcceptFriendRequest(requestId: request.requestId),
@@ -373,22 +389,6 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                       fontSize: 14.sp,
                       color: Colors.grey[600],
                       height: 1.4,
-                    ),
-                  ),
-                  SizedBox(height: 32.h),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
-                    },
-                    icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('Làm mới'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[600],
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
                     ),
                   ),
                 ],
@@ -483,87 +483,70 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
     );
   }
 
-  /// Hiển thị dialog tìm kiếm
-  void _showSearchDialog(BuildContext context) {
-    final TextEditingController searchController = TextEditingController();
-    int? minMutualFriends;
-
-    showDialog(
+  /// Hiển thị bottom modal với các tùy chọn
+  void _showMoreOptions(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Tìm kiếm và lọc',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.r),
+            topRight: Radius.circular(20.r),
           ),
         ),
-        content: Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Tìm theo tên hoặc username',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
+            // Handle bar
+            Container(
+              width: 40.w,
+              height: 4.h,
+              margin: EdgeInsets.symmetric(vertical: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
-            SizedBox(height: 16.h),
-            Row(
-              children: [
-                Text(
-                  'Bạn chung tối thiểu:',
-                  style: TextStyle(fontSize: 14.sp),
+            
+            // Option: Xem lời mời đã gửi
+            ListTile(
+              leading: Icon(
+                Icons.send_outlined,
+                color: Colors.black,
+                size: 24.r,
+              ),
+              title: Text(
+                'Xem lời mời kết bạn đã gửi',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
                 ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: DropdownButtonFormField<int?>(
-                    value: minMutualFriends,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                    items: [
-                      const DropdownMenuItem(value: null, child: Text('Tất cả')),
-                      const DropdownMenuItem(value: 1, child: Text('1+')),
-                      const DropdownMenuItem(value: 5, child: Text('5+')),
-                      const DropdownMenuItem(value: 10, child: Text('10+')),
-                      const DropdownMenuItem(value: 20, child: Text('20+')),
-                    ],
-                    onChanged: (value) => minMutualFriends = value,
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SentFriendRequestsPage(),
                   ),
-                ),
-              ],
+                );
+                // Reload lại friend requests khi quay về
+                if (mounted) {
+                  context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+                }
+              },
             ),
+            
+            SizedBox(height: 16.h),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<FriendBloc>().add(
-                FilterFriendRequests(
-                  searchQuery: searchController.text.trim().isEmpty 
-                      ? null 
-                      : searchController.text.trim(),
-                  minMutualFriends: minMutualFriends,
-                ),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Áp dụng'),
-          ),
-        ],
       ),
     );
   }
 
 
 }
+

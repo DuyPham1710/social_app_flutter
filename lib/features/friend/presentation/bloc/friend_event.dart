@@ -63,3 +63,13 @@ class FilterFriendRequests extends FriendEvent {
     this.minMutualFriends,
   });
 }
+
+class LoadSentFriendRequests extends FriendEvent {
+  const LoadSentFriendRequests();
+}
+
+class CancelSentFriendRequest extends FriendEvent {
+  final String requestId;
+
+  const CancelSentFriendRequest({required this.requestId});
+}

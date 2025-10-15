@@ -4,6 +4,9 @@ abstract class FriendState {
   const FriendState();
 }
 
+// Import for SentFriendRequestEntity
+
+
 class FriendInitial extends FriendState {}
 
 class FriendLoading extends FriendState {}
@@ -24,6 +27,8 @@ class FriendRequestsLoaded extends FriendState {
   final bool ascending;
   final String? searchQuery;
   final int? minMutualFriends;
+  final Set<String> acceptedRequestIds;
+  final Set<String> rejectedRequestIds;
 
   const FriendRequestsLoaded({
     required this.friendRequests,
@@ -32,6 +37,8 @@ class FriendRequestsLoaded extends FriendState {
     this.ascending = false,
     this.searchQuery,
     this.minMutualFriends,
+    this.acceptedRequestIds = const {},
+    this.rejectedRequestIds = const {},
   });
 
   FriendRequestsLoaded copyWith({
@@ -41,6 +48,8 @@ class FriendRequestsLoaded extends FriendState {
     bool? ascending,
     String? searchQuery,
     int? minMutualFriends,
+    Set<String>? acceptedRequestIds,
+    Set<String>? rejectedRequestIds,
   }) {
     return FriendRequestsLoaded(
       friendRequests: friendRequests ?? this.friendRequests,
@@ -49,6 +58,8 @@ class FriendRequestsLoaded extends FriendState {
       ascending: ascending ?? this.ascending,
       searchQuery: searchQuery ?? this.searchQuery,
       minMutualFriends: minMutualFriends ?? this.minMutualFriends,
+      acceptedRequestIds: acceptedRequestIds ?? this.acceptedRequestIds,
+      rejectedRequestIds: rejectedRequestIds ?? this.rejectedRequestIds,
     );
   }
 }
@@ -57,9 +68,22 @@ class FriendSuggestionsLoading extends FriendState {}
 
 class FriendSuggestionsLoaded extends FriendState {
   final List<FriendSuggestionEntity> friendSuggestions;
+  final Set<String> sentRequestUserIds;
 
-  const FriendSuggestionsLoaded({required this.friendSuggestions});
+  const FriendSuggestionsLoaded({
+    required this.friendSuggestions,
+    this.sentRequestUserIds = const {},
+  });
 
+  FriendSuggestionsLoaded copyWith({
+    List<FriendSuggestionEntity>? friendSuggestions,
+    Set<String>? sentRequestUserIds,
+  }) {
+    return FriendSuggestionsLoaded(
+      friendSuggestions: friendSuggestions ?? this.friendSuggestions,
+      sentRequestUserIds: sentRequestUserIds ?? this.sentRequestUserIds,
+    );
+  }
 }
 
 class FriendActionLoading extends FriendState {}
@@ -83,4 +107,26 @@ class FriendActionError extends FriendState {
 
   const FriendActionError({required this.message});
 
+}
+
+class SentFriendRequestsLoading extends FriendState {}
+
+class SentFriendRequestsLoaded extends FriendState {
+  final List<SentFriendRequestEntity> sentRequests;
+  final Set<String> cancelledRequestIds;
+
+  const SentFriendRequestsLoaded({
+    required this.sentRequests,
+    this.cancelledRequestIds = const {},
+  });
+
+  SentFriendRequestsLoaded copyWith({
+    List<SentFriendRequestEntity>? sentRequests,
+    Set<String>? cancelledRequestIds,
+  }) {
+    return SentFriendRequestsLoaded(
+      sentRequests: sentRequests ?? this.sentRequests,
+      cancelledRequestIds: cancelledRequestIds ?? this.cancelledRequestIds,
+    );
+  }
 }
