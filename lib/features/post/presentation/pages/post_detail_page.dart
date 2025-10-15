@@ -5,7 +5,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
@@ -25,10 +24,18 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   late ItemScrollController _scrollController = ItemScrollController();
 
+  void _handlleImageChanged(int newIndex) {
+    _scrollController.scrollTo(
+      index: newIndex + 1, // vì index 0 là header
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
   void _showFullScreenImage(BuildContext context, int initialIndex) async {
     final mediaUrls = widget.post.urls.map((url) => url.url).toList();
 
-    final result = await Navigator.of(context).push<int>(
+    await Navigator.of(context).push<int>(
       PageRouteBuilder(
         opaque: true,
         pageBuilder: (_, animation, __) {
@@ -37,6 +44,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             child: FullScreenImageViewer(
               imageUrls: mediaUrls,
               initialIndex: initialIndex,
+              onImageChanged: _handlleImageChanged,
             ),
           );
         },
@@ -50,15 +58,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
         },
       ),
     );
-
-    // Khi user thoát — nếu có index trả về thì scroll tới ảnh đó
-    if (result != null) {
-      _scrollController.scrollTo(
-        index: result + 1, // +1 vì header nằm ở index 0
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
   }
 
   @override
@@ -138,14 +137,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
                   // Reaction Buttons
                   SizedBox(height: 20.h),
-                  PostAction(),
+                  //   PostAction(),
                 ],
               );
             }
 
             // Index 1+ là các ảnh
             final imageIndex = index - 1;
-            print('Building image at index: $index');
+
             return Column(
               children: [
                 Divider(),

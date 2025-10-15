@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:social_app_fe/core/network/dio_client.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
 import 'package:social_app_fe/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:social_app_fe/features/auth/domain/repository/auth_repository.dart';
@@ -11,6 +12,18 @@ import 'package:social_app_fe/features/auth/domain/usecases/reset_password_useca
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
+import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
+import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/connect_comment_socket_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/get_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_service.dart';
 import 'package:social_app_fe/features/friend/data/repository/friend_repository_impl.dart';
 import 'package:social_app_fe/features/friend/domain/repository/friend_repository.dart';
@@ -35,7 +48,9 @@ Future<void> initializeDependencies() async {
   // Dio
   s1.registerSingleton<Dio>(DioClient.instance);
 
-  // Dependencies
+  // WebSocket - Generic SocketClient
+  s1.registerSingleton<SocketClient>(SocketClient());
+
   // DataSources
   s1.registerLazySingleton<AuthService>(() => AuthService(s1()));
   s1.registerLazySingleton<FriendService>(() => FriendService(s1()));
@@ -43,10 +58,17 @@ Future<void> initializeDependencies() async {
     () => PostRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<CommentRemoteDataSource>(
+    () => CommentRemoteDataSource(s1()),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
   s1.registerLazySingleton<PostRepository>(() => PostRepositoryImpl(s1()));
+  s1.registerLazySingleton<CommentRepository>(
+    () => CommentRepositoryImpl(s1()),
+  );
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
@@ -62,6 +84,26 @@ Future<void> initializeDependencies() async {
 
   s1.registerLazySingleton<GetHomePostsUseCase>(
     () => GetHomePostsUseCase(s1()),
+  );
+
+  // Comment UseCases
+  s1.registerLazySingleton<ConnectCommentSocketUseCase>(
+    () => ConnectCommentSocketUseCase(s1()),
+  );
+  s1.registerLazySingleton<JoinPostUseCase>(() => JoinPostUseCase(s1()));
+  s1.registerLazySingleton<LeavePostUseCase>(() => LeavePostUseCase(s1()));
+  s1.registerLazySingleton<EmitTypingUseCase>(() => EmitTypingUseCase(s1()));
+  s1.registerLazySingleton<ListenTypingUseCase>(
+    () => ListenTypingUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetCommentCountUseCase>(
+    () => GetCommentCountUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenCommentCountUseCase>(
+    () => ListenCommentCountUseCase(s1()),
+  );
+  s1.registerLazySingleton<LoadCommentsUseCase>(
+    () => LoadCommentsUseCase(s1()),
   );
 
   // Friend Usecases
@@ -86,7 +128,23 @@ Future<void> initializeDependencies() async {
     ),
   );
 
-  s1.registerFactory<HomeBloc>(() => HomeBloc(getHomePostsUseCase: s1()));
+  s1.registerFactory<HomeBloc>(
+    () => HomeBloc(
+      getHomePostsUseCase: s1(),
+      connectCommentSocketUseCase: s1(),
+      listenCommentCountUseCase: s1(),
+      loadCommentsUseCase: s1(),
+    ),
+  );
+
+  s1.registerFactory<CommentBloc>(
+    () => CommentBloc(
+      joinPostUseCase: s1(),
+      leavePostUseCase: s1(),
+      emitTypingUseCase: s1(),
+      listenTypingUseCase: s1(),
+    ),
+  );
 
   s1.registerFactory<FriendBloc>(
     () => FriendBloc(

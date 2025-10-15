@@ -119,7 +119,12 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true, // giúp list con chiếm chiều cao vừa đủ
                     itemCount: state.posts?.length,
                     itemBuilder: (context, index) {
-                      return PostItem(post: state.posts![index]);
+                      final post = state.posts![index];
+                      final commentCount = state.commentCounts?[post.id] ?? 0;
+                      return PostItem(
+                        post: post,
+                        commentCount: commentCount,
+                      );
                     },
                   ),
 
