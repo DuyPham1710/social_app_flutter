@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
 
 abstract class CommentDetailsEvent extends Equatable {
   const CommentDetailsEvent();
@@ -23,4 +24,26 @@ class RefreshCommentDetailsEvent extends CommentDetailsEvent {
 
   @override
   List<Object?> get props => [postId];
+}
+
+class StartListeningCommentsEvent extends CommentDetailsEvent {
+  final String postId;
+
+  const StartListeningCommentsEvent(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}
+
+class StopListeningCommentsEvent extends CommentDetailsEvent {
+  const StopListeningCommentsEvent();
+}
+
+class CommentsUpdatedEvent extends CommentDetailsEvent {
+  final CommentsLoadedEntity commentsData;
+
+  const CommentsUpdatedEvent(this.commentsData);
+
+  @override
+  List<Object?> get props => [commentsData];
 }

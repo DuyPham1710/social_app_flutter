@@ -49,6 +49,9 @@ class _ModalCommentState extends State<ModalComment> {
     // Load comment details
     _commentDetailsBloc.add(LoadCommentDetailsEvent(widget.postId));
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _commentDetailsBloc.add(RefreshCommentDetailsEvent(widget.postId));
+    });
     // Listen text changes để emit typing
     _controller.addListener(_onTextChanged);
 
@@ -75,6 +78,7 @@ class _ModalCommentState extends State<ModalComment> {
     // Leave post khi đóng modal
     _commentBloc.add(LeavePostEvent(widget.postId));
     _commentBloc.close();
+    _commentDetailsBloc.add(StopListeningCommentsEvent());
     _commentDetailsBloc.close();
     _controller.dispose();
     _focusNode.dispose();

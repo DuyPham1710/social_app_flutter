@@ -83,13 +83,16 @@ class CommentRemoteDataSource {
     _socketClient.on('commentAdded').listen((data) {
       developer.log('Comment added event', name: 'CommentDataSource');
       try {
-        final postId = data['postId'] as String;
+        //   final postId = data['postId'] as String;
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+        final postId = commentsLoadedModel.postId;
 
         // Tăng số lượng comment cho post này
         _commentCounts[postId] = (_commentCounts[postId] ?? 0) + 1;
 
         // Emit updated counts
         _commentCountController.add(Map.from(_commentCounts));
+        _commentsLoadedController.add(commentsLoadedModel);
       } catch (e) {
         developer.log(
           'Error parsing commentAdded: $e',
@@ -102,13 +105,16 @@ class CommentRemoteDataSource {
     _socketClient.on('commentAdded:ack').listen((data) {
       developer.log('Comment added ack event', name: 'CommentDataSource');
       try {
-        final postId = data['postId'] as String;
+        //final postId = data['postId'] as String;
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+        final postId = commentsLoadedModel.postId;
 
         // Tăng số lượng comment cho post này
         _commentCounts[postId] = (_commentCounts[postId] ?? 0) + 1;
 
         // Emit updated counts
         _commentCountController.add(Map.from(_commentCounts));
+        _commentsLoadedController.add(commentsLoadedModel);
       } catch (e) {
         developer.log(
           'Error parsing commentAdded:ack: $e',
@@ -215,7 +221,27 @@ class CommentRemoteDataSource {
 
   /// Get comments loaded data for a post
   CommentsLoadedModel? getCommentsLoadedData(String postId) {
-    return _commentsLoadedData[postId];
+    final data = _commentsLoadedData[postId];
+    developer.log(
+      'Getting cached data for post $postId: ${data?.count ?? 0} comments, cache size: ${_commentsLoadedData.length}',
+      name: 'CommentDataSource',
+    );
+    return data;
+  }
+
+  /// Clear cached comments data for a post and force reload
+  void clearCommentsCache(String postId) {
+    developer.log(
+      'Clearing comments cache for post: $postId (had ${_commentsLoadedData[postId]?.count ?? 0} comments)',
+      name: 'CommentDataSource',
+    );
+    _commentsLoadedData.remove(postId);
+    // Force reload comments from server
+    loadComments(postId);
+    developer.log(
+      'Cache cleared and reload requested for post: $postId',
+      name: 'CommentDataSource',
+    );
   }
 
   /// Disconnect

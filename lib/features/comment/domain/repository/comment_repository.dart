@@ -26,6 +26,9 @@ abstract class CommentRepository {
   /// Stream để lắng nghe comment count updates
   Stream<Map<String, int>> get commentCountStream;
 
+  /// Stream để lắng nghe comments loaded events
+  Stream<CommentsLoadedEntity> get commentsLoadedStream;
+
   /// Get comments loaded data cho một post
   Future<DataState<CommentsLoadedEntity?>> getCommentsLoadedData(String postId);
 

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class CommentInputField extends StatelessWidget {
   final TextEditingController controller;
@@ -45,6 +46,10 @@ class CommentInputField extends StatelessWidget {
                 focusNode: focusNode,
                 decoration: InputDecoration(
                   hintText: 'What do you think of this?',
+                  hintStyle: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14.sp,
+                  ),
                   border: InputBorder.none,
                 ),
                 minLines: 1,

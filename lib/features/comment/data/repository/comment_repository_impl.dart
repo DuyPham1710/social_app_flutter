@@ -48,6 +48,17 @@ class CommentRepositoryImpl implements CommentRepository {
       _remoteDataSource.commentCountStream;
 
   @override
+  Stream<CommentsLoadedModel> get commentsLoadedStream =>
+      _remoteDataSource.commentsLoadedStream.map(
+        (model) => CommentsLoadedModel(
+          postId: model.postId,
+          comments: model.comments, // Tạm thời empty, sẽ implement sau
+          count: model.count,
+          timestamp: model.timestamp,
+        ),
+      );
+
+  @override
   Future<DataState<CommentsLoadedModel?>> getCommentsLoadedData(
     String postId,
   ) async {

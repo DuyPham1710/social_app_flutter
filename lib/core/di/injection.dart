@@ -22,6 +22,7 @@ import 'package:social_app_fe/features/comment/domain/usecases/get_comments_load
 import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comments_loaded_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
@@ -41,6 +42,7 @@ import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -110,6 +112,10 @@ Future<void> initializeDependencies() async {
     () => GetCommentsLoadedDataUseCase(s1()),
   );
 
+  s1.registerLazySingleton<ListenCommentsLoadedUseCase>(
+    () => ListenCommentsLoadedUseCase(s1()),
+  );
+
   // Friend Usecases
   s1.registerLazySingleton<GetFriendsUseCase>(() => GetFriendsUseCase(s1()));
   s1.registerLazySingleton<GetFriendRequestsUseCase>(
@@ -149,6 +155,15 @@ Future<void> initializeDependencies() async {
     ),
   );
 
+  s1.registerFactory<PostDetailBloc>(
+    () => PostDetailBloc(
+      joinPostUseCase: s1(),
+      leavePostUseCase: s1(),
+      listenCommentCountUseCase: s1(),
+      loadCommentsUseCase: s1(),
+    ),
+  );
+
   s1.registerFactory<CommentBloc>(
     () => CommentBloc(
       joinPostUseCase: s1(),
@@ -159,7 +174,10 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<CommentDetailsBloc>(
-    () => CommentDetailsBloc(getCommentsLoadedDataUseCase: s1()),
+    () => CommentDetailsBloc(
+      getCommentsLoadedDataUseCase: s1(),
+      listenCommentsLoadedUseCase: s1(),
+    ),
   );
 
   s1.registerFactory<FriendBloc>(
