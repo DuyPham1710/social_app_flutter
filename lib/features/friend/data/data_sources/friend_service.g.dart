@@ -10,7 +10,7 @@ part of 'friend_service.dart';
 
 class _FriendService implements FriendService {
   _FriendService(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'http://192.168.100.218:3000/';
+    baseUrl ??= 'http://192.168.0.158:3000/';
   }
 
   final Dio _dio;

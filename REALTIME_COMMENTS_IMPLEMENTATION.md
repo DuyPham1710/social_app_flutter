@@ -20,7 +20,7 @@ Tính năng này cho phép hiển thị số lượng bình luận realtime trê
 - **File**: `lib/core/network/websocket/comment_socket_service.dart`
   - Service quản lý kết nối WebSocket với comment gateway backend
   - Namespace: `/comment`
-  - Base URL: Lấy từ `BASE_URL` constant (http://192.168.100.218:3000/)
+  - Base URL: Lấy từ `BASE_URL` constant (http://192.168.0.158:3000/)
 
 #### Các Event WebSocket Được Hỗ Trợ:
 
@@ -206,7 +206,7 @@ commentSocketService.commentDeletedStream.listen((event) {
 
 ### Test Backend Connection:
 
-1. Đảm bảo backend đang chạy ở `http://192.168.100.218:3000`
+1. Đảm bảo backend đang chạy ở `http://192.168.0.158:3000`
 2. Kiểm tra namespace `/comment` có hoạt động
 3. Login vào app để có `userId`
 4. Mở trang home và check logs:

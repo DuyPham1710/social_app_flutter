@@ -47,3 +47,12 @@ class CommentsUpdatedEvent extends CommentDetailsEvent {
   @override
   List<Object?> get props => [commentsData];
 }
+
+class ClearCommentCacheEvent extends CommentDetailsEvent {
+  final String postId;
+
+  const ClearCommentCacheEvent(this.postId);
+
+  @override
+  List<Object?> get props => [postId];
+}

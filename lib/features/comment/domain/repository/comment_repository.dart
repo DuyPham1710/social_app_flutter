@@ -1,6 +1,8 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
+import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/add_comment_usecase.dart';
 
 abstract class CommentRepository {
   /// Connect to comment socket
@@ -31,6 +33,10 @@ abstract class CommentRepository {
 
   /// Get comments loaded data cho một post
   Future<DataState<CommentsLoadedEntity?>> getCommentsLoadedData(String postId);
+
+  Future<void> clearCommentsCache(String postId);
+
+  void addComment(AddCommentParams params);
 
   /// Disconnect
   void disconnect();

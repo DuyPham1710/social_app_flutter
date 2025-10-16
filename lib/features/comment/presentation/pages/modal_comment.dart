@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/comment/presentation/widgets/comment_head
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_input_field.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/empty_comments_widget.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/typing_indicator.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ModalComment extends StatefulWidget {
   final String postId;
@@ -46,12 +47,9 @@ class _ModalCommentState extends State<ModalComment> {
     // Join post khi mở modal
     _commentBloc.add(JoinPostEvent(widget.postId));
 
-    // Load comment details
+    // Load comment details - không clear cache mỗi lần
     _commentDetailsBloc.add(LoadCommentDetailsEvent(widget.postId));
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _commentDetailsBloc.add(RefreshCommentDetailsEvent(widget.postId));
-    });
     // Listen text changes để emit typing
     _controller.addListener(_onTextChanged);
 
@@ -251,11 +249,20 @@ class _ModalCommentState extends State<ModalComment> {
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                    '6 ngày',
+                                                    comments[index].updatedAt !=
+                                                            null
+                                                        ? timeago.format(
+                                                            comments[index]
+                                                                .updatedAt!,
+                                                          )
+                                                        : "Unknown date",
+
                                                     style: TextStyle(
                                                       fontSize: 12.sp,
                                                       color: AppColors
                                                           .textSecondary,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                   SizedBox(width: 10.w),
@@ -369,7 +376,12 @@ class _ModalCommentState extends State<ModalComment> {
                   focusNode: _focusNode,
                   onSend: () async {
                     if (_controller.text.isNotEmpty) {
-                      print('Posting comment: ${_controller.text}');
+                      final text = _controller.text.trim();
+
+                      // Gửi event vào bloc
+                      context.read<CommentBloc>().add(
+                        AddCommentEvent(postId: widget.postId, content: text),
+                      );
                       // Clear the input field
                       _controller.clear();
                       _focusNode.unfocus();

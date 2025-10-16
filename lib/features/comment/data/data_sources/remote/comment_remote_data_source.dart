@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
 import 'package:social_app_fe/features/comment/data/models/typing_event_model.dart';
+import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 
 class CommentRemoteDataSource {
   final SocketClient _socketClient;
@@ -242,6 +243,14 @@ class CommentRemoteDataSource {
       'Cache cleared and reload requested for post: $postId',
       name: 'CommentDataSource',
     );
+  }
+
+  void addComment(AddCommentParams params) async {
+    developer.log(
+      'Sending new comment for post: ${params.postId}',
+      name: 'CommentRemoteDataSource',
+    );
+    _socketClient.emit('newComment', params.toJson());
   }
 
   /// Disconnect

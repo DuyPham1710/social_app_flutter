@@ -3,6 +3,7 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
+import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
 
 class CommentRepositoryImpl implements CommentRepository {
@@ -78,6 +79,16 @@ class CommentRepositoryImpl implements CommentRepository {
         DioException(requestOptions: RequestOptions(), message: e.toString()),
       );
     }
+  }
+
+  @override
+  Future<void> clearCommentsCache(String postId) async {
+    _remoteDataSource.clearCommentsCache(postId);
+  }
+
+  @override
+  void addComment(AddCommentParams params) async {
+    _remoteDataSource.addComment(params);
   }
 
   @override

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/usecase/usecase.dart';
+import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/add_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
@@ -14,6 +16,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final LeavePostUseCase _leavePostUseCase;
   final EmitTypingUseCase _emitTypingUseCase;
   final ListenTypingUseCase _listenTypingUseCase;
+  final AddCommentUseCase _addCommentUseCase;
   Timer? _typingDebounce;
   StreamSubscription? _typingSubscription;
 
@@ -22,15 +25,28 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     required LeavePostUseCase leavePostUseCase,
     required EmitTypingUseCase emitTypingUseCase,
     required ListenTypingUseCase listenTypingUseCase,
+    required AddCommentUseCase addCommentUseCase,
   }) : _joinPostUseCase = joinPostUseCase,
        _leavePostUseCase = leavePostUseCase,
        _emitTypingUseCase = emitTypingUseCase,
        _listenTypingUseCase = listenTypingUseCase,
+       _addCommentUseCase = addCommentUseCase,
        super(CommentInitial()) {
     on<JoinPostEvent>(_onJoinPost);
     on<LeavePostEvent>(_onLeavePost);
     on<UserTypingEvent>(_onUserTyping);
     on<UpdateTypingUsersEvent>(_onUpdateTypingUsers);
+    on<AddCommentEvent>(_onAddComment);
+  }
+
+  void _onAddComment(AddCommentEvent event, Emitter<CommentState> emit) {
+    _addCommentUseCase(
+      params: AddCommentParams(
+        postId: event.postId,
+        content: event.content,
+        parentId: event.parentId,
+      ),
+    );
   }
 
   void _onJoinPost(JoinPostEvent event, Emitter<CommentState> emit) {
