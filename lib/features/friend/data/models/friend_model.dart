@@ -12,6 +12,8 @@ class FriendModel extends FriendEntity with _$FriendModel {
     @JsonKey(includeIfNull: false) String? username,
     @JsonKey(includeIfNull: false) String? avatarUrl,
     @JsonKey(includeIfNull: false) String? bio,
+    @JsonKey(includeIfNull: false) int? mutualFriendsCount,
+    @JsonKey(includeIfNull: false) List<String>? mutualFriendAvatars,
   }) = _FriendModel;
 
   factory FriendModel.fromJson(Map<String, dynamic> json) =>

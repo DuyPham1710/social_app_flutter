@@ -21,7 +21,11 @@ class _FriendPageState extends State<FriendPage> {
   void initState() {
     super.initState();
     // Load data khi khởi tạo
-    context.read<FriendBloc>().add(LoadFriendRequests(received: true));
+    _loadData();
+  }
+
+  void _loadData() {
+    context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
     context.read<FriendBloc>().add(LoadFriendSuggestions());
   }
 
@@ -44,20 +48,26 @@ class _FriendPageState extends State<FriendPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const FriendHeaderChips(),
+              FriendHeaderChips(
+                onNeedRefresh: _loadData,
+              ),
               SizedBox(height: 16.h),
 
               // Lời mời kết bạn
               _buildSectionHeader(
                 title: 'Lời mời kết bạn',
                 trailing: 'Xem tất cả',
-                onTapTrailing: () {
-                  Navigator.push(
+                onTapTrailing: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const FriendRequestsPage(),
                     ),
                   );
+                  // Reload data khi quay lại từ trang chi tiết
+                  if (mounted) {
+                    _loadData();
+                  }
                 },
               ),
               SizedBox(height: 8.h),

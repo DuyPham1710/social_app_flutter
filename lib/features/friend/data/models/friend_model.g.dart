@@ -13,6 +13,10 @@ _$FriendModelImpl _$$FriendModelImplFromJson(Map<String, dynamic> json) =>
       username: json['username'] as String?,
       avatarUrl: json['avatarUrl'] as String?,
       bio: json['bio'] as String?,
+      mutualFriendsCount: (json['mutualFriendsCount'] as num?)?.toInt(),
+      mutualFriendAvatars: (json['mutualFriendAvatars'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$$FriendModelImplToJson(_$FriendModelImpl instance) =>
@@ -22,4 +26,8 @@ Map<String, dynamic> _$$FriendModelImplToJson(_$FriendModelImpl instance) =>
       if (instance.username case final value?) 'username': value,
       if (instance.avatarUrl case final value?) 'avatarUrl': value,
       if (instance.bio case final value?) 'bio': value,
+      if (instance.mutualFriendsCount case final value?)
+        'mutualFriendsCount': value,
+      if (instance.mutualFriendAvatars case final value?)
+        'mutualFriendAvatars': value,
     };

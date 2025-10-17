@@ -11,5 +11,3 @@ class GetMutualFriendsUseCase {
     return await friendRepository.getMutualFriends(targetUserId, limit: limit);
   }
 }
-
-

@@ -65,3 +65,5 @@ abstract class SentFriendRequestEntity {
   }
 }
 
+
+
