@@ -131,6 +131,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetFriendRequestsUseCase>(
     () => GetFriendRequestsUseCase(s1()),
   );
+  s1.registerLazySingleton<GetSentFriendRequestsUseCase>(
+    () => GetSentFriendRequestsUseCase(s1()),
+  );
   s1.registerLazySingleton<GetFriendSuggestionsUseCase>(
     () => GetFriendSuggestionsUseCase(s1()),
   );
@@ -143,7 +146,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<RejectFriendRequestUseCase>(
     () => RejectFriendRequestUseCase(s1()),
   );
-  s1.registerLazySingleton<CancelFriendRequestUseCase>(() => CancelFriendRequestUseCase(s1()));
+  s1.registerLazySingleton<CancelFriendRequestUseCase>(
+    () => CancelFriendRequestUseCase(s1()),
+  );
 
   // Blocs
   s1.registerFactory<AuthBloc>(
