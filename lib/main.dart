@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/config/theme/app_theme.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -17,6 +18,9 @@ import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
+  print('BASE_URL: ${dotenv.env['BASE_URL']}');
   await initializeDependencies();
 
   final authBloc = s1<AuthBloc>();

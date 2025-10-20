@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/core/constants/constants.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -33,7 +34,7 @@ class SocketClient {
       disconnect();
     }
 
-    final baseUrl = BASE_URL.replaceAll(RegExp(r'/$'), '');
+    final baseUrl = dotenv.env['BASE_URL']?.replaceAll(RegExp(r'/$'), '') ?? '';
     final socketUrl = baseUrl.replaceAll(RegExp(r'http'), 'ws');
     _currentNamespace = namespace;
 

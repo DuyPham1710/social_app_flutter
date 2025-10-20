@@ -10,7 +10,7 @@ part of 'post_remote_data_source.dart';
 
 class _PostRemoteDataSource implements PostRemoteDataSource {
   _PostRemoteDataSource(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'http://192.168.0.158:3000/';
+    baseUrl ??= _dio.options.baseUrl;
   }
 
   final Dio _dio;

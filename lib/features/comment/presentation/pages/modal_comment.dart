@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
@@ -11,6 +12,7 @@ import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.d
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_header_widget.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_input_field.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/empty_comments_widget.dart';
+import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/typing_indicator.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -69,6 +71,13 @@ class _ModalCommentState extends State<ModalComment> {
       // User cleared text
       _commentBloc.add(UserTypingEvent(postId: widget.postId, isTyping: false));
     }
+  }
+
+  void _onReactionChanged(String commentId, EmojiType reaction) {
+    // TODO: Implement reaction logic với server
+    print('Comment $commentId reacted with ${reaction.label}');
+    // Có thể emit event để cập nhật server
+    // _commentBloc.add(ReactToCommentEvent(commentId: commentId, reaction: reaction));
   }
 
   @override
@@ -265,18 +274,18 @@ class _ModalCommentState extends State<ModalComment> {
                                                           FontWeight.w500,
                                                     ),
                                                   ),
+
                                                   SizedBox(width: 10.w),
-                                                  Text(
-                                                    'Thích',
-                                                    style: TextStyle(
-                                                      fontSize: 12.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .textSecondary,
-                                                    ),
+
+                                                  ReactionText(
+                                                    commentId:
+                                                        comments[index].id,
+                                                    onReactionChanged:
+                                                        _onReactionChanged,
                                                   ),
+
                                                   SizedBox(width: 10.w),
+
                                                   Text(
                                                     'Trả lời',
                                                     style: TextStyle(
@@ -368,9 +377,9 @@ class _ModalCommentState extends State<ModalComment> {
                 ),
 
                 Divider(height: 1.h, color: Colors.grey[300]),
-                // _buildTypingIndicator(),
-                // _buildCommentInput(context),
+
                 const TypingIndicator(),
+
                 CommentInputField(
                   controller: _controller,
                   focusNode: _focusNode,
@@ -395,129 +404,4 @@ class _ModalCommentState extends State<ModalComment> {
       ),
     );
   }
-
-  // Widget _buildTypingIndicator() {
-  //   return BlocBuilder<CommentBloc, CommentState>(
-  //     builder: (context, state) {
-  //       if (state is CommentJoined && state.typingUsers.isNotEmpty) {
-  //         final typingUsers = state.typingUsers.toList();
-  //         String typingText;
-
-  //         if (typingUsers.length == 1) {
-  //           typingText = '${typingUsers[0].username ?? 'Someone'} is typing...';
-  //         } else if (typingUsers.length == 2) {
-  //           typingText =
-  //               '${typingUsers[0].username ?? 'Someone'} and ${typingUsers[1].username ?? 'someone'} are typing...';
-  //         } else {
-  //           typingText =
-  //               '${typingUsers[0].username ?? 'Someone'} and ${typingUsers.length - 1} others are typing...';
-  //         }
-
-  //         return Container(
-  //           padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
-  //           child: Row(
-  //             crossAxisAlignment: CrossAxisAlignment.center,
-  //             children: [
-  //               //_buildTypingDots(),
-  //               SizedBox(
-  //                 width: 36.w,
-  //                 height: 26.h,
-  //                 child: ClipRect(
-  //                   child: OverflowBox(
-  //                     maxWidth: 100.w,
-  //                     maxHeight: 80.h,
-  //                     child: ColorFiltered(
-  //                       colorFilter: ColorFilter.mode(
-  //                         AppColors.textSecondary, // Màu giống với text
-  //                         BlendMode.srcATop,
-  //                       ),
-  //                       child: Lottie.asset(
-  //                         'animations/dots_loader.json',
-  //                         repeat: true,
-  //                         fit: BoxFit.contain,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //               SizedBox(width: 8.w),
-
-  //               Expanded(
-  //                 child: Text(
-  //                   typingText,
-  //                   style: TextStyle(
-  //                     fontSize: 12.sp,
-  //                     color: AppColors.textSecondary,
-  //                     fontStyle: FontStyle.italic,
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //       }
-  //       return const SizedBox.shrink();
-  //     },
-  //   );
-  // }
-
-  // Widget _buildCommentInput(BuildContext context) {
-  //   return Padding(
-  //     padding: EdgeInsets.only(
-  //       bottom: MediaQuery.of(
-  //         context,
-  //       ).viewInsets.bottom, // đẩy lên khi bàn phím mở
-  //       left: 16.w,
-  //       right: 10.w,
-  //       top: 8.h,
-  //     ),
-  //     child: Row(
-  //       crossAxisAlignment: CrossAxisAlignment.center,
-  //       children: [
-  //         CircleAvatar(
-  //           radius: 18.r,
-  //           backgroundImage: NetworkImage(
-  //             'https://i.pinimg.com/736x/8b/28/8d/8b288dbd8cb07d0f85adc8bdd7006ecc.jpg',
-  //           ),
-  //         ),
-  //         SizedBox(width: 10.w),
-
-  //         Expanded(
-  //           child: Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 12.w),
-  //             decoration: BoxDecoration(color: Colors.transparent),
-  //             child: TextField(
-  //               controller: _controller,
-  //               focusNode: _focusNode,
-  //               decoration: InputDecoration(
-  //                 hintText: 'What do you think of this?',
-  //                 border: InputBorder.none,
-  //               ),
-  //               minLines: 1,
-  //               maxLines: 5,
-  //             ),
-  //           ),
-  //         ),
-
-  //         SizedBox(width: 6.w),
-
-  //         IconButton(
-  //           icon: Icon(
-  //             CupertinoIcons.paperplane_fill,
-  //             color: Colors.blueAccent,
-  //             size: 24.sp,
-  //           ),
-  //           onPressed: () async {
-  //             if (_controller.text.isNotEmpty) {
-  //               print('Posting comment: ${_controller.text}');
-  //               // Clear the input field
-  //               _controller.clear();
-  //               _focusNode.unfocus();
-  //             }
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }

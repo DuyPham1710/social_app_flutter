@@ -10,7 +10,7 @@ import 'package:social_app_fe/features/auth/data/models/verify_otp_request.dart'
 
 part 'auth_service.g.dart';
 
-@RestApi(baseUrl: BASE_URL)
+@RestApi()
 abstract class AuthService {
   factory AuthService(Dio dio) = _AuthService;
 
