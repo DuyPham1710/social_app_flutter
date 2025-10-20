@@ -1,15 +1,16 @@
-// import 'package:social_app_fe/core/usecase/usecase.dart';
-// import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
+import 'package:social_app_fe/core/usecase/usecase.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
+import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
 
-// /// UseCase để lắng nghe comments loaded event
-// class ListenCommentsLoadedUseCase
-//     implements StreamUseCase<CommentsLoadedData, NoParams> {
-//   final CommentRepository _repository;
+/// UseCase để lắng nghe comments loaded event
+class ListenCommentsLoadedUseCase
+    implements StreamUseCase<CommentsLoadedEntity, NoParams> {
+  final CommentRepository _repository;
 
-//   ListenCommentsLoadedUseCase(this._repository);
+  ListenCommentsLoadedUseCase(this._repository);
 
-//   @override
-//   Stream<CommentsLoadedData> call({required NoParams params}) {
-//     return _repository.commentsLoadedStream;
-//   }
-// }
+  @override
+  Stream<CommentsLoadedEntity> call({required NoParams params}) {
+    return _repository.commentsLoadedStream;
+  }
+}

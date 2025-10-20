@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:pinput/pinput.dart';
-import 'package:social_app_fe/core/constants/constants.dart';
 import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
@@ -22,7 +22,9 @@ class OtpPage extends StatefulWidget {
 
 class _OtpPageState extends State<OtpPage> {
   String otpCode = '';
-  int _secondsRemaining = OTP_DURATION; // 1 phút
+  int _secondsRemaining = int.parse(
+    dotenv.env['OTP_DURATION'] ?? '60',
+  ); // 1 phút
   Timer? _timer;
   String? _email; // Lưu email vào biến local
   bool? _isForgotPassword;
@@ -81,7 +83,7 @@ class _OtpPageState extends State<OtpPage> {
 
   void _startCountdown() {
     _timer?.cancel(); // hủy timer cũ nếu có
-    _secondsRemaining = OTP_DURATION;
+    _secondsRemaining = int.parse(dotenv.env['OTP_DURATION'] ?? '60');
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
         setState(() {
