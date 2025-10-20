@@ -9,9 +9,7 @@ part of 'auth_service.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _AuthService implements AuthService {
-  _AuthService(this._dio, {this.baseUrl}) {
-    baseUrl ??= _dio.options.baseUrl;
-  }
+  _AuthService(this._dio, {this.baseUrl});
 
   final Dio _dio;
 

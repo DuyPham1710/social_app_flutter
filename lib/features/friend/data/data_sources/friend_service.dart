@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
-import 'package:social_app_fe/core/constants/constants.dart';
 import 'package:social_app_fe/features/friend/data/models/friend_model.dart';
 import 'package:social_app_fe/features/friend/data/models/friend_request_model.dart';
-import 'package:social_app_fe/features/friend/data/models/friend_suggestion_model.dart';
 import 'package:social_app_fe/features/friend/data/models/relationship_status_model.dart';
 
 part 'friend_service.g.dart';
