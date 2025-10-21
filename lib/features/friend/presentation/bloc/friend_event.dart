@@ -73,3 +73,9 @@ class CancelSentFriendRequest extends FriendEvent {
 
   const CancelSentFriendRequest({required this.requestId});
 }
+
+class RemoveFriend extends FriendEvent {
+  final String friendId;
+
+  const RemoveFriend({required this.friendId});
+}

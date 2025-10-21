@@ -17,6 +17,9 @@ _$FriendModelImpl _$$FriendModelImplFromJson(Map<String, dynamic> json) =>
       mutualFriendAvatars: (json['mutualFriendAvatars'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      friendsSince: json['friendsSince'] == null
+          ? null
+          : DateTime.parse(json['friendsSince'] as String),
     );
 
 Map<String, dynamic> _$$FriendModelImplToJson(_$FriendModelImpl instance) =>
@@ -30,4 +33,6 @@ Map<String, dynamic> _$$FriendModelImplToJson(_$FriendModelImpl instance) =>
         'mutualFriendsCount': value,
       if (instance.mutualFriendAvatars case final value?)
         'mutualFriendAvatars': value,
+      if (instance.friendsSince?.toIso8601String() case final value?)
+        'friendsSince': value,
     };

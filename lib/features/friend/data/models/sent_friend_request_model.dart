@@ -82,3 +82,6 @@ class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRe
 
 
 
+
+
+

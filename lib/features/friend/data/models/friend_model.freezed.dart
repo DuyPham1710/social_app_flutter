@@ -35,6 +35,8 @@ mixin _$FriendModel {
   int? get mutualFriendsCount => throw _privateConstructorUsedError;
   @JsonKey(includeIfNull: false)
   List<String>? get mutualFriendAvatars => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  DateTime? get friendsSince => throw _privateConstructorUsedError;
 
   /// Serializes this FriendModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -61,6 +63,7 @@ abstract class $FriendModelCopyWith<$Res> {
     @JsonKey(includeIfNull: false) String? bio,
     @JsonKey(includeIfNull: false) int? mutualFriendsCount,
     @JsonKey(includeIfNull: false) List<String>? mutualFriendAvatars,
+    @JsonKey(includeIfNull: false) DateTime? friendsSince,
   });
 }
 
@@ -86,6 +89,7 @@ class _$FriendModelCopyWithImpl<$Res, $Val extends FriendModel>
     Object? bio = freezed,
     Object? mutualFriendsCount = freezed,
     Object? mutualFriendAvatars = freezed,
+    Object? friendsSince = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -117,6 +121,10 @@ class _$FriendModelCopyWithImpl<$Res, $Val extends FriendModel>
                 ? _value.mutualFriendAvatars
                 : mutualFriendAvatars // ignore: cast_nullable_to_non_nullable
                       as List<String>?,
+            friendsSince: freezed == friendsSince
+                ? _value.friendsSince
+                : friendsSince // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -140,6 +148,7 @@ abstract class _$$FriendModelImplCopyWith<$Res>
     @JsonKey(includeIfNull: false) String? bio,
     @JsonKey(includeIfNull: false) int? mutualFriendsCount,
     @JsonKey(includeIfNull: false) List<String>? mutualFriendAvatars,
+    @JsonKey(includeIfNull: false) DateTime? friendsSince,
   });
 }
 
@@ -164,6 +173,7 @@ class __$$FriendModelImplCopyWithImpl<$Res>
     Object? bio = freezed,
     Object? mutualFriendsCount = freezed,
     Object? mutualFriendAvatars = freezed,
+    Object? friendsSince = freezed,
   }) {
     return _then(
       _$FriendModelImpl(
@@ -195,6 +205,10 @@ class __$$FriendModelImplCopyWithImpl<$Res>
             ? _value._mutualFriendAvatars
             : mutualFriendAvatars // ignore: cast_nullable_to_non_nullable
                   as List<String>?,
+        friendsSince: freezed == friendsSince
+            ? _value.friendsSince
+            : friendsSince // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -211,6 +225,7 @@ class _$FriendModelImpl implements _FriendModel {
     @JsonKey(includeIfNull: false) this.bio,
     @JsonKey(includeIfNull: false) this.mutualFriendsCount,
     @JsonKey(includeIfNull: false) final List<String>? mutualFriendAvatars,
+    @JsonKey(includeIfNull: false) this.friendsSince,
   }) : _mutualFriendAvatars = mutualFriendAvatars;
 
   factory _$FriendModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -247,8 +262,12 @@ class _$FriendModelImpl implements _FriendModel {
   }
 
   @override
+  @JsonKey(includeIfNull: false)
+  final DateTime? friendsSince;
+
+  @override
   String toString() {
-    return 'FriendModel(userId: $userId, fullName: $fullName, username: $username, avatarUrl: $avatarUrl, bio: $bio, mutualFriendsCount: $mutualFriendsCount, mutualFriendAvatars: $mutualFriendAvatars)';
+    return 'FriendModel(userId: $userId, fullName: $fullName, username: $username, avatarUrl: $avatarUrl, bio: $bio, mutualFriendsCount: $mutualFriendsCount, mutualFriendAvatars: $mutualFriendAvatars, friendsSince: $friendsSince)';
   }
 
   @override
@@ -269,7 +288,9 @@ class _$FriendModelImpl implements _FriendModel {
             const DeepCollectionEquality().equals(
               other._mutualFriendAvatars,
               _mutualFriendAvatars,
-            ));
+            ) &&
+            (identical(other.friendsSince, friendsSince) ||
+                other.friendsSince == friendsSince));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -283,6 +304,7 @@ class _$FriendModelImpl implements _FriendModel {
     bio,
     mutualFriendsCount,
     const DeepCollectionEquality().hash(_mutualFriendAvatars),
+    friendsSince,
   );
 
   /// Create a copy of FriendModel
@@ -308,6 +330,7 @@ abstract class _FriendModel implements FriendModel {
     @JsonKey(includeIfNull: false) final String? bio,
     @JsonKey(includeIfNull: false) final int? mutualFriendsCount,
     @JsonKey(includeIfNull: false) final List<String>? mutualFriendAvatars,
+    @JsonKey(includeIfNull: false) final DateTime? friendsSince,
   }) = _$FriendModelImpl;
 
   factory _FriendModel.fromJson(Map<String, dynamic> json) =
@@ -334,6 +357,9 @@ abstract class _FriendModel implements FriendModel {
   @override
   @JsonKey(includeIfNull: false)
   List<String>? get mutualFriendAvatars;
+  @override
+  @JsonKey(includeIfNull: false)
+  DateTime? get friendsSince;
 
   /// Create a copy of FriendModel
   /// with the given fields replaced by the non-null parameter values.

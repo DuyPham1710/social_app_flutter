@@ -25,9 +25,17 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return BlocListener<FriendBloc, FriendState>(
+      listener: (context, state) {
+        if (state is FriendActionSuccess) {
+          _showMessage(context, state.message);
+        } else if (state is FriendActionError) {
+          _showMessage(context, state.message);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -150,7 +158,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                                 _showMessage(context, 'Nhắn tin cho ${friend.fullName}');
                               },
                               onMoreOptions: () {
-                                _showMoreOptions(context, friend.fullName ?? 'Người dùng');
+                                _showMoreOptions(context, friend);
                               },
                             );
                           },
@@ -206,6 +214,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
           return const SizedBox.shrink();
         },
+      ),
       ),
     );
   }
@@ -307,7 +316,22 @@ class _FriendsListPageState extends State<FriendsListPage> {
     );
   }
 
-  void _showMoreOptions(BuildContext context, String name) {
+  String _formatFriendsSince(DateTime? friendsSince) {
+    if (friendsSince == null) return 'Là bạn bè từ lâu';
+    
+    final months = [
+      'tháng 1', 'tháng 2', 'tháng 3', 'tháng 4', 'tháng 5', 'tháng 6',
+      'tháng 7', 'tháng 8', 'tháng 9', 'tháng 10', 'tháng 11', 'tháng 12'
+    ];
+    
+    return 'Là bạn bè từ ${months[friendsSince.month - 1]} năm ${friendsSince.year}';
+  }
+
+  void _showMoreOptions(BuildContext context, dynamic friend) {
+    final name = friend.fullName ?? 'Người dùng';
+    final avatarUrl = friend.avatarUrl ?? 'https://i.pravatar.cc/150?img=12';
+    final friendsSince = friend.friendsSince as DateTime?;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -330,30 +354,64 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                _buildOptionItem(
-                  icon: CupertinoIcons.person,
-                  title: 'Xem trang cá nhân',
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showMessage(context, 'Xem trang cá nhân $name');
-                  },
+                // Friend info header
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 30.r,
+                        backgroundImage: NetworkImage(avatarUrl),
+                        backgroundColor: Colors.grey[300],
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              _formatFriendsSince(friendsSince),
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                SizedBox(height: 16.h),
+                Divider(height: 1, color: Colors.grey[200]),
+                SizedBox(height: 8.h),
                 _buildOptionItem(
-                  icon: CupertinoIcons.bell,
-                  title: 'Nhận thông báo',
+                  icon: CupertinoIcons.chat_bubble_fill,
+                  title: 'Nhắn tin cho $name',
                   onTap: () {
                     Navigator.pop(context);
-                    _showMessage(context, 'Nhận thông báo từ $name');
+                    _showMessage(context, 'Nhắn tin cho $name');
                   },
+                  iconColor: AppColors.primary,
                 ),
                 _buildOptionItem(
                   icon: CupertinoIcons.person_badge_minus,
-                  title: 'Hủy kết bạn',
+                  title: 'Hủy kết bạn với $name',
                   onTap: () {
                     Navigator.pop(context);
-                    _showUnfriendDialog(name);
+                    _showUnfriendDialog(friend);
                   },
-                  isDestructive: true,
+                  isDestructive: false,
                 ),
               ],
             ),
@@ -368,6 +426,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
     required String title,
     required VoidCallback onTap,
     bool isDestructive = false,
+    Color? iconColor,
   }) {
     return InkWell(
       onTap: onTap,
@@ -377,7 +436,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
           children: [
             Icon(
               icon,
-              color: isDestructive ? Colors.red : Colors.grey[700],
+              color: iconColor ?? (isDestructive ? Colors.red : Colors.grey[700]),
               size: 24.r,
             ),
             SizedBox(width: 16.w),
@@ -395,7 +454,10 @@ class _FriendsListPageState extends State<FriendsListPage> {
     );
   }
 
-  void _showUnfriendDialog(String name) {
+  void _showUnfriendDialog(dynamic friend) {
+    final name = friend.fullName ?? 'Người dùng';
+    final friendId = friend.userId;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -409,7 +471,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _showMessage(context, 'Đã hủy kết bạn với $name');
+              // Gọi RemoveFriend event với friendId
+              context.read<FriendBloc>().add(RemoveFriend(friendId: friendId));
             },
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,

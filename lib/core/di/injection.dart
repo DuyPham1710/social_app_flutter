@@ -34,6 +34,7 @@ import 'package:social_app_fe/features/friend/domain/usecases/get_friend_suggest
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_sent_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_request_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/remove_friend_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/send_friend_request_usecase.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
@@ -115,6 +116,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<AcceptFriendRequestUseCase>(() => AcceptFriendRequestUseCase(s1()));
   s1.registerLazySingleton<RejectFriendRequestUseCase>(() => RejectFriendRequestUseCase(s1()));
   s1.registerLazySingleton<CancelFriendRequestUseCase>(() => CancelFriendRequestUseCase(s1()));
+  s1.registerLazySingleton<RemoveFriendUseCase>(() => RemoveFriendUseCase(s1()));
 
   // Blocs
   s1.registerFactory<AuthBloc>(
@@ -156,6 +158,7 @@ Future<void> initializeDependencies() async {
       acceptFriendRequestUseCase: s1(),
       rejectFriendRequestUseCase: s1(),
       cancelFriendRequestUseCase: s1(),
+      removeFriendUseCase: s1(),
     ),
   );
 }
