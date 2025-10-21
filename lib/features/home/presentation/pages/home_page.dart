@@ -28,8 +28,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // load post lần đầu khi vào trang
-    context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 2));
+
+    // Chỉ khởi tạo WebSocket, việc load posts sẽ được tự động trigger
+    // sau khi WebSocket connect xong
+    context.read<HomeBloc>().add(const InitializeWebSocketEvent());
 
     // Lắng nghe sự kiện scroll để load more
     _scrollController.addListener(_onScroll);
@@ -91,6 +93,26 @@ class _HomePageState extends State<HomePage> {
                 HomeHeaderWidget(),
                 HomeStoriesWidget(),
 
+                if (state is HomeInitializing)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(color: AppColors.primary),
+                          SizedBox(height: 8),
+                          Text(
+                            "Đang kết nối...",
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 if (state is HomeLoading)
                   const Padding(
                     padding: EdgeInsets.all(16.0),
@@ -121,10 +143,7 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       final post = state.posts![index];
                       final commentCount = state.commentCounts?[post.id] ?? 0;
-                      return PostItem(
-                        post: post,
-                        commentCount: commentCount,
-                      );
+                      return PostItem(post: post, commentCount: commentCount);
                     },
                   ),
 

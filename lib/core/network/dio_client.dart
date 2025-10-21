@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:social_app_fe/core/constants/constants.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/core/network/interceptors/auth_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/log_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/response_interceptor.dart';
@@ -15,7 +15,7 @@ class DioClient {
   static Dio _createDio() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: BASE_URL,
+        baseUrl: dotenv.env['BASE_URL'] ?? 'http://192.168.100.218:3000/',
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {

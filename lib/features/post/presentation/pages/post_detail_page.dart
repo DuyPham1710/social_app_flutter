@@ -1,10 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
@@ -23,6 +31,29 @@ class PostDetailPage extends StatefulWidget {
 
 class _PostDetailPageState extends State<PostDetailPage> {
   late ItemScrollController _scrollController = ItemScrollController();
+  late CommentBloc _commentBloc;
+  late PostDetailBloc _postDetailBloc;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Khởi tạo các Blocs
+    _commentBloc = s1<CommentBloc>();
+    _postDetailBloc = s1<PostDetailBloc>();
+
+    // Initialize post detail để join post và lắng nghe comment count
+    _postDetailBloc.add(InitializePostDetailEvent(widget.post.id));
+  }
+
+  @override
+  void dispose() {
+    // Cleanup các Blocs
+    _commentBloc.add(LeavePostEvent(widget.post.id));
+    _commentBloc.close();
+    _postDetailBloc.close();
+    super.dispose();
+  }
 
   void _handlleImageChanged(int newIndex) {
     _scrollController.scrollTo(
@@ -65,128 +96,145 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final post = widget.post;
     final mediaUrls = post.urls;
     print('Initial Image Index: ${widget.initialImageIndex}');
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: AppColors.background,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: ScrollablePositionedList.builder(
-          itemScrollController: _scrollController,
-          initialScrollIndex: widget.initialImageIndex > 0
-              ? widget.initialImageIndex + 1
-              : 0,
-          itemCount: mediaUrls.length + 1, // +1 cho header item
-          itemBuilder: (context, index) {
-            // Index 0 là header
-            if (index == 0) {
-              return Column(
-                children: [
-                  // AppBar
-                  Container(
-                    color: AppColors.background,
-                    padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top,
-                      left: 8.w,
-                      right: 8.w,
-                      bottom: 12.h,
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            CupertinoIcons.back,
-                            color: AppColors.iconPrimary,
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _commentBloc),
+        BlocProvider.value(value: _postDetailBloc),
+      ],
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark.copyWith(
+          statusBarColor: AppColors.background,
+          statusBarIconBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
+          backgroundColor: AppColors.background,
+          body: ScrollablePositionedList.builder(
+            itemScrollController: _scrollController,
+            initialScrollIndex: widget.initialImageIndex > 0
+                ? widget.initialImageIndex + 1
+                : 0,
+            itemCount: mediaUrls.length + 1, // +1 cho header item
+            itemBuilder: (context, index) {
+              // Index 0 là header
+              if (index == 0) {
+                return Column(
+                  children: [
+                    // AppBar
+                    Container(
+                      color: AppColors.background,
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top,
+                        left: 8.w,
+                        right: 8.w,
+                        bottom: 12.h,
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              CupertinoIcons.back,
+                              color: AppColors.iconPrimary,
+                            ),
+                            onPressed: () => Navigator.pop(context),
                           ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        Expanded(
-                          child: Text(
-                            post.user.fullName ?? 'Unknown',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
+                          Expanded(
+                            child: Text(
+                              post.user.fullName ?? 'Unknown',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 48.w),
-                      ],
-                    ),
-                  ),
-
-                  // Content header
-                  PostHeader(user: post.user, createdAt: post.createdAt),
-
-                  SizedBox(height: 10.h),
-
-                  // Caption
-                  if (post.caption.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          post.caption,
-                          style: TextStyle(fontSize: 14.sp, height: 1.4),
-                        ),
+                          SizedBox(width: 48.w),
+                        ],
                       ),
                     ),
 
-                  // Reaction Buttons
-                  SizedBox(height: 20.h),
-                  //   PostAction(),
+                    // Content header
+                    PostHeader(user: post.user, createdAt: post.createdAt),
+
+                    SizedBox(height: 10.h),
+
+                    // Caption
+                    if (post.caption.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            post.caption,
+                            style: TextStyle(fontSize: 14.sp, height: 1.4),
+                          ),
+                        ),
+                      ),
+
+                    // Reaction Buttons
+                    SizedBox(height: 20.h),
+                    BlocBuilder<PostDetailBloc, PostDetailState>(
+                      builder: (context, state) {
+                        final commentCount = state is PostDetailLoaded
+                            ? state.commentCount
+                            : 0;
+                        return PostAction(
+                          postId: post.id,
+                          commentCount: commentCount,
+                        );
+                      },
+                    ),
+                  ],
+                );
+              }
+
+              // Index 1+ là các ảnh
+              final imageIndex = index - 1;
+
+              return Column(
+                children: [
+                  Divider(),
+
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 6.h),
+                    child: GestureDetector(
+                      onTap: () {
+                        // mở ảnh toàn màn hình khi nhấn
+                        _showFullScreenImage(context, imageIndex);
+                      },
+                      child: Image.network(
+                        mediaUrls[imageIndex].url,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 6.h,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        mediaUrls[imageIndex].title ?? '',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 14.h),
                 ],
               );
-            }
-
-            // Index 1+ là các ảnh
-            final imageIndex = index - 1;
-
-            return Column(
-              children: [
-                Divider(),
-
-                Padding(
-                  padding: EdgeInsets.only(bottom: 6.h),
-                  child: GestureDetector(
-                    onTap: () {
-                      // mở ảnh toàn màn hình khi nhấn
-                      _showFullScreenImage(context, imageIndex);
-                    },
-                    child: Image.network(
-                      mediaUrls[imageIndex].url,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 6.h,
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      mediaUrls[imageIndex].title ?? '',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 14.h),
-              ],
-            );
-          },
+            },
+          ),
         ),
       ),
     );

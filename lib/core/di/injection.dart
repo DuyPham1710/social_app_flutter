@@ -15,15 +15,20 @@ import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/add_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/clear_comments_cache_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/connect_comment_socket_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/get_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/get_comments_loaded_data_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comments_loaded_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_service.dart';
 import 'package:social_app_fe/features/friend/data/repository/friend_repository_impl.dart';
 import 'package:social_app_fe/features/friend/domain/repository/friend_repository.dart';
@@ -42,6 +47,7 @@ import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -107,15 +113,43 @@ Future<void> initializeDependencies() async {
     () => LoadCommentsUseCase(s1()),
   );
 
+  s1.registerLazySingleton<GetCommentsLoadedDataUseCase>(
+    () => GetCommentsLoadedDataUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<ListenCommentsLoadedUseCase>(
+    () => ListenCommentsLoadedUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<ClearCommentsCacheUseCase>(
+    () => ClearCommentsCacheUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<AddCommentUseCase>(() => AddCommentUseCase(s1()));
+
   // Friend Usecases
   s1.registerLazySingleton<GetFriendsUseCase>(() => GetFriendsUseCase(s1()));
-  s1.registerLazySingleton<GetFriendRequestsUseCase>(() => GetFriendRequestsUseCase(s1()));
-  s1.registerLazySingleton<GetSentFriendRequestsUseCase>(() => GetSentFriendRequestsUseCase(s1()));
-  s1.registerLazySingleton<GetFriendSuggestionsUseCase>(() => GetFriendSuggestionsUseCase(s1()));
-  s1.registerLazySingleton<SendFriendRequestUseCase>(() => SendFriendRequestUseCase(s1()));
-  s1.registerLazySingleton<AcceptFriendRequestUseCase>(() => AcceptFriendRequestUseCase(s1()));
-  s1.registerLazySingleton<RejectFriendRequestUseCase>(() => RejectFriendRequestUseCase(s1()));
-  s1.registerLazySingleton<CancelFriendRequestUseCase>(() => CancelFriendRequestUseCase(s1()));
+  s1.registerLazySingleton<GetFriendRequestsUseCase>(
+    () => GetFriendRequestsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetSentFriendRequestsUseCase>(
+    () => GetSentFriendRequestsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetFriendSuggestionsUseCase>(
+    () => GetFriendSuggestionsUseCase(s1()),
+  );
+  s1.registerLazySingleton<SendFriendRequestUseCase>(
+    () => SendFriendRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<AcceptFriendRequestUseCase>(
+    () => AcceptFriendRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<RejectFriendRequestUseCase>(
+    () => RejectFriendRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<CancelFriendRequestUseCase>(
+    () => CancelFriendRequestUseCase(s1()),
+  );
   s1.registerLazySingleton<RemoveFriendUseCase>(() => RemoveFriendUseCase(s1()));
 
   // Blocs
@@ -139,12 +173,30 @@ Future<void> initializeDependencies() async {
     ),
   );
 
+  s1.registerFactory<PostDetailBloc>(
+    () => PostDetailBloc(
+      joinPostUseCase: s1(),
+      leavePostUseCase: s1(),
+      listenCommentCountUseCase: s1(),
+      loadCommentsUseCase: s1(),
+    ),
+  );
+
   s1.registerFactory<CommentBloc>(
     () => CommentBloc(
       joinPostUseCase: s1(),
       leavePostUseCase: s1(),
       emitTypingUseCase: s1(),
       listenTypingUseCase: s1(),
+      addCommentUseCase: s1(),
+    ),
+  );
+
+  s1.registerFactory<CommentDetailsBloc>(
+    () => CommentDetailsBloc(
+      getCommentsLoadedDataUseCase: s1(),
+      listenCommentsLoadedUseCase: s1(),
+      clearCommentsCacheUseCase: s1(),
     ),
   );
 

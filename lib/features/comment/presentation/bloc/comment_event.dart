@@ -29,10 +29,7 @@ class UserTypingEvent extends CommentEvent {
   final String postId;
   final bool isTyping;
 
-  const UserTypingEvent({
-    required this.postId,
-    required this.isTyping,
-  });
+  const UserTypingEvent({required this.postId, required this.isTyping});
 
   @override
   List<Object?> get props => [postId, isTyping];
@@ -53,3 +50,10 @@ class UpdateTypingUsersEvent extends CommentEvent {
   List<Object?> get props => [userId, username, isTyping];
 }
 
+class AddCommentEvent extends CommentEvent {
+  final String postId;
+  final String content;
+  final String? parentId;
+
+  AddCommentEvent({required this.postId, required this.content, this.parentId});
+}

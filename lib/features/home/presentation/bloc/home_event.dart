@@ -29,3 +29,11 @@ class UpdateCommentCountsEvent extends HomeEvent {
   @override
   List<Object?> get props => [commentCounts];
 }
+
+class InitializeWebSocketEvent extends HomeEvent {
+  const InitializeWebSocketEvent();
+}
+
+class WebSocketInitializedEvent extends HomeEvent {
+  const WebSocketInitializedEvent();
+}
