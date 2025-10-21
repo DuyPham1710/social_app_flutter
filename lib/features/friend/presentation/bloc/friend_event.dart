@@ -23,6 +23,10 @@ class LoadFriendSuggestions extends FriendEvent {
 
 }
 
+class LoadFriendPage extends FriendEvent {
+  const LoadFriendPage();
+}
+
 class SendFriendRequest extends FriendEvent {
   final String receiverId;
 

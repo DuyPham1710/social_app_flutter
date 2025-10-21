@@ -25,8 +25,7 @@ class _FriendPageState extends State<FriendPage> {
   }
 
   void _loadData() {
-    context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
-    context.read<FriendBloc>().add(LoadFriendSuggestions());
+    context.read<FriendBloc>().add(const LoadFriendPage());
   }
 
   @override
@@ -39,49 +38,57 @@ class _FriendPageState extends State<FriendPage> {
           IconButton(
             onPressed: () {},
             icon: const Icon(CupertinoIcons.search),
-          )
+          ),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FriendHeaderChips(
-                onNeedRefresh: _loadData,
-              ),
-              SizedBox(height: 16.h),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            _loadData();
+            // Đợi một chút để animation hoàn thành
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FriendHeaderChips(
+                  onNeedRefresh: _loadData,
+                ),
+                SizedBox(height: 16.h),
 
-              // Lời mời kết bạn
-              _buildSectionHeader(
-                title: 'Lời mời kết bạn',
-                trailing: 'Xem tất cả',
-                onTapTrailing: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FriendRequestsPage(),
-                    ),
-                  );
-                  // Reload data khi quay lại từ trang chi tiết
-                  if (mounted) {
-                    _loadData();
-                  }
-                },
-              ),
-              SizedBox(height: 8.h),
-              _buildFriendRequestsSection(),
+                // Lời mời kết bạn
+                _buildSectionHeader(
+                  title: 'Lời mời kết bạn',
+                  trailing: 'Xem tất cả',
+                  onTapTrailing: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FriendRequestsPage(),
+                      ),
+                    );
+                    // Reload data khi quay lại từ trang chi tiết
+                    if (mounted) {
+                      _loadData();
+                    }
+                  },
+                ),
+                SizedBox(height: 8.h),
+                _buildFriendRequestsSection(),
 
-              SizedBox(height: 20.h),
+                SizedBox(height: 20.h),
 
-              // Những người bạn có thể biết
-              _buildSectionHeader(
-                title: 'Những người bạn có thể biết',
-              ),
-              SizedBox(height: 8.h),
-              _buildFriendSuggestionsSection(),
-            ],
+                // Những người bạn có thể biết
+                _buildSectionHeader(
+                  title: 'Những người bạn có thể biết',
+                ),
+                SizedBox(height: 8.h),
+                _buildFriendSuggestionsSection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -131,13 +138,14 @@ class _FriendPageState extends State<FriendPage> {
       },
       child: BlocBuilder<FriendBloc, FriendState>(
         buildWhen: (previous, current) {
-          // Chỉ rebuild khi state liên quan đến friend requests thay đổi
-          return current is FriendRequestsLoading ||
+          // Rebuild khi có FriendPageLoaded hoặc các state liên quan đến friend requests
+          return current is FriendPageLoaded ||
+                 current is FriendRequestsLoading ||
                  current is FriendRequestsLoaded ||
                  (current is FriendError && previous is FriendRequestsLoading);
         },
         builder: (context, state) {
-          if (state is FriendRequestsLoading) {
+          if (state is FriendRequestsLoading || (state is FriendPageLoaded && state.isLoadingRequests)) {
             return Container(
               height: 120.h,
               decoration: BoxDecoration(
@@ -155,8 +163,18 @@ class _FriendPageState extends State<FriendPage> {
                 child: CircularProgressIndicator(),
               ),
             );
-          } else if (state is FriendRequestsLoaded) {
-            if (state.friendRequests.isEmpty) {
+          } else if (state is FriendRequestsLoaded || state is FriendPageLoaded) {
+            final friendRequests = state is FriendRequestsLoaded 
+                ? state.friendRequests 
+                : (state as FriendPageLoaded).friendRequests;
+            final acceptedRequestIds = state is FriendRequestsLoaded 
+                ? state.acceptedRequestIds 
+                : (state as FriendPageLoaded).acceptedRequestIds;
+            final rejectedRequestIds = state is FriendRequestsLoaded 
+                ? state.rejectedRequestIds 
+                : (state as FriendPageLoaded).rejectedRequestIds;
+            
+            if (friendRequests.isEmpty) {
               return Container(
                 height: 100.h,
                 decoration: BoxDecoration(
@@ -208,9 +226,9 @@ class _FriendPageState extends State<FriendPage> {
                 ],
               ),
               child: Column(
-                children: state.friendRequests.take(3).map((request) {
-                  final isAccepted = state.acceptedRequestIds.contains(request.requestId);
-                  final isRejected = state.rejectedRequestIds.contains(request.requestId);
+                children: friendRequests.take(3).map((request) {
+                  final isAccepted = acceptedRequestIds.contains(request.requestId);
+                  final isRejected = rejectedRequestIds.contains(request.requestId);
                   return FriendRequestItem(
                     name: request.displayName,
                     mutualFriends: request.displayMutualFriends,
@@ -268,7 +286,7 @@ class _FriendPageState extends State<FriendPage> {
                     SizedBox(height: 4.h),
                     TextButton(
                       onPressed: () {
-                        context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+                        context.read<FriendBloc>().add(const LoadFriendPage());
                       },
                       child: Text(
                         'Thử lại',
@@ -313,20 +331,30 @@ class _FriendPageState extends State<FriendPage> {
       },
       child: BlocBuilder<FriendBloc, FriendState>(
         buildWhen: (previous, current) {
-          // Chỉ rebuild khi state liên quan đến friend suggestions thay đổi
-          return current is FriendSuggestionsLoading ||
+          // Rebuild khi có FriendPageLoaded hoặc các state liên quan đến friend suggestions
+          return current is FriendPageLoaded ||
+                 current is FriendSuggestionsLoading ||
                  current is FriendSuggestionsLoaded ||
+                 current is FriendActionSuccess ||
+                 current is FriendActionError ||
                  (current is FriendError && previous is FriendSuggestionsLoading);
         },
         builder: (context, state) {
-        if (state is FriendSuggestionsLoading) {
+        if (state is FriendSuggestionsLoading || (state is FriendPageLoaded && state.isLoadingSuggestions)) {
           return const Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is FriendSuggestionsLoaded) {
+        } else if (state is FriendSuggestionsLoaded || state is FriendPageLoaded) {
+          final friendSuggestions = state is FriendSuggestionsLoaded 
+              ? state.friendSuggestions 
+              : (state as FriendPageLoaded).friendSuggestions;
+          final sentRequestUserIds = state is FriendSuggestionsLoaded 
+              ? state.sentRequestUserIds 
+              : (state as FriendPageLoaded).sentRequestUserIds;
+          
           return Column(
-            children: state.friendSuggestions.map((suggestion) {
-              final isSent = state.sentRequestUserIds.contains(suggestion.userId);
+            children: friendSuggestions.map((suggestion) {
+              final isSent = sentRequestUserIds.contains(suggestion.userId);
               return FriendSuggestionItem(
                 name: suggestion.fullName ?? 'Người dùng',
                 mutualFriends: suggestion.mutualFriends ?? 0,

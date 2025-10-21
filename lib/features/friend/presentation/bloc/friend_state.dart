@@ -86,6 +86,62 @@ class FriendSuggestionsLoaded extends FriendState {
   }
 }
 
+class FriendPageLoaded extends FriendState {
+  final List<FriendRequestEntity> friendRequests;
+  final List<FriendSuggestionEntity> friendSuggestions;
+  final Set<String> acceptedRequestIds;
+  final Set<String> rejectedRequestIds;
+  final Set<String> sentRequestUserIds;
+  final bool isLoadingRequests;
+  final bool isLoadingSuggestions;
+  final String sortBy;
+  final bool ascending;
+  final String? searchQuery;
+  final int? minMutualFriends;
+
+  const FriendPageLoaded({
+    required this.friendRequests,
+    required this.friendSuggestions,
+    this.acceptedRequestIds = const {},
+    this.rejectedRequestIds = const {},
+    this.sentRequestUserIds = const {},
+    this.isLoadingRequests = false,
+    this.isLoadingSuggestions = false,
+    this.sortBy = 'time',
+    this.ascending = false,
+    this.searchQuery,
+    this.minMutualFriends,
+  });
+
+  FriendPageLoaded copyWith({
+    List<FriendRequestEntity>? friendRequests,
+    List<FriendSuggestionEntity>? friendSuggestions,
+    Set<String>? acceptedRequestIds,
+    Set<String>? rejectedRequestIds,
+    Set<String>? sentRequestUserIds,
+    bool? isLoadingRequests,
+    bool? isLoadingSuggestions,
+    String? sortBy,
+    bool? ascending,
+    String? searchQuery,
+    int? minMutualFriends,
+  }) {
+    return FriendPageLoaded(
+      friendRequests: friendRequests ?? this.friendRequests,
+      friendSuggestions: friendSuggestions ?? this.friendSuggestions,
+      acceptedRequestIds: acceptedRequestIds ?? this.acceptedRequestIds,
+      rejectedRequestIds: rejectedRequestIds ?? this.rejectedRequestIds,
+      sentRequestUserIds: sentRequestUserIds ?? this.sentRequestUserIds,
+      isLoadingRequests: isLoadingRequests ?? this.isLoadingRequests,
+      isLoadingSuggestions: isLoadingSuggestions ?? this.isLoadingSuggestions,
+      sortBy: sortBy ?? this.sortBy,
+      ascending: ascending ?? this.ascending,
+      searchQuery: searchQuery ?? this.searchQuery,
+      minMutualFriends: minMutualFriends ?? this.minMutualFriends,
+    );
+  }
+}
+
 class FriendActionLoading extends FriendState {}
 
 class FriendActionSuccess extends FriendState {

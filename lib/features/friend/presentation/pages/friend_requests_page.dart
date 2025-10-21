@@ -19,7 +19,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
   void initState() {
     super.initState();
     // Load tất cả lời mời kết bạn khi khởi tạo
-    context.read<FriendBloc>().add(LoadFriendRequests(received: true));
+    context.read<FriendBloc>().add(const LoadFriendPage());
   }
 
   @override
@@ -76,12 +76,14 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
     return BlocBuilder<FriendBloc, FriendState>(
       buildWhen: (previous, current) {
         // Chỉ rebuild khi state liên quan đến friend requests thay đổi
-        return current is FriendRequestsLoaded;
+        return current is FriendRequestsLoaded || current is FriendPageLoaded;
       },
       builder: (context, state) {
         int requestCount = 0;
         
         if (state is FriendRequestsLoaded) {
+          requestCount = state.friendRequests.length;
+        } else if (state is FriendPageLoaded) {
           requestCount = state.friendRequests.length;
         }
         
@@ -179,7 +181,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 label: 'Thử lại',
                 textColor: Colors.white,
                 onPressed: () {
-                  context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+                  context.read<FriendBloc>().add(const LoadFriendPage());
                 },
               ),
             ),
@@ -191,28 +193,39 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           // Chỉ rebuild khi state liên quan đến friend requests (received) thay đổi
           return current is FriendRequestsLoading ||
                  current is FriendRequestsLoaded ||
+                 current is FriendPageLoaded ||
                  (current is FriendError && previous is FriendRequestsLoading);
         },
         builder: (context, state) {
-          if (state is FriendRequestsLoading) {
+          if (state is FriendRequestsLoading || (state is FriendPageLoaded && state.isLoadingRequests)) {
             return _buildLoadingState();
-          } else if (state is FriendRequestsLoaded) {
-            if (state.friendRequests.isEmpty) {
+          } else if (state is FriendRequestsLoaded || state is FriendPageLoaded) {
+            final friendRequests = state is FriendRequestsLoaded 
+                ? state.friendRequests 
+                : (state as FriendPageLoaded).friendRequests;
+            final acceptedRequestIds = state is FriendRequestsLoaded 
+                ? state.acceptedRequestIds 
+                : (state as FriendPageLoaded).acceptedRequestIds;
+            final rejectedRequestIds = state is FriendRequestsLoaded 
+                ? state.rejectedRequestIds 
+                : (state as FriendPageLoaded).rejectedRequestIds;
+            
+            if (friendRequests.isEmpty) {
               return _buildEmptyState();
             }
             
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+                context.read<FriendBloc>().add(const LoadFriendPage());
                 await Future.delayed(const Duration(seconds: 1)); // Đảm bảo refresh indicator hiển thị
               },
               child: ListView.separated(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                itemCount: state.friendRequests.length,
+                itemCount: friendRequests.length,
                 separatorBuilder: (context, index) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
-                  final request = state.friendRequests[index];
-                  return _buildFriendRequestCard(request, state.acceptedRequestIds, state.rejectedRequestIds);
+                  final request = friendRequests[index];
+                  return _buildFriendRequestCard(request, acceptedRequestIds, rejectedRequestIds);
                 },
               ),
             );
@@ -286,7 +299,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             SizedBox(height: 24.h),
             ElevatedButton.icon(
               onPressed: () {
-                context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+                context.read<FriendBloc>().add(const LoadFriendPage());
               },
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('Thử lại'),
@@ -346,7 +359,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
   Widget _buildEmptyState() {
     return RefreshIndicator(
       onRefresh: () async {
-        context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+        context.read<FriendBloc>().add(const LoadFriendPage());
         await Future.delayed(const Duration(seconds: 1));
       },
       child: SingleChildScrollView(
@@ -456,6 +469,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         bool isSelected = false;
         if (state is FriendRequestsLoaded) {
           isSelected = state.sortBy == sortBy && state.ascending == ascending;
+        } else if (state is FriendPageLoaded) {
+          isSelected = state.sortBy == sortBy && state.ascending == ascending;
         }
         
         return ListTile(
@@ -535,7 +550,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 );
                 // Reload lại friend requests khi quay về
                 if (mounted) {
-                  context.read<FriendBloc>().add(const LoadFriendRequests(received: true));
+                  context.read<FriendBloc>().add(const LoadFriendPage());
                 }
               },
             ),

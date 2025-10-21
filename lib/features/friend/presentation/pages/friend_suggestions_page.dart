@@ -18,7 +18,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
   void initState() {
     super.initState();
     // Load tất cả gợi ý kết bạn khi khởi tạo
-    context.read<FriendBloc>().add(LoadFriendSuggestions());
+    context.read<FriendBloc>().add(const LoadFriendPage());
   }
 
   @override
@@ -80,6 +80,8 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         
         if (state is FriendSuggestionsLoaded) {
           suggestionCount = state.friendSuggestions.length;
+        } else if (state is FriendPageLoaded) {
+          suggestionCount = state.friendSuggestions.length;
         }
         
         return Container(
@@ -138,7 +140,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 label: 'Thử lại',
                 textColor: Colors.white,
                 onPressed: () {
-                  context.read<FriendBloc>().add(LoadFriendSuggestions());
+                  context.read<FriendBloc>().add(const LoadFriendPage());
                 },
               ),
             ),
@@ -147,25 +149,32 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
       },
       child: BlocBuilder<FriendBloc, FriendState>(
         builder: (context, state) {
-          if (state is FriendSuggestionsLoading) {
+          if (state is FriendSuggestionsLoading || (state is FriendPageLoaded && state.isLoadingSuggestions)) {
             return _buildLoadingState();
-          } else if (state is FriendSuggestionsLoaded) {
-            if (state.friendSuggestions.isEmpty) {
+          } else if (state is FriendSuggestionsLoaded || state is FriendPageLoaded) {
+            final friendSuggestions = state is FriendSuggestionsLoaded 
+                ? state.friendSuggestions 
+                : (state as FriendPageLoaded).friendSuggestions;
+            final sentRequestUserIds = state is FriendSuggestionsLoaded 
+                ? state.sentRequestUserIds 
+                : (state as FriendPageLoaded).sentRequestUserIds;
+            
+            if (friendSuggestions.isEmpty) {
               return _buildEmptyState();
             }
             
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<FriendBloc>().add(LoadFriendSuggestions());
+                context.read<FriendBloc>().add(const LoadFriendPage());
                 await Future.delayed(const Duration(seconds: 1));
               },
               child: ListView.separated(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                itemCount: state.friendSuggestions.length,
+                itemCount: friendSuggestions.length,
                 separatorBuilder: (context, index) => SizedBox(height: 8.h),
                 itemBuilder: (context, index) {
-                  final suggestion = state.friendSuggestions[index];
-                  return _buildFriendSuggestionCard(suggestion, state.sentRequestUserIds);
+                  final suggestion = friendSuggestions[index];
+                  return _buildFriendSuggestionCard(suggestion, sentRequestUserIds);
                 },
               ),
             );
@@ -239,7 +248,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             SizedBox(height: 24.h),
             ElevatedButton.icon(
               onPressed: () {
-                context.read<FriendBloc>().add(LoadFriendSuggestions());
+                context.read<FriendBloc>().add(const LoadFriendPage());
               },
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('Thử lại'),
@@ -291,7 +300,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
   Widget _buildEmptyState() {
     return RefreshIndicator(
       onRefresh: () async {
-        context.read<FriendBloc>().add(LoadFriendSuggestions());
+        context.read<FriendBloc>().add(const LoadFriendPage());
         await Future.delayed(const Duration(seconds: 1));
       },
       child: SingleChildScrollView(
@@ -339,7 +348,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                   SizedBox(height: 32.h),
                   ElevatedButton.icon(
                     onPressed: () {
-                      context.read<FriendBloc>().add(LoadFriendSuggestions());
+                      context.read<FriendBloc>().add(const LoadFriendPage());
                     },
                     icon: const Icon(Icons.refresh, size: 18),
                     label: const Text('Làm mới'),
