@@ -6,7 +6,8 @@ import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/home/presentation/widgets/home_header_widget.dart';
-import 'package:social_app_fe/features/home/presentation/widgets/home_stories_widget.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/home_stories_widget.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/shared/component/custom_refresh_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_item.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -62,6 +63,15 @@ class _HomePageState extends State<HomePage> {
     // Load lại posts từ đầu (page 1)
     await Future.delayed(const Duration(milliseconds: 1000));
     context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 2));
+    // Reload stories as well
+    try {
+      context.read<HomeStoriesBloc>().add(
+        const LoadHomeStoriesEvent(page: 1, limit: 5),
+      );
+    } catch (_) {
+      // Nếu HomeStoriesBloc chưa được provide ở trên (ví dụ provider nằm trong widget khác),
+      // thì không làm gì để tránh crash. Caller có thể wrap HomeStoriesWidget với BlocProvider.
+    }
     // Listener sẽ tự động complete refresh khi state thay đổi
   }
 
@@ -91,7 +101,7 @@ class _HomePageState extends State<HomePage> {
               physics: const ClampingScrollPhysics(),
               children: [
                 HomeHeaderWidget(),
-                HomeStoriesWidget(),
+                HomeStoriesWidget(page: 1, limit: 5),
 
                 if (state is HomeInitializing)
                   const Padding(
