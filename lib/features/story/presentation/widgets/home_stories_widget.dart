@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
+import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 
 import '../bloc/home_stories_bloc.dart';
 
@@ -84,7 +87,8 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget> {
                   return _buildAddStory();
                 }
                 final story = stories[index - 1];
-                return _buildStoryCard(story);
+                final groupIndex = index - 1;
+                return _buildStoryCard(story, groupIndex, groupedStories.users);
               },
               separatorBuilder: (_, __) => SizedBox(width: 12.w),
               itemCount: stories.length + 1,
@@ -137,75 +141,115 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget> {
     );
   }
 
-  Widget _buildStoryCard(story) {
+  Widget _buildStoryCard(
+    story,
+    int groupIndex,
+    List<GroupedUserStoryEntity> groups,
+  ) {
     // story là StoryEntity
-    return Column(
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              width: 80.w,
-              height: 120.w,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                image: story.mediaUrl != null
-                    ? DecorationImage(
-                        image: NetworkImage(story.mediaUrl!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-                color: story.mediaUrl == null ? Colors.grey[300] : null,
-              ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                StoryViewerPage(
+                  groups: groups,
+                  initialGroupIndex: groupIndex,
+                  initialStoryIndex: 0,
+                ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 1.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeOut;
+
+                  final tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+            // Tùy chỉnh thời gian chuyển cảnh
+            transitionDuration: Duration(
+              milliseconds: int.parse(dotenv.env['TRANSITION_TIME']!),
             ),
-
-            // Badge LIVE
-            // Positioned(
-            //   top: 8,
-            //   right: 8,
-            //   child: story.isLive
-            //       ? Container(
-            //           padding: EdgeInsets.symmetric(
-            //             horizontal: 6.w,
-            //             vertical: 2.h,
-            //           ),
-            //           decoration: BoxDecoration(
-            //             color: Colors.black87,
-            //             borderRadius: BorderRadius.circular(6.r),
-            //           ),
-            //           child: Text(
-            //             "LIVE",
-            //             style: TextStyle(
-            //               color: Colors.white,
-            //               fontSize: 10.sp,
-            //               fontWeight: FontWeight.bold,
-            //             ),
-            //           ),
-            //         )
-            //       : const SizedBox(),
-            // ),
-
-            // Avatar dưới chính giữa
-            Positioned(
-              bottom: -18.h,
-              child: CircleAvatar(
-                radius: 18.r,
-                backgroundColor: Colors.white,
-                child: CircleAvatar(
-                  radius: 16.r,
-                  backgroundImage: NetworkImage(story.user.avatarUrl ?? ""),
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                width: 80.w,
+                height: 120.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  image: story.mediaUrl != null
+                      ? DecorationImage(
+                          image: NetworkImage(story.mediaUrl!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  color: story.mediaUrl == null ? Colors.grey[300] : null,
                 ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 30.h),
-        Text(
-          story.user.fullName ?? "Unknown",
-          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
-        ),
-      ],
+
+              // Badge LIVE
+              // Positioned(
+              //   top: 8,
+              //   right: 8,
+              //   child: story.isLive
+              //       ? Container(
+              //           padding: EdgeInsets.symmetric(
+              //             horizontal: 6.w,
+              //             vertical: 2.h,
+              //           ),
+              //           decoration: BoxDecoration(
+              //             color: Colors.black87,
+              //             borderRadius: BorderRadius.circular(6.r),
+              //           ),
+              //           child: Text(
+              //             "LIVE",
+              //             style: TextStyle(
+              //               color: Colors.white,
+              //               fontSize: 10.sp,
+              //               fontWeight: FontWeight.bold,
+              //             ),
+              //           ),
+              //         )
+              //       : const SizedBox(),
+              // ),
+
+              // Avatar dưới chính giữa
+              Positioned(
+                bottom: -18.h,
+                child: CircleAvatar(
+                  radius: 18.r,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 16.r,
+                    backgroundImage: NetworkImage(story.user.avatarUrl ?? ""),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 30.h),
+
+          Text(
+            story.user.fullName ?? "Unknown",
+            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
     );
   }
 }
