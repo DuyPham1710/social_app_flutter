@@ -17,7 +17,8 @@ class HomeStoriesWidget extends StatefulWidget {
   State<HomeStoriesWidget> createState() => _HomeStoriesWidgetState();
 }
 
-class _HomeStoriesWidgetState extends State<HomeStoriesWidget> {
+class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
+    with AutomaticKeepAliveClientMixin {
   late ScrollController _scrollController;
   int _currentPage = 1;
   bool _isLoadingMore = false;
@@ -59,7 +60,12 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return BlocBuilder<HomeStoriesBloc, HomeStoriesState>(
       builder: (context, state) {
         if (state is HomeStoriesLoading) {
@@ -73,7 +79,23 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget> {
         if (state is HomeStoriesLoaded) {
           final groupedStories = state.groupedStories;
           // Lấy danh sách story đầu tiên của mỗi user
-          final stories = groupedStories.users
+          final groupsWithStories = groupedStories.users
+              .where((group) => group.stories.isNotEmpty)
+              .toList();
+
+          // Nếu không có user nào có story, chỉ hiển thị nút Add Story
+          if (groupsWithStories.isEmpty) {
+            return SizedBox(
+              height: 200.w,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                child: Row(children: [_buildAddStory()]),
+              ),
+            );
+          }
+
+          // Lấy story đầu tiên từ danh sách đã lọc
+          final stories = groupsWithStories
               .map((group) => group.stories.first)
               .toList();
           return SizedBox(
@@ -88,7 +110,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget> {
                 }
                 final story = stories[index - 1];
                 final groupIndex = index - 1;
-                return _buildStoryCard(story, groupIndex, groupedStories.users);
+                return _buildStoryCard(story, groupIndex, groupsWithStories);
               },
               separatorBuilder: (_, __) => SizedBox(width: 12.w),
               itemCount: stories.length + 1,
