@@ -48,6 +48,11 @@ import 'package:social_app_fe/features/post/data/repository/post_repository_impl
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
+import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
+import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
+import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
+import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_usecase.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -69,6 +74,10 @@ Future<void> initializeDependencies() async {
     () => CommentRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<StoryRemoteDataSource>(
+    () => StoryRemoteDataSource(s1()),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
@@ -76,6 +85,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<CommentRepository>(
     () => CommentRepositoryImpl(s1()),
   );
+  s1.registerLazySingleton<StoryRepository>(() => StoryRepositoryImpl(s1()));
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
@@ -152,6 +162,11 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<RemoveFriendUseCase>(() => RemoveFriendUseCase(s1()));
 
+  // Story Usecases
+  s1.registerLazySingleton<GetHomeStoriesUsecase>(
+    () => GetHomeStoriesUsecase(s1()),
+  );
+
   // Blocs
   s1.registerFactory<AuthBloc>(
     () => AuthBloc(
@@ -212,5 +227,9 @@ Future<void> initializeDependencies() async {
       cancelFriendRequestUseCase: s1(),
       removeFriendUseCase: s1(),
     ),
+  );
+
+  s1.registerFactory<HomeStoriesBloc>(
+    () => HomeStoriesBloc(getHomeStoriesUseCase: s1()),
   );
 }
