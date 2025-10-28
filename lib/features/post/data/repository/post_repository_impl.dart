@@ -33,7 +33,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<DataState<PostListEntity>> getProfilePosts({
+  Future<DataState<PostListModel>> getProfilePosts({
     required String ownerId,
     int page = 1,
     int limit = 10,
