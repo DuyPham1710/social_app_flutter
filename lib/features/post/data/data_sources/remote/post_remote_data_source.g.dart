@@ -43,6 +43,25 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
     return _value;
   }
 
+  @override
+  Future<DataState<PostListModel>> getProfilePosts({
+    required String ownerId,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/post/user/$ownerId',
+        queryParameters: {'page': page, 'limit': limit},
+      );
+
+      final data = PostListModel.fromJson(response.data);
+      return DataStateSuccess(data);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

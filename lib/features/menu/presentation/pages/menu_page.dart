@@ -122,6 +122,7 @@ class MenuPage extends StatelessWidget {
             const MenuHeader(
               name: 'Nguyễn.H.N. Lam',
               avatarUrl: 'https://i.pravatar.cc/150?img=10',
+              userId: '68e9d3fa7ae32fe700d1d3cc',
             ),
             const SizedBox(height: 16),
             MenuSection(title: 'Tiện ích', items: mainItems),

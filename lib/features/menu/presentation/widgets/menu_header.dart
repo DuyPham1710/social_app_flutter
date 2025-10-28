@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+
+import '../../../post/domain/usecases/get_profile_posts_usecase.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
 
 class MenuHeader extends StatelessWidget {
   final String name;
   final String avatarUrl;
+  final String userId;
 
-  const MenuHeader({super.key, required this.name, required this.avatarUrl});
+  const MenuHeader({super.key, required this.name, required this.avatarUrl, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +21,14 @@ class MenuHeader extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const ProfilePage()),
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => ProfileBloc(
+                getProfilePostsUseCase: context.read<GetProfilePostsUseCase>(),
+              ),
+              child: ProfilePage(userId: userId),
+            ),
+          ),
         );
       },
       child: Row(

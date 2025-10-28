@@ -6,4 +6,10 @@ abstract class PostRepository {
     int page = 1,
     int limit = 10,
   });
+
+  Future<DataState<PostListEntity>> getProfilePosts({
+    required String ownerId,
+    int page = 1,
+    int limit = 10,
+  });
 }

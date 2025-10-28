@@ -32,4 +32,14 @@ class PostRepositoryImpl implements PostRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<PostListEntity>> getProfilePosts({
+    required String ownerId,
+    int page = 1,
+    int limit = 10,
+  }) {
+    // TODO: implement getProfilePosts
+    throw UnimplementedError();
+  }
 }
