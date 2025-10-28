@@ -20,3 +20,20 @@ class LoadPostsEvent extends HomeEvent {
 class LoadMorePostsEvent extends HomeEvent {
   const LoadMorePostsEvent();
 }
+
+class UpdateCommentCountsEvent extends HomeEvent {
+  final Map<String, int> commentCounts;
+
+  const UpdateCommentCountsEvent(this.commentCounts);
+
+  @override
+  List<Object?> get props => [commentCounts];
+}
+
+class InitializeWebSocketEvent extends HomeEvent {
+  const InitializeWebSocketEvent();
+}
+
+class WebSocketInitializedEvent extends HomeEvent {
+  const WebSocketInitializedEvent();
+}

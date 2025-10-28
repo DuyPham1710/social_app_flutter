@@ -94,10 +94,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoaded && state.flowType == 'update_personal_info') {
+            if (state is AuthLoaded &&
+                state.flowType == 'update_personal_info') {
               BlocProvider.of<AuthBloc>(context).add(AuthReset());
               showDialogSuccess(context, "Registration");
-            } else if (state is AuthError && state.flowType == 'update_personal_info') {
+            } else if (state is AuthError &&
+                state.flowType == 'update_personal_info') {
               final message = state.errorMessage ?? 'Đăng ký thất bại';
               UIUtils.showErrorMessage(context, message);
             }
@@ -226,12 +228,19 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                               FocusScope.of(
                                 context,
                               ).requestFocus(FocusNode()); // tắt bàn phím
-                              final gender = await showModalBottomSheet<String>(
-                                context: context,
-                                builder: (context) {
-                                  return ModalGender();
-                                },
-                              );
+                              final gender =
+                                  await showCupertinoModalPopup<String>(
+                                    context: context,
+                                    builder: (context) {
+                                      return ModalGender();
+                                    },
+                                  );
+                              // final gender = await showModalBottomSheet<String>(
+                              //   context: context,
+                              //   builder: (context) {
+                              //     return ModalGender();
+                              //   },
+                              // );
                               if (gender != null) {
                                 genderController.text = gender;
                               }

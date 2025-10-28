@@ -6,12 +6,18 @@ class FriendSuggestionItem extends StatelessWidget {
   final String name;
   final int mutualFriends;
   final String avatarUrl;
+  final List<String>? mutualFriendAvatars;
+  final VoidCallback? onAddFriend;
+  final bool isSent;
 
   const FriendSuggestionItem({
     super.key,
     required this.name,
     required this.mutualFriends,
     required this.avatarUrl,
+    this.mutualFriendAvatars,
+    this.onAddFriend,
+    this.isSent = false,
   });
 
   @override
@@ -35,7 +41,7 @@ class FriendSuggestionItem extends StatelessWidget {
         // Quan trọng: căn chỉnh lên đầu
         children: [
           // Avatar
-          CircleAvatar(radius: 28.r, backgroundImage: NetworkImage(avatarUrl)),
+          CircleAvatar(radius: 32.r, backgroundImage: NetworkImage(avatarUrl)),
           SizedBox(width: 12.w),
 
           // Phần Tên, Bạn chung và Nút
@@ -53,45 +59,81 @@ class FriendSuggestionItem extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
 
-                // Bạn chung
-                Row(
-                  children: [
-                    _mutualGroupAvatars(),
-                    SizedBox(width: 6.w),
-                    Text(
-                      '$mutualFriends bạn chung',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.black.withOpacity(0.7),
+                // Bạn chung - chỉ hiển thị khi có bạn chung
+                if (mutualFriends > 0) ...[
+                  Row(
+                    children: [
+                      _buildMutualFriendAvatars(),
+                      SizedBox(width: 6.w),
+                      Text(
+                        '$mutualFriends bạn chung',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.black.withOpacity(0.7),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h), // Khoảng cách giữa thông tin và nút
+                    ],
+                  ),
+                  SizedBox(height: 12.h), // Khoảng cách giữa thông tin và nút
+                ],
+                
+                // Nếu không có bạn chung, thêm space nhỏ hơn
+                if (mutualFriends == 0)
+                  SizedBox(height: 4.h),
 
-                // Các Nút (Thêm bạn bè và Gỡ)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _buildActionButton(
-                        label: 'Thêm bạn bè',
-                        background: AppColors.primary,
-                        foreground: Colors.white,
-                        onTap: () {},
-                      ),
+                // Các Nút hoặc thông báo
+                if (isSent)
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: Colors.blue[200]!, width: 1),
                     ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: _buildActionButton(
-                        label: 'Gỡ',
-                        background: const Color(0xFFE7E7E7),
-                        foreground: Colors.black,
-                        onTap: () {},
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.send,
+                          color: Colors.blue[700],
+                          size: 16.r,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          'Đã gửi lời mời kết bạn',
+                          style: TextStyle(
+                            color: Colors.blue[700],
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildActionButton(
+                          label: 'Thêm bạn bè',
+                          background: AppColors.primary,
+                          foreground: Colors.white,
+                          onTap: onAddFriend ?? () {},
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: _buildActionButton(
+                          label: 'Gỡ',
+                          background: const Color(0xFFE7E7E7),
+                          foreground: Colors.black,
+                          onTap: () {},
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -100,17 +142,34 @@ class FriendSuggestionItem extends StatelessWidget {
     );
   }
 
-  // Các phương thức private khác giữ nguyên
-  Widget _mutualGroupAvatars() {
+  Widget _buildMutualFriendAvatars() {
+    // Nếu không có avatars hoặc không có bạn chung, return empty widget
+    if (mutualFriends == 0 || mutualFriendAvatars == null || mutualFriendAvatars!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return SizedBox(
       width: 48.w,
       height: 20.h,
       child: Stack(
-        children: [
-          _smallAvatar('https://i.pravatar.cc/40?img=4', left: 0),
-          _smallAvatar('https://i.pravatar.cc/40?img=5', left: 16.w),
-          _smallAvatar('https://i.pravatar.cc/40?img=6', left: 32.w),
-        ],
+        children: List.generate(
+          mutualFriendAvatars!.length.clamp(0, 3),
+              (index) => Positioned(
+            left: index * 16.w,
+            child: Container(
+              width: 20.r,
+              height: 20.r,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 2),
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: NetworkImage(mutualFriendAvatars![index]),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
