@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import '../bloc/menu_bloc.dart';
+import '../bloc/menu_event.dart';
+import '../bloc/menu_state.dart';
 import '../widgets/menu_header.dart';
 import '../widgets/menu_section.dart';
 import '../widgets/menu_footer.dart';
 import '../../../../../shared/component/layout/icon_text_tile.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/menu_bloc.dart';
-import '../bloc/menu_event.dart';
-import '../bloc/menu_state.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    //final getCurrentUser = context.read<GetCurrentUserUseCase>();
+    return BlocProvider<MenuBloc>(
+      create: (_) => s1<MenuBloc>()..add(LoadCurrentUserEvent()),
+      child: const _MenuView(),
+    );
+  }
+}
 
+class _MenuView extends StatelessWidget {
+  const _MenuView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     final mainItems = [
       {
         'icon': SvgPicture.asset(
@@ -54,12 +65,11 @@ class MenuPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // ẩn nút back
+        automaticallyImplyLeading: false,
         title: const Text(
           'Menu',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
-
         backgroundColor: AppColors.background,
         elevation: 0.5,
         actions: [
@@ -73,7 +83,6 @@ class MenuPage extends StatelessWidget {
           ),
         ],
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
