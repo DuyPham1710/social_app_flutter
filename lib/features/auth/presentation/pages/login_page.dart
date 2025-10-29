@@ -9,6 +9,8 @@ import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -62,7 +64,8 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) {
             // Chỉ xử lý state từ login flow
             if (state is AuthLoaded && state.flowType == 'login') {
-              Navigator.pushNamed(context, '/main');
+              context.read<MenuBloc>().add(LoadCurrentUserEvent());
+              Navigator.pushReplacementNamed(context, '/main');
             } else if (state is AuthError && state.flowType == 'login') {
               final errorMsg = state.errorMessage ?? 'Đăng nhập thất bại';
               UIUtils.showErrorMessage(context, errorMsg);

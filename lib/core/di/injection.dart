@@ -53,6 +53,8 @@ import 'package:social_app_fe/features/story/data/repository/story_repository_im
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
 import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_usecase.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
 
 final s1 = GetIt.instance;
 
@@ -160,12 +162,20 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<CancelFriendRequestUseCase>(
     () => CancelFriendRequestUseCase(s1()),
   );
-  s1.registerLazySingleton<RemoveFriendUseCase>(() => RemoveFriendUseCase(s1()));
+  s1.registerLazySingleton<RemoveFriendUseCase>(
+    () => RemoveFriendUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<GetCurrentUserUseCase>(
+    () => GetCurrentUserUseCase(s1()),
+  );
 
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),
   );
+
+  s1.registerFactory(() => MenuBloc(s1()));
 
   // Blocs
   s1.registerFactory<AuthBloc>(

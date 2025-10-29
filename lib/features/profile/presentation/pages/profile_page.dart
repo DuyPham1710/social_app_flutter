@@ -105,6 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const Divider(),
                   const SizedBox(height: 12),
+
                   CreatePostWidget(
                     avatarUrl: 'https://i.pravatar.cc/150?img=10',
                     onCreatePost: () =>
@@ -122,16 +123,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
+
                   if (state is ProfileError)
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Center(
                         child: Text(
                           state.errorMessage ?? "Không thể tải bài viết",
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(color: AppColors.textSecondary),
                         ),
                       ),
                     ),
+
+
                   if (state is ProfileLoaded)
                     ...posts.map((post) => PostItem(post: post)).toList(),
 
