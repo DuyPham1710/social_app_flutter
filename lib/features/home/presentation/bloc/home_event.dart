@@ -37,3 +37,12 @@ class InitializeWebSocketEvent extends HomeEvent {
 class WebSocketInitializedEvent extends HomeEvent {
   const WebSocketInitializedEvent();
 }
+
+class ReactPostEvent extends HomeEvent {
+  final String postId;
+  final String emojiId;
+  const ReactPostEvent({required this.postId, required this.emojiId});
+
+  @override
+  List<Object?> get props => [postId, emojiId];
+}

@@ -47,6 +47,7 @@ import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
@@ -99,9 +100,12 @@ Future<void> initializeDependencies() async {
     () => UpdatePersonalInfoUsecase(s1()),
   );
 
+  // post usecase
   s1.registerLazySingleton<GetHomePostsUseCase>(
     () => GetHomePostsUseCase(s1()),
   );
+
+  s1.registerLazySingleton<ReactPostUsecase>(() => ReactPostUsecase(s1()));
 
   // Comment UseCases
   s1.registerLazySingleton<ConnectCommentSocketUseCase>(
@@ -160,7 +164,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<CancelFriendRequestUseCase>(
     () => CancelFriendRequestUseCase(s1()),
   );
-  s1.registerLazySingleton<RemoveFriendUseCase>(() => RemoveFriendUseCase(s1()));
+  s1.registerLazySingleton<RemoveFriendUseCase>(
+    () => RemoveFriendUseCase(s1()),
+  );
 
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
@@ -185,6 +191,7 @@ Future<void> initializeDependencies() async {
       connectCommentSocketUseCase: s1(),
       listenCommentCountUseCase: s1(),
       loadCommentsUseCase: s1(),
+      reactPostUseCase: s1(),
     ),
   );
 

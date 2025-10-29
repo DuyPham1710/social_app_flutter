@@ -28,6 +28,10 @@ mixin _$PostModel {
   UserModel get user => throw _privateConstructorUsedError;
   List<PostUrlModel> get urls => throw _privateConstructorUsedError;
   String get layout => throw _privateConstructorUsedError;
+  List<ReactPostModel> get reacts => throw _privateConstructorUsedError;
+  @EmojiConverter()
+  @JsonKey(name: 'isReact')
+  EmojiType? get isReact => throw _privateConstructorUsedError;
   @JsonKey(name: 'privacy_type')
   PrivacyType get privacyType => throw _privateConstructorUsedError;
   @JsonKey(name: 'friends_except')
@@ -58,6 +62,8 @@ abstract class $PostModelCopyWith<$Res> {
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
+    List<ReactPostModel> reacts,
+    @EmojiConverter() @JsonKey(name: 'isReact') EmojiType? isReact,
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'friends_except') List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
@@ -88,6 +94,8 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
+    Object? reacts = null,
+    Object? isReact = freezed,
     Object? privacyType = null,
     Object? friendsExcept = null,
     Object? friendsDetail = null,
@@ -116,6 +124,14 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
                 ? _value.layout
                 : layout // ignore: cast_nullable_to_non_nullable
                       as String,
+            reacts: null == reacts
+                ? _value.reacts
+                : reacts // ignore: cast_nullable_to_non_nullable
+                      as List<ReactPostModel>,
+            isReact: freezed == isReact
+                ? _value.isReact
+                : isReact // ignore: cast_nullable_to_non_nullable
+                      as EmojiType?,
             privacyType: null == privacyType
                 ? _value.privacyType
                 : privacyType // ignore: cast_nullable_to_non_nullable
@@ -167,6 +183,8 @@ abstract class _$$PostModelImplCopyWith<$Res>
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
+    List<ReactPostModel> reacts,
+    @EmojiConverter() @JsonKey(name: 'isReact') EmojiType? isReact,
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'friends_except') List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
@@ -197,6 +215,8 @@ class __$$PostModelImplCopyWithImpl<$Res>
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
+    Object? reacts = null,
+    Object? isReact = freezed,
     Object? privacyType = null,
     Object? friendsExcept = null,
     Object? friendsDetail = null,
@@ -225,6 +245,14 @@ class __$$PostModelImplCopyWithImpl<$Res>
             ? _value.layout
             : layout // ignore: cast_nullable_to_non_nullable
                   as String,
+        reacts: null == reacts
+            ? _value._reacts
+            : reacts // ignore: cast_nullable_to_non_nullable
+                  as List<ReactPostModel>,
+        isReact: freezed == isReact
+            ? _value.isReact
+            : isReact // ignore: cast_nullable_to_non_nullable
+                  as EmojiType?,
         privacyType: null == privacyType
             ? _value.privacyType
             : privacyType // ignore: cast_nullable_to_non_nullable
@@ -259,6 +287,8 @@ class _$PostModelImpl implements _PostModel {
     @JsonKey(name: 'userId') required this.user,
     required final List<PostUrlModel> urls,
     required this.layout,
+    final List<ReactPostModel> reacts = const [],
+    @EmojiConverter() @JsonKey(name: 'isReact') this.isReact,
     @JsonKey(name: 'privacy_type') this.privacyType = PrivacyType.public,
     @JsonKey(name: 'friends_except')
     final List<String> friendsExcept = const [],
@@ -267,6 +297,7 @@ class _$PostModelImpl implements _PostModel {
     this.createdAt,
     this.updatedAt,
   }) : _urls = urls,
+       _reacts = reacts,
        _friendsExcept = friendsExcept,
        _friendsDetail = friendsDetail;
 
@@ -291,6 +322,19 @@ class _$PostModelImpl implements _PostModel {
 
   @override
   final String layout;
+  final List<ReactPostModel> _reacts;
+  @override
+  @JsonKey()
+  List<ReactPostModel> get reacts {
+    if (_reacts is EqualUnmodifiableListView) return _reacts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_reacts);
+  }
+
+  @override
+  @EmojiConverter()
+  @JsonKey(name: 'isReact')
+  final EmojiType? isReact;
   @override
   @JsonKey(name: 'privacy_type')
   final PrivacyType privacyType;
@@ -327,6 +371,8 @@ class _$PostModelImpl implements _PostModel {
             (identical(other.user, user) || other.user == user) &&
             const DeepCollectionEquality().equals(other._urls, _urls) &&
             (identical(other.layout, layout) || other.layout == layout) &&
+            const DeepCollectionEquality().equals(other._reacts, _reacts) &&
+            (identical(other.isReact, isReact) || other.isReact == isReact) &&
             (identical(other.privacyType, privacyType) ||
                 other.privacyType == privacyType) &&
             const DeepCollectionEquality().equals(
@@ -352,6 +398,8 @@ class _$PostModelImpl implements _PostModel {
     user,
     const DeepCollectionEquality().hash(_urls),
     layout,
+    const DeepCollectionEquality().hash(_reacts),
+    isReact,
     privacyType,
     const DeepCollectionEquality().hash(_friendsExcept),
     const DeepCollectionEquality().hash(_friendsDetail),
@@ -380,6 +428,8 @@ abstract class _PostModel implements PostModel {
     @JsonKey(name: 'userId') required final UserModel user,
     required final List<PostUrlModel> urls,
     required final String layout,
+    final List<ReactPostModel> reacts,
+    @EmojiConverter() @JsonKey(name: 'isReact') final EmojiType? isReact,
     @JsonKey(name: 'privacy_type') final PrivacyType privacyType,
     @JsonKey(name: 'friends_except') final List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') final List<String> friendsDetail,
@@ -402,6 +452,12 @@ abstract class _PostModel implements PostModel {
   List<PostUrlModel> get urls;
   @override
   String get layout;
+  @override
+  List<ReactPostModel> get reacts;
+  @override
+  @EmojiConverter()
+  @JsonKey(name: 'isReact')
+  EmojiType? get isReact;
   @override
   @JsonKey(name: 'privacy_type')
   PrivacyType get privacyType;

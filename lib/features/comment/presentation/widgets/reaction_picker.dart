@@ -3,17 +3,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:lottie/lottie.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/shared/helpers/reaction_fly_overlay.dart';
 
 class ReactionPicker extends StatefulWidget {
   final Function(EmojiType) onReactionSelected;
   final Widget child;
   final EmojiType? currentReaction;
+  // true thì cạnh trái của khung picker sẽ thẳng hàng với cạnh trái của widget con
+  final bool alignLeftToChild;
 
   const ReactionPicker({
     super.key,
     required this.onReactionSelected,
     required this.child,
     this.currentReaction,
+    this.alignLeftToChild = false,
   });
 
   @override
@@ -31,10 +35,15 @@ class _ReactionPickerState extends State<ReactionPicker>
 
   int _hoveredIndex = -1;
   GlobalKey _childKey = GlobalKey();
+  late final List<GlobalKey> _emojiKeys;
 
   @override
   void initState() {
     super.initState();
+    _emojiKeys = List<GlobalKey>.generate(
+      EmojiType.values.length,
+      (_) => GlobalKey(),
+    );
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -88,9 +97,12 @@ class _ReactionPickerState extends State<ReactionPicker>
         (iconSize + (horizontalMargin * 2)) * EmojiType.values.length +
         (containerPadding * 2);
 
-    // Tính toán vị trí bên trái để picker luôn ở giữa
-    final pickerLeftPosition =
-        (position.dx + renderBox.size.width / 2) - (totalWidth / 2) + 30.sp;
+    // Tính toán vị trí bên trái
+    // - Nếu alignLeftToChild = true: canh trái khung picker trùng với trái của icon
+    // - Ngược lại: canh giữa như hành vi hiện tại
+    final pickerLeftPosition = widget.alignLeftToChild
+        ? position.dx
+        : (position.dx + renderBox.size.width / 2) - (totalWidth / 2) + 30.sp;
     // --- KẾT THÚC TÍNH TOÁN ---
 
     _overlayEntry = OverlayEntry(
@@ -190,6 +202,7 @@ class _ReactionPickerState extends State<ReactionPicker>
                                           ..scale(isHovered ? 1.2 : 1.0),
                                         // THAY ĐỔI: Kích thước icon to hơn
                                         child: SizedBox(
+                                          key: _emojiKeys[index],
                                           width: iconSize,
                                           height: iconSize,
                                           child: Lottie.asset(
@@ -227,6 +240,19 @@ class _ReactionPickerState extends State<ReactionPicker>
   }
 
   void _selectReaction(EmojiType emoji) {
+    // trigger fly animation: from selected emoji to the first emoji in the picker
+    final int selectedIndex = EmojiType.values.indexOf(emoji);
+    if (selectedIndex >= 0 && _emojiKeys.length > selectedIndex) {
+      final startKey = _emojiKeys[selectedIndex];
+      ReactionFlyOverlay.showFromAnchorDelta(
+        context: context,
+        startAnchorKey: startKey,
+        emojiIcon: emoji.icon,
+        delta: const Offset(-100.0, -40.0),
+        arcLift: -40.0,
+      );
+    }
+
     widget.onReactionSelected(emoji);
     _hideReactionPicker();
   }

@@ -1,15 +1,16 @@
 enum EmojiType {
-  like('Thích', '👍'),
-  love('Yêu thích', '❤️'),
-  haha('Haha', '😂'),
-  wow('Wow', '😮'),
-  sad('Buồn', '😢'),
-  angry('Phẫn nộ', '😡');
+  like('671fdc000000000000000001', 'Thích', '👍'),
+  love('671fdc000000000000000002', 'Yêu thích', '❤️'),
+  haha('671fdc000000000000000003', 'Haha', '😂'),
+  wow('671fdc000000000000000004', 'Wow', '😮'),
+  sad('671fdc000000000000000005', 'Buồn', '😢'),
+  angry('671fdc000000000000000006', 'Phẫn nộ', '😡');
 
+  final String id;
   final String label;
   final String icon;
 
-  const EmojiType(this.label, this.icon);
+  const EmojiType(this.id, this.label, this.icon);
 
   static EmojiType fromLabel(String label) {
     return EmojiType.values.firstWhere(

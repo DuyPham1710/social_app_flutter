@@ -15,6 +15,15 @@ _$PostModelImpl _$$PostModelImplFromJson(Map<String, dynamic> json) =>
           .map((e) => PostUrlModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       layout: json['layout'] as String,
+      reacts:
+          (json['reacts'] as List<dynamic>?)
+              ?.map((e) => ReactPostModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      isReact: _$JsonConverterFromJson<Map<String, dynamic>, EmojiType>(
+        json['isReact'],
+        const EmojiConverter().fromJson,
+      ),
       privacyType:
           $enumDecodeNullable(_$PrivacyTypeEnumMap, json['privacy_type']) ??
           PrivacyType.public,
@@ -43,12 +52,22 @@ Map<String, dynamic> _$$PostModelImplToJson(_$PostModelImpl instance) =>
       'userId': instance.user,
       'urls': instance.urls,
       'layout': instance.layout,
+      'reacts': instance.reacts,
+      'isReact': _$JsonConverterToJson<Map<String, dynamic>, EmojiType>(
+        instance.isReact,
+        const EmojiConverter().toJson,
+      ),
       'privacy_type': _$PrivacyTypeEnumMap[instance.privacyType]!,
       'friends_except': instance.friendsExcept,
       'friends_detail': instance.friendsDetail,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
 
 const _$PrivacyTypeEnumMap = {
   PrivacyType.public: 'public',
@@ -57,3 +76,8 @@ const _$PrivacyTypeEnumMap = {
   PrivacyType.friendsDetail: 'friends_detail',
   PrivacyType.private: 'private',
 };
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);

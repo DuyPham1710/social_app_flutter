@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usec
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   bool _isWebSocketInitialized = false;
@@ -18,6 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final ConnectCommentSocketUseCase connectCommentSocketUseCase;
   final ListenCommentCountUseCase listenCommentCountUseCase;
   final LoadCommentsUseCase loadCommentsUseCase;
+  final ReactPostUsecase reactPostUseCase;
   StreamSubscription? _commentCountSubscription;
 
   HomeBloc({
@@ -25,13 +27,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.connectCommentSocketUseCase,
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
+    required this.reactPostUseCase,
   }) : super(HomeInitial()) {
     on<InitializeWebSocketEvent>(_onInitializeWebSocket);
     on<WebSocketInitializedEvent>(_onWebSocketInitialized);
     on<LoadPostsEvent>(_onLoadPosts);
     on<LoadMorePostsEvent>(_onLoadMorePosts);
     on<UpdateCommentCountsEvent>(_onUpdateCommentCounts);
-
+    on<ReactPostEvent>(_onReactPost);
     // Kết nối WebSocket khi khởi tạo HomeBloc
     // _initializeWebSocket();
   }
@@ -101,6 +104,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           isLoadingMore: currentState.isLoadingMore,
         ),
       );
+    }
+  }
+
+  void _onReactPost(ReactPostEvent event, Emitter<HomeState> emit) async {
+    final dataState = await reactPostUseCase(
+      params: ReactPostParams(postId: event.postId, emoji: event.emojiId),
+    );
+    if (dataState is DataStateSuccess && dataState.data != null) {
+      // Reload posts để cập nhật react count và react info
+      //add(const LoadPostsEvent(page: 1, limit: 2));
+      print('Reacted to post successfully');
+    } else {
+      final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+      emit(HomeError(dataState.error!, errorMessage: errorMessage));
     }
   }
 

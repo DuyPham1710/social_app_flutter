@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_react_info.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
@@ -88,63 +89,16 @@ class PostItem extends StatelessWidget {
           SizedBox(height: 8.h),
 
           // Likes info
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: Row(
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: const [
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundImage: NetworkImage(
-                        "https://randomuser.me/api/portraits/men/2.jpg",
-                      ),
-                    ),
-                    Positioned(
-                      left: 18,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundImage: NetworkImage(
-                          "https://randomuser.me/api/portraits/women/2.jpg",
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(width: 30.w),
-
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Liked by ",
-                          style: TextStyle(fontSize: 12.sp),
-                        ),
-                        TextSpan(
-                          text: "Lam ",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(
-                          text: "and 100+ others",
-                          style: TextStyle(fontSize: 12.sp),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          PostReactInfo(reacts: post.reacts),
 
           SizedBox(height: 20.h),
 
-          PostAction(postId: post.id, commentCount: commentCount),
+          PostAction(
+            postId: post.id,
+            reactCount: post.reacts!.length,
+            isReact: post.isReact,
+            commentCount: commentCount,
+          ),
         ],
       ),
     );
