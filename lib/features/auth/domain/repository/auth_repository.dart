@@ -2,7 +2,6 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
 import 'package:social_app_fe/features/auth/data/models/register_request.dart';
 import 'package:social_app_fe/features/auth/data/models/reset_password_request.dart';
-import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import 'package:social_app_fe/features/auth/data/models/verify_otp_request.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 

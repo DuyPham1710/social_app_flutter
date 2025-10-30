@@ -26,6 +26,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
   }) : super(HomeInitial()) {
+    print('>>> HomeBloc CREATED');
     on<InitializeWebSocketEvent>(_onInitializeWebSocket);
     on<WebSocketInitializedEvent>(_onWebSocketInitialized);
     on<LoadPostsEvent>(_onLoadPosts);
