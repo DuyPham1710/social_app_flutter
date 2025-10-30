@@ -1,10 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
+import 'package:dio/dio.dart';
 
 abstract class ProfileState extends Equatable {
   final List<PostEntity>? posts;
-  final DioException? error;
+  final Map<String, int>? commentCounts;
   final String? errorMessage;
   final int? currentPage;
   final int? limit;
@@ -13,7 +13,7 @@ abstract class ProfileState extends Equatable {
 
   const ProfileState({
     this.posts,
-    this.error,
+    this.commentCounts,
     this.errorMessage,
     this.currentPage,
     this.limit,
@@ -24,7 +24,7 @@ abstract class ProfileState extends Equatable {
   @override
   List<Object?> get props => [
         posts,
-        error,
+        commentCounts,
         errorMessage,
         currentPage,
         limit,
@@ -40,20 +40,14 @@ class ProfileLoading extends ProfileState {}
 class ProfileLoaded extends ProfileState {
   const ProfileLoaded(
     List<PostEntity> posts, {
-    int? currentPage,
-    int? limit,
-    bool? hasNext,
-    bool isLoadingMore = false,
-  }) : super(
-          posts: posts,
-          currentPage: currentPage,
-          limit: limit,
-          hasNext: hasNext,
-          isLoadingMore: isLoadingMore,
-        );
+    super.commentCounts,
+    super.currentPage,
+    super.limit,
+    super.hasNext,
+    super.isLoadingMore,
+  }) : super(posts: posts);
 }
 
 class ProfileError extends ProfileState {
-  const ProfileError(DioException error, {super.errorMessage})
-      : super(error: error);
+  const ProfileError(String message) : super(errorMessage: message);
 }

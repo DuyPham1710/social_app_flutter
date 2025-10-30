@@ -12,21 +12,18 @@ class GetProfilePostsUseCase
   @override
   Future<DataState<PostListEntity>> call({GetProfilePostsParams? params}) {
     return _repository.getProfilePosts(
-      ownerId: params!.ownerId,
-      page: params.page,
-      limit: params.limit,
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 10,
     );
   }
 }
 
 class GetProfilePostsParams {
-  final String ownerId;
   final int page;
   final int limit;
 
   const GetProfilePostsParams({
-    required this.ownerId,
     this.page = 1,
-    this.limit = 10,
+    this.limit = 2,
   });
 }

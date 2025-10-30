@@ -15,4 +15,10 @@ abstract class PostRemoteDataSource {
     @Query('page') int page,
     @Query('limit') int limit,
   );
+
+  @GET('/post')
+  Future<PostListModel> getProfilePosts(
+    @Query('page') int page,
+    @Query('limit') int limit,
+  );
 }

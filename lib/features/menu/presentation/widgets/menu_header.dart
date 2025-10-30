@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
-
+import 'package:social_app_fe/core/di/injection.dart' as di;
 import '../../../post/domain/usecases/get_profile_posts_usecase.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../comment/domain/usecases/listen_comment_count_usecase.dart';
+import '../../../comment/domain/usecases/load_comment_usecase.dart';
 
 class MenuHeader extends StatelessWidget {
   final String name;
   final String avatarUrl;
   final String userId;
 
-  const MenuHeader({super.key, required this.name, required this.avatarUrl, required this.userId});
+  const MenuHeader({
+    super.key,
+    required this.name,
+    required this.avatarUrl,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +28,12 @@ class MenuHeader extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => BlocProvider(
-              create: (context) => ProfileBloc(
-                getProfilePostsUseCase: context.read<GetProfilePostsUseCase>(),
+              create: (_) => ProfileBloc(
+                getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
+                listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
+                loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
               ),
-              child: ProfilePage(userId: userId),
+              child: const ProfilePage(),
             ),
           ),
         );

@@ -34,11 +34,14 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<DataState<PostListModel>> getProfilePosts({
-    required String ownerId,
     int page = 1,
     int limit = 10,
-  }) {
-    // TODO: implement getProfilePosts
-    throw UnimplementedError();
+  }) async {
+    try {
+      final response = await remoteDataSource.getProfilePosts(page, limit);
+    return DataStateSuccess(response);
+  } on DioException catch (e) {
+    return DataStateError(e);
+  }
   }
 }

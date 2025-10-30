@@ -42,22 +42,29 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
   }
 
   @override
-  Future<DataState<PostListModel>> getProfilePosts({
-    required String ownerId,
-    int page = 1,
-    int limit = 10,
-  }) async {
+  Future<PostListModel> getProfilePosts(int page, int limit) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<PostListModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/post',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PostListModel _value;
     try {
-      final response = await _dio.get(
-        '/post/user/$ownerId',
-        queryParameters: {'page': page, 'limit': limit},
-      );
-
-      final data = PostListModel.fromJson(response.data);
-      return DataStateSuccess(data);
-    } on DioException catch (e) {
-      return DataStateError(e);
+      _value = PostListModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      rethrow;
     }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

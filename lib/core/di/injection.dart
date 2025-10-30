@@ -47,6 +47,7 @@ import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
@@ -103,6 +104,10 @@ Future<void> initializeDependencies() async {
 
   s1.registerLazySingleton<GetHomePostsUseCase>(
     () => GetHomePostsUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<GetProfilePostsUseCase>(
+    () => GetProfilePostsUseCase(s1()),
   );
 
   // Comment UseCases
@@ -243,3 +248,5 @@ Future<void> initializeDependencies() async {
     () => HomeStoriesBloc(getHomeStoriesUseCase: s1()),
   );
 }
+
+class sl {}

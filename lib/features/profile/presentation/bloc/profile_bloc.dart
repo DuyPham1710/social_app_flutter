@@ -1,16 +1,32 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/core/usecase/usecase.dart';
 import 'package:social_app_fe/core/utils/error_utils.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'dart:async';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetProfilePostsUseCase getProfilePostsUseCase;
+  final ListenCommentCountUseCase listenCommentCountUseCase;
+  final LoadCommentsUseCase loadCommentsUseCase;
 
-  ProfileBloc({required this.getProfilePostsUseCase}) : super(ProfileInitial()) {
+  StreamSubscription? _commentCountSubscription;
+  ProfileBloc({
+    required this.getProfilePostsUseCase,
+    required this.listenCommentCountUseCase,
+    required this.loadCommentsUseCase,
+  }) : super(ProfileInitial()) {
     on<LoadProfilePostsEvent>(_onLoadProfilePosts);
     on<LoadMoreProfilePostsEvent>(_onLoadMoreProfilePosts);
+    on<UpdateProfileCommentCountsEvent>(_onUpdateCommentCounts);
+    _commentCountSubscription =
+        listenCommentCountUseCase(params: const NoParams()).listen((counts) {
+          add(UpdateProfileCommentCountsEvent(counts));
+        });
   }
 
   Future<void> _onLoadProfilePosts(
@@ -19,25 +35,28 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
 
-    final dataState = await getProfilePostsUseCase(
-      params: GetProfilePostsParams(
-        ownerId: event.ownerId,
-        page: event.page,
-        limit: event.limit,
-      ),
+    final result = await getProfilePostsUseCase(
+      params: GetProfilePostsParams(page: event.page, limit: event.limit),
     );
 
-    if (dataState is DataStateSuccess && dataState.data != null) {
-      final postListEntity = dataState.data!;
-      emit(ProfileLoaded(
-        postListEntity.data,
-        currentPage: postListEntity.page,
-        limit: postListEntity.limit,
-        hasNext: postListEntity.hasNext,
-      ));
+    if (result is DataStateSuccess && result.data != null) {
+      final postListEntity = result.data!;
+
+      for (final post in postListEntity.data) {
+        loadCommentsUseCase(params: LoadCommentsParams(post.id));
+      }
+
+      emit(
+        ProfileLoaded(
+          postListEntity.data,
+          currentPage: postListEntity.page,
+          limit: postListEntity.limit,
+          hasNext: postListEntity.hasNext,
+          commentCounts: {},
+        ),
+      );
     } else {
-      final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(ProfileError(dataState.error!, errorMessage: errorMessage));
+      emit(ProfileError(ErrorUtils.getErrorMessage(result.error!)));
     }
   }
 
@@ -49,46 +68,81 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     if (currentState is! ProfileLoaded ||
         currentState.hasNext != true ||
-        currentState.isLoadingMore) {
+        currentState.isLoadingMore)
       return;
-    }
 
-    emit(ProfileLoaded(
-      currentState.posts!,
-      currentPage: currentState.currentPage,
-      limit: currentState.limit,
-      hasNext: currentState.hasNext,
-      isLoadingMore: true,
-    ));
-
-    final nextPage = (currentState.currentPage ?? 1) + 1;
-    final dataState = await getProfilePostsUseCase(
-      params: GetProfilePostsParams(
-        ownerId: event.ownerId,
-        page: nextPage,
-        limit: currentState.limit ?? 10,
-      ),
-    );
-
-    if (dataState is DataStateSuccess && dataState.data != null) {
-      final postListEntity = dataState.data!;
-      final updatedPosts = [...currentState.posts!, ...postListEntity.data];
-
-      emit(ProfileLoaded(
-        updatedPosts,
-        currentPage: postListEntity.page,
-        limit: postListEntity.limit,
-        hasNext: postListEntity.hasNext,
-        isLoadingMore: false,
-      ));
-    } else {
-      emit(ProfileLoaded(
+    emit(
+      ProfileLoaded(
         currentState.posts!,
         currentPage: currentState.currentPage,
         limit: currentState.limit,
         hasNext: currentState.hasNext,
-        isLoadingMore: false,
-      ));
+        isLoadingMore: true,
+      ),
+    );
+
+    final nextPage = (currentState.currentPage ?? 1) + 1;
+
+    final result = await getProfilePostsUseCase(
+      params: GetProfilePostsParams(
+        page: nextPage,
+        limit: currentState.limit ?? 4,
+      ),
+    );
+
+    if (result is DataStateSuccess && result.data != null) {
+      final newPosts = [...currentState.posts!, ...result.data!.data];
+
+      for (final post in result.data!.data) {
+        loadCommentsUseCase(params: LoadCommentsParams(post.id));
+      }
+
+      emit(
+        ProfileLoaded(
+          newPosts,
+          commentCounts: currentState.commentCounts,
+          currentPage: result.data!.page,
+          limit: result.data!.limit,
+          hasNext: result.data!.hasNext,
+          isLoadingMore: false,
+        ),
+      );
+    } else {
+      emit(
+        ProfileLoaded(
+          currentState.posts!,
+          commentCounts: currentState.commentCounts,
+          currentPage: currentState.currentPage,
+          limit: currentState.limit,
+          hasNext: currentState.hasNext,
+          isLoadingMore: false,
+        ),
+      );
     }
+  }
+
+  void _onUpdateCommentCounts(
+    UpdateProfileCommentCountsEvent event,
+    Emitter<ProfileState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is ProfileLoaded) {
+      emit(
+        ProfileLoaded(
+          currentState.posts!,
+          commentCounts: event.commentCounts,
+          currentPage: currentState.currentPage,
+          limit: currentState.limit,
+          hasNext: currentState.hasNext,
+          isLoadingMore: currentState.isLoadingMore,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _commentCountSubscription?.cancel();
+    return super.close();
   }
 }

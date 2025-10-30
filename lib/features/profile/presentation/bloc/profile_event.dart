@@ -8,25 +8,23 @@ abstract class ProfileEvent extends Equatable {
 }
 
 class LoadProfilePostsEvent extends ProfileEvent {
-  final String ownerId;
   final int page;
   final int limit;
 
-  const LoadProfilePostsEvent({
-    required this.ownerId,
-    this.page = 1,
-    this.limit = 10,
-  });
+  const LoadProfilePostsEvent({this.page = 1, this.limit = 2});
 
   @override
-  List<Object?> get props => [ownerId, page, limit];
+  List<Object?> get props => [page, limit];
+}
+class LoadMoreProfilePostsEvent extends ProfileEvent {
+  const LoadMoreProfilePostsEvent();
 }
 
-class LoadMoreProfilePostsEvent extends ProfileEvent {
-  final String ownerId;
+class UpdateProfileCommentCountsEvent extends ProfileEvent {
+  final Map<String, int> commentCounts;
 
-  const LoadMoreProfilePostsEvent({required this.ownerId});
+  const UpdateProfileCommentCountsEvent(this.commentCounts);
 
   @override
-  List<Object?> get props => [ownerId];
+  List<Object?> get props => [commentCounts];
 }

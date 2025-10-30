@@ -13,22 +13,32 @@ import '../widgets/friend_list_widget.dart';
 import '../widgets/create_post_widget.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String userId; //Truyền userId để biết profile của ai
-
-  const ProfilePage({super.key, required this.userId});
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    // Khi vào trang -> load bài viết của user
-    context.read<ProfileBloc>().add(
-      LoadProfilePostsEvent(ownerId: widget.userId, page: 1, limit: 5),
-    );
+    context.read<ProfileBloc>().add(const LoadProfilePostsEvent());
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        context.read<ProfileBloc>().add(const LoadMoreProfilePostsEvent());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,14 +56,16 @@ class _ProfilePageState extends State<ProfilePage> {
           final posts = state.posts ?? [];
 
           return CustomScrollView(
+            controller: _scrollController,
             slivers: [
               // Header
               SliverAppBar(
                 pinned: true,
                 backgroundColor: AppColors.background,
                 elevation: 0,
-                title: const Text(
-                  'Nguyễn.H.N. Lam',
+                title: Text(
+                  //lấy tên người dùng từ storage
+                  'Trang cá nhân',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -107,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
 
                   CreatePostWidget(
-                    avatarUrl: 'https://i.pravatar.cc/150?img=10',
+                    avatarUrl: 'https://i.pravatar.cc/150?img=5',
                     onCreatePost: () =>
                         Navigator.pushNamed(context, '/create_post'),
                   ),
@@ -130,14 +142,39 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Center(
                         child: Text(
                           state.errorMessage ?? "Không thể tải bài viết",
-                          style: const TextStyle(color: AppColors.textSecondary),
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     ),
 
-
                   if (state is ProfileLoaded)
-                    ...posts.map((post) => PostItem(post: post)).toList(),
+                    ...posts.map((post) {
+                      final commentCount = state.commentCounts?[post.id] ?? 0;
+                      return PostItem(post: post, commentCount: commentCount);
+                    }).toList(),
+                  
+                  if (state is ProfileLoaded && state.isLoadingMore)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+
+                  if (state is ProfileLoaded && state.hasNext == false)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: Center(
+                        child: Text(
+                          "Đã hiển thị hết bài viết",
+                          style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                        ),
+                      ),
+                    ),
 
                   if (state is ProfileLoaded && posts.isEmpty)
                     Padding(
