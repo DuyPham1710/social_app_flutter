@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_item.dart'
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_actions.dart';
 import '../widgets/profile_info.dart';
@@ -26,6 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     context.read<ProfileBloc>().add(const LoadProfilePostsEvent());
+    context.read<FriendBloc>().add(const LoadFriends());
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -87,32 +89,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   const ProfileInfo(),
                   const Divider(),
                   FriendListWidget(
-                    friends: [
-                      {
-                        "name": "Nguyễn Minh",
-                        "avatarUrl": "https://i.pravatar.cc/150?img=11",
-                      },
-                      {
-                        "name": "Trần Linh",
-                        "avatarUrl": "https://i.pravatar.cc/150?img=12",
-                      },
-                      {
-                        "name": "Nguyễn Minh",
-                        "avatarUrl": "https://i.pravatar.cc/150?img=13",
-                      },
-                      {
-                        "name": "Trần Linh",
-                        "avatarUrl": "https://i.pravatar.cc/150?img=14",
-                      },
-                      {
-                        "name": "Nguyễn Minh",
-                        "avatarUrl": "https://i.pravatar.cc/150?img=15",
-                      },
-                      {
-                        "name": "Trần Linh",
-                        "avatarUrl": "https://i.pravatar.cc/150?img=16",
-                      },
-                    ],
                     onViewAll: () => Navigator.pushNamed(context, '/friends'),
                   ),
                   const Divider(),
@@ -154,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       final commentCount = state.commentCounts?[post.id] ?? 0;
                       return PostItem(post: post, commentCount: commentCount);
                     }).toList(),
-                  
+
                   if (state is ProfileLoaded && state.isLoadingMore)
                     const Padding(
                       padding: EdgeInsets.all(16.0),

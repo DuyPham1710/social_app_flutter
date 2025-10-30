@@ -1,4 +1,4 @@
-import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/profile/domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
@@ -14,4 +14,5 @@ class UserModel extends UserEntity {
     super.isActive,
     super.createdAt,
   });
+
 }
