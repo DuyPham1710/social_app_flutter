@@ -51,6 +51,10 @@ import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usec
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
+import 'package:social_app_fe/features/profile/data/repository/user_repository_impl.dart';
+import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
@@ -58,6 +62,7 @@ import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_us
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:social_app_fe/features/profile/data/data_sources/user_remote_data_source.dart';
 
 final s1 = GetIt.instance;
 
@@ -183,6 +188,29 @@ Future<void> initializeDependencies() async {
     () => GetCurrentUserUseCase(s1()),
   );
 
+  //profile
+  // Profile Data Source
+  s1.registerLazySingleton<UserRemoteDataSource>(
+    () => UserRemoteDataSource(s1()),
+  );
+
+  // Profile Repository
+  s1.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(s1()));
+
+  // Profile UseCase
+  s1.registerLazySingleton<GetUserProfileUseCase>(
+    () => GetUserProfileUseCase(s1()),
+  );
+
+  // Profile Bloc
+  s1.registerFactory(
+    () => ProfileBloc(
+      getProfilePostsUseCase: s1(),
+      listenCommentCountUseCase: s1(),
+      loadCommentsUseCase: s1(),
+      getUserProfileUseCase: s1(),
+    ),
+  );
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),

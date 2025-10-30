@@ -6,6 +6,7 @@ import '../../../post/domain/usecases/get_profile_posts_usecase.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../comment/domain/usecases/listen_comment_count_usecase.dart';
 import '../../../comment/domain/usecases/load_comment_usecase.dart';
+import '../../../profile/domain/usecases/get_user_profile_usecase.dart';
 
 class MenuHeader extends StatelessWidget {
   final String name;
@@ -32,6 +33,7 @@ class MenuHeader extends StatelessWidget {
                 getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
                 listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
                 loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
+                getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
               ),
               child: const ProfilePage(),
             ),
