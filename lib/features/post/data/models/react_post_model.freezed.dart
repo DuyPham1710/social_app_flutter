@@ -31,6 +31,7 @@ mixin _$ReactPostModel {
   EmojiType get emoji => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  int? get mutualFriendsCount => throw _privateConstructorUsedError;
 
   /// Serializes this ReactPostModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,6 +57,7 @@ abstract class $ReactPostModelCopyWith<$Res> {
     @EmojiConverter() @JsonKey(name: 'emojiId') EmojiType emoji,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? mutualFriendsCount,
   });
 
   $UserModelCopyWith<$Res> get user;
@@ -82,6 +84,7 @@ class _$ReactPostModelCopyWithImpl<$Res, $Val extends ReactPostModel>
     Object? emoji = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? mutualFriendsCount = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -109,6 +112,10 @@ class _$ReactPostModelCopyWithImpl<$Res, $Val extends ReactPostModel>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            mutualFriendsCount: freezed == mutualFriendsCount
+                ? _value.mutualFriendsCount
+                : mutualFriendsCount // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -141,6 +148,7 @@ abstract class _$$ReactPostModelImplCopyWith<$Res>
     @EmojiConverter() @JsonKey(name: 'emojiId') EmojiType emoji,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? mutualFriendsCount,
   });
 
   @override
@@ -167,6 +175,7 @@ class __$$ReactPostModelImplCopyWithImpl<$Res>
     Object? emoji = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? mutualFriendsCount = freezed,
   }) {
     return _then(
       _$ReactPostModelImpl(
@@ -194,6 +203,10 @@ class __$$ReactPostModelImplCopyWithImpl<$Res>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        mutualFriendsCount: freezed == mutualFriendsCount
+            ? _value.mutualFriendsCount
+            : mutualFriendsCount // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -209,6 +222,7 @@ class _$ReactPostModelImpl implements _ReactPostModel {
     @EmojiConverter() @JsonKey(name: 'emojiId') required this.emoji,
     this.createdAt,
     this.updatedAt,
+    this.mutualFriendsCount,
   });
 
   factory _$ReactPostModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -230,10 +244,12 @@ class _$ReactPostModelImpl implements _ReactPostModel {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  @override
+  final int? mutualFriendsCount;
 
   @override
   String toString() {
-    return 'ReactPostModel(id: $id, user: $user, postId: $postId, emoji: $emoji, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'ReactPostModel(id: $id, user: $user, postId: $postId, emoji: $emoji, createdAt: $createdAt, updatedAt: $updatedAt, mutualFriendsCount: $mutualFriendsCount)';
   }
 
   @override
@@ -248,13 +264,23 @@ class _$ReactPostModelImpl implements _ReactPostModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.mutualFriendsCount, mutualFriendsCount) ||
+                other.mutualFriendsCount == mutualFriendsCount));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, user, postId, emoji, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    user,
+    postId,
+    emoji,
+    createdAt,
+    updatedAt,
+    mutualFriendsCount,
+  );
 
   /// Create a copy of ReactPostModel
   /// with the given fields replaced by the non-null parameter values.
@@ -281,6 +307,7 @@ abstract class _ReactPostModel implements ReactPostModel {
     @EmojiConverter() @JsonKey(name: 'emojiId') required final EmojiType emoji,
     final DateTime? createdAt,
     final DateTime? updatedAt,
+    final int? mutualFriendsCount,
   }) = _$ReactPostModelImpl;
 
   factory _ReactPostModel.fromJson(Map<String, dynamic> json) =
@@ -302,6 +329,8 @@ abstract class _ReactPostModel implements ReactPostModel {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  int? get mutualFriendsCount;
 
   /// Create a copy of ReactPostModel
   /// with the given fields replaced by the non-null parameter values.

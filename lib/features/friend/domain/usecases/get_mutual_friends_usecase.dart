@@ -7,7 +7,10 @@ class GetMutualFriendsUseCase {
 
   GetMutualFriendsUseCase(this.friendRepository);
 
-  Future<DataState<List<FriendEntity>>> call(String targetUserId, {int limit = 3}) async {
+  Future<DataState<List<FriendEntity>>> call(
+    String targetUserId, {
+    int limit = 3,
+  }) async {
     return await friendRepository.getMutualFriends(targetUserId, limit: limit);
   }
 }

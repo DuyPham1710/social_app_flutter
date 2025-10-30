@@ -34,6 +34,7 @@ class ReactPostModel extends ReactPostEntity with _$ReactPostModel {
     @EmojiConverter() @JsonKey(name: 'emojiId') required EmojiType emoji,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? mutualFriendsCount,
   }) = _ReactPostModel;
 
   factory ReactPostModel.fromJson(Map<String, dynamic> json) =>

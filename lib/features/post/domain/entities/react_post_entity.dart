@@ -8,6 +8,7 @@ class ReactPostEntity {
   final EmojiType emoji;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final int? mutualFriendsCount;
 
   ReactPostEntity({
     required this.id,
@@ -16,5 +17,6 @@ class ReactPostEntity {
     required this.emoji,
     this.createdAt,
     this.updatedAt,
+    this.mutualFriendsCount,
   });
 }
