@@ -13,7 +13,8 @@ class PostAction extends StatefulWidget {
   final int reactCount;
   final EmojiType? isReact;
   final int commentCount;
-  // final void Function(EmojiType? newReaction)? onReactionChanged;
+  final void Function(EmojiType? newReaction)?
+  onReactionChanged; // Thêm parameter
 
   const PostAction({
     super.key,
@@ -21,7 +22,7 @@ class PostAction extends StatefulWidget {
     this.reactCount = 0,
     this.commentCount = 0,
     this.isReact,
-    //  this.onReactionChanged,
+    this.onReactionChanged,
   });
 
   @override
@@ -30,7 +31,7 @@ class PostAction extends StatefulWidget {
 
 class _PostActionState extends State<PostAction> {
   String get postId => widget.postId;
-  int get reactCount => widget.reactCount;
+  late int _reactCount;
   int get commentCount => widget.commentCount;
   EmojiType? _currentReaction;
   final GlobalKey _iconKey = GlobalKey();
@@ -39,9 +40,23 @@ class _PostActionState extends State<PostAction> {
   void initState() {
     super.initState();
     _currentReaction = widget.isReact;
+    _reactCount = widget.reactCount;
+  }
+
+  @override
+  void didUpdateWidget(PostAction oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.isReact != widget.isReact) {
+      setState(() {
+        _reactCount = widget.reactCount;
+        _currentReaction = widget.isReact;
+      });
+    }
   }
 
   void _handleReactionSelected(EmojiType reaction) {
+    final wasReacted = _currentReaction != null;
     // Gọi BLoC event để react post
     context.read<HomeBloc>().add(
       ReactPostEvent(postId: postId, emojiId: reaction.id),
@@ -50,10 +65,44 @@ class _PostActionState extends State<PostAction> {
     setState(() {
       if (_currentReaction == reaction) {
         _currentReaction = null;
+        // giảm đi 1 vì người dùng đã hủy reaction
+        if (_reactCount > 0) _reactCount--;
       } else {
+        // Nếu chưa react hoặc đổi sang emoji khác -> +1 hoặc giữ nguyên
+        if (!wasReacted) _reactCount++;
         _currentReaction = reaction;
       }
     });
+
+    // Notify parent để cập nhật PostReactInfo
+    widget.onReactionChanged?.call(_currentReaction);
+  }
+
+  void _handleIconTap() {
+    if (_currentReaction != null) {
+      // Đã react -> Hủy react bằng cách gọi lại với emoji hiện tại
+      context.read<HomeBloc>().add(
+        ReactPostEvent(postId: postId, emojiId: _currentReaction!.id),
+      );
+
+      setState(() {
+        _currentReaction = null;
+        if (_reactCount > 0) _reactCount--;
+      });
+    } else {
+      // Chưa react -> React với emoji like mặc định
+      context.read<HomeBloc>().add(
+        ReactPostEvent(postId: postId, emojiId: EmojiType.like.id),
+      );
+
+      setState(() {
+        _currentReaction = EmojiType.like;
+        _reactCount++;
+      });
+    }
+
+    // Notify parent để cập nhật PostReactInfo
+    widget.onReactionChanged?.call(_currentReaction);
   }
 
   @override
@@ -68,22 +117,26 @@ class _PostActionState extends State<PostAction> {
         children: [
           Row(
             children: [
-              ReactionPicker(
-                alignLeftToChild: true,
-                currentReaction: _currentReaction,
-                onReactionSelected: _handleReactionSelected,
-                child: hasReacted
-                    ? Text(
-                        emojiIcon,
-                        key: _iconKey,
-                        style: TextStyle(fontSize: 20.sp),
-                      )
-                    : Icon(
-                        CupertinoIcons.hand_thumbsup,
-                        key: _iconKey,
-                        color: Colors.grey,
-                        size: 24.sp,
-                      ),
+              // Wrap với GestureDetector để xử lý onTap riêng
+              GestureDetector(
+                onTap: _handleIconTap,
+                child: ReactionPicker(
+                  alignLeftToChild: true,
+                  currentReaction: _currentReaction,
+                  onReactionSelected: _handleReactionSelected,
+                  child: hasReacted
+                      ? Text(
+                          emojiIcon,
+                          key: _iconKey,
+                          style: TextStyle(fontSize: 20.sp),
+                        )
+                      : Icon(
+                          CupertinoIcons.hand_thumbsup,
+                          key: _iconKey,
+                          color: Colors.grey,
+                          size: 24.sp,
+                        ),
+                ),
               ),
 
               SizedBox(width: 8.w),
@@ -98,7 +151,7 @@ class _PostActionState extends State<PostAction> {
                     },
                   );
                 },
-                child: Text("$reactCount", style: TextStyle(fontSize: 12.sp)),
+                child: Text("$_reactCount", style: TextStyle(fontSize: 12.sp)),
               ),
               SizedBox(width: 20.w),
               GestureDetector(

@@ -22,7 +22,7 @@ class CommentContentWidget extends StatelessWidget {
                 CircleAvatar(
                   radius: 18.r,
                   backgroundImage: NetworkImage(
-                    'https://i.pinimg.com/736x/8b/28/8d/8b288dbd8cb07d0f85adc8bdd7006ecc.jpg',
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
                   ),
                 ),
 

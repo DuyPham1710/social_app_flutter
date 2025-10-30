@@ -1,4 +1,5 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_list_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 
@@ -12,4 +13,6 @@ abstract class PostRepository {
     required String postId,
     required String emoji,
   });
+
+  Future<DataState<PostEntity>> getPostDetail({required String postId});
 }

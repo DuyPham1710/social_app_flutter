@@ -11,6 +11,8 @@ abstract class PostDetailState extends Equatable {
 
 class PostDetailInitial extends PostDetailState {}
 
+class PostDetailLoading extends PostDetailState {}
+
 class PostDetailLoaded extends PostDetailState {
   const PostDetailLoaded({required super.commentCount});
 }

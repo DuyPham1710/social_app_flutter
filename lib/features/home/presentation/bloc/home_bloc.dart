@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usec
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
@@ -20,6 +21,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final ListenCommentCountUseCase listenCommentCountUseCase;
   final LoadCommentsUseCase loadCommentsUseCase;
   final ReactPostUsecase reactPostUseCase;
+  final GetPostDetailUsecase getPostDetailUsecase;
   StreamSubscription? _commentCountSubscription;
 
   HomeBloc({
@@ -28,6 +30,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
     required this.reactPostUseCase,
+    required this.getPostDetailUsecase,
   }) : super(HomeInitial()) {
     on<InitializeWebSocketEvent>(_onInitializeWebSocket);
     on<WebSocketInitializedEvent>(_onWebSocketInitialized);
@@ -35,6 +38,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<LoadMorePostsEvent>(_onLoadMorePosts);
     on<UpdateCommentCountsEvent>(_onUpdateCommentCounts);
     on<ReactPostEvent>(_onReactPost);
+    on<GetPostDetailEvent>(_onGetPostDetail);
     // Kết nối WebSocket khi khởi tạo HomeBloc
     // _initializeWebSocket();
   }
@@ -114,10 +118,52 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (dataState is DataStateSuccess && dataState.data != null) {
       // Reload posts để cập nhật react count và react info
       //add(const LoadPostsEvent(page: 1, limit: 2));
-      print('Reacted to post successfully');
+      print('Reacted to post successfully with data: ${dataState.data!.id}  ');
+      add(GetPostDetailEvent(postId: event.postId));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
       emit(HomeError(dataState.error!, errorMessage: errorMessage));
+    }
+  }
+
+  void _onGetPostDetail(
+    GetPostDetailEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    final dataState = await getPostDetailUsecase(
+      params: GetPostDetailParams(postId: event.postId),
+    );
+
+    if (dataState is DataStateSuccess && dataState.data != null) {
+      final updatedPost = dataState.data!;
+      final currentState = state;
+
+      if (currentState is HomeLoaded) {
+        // Tìm và cập nhật post trong danh sách
+        final updatedPosts = currentState.posts!.map((post) {
+          if (post.id == event.postId) {
+            return updatedPost; // Thay thế bằng post đã được update từ backend
+          }
+          return post;
+        }).toList();
+
+        emit(
+          HomeLoaded(
+            updatedPosts,
+            commentCounts: currentState.commentCounts,
+            currentPage: currentState.currentPage,
+            limit: currentState.limit,
+            hasNext: currentState.hasNext,
+            isLoadingMore: currentState.isLoadingMore,
+          ),
+        );
+
+        print('Updated post ${event.postId} with new react data');
+      }
+    } else {
+      final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+      print('Error getting post detail: $errorMessage');
+      // Không emit error để không làm gián đoạn UI, chỉ log
     }
   }
 

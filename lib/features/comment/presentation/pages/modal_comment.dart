@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
-import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
@@ -11,18 +10,20 @@ import 'package:social_app_fe/features/comment/presentation/bloc/comment_details
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_header_widget.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_input_field.dart';
+import 'package:social_app_fe/features/comment/presentation/widgets/comment_item.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/empty_comments_widget.dart';
-import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/typing_indicator.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 
 class ModalComment extends StatefulWidget {
   final String postId;
+  final List<ReactPostEntity>? reacts;
   final bool? isPressComment;
 
   const ModalComment({
     super.key,
     required this.postId,
+    this.reacts,
     this.isPressComment = false,
   });
 
@@ -73,13 +74,6 @@ class _ModalCommentState extends State<ModalComment> {
     }
   }
 
-  void _onReactionChanged(String commentId, EmojiType reaction) {
-    // TODO: Implement reaction logic với server
-    print('Comment $commentId reacted with ${reaction.label}');
-    // Có thể emit event để cập nhật server
-    // _commentBloc.add(ReactToCommentEvent(commentId: commentId, reaction: reaction));
-  }
-
   @override
   void dispose() {
     // Leave post khi đóng modal
@@ -126,7 +120,7 @@ class _ModalCommentState extends State<ModalComment> {
 
                 SizedBox(height: 10.h),
 
-                CommentHeaderWidget(),
+                CommentHeaderWidget(postId: widget.postId),
 
                 SizedBox(height: 10.h),
                 Divider(height: 1.h, color: AppColors.divider),
@@ -181,193 +175,7 @@ class _ModalCommentState extends State<ModalComment> {
                           controller: scrollController,
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
-                            return Container(
-                              padding: EdgeInsets.fromLTRB(
-                                12.w,
-                                12.h,
-                                4.w,
-                                16.h,
-                              ),
-
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 18.r,
-                                    backgroundImage: NetworkImage(
-                                      comments[index].user.avatarUrl ??
-                                          'https://i.pinimg.com/736x/8b/28/8d/8b288dbd8cb07d0f85adc8bdd7006ecc.jpg',
-                                    ),
-                                  ),
-
-                                  SizedBox(width: 10.w),
-
-                                  // Comment content
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Comment container
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w,
-                                            vertical: 8.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                AppColors.backgroundCommentItem,
-                                            borderRadius: BorderRadius.circular(
-                                              14.r,
-                                            ),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                comments[index].user.fullName ??
-                                                    'Unknown',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13.sp,
-                                                  color: AppColors.textPrimary,
-                                                ),
-                                              ),
-                                              SizedBox(height: 3.h),
-                                              Text(
-                                                comments[index].content,
-                                                style: TextStyle(
-                                                  fontSize: 14.sp,
-                                                  color: AppColors.textPrimary,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            // Bottom actions: date, like, reply
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                top: 4.h,
-                                                left: 6.w,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    comments[index].updatedAt !=
-                                                            null
-                                                        ? timeago.format(
-                                                            comments[index]
-                                                                .updatedAt!,
-                                                          )
-                                                        : "Unknown date",
-
-                                                    style: TextStyle(
-                                                      fontSize: 12.sp,
-                                                      color: AppColors
-                                                          .textSecondary,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-
-                                                  SizedBox(width: 10.w),
-
-                                                  ReactionText(
-                                                    commentId:
-                                                        comments[index].id,
-                                                    onReactionChanged:
-                                                        _onReactionChanged,
-                                                  ),
-
-                                                  SizedBox(width: 10.w),
-
-                                                  Text(
-                                                    'Trả lời',
-                                                    style: TextStyle(
-                                                      fontSize: 12.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors
-                                                          .textSecondary,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-
-                                            // Reaction badge (bottom right corner)
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                top: 4.h,
-                                                left: 8.w,
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                          horizontal: 4.w,
-                                                          vertical: 2.h,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            10.r,
-                                                          ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black12,
-                                                          blurRadius: 2,
-                                                          offset: Offset(0, 1),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Image.network(
-                                                          'https://i.pinimg.com/1200x/39/44/6c/39446caa52f53369b92bc97253d2b2f1.jpg',
-                                                          width: 12.w,
-                                                          height: 12.h,
-                                                        ),
-                                                        SizedBox(width: 2.w),
-                                                        Image.network(
-                                                          'https://www.citypng.com/public/uploads/preview/haha-facebook-messenger-react-face-like-emoji-701751695136164me5ogbbpnk.png',
-                                                          width: 12.w,
-                                                          height: 12.h,
-                                                        ),
-                                                        SizedBox(width: 4.w),
-                                                        Text(
-                                                          '5',
-                                                          style: TextStyle(
-                                                            fontSize: 11.sp,
-                                                            color: Colors
-                                                                .grey[700],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
+                            return CommentItem(comment: comments[index]);
                           },
                         );
                       }

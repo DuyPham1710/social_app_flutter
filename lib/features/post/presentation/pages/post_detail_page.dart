@@ -5,15 +5,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/enums/emoji.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/utils/react_post_util.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
+import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_react_info.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
 class PostDetailPage extends StatefulWidget {
@@ -33,10 +39,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
   late ItemScrollController _scrollController = ItemScrollController();
   late CommentBloc _commentBloc;
   late PostDetailBloc _postDetailBloc;
+  late List<ReactPostEntity> _localReacts;
+  late EmojiType? _currentUserReaction;
 
   @override
   void initState() {
     super.initState();
+    _localReacts = List.from(widget.post.reacts ?? []);
+    _currentUserReaction = widget.post.isReact;
 
     // Khởi tạo các Blocs
     _commentBloc = s1<CommentBloc>();
@@ -44,6 +54,32 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     // Initialize post detail để join post và lắng nghe comment count
     _postDetailBloc.add(InitializePostDetailEvent(widget.post.id));
+  }
+
+  @override
+  void didUpdateWidget(PostDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.post != widget.post) {
+      _localReacts = List.from(widget.post.reacts ?? []);
+      _currentUserReaction = widget.post.isReact;
+    }
+  }
+
+  void _onReactionChanged(EmojiType? newReaction) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+    setState(() {
+      _currentUserReaction = newReaction;
+
+      _localReacts = updateLocalReacts(
+        currentReacts: _localReacts,
+        currentUserId: currentUserId,
+        newReaction: newReaction,
+        post: widget.post,
+        userData: userData,
+      );
+    });
   }
 
   @override
@@ -172,6 +208,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         ),
                       ),
 
+                    SizedBox(height: 20.h),
+
+                    // Likes info
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return ModalComment(postId: widget.post.id);
+                          },
+                        );
+                      },
+                      child: PostReactInfo(reacts: _localReacts),
+                    ),
+
                     // Reaction Buttons
                     SizedBox(height: 20.h),
                     BlocBuilder<PostDetailBloc, PostDetailState>(
@@ -181,7 +233,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             : 0;
                         return PostAction(
                           postId: post.id,
+                          reactCount: _localReacts
+                              .length, // ← Sử dụng _localReacts thay vì post.reacts
+                          isReact: _currentUserReaction,
                           commentCount: commentCount,
+                          onReactionChanged: _onReactionChanged,
                         );
                       },
                     ),

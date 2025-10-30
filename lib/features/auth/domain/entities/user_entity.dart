@@ -1,4 +1,4 @@
-abstract class UserEntity {
+class UserEntity {
   final String userId;
   final String? fullName;
   final String? phoneNumber;

@@ -2,7 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/enums/emoji.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/utils/react_post_util.dart';
+import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
+import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
@@ -11,11 +16,54 @@ import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 
-class PostItem extends StatelessWidget {
+class PostItem extends StatefulWidget {
   final PostEntity post;
   final int commentCount;
 
   const PostItem({super.key, required this.post, this.commentCount = 0});
+
+  @override
+  State<PostItem> createState() => _PostItemState();
+}
+
+class _PostItemState extends State<PostItem> {
+  late List<ReactPostEntity> _localReacts;
+  late EmojiType? _currentUserReaction;
+
+  @override
+  void initState() {
+    super.initState();
+    _localReacts = List.from(widget.post.reacts ?? []);
+    _currentUserReaction = widget.post.isReact;
+  }
+
+  @override
+  void didUpdateWidget(PostItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.post != widget.post) {
+      setState(() {
+        _localReacts = List.from(widget.post.reacts ?? []);
+        _currentUserReaction = widget.post.isReact;
+      });
+    }
+  }
+
+  void _onReactionChanged(EmojiType? newReaction) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+    setState(() {
+      _currentUserReaction = newReaction;
+
+      _localReacts = updateLocalReacts(
+        currentReacts: _localReacts,
+        currentUserId: currentUserId,
+        newReaction: newReaction,
+        post: widget.post,
+        userData: userData,
+      );
+    });
+  }
 
   Widget _buildMediaLayout(BuildContext context, List<dynamic> urls) {
     late final Widget layout;
@@ -24,13 +72,15 @@ class PostItem extends StatelessWidget {
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) =>
-              PostDetailPage(post: post, initialImageIndex: initialIndex),
+          builder: (_) => PostDetailPage(
+            post: widget.post,
+            initialImageIndex: initialIndex,
+          ),
         ),
       );
     }
 
-    switch (post.layout.toLowerCase()) {
+    switch (widget.post.layout.toLowerCase()) {
       case 'classic':
         layout = LayoutPostClassic(urls: urls, onImageTap: onImageTap);
       case 'column':
@@ -45,7 +95,7 @@ class PostItem extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          CupertinoPageRoute(builder: (_) => PostDetailPage(post: post)),
+          CupertinoPageRoute(builder: (_) => PostDetailPage(post: widget.post)),
         );
       },
       child: layout,
@@ -54,8 +104,8 @@ class PostItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = post.user;
-    final urls = post.urls;
+    final user = widget.post.user;
+    final urls = widget.post.urls;
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8.h),
@@ -70,12 +120,12 @@ class PostItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          PostHeader(user: user, createdAt: post.createdAt),
+          PostHeader(user: user, createdAt: widget.post.createdAt),
 
           // Caption
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: Text(post.caption, style: TextStyle(fontSize: 13.sp)),
+            child: Text(widget.post.caption, style: TextStyle(fontSize: 13.sp)),
           ),
 
           SizedBox(height: 8.h),
@@ -89,15 +139,27 @@ class PostItem extends StatelessWidget {
           SizedBox(height: 8.h),
 
           // Likes info
-          PostReactInfo(reacts: post.reacts),
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (BuildContext context) {
+                  return ModalComment(postId: widget.post.id);
+                },
+              );
+            },
+            child: PostReactInfo(reacts: _localReacts),
+          ),
 
           SizedBox(height: 20.h),
 
           PostAction(
-            postId: post.id,
-            reactCount: post.reacts!.length,
-            isReact: post.isReact,
-            commentCount: commentCount,
+            postId: widget.post.id,
+            reactCount: _localReacts.length,
+            isReact: _currentUserReaction,
+            commentCount: widget.commentCount,
+            onReactionChanged: _onReactionChanged,
           ),
         ],
       ),

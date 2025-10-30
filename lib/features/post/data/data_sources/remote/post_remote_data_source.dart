@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
+import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
 
 part 'post_remote_data_source.g.dart';
@@ -17,4 +18,7 @@ abstract class PostRemoteDataSource {
 
   @POST('/react-post')
   Future<ReactPostModel> reactPost(@Body() Map<String, dynamic> body);
+
+  @GET('/post/{postId}')
+  Future<PostModel> getPostDetail(@Path('postId') String postId);
 }

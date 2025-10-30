@@ -46,3 +46,11 @@ class ReactPostEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId, emojiId];
 }
+
+class GetPostDetailEvent extends HomeEvent {
+  final String postId;
+  const GetPostDetailEvent({required this.postId});
+
+  @override
+  List<Object?> get props => [postId];
+}
