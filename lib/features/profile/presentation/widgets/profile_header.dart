@@ -51,7 +51,7 @@ class ProfileHeader extends StatelessWidget {
                     child: const CircleAvatar(
                       radius: 60,
                       backgroundImage: NetworkImage(
-                        'https://i.pravatar.cc/200?img=10',
+                        'https://picsum.photos/900/200',
                       ),
                     ),
                   ),
@@ -81,11 +81,15 @@ class ProfileHeader extends StatelessWidget {
         ),
         // Tên nằm sau avatar
         const SizedBox(height: 6),
-        const Text(
-          'A great love isn’t one who loves many, but one who loves one deeply.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-          textAlign: TextAlign.center,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Text(
+            'A great love isn’t one who loves many, but one who loves one deeply.',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            textAlign: TextAlign.center,
+          ),
         ),
+
         const SizedBox(height: 10),
       ],
     );

@@ -38,7 +38,6 @@ class CommentRemoteDataSource {
       userId: userId,
       username: username,
     );
-
     // Setup listeners
     _setupCommentCountListeners();
     _setupTypingListeners();

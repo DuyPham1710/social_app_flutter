@@ -48,6 +48,7 @@ import 'package:social_app_fe/features/post/data/repository/post_repository_impl
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
@@ -55,6 +56,8 @@ import 'package:social_app_fe/features/story/data/repository/story_repository_im
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
 import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_usecase.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
 
 final s1 = GetIt.instance;
 
@@ -109,6 +112,10 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<ReactPostUsecase>(() => ReactPostUsecase(s1()));
   s1.registerLazySingleton<GetPostDetailUsecase>(
     () => GetPostDetailUsecase(s1()),
+  );
+
+  s1.registerLazySingleton<GetProfilePostsUseCase>(
+    () => GetProfilePostsUseCase(s1()),
   );
 
   // Comment UseCases
@@ -172,10 +179,16 @@ Future<void> initializeDependencies() async {
     () => RemoveFriendUseCase(s1()),
   );
 
+  s1.registerLazySingleton<GetCurrentUserUseCase>(
+    () => GetCurrentUserUseCase(s1()),
+  );
+
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),
   );
+
+  s1.registerFactory(() => MenuBloc(s1()));
 
   // Blocs
   s1.registerFactory<AuthBloc>(
@@ -245,3 +258,5 @@ Future<void> initializeDependencies() async {
     () => HomeStoriesBloc(getHomeStoriesUseCase: s1()),
   );
 }
+
+class sl {}

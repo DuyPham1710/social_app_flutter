@@ -14,4 +14,6 @@ abstract class AuthRepository {
   Future<DataState<UserEntity>> updatePersonalInfo(UserEntity user);
 
   Future<DataState<UserEntity>> resetPassword(ResetPasswordRequest request);
+
+  Future<DataState<UserEntity>> getCurrentUser();
 }

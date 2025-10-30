@@ -13,6 +13,9 @@ import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
+import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUsecase loginUsecase;
@@ -57,7 +60,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoaded(dataState.data!, flowType: 'reset_password'));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(AuthError(dataState.error!, errorMessage: errorMessage, flowType: 'reset_password'));
+      emit(
+        AuthError(
+          dataState.error!,
+          errorMessage: errorMessage,
+          flowType: 'reset_password',
+        ),
+      );
       return;
     }
   }
@@ -74,7 +83,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoaded(dataState.data!, flowType: 'update_personal_info'));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(AuthError(dataState.error!, errorMessage: errorMessage, flowType: 'update_personal_info'));
+      emit(
+        AuthError(
+          dataState.error!,
+          errorMessage: errorMessage,
+          flowType: 'update_personal_info',
+        ),
+      );
       return;
     }
   }
@@ -88,7 +103,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(OtpResendSuccess(dataState.data!, flowType: 'resend_otp'));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(AuthError(dataState.error!, errorMessage: errorMessage, flowType: 'resend_otp'));
+      emit(
+        AuthError(
+          dataState.error!,
+          errorMessage: errorMessage,
+          flowType: 'resend_otp',
+        ),
+      );
       return;
     }
   }
@@ -104,7 +125,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoaded(dataState.data!, flowType: 'verify_otp'));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(AuthError(dataState.error!, errorMessage: errorMessage, flowType: 'verify_otp'));
+      emit(
+        AuthError(
+          dataState.error!,
+          errorMessage: errorMessage,
+          flowType: 'verify_otp',
+        ),
+      );
       return;
     }
   }
@@ -120,7 +147,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoaded(dataState.data!, flowType: 'login'));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(AuthError(dataState.error!, errorMessage: errorMessage, flowType: 'login'));
+      emit(
+        AuthError(
+          dataState.error!,
+          errorMessage: errorMessage,
+          flowType: 'login',
+        ),
+      );
       return;
     }
   }
@@ -140,7 +173,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoaded(dataState.data!, flowType: 'register'));
     } else {
       final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
-      emit(AuthError(dataState.error!, errorMessage: errorMessage, flowType: 'register'));
+      emit(
+        AuthError(
+          dataState.error!,
+          errorMessage: errorMessage,
+          flowType: 'register',
+        ),
+      );
       return;
     }
   }

@@ -4,6 +4,8 @@ import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
 
+import '../../../../../core/resources/data_state.dart';
+
 part 'post_remote_data_source.g.dart';
 
 @RestApi()
@@ -21,4 +23,10 @@ abstract class PostRemoteDataSource {
 
   @GET('/post/{postId}')
   Future<PostModel> getPostDetail(@Path('postId') String postId);
+
+  @GET('/post')
+  Future<PostListModel> getProfilePosts(
+    @Query('page') int page,
+    @Query('limit') int limit,
+  );
 }

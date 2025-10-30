@@ -15,12 +15,20 @@ class FriendsListPage extends StatefulWidget {
 
 class _FriendsListPageState extends State<FriendsListPage> {
   String _sortBy = 'name'; // 'name', 'recent', 'online'
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     // Load danh sách bạn bè khi khởi tạo
     context.read<FriendBloc>().add(const LoadFriends());
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,7 +61,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
         actions: [
           IconButton(
             icon: const Icon(CupertinoIcons.search, color: Colors.black),
-            onPressed: _showSearch,
+            onPressed: _showSearch
           ),
         ],
       ),
@@ -65,11 +73,60 @@ class _FriendsListPageState extends State<FriendsListPage> {
             );
           } else if (state is FriendLoaded) {
             final friends = state.friends;
+            final filteredFriends = friends.where((f) {
+              if (_searchQuery.isEmpty) return true;
+              final q = _searchQuery.toLowerCase();
+              final name = (f.fullName ?? '').toLowerCase();
+              final username = (f.username ?? '').toLowerCase();
+              return name.contains(q) || username.contains(q);
+            }).toList();
             final onlineFriendsCount = 50; // Tạm thời hardcode, sau có thể lấy từ API
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Search bar
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm bạn bè',
+                      prefixIcon: const Icon(CupertinoIcons.search),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(CupertinoIcons.xmark_circle_fill),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                  ),
+                ),
                 // Header section
                 Container(
                   padding: EdgeInsets.all(16.w),
@@ -88,7 +145,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${friends.length} bạn bè',
+                            '${filteredFriends.length} bạn bè',
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.w700,
@@ -123,7 +180,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
                 // Friends list
                 Expanded(
-                  child: friends.isEmpty
+                  child: filteredFriends.isEmpty
                       ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -146,9 +203,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
                           ),
                         )
                       : ListView.builder(
-                          itemCount: friends.length,
+                          itemCount: filteredFriends.length,
                           itemBuilder: (context, index) {
-                            final friend = friends[index];
+                            final friend = filteredFriends[index];
                             return FriendItem(
                               name: friend.fullName ?? 'Người dùng',
                               mutualFriends: friend.mutualFriendsCount ?? 0,
@@ -484,4 +541,3 @@ class _FriendsListPageState extends State<FriendsListPage> {
     );
   }
 }
-

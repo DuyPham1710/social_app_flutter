@@ -15,4 +15,8 @@ abstract class PostRepository {
   });
 
   Future<DataState<PostEntity>> getPostDetail({required String postId});
+  Future<DataState<PostListEntity>> getProfilePosts({
+    int page = 1,
+    int limit = 10,
+  });
 }

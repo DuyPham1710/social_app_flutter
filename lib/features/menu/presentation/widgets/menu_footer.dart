@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/menu_bloc.dart';
+import '../bloc/menu_event.dart';
 
 class MenuFooter extends StatelessWidget {
   const MenuFooter({super.key});
@@ -21,7 +24,14 @@ class MenuFooter extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.logout, color: Colors.red),
           title: const Text('Đăng xuất'),
-          onTap: () {},
+          onTap: () {
+            context.read<MenuBloc>().add(LogoutEvent());
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/login',
+              (route) => false,
+            );
+          },
         ),
       ],
     );

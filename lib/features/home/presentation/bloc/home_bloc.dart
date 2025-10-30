@@ -32,6 +32,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.reactPostUseCase,
     required this.getPostDetailUsecase,
   }) : super(HomeInitial()) {
+    print('>>> HomeBloc CREATED');
     on<InitializeWebSocketEvent>(_onInitializeWebSocket);
     on<WebSocketInitializedEvent>(_onWebSocketInitialized);
     on<LoadPostsEvent>(_onLoadPosts);

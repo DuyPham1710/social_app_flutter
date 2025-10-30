@@ -33,7 +33,7 @@ class CustomBottomNavigation extends StatelessWidget {
           _buildNavItem(CupertinoIcons.person_2, 1),
           _buildNavItem(CupertinoIcons.plus_app, 2),
           _buildNavItem(CupertinoIcons.bell, 3),
-          _buildNavItem(CupertinoIcons.person_crop_circle, 4),
+          _buildNavItem(CupertinoIcons.line_horizontal_3, 4),
         ],
       ),
     );

@@ -542,14 +542,14 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               ),
               onTap: () async {
                 Navigator.pop(context);
-                await Navigator.push(
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const SentFriendRequestsPage(),
                   ),
                 );
                 // Reload lại friend requests khi quay về
-                if (mounted) {
+                if (result == true && mounted) {
                   context.read<FriendBloc>().add(const LoadFriendPage());
                 }
               },

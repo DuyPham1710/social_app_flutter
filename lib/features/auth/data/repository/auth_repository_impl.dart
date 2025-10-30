@@ -92,4 +92,32 @@ class AuthRepositoryImpl implements AuthRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<UserEntity>> getCurrentUser() async {
+    try {
+      final userData = await TokenStorage.getUserData();
+      if (userData == null) {
+        return DataStateError(DioException(
+        requestOptions: RequestOptions(path: ''),
+        error: "No user data found"
+      ));
+      }
+
+      final user = UserModel(
+        userId: userData['id'],
+        fullName: userData['fullName'],
+        email: userData['email'],
+        username: userData['username'],
+        avatarUrl: userData['avatarUrl'],
+      );
+
+      return DataStateSuccess(user);
+    } catch (e) {
+      return DataStateError(DioException(
+        requestOptions: RequestOptions(path: ''),
+        error: "Failed to load user"
+      ));
+    }
+  }
 }
