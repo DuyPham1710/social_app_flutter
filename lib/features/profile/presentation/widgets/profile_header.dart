@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key});
+  final UserEntity? user;
+  const ProfileHeader({super.key, this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +50,10 @@ class ProfileHeader extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 4),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 60,
                       backgroundImage: NetworkImage(
-                        'https://picsum.photos/900/200',
+                        user?.avatarUrl ?? 'https://picsum.photos/200',
                       ),
                     ),
                   ),
@@ -74,17 +76,16 @@ class ProfileHeader extends StatelessWidget {
         ),
 
         const SizedBox(height: 55), // để tránh avatar đè lên phần sau
-        const Text(
-          'Nguyễn.H.N. Lam',
+        Text(
+          user?.fullName ?? 'User Name',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           textAlign: TextAlign.left,
         ),
-        // Tên nằm sau avatar
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Text(
-            'A great love isn’t one who loves many, but one who loves one deeply.',
+            user?.bio ?? 'No bio available',
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
             textAlign: TextAlign.center,
           ),

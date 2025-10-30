@@ -28,3 +28,7 @@ class UpdateProfileCommentCountsEvent extends ProfileEvent {
   @override
   List<Object?> get props => [commentCounts];
 }
+
+class LoadUserProfileEvent extends ProfileEvent {
+  const LoadUserProfileEvent();
+}

@@ -26,6 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    context.read<ProfileBloc>().add(const LoadUserProfileEvent());
     context.read<ProfileBloc>().add(const LoadProfilePostsEvent());
     context.read<FriendBloc>().add(const LoadFriends());
 
@@ -56,6 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         builder: (context, state) {
           final posts = state.posts ?? [];
+          final user = state.user;
 
           return CustomScrollView(
             controller: _scrollController,
@@ -66,7 +68,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 backgroundColor: AppColors.background,
                 elevation: 0,
                 title: Text(
-                  //lấy tên người dùng từ storage
                   'Trang cá nhân',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -84,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
               // Nội dung
               SliverList(
                 delegate: SliverChildListDelegate([
-                  const ProfileHeader(),
+                  ProfileHeader(user: user),
                   const ProfileActions(),
                   const ProfileInfo(),
                   const Divider(),
