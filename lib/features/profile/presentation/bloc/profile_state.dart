@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
-import 'package:dio/dio.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 
 abstract class ProfileState extends Equatable {
   final List<PostEntity>? posts;
@@ -10,6 +10,7 @@ abstract class ProfileState extends Equatable {
   final int? limit;
   final bool? hasNext;
   final bool isLoadingMore;
+  final UserEntity? user;
 
   const ProfileState({
     this.posts,
@@ -19,18 +20,20 @@ abstract class ProfileState extends Equatable {
     this.limit,
     this.hasNext,
     this.isLoadingMore = false,
+    this.user,
   });
 
   @override
   List<Object?> get props => [
-        posts,
-        commentCounts,
-        errorMessage,
-        currentPage,
-        limit,
-        hasNext,
-        isLoadingMore,
-      ];
+    posts,
+    commentCounts,
+    errorMessage,
+    currentPage,
+    limit,
+    hasNext,
+    isLoadingMore,
+    user,
+  ];
 }
 
 class ProfileInitial extends ProfileState {}
@@ -45,6 +48,7 @@ class ProfileLoaded extends ProfileState {
     super.limit,
     super.hasNext,
     super.isLoadingMore,
+    super.user,
   }) : super(posts: posts);
 }
 

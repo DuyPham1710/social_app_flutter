@@ -8,8 +8,10 @@ import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_us
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'dart:async';
+import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
+  final GetUserProfileUseCase getUserProfileUseCase;
   final GetProfilePostsUseCase getProfilePostsUseCase;
   final ListenCommentCountUseCase listenCommentCountUseCase;
   final LoadCommentsUseCase loadCommentsUseCase;
@@ -19,10 +21,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.getProfilePostsUseCase,
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
+    required this.getUserProfileUseCase,
   }) : super(ProfileInitial()) {
+    on<LoadUserProfileEvent>(_onLoadUserProfile);
     on<LoadProfilePostsEvent>(_onLoadProfilePosts);
     on<LoadMoreProfilePostsEvent>(_onLoadMoreProfilePosts);
     on<UpdateProfileCommentCountsEvent>(_onUpdateCommentCounts);
+
     _commentCountSubscription =
         listenCommentCountUseCase(params: const NoParams()).listen((counts) {
           add(UpdateProfileCommentCountsEvent(counts));
@@ -33,6 +38,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     LoadProfilePostsEvent event,
     Emitter<ProfileState> emit,
   ) async {
+    final currentState = state;
     emit(ProfileLoading());
 
     final result = await getProfilePostsUseCase(
@@ -53,6 +59,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           limit: postListEntity.limit,
           hasNext: postListEntity.hasNext,
           commentCounts: {},
+          user: currentState.user,
         ),
       );
     } else {
@@ -78,6 +85,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         limit: currentState.limit,
         hasNext: currentState.hasNext,
         isLoadingMore: true,
+        user: currentState.user,
       ),
     );
 
@@ -105,6 +113,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           limit: result.data!.limit,
           hasNext: result.data!.hasNext,
           isLoadingMore: false,
+          user: currentState.user,
         ),
       );
     } else {
@@ -116,8 +125,25 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           limit: currentState.limit,
           hasNext: currentState.hasNext,
           isLoadingMore: false,
+          user: currentState.user,
         ),
       );
+    }
+  }
+
+  Future<void> _onLoadUserProfile(
+    LoadUserProfileEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(ProfileLoading());
+
+    final result = await getUserProfileUseCase();
+
+    if (result is DataStateSuccess && result.data != null) {
+      emit(ProfileLoaded([], user: result.data));
+      add(LoadProfilePostsEvent());
+    } else {
+      emit(ProfileError(result.error?.toString() ?? "Không thể tải user"));
     }
   }
 
@@ -135,6 +161,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           limit: currentState.limit,
           hasNext: currentState.hasNext,
           isLoadingMore: currentState.isLoadingMore,
+          user: currentState.user,
         ),
       );
     }
