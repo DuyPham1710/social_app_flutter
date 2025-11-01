@@ -9,6 +9,7 @@ class ReactPostEntity {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int? mutualFriendsCount;
+  final bool? isFriend;
 
   ReactPostEntity({
     required this.id,
@@ -18,5 +19,6 @@ class ReactPostEntity {
     this.createdAt,
     this.updatedAt,
     this.mutualFriendsCount,
+    this.isFriend,
   });
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/react/react_list_widget.dart';
 
 class ReactionDetailsPage extends StatefulWidget {
   final List<ReactPostEntity> reacts;
@@ -23,19 +26,12 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
   late TabController _tabController;
   late List<ReactPostEntity> _filteredReacts;
   EmojiType? _selectedEmoji;
-  final Set<String> _sentFriendRequestUserIds = <String>{};
 
   @override
   void initState() {
     super.initState();
 
-    // Sắp xếp theo thời gian react (mới nhất trước)
-    _filteredReacts = List.from(widget.reacts)
-      ..sort(
-        (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
-          a.createdAt ?? DateTime.now(),
-        ),
-      );
+    _filteredReacts = widget.reacts;
 
     // Tính số lượng tab (Tất cả + các emoji có người react)
     final emojiCounts = <EmojiType, int>{};
@@ -50,6 +46,8 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
     );
 
     _tabController.addListener(_onTabChanged);
+
+    context.read<FriendBloc>().add(const LoadSentFriendRequests());
   }
 
   @override
@@ -63,25 +61,14 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
       if (_tabController.index == 0) {
         // Tab "Tất cả"
         _selectedEmoji = null;
-        _filteredReacts = List.from(widget.reacts)
-          ..sort(
-            (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
-              a.createdAt ?? DateTime.now(),
-            ),
-          );
+        _filteredReacts = widget.reacts;
       } else {
         // Tab emoji cụ thể
         final emojiTypes = _getUniqueEmojis();
         _selectedEmoji = emojiTypes[_tabController.index - 1];
-        _filteredReacts =
-            widget.reacts
-                .where((react) => react.emoji == _selectedEmoji)
-                .toList()
-              ..sort(
-                (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
-                  a.createdAt ?? DateTime.now(),
-                ),
-              );
+        _filteredReacts = widget.reacts
+            .where((react) => react.emoji == _selectedEmoji)
+            .toList();
       }
     });
   }
@@ -197,7 +184,7 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
         controller: _tabController,
         children: [
           // Tab "Tất cả"
-          _buildReactsList(_filteredReacts),
+          ReactListWidget(reacts: _filteredReacts),
 
           // Tabs cho từng emoji
           ...uniqueEmojis.map((emoji) {
@@ -208,189 +195,9 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
                       a.createdAt ?? DateTime.now(),
                     ),
                   );
-            return _buildReactsList(emojiReacts);
+            return ReactListWidget(reacts: emojiReacts);
           }),
         ],
-      ),
-    );
-  }
-
-  Widget _buildReactsList(List<ReactPostEntity> reacts) {
-    if (reacts.isEmpty) {
-      return Center(
-        child: Text(
-          'Chưa có ai bày tỏ cảm xúc',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: reacts.length,
-      itemBuilder: (context, index) {
-        final react = reacts[index];
-        return _buildReactItem(react);
-      },
-    );
-  }
-
-  Widget _buildReactItem(ReactPostEntity react) {
-    final bool showMutualFriends = (react.mutualFriendsCount ?? 0) > 0;
-    final bool isSend = _sentFriendRequestUserIds.contains(react.user.userId);
-
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12.h),
-      child: Row(
-        children: [
-          // Avatar với emoji
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 22.r,
-                backgroundImage: NetworkImage(
-                  react.user.avatarUrl ??
-                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
-                ),
-
-                backgroundColor: AppColors.background,
-
-                child: react.user.avatarUrl == null
-                    ? Icon(
-                        Icons.person,
-                        color: AppColors.textSecondary,
-                        size: 22.sp,
-                      )
-                    : null,
-              ),
-
-              Positioned(
-                bottom: -2,
-                right: -2,
-                child: Container(
-                  width: 20.w,
-                  height: 20.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.background, width: 2),
-                  ),
-                  child: Center(
-                    child: Text(
-                      react.emoji.icon,
-                      style: TextStyle(fontSize: 12.sp),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(width: 12.w),
-
-          // User info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: showMutualFriends
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.start,
-              children: [
-                Text(
-                  react.user.fullName ?? react.user.username ?? 'Unknown',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                if (showMutualFriends) ...[
-                  SizedBox(height: 2.h),
-                  Text(
-                    '${react.mutualFriendsCount} bạn chung',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          // Action button (Thêm bạn bè/Nhắc đến)
-          if (showMutualFriends) ...[
-            SizedBox(width: 8.w),
-            _buildActionButton(react.user.userId, isSend),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton(String userId, bool isSend) {
-    final isFriend = false;
-
-    if (!isFriend) {
-      return GestureDetector(
-        onTap: () {
-          if (!isSend) {
-            setState(() {
-              _sentFriendRequestUserIds.add(userId);
-            });
-          } else {
-            setState(() {
-              _sentFriendRequestUserIds.remove(userId);
-            });
-          }
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-          decoration: BoxDecoration(
-            color: isSend ? Colors.blue[50] : AppColors.primary,
-            borderRadius: BorderRadius.circular(6.r),
-          ),
-          child: isSend
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.send, color: Colors.blue[700], size: 16.r),
-                    SizedBox(width: 8.w),
-                    Text(
-                      'Đã gửi',
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                )
-              : Text(
-                  'Thêm bạn bè',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-        ),
-      );
-    }
-
-    return OutlinedButton(
-      onPressed: () {
-        // TODO: Xử lý nhắc đến
-      },
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: Colors.grey.shade400),
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-      child: Text(
-        'Nhắc đến',
-        style: TextStyle(fontSize: 14.sp, color: Colors.black),
       ),
     );
   }

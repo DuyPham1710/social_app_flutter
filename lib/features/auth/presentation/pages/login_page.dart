@@ -11,8 +11,6 @@ import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
-import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
-import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

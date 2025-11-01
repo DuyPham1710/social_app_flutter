@@ -21,6 +21,7 @@ _$ReactPostModelImpl _$$ReactPostModelImplFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['updatedAt'] as String),
       mutualFriendsCount: (json['mutualFriendsCount'] as num?)?.toInt(),
+      isFriend: json['isFriend'] as bool?,
     );
 
 Map<String, dynamic> _$$ReactPostModelImplToJson(
@@ -33,4 +34,5 @@ Map<String, dynamic> _$$ReactPostModelImplToJson(
   'createdAt': instance.createdAt?.toIso8601String(),
   'updatedAt': instance.updatedAt?.toIso8601String(),
   'mutualFriendsCount': instance.mutualFriendsCount,
+  'isFriend': instance.isFriend,
 };

@@ -35,6 +35,7 @@ class ReactPostModel extends ReactPostEntity with _$ReactPostModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     int? mutualFriendsCount,
+    bool? isFriend,
   }) = _ReactPostModel;
 
   factory ReactPostModel.fromJson(Map<String, dynamic> json) =>
