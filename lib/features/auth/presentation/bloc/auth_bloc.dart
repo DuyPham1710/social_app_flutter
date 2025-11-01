@@ -13,9 +13,6 @@ import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
-import 'package:social_app_fe/core/network/websocket/socket_client.dart';
-import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
-import 'package:social_app_fe/core/di/injection.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUsecase loginUsecase;

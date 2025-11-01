@@ -32,6 +32,7 @@ mixin _$ReactPostModel {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
   int? get mutualFriendsCount => throw _privateConstructorUsedError;
+  bool? get isFriend => throw _privateConstructorUsedError;
 
   /// Serializes this ReactPostModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -58,6 +59,7 @@ abstract class $ReactPostModelCopyWith<$Res> {
     DateTime? createdAt,
     DateTime? updatedAt,
     int? mutualFriendsCount,
+    bool? isFriend,
   });
 
   $UserModelCopyWith<$Res> get user;
@@ -85,6 +87,7 @@ class _$ReactPostModelCopyWithImpl<$Res, $Val extends ReactPostModel>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? mutualFriendsCount = freezed,
+    Object? isFriend = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -116,6 +119,10 @@ class _$ReactPostModelCopyWithImpl<$Res, $Val extends ReactPostModel>
                 ? _value.mutualFriendsCount
                 : mutualFriendsCount // ignore: cast_nullable_to_non_nullable
                       as int?,
+            isFriend: freezed == isFriend
+                ? _value.isFriend
+                : isFriend // ignore: cast_nullable_to_non_nullable
+                      as bool?,
           )
           as $Val,
     );
@@ -149,6 +156,7 @@ abstract class _$$ReactPostModelImplCopyWith<$Res>
     DateTime? createdAt,
     DateTime? updatedAt,
     int? mutualFriendsCount,
+    bool? isFriend,
   });
 
   @override
@@ -176,6 +184,7 @@ class __$$ReactPostModelImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? mutualFriendsCount = freezed,
+    Object? isFriend = freezed,
   }) {
     return _then(
       _$ReactPostModelImpl(
@@ -207,6 +216,10 @@ class __$$ReactPostModelImplCopyWithImpl<$Res>
             ? _value.mutualFriendsCount
             : mutualFriendsCount // ignore: cast_nullable_to_non_nullable
                   as int?,
+        isFriend: freezed == isFriend
+            ? _value.isFriend
+            : isFriend // ignore: cast_nullable_to_non_nullable
+                  as bool?,
       ),
     );
   }
@@ -223,6 +236,7 @@ class _$ReactPostModelImpl implements _ReactPostModel {
     this.createdAt,
     this.updatedAt,
     this.mutualFriendsCount,
+    this.isFriend,
   });
 
   factory _$ReactPostModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -246,10 +260,12 @@ class _$ReactPostModelImpl implements _ReactPostModel {
   final DateTime? updatedAt;
   @override
   final int? mutualFriendsCount;
+  @override
+  final bool? isFriend;
 
   @override
   String toString() {
-    return 'ReactPostModel(id: $id, user: $user, postId: $postId, emoji: $emoji, createdAt: $createdAt, updatedAt: $updatedAt, mutualFriendsCount: $mutualFriendsCount)';
+    return 'ReactPostModel(id: $id, user: $user, postId: $postId, emoji: $emoji, createdAt: $createdAt, updatedAt: $updatedAt, mutualFriendsCount: $mutualFriendsCount, isFriend: $isFriend)';
   }
 
   @override
@@ -266,7 +282,9 @@ class _$ReactPostModelImpl implements _ReactPostModel {
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.mutualFriendsCount, mutualFriendsCount) ||
-                other.mutualFriendsCount == mutualFriendsCount));
+                other.mutualFriendsCount == mutualFriendsCount) &&
+            (identical(other.isFriend, isFriend) ||
+                other.isFriend == isFriend));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -280,6 +298,7 @@ class _$ReactPostModelImpl implements _ReactPostModel {
     createdAt,
     updatedAt,
     mutualFriendsCount,
+    isFriend,
   );
 
   /// Create a copy of ReactPostModel
@@ -308,6 +327,7 @@ abstract class _ReactPostModel implements ReactPostModel {
     final DateTime? createdAt,
     final DateTime? updatedAt,
     final int? mutualFriendsCount,
+    final bool? isFriend,
   }) = _$ReactPostModelImpl;
 
   factory _ReactPostModel.fromJson(Map<String, dynamic> json) =
@@ -331,6 +351,8 @@ abstract class _ReactPostModel implements ReactPostModel {
   DateTime? get updatedAt;
   @override
   int? get mutualFriendsCount;
+  @override
+  bool? get isFriend;
 
   /// Create a copy of ReactPostModel
   /// with the given fields replaced by the non-null parameter values.

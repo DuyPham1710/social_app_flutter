@@ -103,7 +103,11 @@ class CommentHeaderWidget extends StatelessWidget {
                         ),
                       ),
 
-                    SizedBox(width: 12.w),
+                    Container(
+                      width: 10.w,
+                      height: 24.h,
+                      color: AppColors.background,
+                    ),
 
                     Text(
                       reactCount.toString(),
@@ -113,6 +117,12 @@ class CommentHeaderWidget extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+
+                    Container(
+                      width: 30.w,
+                      height: 24.h,
+                      color: AppColors.background,
+                    ),
                   ],
                 ),
               ),
@@ -120,7 +130,7 @@ class CommentHeaderWidget extends StatelessWidget {
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  '28 lượt chia sẻ',
+                  '0 lượt chia sẻ',
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textPrimary,
