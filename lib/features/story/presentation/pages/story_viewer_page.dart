@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_background_widget.dart';
@@ -30,6 +31,9 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   late int _currentGroupIndex;
   late int _currentStoryIndex;
 
+  // Audio player for Deezer preview
+  late final AudioPlayer _audioPlayer;
+
   // Thêm biến để theo dõi vị trí kéo
   Offset _dragOffset = Offset.zero;
 
@@ -45,6 +49,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   @override
   void initState() {
     super.initState();
+    _audioPlayer = AudioPlayer();
     _currentGroupIndex = widget.initialGroupIndex.clamp(
       0,
       widget.groups.length - 1,
@@ -55,6 +60,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     );
     _initController();
     _controller.forward();
+    _playCurrentPreview();
   }
 
   void _initController() {
@@ -73,6 +79,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   void dispose() {
     _controller.dispose();
     _textController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -80,10 +87,12 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     _controller.stop();
     _controller.reset();
     _controller.forward();
+    _playCurrentPreview();
   }
 
   void _close() {
     _controller.stop();
+    _audioPlayer.stop();
     Navigator.of(context).pop();
   }
 
@@ -123,6 +132,21 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     }
   }
 
+  Future<void> _playCurrentPreview() async {
+    final previewUrl = _currentStory.music?.preview;
+    if (previewUrl == null || previewUrl.isEmpty) {
+      await _audioPlayer.stop();
+      return;
+    }
+    try {
+      await _audioPlayer.stop();
+      await _audioPlayer.setSource(UrlSource(previewUrl));
+      await _audioPlayer.resume();
+    } catch (_) {
+      // Silently ignore playback errors for now
+    }
+  }
+
   void _onTapDown(TapDownDetails details) {
     final width = MediaQuery.of(context).size.width;
     final dx = details.globalPosition.dx;
@@ -142,9 +166,18 @@ class _StoryViewerPageState extends State<StoryViewerPage>
           behavior: HitTestBehavior.opaque,
           onTapDown: _onTapDown,
           onLongPressStart: (_) => _controller.stop(),
-          onLongPressEnd: (_) => _controller.forward(),
-          onVerticalDragStart: (_) => _controller.stop(),
-          onHorizontalDragStart: (_) => _controller.stop(),
+          onLongPressEnd: (_) {
+            _controller.forward();
+            _audioPlayer.resume();
+          },
+          onVerticalDragStart: (_) {
+            _controller.stop();
+            _audioPlayer.pause();
+          },
+          onHorizontalDragStart: (_) {
+            _controller.stop();
+            _audioPlayer.pause();
+          },
           onVerticalDragUpdate: (details) {
             setState(() {
               //  _dragOffset sẽ theo dõi cả kéo lên (dy < 0) và kéo xuống (dy > 0)
@@ -169,6 +202,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                 _dragOffset = Offset.zero;
               });
               _controller.forward();
+              _audioPlayer.resume();
             }
           },
           onHorizontalDragEnd: (details) {
@@ -211,6 +245,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                 _horizontalOffset = 0.0;
               });
               _controller.forward();
+              _audioPlayer.resume();
             }
             // reset offset after handling
             setState(() {
