@@ -17,9 +17,9 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_react_info.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
 class PostDetailPage extends StatefulWidget {

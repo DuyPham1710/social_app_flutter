@@ -4,7 +4,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/react/react_item_widget.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/react_item_widget.dart';
 
 class ReactListWidget extends StatelessWidget {
   final List<ReactPostEntity> reacts;

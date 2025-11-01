@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/react/react_action_button.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/react_action_button.dart';
 
 class ReactItemWidget extends StatelessWidget {
   final ReactPostEntity react;

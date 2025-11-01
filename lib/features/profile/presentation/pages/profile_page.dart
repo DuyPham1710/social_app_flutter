@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_item.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
@@ -130,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ...posts.map((post) {
                       final commentCount = state.commentCounts?[post.id] ?? 0;
                       return PostItem(post: post, commentCount: commentCount);
-                    }).toList(),
+                    }),
 
                   if (state is ProfileLoaded && state.isLoadingMore)
                     const Padding(

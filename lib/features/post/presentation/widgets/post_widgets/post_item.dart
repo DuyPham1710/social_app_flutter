@@ -9,9 +9,9 @@ import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_action.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_header.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_react_info.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
