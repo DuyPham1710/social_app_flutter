@@ -9,11 +9,13 @@ import 'package:timeago/timeago.dart' as timeago;
 
 class CommentItem extends StatefulWidget {
   final CommentEntity comment;
-  final Function(String userDisplayName)? onReply;
+  final Function(String? parentId, String userDisplayName)? onReply;
   final List<CommentEntity>? replies;
   final bool isReply;
   final bool showReplies;
   final VoidCallback? onToggleReplies;
+  final String? currentUserId;
+  final Function(String commentId, String newContent)? onUpdateComment;
 
   const CommentItem({
     super.key,
@@ -23,6 +25,8 @@ class CommentItem extends StatefulWidget {
     this.isReply = false,
     this.showReplies = false,
     this.onToggleReplies,
+    this.currentUserId,
+    this.onUpdateComment,
   });
 
   @override
@@ -57,8 +61,8 @@ class _CommentItemState extends State<CommentItem> {
     // print('>>> comment: ${widget.comment.parentId}');
     return Container(
       padding: widget.isReply
-          ? EdgeInsets.fromLTRB(4.w, 8.h, 4.w, 8.h)
-          : EdgeInsets.fromLTRB(12.w, 12.h, 4.w, 16.h),
+          ? EdgeInsets.fromLTRB(0.w, 8.h, 4.w, 8.h)
+          : EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
 
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,6 +99,8 @@ class _CommentItemState extends State<CommentItem> {
                     widget.comment,
                     onReply: widget.onReply,
                     onReactionChanged: _onReactionChanged,
+                    currentUserId: widget.currentUserId,
+                    onUpdateComment: widget.onUpdateComment,
                   );
                 });
               },
@@ -174,7 +180,19 @@ class _CommentItemState extends State<CommentItem> {
                                       widget.comment.user.fullName ??
                                       widget.comment.user.username ??
                                       'Unknown';
-                                  widget.onReply!(userName);
+
+                                  if (widget.comment.parentId != null) {
+                                    // Nếu đã là reply thì trả về parentId gốc
+                                    widget.onReply!(
+                                      widget.comment.parentId!.id,
+                                      userName,
+                                    );
+                                  } else {
+                                    widget.onReply!(
+                                      widget.comment.id,
+                                      userName,
+                                    );
+                                  }
                                 }
                               },
                               child: Text(
@@ -287,11 +305,13 @@ class _CommentItemState extends State<CommentItem> {
                     Column(
                       children: widget.replies!.map((reply) {
                         return Container(
-                          margin: EdgeInsets.only(left: 30.w, top: 8.h),
+                          margin: EdgeInsets.only(left: 10.w, top: 8.h),
                           child: CommentItem(
                             comment: reply,
                             onReply: widget.onReply,
                             isReply: true,
+                            currentUserId: widget.currentUserId,
+                            onUpdateComment: widget.onUpdateComment,
                           ),
                         );
                       }).toList(),

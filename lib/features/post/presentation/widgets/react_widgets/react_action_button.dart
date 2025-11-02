@@ -10,7 +10,7 @@ class ReactActionButton extends StatelessWidget {
   final bool? isFriend;
   final bool isSend;
   final String? requestId;
-  final Function(String userDisplayName)? onMention;
+  final Function(String? parentId, String userDisplayName)? onMention;
   final String userDisplayName;
 
   const ReactActionButton({
@@ -87,7 +87,7 @@ class ReactActionButton extends StatelessWidget {
       onPressed: () {
         // Gọi callback onMention và đóng ReactionDetailsPage
         if (onMention != null) {
-          onMention!(userDisplayName);
+          onMention!(null, userDisplayName);
           Navigator.pop(context);
         }
       },

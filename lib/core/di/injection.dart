@@ -28,6 +28,7 @@ import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_co
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comments_loaded_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/update_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_service.dart';
@@ -157,6 +158,9 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerLazySingleton<AddCommentUseCase>(() => AddCommentUseCase(s1()));
+  s1.registerLazySingleton<UpdateCommentUsecase>(
+    () => UpdateCommentUsecase(s1()),
+  );
   s1.registerLazySingleton<DeleteCommentUsecase>(
     () => DeleteCommentUsecase(s1()),
   );
@@ -261,6 +265,7 @@ Future<void> initializeDependencies() async {
       emitTypingUseCase: s1(),
       listenTypingUseCase: s1(),
       addCommentUseCase: s1(),
+      updateCommentUseCase: s1(),
       deleteCommentUsecase: s1(),
     ),
   );

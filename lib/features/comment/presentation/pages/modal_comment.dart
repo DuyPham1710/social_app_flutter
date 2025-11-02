@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
@@ -37,12 +38,14 @@ class _ModalCommentState extends State<ModalComment> {
   late FocusNode _focusNode;
   late CommentBloc _commentBloc;
   late CommentDetailsBloc _commentDetailsBloc;
+  late String? _parentId;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
     _focusNode = FocusNode();
+    _parentId = null;
 
     // Tạo CommentBloc và CommentDetailsBloc từ DI
     _commentBloc = s1<CommentBloc>();
@@ -70,12 +73,25 @@ class _ModalCommentState extends State<ModalComment> {
       // User is typing
       _commentBloc.add(UserTypingEvent(postId: widget.postId, isTyping: true));
     } else {
+      _parentId = null;
       // User cleared text
       _commentBloc.add(UserTypingEvent(postId: widget.postId, isTyping: false));
     }
   }
 
-  void _handleReply(String userDisplayName) {
+  void _handleUpdateComment(String commentId, String newContent) {
+    // Gửi event cập nhật comment
+    _commentBloc.add(
+      UpdateCommentEvent(
+        commentId: commentId,
+        content: newContent,
+        postId: widget.postId,
+      ),
+    );
+  }
+
+  void _handleReply(String? parentId, String userDisplayName) {
+    _parentId = parentId;
     // Thêm reply mention vào text field và focus
     final currentText = _controller.text;
     final replyText = '$userDisplayName ';
@@ -235,18 +251,27 @@ class _ModalCommentState extends State<ModalComment> {
                             .where((c) => c.parentId == null)
                             .toList();
 
-                        return ListView.builder(
-                          controller: scrollController,
-                          itemCount: parentComments.length,
-                          itemBuilder: (context, index) {
-                            final parentComment = parentComments[index];
-                            final replies =
-                                groupedComments[parentComment.id] ?? [];
+                        return FutureBuilder<Map<String, dynamic>?>(
+                          future: TokenStorage.getUserData(),
+                          builder: (context, snapshot) {
+                            final currentUserId = snapshot.data?['id'];
 
-                            return CommentItem(
-                              comment: parentComment,
-                              onReply: _handleReply,
-                              replies: replies,
+                            return ListView.builder(
+                              controller: scrollController,
+                              itemCount: parentComments.length,
+                              itemBuilder: (context, index) {
+                                final parentComment = parentComments[index];
+                                final replies =
+                                    groupedComments[parentComment.id] ?? [];
+
+                                return CommentItem(
+                                  comment: parentComment,
+                                  onReply: _handleReply,
+                                  replies: replies,
+                                  currentUserId: currentUserId,
+                                  onUpdateComment: _handleUpdateComment,
+                                );
+                              },
                             );
                           },
                         );
@@ -269,7 +294,11 @@ class _ModalCommentState extends State<ModalComment> {
 
                       // Gửi event vào bloc
                       context.read<CommentBloc>().add(
-                        AddCommentEvent(postId: widget.postId, content: text),
+                        AddCommentEvent(
+                          postId: widget.postId,
+                          content: text,
+                          parentId: _parentId,
+                        ),
                       );
                       // Clear the input field
                       _controller.clear();

@@ -5,6 +5,7 @@ import 'package:social_app_fe/features/comment/data/models/comments_loaded_model
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/params/update_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
 
 class CommentRepositoryImpl implements CommentRepository {
@@ -95,6 +96,11 @@ class CommentRepositoryImpl implements CommentRepository {
   @override
   void deleteComment(DeleteCommentParams params) async {
     _remoteDataSource.deleteComment(params);
+  }
+
+  @override
+  void updateComment(UpdateCommentParams params) async {
+    _remoteDataSource.updateComment(params);
   }
 
   @override

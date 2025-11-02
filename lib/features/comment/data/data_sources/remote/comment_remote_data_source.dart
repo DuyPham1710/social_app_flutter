@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/comment/data/models/comments_loaded_model
 import 'package:social_app_fe/features/comment/data/models/typing_event_model.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/params/update_comment_params.dart';
 
 class CommentRemoteDataSource {
   final SocketClient _socketClient;
@@ -119,6 +120,37 @@ class CommentRemoteDataSource {
       } catch (e) {
         developer.log(
           'Error parsing commentAdded:ack: $e',
+          name: 'CommentDataSource',
+        );
+      }
+    });
+
+    // Lắng nghe khi comment bị cập nhật
+    _socketClient.on('commentUpdated').listen((data) {
+      developer.log('Comment updated event', name: 'CommentDataSource');
+      try {
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+
+        // Chỉ emit commentsLoadedModel mới
+        _commentsLoadedController.add(commentsLoadedModel);
+      } catch (e) {
+        developer.log(
+          'Error parsing commentUpdated: $e',
+          name: 'CommentDataSource',
+        );
+      }
+    });
+
+    _socketClient.on('commentUpdated:ack').listen((data) {
+      developer.log('Comment updated ack event', name: 'CommentDataSource');
+      try {
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+
+        // Chỉ emit commentsLoadedModel mới
+        _commentsLoadedController.add(commentsLoadedModel);
+      } catch (e) {
+        developer.log(
+          'Error parsing commentUpdated:ack: $e',
           name: 'CommentDataSource',
         );
       }
@@ -255,6 +287,14 @@ class CommentRemoteDataSource {
       name: 'CommentRemoteDataSource',
     );
     _socketClient.emit('newComment', params.toJson());
+  }
+
+  void updateComment(UpdateCommentParams params) async {
+    developer.log(
+      'Sending update comment for post: ${params.postId}, comment: ${params.commentId}',
+      name: 'CommentRemoteDataSource',
+    );
+    _socketClient.emit('updateComment', params.toJson());
   }
 
   void deleteComment(DeleteCommentParams params) async {

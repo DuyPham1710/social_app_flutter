@@ -11,7 +11,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/r
 class ReactionDetailsPage extends StatefulWidget {
   final List<ReactPostEntity> reacts;
   final String postId;
-  final Function(String userDisplayName)? onMention;
+  final Function(String? parentId, String userDisplayName)? onMention;
   const ReactionDetailsPage({
     super.key,
     required this.reacts,

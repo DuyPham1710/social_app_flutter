@@ -3,6 +3,7 @@ import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_e
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/params/update_comment_params.dart';
 
 abstract class CommentRepository {
   /// Connect to comment socket
@@ -39,6 +40,8 @@ abstract class CommentRepository {
   void addComment(AddCommentParams params);
 
   void deleteComment(DeleteCommentParams params);
+
+  void updateComment(UpdateCommentParams params);
 
   /// Disconnect
   void disconnect();

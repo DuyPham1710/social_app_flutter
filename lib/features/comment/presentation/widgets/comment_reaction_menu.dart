@@ -18,8 +18,10 @@ class CommentReactionMenu {
     BuildContext context,
     Offset position,
     CommentEntity comment, {
-    Function(String userDisplayName)? onReply,
+    Function(String? parentId, String userDisplayName)? onReply,
     Function(String commentId, EmojiType reaction)? onReactionChanged,
+    String? currentUserId,
+    Function(String commentId, String newContent)? onUpdateComment,
   }) {
     if (_overlayEntry != null) return;
 
@@ -44,25 +46,33 @@ class CommentReactionMenu {
             ),
 
             // Menu
-            Positioned(
-              left: position.dx,
-              top: position.dy,
+            Center(
               child: Material(
                 color: Colors.transparent,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildReactBar(onReactionChanged, comment.id),
+                child: IntrinsicWidth(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildReactBar(onReactionChanged, comment.id),
 
-                    SizedBox(height: 12.h),
+                      SizedBox(height: 12.h),
 
-                    // Hiển thị lại comment
-                    _buildCommentBubble(comment),
+                      // Hiển thị lại comment
+                      _buildCommentBubble(comment),
 
-                    SizedBox(height: 12.h),
+                      SizedBox(height: 12.h),
 
-                    _buildActionMenu(context, comment, onReply),
-                  ],
+                      _buildActionMenu(
+                        context,
+                        comment,
+                        onReply,
+                        currentUserId,
+                        onUpdateComment,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -143,7 +153,9 @@ class CommentReactionMenu {
   static Widget _buildActionMenu(
     BuildContext context,
     CommentEntity comment,
-    Function(String userDisplayName)? onReply,
+    Function(String? parentId, String userDisplayName)? onReply,
+    String? currentUserId,
+    Function(String commentId, String newContent)? onUpdateComment,
   ) {
     return Container(
       width: 200.w,
@@ -161,61 +173,193 @@ class CommentReactionMenu {
               if (onReply != null) {
                 final userName =
                     comment.user.fullName ?? comment.user.username ?? 'Unknown';
-                onReply(userName);
+
+                if (comment.parentId != null) {
+                  // Nếu đã là reply thì trả về parentId gốc
+                  onReply(comment.parentId!.id, userName);
+                } else {
+                  onReply(comment.id, userName);
+                }
               }
             },
           ),
-          _menuItem(Icons.edit, 'Chỉnh sửa'),
-          _menuItem(
-            Icons.delete,
-            'Xóa',
-            color: Colors.red,
-            onTap: () {
-              hide();
-              showCupertinoDialog(
-                context: context,
-                builder: (dialogContext) => CupertinoAlertDialog(
-                  title: const Text(
-                    'Xóa bình luận',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  content: const Text(
-                    'Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  actions: [
-                    CupertinoDialogAction(
-                      isDefaultAction: true,
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop(); // đóng dialog
-                      },
-                      child: const Text(
-                        'Hủy',
-                        style: TextStyle(color: AppColors.primary),
-                      ),
-                    ),
-                    CupertinoDialogAction(
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        context.read<CommentBloc>().add(
-                          DeleteCommentEvent(
-                            commentId: comment.id,
-                            postId: comment.postId,
-                          ),
-                        );
+          // Chỉ hiển thị nút chỉnh sửa nếu là comment của user hiện tại
+          if (currentUserId != null && comment.user.userId == currentUserId)
+            _menuItem(
+              Icons.edit,
+              'Chỉnh sửa',
+              onTap: () {
+                hide();
 
-                        Navigator.of(dialogContext).pop(); // đóng dialog
-                      },
-                      child: const Text(
-                        'Xóa',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                final TextEditingController controller = TextEditingController(
+                  text: comment.content,
+                );
+
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      backgroundColor: AppColors.background,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
+                      titlePadding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 10.h),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 10.h,
+                      ),
+                      actionsPadding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 10.h),
+
+                      title: Center(
+                        child: Text(
+                          'Chỉnh sửa',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.sp,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+
+                      content: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.2),
+                          ),
+                        ),
+                        padding: EdgeInsets.all(8.w),
+
+                        child: TextField(
+                          controller: controller,
+                          maxLines: null,
+                          autofocus: true,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textPrimary,
+                          ),
+                          cursorColor: AppColors.primary,
+                          decoration: InputDecoration(
+                            hintText: 'Nhập nội dung mới...',
+                            hintStyle: TextStyle(
+                              color: AppColors.textSecondary.withOpacity(0.6),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+
+                      actionsAlignment: MainAxisAlignment.end,
+                      actions: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primary,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14.w,
+                              vertical: 8.h,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            'Hủy',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 10.h,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            final newContent = controller.text.trim();
+                            if (newContent.isNotEmpty &&
+                                newContent != comment.content) {
+                              // Sử dụng callback thay vì context.read
+                              onUpdateComment?.call(comment.id, newContent);
+                            }
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            'Cập nhật',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          // Chỉ hiển thị nút xóa nếu là comment của user hiện tại
+          if (currentUserId != null && comment.user.userId == currentUserId)
+            _menuItem(
+              Icons.delete,
+              'Xóa',
+              color: Colors.red,
+              onTap: () {
+                hide();
+                showCupertinoDialog(
+                  context: context,
+                  builder: (dialogContext) => CupertinoAlertDialog(
+                    title: const Text(
+                      'Xóa bình luận',
+                      style: TextStyle(color: AppColors.textPrimary),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                    content: const Text(
+                      'Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?',
+                      style: TextStyle(color: AppColors.textPrimary),
+                    ),
+                    actions: [
+                      CupertinoDialogAction(
+                        isDefaultAction: true,
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop(); // đóng dialog
+                        },
+                        child: const Text(
+                          'Hủy',
+                          style: TextStyle(color: AppColors.primary),
+                        ),
+                      ),
+                      CupertinoDialogAction(
+                        isDestructiveAction: true,
+                        onPressed: () {
+                          context.read<CommentBloc>().add(
+                            DeleteCommentEvent(
+                              commentId: comment.id,
+                              postId: comment.postId,
+                            ),
+                          );
+
+                          Navigator.of(dialogContext).pop(); // đóng dialog
+                        },
+                        child: const Text(
+                          'Xóa',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           _menuItem(Icons.share, 'Chia sẻ bình luận'),
           _menuItem(
             Icons.copy,
