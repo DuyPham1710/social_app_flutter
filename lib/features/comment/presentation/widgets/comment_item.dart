@@ -4,12 +4,40 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
+import 'package:social_app_fe/features/comment/presentation/widgets/comment_reaction_menu.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class CommentItem extends StatelessWidget {
+class CommentItem extends StatefulWidget {
   final CommentEntity comment;
+  final Function(String userDisplayName)? onReply;
+  final List<CommentEntity>? replies;
+  final bool isReply;
+  final bool showReplies;
+  final VoidCallback? onToggleReplies;
 
-  const CommentItem({super.key, required this.comment});
+  const CommentItem({
+    super.key,
+    required this.comment,
+    this.onReply,
+    this.replies,
+    this.isReply = false,
+    this.showReplies = false,
+    this.onToggleReplies,
+  });
+
+  @override
+  State<CommentItem> createState() => _CommentItemState();
+}
+
+class _CommentItemState extends State<CommentItem> {
+  final GlobalKey _commentKey = GlobalKey();
+  bool _showReplies = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _showReplies = widget.showReplies;
+  }
 
   void _onReactionChanged(String commentId, EmojiType reaction) {
     // TODO: Implement reaction logic với server
@@ -19,17 +47,26 @@ class CommentItem extends StatelessWidget {
   }
 
   @override
+  void dispose() {
+    CommentReactionMenu.hide();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // print('>>> comment: ${widget.comment.parentId}');
     return Container(
-      padding: EdgeInsets.fromLTRB(12.w, 12.h, 4.w, 16.h),
+      padding: widget.isReply
+          ? EdgeInsets.fromLTRB(4.w, 8.h, 4.w, 8.h)
+          : EdgeInsets.fromLTRB(12.w, 12.h, 4.w, 16.h),
 
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            radius: 18.r,
+            radius: widget.isReply ? 14.r : 18.r,
             backgroundImage: NetworkImage(
-              comment.user.avatarUrl ??
+              widget.comment.user.avatarUrl ??
                   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
             ),
           ),
@@ -38,135 +75,229 @@ class CommentItem extends StatelessWidget {
 
           // Comment content
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Comment container
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 8.h,
+            child: GestureDetector(
+              key: _commentKey,
+              onLongPressStart: (details) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final renderBox =
+                      _commentKey.currentContext?.findRenderObject()
+                          as RenderBox?;
+                  if (renderBox == null) return;
+
+                  final position = renderBox.localToGlobal(Offset.zero);
+
+                  CommentReactionMenu.show(
+                    context,
+                    Offset(
+                      position.dx,
+                      position.dy - 66.h,
+                    ), // canh chỉnh menu ở đầu comment
+                    widget.comment,
+                    onReply: widget.onReply,
+                    onReactionChanged: _onReactionChanged,
+                  );
+                });
+              },
+
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Comment container
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 8.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundCommentItem,
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.comment.user.fullName ?? 'Unknown',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.sp,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+
+                        SizedBox(height: 3.h),
+
+                        Text(
+                          widget.comment.content,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundCommentItem,
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        comment.user.fullName ?? 'Unknown',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13.sp,
-                          color: AppColors.textPrimary,
+                      // Bottom actions: date, like, reply
+                      Padding(
+                        padding: EdgeInsets.only(top: 4.h, left: 6.w),
+                        child: Row(
+                          children: [
+                            Text(
+                              widget.comment.updatedAt != null
+                                  ? timeago.format(widget.comment.updatedAt!)
+                                  : "Unknown date",
+
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+                            SizedBox(width: 10.w),
+
+                            ReactionText(
+                              commentId: widget.comment.id,
+                              onReactionChanged: _onReactionChanged,
+                            ),
+
+                            SizedBox(width: 10.w),
+
+                            GestureDetector(
+                              onTap: () {
+                                // Handle reply action
+                                if (widget.onReply != null) {
+                                  final userName =
+                                      widget.comment.user.fullName ??
+                                      widget.comment.user.username ??
+                                      'Unknown';
+                                  widget.onReply!(userName);
+                                }
+                              },
+                              child: Text(
+                                'Trả lời',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 3.h),
-                      Text(
-                        comment.content,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: AppColors.textPrimary,
+
+                      // Reaction badge (bottom right corner)
+                      Padding(
+                        padding: EdgeInsets.only(top: 4.h, left: 8.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 4.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 2,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    EmojiType.love.icon,
+                                    style: TextStyle(fontSize: 12.sp),
+                                  ),
+
+                                  SizedBox(width: 2.w),
+
+                                  Text(
+                                    EmojiType.haha.icon,
+                                    style: TextStyle(fontSize: 12.sp),
+                                  ),
+                                  SizedBox(width: 4.w),
+
+                                  Text(
+                                    '5',
+                                    style: TextStyle(
+                                      fontSize: 11.sp,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Bottom actions: date, like, reply
+
+                  // Show reply count and toggle if this comment has replies
+                  if (widget.replies != null && widget.replies!.isNotEmpty)
                     Padding(
-                      padding: EdgeInsets.only(top: 4.h, left: 6.w),
-                      child: Row(
-                        children: [
-                          Text(
-                            comment.updatedAt != null
-                                ? timeago.format(comment.updatedAt!)
-                                : "Unknown date",
-
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          SizedBox(width: 10.w),
-
-                          ReactionText(
-                            commentId: comment.id,
-                            onReactionChanged: _onReactionChanged,
-                          ),
-
-                          SizedBox(width: 10.w),
-
-                          Text(
-                            'Trả lời',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
+                      padding: EdgeInsets.only(top: 8.h, left: 6.w),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showReplies = !_showReplies;
+                          });
+                          widget.onToggleReplies?.call();
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              _showReplies
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              size: 16.sp,
                               color: AppColors.textSecondary,
                             ),
-                          ),
-                        ],
+
+                            SizedBox(width: 4.w),
+
+                            Text(
+                              'Xem ${widget.replies!.length} phản hồi',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 
-                    // Reaction badge (bottom right corner)
-                    Padding(
-                      padding: EdgeInsets.only(top: 4.h, left: 8.w),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 4.w,
-                              vertical: 2.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 2,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.network(
-                                  'https://i.pinimg.com/1200x/39/44/6c/39446caa52f53369b92bc97253d2b2f1.jpg',
-                                  width: 12.w,
-                                  height: 12.h,
-                                ),
-                                SizedBox(width: 2.w),
-                                Image.network(
-                                  'https://www.citypng.com/public/uploads/preview/haha-facebook-messenger-react-face-like-emoji-701751695136164me5ogbbpnk.png',
-                                  width: 12.w,
-                                  height: 12.h,
-                                ),
-                                SizedBox(width: 4.w),
-                                Text(
-                                  '5',
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ],
-                            ),
+                  // Show replies if expanded
+                  if (_showReplies &&
+                      widget.replies != null &&
+                      widget.replies!.isNotEmpty)
+                    Column(
+                      children: widget.replies!.map((reply) {
+                        return Container(
+                          margin: EdgeInsets.only(left: 30.w, top: 8.h),
+                          child: CommentItem(
+                            comment: reply,
+                            onReply: widget.onReply,
+                            isReply: true,
                           ),
-                        ],
-                      ),
+                        );
+                      }).toList(),
                     ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

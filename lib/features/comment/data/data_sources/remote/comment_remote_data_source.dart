@@ -5,6 +5,7 @@ import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
 import 'package:social_app_fe/features/comment/data/models/typing_event_model.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
 
 class CommentRemoteDataSource {
   final SocketClient _socketClient;
@@ -127,7 +128,8 @@ class CommentRemoteDataSource {
     _socketClient.on('commentDeleted').listen((data) {
       developer.log('Comment deleted event', name: 'CommentDataSource');
       try {
-        final postId = data['postId'] as String;
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+        final postId = commentsLoadedModel.postId;
 
         // Giảm số lượng comment cho post này
         if (_commentCounts.containsKey(postId) && _commentCounts[postId]! > 0) {
@@ -136,6 +138,7 @@ class CommentRemoteDataSource {
 
         // Emit updated counts
         _commentCountController.add(Map.from(_commentCounts));
+        _commentsLoadedController.add(commentsLoadedModel);
       } catch (e) {
         developer.log(
           'Error parsing commentDeleted: $e',
@@ -148,7 +151,8 @@ class CommentRemoteDataSource {
     _socketClient.on('commentDeleted:ack').listen((data) {
       developer.log('Comment deleted ack event', name: 'CommentDataSource');
       try {
-        final postId = data['postId'] as String;
+        final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
+        final postId = commentsLoadedModel.postId;
 
         // Giảm số lượng comment cho post này
         if (_commentCounts.containsKey(postId) && _commentCounts[postId]! > 0) {
@@ -157,6 +161,7 @@ class CommentRemoteDataSource {
 
         // Emit updated counts
         _commentCountController.add(Map.from(_commentCounts));
+        _commentsLoadedController.add(commentsLoadedModel);
       } catch (e) {
         developer.log(
           'Error parsing commentDeleted:ack: $e',
@@ -250,6 +255,14 @@ class CommentRemoteDataSource {
       name: 'CommentRemoteDataSource',
     );
     _socketClient.emit('newComment', params.toJson());
+  }
+
+  void deleteComment(DeleteCommentParams params) async {
+    developer.log(
+      'Sending delete comment for post: ${params.postId}, comment: ${params.commentId}',
+      name: 'CommentRemoteDataSource',
+    );
+    _socketClient.emit('deleteComment', params.toJson());
   }
 
   /// Disconnect

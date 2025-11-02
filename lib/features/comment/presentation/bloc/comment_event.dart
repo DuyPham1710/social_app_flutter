@@ -57,3 +57,13 @@ class AddCommentEvent extends CommentEvent {
 
   AddCommentEvent({required this.postId, required this.content, this.parentId});
 }
+
+class DeleteCommentEvent extends CommentEvent {
+  final String postId;
+  final String commentId;
+
+  const DeleteCommentEvent({required this.postId, required this.commentId});
+
+  @override
+  List<Object?> get props => [postId, commentId];
+}

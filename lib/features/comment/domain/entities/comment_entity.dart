@@ -1,11 +1,12 @@
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/comment/domain/entities/parent_comment_entity.dart';
 
 class CommentEntity {
   final String id;
   final String content;
   final UserEntity user;
   final String postId;
-  final String? parentId;
+  final ParentCommentEntity? parentId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -24,4 +25,3 @@ class CommentEntity {
     return 'CommentEntity(id: $id, content: $content, user: $user, postId: $postId, parentId: $parentId)';
   }
 }
-

@@ -12,7 +12,11 @@ _$CommentModelImpl _$$CommentModelImplFromJson(Map<String, dynamic> json) =>
       content: json['content'] as String,
       user: UserModel.fromJson(json['userId'] as Map<String, dynamic>),
       postId: json['postId'] as String,
-      parentId: json['parentId'] as String?,
+      parentId: json['parentId'] == null
+          ? null
+          : ParentCommentModel.fromJson(
+              json['parentId'] as Map<String, dynamic>,
+            ),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

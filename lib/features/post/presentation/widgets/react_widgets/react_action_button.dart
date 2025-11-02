@@ -10,6 +10,8 @@ class ReactActionButton extends StatelessWidget {
   final bool? isFriend;
   final bool isSend;
   final String? requestId;
+  final Function(String userDisplayName)? onMention;
+  final String userDisplayName;
 
   const ReactActionButton({
     super.key,
@@ -17,6 +19,8 @@ class ReactActionButton extends StatelessWidget {
     this.isFriend,
     required this.isSend,
     this.requestId,
+    this.onMention,
+    required this.userDisplayName,
   });
 
   @override
@@ -81,7 +85,11 @@ class ReactActionButton extends StatelessWidget {
 
     return OutlinedButton(
       onPressed: () {
-        // TODO: Xử lý nhắc đến
+        // Gọi callback onMention và đóng ReactionDetailsPage
+        if (onMention != null) {
+          onMention!(userDisplayName);
+          Navigator.pop(context);
+        }
       },
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: Colors.grey.shade400),

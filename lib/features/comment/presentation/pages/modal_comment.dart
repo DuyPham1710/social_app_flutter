@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
@@ -74,6 +75,58 @@ class _ModalCommentState extends State<ModalComment> {
     }
   }
 
+  void _handleReply(String userDisplayName) {
+    // Thêm reply mention vào text field và focus
+    final currentText = _controller.text;
+    final replyText = '$userDisplayName ';
+
+    // Nếu đã có text, thêm reply sau text hiện tại với space
+    final newText = currentText.isEmpty ? replyText : '$currentText $replyText';
+
+    _controller.text = newText;
+    _controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: newText.length),
+    );
+
+    // Focus vào text field
+    _focusNode.requestFocus();
+  }
+
+  Map<String, List<CommentEntity>> _groupCommentsByParent(
+    List<CommentEntity> comments,
+  ) {
+    final Map<String, List<CommentEntity>> grouped = {};
+    final List<CommentEntity> parentComments = [];
+    final List<CommentEntity> replies = [];
+
+    // Chia comments thành parent và replies
+    for (final comment in comments) {
+      if (comment.parentId == null) {
+        parentComments.add(comment);
+      } else {
+        replies.add(comment);
+      }
+    }
+
+    // Group replies by parent ID
+    for (final reply in replies) {
+      final parentId = reply.parentId?.id ?? '';
+      if (grouped[parentId] == null) {
+        grouped[parentId] = [];
+      }
+      grouped[parentId]!.add(reply);
+    }
+
+    // Add parent comments with empty reply lists if no replies
+    for (final parent in parentComments) {
+      if (grouped[parent.id] == null) {
+        grouped[parent.id] = [];
+      }
+    }
+
+    return grouped;
+  }
+
   @override
   void dispose() {
     // Leave post khi đóng modal
@@ -120,7 +173,10 @@ class _ModalCommentState extends State<ModalComment> {
 
                 SizedBox(height: 10.h),
 
-                CommentHeaderWidget(postId: widget.postId),
+                CommentHeaderWidget(
+                  postId: widget.postId,
+                  onMention: _handleReply,
+                ),
 
                 SizedBox(height: 10.h),
                 Divider(height: 1.h, color: AppColors.divider),
@@ -171,11 +227,27 @@ class _ModalCommentState extends State<ModalComment> {
                       if (state is CommentDetailsLoaded) {
                         final comments = state.commentsData!.comments;
 
+                        final groupedComments = _groupCommentsByParent(
+                          comments,
+                        );
+
+                        final parentComments = comments
+                            .where((c) => c.parentId == null)
+                            .toList();
+
                         return ListView.builder(
                           controller: scrollController,
-                          itemCount: comments.length,
+                          itemCount: parentComments.length,
                           itemBuilder: (context, index) {
-                            return CommentItem(comment: comments[index]);
+                            final parentComment = parentComments[index];
+                            final replies =
+                                groupedComments[parentComment.id] ?? [];
+
+                            return CommentItem(
+                              comment: parentComment,
+                              onReply: _handleReply,
+                              replies: replies,
+                            );
                           },
                         );
                       }

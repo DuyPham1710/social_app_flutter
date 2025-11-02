@@ -8,11 +8,13 @@ class ReactItemWidget extends StatelessWidget {
   final ReactPostEntity react;
   final bool isSend;
   final String? requestId;
+  final Function(String userDisplayName)? onMention;
   const ReactItemWidget({
     super.key,
     required this.react,
     required this.isSend,
     this.requestId,
+    this.onMention,
   });
 
   @override
@@ -107,6 +109,9 @@ class ReactItemWidget extends StatelessWidget {
               isFriend: react.isFriend,
               isSend: isSend,
               requestId: requestId,
+              onMention: onMention,
+              userDisplayName:
+                  react.user.fullName ?? react.user.username ?? 'Unknown',
             ),
           ],
         ],

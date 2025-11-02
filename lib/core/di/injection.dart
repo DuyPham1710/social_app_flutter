@@ -18,6 +18,7 @@ import 'package:social_app_fe/features/comment/domain/repository/comment_reposit
 import 'package:social_app_fe/features/comment/domain/usecases/add_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/clear_comments_cache_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/connect_comment_socket_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/delete_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/get_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/get_comments_loaded_data_usecase.dart';
@@ -156,6 +157,9 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerLazySingleton<AddCommentUseCase>(() => AddCommentUseCase(s1()));
+  s1.registerLazySingleton<DeleteCommentUsecase>(
+    () => DeleteCommentUsecase(s1()),
+  );
 
   // Friend Usecases
   s1.registerLazySingleton<GetFriendsUseCase>(() => GetFriendsUseCase(s1()));
@@ -257,6 +261,7 @@ Future<void> initializeDependencies() async {
       emitTypingUseCase: s1(),
       listenTypingUseCase: s1(),
       addCommentUseCase: s1(),
+      deleteCommentUsecase: s1(),
     ),
   );
 
