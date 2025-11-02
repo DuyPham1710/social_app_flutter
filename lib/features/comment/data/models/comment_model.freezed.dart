@@ -27,7 +27,7 @@ mixin _$CommentModel {
   @JsonKey(name: 'userId')
   UserModel get user => throw _privateConstructorUsedError;
   String get postId => throw _privateConstructorUsedError;
-  String? get parentId => throw _privateConstructorUsedError;
+  ParentCommentModel? get parentId => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
@@ -53,12 +53,13 @@ abstract class $CommentModelCopyWith<$Res> {
     String content,
     @JsonKey(name: 'userId') UserModel user,
     String postId,
-    String? parentId,
+    ParentCommentModel? parentId,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
 
   $UserModelCopyWith<$Res> get user;
+  $ParentCommentModelCopyWith<$Res>? get parentId;
 }
 
 /// @nodoc
@@ -105,7 +106,7 @@ class _$CommentModelCopyWithImpl<$Res, $Val extends CommentModel>
             parentId: freezed == parentId
                 ? _value.parentId
                 : parentId // ignore: cast_nullable_to_non_nullable
-                      as String?,
+                      as ParentCommentModel?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -128,6 +129,20 @@ class _$CommentModelCopyWithImpl<$Res, $Val extends CommentModel>
       return _then(_value.copyWith(user: value) as $Val);
     });
   }
+
+  /// Create a copy of CommentModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ParentCommentModelCopyWith<$Res>? get parentId {
+    if (_value.parentId == null) {
+      return null;
+    }
+
+    return $ParentCommentModelCopyWith<$Res>(_value.parentId!, (value) {
+      return _then(_value.copyWith(parentId: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -144,13 +159,15 @@ abstract class _$$CommentModelImplCopyWith<$Res>
     String content,
     @JsonKey(name: 'userId') UserModel user,
     String postId,
-    String? parentId,
+    ParentCommentModel? parentId,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
 
   @override
   $UserModelCopyWith<$Res> get user;
+  @override
+  $ParentCommentModelCopyWith<$Res>? get parentId;
 }
 
 /// @nodoc
@@ -196,7 +213,7 @@ class __$$CommentModelImplCopyWithImpl<$Res>
         parentId: freezed == parentId
             ? _value.parentId
             : parentId // ignore: cast_nullable_to_non_nullable
-                  as String?,
+                  as ParentCommentModel?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -237,7 +254,7 @@ class _$CommentModelImpl implements _CommentModel {
   @override
   final String postId;
   @override
-  final String? parentId;
+  final ParentCommentModel? parentId;
   @override
   final DateTime? createdAt;
   @override
@@ -293,7 +310,7 @@ abstract class _CommentModel implements CommentModel {
     required final String content,
     @JsonKey(name: 'userId') required final UserModel user,
     required final String postId,
-    final String? parentId,
+    final ParentCommentModel? parentId,
     final DateTime? createdAt,
     final DateTime? updatedAt,
   }) = _$CommentModelImpl;
@@ -312,7 +329,7 @@ abstract class _CommentModel implements CommentModel {
   @override
   String get postId;
   @override
-  String? get parentId;
+  ParentCommentModel? get parentId;
   @override
   DateTime? get createdAt;
   @override

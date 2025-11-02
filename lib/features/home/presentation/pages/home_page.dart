@@ -9,7 +9,7 @@ import 'package:social_app_fe/features/home/presentation/widgets/home_header_wid
 import 'package:social_app_fe/features/story/presentation/widgets/home_stories_widget.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/shared/component/custom_refresh_header.dart';
-import 'package:social_app_fe/features/post/presentation/widgets/post_item.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter/cupertino.dart';
 

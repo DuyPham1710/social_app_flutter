@@ -11,10 +11,12 @@ import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/r
 class ReactionDetailsPage extends StatefulWidget {
   final List<ReactPostEntity> reacts;
   final String postId;
+  final Function(String? parentId, String userDisplayName)? onMention;
   const ReactionDetailsPage({
     super.key,
     required this.reacts,
     required this.postId,
+    this.onMention,
   });
 
   @override
@@ -184,7 +186,7 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
         controller: _tabController,
         children: [
           // Tab "Tất cả"
-          ReactListWidget(reacts: _filteredReacts),
+          ReactListWidget(reacts: _filteredReacts, onMention: widget.onMention),
 
           // Tabs cho từng emoji
           ...uniqueEmojis.map((emoji) {
@@ -195,7 +197,10 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
                       a.createdAt ?? DateTime.now(),
                     ),
                   );
-            return ReactListWidget(reacts: emojiReacts);
+            return ReactListWidget(
+              reacts: emojiReacts,
+              onMention: widget.onMention,
+            );
           }),
         ],
       ),

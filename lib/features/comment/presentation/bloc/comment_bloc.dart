@@ -3,11 +3,15 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/usecase/usecase.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
+import 'package:social_app_fe/features/comment/domain/params/update_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/add_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/delete_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/update_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_state.dart';
 
@@ -17,6 +21,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final EmitTypingUseCase _emitTypingUseCase;
   final ListenTypingUseCase _listenTypingUseCase;
   final AddCommentUseCase _addCommentUseCase;
+  final UpdateCommentUsecase _updateCommentUseCase;
+  final DeleteCommentUsecase _deleteCommentUsecase;
   Timer? _typingDebounce;
   StreamSubscription? _typingSubscription;
 
@@ -26,17 +32,42 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     required EmitTypingUseCase emitTypingUseCase,
     required ListenTypingUseCase listenTypingUseCase,
     required AddCommentUseCase addCommentUseCase,
+    required UpdateCommentUsecase updateCommentUseCase,
+    required DeleteCommentUsecase deleteCommentUsecase,
   }) : _joinPostUseCase = joinPostUseCase,
        _leavePostUseCase = leavePostUseCase,
        _emitTypingUseCase = emitTypingUseCase,
        _listenTypingUseCase = listenTypingUseCase,
        _addCommentUseCase = addCommentUseCase,
+       _updateCommentUseCase = updateCommentUseCase,
+       _deleteCommentUsecase = deleteCommentUsecase,
        super(CommentInitial()) {
     on<JoinPostEvent>(_onJoinPost);
     on<LeavePostEvent>(_onLeavePost);
     on<UserTypingEvent>(_onUserTyping);
     on<UpdateTypingUsersEvent>(_onUpdateTypingUsers);
     on<AddCommentEvent>(_onAddComment);
+    on<UpdateCommentEvent>(_onUpdateComment);
+    on<DeleteCommentEvent>(_onDeleteComment);
+  }
+
+  void _onUpdateComment(UpdateCommentEvent event, Emitter<CommentState> emit) {
+    _updateCommentUseCase(
+      params: UpdateCommentParams(
+        postId: event.postId,
+        commentId: event.commentId,
+        content: event.content,
+      ),
+    );
+  }
+
+  void _onDeleteComment(DeleteCommentEvent event, Emitter<CommentState> emit) {
+    _deleteCommentUsecase(
+      params: DeleteCommentParams(
+        postId: event.postId,
+        commentId: event.commentId,
+      ),
+    );
   }
 
   void _onAddComment(AddCommentEvent event, Emitter<CommentState> emit) {

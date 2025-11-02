@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
+import 'package:social_app_fe/features/comment/data/models/parent_comment_model.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 
 part 'comment_model.freezed.dart';
@@ -12,7 +13,7 @@ class CommentModel extends CommentEntity with _$CommentModel {
     required String content,
     @JsonKey(name: 'userId') required UserModel user,
     required String postId,
-    String? parentId,
+    ParentCommentModel? parentId,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _CommentModel;
