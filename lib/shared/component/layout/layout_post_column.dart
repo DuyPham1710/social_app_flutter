@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
 
 class LayoutPostColumn extends StatelessWidget {
   final List<dynamic> urls;
@@ -11,17 +12,43 @@ class LayoutPostColumn extends StatelessWidget {
     required this.onImageTap,
   });
 
+  // chưa dùng đến
   List<dynamic> get sortedUrls {
     final List<dynamic> sorted = List.from(urls);
     sorted.sort((a, b) => a.order.compareTo(b.order));
     return sorted;
   }
 
+  Widget _buildImageWidget(dynamic imageData) {
+    if (imageData is File) {
+      return Image.file(imageData, fit: BoxFit.cover, width: double.infinity);
+    } else if (imageData is String) {
+      return Image.network(
+        imageData,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    } else if (imageData != null && imageData.url != null) {
+      return Image.network(
+        imageData.url,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    } else {
+      return Container(
+        color: Colors.grey[300],
+        child: Icon(Icons.image, color: Colors.grey[600]),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (urls.isEmpty) return const SizedBox.shrink();
 
-    final orderedUrls = sortedUrls;
+    // Không cần sort cho local files vì chúng đã được sắp xếp
+    //  final orderedUrls = sortedUrls;
+    final orderedUrls = urls;
 
     // Layout ngang - mỗi ảnh 1 cột
     final maxImages = orderedUrls.length > 4 ? 4 : orderedUrls.length;
@@ -34,11 +61,7 @@ class LayoutPostColumn extends StatelessWidget {
           aspectRatio: 1.0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(
-              orderedUrls[0].url,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: _buildImageWidget(orderedUrls[0]),
           ),
         ),
       );
@@ -89,11 +112,7 @@ class LayoutPostColumn extends StatelessWidget {
         height: 250.h, // Chiều cao cố định cho ảnh, ảnh sẽ to và có thể bị cắt
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.r),
-          child: Image.network(
-            orderedUrls[index].url,
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
+          child: _buildImageWidget(orderedUrls[index]),
         ),
       ),
     );
@@ -110,11 +129,7 @@ class LayoutPostColumn extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  orderedUrls[index].url,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: _buildImageWidget(orderedUrls[index]),
               ),
 
               Container(

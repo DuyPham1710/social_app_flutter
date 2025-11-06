@@ -3,6 +3,7 @@ import 'package:social_app_fe/features/app/presentation/widgets/custom_bottom_na
 import 'package:social_app_fe/features/friend/presentation/pages/friend_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 import 'package:social_app_fe/features/menu/presentation/pages/menu_page.dart';
+import 'package:social_app_fe/features/post/presentation/pages/create_post_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -29,7 +30,12 @@ class _MainPageState extends State<MainPage> {
           setState(() => _currentIndex = index);
         },
         //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-        children: const [HomePage(), FriendPage(), MenuPage()],
+        children: const [
+          HomePage(),
+          FriendPage(),
+          CreatePostPage(),
+          MenuPage(),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavigation(
         currentIndex: _currentIndex,
