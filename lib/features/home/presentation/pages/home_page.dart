@@ -6,6 +6,9 @@ import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/home/presentation/widgets/home_header_widget.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_creating_progress.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/home_stories_widget.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/shared/component/custom_refresh_header.dart';
@@ -102,6 +105,15 @@ class _HomePageState extends State<HomePage> {
               children: [
                 HomeHeaderWidget(),
                 HomeStoriesWidget(page: 1, limit: 5),
+
+                BlocBuilder<PostBloc, PostState>(
+                  builder: (context, postState) {
+                    if (postState is PostCreating) {
+                      return const PostCreatingProgress();
+                    }
+                    return const SizedBox.shrink(); // Không hiển thị nếu không tạo post
+                  },
+                ),
 
                 if (state is HomeInitializing)
                   const Padding(

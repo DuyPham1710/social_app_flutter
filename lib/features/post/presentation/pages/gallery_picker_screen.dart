@@ -8,8 +8,13 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/bo
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/grid_image_item.dart';
 
 class GalleryPickerScreen extends StatefulWidget {
+  final List<AssetEntity> selectedAssets;
   final VoidCallback? openCamera;
-  const GalleryPickerScreen({super.key, this.openCamera});
+  const GalleryPickerScreen({
+    super.key,
+    required this.selectedAssets,
+    this.openCamera,
+  });
 
   @override
   State<GalleryPickerScreen> createState() => _GalleryPickerScreenState();
@@ -26,6 +31,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
   @override
   void initState() {
     super.initState();
+    selectedAssets = List.from(widget.selectedAssets);
     _loadGallery();
   }
 

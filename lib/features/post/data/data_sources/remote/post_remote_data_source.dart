@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
+import 'package:social_app_fe/features/post/data/models/create_post_response.dart';
 import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
@@ -26,5 +27,18 @@ abstract class PostRemoteDataSource {
   Future<PostListModel> getProfilePosts(
     @Query('page') int page,
     @Query('limit') int limit,
+  );
+
+  @POST('/post')
+  @MultiPart()
+  Future<CreatePostResponse> createPost(
+    @Part(name: 'caption') String? caption,
+    @Part(name: 'layout') String? layout,
+    @Part(name: 'privacyType') String? privacyType,
+    @Part(name: 'orders') String? orders,
+    @Part(name: 'titles') String? titles,
+    @Part(name: 'friendsExcept') String? friendsExcept,
+    @Part(name: 'friendsDetail') String? friendsDetail,
+    @Part(name: 'files') List<MultipartFile>? files,
   );
 }

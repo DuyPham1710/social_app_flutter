@@ -10,12 +10,13 @@ class EditSelectedImagePage extends StatefulWidget {
   final List<File> imageFiles;
   final int initialIndex;
   final VoidCallback? onAdd;
-
+  final Function(int index)? onRemoveAtIndex;
   const EditSelectedImagePage({
     super.key,
     required this.imageFiles,
     required this.initialIndex,
     this.onAdd,
+    this.onRemoveAtIndex,
   });
 
   @override
@@ -181,10 +182,10 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                         right: 10.w,
                         child: GestureDetector(
                           onTap: () {
-                            // TODO: xử lý khi nhấn nút X (xóa ảnh khỏi danh sách)
                             setState(() {
                               widget.imageFiles.removeAt(index);
                             });
+                            widget.onRemoveAtIndex?.call(index);
                           },
                           child: Container(
                             padding: EdgeInsets.all(6.w),

@@ -30,10 +30,15 @@ class _MainPageState extends State<MainPage> {
           setState(() => _currentIndex = index);
         },
         //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-        children: const [
+        children: [
           HomePage(),
           FriendPage(),
-          CreatePostPage(),
+          CreatePostPage(
+            onPostCreated: () {
+              _pageController.jumpToPage(0);
+              setState(() => _currentIndex = 0);
+            },
+          ),
           MenuPage(),
         ],
       ),

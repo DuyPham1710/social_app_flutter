@@ -3,24 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/features/post/presentation/pages/edit_selected_image_page.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 import 'dart:io';
 
-enum ImageLayoutType { classic, column, frame }
-
 class SelectedImagesDisplay extends StatefulWidget {
   final List<AssetEntity> selectedAssets;
   final VoidCallback? onEdit;
   final Function(List<AssetEntity>)? onRemove;
+  final Function(int index)? onRemoveAtIndex;
 
   const SelectedImagesDisplay({
     super.key,
     required this.selectedAssets,
     this.onEdit,
     this.onRemove,
+    this.onRemoveAtIndex,
   });
 
   @override
@@ -28,7 +29,7 @@ class SelectedImagesDisplay extends StatefulWidget {
 }
 
 class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
-  ImageLayoutType _currentLayout = ImageLayoutType.classic;
+  LayoutType _currentLayout = LayoutType.classic;
   List<File> _imageFiles = [];
   bool _isLoading = true;
 
@@ -79,7 +80,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           CupertinoActionSheetAction(
             onPressed: () {
               setState(() {
-                _currentLayout = ImageLayoutType.classic;
+                _currentLayout = LayoutType.classic;
               });
               Navigator.pop(context);
             },
@@ -89,7 +90,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
               children: [
                 Icon(
                   CupertinoIcons.grid,
-                  color: _currentLayout == ImageLayoutType.classic
+                  color: _currentLayout == LayoutType.classic
                       ? AppColors.primary
                       : AppColors.textPrimary,
                 ),
@@ -99,7 +100,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                 Text(
                   'Classic',
                   style: TextStyle(
-                    color: _currentLayout == ImageLayoutType.classic
+                    color: _currentLayout == LayoutType.classic
                         ? AppColors.primary
                         : AppColors.textPrimary,
                   ),
@@ -111,7 +112,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           CupertinoActionSheetAction(
             onPressed: () {
               setState(() {
-                _currentLayout = ImageLayoutType.column;
+                _currentLayout = LayoutType.column;
               });
               Navigator.pop(context);
             },
@@ -121,7 +122,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
               children: [
                 Icon(
                   CupertinoIcons.rectangle_3_offgrid,
-                  color: _currentLayout == ImageLayoutType.column
+                  color: _currentLayout == LayoutType.column
                       ? AppColors.primary
                       : AppColors.textPrimary,
                 ),
@@ -131,7 +132,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                 Text(
                   'Column',
                   style: TextStyle(
-                    color: _currentLayout == ImageLayoutType.column
+                    color: _currentLayout == LayoutType.column
                         ? AppColors.primary
                         : AppColors.textPrimary,
                   ),
@@ -143,7 +144,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           CupertinoActionSheetAction(
             onPressed: () {
               setState(() {
-                _currentLayout = ImageLayoutType.frame;
+                _currentLayout = LayoutType.frame;
               });
               Navigator.pop(context);
             },
@@ -153,7 +154,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
               children: [
                 Icon(
                   CupertinoIcons.square_stack_3d_down_right,
-                  color: _currentLayout == ImageLayoutType.frame
+                  color: _currentLayout == LayoutType.frame
                       ? AppColors.primary
                       : AppColors.textPrimary,
                 ),
@@ -163,7 +164,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                 Text(
                   'Frame',
                   style: TextStyle(
-                    color: _currentLayout == ImageLayoutType.frame
+                    color: _currentLayout == LayoutType.frame
                         ? AppColors.primary
                         : AppColors.textPrimary,
                   ),
@@ -197,6 +198,9 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           imageFiles: _imageFiles,
           initialIndex: index,
           onAdd: widget.onEdit,
+          onRemoveAtIndex: (removeIndex) {
+            widget.onRemoveAtIndex?.call(removeIndex);
+          },
         ),
       ),
     );
@@ -206,11 +210,11 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
     if (_imageFiles.isEmpty) return const SizedBox.shrink();
 
     switch (_currentLayout) {
-      case ImageLayoutType.classic:
+      case LayoutType.classic:
         return LayoutPostClassic(urls: _imageFiles, onImageTap: _onImageTap);
-      case ImageLayoutType.column:
+      case LayoutType.column:
         return LayoutPostColumn(urls: _imageFiles, onImageTap: _onImageTap);
-      case ImageLayoutType.frame:
+      case LayoutType.frame:
         return LayoutPostFrame(urls: _imageFiles, onImageTap: _onImageTap);
     }
   }
@@ -394,22 +398,22 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
 
   IconData _getLayoutIcon() {
     switch (_currentLayout) {
-      case ImageLayoutType.classic:
+      case LayoutType.classic:
         return CupertinoIcons.grid;
-      case ImageLayoutType.column:
+      case LayoutType.column:
         return CupertinoIcons.rectangle_3_offgrid;
-      case ImageLayoutType.frame:
+      case LayoutType.frame:
         return CupertinoIcons.square_stack_3d_down_right;
     }
   }
 
   String _getLayoutName() {
     switch (_currentLayout) {
-      case ImageLayoutType.classic:
+      case LayoutType.classic:
         return 'Classic';
-      case ImageLayoutType.column:
+      case LayoutType.column:
         return 'Column';
-      case ImageLayoutType.frame:
+      case LayoutType.frame:
         return 'Frame';
     }
   }

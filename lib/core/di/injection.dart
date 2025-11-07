@@ -52,7 +52,9 @@ import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_useca
 import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/create_post_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/profile/data/repository/user_repository_impl.dart';
 import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
@@ -120,6 +122,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetPostDetailUsecase>(
     () => GetPostDetailUsecase(s1()),
   );
+  s1.registerLazySingleton<CreatePostUsecase>(() => CreatePostUsecase(s1()));
 
   s1.registerLazySingleton<GetProfilePostsUseCase>(
     () => GetProfilePostsUseCase(s1()),
@@ -257,6 +260,8 @@ Future<void> initializeDependencies() async {
       loadCommentsUseCase: s1(),
     ),
   );
+
+  s1.registerFactory<PostBloc>(() => PostBloc(s1()));
 
   s1.registerFactory<CommentBloc>(
     () => CommentBloc(

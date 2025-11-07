@@ -2,10 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/enums/layout_type.dart';
+import 'package:social_app_fe/core/enums/privacy_type.dart';
+import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_event.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
 import 'package:social_app_fe/features/post/presentation/pages/gallery_picker_screen.dart';
@@ -13,7 +20,8 @@ import 'package:social_app_fe/features/post/presentation/pages/privacy_page.dart
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
 
 class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({super.key});
+  final VoidCallback? onPostCreated;
+  const CreatePostPage({super.key, this.onPostCreated});
 
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
@@ -21,6 +29,61 @@ class CreatePostPage extends StatefulWidget {
 
 class _CreatePostPageState extends State<CreatePostPage> {
   List<AssetEntity> _selectedAssets = [];
+  final TextEditingController _captionController = TextEditingController();
+  LayoutType _selectedLayout = LayoutType.classic;
+  PrivacyType _selectedPrivacy = PrivacyType.public;
+  bool _isCreatingPost = false;
+
+  @override
+  void dispose() {
+    _captionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _createPost() async {
+    setState(() {
+      _isCreatingPost = true;
+    });
+
+    try {
+      // Convert AssetEntity to File
+      List<File> files = [];
+      for (var asset in _selectedAssets) {
+        final file = await asset.file;
+        if (file != null) {
+          files.add(file);
+        }
+      }
+
+      // Create post entity
+      final postEntity = CreatePostEntity(
+        caption: _captionController.text.trim().isNotEmpty
+            ? _captionController.text.trim()
+            : null,
+        files: files.isNotEmpty ? files : null,
+        layout: _selectedLayout,
+        privacyType: _selectedPrivacy,
+        // orders and titles can be added later if needed
+        orders: files.isNotEmpty
+            ? List.generate(files.length, (index) => index)
+            : null,
+        titles: null, // Can be added if needed
+        friendsExcept: null, // Can be added based on privacy settings
+        friendsDetail: null, // Can be added based on privacy settings
+      );
+      print('Creating post with entity: $postEntity');
+      // Trigger BLoC event
+      context.read<PostBloc>().add(CreatePostRequested(postEntity: postEntity));
+    } catch (e) {
+      setState(() {
+        _isCreatingPost = false;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra: ${e.toString()}')));
+    }
+  }
 
   void _onSelectImage(BuildContext context) async {
     PermissionStatus status;
@@ -48,7 +111,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
       final result = await Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => GalleryPickerScreen(openCamera: () => _openCamera()),
+          builder: (_) => GalleryPickerScreen(
+            selectedAssets: _selectedAssets,
+            openCamera: () => _openCamera(),
+          ),
         ),
       );
 
@@ -215,240 +281,285 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
+    return BlocListener<PostBloc, PostState>(
+      listener: (context, state) {
+        setState(() {
+          _isCreatingPost = state is PostCreating;
+        });
+
+        if (state is PostCreating) {
+          widget.onPostCreated?.call();
+        }
+
+        if (state is PostCreated) {
+          showSuccessSnackBar(context, state.message);
+
+          // Clear form and go back
+          _captionController.clear();
+          setState(() {
+            _selectedAssets.clear();
+          });
+
+          //  widget.onPostCreated?.call();
+          // Navigator.of(context).pop();
+        } else if (state is PostCreateError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+
+      child: SafeArea(
+        child: Scaffold(
           backgroundColor: AppColors.background,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          automaticallyImplyLeading: false,
+          appBar: AppBar(
+            backgroundColor: AppColors.background,
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            automaticallyImplyLeading: false,
 
-          title: Text(
-            'Tạo bài viết',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w600,
+            title: Text(
+              'Tạo bài viết',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          centerTitle: false,
+            centerTitle: false,
 
-          actions: [
-            Row(
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    // Handle post creation logic here
-                    print('Post created!');
-                  },
-                  child: Text(
-                    'Đăng',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-
-                SizedBox(width: 12.w),
-              ],
-            ),
-          ],
-        ),
-
-        body: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Container(
-            padding: EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
-
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 20.r,
-                      backgroundImage: NetworkImage(
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
-                      ),
-                    ),
-
-                    SizedBox(width: 12.w),
-
-                    Expanded(
-                      child: GestureDetector(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                                vertical: 8.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.background,
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Phạm Duy',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13.sp,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-
-                                  SizedBox(height: 8.h),
-
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (_) => PrivacyPage(
-                                            selectedOption: 'Công khai',
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.h,
-                                        vertical: 4.w,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Color(
-                                          0xFF3B82F6,
-                                        ).withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(
-                                          8.r,
-                                        ),
-                                      ),
-
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.public,
-                                            color: Color(0xFF3B82F6),
-                                            size: 14.sp,
-                                          ),
-
-                                          SizedBox(width: 4.w),
-
-                                          Text(
-                                            'Công khai',
-                                            style: TextStyle(
-                                              color: Color(0xFF3B82F6),
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13.sp,
-                                            ),
-                                          ),
-
-                                          SizedBox(width: 2.w),
-
-                                          Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Color(0xFF3B82F6),
-                                            size: 18.sp,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 14.h),
-
-                /// Ô nhập "Bạn đang nghĩ gì?"
-                TextField(
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 18.sp,
-                  ),
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    hintText: 'Bạn đang nghĩ gì?',
-                    hintStyle: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 18.sp,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-
-                /// Selected images display
-                if (_selectedAssets.isNotEmpty) ...[
-                  SelectedImagesDisplay(
-                    selectedAssets: _selectedAssets,
-                    onEdit: () => _onSelectImage(context),
-                    onRemove: (assets) {
-                      setState(() {
-                        _selectedAssets.clear();
-                      });
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-
-        bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
-          color: AppColors.background,
-
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Divider(height: 1.h, color: AppColors.divider),
-
-              SizedBox(height: 10.h),
-
+            actions: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _bottomIcon(
-                    Icons.image,
-                    color: Colors.green,
-                    onTap: () => _onSelectImage(context),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 10.h,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: _isCreatingPost ? null : _createPost,
+
+                    child: _isCreatingPost
+                        ? SizedBox(
+                            width: 14.sp,
+                            height: 14.sp,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Đăng',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
-                  _bottomIcon(Icons.person_add_alt_1, color: Colors.blueAccent),
-                  _bottomIcon(Icons.emoji_emotions, color: Colors.amber),
-                  _bottomIcon(Icons.location_on, color: Colors.redAccent),
-                  _bottomIcon(
-                    CupertinoIcons.ellipsis_circle,
-                    color: Colors.grey,
-                    onTap: () => _showMoreOptions(context),
-                  ),
+
+                  SizedBox(width: 12.w),
                 ],
               ),
             ],
+          ),
+
+          body: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Container(
+              padding: EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
+
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 20.r,
+                        backgroundImage: NetworkImage(
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+                        ),
+                      ),
+
+                      SizedBox(width: 12.w),
+
+                      Expanded(
+                        child: GestureDetector(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 8.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.background,
+                                  borderRadius: BorderRadius.circular(14.r),
+                                ),
+
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Phạm Duy',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.sp,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+
+                                    SizedBox(height: 8.h),
+
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (_) => PrivacyPage(
+                                              selectedOption: 'Công khai',
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.h,
+                                          vertical: 4.w,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Color(
+                                            0xFF3B82F6,
+                                          ).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            8.r,
+                                          ),
+                                        ),
+
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.public,
+                                              color: Color(0xFF3B82F6),
+                                              size: 14.sp,
+                                            ),
+
+                                            SizedBox(width: 4.w),
+
+                                            Text(
+                                              'Công khai',
+                                              style: TextStyle(
+                                                color: Color(0xFF3B82F6),
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13.sp,
+                                              ),
+                                            ),
+
+                                            SizedBox(width: 2.w),
+
+                                            Icon(
+                                              Icons.arrow_drop_down,
+                                              color: Color(0xFF3B82F6),
+                                              size: 18.sp,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 14.h),
+
+                  /// Ô nhập "Bạn đang nghĩ gì?"
+                  TextField(
+                    controller: _captionController,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 18.sp,
+                    ),
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: 'Bạn đang nghĩ gì?',
+                      hintStyle: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 18.sp,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
+
+                  /// Selected images display
+                  if (_selectedAssets.isNotEmpty) ...[
+                    SelectedImagesDisplay(
+                      selectedAssets: _selectedAssets,
+                      onEdit: () => _onSelectImage(context),
+                      onRemove: (assets) {
+                        setState(() {
+                          _selectedAssets.clear();
+                        });
+                      },
+                      onRemoveAtIndex: (index) {
+                        setState(() {
+                          _selectedAssets.removeAt(index);
+                        });
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          bottomNavigationBar: Container(
+            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+            color: AppColors.background,
+
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Divider(height: 1.h, color: AppColors.divider),
+
+                SizedBox(height: 10.h),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _bottomIcon(
+                      Icons.image,
+                      color: Colors.green,
+                      onTap: () => _onSelectImage(context),
+                    ),
+                    _bottomIcon(
+                      Icons.person_add_alt_1,
+                      color: Colors.blueAccent,
+                    ),
+                    _bottomIcon(Icons.emoji_emotions, color: Colors.amber),
+                    _bottomIcon(Icons.location_on, color: Colors.redAccent),
+                    _bottomIcon(
+                      CupertinoIcons.ellipsis_circle,
+                      color: Colors.grey,
+                      onTap: () => _showMoreOptions(context),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -459,6 +570,33 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return GestureDetector(
       onTap: onTap,
       child: Icon(icon, color: color, size: 28.sp),
+    );
+  }
+
+  void showSuccessSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.green.shade600,
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 }
