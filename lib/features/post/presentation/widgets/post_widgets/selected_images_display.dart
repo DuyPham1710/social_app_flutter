@@ -15,6 +15,7 @@ class SelectedImagesDisplay extends StatefulWidget {
   final VoidCallback? onEdit;
   final Function(List<AssetEntity>)? onRemove;
   final Function(int index)? onRemoveAtIndex;
+  final Function(LayoutType layout)? onChangedLayout;
 
   const SelectedImagesDisplay({
     super.key,
@@ -22,6 +23,7 @@ class SelectedImagesDisplay extends StatefulWidget {
     this.onEdit,
     this.onRemove,
     this.onRemoveAtIndex,
+    this.onChangedLayout,
   });
 
   @override
@@ -81,6 +83,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
             onPressed: () {
               setState(() {
                 _currentLayout = LayoutType.classic;
+                widget.onChangedLayout?.call(LayoutType.classic);
               });
               Navigator.pop(context);
             },
@@ -113,6 +116,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
             onPressed: () {
               setState(() {
                 _currentLayout = LayoutType.column;
+                widget.onChangedLayout?.call(LayoutType.column);
               });
               Navigator.pop(context);
             },
@@ -145,6 +149,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
             onPressed: () {
               setState(() {
                 _currentLayout = LayoutType.frame;
+                widget.onChangedLayout?.call(LayoutType.frame);
               });
               Navigator.pop(context);
             },

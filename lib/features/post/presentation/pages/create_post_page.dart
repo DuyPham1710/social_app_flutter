@@ -7,17 +7,24 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
+import 'package:social_app_fe/core/utils/privacy_util.dart';
 import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
+import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
+import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_event.dart';
+import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_state.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
 import 'package:social_app_fe/features/post/presentation/pages/gallery_picker_screen.dart';
-import 'package:social_app_fe/features/post/presentation/pages/privacy_page.dart';
+import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
+import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CreatePostPage extends StatefulWidget {
   final VoidCallback? onPostCreated;
@@ -31,7 +38,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   List<AssetEntity> _selectedAssets = [];
   final TextEditingController _captionController = TextEditingController();
   LayoutType _selectedLayout = LayoutType.classic;
-  PrivacyType _selectedPrivacy = PrivacyType.public;
+  late PrivacyType _selectedPrivacy;
+  String _selectedPrivacyLabel = '';
   bool _isCreatingPost = false;
 
   @override
@@ -71,7 +79,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         friendsExcept: null, // Can be added based on privacy settings
         friendsDetail: null, // Can be added based on privacy settings
       );
-      print('Creating post with entity: $postEntity');
+
       // Trigger BLoC event
       context.read<PostBloc>().add(CreatePostRequested(postEntity: postEntity));
     } catch (e) {
@@ -418,60 +426,107 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                                     SizedBox(height: 8.h),
 
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          CupertinoPageRoute(
-                                            builder: (_) => PrivacyPage(
-                                              selectedOption: 'Công khai',
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 10.h,
-                                          vertical: 4.w,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Color(
-                                            0xFF3B82F6,
-                                          ).withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                        ),
+                                    BlocProvider(
+                                      create: (_) =>
+                                          s1<PrivacyBloc>()
+                                            ..add(GetDefaultPrivacyRequested()),
+                                      child: BlocBuilder<PrivacyBloc, PrivacyState>(
+                                        builder: (context, state) {
+                                          if (state is PrivacyLoading) {
+                                            return const CupertinoActivityIndicator();
+                                          }
 
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.public,
-                                              color: Color(0xFF3B82F6),
-                                              size: 14.sp,
-                                            ),
+                                          if (state is PrivacyLoaded) {
+                                            _selectedPrivacyLabel =
+                                                state.selectedPrivacy;
 
-                                            SizedBox(width: 4.w),
+                                            _selectedPrivacy =
+                                                PrivacyUtil.labelToPrivacyType(
+                                                  state.selectedPrivacy,
+                                                );
+                                          }
 
-                                            Text(
-                                              'Công khai',
-                                              style: TextStyle(
-                                                color: Color(0xFF3B82F6),
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 13.sp,
+                                          return GestureDetector(
+                                            onTap: () async {
+                                              final result = await Navigator.push(
+                                                context,
+                                                CupertinoPageRoute(
+                                                  builder: (_) => BlocProvider.value(
+                                                    value: context
+                                                        .read<
+                                                          PrivacyBloc
+                                                        >(), // dùng lại bloc
+                                                    child: PrivacyPage(
+                                                      selectedOption:
+                                                          _selectedPrivacyLabel,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+
+                                              if (result != null) {
+                                                setState(() {
+                                                  _selectedPrivacyLabel =
+                                                      result;
+
+                                                  _selectedPrivacy =
+                                                      PrivacyUtil.labelToPrivacyType(
+                                                        result,
+                                                      );
+                                                });
+                                                print(
+                                                  'Privacy selection _selectedPrivacyLabel: $_selectedPrivacyLabel',
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 10.h,
+                                                vertical: 4.w,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Color(
+                                                  0xFF3B82F6,
+                                                ).withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                              ),
+
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    getIcon(
+                                                      _selectedPrivacyLabel,
+                                                    ),
+                                                    color: Color(0xFF3B82F6),
+                                                    size: 14.sp,
+                                                  ),
+
+                                                  SizedBox(width: 4.w),
+
+                                                  Text(
+                                                    _selectedPrivacyLabel,
+                                                    style: TextStyle(
+                                                      color: Color(0xFF3B82F6),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 13.sp,
+                                                    ),
+                                                  ),
+
+                                                  SizedBox(width: 2.w),
+
+                                                  Icon(
+                                                    Icons.arrow_drop_down,
+                                                    color: Color(0xFF3B82F6),
+                                                    size: 18.sp,
+                                                  ),
+                                                ],
                                               ),
                                             ),
-
-                                            SizedBox(width: 2.w),
-
-                                            Icon(
-                                              Icons.arrow_drop_down,
-                                              color: Color(0xFF3B82F6),
-                                              size: 18.sp,
-                                            ),
-                                          ],
-                                        ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ],
@@ -508,6 +563,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   if (_selectedAssets.isNotEmpty) ...[
                     SelectedImagesDisplay(
                       selectedAssets: _selectedAssets,
+                      onChangedLayout: (layout) {
+                        setState(() {
+                          _selectedLayout = layout;
+                        });
+                      },
                       onEdit: () => _onSelectImage(context),
                       onRemove: (assets) {
                         setState(() {
@@ -570,33 +630,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return GestureDetector(
       onTap: onTap,
       child: Icon(icon, color: color, size: 28.sp),
-    );
-  }
-
-  void showSuccessSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: Colors.green.shade600,
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 2),
-      ),
     );
   }
 }
