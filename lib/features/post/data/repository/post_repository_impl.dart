@@ -86,9 +86,8 @@ class PostRepositoryImpl implements PostRepository {
         }
       }
 
-      // Convert enums to strings
-      final layoutString = post.layout?.name;
-      final privacyString = post.privacyType?.name;
+      String? layoutString = post.layout!.name;
+      String? privacyString = post.privacyType!.name;
 
       // Convert lists to JSON strings
       final ordersString = post.orders != null ? jsonEncode(post.orders) : null;

@@ -34,11 +34,11 @@ abstract class PostRemoteDataSource {
   Future<CreatePostResponse> createPost(
     @Part(name: 'caption') String? caption,
     @Part(name: 'layout') String? layout,
-    @Part(name: 'privacyType') String? privacyType,
+    @Part(name: 'privacy_type') String? privacyType,
     @Part(name: 'orders') String? orders,
     @Part(name: 'titles') String? titles,
-    @Part(name: 'friendsExcept') String? friendsExcept,
-    @Part(name: 'friendsDetail') String? friendsDetail,
+    @Part(name: 'friends_except') String? friendsExcept,
+    @Part(name: 'friends_detail') String? friendsDetail,
     @Part(name: 'files') List<MultipartFile>? files,
   );
 }

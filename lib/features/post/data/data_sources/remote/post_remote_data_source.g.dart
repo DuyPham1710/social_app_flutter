@@ -149,7 +149,7 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
       _data.fields.add(MapEntry('layout', layout));
     }
     if (privacyType != null) {
-      _data.fields.add(MapEntry('privacyType', privacyType));
+      _data.fields.add(MapEntry('privacy_type', privacyType));
     }
     if (orders != null) {
       _data.fields.add(MapEntry('orders', orders));
@@ -158,10 +158,10 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
       _data.fields.add(MapEntry('titles', titles));
     }
     if (friendsExcept != null) {
-      _data.fields.add(MapEntry('friendsExcept', friendsExcept));
+      _data.fields.add(MapEntry('friends_except', friendsExcept));
     }
     if (friendsDetail != null) {
-      _data.fields.add(MapEntry('friendsDetail', friendsDetail));
+      _data.fields.add(MapEntry('friends_detail', friendsDetail));
     }
     if (files != null) {
       _data.files.addAll(files.map((i) => MapEntry('files', i)));

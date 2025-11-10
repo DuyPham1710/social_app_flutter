@@ -49,6 +49,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Future<void> _createPost() async {
+    // ẩn bàn phím
+    FocusScope.of(context).unfocus();
+
     setState(() {
       _isCreatingPost = true;
     });
@@ -439,7 +442,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                           if (state is PrivacyLoaded) {
                                             _selectedPrivacyLabel =
                                                 state.selectedPrivacy;
-
                                             _selectedPrivacy =
                                                 PrivacyUtil.labelToPrivacyType(
                                                   state.selectedPrivacy,
@@ -474,9 +476,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         result,
                                                       );
                                                 });
-                                                print(
-                                                  'Privacy selection _selectedPrivacyLabel: $_selectedPrivacyLabel',
-                                                );
                                               }
                                             },
                                             child: Container(
