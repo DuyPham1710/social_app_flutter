@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
 
 class LayoutPostFrame extends StatelessWidget {
   final List<dynamic> urls;
@@ -11,10 +12,34 @@ class LayoutPostFrame extends StatelessWidget {
     required this.onImageTap,
   });
 
+  // chưa dùng đến
   List<dynamic> get sortedUrls {
     final List<dynamic> sorted = List.from(urls);
     sorted.sort((a, b) => a.order.compareTo(b.order));
     return sorted;
+  }
+
+  Widget _buildImageWidget(dynamic imageData) {
+    if (imageData is File) {
+      return Image.file(imageData, fit: BoxFit.cover, width: double.infinity);
+    } else if (imageData is String) {
+      return Image.network(
+        imageData,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    } else if (imageData != null && imageData.url != null) {
+      return Image.network(
+        imageData.url,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    } else {
+      return Container(
+        color: Colors.grey[300],
+        child: Icon(Icons.image, color: Colors.grey[600]),
+      );
+    }
   }
 
   // Bộ màu pastel dễ nhìn cho background
@@ -32,8 +57,11 @@ class LayoutPostFrame extends StatelessWidget {
   ];
 
   Color get randomFrameColor {
-    // Sử dụng hash của URLs để đảm bảo cùng 1 post luôn có cùng màu
-    final seed = urls.map((e) => e.url).join().hashCode;
+    // Sử dụng hash của paths để đảm bảo cùng 1 post luôn có cùng màu
+    final seed = urls
+        .map((e) => e is File ? e.path : e.toString())
+        .join()
+        .hashCode;
     final index = seed.abs() % _frameColors.length;
     return _frameColors[index];
   }
@@ -42,7 +70,9 @@ class LayoutPostFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     if (urls.isEmpty) return const SizedBox.shrink();
 
-    final orderedUrls = sortedUrls;
+    // Không cần sort cho local files vì chúng đã được sắp xếp
+    // final orderedUrls = sortedUrls;
+    final orderedUrls = urls;
 
     return _buildFrameLayout(orderedUrls);
   }
@@ -61,7 +91,7 @@ class LayoutPostFrame extends StatelessWidget {
             aspectRatio: 1.0,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+              child: _buildImageWidget(orderedUrls[0]),
             ),
           ),
         ),
@@ -83,11 +113,7 @@ class LayoutPostFrame extends StatelessWidget {
                     height: 250.h,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        orderedUrls[0].url,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
+                      child: _buildImageWidget(orderedUrls[0]),
                     ),
                   ),
                 ),
@@ -102,11 +128,7 @@ class LayoutPostFrame extends StatelessWidget {
                     height: 250.h,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        orderedUrls[1].url,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
+                      child: _buildImageWidget(orderedUrls[1]),
                     ),
                   ),
                 ),
@@ -155,11 +177,7 @@ class LayoutPostFrame extends StatelessWidget {
             height: 250.h,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                orderedUrls[0].url,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
+              child: _buildImageWidget(orderedUrls[0]),
             ),
           ),
         ),
@@ -172,11 +190,7 @@ class LayoutPostFrame extends StatelessWidget {
             height: 250.h,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
-                orderedUrls[1].url,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
+              child: _buildImageWidget(orderedUrls[1]),
             ),
           ),
         ),
@@ -196,11 +210,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 300.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  orderedUrls[2].url,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: _buildImageWidget(orderedUrls[2]),
               ),
             ),
           )
@@ -211,11 +221,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 180.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  orderedUrls[2].url,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: _buildImageWidget(orderedUrls[2]),
               ),
             ),
           ),
@@ -227,11 +233,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 180.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  orderedUrls[3].url,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: _buildImageWidget(orderedUrls[3]),
               ),
             ),
           ),
@@ -239,18 +241,14 @@ class LayoutPostFrame extends StatelessWidget {
         if (maxImages >= 5) ...[
           SizedBox(height: 10.h),
           orderedUrls.length > 5
-              ? _buildOverlayImage(orderedUrls[4].url, orderedUrls.length - 5)
+              ? _buildOverlayImage(orderedUrls[4], orderedUrls.length - 5)
               : GestureDetector(
                   onTap: () => onImageTap(4),
                   child: SizedBox(
                     height: 180.h,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        orderedUrls[4].url,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
+                      child: _buildImageWidget(orderedUrls[4]),
                     ),
                   ),
                 ),
@@ -259,7 +257,7 @@ class LayoutPostFrame extends StatelessWidget {
     );
   }
 
-  Widget _buildOverlayImage(String imageUrl, int remaining) {
+  Widget _buildOverlayImage(dynamic imageData, int remaining) {
     return GestureDetector(
       onTap: () => onImageTap(4),
       child: SizedBox(
@@ -271,11 +269,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 180.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: _buildImageWidget(imageData),
               ),
             ),
 

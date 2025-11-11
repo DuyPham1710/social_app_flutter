@@ -15,6 +15,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/reset_password_pa
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 
@@ -30,6 +31,7 @@ Future<void> main() async {
   final friendBloc = s1<FriendBloc>();
   final homeStoriesBloc = s1<HomeStoriesBloc>();
   final menuBloc = s1<MenuBloc>();
+  final postBloc = s1<PostBloc>();
 
   runApp(
     MultiBlocProvider(
@@ -39,6 +41,7 @@ Future<void> main() async {
         BlocProvider.value(value: friendBloc),
         BlocProvider.value(value: homeStoriesBloc),
         BlocProvider.value(value: menuBloc),
+        BlocProvider.value(value: postBloc),
       ],
       child: MyApp(),
     ),

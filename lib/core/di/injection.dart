@@ -52,7 +52,9 @@ import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_useca
 import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/create_post_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/profile/data/repository/user_repository_impl.dart';
 import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
@@ -65,6 +67,12 @@ import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:social_app_fe/features/profile/data/data_sources/user_remote_data_source.dart';
+import 'package:social_app_fe/features/privacy/data/data_sources/remote/privacy_remote_data_source.dart';
+import 'package:social_app_fe/features/privacy/data/repository/privacy_repository_impl.dart';
+import 'package:social_app_fe/features/privacy/domain/repository/privacy_repository.dart';
+import 'package:social_app_fe/features/privacy/domain/usecases/get_default_privacy_usecase.dart';
+import 'package:social_app_fe/features/privacy/domain/usecases/set_default_privacy_usecase.dart';
+import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -90,6 +98,10 @@ Future<void> initializeDependencies() async {
     () => StoryRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<PrivacyRemoteDataSource>(
+    () => PrivacyRemoteDataSource(s1()),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
@@ -98,6 +110,9 @@ Future<void> initializeDependencies() async {
     () => CommentRepositoryImpl(s1()),
   );
   s1.registerLazySingleton<StoryRepository>(() => StoryRepositoryImpl(s1()));
+  s1.registerLazySingleton<PrivacyRepository>(
+    () => PrivacyRepositoryImpl(s1()),
+  );
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
@@ -120,6 +135,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetPostDetailUsecase>(
     () => GetPostDetailUsecase(s1()),
   );
+  s1.registerLazySingleton<CreatePostUsecase>(() => CreatePostUsecase(s1()));
 
   s1.registerLazySingleton<GetProfilePostsUseCase>(
     () => GetProfilePostsUseCase(s1()),
@@ -224,6 +240,15 @@ Future<void> initializeDependencies() async {
     () => GetHomeStoriesUsecase(s1()),
   );
 
+  // Privacy UseCases
+  s1.registerLazySingleton<GetDefaultPrivacyUseCase>(
+    () => GetDefaultPrivacyUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<SetDefaultPrivacyUseCase>(
+    () => SetDefaultPrivacyUseCase(s1()),
+  );
+
   s1.registerFactory(() => MenuBloc(s1()));
 
   // Blocs
@@ -257,6 +282,8 @@ Future<void> initializeDependencies() async {
       loadCommentsUseCase: s1(),
     ),
   );
+
+  s1.registerFactory<PostBloc>(() => PostBloc(s1()));
 
   s1.registerFactory<CommentBloc>(
     () => CommentBloc(
@@ -295,6 +322,8 @@ Future<void> initializeDependencies() async {
   s1.registerFactory<HomeStoriesBloc>(
     () => HomeStoriesBloc(getHomeStoriesUseCase: s1()),
   );
+
+  s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
 }
 
 class sl {}

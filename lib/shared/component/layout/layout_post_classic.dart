@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
 
 class LayoutPostClassic extends StatelessWidget {
   final List<dynamic> urls;
@@ -11,17 +12,43 @@ class LayoutPostClassic extends StatelessWidget {
     required this.onImageTap,
   });
 
+  // chưa dùng đến
   List<dynamic> get sortedUrls {
     final List<dynamic> sorted = List.from(urls);
     sorted.sort((a, b) => a.order.compareTo(b.order));
     return sorted;
   }
 
+  Widget _buildImageWidget(dynamic imageData) {
+    if (imageData is File) {
+      return Image.file(imageData, fit: BoxFit.cover, width: double.infinity);
+    } else if (imageData is String) {
+      return Image.network(
+        imageData,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    } else if (imageData != null && imageData.url != null) {
+      return Image.network(
+        imageData.url,
+        fit: BoxFit.cover,
+        width: double.infinity,
+      );
+    } else {
+      return Container(
+        color: Colors.grey[300],
+        child: Icon(Icons.image, color: Colors.grey[600]),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (urls.isEmpty) return const SizedBox.shrink();
 
-    final orderedUrls = sortedUrls;
+    // Không cần sort cho local files vì chúng đã được sắp xếp
+    // final orderedUrls = sortedUrls;
+    final orderedUrls = urls;
 
     if (orderedUrls.length == 1) {
       // 1 hình: hiển thị bình thường
@@ -31,11 +58,7 @@ class LayoutPostClassic extends StatelessWidget {
           aspectRatio: 1.0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
-            child: Image.network(
-              orderedUrls[0].url,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: _buildImageWidget(orderedUrls[0]),
           ),
         ),
       );
@@ -50,7 +73,7 @@ class LayoutPostClassic extends StatelessWidget {
               flex: 1,
               child: GestureDetector(
                 onTap: () => onImageTap(0),
-                child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+                child: _buildImageWidget(orderedUrls[0]),
               ),
             ),
 
@@ -61,7 +84,7 @@ class LayoutPostClassic extends StatelessWidget {
               flex: 1,
               child: GestureDetector(
                 onTap: () => onImageTap(1),
-                child: Image.network(orderedUrls[1].url, fit: BoxFit.cover),
+                child: _buildImageWidget(orderedUrls[1]),
               ),
             ),
           ],
@@ -84,14 +107,14 @@ class LayoutPostClassic extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(0),
-                  child: Image.network(orderedUrls[0].url, fit: BoxFit.cover),
+                  child: _buildImageWidget(orderedUrls[0]),
                 ),
               ),
               SizedBox(width: 4.w),
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(1),
-                  child: Image.network(orderedUrls[1].url, fit: BoxFit.cover),
+                  child: _buildImageWidget(orderedUrls[1]),
                 ),
               ),
             ],
@@ -129,7 +152,7 @@ class LayoutPostClassic extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(orderedUrls[i].url, fit: BoxFit.cover),
+                  _buildImageWidget(orderedUrls[i]),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.5),
@@ -155,7 +178,7 @@ class LayoutPostClassic extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () => onImageTap(i),
-              child: Image.network(orderedUrls[i].url, fit: BoxFit.cover),
+              child: _buildImageWidget(orderedUrls[i]),
             ),
           ),
         );

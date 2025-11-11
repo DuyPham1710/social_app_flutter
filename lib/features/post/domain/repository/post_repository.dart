@@ -1,4 +1,5 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_list_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
@@ -19,4 +20,6 @@ abstract class PostRepository {
     int page = 1,
     int limit = 10,
   });
+
+  Future<DataState<String>> createPost({required CreatePostEntity post});
 }

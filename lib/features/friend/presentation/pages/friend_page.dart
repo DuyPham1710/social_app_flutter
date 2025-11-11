@@ -32,13 +32,11 @@ class _FriendPageState extends State<FriendPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: const Text('Friend'),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(CupertinoIcons.search),
-          ),
+          IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.search)),
         ],
       ),
       body: SafeArea(
@@ -54,9 +52,7 @@ class _FriendPageState extends State<FriendPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FriendHeaderChips(
-                  onNeedRefresh: _loadData,
-                ),
+                FriendHeaderChips(onNeedRefresh: _loadData),
                 SizedBox(height: 16.h),
 
                 // Lời mời kết bạn
@@ -82,9 +78,7 @@ class _FriendPageState extends State<FriendPage> {
                 SizedBox(height: 20.h),
 
                 // Những người bạn có thể biết
-                _buildSectionHeader(
-                  title: 'Những người bạn có thể biết',
-                ),
+                _buildSectionHeader(title: 'Những người bạn có thể biết'),
                 SizedBox(height: 8.h),
                 _buildFriendSuggestionsSection(),
               ],
@@ -121,7 +115,11 @@ class _FriendPageState extends State<FriendPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(state.message)),
                 ],
@@ -140,12 +138,13 @@ class _FriendPageState extends State<FriendPage> {
         buildWhen: (previous, current) {
           // Rebuild khi có FriendPageLoaded hoặc các state liên quan đến friend requests
           return current is FriendPageLoaded ||
-                 current is FriendRequestsLoading ||
-                 current is FriendRequestsLoaded ||
-                 (current is FriendError && previous is FriendRequestsLoading);
+              current is FriendRequestsLoading ||
+              current is FriendRequestsLoaded ||
+              (current is FriendError && previous is FriendRequestsLoading);
         },
         builder: (context, state) {
-          if (state is FriendRequestsLoading || (state is FriendPageLoaded && state.isLoadingRequests)) {
+          if (state is FriendRequestsLoading ||
+              (state is FriendPageLoaded && state.isLoadingRequests)) {
             return Container(
               height: 120.h,
               decoration: BoxDecoration(
@@ -159,21 +158,20 @@ class _FriendPageState extends State<FriendPage> {
                   ),
                 ],
               ),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             );
-          } else if (state is FriendRequestsLoaded || state is FriendPageLoaded) {
-            final friendRequests = state is FriendRequestsLoaded 
-                ? state.friendRequests 
+          } else if (state is FriendRequestsLoaded ||
+              state is FriendPageLoaded) {
+            final friendRequests = state is FriendRequestsLoaded
+                ? state.friendRequests
                 : (state as FriendPageLoaded).friendRequests;
-            final acceptedRequestIds = state is FriendRequestsLoaded 
-                ? state.acceptedRequestIds 
+            final acceptedRequestIds = state is FriendRequestsLoaded
+                ? state.acceptedRequestIds
                 : (state as FriendPageLoaded).acceptedRequestIds;
-            final rejectedRequestIds = state is FriendRequestsLoaded 
-                ? state.rejectedRequestIds 
+            final rejectedRequestIds = state is FriendRequestsLoaded
+                ? state.rejectedRequestIds
                 : (state as FriendPageLoaded).rejectedRequestIds;
-            
+
             if (friendRequests.isEmpty) {
               return Container(
                 height: 100.h,
@@ -211,7 +209,7 @@ class _FriendPageState extends State<FriendPage> {
                 ),
               );
             }
-            
+
             // Hiển thị tối đa 3 lời mời đầu tiên
             return Container(
               decoration: BoxDecoration(
@@ -227,8 +225,12 @@ class _FriendPageState extends State<FriendPage> {
               ),
               child: Column(
                 children: friendRequests.take(3).map((request) {
-                  final isAccepted = acceptedRequestIds.contains(request.requestId);
-                  final isRejected = rejectedRequestIds.contains(request.requestId);
+                  final isAccepted = acceptedRequestIds.contains(
+                    request.requestId,
+                  );
+                  final isRejected = rejectedRequestIds.contains(
+                    request.requestId,
+                  );
                   return FriendRequestItem(
                     name: request.displayName,
                     mutualFriends: request.displayMutualFriends,
@@ -301,7 +303,7 @@ class _FriendPageState extends State<FriendPage> {
               ),
             );
           }
-          
+
           return const SizedBox.shrink();
         },
       ),
@@ -333,69 +335,70 @@ class _FriendPageState extends State<FriendPage> {
         buildWhen: (previous, current) {
           // Rebuild khi có FriendPageLoaded hoặc các state liên quan đến friend suggestions
           return current is FriendPageLoaded ||
-                 current is FriendSuggestionsLoading ||
-                 current is FriendSuggestionsLoaded ||
-                 current is FriendActionSuccess ||
-                 current is FriendActionError ||
-                 (current is FriendError && previous is FriendSuggestionsLoading);
+              current is FriendSuggestionsLoading ||
+              current is FriendSuggestionsLoaded ||
+              current is FriendActionSuccess ||
+              current is FriendActionError ||
+              (current is FriendError && previous is FriendSuggestionsLoading);
         },
         builder: (context, state) {
-        if (state is FriendSuggestionsLoading || (state is FriendPageLoaded && state.isLoadingSuggestions)) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is FriendSuggestionsLoaded || state is FriendPageLoaded) {
-          final friendSuggestions = state is FriendSuggestionsLoaded 
-              ? state.friendSuggestions 
-              : (state as FriendPageLoaded).friendSuggestions;
-          final sentRequestUserIds = state is FriendSuggestionsLoaded 
-              ? state.sentRequestUserIds 
-              : (state as FriendPageLoaded).sentRequestUserIds;
-          
-          return Column(
-            children: friendSuggestions.map((suggestion) {
-              final isSent = sentRequestUserIds.contains(suggestion.userId);
-              return FriendSuggestionItem(
-                name: suggestion.fullName ?? 'Người dùng',
-                mutualFriends: suggestion.mutualFriends ?? 0,
-                avatarUrl: suggestion.avatarUrl ?? 'https://i.pravatar.cc/150?img=30',
-                mutualFriendAvatars: suggestion.mutualFriendAvatars,
-                isSent: isSent,
-                onAddFriend: () {
-                  context.read<FriendBloc>().add(
-                    SendFriendRequest(receiverId: suggestion.userId),
-                  );
-                },
-              );
-            }).toList(),
-          );
-        } else if (state is FriendError) {
-          return Column(
-            children: List.generate(
-              3,
-              (index) => FriendSuggestionItem(
-                name: 'Người dùng ${index + 1}',
-                mutualFriends: 5 + index,
-                avatarUrl: 'https://i.pravatar.cc/150?img=${index + 10}',
-                onAddFriend: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Chức năng đang được phát triển'),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
-                },
+          if (state is FriendSuggestionsLoading ||
+              (state is FriendPageLoaded && state.isLoadingSuggestions)) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is FriendSuggestionsLoaded ||
+              state is FriendPageLoaded) {
+            final friendSuggestions = state is FriendSuggestionsLoaded
+                ? state.friendSuggestions
+                : (state as FriendPageLoaded).friendSuggestions;
+            final sentRequestUserIds = state is FriendSuggestionsLoaded
+                ? state.sentRequestUserIds
+                : (state as FriendPageLoaded).sentRequestUserIds;
+
+            return Column(
+              children: friendSuggestions.map((suggestion) {
+                final isSent = sentRequestUserIds.contains(suggestion.userId);
+                return FriendSuggestionItem(
+                  name: suggestion.fullName ?? 'Người dùng',
+                  mutualFriends: suggestion.mutualFriends ?? 0,
+                  avatarUrl:
+                      suggestion.avatarUrl ??
+                      'https://i.pravatar.cc/150?img=30',
+                  mutualFriendAvatars: suggestion.mutualFriendAvatars,
+                  isSent: isSent,
+                  onAddFriend: () {
+                    context.read<FriendBloc>().add(
+                      SendFriendRequest(receiverId: suggestion.userId),
+                    );
+                  },
+                );
+              }).toList(),
+            );
+          } else if (state is FriendError) {
+            return Column(
+              children: List.generate(
+                3,
+                (index) => FriendSuggestionItem(
+                  name: 'Người dùng ${index + 1}',
+                  mutualFriends: 5 + index,
+                  avatarUrl: 'https://i.pravatar.cc/150?img=${index + 10}',
+                  onAddFriend: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Chức năng đang được phát triển'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          );
-        }
-        
-        return const SizedBox.shrink();
-      },
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
       ),
     );
   }
-
 
   Widget _buildSectionHeader({
     required String title,
@@ -429,6 +432,3 @@ class _FriendPageState extends State<FriendPage> {
     );
   }
 }
-
-
-
