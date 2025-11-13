@@ -41,4 +41,11 @@ abstract class PostRemoteDataSource {
     @Part(name: 'friends_detail') String? friendsDetail,
     @Part(name: 'files') List<MultipartFile>? files,
   );
+
+  @GET('/post/user/{userId}')
+  Future<PostListModel> getUserPosts(
+    @Path('userId') String userId,
+    @Query('page') int page,
+    @Query('limit') int limit,
+  );
 }

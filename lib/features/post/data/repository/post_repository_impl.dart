@@ -70,6 +70,20 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
+  Future<DataState<PostListModel>> getUserPosts({
+    required String userId,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      final response = await remoteDataSource.getUserPosts(userId, page, limit);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
   Future<DataState<String>> createPost({required CreatePostEntity post}) async {
     try {
       final model = CreatePostModel.fromEntity(post);

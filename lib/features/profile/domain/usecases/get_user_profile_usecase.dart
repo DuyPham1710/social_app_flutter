@@ -12,4 +12,6 @@ class GetUserProfileUseCase implements UseCase<DataState<UserEntity>, void> {
   Future<DataState<UserEntity>> call({void params}) {
     return _userRepository.getUserProfile();
   }
+
+  
 }
