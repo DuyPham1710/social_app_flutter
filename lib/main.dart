@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/config/theme/app_theme.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/app/presentation/pages/main_page.dart';
+import 'package:social_app_fe/features/app/presentation/pages/splash_page.dart';
+import 'package:social_app_fe/features/app/presentation/widgets/restart_widget.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/login_page.dart';
@@ -23,27 +25,29 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  print('BASE_URL: ${dotenv.env['BASE_URL']}');
+  // print('BASE_URL: ${dotenv.env['BASE_URL']}');
   await initializeDependencies();
 
-  final authBloc = s1<AuthBloc>();
-  final homeBloc = s1<HomeBloc>();
-  final friendBloc = s1<FriendBloc>();
-  final homeStoriesBloc = s1<HomeStoriesBloc>();
-  final menuBloc = s1<MenuBloc>();
-  final postBloc = s1<PostBloc>();
+  // final authBloc = s1<AuthBloc>();
+  // final homeBloc = s1<HomeBloc>();
+  // final friendBloc = s1<FriendBloc>();
+  // final homeStoriesBloc = s1<HomeStoriesBloc>();
+  // final menuBloc = s1<MenuBloc>();
+  // final postBloc = s1<PostBloc>();
 
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: authBloc),
-        BlocProvider.value(value: homeBloc),
-        BlocProvider.value(value: friendBloc),
-        BlocProvider.value(value: homeStoriesBloc),
-        BlocProvider.value(value: menuBloc),
-        BlocProvider.value(value: postBloc),
-      ],
-      child: MyApp(),
+    RestartWidget(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => s1<AuthBloc>()),
+          BlocProvider(create: (_) => s1<HomeBloc>()),
+          BlocProvider(create: (_) => s1<FriendBloc>()),
+          BlocProvider(create: (_) => s1<HomeStoriesBloc>()),
+          BlocProvider(create: (_) => s1<MenuBloc>()),
+          BlocProvider(create: (_) => s1<PostBloc>()),
+        ],
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -62,8 +66,9 @@ class MyApp extends StatelessWidget {
           title: 'Namer App',
           debugShowCheckedModeBanner: false,
           theme: theme(),
-          initialRoute: '/login',
+          initialRoute: '/splash',
           routes: <String, WidgetBuilder>{
+            '/splash': (context) => const SplashPage(),
             '/main': (BuildContext context) => const MainPage(),
             '/login': (BuildContext context) => const LoginPage(),
             '/home': (BuildContext context) => const HomePage(),

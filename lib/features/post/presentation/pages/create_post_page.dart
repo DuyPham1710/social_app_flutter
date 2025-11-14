@@ -11,6 +11,9 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_event.dart';
@@ -41,6 +44,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
   late PrivacyType _selectedPrivacy;
   String _selectedPrivacyLabel = '';
   bool _isCreatingPost = false;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<MenuBloc>().add(LoadCurrentUserEvent());
+  }
 
   @override
   void dispose() {
@@ -388,154 +397,183 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
               child: Column(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 20.r,
-                        backgroundImage: NetworkImage(
-                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
-                        ),
-                      ),
+                  BlocBuilder<MenuBloc, MenuState>(
+                    builder: (context, state) {
+                      if (state is MenuLoadingState) {
+                        return const Center(
+                          child: CupertinoActivityIndicator(),
+                        );
+                      }
 
-                      SizedBox(width: 12.w),
+                      if (state is MenuLoadedState) {
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 20.r,
+                              backgroundImage: NetworkImage(
+                                state.user.avatarUrl ??
+                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+                              ),
+                            ),
 
-                      Expanded(
-                        child: GestureDetector(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
-                                  vertical: 8.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.circular(14.r),
-                                ),
+                            SizedBox(width: 12.w),
 
+                            Expanded(
+                              child: GestureDetector(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Phạm Duy',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.sp,
-                                        color: AppColors.textPrimary,
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w,
+                                        vertical: 8.h,
                                       ),
-                                    ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.background,
+                                        borderRadius: BorderRadius.circular(
+                                          14.r,
+                                        ),
+                                      ),
 
-                                    SizedBox(height: 8.h),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            state.user.fullName ?? 'unknown',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13.sp,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
 
-                                    BlocProvider(
-                                      create: (_) =>
-                                          s1<PrivacyBloc>()
-                                            ..add(GetDefaultPrivacyRequested()),
-                                      child: BlocBuilder<PrivacyBloc, PrivacyState>(
-                                        builder: (context, state) {
-                                          if (state is PrivacyLoading) {
-                                            return const CupertinoActivityIndicator();
-                                          }
+                                          SizedBox(height: 8.h),
 
-                                          if (state is PrivacyLoaded) {
-                                            _selectedPrivacyLabel =
-                                                state.selectedPrivacy;
-                                            _selectedPrivacy =
-                                                PrivacyUtil.labelToPrivacyType(
-                                                  state.selectedPrivacy,
-                                                );
-                                          }
+                                          BlocProvider(
+                                            create: (_) => s1<PrivacyBloc>()
+                                              ..add(
+                                                GetDefaultPrivacyRequested(),
+                                              ),
+                                            child: BlocBuilder<PrivacyBloc, PrivacyState>(
+                                              builder: (context, state) {
+                                                if (state is PrivacyLoading) {
+                                                  return const CupertinoActivityIndicator();
+                                                }
 
-                                          return GestureDetector(
-                                            onTap: () async {
-                                              final result = await Navigator.push(
-                                                context,
-                                                CupertinoPageRoute(
-                                                  builder: (_) => BlocProvider.value(
-                                                    value: context
-                                                        .read<
-                                                          PrivacyBloc
-                                                        >(), // dùng lại bloc
-                                                    child: PrivacyPage(
-                                                      selectedOption:
-                                                          _selectedPrivacyLabel,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-
-                                              if (result != null) {
-                                                setState(() {
+                                                if (state is PrivacyLoaded) {
                                                   _selectedPrivacyLabel =
-                                                      result;
-
+                                                      state.selectedPrivacy;
                                                   _selectedPrivacy =
                                                       PrivacyUtil.labelToPrivacyType(
-                                                        result,
+                                                        state.selectedPrivacy,
                                                       );
-                                                });
-                                              }
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 10.h,
-                                                vertical: 4.w,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Color(
-                                                  0xFF3B82F6,
-                                                ).withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.r),
-                                              ),
+                                                }
 
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    getIcon(
-                                                      _selectedPrivacyLabel,
+                                                return GestureDetector(
+                                                  onTap: () async {
+                                                    final result = await Navigator.push(
+                                                      context,
+                                                      CupertinoPageRoute(
+                                                        builder: (_) =>
+                                                            BlocProvider.value(
+                                                              value: context
+                                                                  .read<
+                                                                    PrivacyBloc
+                                                                  >(), // dùng lại bloc
+                                                              child: PrivacyPage(
+                                                                selectedOption:
+                                                                    _selectedPrivacyLabel,
+                                                              ),
+                                                            ),
+                                                      ),
+                                                    );
+
+                                                    if (result != null) {
+                                                      setState(() {
+                                                        _selectedPrivacyLabel =
+                                                            result;
+
+                                                        _selectedPrivacy =
+                                                            PrivacyUtil.labelToPrivacyType(
+                                                              result,
+                                                            );
+                                                      });
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          horizontal: 10.h,
+                                                          vertical: 4.w,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: Color(
+                                                        0xFF3B82F6,
+                                                      ).withOpacity(0.1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8.r,
+                                                          ),
                                                     ),
-                                                    color: Color(0xFF3B82F6),
-                                                    size: 14.sp,
-                                                  ),
 
-                                                  SizedBox(width: 4.w),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Icon(
+                                                          getIcon(
+                                                            _selectedPrivacyLabel,
+                                                          ),
+                                                          color: Color(
+                                                            0xFF3B82F6,
+                                                          ),
+                                                          size: 14.sp,
+                                                        ),
 
-                                                  Text(
-                                                    _selectedPrivacyLabel,
-                                                    style: TextStyle(
-                                                      color: Color(0xFF3B82F6),
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 13.sp,
+                                                        SizedBox(width: 4.w),
+
+                                                        Text(
+                                                          _selectedPrivacyLabel,
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                              0xFF3B82F6,
+                                                            ),
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 13.sp,
+                                                          ),
+                                                        ),
+
+                                                        SizedBox(width: 2.w),
+
+                                                        Icon(
+                                                          Icons.arrow_drop_down,
+                                                          color: Color(
+                                                            0xFF3B82F6,
+                                                          ),
+                                                          size: 18.sp,
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-
-                                                  SizedBox(width: 2.w),
-
-                                                  Icon(
-                                                    Icons.arrow_drop_down,
-                                                    color: Color(0xFF3B82F6),
-                                                    size: 18.sp,
-                                                  ),
-                                                ],
-                                              ),
+                                                );
+                                              },
                                             ),
-                                          );
-                                        },
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                            ),
+                          ],
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
                   ),
 
                   SizedBox(height: 14.h),

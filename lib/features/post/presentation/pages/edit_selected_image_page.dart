@@ -1,10 +1,14 @@
 import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_editor_plus/image_editor_plus.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/video_util.dart';
+import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
+import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class EditSelectedImagePage extends StatefulWidget {
   final List<File> imageFiles;
@@ -42,6 +46,15 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  // Method to show full screen video player
+  void _showVideoPlayer(File videoFile) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VideoPlayerScreen(videoData: videoFile),
+      ),
+    );
   }
 
   @override
@@ -127,54 +140,152 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                 padding: EdgeInsets.only(bottom: 6.h),
                 child: GestureDetector(
                   onTap: () {
-                    // mở ảnh toàn màn hình khi nhấn
-                    //    _showFullScreenImage(context, imageIndex);
+                    // Check if it's a video or image and handle accordingly
+                    if (VideoUtil.isVideo(widget.imageFiles[index])) {
+                      _showVideoPlayer(widget.imageFiles[index]);
+                    } else {
+                      // mở ảnh toàn màn hình khi nhấn
+                      //    _showFullScreenImage(context, imageIndex);
+                    }
                   },
                   child: Stack(
                     children: [
-                      Image.file(
-                        widget.imageFiles[index],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
+                      Stack(
+                        children: [
+                          // Check if it's video or image and display accordingly
+                          VideoUtil.isVideo(widget.imageFiles[index])
+                              ? buildVideoThumbnail()
+                              : Image.file(
+                                  widget.imageFiles[index],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  key: ValueKey(
+                                    '${widget.imageFiles[index].path}_${widget.imageFiles[index].lastModifiedSync().millisecondsSinceEpoch}',
+                                  ),
+                                ),
+                        ],
                       ),
 
                       Positioned(
                         top: 10.h,
                         left: 10.w,
-                        child: GestureDetector(
-                          onTap: () {
-                            // TODO: xử lý khi nhấn chỉnh sửa (mở crop, filter, v.v.)
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 6.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.background.withOpacity(0.8),
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.edit,
-                                  color: AppColors.textPrimary,
-                                  size: 16.sp,
+                        child: VideoUtil.isVideo(widget.imageFiles[index])
+                            ? Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 6.h,
                                 ),
-                                SizedBox(width: 4.w),
-                                Text(
-                                  'Chỉnh sửa',
-                                  style: TextStyle(
-                                    color: AppColors.textPrimary,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w500,
+                                decoration: BoxDecoration(
+                                  color: AppColors.background.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.videocam,
+                                      color: AppColors.textSecondary,
+                                      size: 16.sp,
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      'Video',
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () async {
+                                  try {
+                                    // Đọc dữ liệu byte từ ảnh gốc
+                                    final imageBytes = await widget
+                                        .imageFiles[index]
+                                        .readAsBytes();
+
+                                    // Mở trình chỉnh sửa ảnh
+                                    final editedImage = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ImageEditor(image: imageBytes),
+                                      ),
+                                    );
+
+                                    // Nếu người dùng đã chỉnh sửa xong và quay lại
+                                    if (editedImage != null &&
+                                        editedImage is Uint8List) {
+                                      // Tạo tên file mới với timestamp để tránh cache
+                                      final timestamp =
+                                          DateTime.now().millisecondsSinceEpoch;
+                                      final directory =
+                                          widget.imageFiles[index].parent;
+                                      final fileName = widget
+                                          .imageFiles[index]
+                                          .path
+                                          .split('/')
+                                          .last;
+                                      final nameWithoutExt = fileName
+                                          .split('.')
+                                          .first;
+                                      final extension = fileName
+                                          .split('.')
+                                          .last;
+                                      final newPath =
+                                          '${directory.path}/${nameWithoutExt}_edited_$timestamp.$extension';
+
+                                      final newFile = File(newPath);
+
+                                      // Ghi ảnh đã chỉnh sửa vào file mới
+                                      await newFile.writeAsBytes(editedImage);
+
+                                      // Clear image cache để force reload
+                                      imageCache.clear();
+                                      imageCache.clearLiveImages();
+
+                                      setState(() {
+                                        // Cập nhật với file mới
+                                        widget.imageFiles[index] = newFile;
+                                      });
+                                    }
+                                  } catch (e) {
+                                    print("Lỗi khi chỉnh sửa ảnh: $e");
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w,
+                                    vertical: 6.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.background.withOpacity(
+                                      0.8,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.edit,
+                                        color: AppColors.textPrimary,
+                                        size: 16.sp,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        'Chỉnh sửa',
+                                        style: TextStyle(
+                                          color: AppColors.textPrimary,
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              ),
                       ),
 
                       Positioned(

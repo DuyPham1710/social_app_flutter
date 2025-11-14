@@ -326,4 +326,7 @@ Future<void> initializeDependencies() async {
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
 }
 
-class sl {}
+Future<void> resetDependencies() async {
+  await s1.reset(dispose: true);
+  await initializeDependencies(); // đăng ký lại DI toàn bộ
+}

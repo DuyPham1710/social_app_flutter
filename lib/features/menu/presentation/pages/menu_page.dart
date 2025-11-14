@@ -7,7 +7,6 @@ import '../bloc/menu_state.dart';
 import '../widgets/menu_header.dart';
 import '../widgets/menu_section.dart';
 import '../widgets/menu_footer.dart';
-import '../../../../../shared/component/layout/icon_text_tile.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 
