@@ -50,6 +50,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     on<RejectFriendRequest>(_onRejectFriendRequest);
     on<CancelSentFriendRequest>(_onCancelSentFriendRequest);
     on<RemoveFriend>(_onRemoveFriend);
+    on<RemoveFriendSuggestion>(_onRemoveFriendSuggestion);
     on<SortFriendRequests>(_onSortFriendRequests);
     on<FilterFriendRequests>(_onFilterFriendRequests);
   }
@@ -474,6 +475,28 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     } else if (dataState is DataStateError) {
       final errorMessage = _getErrorMessage(dataState.error);
       emit(FriendActionError(message: errorMessage));
+    }
+  }
+
+  Future<void> _onRemoveFriendSuggestion(
+    RemoveFriendSuggestion event,
+    Emitter<FriendState> emit,
+  ) async {
+    final currentState = state;
+
+    // Xóa gợi ý khỏi danh sách trong state hiện tại
+    if (currentState is FriendPageLoaded) {
+      final updatedSuggestions = currentState.friendSuggestions
+          .where((suggestion) => suggestion.userId != event.userId)
+          .toList();
+
+      emit(currentState.copyWith(friendSuggestions: updatedSuggestions));
+    } else if (currentState is FriendSuggestionsLoaded) {
+      final updatedSuggestions = currentState.friendSuggestions
+          .where((suggestion) => suggestion.userId != event.userId)
+          .toList();
+
+      emit(currentState.copyWith(friendSuggestions: updatedSuggestions));
     }
   }
 }

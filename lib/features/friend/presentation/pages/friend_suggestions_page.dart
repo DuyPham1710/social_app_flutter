@@ -293,6 +293,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             SendFriendRequest(receiverId: suggestion.userId),
           );
         },
+        onRemove: () {
+          context.read<FriendBloc>().add(
+            RemoveFriendSuggestion(userId: suggestion.userId),
+          );
+        },
       ),
     );
   }
