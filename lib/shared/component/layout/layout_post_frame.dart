@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
+import 'package:social_app_fe/core/utils/video_util.dart';
 
 class LayoutPostFrame extends StatelessWidget {
   final List<dynamic> urls;
@@ -20,26 +21,103 @@ class LayoutPostFrame extends StatelessWidget {
   }
 
   Widget _buildImageWidget(dynamic imageData) {
+    Widget mediaWidget;
+
     if (imageData is File) {
-      return Image.file(imageData, fit: BoxFit.cover, width: double.infinity);
+      // Check if it's a video file first
+      if (VideoUtil.isVideo(imageData)) {
+        // For video files, show a black background with video icon
+        mediaWidget = Container(
+          color: Colors.grey[800],
+          child: Center(
+            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
+          ),
+        );
+      } else {
+        // For image files, show the image
+        mediaWidget = Image.file(
+          imageData,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.grey[300],
+              child: Icon(Icons.broken_image, color: Colors.grey[600]),
+            );
+          },
+        );
+      }
     } else if (imageData is String) {
-      return Image.network(
-        imageData,
-        fit: BoxFit.cover,
-        width: double.infinity,
-      );
+      if (VideoUtil.isVideo(imageData)) {
+        // For video URLs, show video icon
+        mediaWidget = Container(
+          color: Colors.grey[800],
+          child: Center(
+            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
+          ),
+        );
+      } else {
+        mediaWidget = Image.network(
+          imageData,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.grey[300],
+              child: Icon(Icons.broken_image, color: Colors.grey[600]),
+            );
+          },
+        );
+      }
     } else if (imageData != null && imageData.url != null) {
-      return Image.network(
-        imageData.url,
-        fit: BoxFit.cover,
-        width: double.infinity,
-      );
+      if (VideoUtil.isVideo(imageData)) {
+        mediaWidget = Container(
+          color: Colors.grey[800],
+          child: Center(
+            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
+          ),
+        );
+      } else {
+        mediaWidget = Image.network(
+          imageData.url,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.grey[300],
+              child: Icon(Icons.broken_image, color: Colors.grey[600]),
+            );
+          },
+        );
+      }
     } else {
-      return Container(
+      mediaWidget = Container(
         color: Colors.grey[300],
         child: Icon(Icons.image, color: Colors.grey[600]),
       );
     }
+
+    // If it's a video, add play icon overlay
+    // if (VideoUtil.isVideo(imageData)) {
+    //   return Stack(
+    //     fit: StackFit.expand,
+    //     children: [
+    //       mediaWidget,
+    //       Container(
+    //         color: Colors.black.withOpacity(0.3),
+    //         child: Center(
+    //           child: Icon(
+    //             Icons.play_circle_filled,
+    //             color: Colors.white,
+    //             size: 48.sp,
+    //           ),
+    //         ),
+    //       ),
+    //     ],
+    //   );
+    // }
+
+    return mediaWidget;
   }
 
   // Bộ màu pastel dễ nhìn cho background

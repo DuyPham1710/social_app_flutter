@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
-import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
-import 'package:social_app_fe/core/di/injection.dart';
-import 'package:social_app_fe/core/network/websocket/socket_client.dart';
-import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -28,6 +25,9 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   }
   Future<void> _onLogout(LogoutEvent event, Emitter<MenuState> emit) async {
     await TokenStorage.clear();
+
+    await resetDependencies();
+
     emit(MenuInitial());
   }
 }

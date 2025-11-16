@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/utils/react_post_util.dart';
+import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
@@ -17,10 +18,12 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.dart';
+import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
+import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostEntity post;
@@ -89,6 +92,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _commentBloc.close();
     _postDetailBloc.close();
     super.dispose();
+  }
+
+  void _showVideoPlayer(String videoUrl) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VideoPlayerScreen(videoData: videoUrl),
+      ),
+    );
   }
 
   void _handlleImageChanged(int newIndex) {
@@ -257,13 +268,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     child: GestureDetector(
                       onTap: () {
                         // mở ảnh toàn màn hình khi nhấn
-                        _showFullScreenImage(context, imageIndex);
+                        if (VideoUtil.isVideo(mediaUrls[imageIndex].url)) {
+                          _showVideoPlayer(mediaUrls[imageIndex].url);
+                        } else {
+                          _showFullScreenImage(context, imageIndex);
+                        }
                       },
-                      child: Image.network(
-                        mediaUrls[imageIndex].url,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
+                      child: VideoUtil.isVideo(mediaUrls[imageIndex].url)
+                          ? buildVideoThumbnail()
+                          : Image.network(
+                              mediaUrls[imageIndex].url,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
                     ),
                   ),
 
