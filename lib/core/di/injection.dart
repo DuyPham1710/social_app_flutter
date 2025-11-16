@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/network/dio_client.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
@@ -39,6 +40,7 @@ import 'package:social_app_fe/features/friend/domain/usecases/cancel_friend_requ
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_suggestions_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friends_by_userid_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_sent_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_request_usecase.dart';
@@ -61,6 +63,7 @@ import 'package:social_app_fe/features/profile/data/repository/user_repository_i
 import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
@@ -214,6 +217,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetCurrentUserUseCase>(
     () => GetCurrentUserUseCase(s1()),
   );
+  s1.registerLazySingleton<GetFriendsByUserIdUseCase>(
+    () => GetFriendsByUserIdUseCase(s1()),
+  );
 
   //profile
   // Profile Data Source
@@ -243,6 +249,7 @@ Future<void> initializeDependencies() async {
       getUserProfileUseCase: s1(),
     ),
   );
+
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),

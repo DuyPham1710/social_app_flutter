@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/relationship_status_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 
@@ -8,6 +9,8 @@ class OtherProfileState extends Equatable {
   final Map<String, int>? commentCounts;
   final UserEntity? user;
   final RelationshipStatusEntity? relationship;
+  final List<FriendEntity>? friends;
+
   final int? currentPage;
   final bool? hasNext;
   final String? error;
@@ -18,6 +21,7 @@ class OtherProfileState extends Equatable {
     this.commentCounts,
     this.user,
     this.relationship,
+    this.friends,
     this.currentPage,
     this.hasNext,
     this.error,
@@ -30,6 +34,7 @@ class OtherProfileState extends Equatable {
         commentCounts,
         user,
         relationship,
+        friends,
         currentPage,
         hasNext,
         error,
@@ -47,8 +52,10 @@ class OtherProfileLoaded extends OtherProfileState {
     super.commentCounts,
     super.user,
     super.relationship,
+    super.friends,
     super.currentPage,
     super.hasNext,
+    super.isLoadingMore,
   }) : super(posts: posts);
 
   OtherProfileLoaded copyWith({
@@ -56,6 +63,7 @@ class OtherProfileLoaded extends OtherProfileState {
     Map<String, int>? commentCounts,
     UserEntity? user,
     RelationshipStatusEntity? relationship,
+    List<FriendEntity>? friends,
     int? currentPage,
     bool? hasNext,
     bool? isLoadingMore,
@@ -65,11 +73,14 @@ class OtherProfileLoaded extends OtherProfileState {
       commentCounts: commentCounts ?? this.commentCounts,
       user: user ?? this.user,
       relationship: relationship ?? this.relationship,
+      friends: friends?? this.friends,
       currentPage: currentPage ?? this.currentPage,
       hasNext: hasNext ?? this.hasNext,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 }
+
 
 class OtherProfileError extends OtherProfileState {
   const OtherProfileError(String message) : super(error: message);

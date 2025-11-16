@@ -29,3 +29,15 @@ class UpdateOtherProfileCommentCountsEvent extends OtherProfileEvent {
   final Map<String, int> commentCounts;
   const UpdateOtherProfileCommentCountsEvent(this.commentCounts);
 }
+
+class ReloadRelationshipEvent extends OtherProfileEvent {
+  final String userId;
+  const ReloadRelationshipEvent(this.userId);
+}
+
+class LoadOtherProfileFriendsEvent extends OtherProfileEvent {
+  final String userId;
+  const LoadOtherProfileFriendsEvent(this.userId);
+}
+
+

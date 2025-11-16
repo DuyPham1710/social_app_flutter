@@ -38,6 +38,12 @@ abstract class FriendService {
   @GET('/friends/list')
   Future<List<FriendModel>> getFriends();
 
+  //Lấy danh sách bạn bè của 1 use
+  @GET('/friends/list/{targetUserId}')
+  Future<List<FriendModel>> getFriendsbyUserId(
+    @Path('targetUserId') String targetUserId,
+  );
+
   // Tìm kiếm bạn bè
   @GET('/friends/search')
   Future<List<FriendModel>> searchFriends(

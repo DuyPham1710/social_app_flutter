@@ -7,6 +7,7 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friends_by_userid_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
@@ -52,13 +53,14 @@ class PostHeader extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) => OtherProfileBloc(
               getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
+              getFriendsByUserIdUseCase: di.s1<GetFriendsByUserIdUseCase>(),
               getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
               getFriendRelationshipUseCase: di
                   .s1<GetFriendRelationshipUseCase>(),
               listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
               loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
             )..add(LoadOtherUserProfileEvent(userId: user.userId!)),
-            child: const OtherProfilePage(),
+            child: OtherProfilePage(userId: user.userId!),
           ),
         ),
       );

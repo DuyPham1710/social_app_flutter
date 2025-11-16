@@ -76,15 +76,17 @@ class FriendSuggestionItem extends StatelessWidget {
                   ),
                   SizedBox(height: 12.h), // Khoảng cách giữa thông tin và nút
                 ],
-                
+
                 // Nếu không có bạn chung, thêm space nhỏ hơn
-                if (mutualFriends == 0)
-                  SizedBox(height: 4.h),
+                if (mutualFriends == 0) SizedBox(height: 4.h),
 
                 // Các Nút hoặc thông báo
                 if (isSent)
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 16.w,
+                    ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
@@ -94,11 +96,7 @@ class FriendSuggestionItem extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.send,
-                          color: Colors.blue[700],
-                          size: 16.r,
-                        ),
+                        Icon(Icons.send, color: Colors.blue[700], size: 16.r),
                         SizedBox(width: 8.w),
                         Text(
                           'Đã gửi lời mời kết bạn',
@@ -144,7 +142,9 @@ class FriendSuggestionItem extends StatelessWidget {
 
   Widget _buildMutualFriendAvatars() {
     // Nếu không có avatars hoặc không có bạn chung, return empty widget
-    if (mutualFriends == 0 || mutualFriendAvatars == null || mutualFriendAvatars!.isEmpty) {
+    if (mutualFriends == 0 ||
+        mutualFriendAvatars == null ||
+        mutualFriendAvatars!.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -154,7 +154,7 @@ class FriendSuggestionItem extends StatelessWidget {
       child: Stack(
         children: List.generate(
           mutualFriendAvatars!.length.clamp(0, 3),
-              (index) => Positioned(
+          (index) => Positioned(
             left: index * 16.w,
             child: Container(
               width: 20.r,
