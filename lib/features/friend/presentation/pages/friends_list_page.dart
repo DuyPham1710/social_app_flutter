@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
+import 'package:social_app_fe/features/friend/data/data_sources/friend_online_service.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_item.dart';
 
@@ -17,17 +22,62 @@ class _FriendsListPageState extends State<FriendsListPage> {
   String _sortBy = 'name'; // 'name', 'recent', 'online'
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  
+  FriendOnlineService? _onlineService;
+  StreamSubscription<Map<String, FriendOnlineStatus>>? _friendsStatusSubscription;
+  Map<String, FriendOnlineStatus> _friendsStatus = {};
+  bool _hasInitializedFriendsStatus = false;
 
   @override
   void initState() {
     super.initState();
     // Load danh sách bạn bè khi khởi tạo
     context.read<FriendBloc>().add(const LoadFriends());
+    _initializeOnlineService();
+  }
+
+  Future<void> _initializeOnlineService() async {
+    try {
+      // Lấy thông tin user hiện tại
+      final userData = await TokenStorage.getUserData();
+      if (userData == null || !mounted) return;
+
+      final userId = userData['id']?.toString() ?? '';
+      final username = userData['username']?.toString() ?? 
+                      userData['fullName']?.toString() ?? 'User';
+
+      if (userId.isEmpty) return;
+
+      // Khởi tạo service
+      final socketClient = SocketClient();
+      _onlineService = FriendOnlineService(socketClient);
+      
+      // Kết nối và lắng nghe
+      _onlineService!.connect(userId, username);
+      
+      // Lắng nghe stream trạng thái bạn bè
+      _friendsStatusSubscription = _onlineService!.friendsStatusStream.listen(
+        (statusMap) {
+          if (mounted) {
+            setState(() {
+              _friendsStatus = statusMap;
+            });
+          }
+        },
+        onError: (error) {
+          debugPrint('Error in friends status stream: $error');
+        },
+      );
+    } catch (e) {
+      debugPrint('Error initializing online service: $e');
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _friendsStatusSubscription?.cancel();
+    _onlineService?.dispose();
     super.dispose();
   }
 
@@ -39,6 +89,16 @@ class _FriendsListPageState extends State<FriendsListPage> {
           _showMessage(context, state.message);
         } else if (state is FriendActionError) {
           _showMessage(context, state.message);
+        }
+        
+        // Khởi tạo trạng thái bạn bè khi có danh sách mới
+        if (state is FriendLoaded && 
+            _onlineService != null && 
+            !_hasInitializedFriendsStatus &&
+            state.friends.isNotEmpty) {
+          final friendIds = state.friends.map((f) => f.userId).toList();
+          _onlineService!.initializeFriendsStatus(friendIds);
+          _hasInitializedFriendsStatus = true;
         }
       },
       child: Scaffold(
@@ -73,6 +133,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
             );
           } else if (state is FriendLoaded) {
             final friends = state.friends;
+            
             final filteredFriends = friends.where((f) {
               if (_searchQuery.isEmpty) return true;
               final q = _searchQuery.toLowerCase();
@@ -80,7 +141,11 @@ class _FriendsListPageState extends State<FriendsListPage> {
               final username = (f.username ?? '').toLowerCase();
               return name.contains(q) || username.contains(q);
             }).toList();
-            final onlineFriendsCount = 50; // Tạm thời hardcode, sau có thể lấy từ API
+            
+            // Đếm số lượng bạn bè online từ status
+            final onlineFriendsCount = _friendsStatus.values
+                .where((status) => status.isOnline)
+                .length;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,11 +271,16 @@ class _FriendsListPageState extends State<FriendsListPage> {
                           itemCount: filteredFriends.length,
                           itemBuilder: (context, index) {
                             final friend = filteredFriends[index];
+                            // Lấy trạng thái online từ WebSocket
+                            final friendStatus = _friendsStatus[friend.userId];
+                            
                             return FriendItem(
                               name: friend.fullName ?? 'Người dùng',
                               mutualFriends: friend.mutualFriendsCount ?? 0,
                               avatarUrl: friend.avatarUrl,
                               mutualFriendAvatars: friend.mutualFriendAvatars,
+                              isOnline: friendStatus?.isOnline,
+                              lastSeen: friendStatus?.lastSeen,
                               onMessage: () {
                                 _showMessage(context, 'Nhắn tin cho ${friend.fullName}');
                               },
@@ -223,7 +293,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                 ),
               ],
             );
-          } else if (state is FriendError) {
+            } else if (state is FriendError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -269,9 +339,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
             );
           }
 
-          return const SizedBox.shrink();
-        },
-      ),
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

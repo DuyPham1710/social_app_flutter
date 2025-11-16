@@ -1,10 +1,16 @@
+import 'dart:async';
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
+import 'package:social_app_fe/features/friend/data/data_sources/friend_online_service.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_suggestions_page.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friends_list_page.dart';
 
-class FriendHeaderChips extends StatelessWidget {
+class FriendHeaderChips extends StatefulWidget {
   final VoidCallback? onNeedRefresh;
   
   const FriendHeaderChips({
@@ -13,13 +19,104 @@ class FriendHeaderChips extends StatelessWidget {
   });
 
   @override
+  State<FriendHeaderChips> createState() => _FriendHeaderChipsState();
+}
+
+class _FriendHeaderChipsState extends State<FriendHeaderChips> {
+  FriendOnlineService? _onlineService;
+  StreamSubscription<int>? _onlineCountSubscription;
+  int _onlineCount = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeOnlineService();
+  }
+
+  Future<void> _initializeOnlineService() async {
+    try {
+      // Lấy thông tin user hiện tại
+      final userData = await TokenStorage.getUserData();
+      if (userData == null || !mounted) return;
+
+      final userId = userData['id']?.toString() ?? '';
+      final username = userData['username']?.toString() ?? 
+                      userData['fullName']?.toString() ?? 'User';
+
+      if (userId.isEmpty) return;
+
+      // Khởi tạo service
+      final socketClient = SocketClient();
+      _onlineService = FriendOnlineService(socketClient);
+      
+      // Kết nối và lắng nghe
+      _onlineService!.connect(userId, username);
+      
+      // Lắng nghe stream số lượng online
+      _onlineCountSubscription = _onlineService!.onlineCountStream.listen(
+        (count) {
+          if (mounted) {
+            setState(() {
+              _onlineCount = count;
+              _isLoading = false;
+            });
+          }
+        },
+        onError: (error) {
+          developer.log(
+            'Error in online count stream: $error',
+            name: 'FriendHeaderChips',
+          );
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        },
+      );
+
+      // Set timeout để hiển thị loading nếu không nhận được data
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted && _isLoading) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
+    } catch (e) {
+      developer.log(
+        'Error initializing online service: $e',
+        name: 'FriendHeaderChips',
+      );
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _onlineCountSubscription?.cancel();
+    _onlineService?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         _buildChip(
-          label: '54 người đang online',
+          label: _isLoading
+              ? 'Đang tải...'
+              : '$_onlineCount người đang online',
           leading: _buildOnlineDot(),
-          onTap: () {},
+          onTap: () {
+            // Refresh số lượng online
+            _onlineService?.refreshOnlineCount();
+          },
         ),
         SizedBox(width: 8.w),
         _buildChip(
@@ -32,7 +129,7 @@ class FriendHeaderChips extends StatelessWidget {
               ),
             );
             // Gọi callback để reload dữ liệu
-            onNeedRefresh?.call();
+            widget.onNeedRefresh?.call();
           },
         ),
         SizedBox(width: 8.w),
@@ -46,7 +143,7 @@ class FriendHeaderChips extends StatelessWidget {
               ),
             );
             // Gọi callback để reload dữ liệu
-            onNeedRefresh?.call();
+            widget.onNeedRefresh?.call();
           },
         ),
       ],

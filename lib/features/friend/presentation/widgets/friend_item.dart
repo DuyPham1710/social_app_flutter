@@ -8,6 +8,8 @@ class FriendItem extends StatelessWidget {
   final int mutualFriends;
   final String? avatarUrl;
   final List<String>? mutualFriendAvatars;
+  final bool? isOnline;
+  final DateTime? lastSeen;
   final VoidCallback? onMessage;
   final VoidCallback? onMoreOptions;
 
@@ -17,6 +19,8 @@ class FriendItem extends StatelessWidget {
     required this.mutualFriends,
     this.avatarUrl,
     this.mutualFriendAvatars,
+    this.isOnline,
+    this.lastSeen,
     this.onMessage,
     this.onMoreOptions,
   });
@@ -51,23 +55,13 @@ class FriendItem extends StatelessWidget {
                       )
                     : null,
               ),
-              // Online indicator
-              Positioned(
-                right: 2,
-                bottom: 2,
-                child: Container(
-                  width: 14.r,
-                  height: 14.r,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2CD45C),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 2,
-                    ),
-                  ),
+              // Online indicator hoặc last seen
+              if (_shouldShowIndicator())
+                Positioned(
+                  right: 2,
+                  bottom: 2,
+                  child: _buildStatusIndicator(),
                 ),
-              ),
             ],
           ),
           SizedBox(width: 12.w),
@@ -87,8 +81,18 @@ class FriendItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4.h),
-                // Chỉ hiển thị khi có bạn chung
-                if (mutualFriends > 0)
+                // Hiển thị trạng thái online hoặc last seen
+                if (_shouldShowIndicator() && !_isOnline())
+                  Text(
+                    _getLastSeenText(),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Colors.grey[500],
+                      fontWeight: FontWeight.w400,
+                    ),
+                  )
+                // Chỉ hiển thị khi có bạn chung và không có last seen
+                else if (mutualFriends > 0)
                   Row(
                     children: [
                       // Hiển thị avatars bạn chung hoặc icon mặc định
@@ -197,6 +201,87 @@ class FriendItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Kiểm tra xem có nên hiển thị indicator không
+  bool _shouldShowIndicator() {
+    // Hiển thị nếu online
+    if (_isOnline()) return true;
+    
+    // Hiển thị nếu có lastSeen và trong vòng 1 ngày
+    if (lastSeen != null) {
+      final now = DateTime.now();
+      final difference = now.difference(lastSeen!);
+      return difference.inDays < 1;
+    }
+    
+    return false;
+  }
+
+  /// Kiểm tra user có đang online không
+  bool _isOnline() {
+    return isOnline == true;
+  }
+
+  /// Build indicator (chấm xanh hoặc xám)
+  Widget _buildStatusIndicator() {
+    if (_isOnline()) {
+      // Chấm xanh cho online
+      return Container(
+        width: 14.r,
+        height: 14.r,
+        decoration: BoxDecoration(
+          color: const Color(0xFF2CD45C),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 2,
+          ),
+        ),
+      );
+    } else if (lastSeen != null) {
+      // Chấm xám cho offline nhưng có last seen
+      return Container(
+        width: 14.r,
+        height: 14.r,
+        decoration: BoxDecoration(
+          color: Colors.grey[400],
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 2,
+          ),
+        ),
+      );
+    }
+    
+    return const SizedBox.shrink();
+  }
+
+  /// Lấy text hiển thị thời gian last seen
+  String _getLastSeenText() {
+    if (lastSeen == null) return '';
+    
+    final now = DateTime.now();
+    final difference = now.difference(lastSeen!);
+    
+    // Nếu quá 1 ngày, không hiển thị
+    if (difference.inDays >= 1) return '';
+    
+    // Nếu dưới 1 phút
+    if (difference.inMinutes < 1) {
+      return 'Vừa hoạt động';
+    }
+    
+    // Nếu dưới 1 giờ
+    if (difference.inHours < 1) {
+      final minutes = difference.inMinutes;
+      return '$minutes phút trước';
+    }
+    
+    // Nếu dưới 1 ngày
+    final hours = difference.inHours;
+    return '$hours giờ trước';
   }
 }
 
