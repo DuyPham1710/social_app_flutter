@@ -53,7 +53,6 @@ class PostHeader extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) => OtherProfileBloc(
               getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
-              getFriendsByUserIdUseCase: di.s1<GetFriendsByUserIdUseCase>(),
               getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
               getFriendRelationshipUseCase: di
                   .s1<GetFriendRelationshipUseCase>(),

@@ -9,7 +9,6 @@ class OtherProfileState extends Equatable {
   final Map<String, int>? commentCounts;
   final UserEntity? user;
   final RelationshipStatusEntity? relationship;
-  final List<FriendEntity>? friends;
 
   final int? currentPage;
   final bool? hasNext;
@@ -21,7 +20,6 @@ class OtherProfileState extends Equatable {
     this.commentCounts,
     this.user,
     this.relationship,
-    this.friends,
     this.currentPage,
     this.hasNext,
     this.error,
@@ -30,16 +28,15 @@ class OtherProfileState extends Equatable {
 
   @override
   List<Object?> get props => [
-        posts,
-        commentCounts,
-        user,
-        relationship,
-        friends,
-        currentPage,
-        hasNext,
-        error,
-        isLoadingMore,
-      ];
+    posts,
+    commentCounts,
+    user,
+    relationship,
+    currentPage,
+    hasNext,
+    error,
+    isLoadingMore,
+  ];
 }
 
 class OtherProfileInitial extends OtherProfileState {}
@@ -52,7 +49,6 @@ class OtherProfileLoaded extends OtherProfileState {
     super.commentCounts,
     super.user,
     super.relationship,
-    super.friends,
     super.currentPage,
     super.hasNext,
     super.isLoadingMore,
@@ -63,7 +59,6 @@ class OtherProfileLoaded extends OtherProfileState {
     Map<String, int>? commentCounts,
     UserEntity? user,
     RelationshipStatusEntity? relationship,
-    List<FriendEntity>? friends,
     int? currentPage,
     bool? hasNext,
     bool? isLoadingMore,
@@ -73,14 +68,12 @@ class OtherProfileLoaded extends OtherProfileState {
       commentCounts: commentCounts ?? this.commentCounts,
       user: user ?? this.user,
       relationship: relationship ?? this.relationship,
-      friends: friends?? this.friends,
       currentPage: currentPage ?? this.currentPage,
       hasNext: hasNext ?? this.hasNext,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 }
-
 
 class OtherProfileError extends OtherProfileState {
   const OtherProfileError(String message) : super(error: message);

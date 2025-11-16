@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/friend_list_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_header.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_info.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/create_post_widget.dart';
@@ -142,48 +143,12 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
 
                   const ProfileInfo(),
                   Divider(),
-                  if (state.friends != null && state.friends!.isNotEmpty) ...[
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      child: Text(
-                        "Bạn bè",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 90,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: state.friends!.length,
-                        separatorBuilder: (_, __) => SizedBox(width: 12),
-                        itemBuilder: (context, index) {
-                          final friend = state.friends![index];
-                          return Column(
-                            children: [
-                              CircleAvatar(
-                                radius: 28,
-                                backgroundImage: NetworkImage(
-                                  friend.avatarUrl ?? '',
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                friend.fullName ?? '',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 13),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                  FriendListWidget(
+                    onViewAll: () => Navigator.pushNamed(context, '/friends'),
+                    userId: user.userId,
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 12),
 
                   /// Posts
                   if (posts.isEmpty)

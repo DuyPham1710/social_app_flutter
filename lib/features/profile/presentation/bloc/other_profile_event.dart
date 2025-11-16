@@ -35,9 +35,4 @@ class ReloadRelationshipEvent extends OtherProfileEvent {
   const ReloadRelationshipEvent(this.userId);
 }
 
-class LoadOtherProfileFriendsEvent extends OtherProfileEvent {
-  final String userId;
-  const LoadOtherProfileFriendsEvent(this.userId);
-}
-
 

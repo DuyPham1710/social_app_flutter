@@ -6,7 +6,6 @@ abstract class FriendState {
 
 // Import for SentFriendRequestEntity
 
-
 class FriendInitial extends FriendState {}
 
 class FriendLoading extends FriendState {}
@@ -15,7 +14,6 @@ class FriendLoaded extends FriendState {
   final List<FriendEntity> friends;
 
   const FriendLoaded({required this.friends});
-
 }
 
 class FriendRequestsLoading extends FriendState {}
@@ -148,21 +146,18 @@ class FriendActionSuccess extends FriendState {
   final String message;
 
   const FriendActionSuccess({required this.message});
-
 }
 
 class FriendError extends FriendState {
   final String message;
 
   const FriendError({required this.message});
-
 }
 
 class FriendActionError extends FriendState {
   final String message;
 
   const FriendActionError({required this.message});
-
 }
 
 class SentFriendRequestsLoading extends FriendState {}
@@ -185,4 +180,10 @@ class SentFriendRequestsLoaded extends FriendState {
       cancelledRequestIds: cancelledRequestIds ?? this.cancelledRequestIds,
     );
   }
+}
+
+class FriendByUserLoaded extends FriendState {
+  final List<FriendEntity> friends;
+
+  const FriendByUserLoaded({required this.friends});
 }

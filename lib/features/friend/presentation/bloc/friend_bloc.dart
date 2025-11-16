@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/friend/domain/usecases/accept_friend_requ
 import 'package:social_app_fe/features/friend/domain/usecases/cancel_friend_request_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_suggestions_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friends_by_userid_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_sent_friend_requests_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_request_usecase.dart';
@@ -28,7 +29,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   final RejectFriendRequestUseCase rejectFriendRequestUseCase;
   final CancelFriendRequestUseCase cancelFriendRequestUseCase;
   final RemoveFriendUseCase removeFriendUseCase;
-
+  final GetFriendsByUserIdUseCase getFriendsByUserIdUseCase;
   FriendBloc({
     required this.getFriendsUseCase,
     required this.getFriendRequestsUseCase,
@@ -39,6 +40,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     required this.rejectFriendRequestUseCase,
     required this.cancelFriendRequestUseCase,
     required this.removeFriendUseCase,
+    required this.getFriendsByUserIdUseCase,
   }) : super(FriendInitial()) {
     on<LoadFriends>(_onLoadFriends);
     on<LoadFriendRequests>(_onLoadFriendRequests);
@@ -52,6 +54,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     on<RemoveFriend>(_onRemoveFriend);
     on<SortFriendRequests>(_onSortFriendRequests);
     on<FilterFriendRequests>(_onFilterFriendRequests);
+    on<LoadFriendsByUserId>(_onLoadFriendsByUserId);
   }
 
   Future<void> _onLoadFriends(
@@ -474,6 +477,25 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     } else if (dataState is DataStateError) {
       final errorMessage = _getErrorMessage(dataState.error);
       emit(FriendActionError(message: errorMessage));
+    }
+  }
+
+  Future<void> _onLoadFriendsByUserId(
+    LoadFriendsByUserId event,
+    Emitter<FriendState> emit,
+  ) async {
+    emit(FriendLoading());
+
+    final dataState = await getFriendsByUserIdUseCase(event.userId);
+
+    if (dataState is DataStateSuccess) {
+      emit(FriendLoaded(friends: dataState.data ?? []));
+    } else {
+      emit(
+        FriendError(
+          message: dataState.error?.message ?? 'Không thể tải danh sách bạn bè',
+        ),
+      );
     }
   }
 }

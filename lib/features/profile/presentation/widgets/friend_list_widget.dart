@@ -6,8 +6,9 @@ import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart
 
 class FriendListWidget extends StatefulWidget {
   final VoidCallback? onViewAll;
+  final String? userId;
 
-  const FriendListWidget({super.key, this.onViewAll});
+  const FriendListWidget({super.key, this.onViewAll, this.userId});
 
   @override
   State<FriendListWidget> createState() => _FriendListWidgetState();
@@ -18,7 +19,11 @@ class _FriendListWidgetState extends State<FriendListWidget> {
   void initState() {
     super.initState();
     // Khi widget được tạo, gửi event để load danh sách bạn bè
-    context.read<FriendBloc>().add(const LoadFriends());
+    if (widget.userId == null) {
+      context.read<FriendBloc>().add(const LoadFriends());
+    } else {
+      context.read<FriendBloc>().add(LoadFriendsByUserId(widget.userId!));
+    }
   }
 
   @override

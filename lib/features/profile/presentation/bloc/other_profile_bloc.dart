@@ -2,10 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/usecase/usecase.dart';
-import 'package:social_app_fe/core/utils/error_utils.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friend_requests_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friends_by_userid_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
@@ -16,7 +13,7 @@ import 'other_profile_state.dart';
 class OtherProfileBloc extends Bloc<OtherProfileEvent, OtherProfileState> {
   final GetOtherUserProfileUseCase getOtherUserProfileUseCase;
   final GetUserPostsUseCase getUserPostsUseCase;
-  final GetFriendsByUserIdUseCase getFriendsByUserIdUseCase;
+  // final GetFriendsByUserIdUseCase getFriendsByUserIdUseCase;
   final GetFriendRelationshipUseCase getFriendRelationshipUseCase;
   final ListenCommentCountUseCase listenCommentCountUseCase;
   final LoadCommentsUseCase loadCommentsUseCase;
@@ -27,12 +24,12 @@ class OtherProfileBloc extends Bloc<OtherProfileEvent, OtherProfileState> {
     required this.getOtherUserProfileUseCase,
     required this.getUserPostsUseCase,
     required this.getFriendRelationshipUseCase,
-    required this.getFriendsByUserIdUseCase,
+    // required this.getFriendsByUserIdUseCase,
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
   }) : super(OtherProfileInitial()) {
     on<LoadOtherUserProfileEvent>(_onLoadOtherUserProfile);
-    on<LoadOtherProfileFriendsEvent>(_onLoadOtherProfileFriends);
+    // on<LoadOtherProfileFriendsEvent>(_onLoadOtherProfileFriends);
     on<LoadOtherProfilePostsEvent>(_onLoadOtherProfilePosts);
     on<LoadMoreOtherProfilePostsEvent>(_onLoadMoreOtherProfilePosts);
     on<UpdateOtherProfileCommentCountsEvent>(_onUpdateCommentCounts);
@@ -67,7 +64,7 @@ class OtherProfileBloc extends Bloc<OtherProfileEvent, OtherProfileState> {
         ),
       );
 
-      add(LoadOtherProfileFriendsEvent(event.userId));
+      //add(LoadOtherProfileFriendsEvent(event.userId));
       add(LoadOtherProfilePostsEvent(userId: event.userId));
     }
   }
@@ -151,22 +148,22 @@ class OtherProfileBloc extends Bloc<OtherProfileEvent, OtherProfileState> {
     }
   }
 
-  Future<void> _onLoadOtherProfileFriends(
-    LoadOtherProfileFriendsEvent event,
-    Emitter<OtherProfileState> emit,
-  ) async {
-    final result = await getFriendsByUserIdUseCase(event.userId);
+  // Future<void> _onLoadOtherProfileFriends(
+  //   LoadOtherProfileFriendsEvent event,
+  //   Emitter<OtherProfileState> emit,
+  // ) async {
+  //   final result = await getFriendsByUserIdUseCase(event.userId);
 
-    if (state is OtherProfileLoaded) {
-      final current = state as OtherProfileLoaded;
+  //   if (state is OtherProfileLoaded) {
+  //     final current = state as OtherProfileLoaded;
 
-      if (result is DataStateSuccess) {
-        emit(current.copyWith(friends: result.data));
-      } else {
-        emit(current.copyWith(friends: []));
-      }
-    }
-  }
+  //     if (result is DataStateSuccess) {
+  //       emit(current.copyWith(friends: result.data));
+  //     } else {
+  //       emit(current.copyWith(friends: []));
+  //     }
+  //   }
+  // }
 
   void _onUpdateCommentCounts(
     UpdateOtherProfileCommentCountsEvent event,

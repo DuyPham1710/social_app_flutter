@@ -331,6 +331,7 @@ Future<void> initializeDependencies() async {
       rejectFriendRequestUseCase: s1(),
       cancelFriendRequestUseCase: s1(),
       removeFriendUseCase: s1(),
+      getFriendsByUserIdUseCase: s1(),
     ),
   );
 
