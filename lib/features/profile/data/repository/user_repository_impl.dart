@@ -28,4 +28,14 @@ class UserRepositoryImpl implements UserRepository {
       );
     }
   }
+
+  @override
+  Future<DataState<UserModel>> getUserProfileById(String userId) async {
+    try {
+      final response = await _remoteDataSource.getUserProfileById(userId);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

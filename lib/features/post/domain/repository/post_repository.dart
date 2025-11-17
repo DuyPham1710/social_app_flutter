@@ -21,5 +21,11 @@ abstract class PostRepository {
     int limit = 10,
   });
 
+  Future<DataState<PostListEntity>> getUserPosts({
+    required String userId,
+    int page = 1,
+    int limit = 10,
+  });
+
   Future<DataState<String>> createPost({required CreatePostEntity post});
 }

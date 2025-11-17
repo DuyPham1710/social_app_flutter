@@ -27,7 +27,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     context.read<ProfileBloc>().add(const LoadUserProfileEvent());
-    context.read<ProfileBloc>().add(const LoadProfilePostsEvent());
     context.read<FriendBloc>().add(const LoadFriends());
 
     _scrollController.addListener(() {
@@ -58,7 +57,11 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (context, state) {
           final posts = state.posts ?? [];
           final user = state.user;
-
+          if (user == null) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
+          }
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -85,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
               // Nội dung
               SliverList(
                 delegate: SliverChildListDelegate([
-                  ProfileHeader(user: user),
+                  ProfileHeader(user: user, isLoading: state.isUserLoading),
                   const ProfileActions(),
                   const ProfileInfo(),
                   const Divider(),
@@ -96,14 +99,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
 
                   CreatePostWidget(
-                    avatarUrl: 'https://i.pravatar.cc/150?img=5',
+                    avatarUrl: user?.avatarUrl,
                     onCreatePost: () =>
                         Navigator.pushNamed(context, '/create_post'),
                   ),
                   const Divider(),
 
                   // Trạng thái loading / lỗi / bài viết
-                  if (state is ProfileLoading)
+                  if (state is ProfileLoading && state.user == null)
                     const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Center(

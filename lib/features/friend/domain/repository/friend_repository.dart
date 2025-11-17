@@ -40,6 +40,10 @@ abstract class FriendRepository {
   
   // Lấy gợi ý bạn bè
   Future<DataState<List<FriendSuggestionEntity>>> getFriendSuggestions({int page = 1, int limit = 10});
+
+  //Lấy list friend của 1 user
+  Future<DataState<List<FriendEntity>>> getFriendsByUserId(String userId);
+
 }
 
 
