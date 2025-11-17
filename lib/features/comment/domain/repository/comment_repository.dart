@@ -1,4 +1,5 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comment-log_loaded_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
@@ -32,6 +33,9 @@ abstract class CommentRepository {
   /// Stream để lắng nghe comments loaded events
   Stream<CommentsLoadedEntity> get commentsLoadedStream;
 
+  /// Stream để lắng nghe comment history loaded events
+  Stream<CommentLogsLoadedEntity> get commentHistoryLoadedStream;
+
   /// Get comments loaded data cho một post
   Future<DataState<CommentsLoadedEntity?>> getCommentsLoadedData(String postId);
 
@@ -42,6 +46,8 @@ abstract class CommentRepository {
   void deleteComment(DeleteCommentParams params);
 
   void updateComment(UpdateCommentParams params);
+
+  void loadCommentHistory(String commentId);
 
   /// Disconnect
   void disconnect();

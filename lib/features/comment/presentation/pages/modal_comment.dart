@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/comment/presentation/bloc/comment_details
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_state.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
+import 'package:social_app_fe/features/comment/presentation/pages/comment_history_page.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_header_widget.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_input_field.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_item.dart';
@@ -80,12 +81,34 @@ class _ModalCommentState extends State<ModalComment> {
   }
 
   void _handleUpdateComment(String commentId, String newContent) {
+    // Dismiss keyboard
+    FocusScope.of(context).unfocus();
     // Gửi event cập nhật comment
     _commentBloc.add(
       UpdateCommentEvent(
         commentId: commentId,
         content: newContent,
         postId: widget.postId,
+      ),
+    );
+  }
+
+  void _handleDeleteComment(String commentId, String postId) {
+    // Gửi event xóa comment
+    _commentBloc.add(DeleteCommentEvent(commentId: commentId, postId: postId));
+  }
+
+  void _handleViewHistory(String commentId, String currentContent) {
+    // Navigate to comment history page với CommentBloc
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: _commentBloc,
+          child: CommentHistoryPage(
+            commentId: commentId,
+            currentContent: currentContent,
+          ),
+        ),
       ),
     );
   }
@@ -270,6 +293,8 @@ class _ModalCommentState extends State<ModalComment> {
                                   replies: replies,
                                   currentUserId: currentUserId,
                                   onUpdateComment: _handleUpdateComment,
+                                  onDeleteComment: _handleDeleteComment,
+                                  onViewHistory: _handleViewHistory,
                                 );
                               },
                             );

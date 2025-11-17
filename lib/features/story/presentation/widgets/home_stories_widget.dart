@@ -139,9 +139,9 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
               width: 80.w,
               height: 120.w,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Colors.grey.shade400, width: 1),
+                border: Border.all(color: AppColors.textSecondary, width: 1),
               ),
             ),
             Positioned(

@@ -16,6 +16,8 @@ class CommentItem extends StatefulWidget {
   final VoidCallback? onToggleReplies;
   final String? currentUserId;
   final Function(String commentId, String newContent)? onUpdateComment;
+  final Function(String commentId, String postId)? onDeleteComment;
+  final Function(String commentId, String currentContent)? onViewHistory;
 
   const CommentItem({
     super.key,
@@ -27,6 +29,8 @@ class CommentItem extends StatefulWidget {
     this.onToggleReplies,
     this.currentUserId,
     this.onUpdateComment,
+    this.onDeleteComment,
+    this.onViewHistory,
   });
 
   @override
@@ -82,6 +86,7 @@ class _CommentItemState extends State<CommentItem> {
             child: GestureDetector(
               key: _commentKey,
               onLongPressStart: (details) {
+                FocusScope.of(context).unfocus();
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   final renderBox =
                       _commentKey.currentContext?.findRenderObject()
@@ -101,6 +106,8 @@ class _CommentItemState extends State<CommentItem> {
                     onReactionChanged: _onReactionChanged,
                     currentUserId: widget.currentUserId,
                     onUpdateComment: widget.onUpdateComment,
+                    onDeleteComment: widget.onDeleteComment,
+                    onViewHistory: widget.onViewHistory,
                   );
                 });
               },
@@ -312,6 +319,8 @@ class _CommentItemState extends State<CommentItem> {
                             isReply: true,
                             currentUserId: widget.currentUserId,
                             onUpdateComment: widget.onUpdateComment,
+                            onDeleteComment: widget.onDeleteComment,
+                            onViewHistory: widget.onViewHistory,
                           ),
                         );
                       }).toList(),

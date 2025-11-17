@@ -67,6 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
             slivers: [
               // Header
               SliverAppBar(
+                surfaceTintColor: Colors.transparent,
                 pinned: true,
                 backgroundColor: AppColors.background,
                 elevation: 0,
@@ -99,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
 
                   CreatePostWidget(
-                    avatarUrl: user?.avatarUrl,
+                    avatarUrl: user.avatarUrl,
                     onCreatePost: () =>
                         Navigator.pushNamed(context, '/create_post'),
                   ),

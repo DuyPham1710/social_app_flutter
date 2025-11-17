@@ -9,11 +9,13 @@ part of 'story_remote_data_source.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _StoryRemoteDataSource implements StoryRemoteDataSource {
-  _StoryRemoteDataSource(this._dio, {this.baseUrl});
+  _StoryRemoteDataSource(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
   String? baseUrl;
+
+  final ParseErrorLogger? errorLogger;
 
   @override
   Future<GroupedStoryListModel> getHomeStories(int page, int limit) async {
@@ -36,6 +38,7 @@ class _StoryRemoteDataSource implements StoryRemoteDataSource {
     try {
       _value = GroupedStoryListModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;

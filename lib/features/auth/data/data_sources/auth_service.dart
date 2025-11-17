@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_request.dart';
 import 'package:social_app_fe/features/auth/data/models/auth_response.dart';
 import 'package:social_app_fe/features/auth/data/models/register_request.dart';

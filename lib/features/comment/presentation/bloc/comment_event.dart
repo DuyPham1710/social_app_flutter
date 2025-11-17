@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comment-log_loaded_entity.dart';
 
 abstract class CommentEvent extends Equatable {
   const CommentEvent();
@@ -81,4 +82,22 @@ class DeleteCommentEvent extends CommentEvent {
 
   @override
   List<Object?> get props => [postId, commentId];
+}
+
+class LoadCommentHistoryEvent extends CommentEvent {
+  final String commentId;
+
+  const LoadCommentHistoryEvent({required this.commentId});
+
+  @override
+  List<Object?> get props => [commentId];
+}
+
+class CommentHistoryLoadedInternalEvent extends CommentEvent {
+  final CommentLogsLoadedEntity commentHistory;
+
+  const CommentHistoryLoadedInternalEvent(this.commentHistory);
+
+  @override
+  List<Object?> get props => [commentHistory];
 }

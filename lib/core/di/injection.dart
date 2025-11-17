@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/network/dio_client.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
@@ -29,6 +28,8 @@ import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_co
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comments_loaded_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_history_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_history_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/update_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
@@ -63,7 +64,6 @@ import 'package:social_app_fe/features/profile/data/repository/user_repository_i
 import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
-import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
@@ -185,6 +185,12 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<DeleteCommentUsecase>(
     () => DeleteCommentUsecase(s1()),
+  );
+  s1.registerLazySingleton<LoadCommentHistoryUseCase>(
+    () => LoadCommentHistoryUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenCommentHistoryUseCase>(
+    () => ListenCommentHistoryUseCase(s1()),
   );
 
   // Friend Usecases
@@ -309,6 +315,8 @@ Future<void> initializeDependencies() async {
       addCommentUseCase: s1(),
       updateCommentUseCase: s1(),
       deleteCommentUsecase: s1(),
+      loadCommentHistoryUseCase: s1(),
+      listenCommentHistoryUseCase: s1(),
     ),
   );
 

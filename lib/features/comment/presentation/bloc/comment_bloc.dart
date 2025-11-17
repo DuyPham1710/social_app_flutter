@@ -11,6 +11,8 @@ import 'package:social_app_fe/features/comment/domain/usecases/emit_typing_useca
 import 'package:social_app_fe/features/comment/domain/usecases/join_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/leave_post_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_typing_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_history_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_history_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/update_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_state.dart';
@@ -23,8 +25,11 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final AddCommentUseCase _addCommentUseCase;
   final UpdateCommentUsecase _updateCommentUseCase;
   final DeleteCommentUsecase _deleteCommentUsecase;
+  final LoadCommentHistoryUseCase _loadCommentHistoryUseCase;
+  final ListenCommentHistoryUseCase _listenCommentHistoryUseCase;
   Timer? _typingDebounce;
   StreamSubscription? _typingSubscription;
+  StreamSubscription? _commentHistorySubscription;
 
   CommentBloc({
     required JoinPostUseCase joinPostUseCase,
@@ -34,6 +39,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     required AddCommentUseCase addCommentUseCase,
     required UpdateCommentUsecase updateCommentUseCase,
     required DeleteCommentUsecase deleteCommentUsecase,
+    required LoadCommentHistoryUseCase loadCommentHistoryUseCase,
+    required ListenCommentHistoryUseCase listenCommentHistoryUseCase,
   }) : _joinPostUseCase = joinPostUseCase,
        _leavePostUseCase = leavePostUseCase,
        _emitTypingUseCase = emitTypingUseCase,
@@ -41,6 +48,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
        _addCommentUseCase = addCommentUseCase,
        _updateCommentUseCase = updateCommentUseCase,
        _deleteCommentUsecase = deleteCommentUsecase,
+       _loadCommentHistoryUseCase = loadCommentHistoryUseCase,
+       _listenCommentHistoryUseCase = listenCommentHistoryUseCase,
        super(CommentInitial()) {
     on<JoinPostEvent>(_onJoinPost);
     on<LeavePostEvent>(_onLeavePost);
@@ -49,6 +58,41 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     on<AddCommentEvent>(_onAddComment);
     on<UpdateCommentEvent>(_onUpdateComment);
     on<DeleteCommentEvent>(_onDeleteComment);
+    on<LoadCommentHistoryEvent>(_onLoadCommentHistory);
+    on<CommentHistoryLoadedInternalEvent>(_onCommentHistoryLoadedInternal);
+
+    _setupCommentHistoryListener();
+  }
+
+  void _setupCommentHistoryListener() async {
+    final stream = await _listenCommentHistoryUseCase(params: const NoParams());
+    _commentHistorySubscription = stream.listen((commentHistory) {
+      add(CommentHistoryLoadedInternalEvent(commentHistory));
+    });
+  }
+
+  void _onLoadCommentHistory(
+    LoadCommentHistoryEvent event,
+    Emitter<CommentState> emit,
+  ) async {
+    emit(CommentHistoryLoading(commentId: event.commentId));
+
+    try {
+      await _loadCommentHistoryUseCase(
+        params: LoadCommentHistoryParams(event.commentId),
+      );
+    } catch (e) {
+      emit(
+        CommentHistoryError(message: e.toString(), commentId: event.commentId),
+      );
+    }
+  }
+
+  void _onCommentHistoryLoadedInternal(
+    CommentHistoryLoadedInternalEvent event,
+    Emitter<CommentState> emit,
+  ) {
+    emit(CommentHistoryLoaded(commentHistory: event.commentHistory));
   }
 
   void _onUpdateComment(UpdateCommentEvent event, Emitter<CommentState> emit) {
@@ -169,6 +213,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   Future<void> close() {
     _typingDebounce?.cancel();
     _typingSubscription?.cancel();
+    _commentHistorySubscription?.cancel();
     return super.close();
   }
 }
