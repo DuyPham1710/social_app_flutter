@@ -232,6 +232,7 @@ class _FriendPageState extends State<FriendPage> {
                     request.requestId,
                   );
                   return FriendRequestItem(
+                    userId: request.senderId,
                     name: request.displayName,
                     mutualFriends: request.displayMutualFriends,
                     timeAgo: request.formattedTimeAgo,
@@ -358,6 +359,7 @@ class _FriendPageState extends State<FriendPage> {
               children: friendSuggestions.map((suggestion) {
                 final isSent = sentRequestUserIds.contains(suggestion.userId);
                 return FriendSuggestionItem(
+                  userId: suggestion.userId,
                   name: suggestion.fullName ?? 'Người dùng',
                   mutualFriends: suggestion.mutualFriends ?? 0,
                   avatarUrl:
@@ -378,6 +380,7 @@ class _FriendPageState extends State<FriendPage> {
               children: List.generate(
                 3,
                 (index) => FriendSuggestionItem(
+                  userId: "68e9d3fa7ae32fe700d1d3cc",
                   name: 'Người dùng ${index + 1}',
                   mutualFriends: 5 + index,
                   avatarUrl: 'https://i.pravatar.cc/150?img=${index + 10}',

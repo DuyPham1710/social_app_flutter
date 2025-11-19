@@ -176,7 +176,9 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     ),
 
                   /// End of posts
-                  if (state is OtherProfileLoaded && state.hasNext == false)
+                  if (state is OtherProfileLoaded &&
+                      state.hasNext == false &&
+                      posts.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.h),
                       child: Center(

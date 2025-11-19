@@ -146,7 +146,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
 
-                  if (state is ProfileLoaded && state.hasNext == false)
+                  if (state is ProfileLoaded &&
+                      state.hasNext == false &&
+                      posts.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.h),
                       child: Center(

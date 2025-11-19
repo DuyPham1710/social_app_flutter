@@ -207,6 +207,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                           itemBuilder: (context, index) {
                             final friend = filteredFriends[index];
                             return FriendItem(
+                              friendId: friend.userId,
                               name: friend.fullName ?? 'Người dùng',
                               mutualFriends: friend.mutualFriendsCount ?? 0,
                               avatarUrl: friend.avatarUrl,
