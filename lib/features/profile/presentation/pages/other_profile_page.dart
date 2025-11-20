@@ -38,6 +38,9 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
       LoadOtherProfilePostsEvent(userId: widget.userId, page: 1),
     );
 
+    //lấy bạn bè
+    context.read<FriendBloc>().add(LoadFriendsByUserId(widget.userId));
+
     /// Handle load more when scroll
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=

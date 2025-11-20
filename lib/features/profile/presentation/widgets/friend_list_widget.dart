@@ -16,17 +16,6 @@ class FriendListWidget extends StatefulWidget {
 
 class _FriendListWidgetState extends State<FriendListWidget> {
   @override
-  void initState() {
-    super.initState();
-    // Khi widget được tạo, gửi event để load danh sách bạn bè
-    if (widget.userId == null) {
-      context.read<FriendBloc>().add(const LoadFriends());
-    } else {
-      context.read<FriendBloc>().add(LoadFriendsByUserId(widget.userId!));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
@@ -39,9 +28,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               ),
             ),
           );
-        }
-
-        if (state is FriendError) {
+        } else if (state is FriendError) {
           return _buildContainer(
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -54,9 +41,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               ),
             ),
           );
-        }
-
-        if (state is FriendLoaded) {
+        } else if (state is FriendLoaded) {
           final friends = state.friends;
 
           if (friends.isEmpty) {

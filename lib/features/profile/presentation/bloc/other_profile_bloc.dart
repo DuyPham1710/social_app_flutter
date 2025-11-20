@@ -64,7 +64,7 @@ class OtherProfileBloc extends Bloc<OtherProfileEvent, OtherProfileState> {
         ),
       );
 
-      //add(LoadOtherProfileFriendsEvent(event.userId));
+      //add(LoadOtherProfileEvent(event.userId));
       add(LoadOtherProfilePostsEvent(userId: event.userId));
     }
   }
