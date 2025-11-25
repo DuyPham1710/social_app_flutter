@@ -54,3 +54,11 @@ class GetPostDetailEvent extends HomeEvent {
   @override
   List<Object?> get props => [postId];
 }
+
+class ConnectChatEvent extends HomeEvent {
+  const ConnectChatEvent();
+}
+
+class DisconnectChatEvent extends HomeEvent {
+  const DisconnectChatEvent();
+}

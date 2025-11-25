@@ -23,3 +23,19 @@ class UserModel extends UserEntity with _$UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
 }
+
+extension UserModelX on UserModel {
+  UserEntity toEntity() => UserEntity(
+    userId: userId,
+    fullName: fullName,
+    phoneNumber: phoneNumber,
+    bio: bio,
+    avatarUrl: avatarUrl,
+    dateOfBirth: dateOfBirth,
+    gender: gender,
+    email: email,
+    username: username,
+    isActive: isActive,
+    createdAt: createdAt,
+  );
+}

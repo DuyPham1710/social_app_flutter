@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/chat_list_page.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key});
@@ -37,7 +38,10 @@ class HomeHeaderWidget extends StatelessWidget {
                   color: AppColors.primary,
                 ),
                 onPressed: () {
-                  // Handle messages action
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(builder: (_) => const ChatListPage()),
+                  );
                 },
               ),
             ],

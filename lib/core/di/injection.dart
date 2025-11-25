@@ -12,6 +12,12 @@ import 'package:social_app_fe/features/auth/domain/usecases/reset_password_useca
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source.dart';
+import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source_impl.dart';
+import 'package:social_app_fe/features/chat/data/repository/chat_repository_impl.dart';
+import 'package:social_app_fe/features/chat/domain/repository/chat_repository.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
@@ -108,6 +114,10 @@ Future<void> initializeDependencies() async {
     () => PrivacyRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(s1()),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
@@ -118,6 +128,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<StoryRepository>(() => StoryRepositoryImpl(s1()));
   s1.registerLazySingleton<PrivacyRepository>(
     () => PrivacyRepositoryImpl(s1()),
+  );
+  s1.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(remoteDataSource: s1()),
   );
 
   // Usecases
@@ -246,6 +259,15 @@ Future<void> initializeDependencies() async {
 
   s1.registerLazySingleton(() => GetFriendRelationshipUseCase(s1()));
 
+  // Chat UseCases
+  s1.registerLazySingleton<ConnectChatUseCase>(() => ConnectChatUseCase(s1()));
+  s1.registerLazySingleton<DisconnectChatUsecase>(
+    () => DisconnectChatUsecase(s1()),
+  );
+  s1.registerLazySingleton<GetConversationsUseCase>(
+    () => GetConversationsUseCase(s1()),
+  );
+
   // Profile Bloc
   s1.registerFactory(
     () => ProfileBloc(
@@ -292,6 +314,8 @@ Future<void> initializeDependencies() async {
       loadCommentsUseCase: s1(),
       reactPostUseCase: s1(),
       getPostDetailUsecase: s1(),
+      connectChatUseCase: s1(),
+      disconnectChatUseCase: s1(),
     ),
   );
 
@@ -348,6 +372,8 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
+
+  s1.registerFactory<ChatBloc>(() => ChatBloc(getConversationsUseCase: s1()));
 }
 
 Future<void> resetDependencies() async {
