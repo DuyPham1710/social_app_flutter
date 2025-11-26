@@ -101,8 +101,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   CreatePostWidget(
                     avatarUrl: user.avatarUrl,
-                    onCreatePost: () =>
-                        Navigator.pushNamed(context, '/create_post'),
+                    //onCreatePost: () =>
+                        //Navigator.pushNamed(context, '/create_post'),
                   ),
                   const Divider(),
 
