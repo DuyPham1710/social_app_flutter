@@ -4,15 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
-import 'package:social_app_fe/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:social_app_fe/features/chat/presentation/bloc/chat_event.dart';
-import 'package:social_app_fe/features/chat/presentation/bloc/chat_state.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_bloc.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_event.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_state.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/conversation_item.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/conversations_loading_widget.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/list_friend_loading.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/story_chat_item_widget.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/friend_message_suggestion_item.dart';
+import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 
@@ -24,6 +26,8 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
+  String? userId;
+
   @override
   void initState() {
     super.initState();
@@ -31,36 +35,185 @@ class _ChatListPageState extends State<ChatListPage> {
   }
 
   Future<void> _loadData() async {
-    _loadFriends();
-    await _loadConversations();
+    await _loadUserInfo();
+    if (userId != null) {
+      _loadFriends();
+      await _loadConversations();
+    }
+  }
+
+  Future<void> _loadUserInfo() async {
+    final userData = await TokenStorage.getUserData();
+    userId = userData?['id'];
   }
 
   Future<void> _loadConversations() async {
-    final userData = await TokenStorage.getUserData();
-    final userId = userData?['id'];
-    if (userId != null) {
-      context.read<ChatBloc>().add(
-        LoadConversationsEvent(userId: userId, page: 1, limit: 10),
-      );
-    }
+    if (userId == null) return;
+    context.read<ConversationBloc>().add(
+      LoadConversationsEvent(userId: userId!, page: 1, limit: 10),
+    );
   }
 
   void _loadFriends() {
     context.read<FriendBloc>().add(LoadFriends());
   }
 
+  Future<void> _joinConversationAndNavigate(
+    String conversationId,
+    UserEntity friendInfo,
+  ) async {
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not found. Please login again.'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => ChatDetailPage(
+          userId: userId!,
+          conversationId: conversationId,
+          friendInfo: friendInfo,
+        ),
+      ),
+    );
+  }
+
+  /// Find existing 1-1 conversation with a friend
+  /// Returns conversationId if found, null if not found
+  Future<String?> _findConversationWithFriend(String friendId) async {
+    final chatState = context.read<ConversationBloc>().state;
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+
+    if (chatState is ConversationsLoaded && currentUserId != null) {
+      final conversations = chatState.conversations.data;
+
+      // Look for 1-1 conversation (not group) that includes both current user and friend
+      for (final conversation in conversations) {
+        if (!conversation.isGroup && conversation.participants.length == 2) {
+          final participantIds = conversation.participants
+              .map((p) => p.userId)
+              .toList();
+
+          // Check if conversation contains both current user and the friend
+          final hasCurrentUser = participantIds.contains(currentUserId);
+          final hasThisFriend = participantIds.contains(friendId);
+
+          if (hasCurrentUser && hasThisFriend) {
+            return conversation.id;
+          }
+        }
+      }
+    }
+
+    return null; // No existing conversation found
+  }
+
+  /// Handle tap on friend (story or suggestion)
+  /// Check if conversation exists, if yes join it, if no create new one
+  Future<void> _handleFriendTap(FriendEntity friend) async {
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not found. Please login again.'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+
+      final existingConversationId = await _findConversationWithFriend(
+        friend.userId,
+      );
+
+      // Hide loading indicator
+      Navigator.of(context).pop();
+
+      UserEntity friendInfo = UserEntity(
+        userId: friend.userId,
+        username: friend.username,
+        fullName: friend.fullName,
+        avatarUrl: friend.avatarUrl,
+      );
+
+      if (existingConversationId != null) {
+        print(
+          'Found existing conversation: $existingConversationId with friend: ${friend.userId}',
+        );
+        _joinConversationAndNavigate(existingConversationId, friendInfo);
+      } else {
+        print(
+          'No existing conversation with friend: ${friend.userId}, creating new chat',
+        );
+
+        Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (_) => ChatDetailPage(
+              // Pass friendId to create new conversation
+              userId: userId!,
+              friendId: friend.userId,
+              friendInfo: friendInfo,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Hide loading indicator if error
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error finding conversation: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ChatBloc, ChatState>(
+    return BlocListener<ConversationBloc, ConversationState>(
       listener: (context, state) {
-        if (state is ChatError) {
+        if (state is ConversationError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Chat error: ${state.message}'),
+              content: Text('Conversation error: ${state.message}'),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
           );
+          // } else if (state is JoinConversationSuccess) {
+          //   // Navigate to ChatDetailPage after successful join
+          //   // Navigator.push(
+          //   //   context,
+          //   //   CupertinoPageRoute(
+          //   //     builder: (_) =>
+          //   //         ChatDetailPage(conversationId: state.conversationId),
+          //   //   ),
+          //   // );
+          //   print(
+          //     'Successfully joined conversation: ${state.conversationId}, navigating to detail page',
+          //   );
           // } else if (state is ConversationsLoaded) {
           //   ScaffoldMessenger.of(context).showSnackBar(
           //     SnackBar(
@@ -100,18 +253,12 @@ class _ChatListPageState extends State<ChatListPage> {
               ),
             ],
           ),
-          title: BlocBuilder<ChatBloc, ChatState>(
-            builder: (context, state) {
-              String title = "Duy Phạm";
-
-              return Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              );
-            },
+          title: Text(
+            "Duy Phạm",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
           actions: [
             IconButton(
@@ -195,13 +342,8 @@ class _ChatListPageState extends State<ChatListPage> {
                                 name: friend.fullName!.trim().split(' ').last,
                                 showAddButton: false,
                                 onTap: () {
-                                  // Navigate to chat with this friend
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (_) => ChatDetailPage(),
-                                    ),
-                                  );
+                                  // Check if conversation exists with this friend
+                                  _handleFriendTap(friend);
                                 },
                               ),
                             );
@@ -220,14 +362,34 @@ class _ChatListPageState extends State<ChatListPage> {
               SliverToBoxAdapter(child: SizedBox(height: 4.h)),
 
               // Danh sách hội thoại
-              BlocBuilder<ChatBloc, ChatState>(
+              BlocBuilder<ConversationBloc, ConversationState>(
                 builder: (context, state) {
+                  // Handle loading state
                   if (state is ConversationsLoading) {
                     return const SliverToBoxAdapter(
                       child: ConversationsLoadingWidget(),
                     );
-                  } else if (state is ConversationsLoaded) {
-                    final conversations = state.conversations.data;
+                  }
+
+                  // Handle loaded state (including when join conversation is successful)
+                  ConversationsLoaded? conversationsState;
+                  if (state is ConversationsLoaded) {
+                    conversationsState = state;
+                  }
+                  // Keep showing conversations even after successful join
+                  else if (state is JoinConversationSuccess) {
+                    // Try to get the last conversations state from bloc
+                    // For now, we'll trigger a reload
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _loadConversations();
+                    });
+                    // return const SliverToBoxAdapter(
+                    //   child: ConversationsLoadingWidget(),
+                    // );
+                  }
+
+                  if (conversationsState != null) {
+                    final conversations = conversationsState.conversations.data;
                     if (conversations.isEmpty) {
                       // Show friend suggestions when no conversations
                       return SliverToBoxAdapter(
@@ -260,20 +422,18 @@ class _ChatListPageState extends State<ChatListPage> {
                                 "${conversation.lastMessage?.text} • ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}",
                             isUnread: (conversation.unreadCount ?? 0) > 0,
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (_) => ChatDetailPage(
-                                    conversationId: conversation.id,
-                                  ),
-                                ),
+                              _joinConversationAndNavigate(
+                                conversation.id,
+                                otherParticipant!,
                               );
                             },
                           ),
                         );
                       }, childCount: conversations.length),
                     );
-                  } else if (state is ConversationsError) {
+                  }
+                  // Handle error state
+                  else if (state is ConversationsError) {
                     return SliverToBoxAdapter(
                       child: Center(
                         child: Column(
@@ -290,9 +450,13 @@ class _ChatListPageState extends State<ChatListPage> {
                       ),
                     );
                   }
-                  return const SliverToBoxAdapter(
-                    child: Center(child: Text('No conversations loaded')),
-                  );
+                  // For any other state (MessagesLoaded, JoinConversationSuccess, etc.)
+                  // Trigger reload of conversations and show loading
+                  else {
+                    return const SliverToBoxAdapter(
+                      child: ConversationsLoadingWidget(),
+                    );
+                  }
                 },
               ),
             ],
@@ -336,11 +500,8 @@ class _ChatListPageState extends State<ChatListPage> {
                   avatar: friend.avatarUrl ?? "https://i.pravatar.cc/200",
                   name: friend.fullName ?? friend.username ?? "Unknown",
                   onTap: () {
-                    // Navigate to chat with this friend
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(builder: (_) => ChatDetailPage()),
-                    );
+                    // Check if conversation exists with this friend
+                    _handleFriendTap(friend);
                   },
                 );
               }),

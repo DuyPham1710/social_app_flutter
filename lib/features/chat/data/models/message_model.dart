@@ -7,11 +7,7 @@ class AttachmentModel {
   final String type; // image, video, file, audio
   final int size;
 
-  AttachmentModel({
-    required this.url,
-    required this.type,
-    required this.size,
-  });
+  AttachmentModel({required this.url, required this.type, required this.size});
 
   factory AttachmentModel.fromJson(Map<String, dynamic> json) {
     return AttachmentModel(
@@ -21,11 +17,7 @@ class AttachmentModel {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'url': url,
-    'type': type,
-    'size': size,
-  };
+  Map<String, dynamic> toJson() => {'url': url, 'type': type, 'size': size};
 
   AttachmentEntity toEntity() =>
       AttachmentEntity(url: url, type: type, size: size);
@@ -35,10 +27,7 @@ class ReactionModel {
   final UserModel user;
   final String reaction;
 
-  ReactionModel({
-    required this.user,
-    required this.reaction,
-  });
+  ReactionModel({required this.user, required this.reaction});
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
     return ReactionModel(
@@ -60,10 +49,7 @@ class SeenByModel {
   final UserModel user;
   final DateTime seenAt;
 
-  SeenByModel({
-    required this.user,
-    required this.seenAt,
-  });
+  SeenByModel({required this.user, required this.seenAt});
 
   factory SeenByModel.fromJson(Map<String, dynamic> json) {
     return SeenByModel(
@@ -116,21 +102,29 @@ class MessageModel {
       conversationId: json['conversationId'] as String?,
       sender: UserModel.fromJson(json['senderId'] as Map<String, dynamic>),
       text: json['text'] as String?,
-      attachments: json['attachments'] != null
+      attachments: json['attachments'] != []
           ? (json['attachments'] as List)
-              .map((item) => AttachmentModel.fromJson(item as Map<String, dynamic>))
-              .toList()
+                .map(
+                  (item) =>
+                      AttachmentModel.fromJson(item as Map<String, dynamic>),
+                )
+                .toList()
           : [],
       replyTo: json['replyTo'],
-      reactions: json['reactions'] != null
+      reactions: json['reactions'] != []
           ? (json['reactions'] as List)
-              .map((item) => ReactionModel.fromJson(item as Map<String, dynamic>))
-              .toList()
+                .map(
+                  (item) =>
+                      ReactionModel.fromJson(item as Map<String, dynamic>),
+                )
+                .toList()
           : [],
-      seenBy: json['seenBy'] != null
+      seenBy: json['seenBy'] != []
           ? (json['seenBy'] as List)
-              .map((item) => SeenByModel.fromJson(item as Map<String, dynamic>))
-              .toList()
+                .map(
+                  (item) => SeenByModel.fromJson(item as Map<String, dynamic>),
+                )
+                .toList()
           : [],
       deletedForEveryone: json['deletedForEveryone'] as bool? ?? false,
       deletedFor: json['deletedFor'] != null

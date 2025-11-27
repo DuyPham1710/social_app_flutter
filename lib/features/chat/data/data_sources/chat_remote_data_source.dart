@@ -1,4 +1,5 @@
 import 'package:social_app_fe/features/chat/data/models/chat_models.dart';
+import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
 
 abstract class ChatRemoteDataSource {
   // Load conversations
@@ -8,8 +9,23 @@ abstract class ChatRemoteDataSource {
     int limit = 20,
   });
 
+  // Load messages in a conversation
+  Future<MessageReponseModel> getConversationMessages({
+    required String userId,
+    required String conversationId,
+    int page = 1,
+    int limit = 20,
+  });
+
+  // Join conversation
+  Future<void> joinConversation({
+    required String userId,
+    required String conversationId,
+  });
+
   // // Real-time events
   Stream<ConversationsResponseModel> get onConversationsLoaded;
+  Stream<MessageReponseModel> get onMessagesLoaded;
   // Stream<MessageModel> get onNewMessage;
   // Stream<ConversationModel> get onConversationUpdate;
   // Stream<Map<String, dynamic>> get onTyping;

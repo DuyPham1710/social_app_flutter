@@ -1,5 +1,6 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/chat/domain/entities/conversation_response_entity.dart';
+import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 
 abstract class ChatRepository {
   // Connection management
@@ -15,8 +16,21 @@ abstract class ChatRepository {
     int limit = 10,
   });
 
+  Future<DataState<MessageResponseEntity>> getConversationMessages({
+    required String userId,
+    required String conversationId,
+    int page = 1,
+    int limit = 20,
+  });
+
+  Future<DataState<void>> joinConversation({
+    required String userId,
+    required String conversationId,
+  });
+
   // // Real-time events
   Stream<ConversationResponseEntity> get onConversationsLoaded;
+  Stream<MessageResponseEntity> get onMessagesLoaded;
   // Stream<MessageEntity> get onNewMessage;
   // Stream<ConversationEntity> get onConversationUpdate;
   // Stream<Map<String, dynamic>> get onTyping;

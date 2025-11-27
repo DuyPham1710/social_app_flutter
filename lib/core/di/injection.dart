@@ -17,7 +17,7 @@ import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_s
 import 'package:social_app_fe/features/chat/data/repository/chat_repository_impl.dart';
 import 'package:social_app_fe/features/chat/domain/repository/chat_repository.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
-import 'package:social_app_fe/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
@@ -267,6 +267,10 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetConversationsUseCase>(
     () => GetConversationsUseCase(s1()),
   );
+  s1.registerLazySingleton<JoinConversationUseCase>(
+    () => JoinConversationUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMessagesUseCase>(() => GetMessagesUseCase(s1()));
 
   // Profile Bloc
   s1.registerFactory(
@@ -373,7 +377,14 @@ Future<void> initializeDependencies() async {
 
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
 
-  s1.registerFactory<ChatBloc>(() => ChatBloc(getConversationsUseCase: s1()));
+  s1.registerFactory<ConversationBloc>(
+    () => ConversationBloc(
+      getConversationsUseCase: s1(),
+      joinConversationUseCase: s1(),
+    ),
+  );
+
+  s1.registerFactory<MessageBloc>(() => MessageBloc(getMessagesUseCase: s1()));
 }
 
 Future<void> resetDependencies() async {

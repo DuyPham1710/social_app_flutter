@@ -2,22 +2,27 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
-import 'chat_event.dart';
-import 'chat_state.dart';
+import 'conversation_event.dart';
+import 'conversation_state.dart';
 
-class ChatBloc extends Bloc<ChatEvent, ChatState> {
+class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final GetConversationsUseCase _getConversationsUseCase;
+  final JoinConversationUseCase _joinConversationUseCase;
   // bool _isConnected = false;
 
-  ChatBloc({required GetConversationsUseCase getConversationsUseCase})
-    : _getConversationsUseCase = getConversationsUseCase,
-      super(const ChatInitial()) {
+  ConversationBloc({
+    required GetConversationsUseCase getConversationsUseCase,
+    required JoinConversationUseCase joinConversationUseCase,
+  }) : _getConversationsUseCase = getConversationsUseCase,
+       _joinConversationUseCase = joinConversationUseCase,
+       super(const ConversationInitial()) {
     on<LoadConversationsEvent>(_onLoadConversations);
+    on<JoinConversationEvent>(_onJoinConversation);
   }
 
   Future<void> _onLoadConversations(
     LoadConversationsEvent event,
-    Emitter<ChatState> emit,
+    Emitter<ConversationState> emit,
   ) async {
     emit(const ConversationsLoading());
 
@@ -46,6 +51,38 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       print('Exception loading conversations: $e');
     }
   }
+
+  Future<void> _onJoinConversation(
+    JoinConversationEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    emit(const JoinConversationLoading());
+
+    try {
+      final result = await _joinConversationUseCase(
+        params: JoinConversationParams(
+          userId: event.userId,
+          conversationId: event.conversationId,
+        ),
+      );
+
+      if (result is DataStateSuccess) {
+        emit(JoinConversationSuccess(event.conversationId));
+        print('Joined conversation ${event.conversationId} successfully');
+      } else if (result is DataStateError) {
+        emit(
+          JoinConversationError(
+            result.error?.message ?? 'Failed to join conversation',
+          ),
+        );
+        print('Error joining conversation: ${result.error}');
+      }
+    } catch (e) {
+      emit(JoinConversationError('Failed to join conversation: $e'));
+      print('Exception joining conversation: $e');
+    }
+  }
+
   // Future<void> _onConnectChat(
   //   ConnectChatEvent event,
   //   Emitter<ChatState> emit,

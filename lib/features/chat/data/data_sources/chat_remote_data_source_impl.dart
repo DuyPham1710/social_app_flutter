@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
+
 import '../../../../core/network/websocket/socket_client.dart';
 import '../models/chat_models.dart';
 import 'chat_remote_data_source.dart';
@@ -10,6 +12,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   // Stream controllers for real-time events
   final _conversationsLoadedController =
       StreamController<ConversationsResponseModel>.broadcast();
+  final _messagesLoadedController =
+      StreamController<MessageReponseModel>.broadcast();
   // final _newMessageController = StreamController<MessageModel>.broadcast();
   // final _conversationUpdateController =
   //     StreamController<ConversationModel>.broadcast();
@@ -31,6 +35,9 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Stream<ConversationsResponseModel> get onConversationsLoaded =>
       _conversationsLoadedController.stream;
 
+  @override
+  Stream<MessageReponseModel> get onMessagesLoaded =>
+      _messagesLoadedController.stream;
   // @override
   // Stream<MessageModel> get onNewMessage => _newMessageController.stream;
 
@@ -50,7 +57,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     // Reset connection state
     _isConnected = false;
     _connectionCompleter = Completer<void>();
-    
+
     _socketClient.connect(
       namespace: 'chat',
       userId: userId,
@@ -60,20 +67,23 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     // Setup connection listeners
     _setupConnectionListeners();
     _setupConversationListeners();
-    // _setupMessageListeners();
+    _setupMessageListeners();
     // _setupTypingListeners();
   }
-  
+
   /// Wait for connection to be established
-  Future<void> waitForConnection({Duration timeout = const Duration(seconds: 10)}) async {
+  @override
+  Future<void> waitForConnection({
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
     if (_isConnected) {
       return;
     }
-    
+
     if (_connectionCompleter == null) {
       throw Exception('Connection not initiated');
     }
-    
+
     return _connectionCompleter!.future.timeout(
       timeout,
       onTimeout: () {
@@ -98,7 +108,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         'Registered to chat namespace: ${data['userId']} (${data['username']})',
         name: 'ChatDataSource',
       );
-      
+
       // Mark as connected when registration is acknowledged
       _isConnected = true;
       if (_connectionCompleter != null && !_connectionCompleter!.isCompleted) {
@@ -162,18 +172,40 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   // /// Setup listeners for message events
-  // void _setupMessageListeners() {
-  //   // Listen for new messages
-  //   _socketClient.on('message:new').listen((data) {
-  //     developer.log('New message event', name: 'ChatDataSource');
-  //     try {
-  //       final message = MessageModel.fromJson(data);
-  //       _newMessageController.add(message);
-  //     } catch (e) {
-  //       developer.log('Error parsing message:new: $e', name: 'ChatDataSource');
-  //     }
-  //   });
-  // }
+  void _setupMessageListeners() {
+    // Listen for messages loaded
+    _socketClient.on('messages:loaded').listen((data) {
+      developer.log('Messages loaded from backend', name: 'ChatDataSource');
+      developer.log(
+        'Raw messages data: ${data.toString()}',
+        name: 'ChatDataSource',
+      );
+      try {
+        final response = MessageReponseModel.fromJson(data);
+        _messagesLoadedController.add(response);
+
+        developer.log(
+          'Loaded ${response.data.length} messages, page ${response.pagination.currentPage}/${response.pagination.totalPages}',
+          name: 'ChatDataSource',
+        );
+      } catch (e) {
+        developer.log(
+          'Error parsing messages:loaded: $e',
+          name: 'ChatDataSource',
+        );
+      }
+    });
+    // Listen for new messages
+    // _socketClient.on('message:new').listen((data) {
+    //   developer.log('New message event', name: 'ChatDataSource');
+    //   try {
+    //     final message = MessageModel.fromJson(data);
+    //     _newMessageController.add(message);
+    //   } catch (e) {
+    //     developer.log('Error parsing message:new: $e', name: 'ChatDataSource');
+    //   }
+    // });
+  }
 
   // /// Setup listeners for typing events
   // void _setupTypingListeners() {
@@ -204,10 +236,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     try {
       await waitForConnection();
     } catch (e) {
-      developer.log(
-        'Connection not ready: $e',
-        name: 'ChatDataSource',
-      );
+      developer.log('Connection not ready: $e', name: 'ChatDataSource');
       throw Exception('Chat connection not ready: $e');
     }
 
@@ -241,6 +270,53 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return completer.future;
   }
 
+  /// Join conversation
+  @override
+  Future<void> joinConversation({
+    required String userId,
+    required String conversationId,
+  }) async {
+    developer.log(
+      'Joining conversation: $conversationId for user: $userId',
+      name: 'ChatDataSource',
+    );
+
+    // Wait for connection to be established
+    try {
+      await waitForConnection();
+    } catch (e) {
+      developer.log(
+        'Connection not ready for join conversation: $e',
+        name: 'ChatDataSource',
+      );
+      throw Exception('Chat connection not ready: $e');
+    }
+
+    // Emit the join request and wait for response
+    // Backend returns response directly, not via event
+    try {
+      _socketClient.emit('conversation:join', {
+        'userId': userId,
+        'conversationId': conversationId,
+      });
+
+      developer.log(
+        'Join conversation request sent successfully',
+        name: 'ChatDataSource',
+      );
+
+      // Since backend handles join synchronously and marks messages as read,
+      // we can consider the join successful if no error is thrown
+      return Future.value();
+    } catch (e) {
+      developer.log(
+        'Error emitting join conversation: $e',
+        name: 'ChatDataSource',
+      );
+      throw Exception('Failed to join conversation: $e');
+    }
+  }
+
   /// Get cached conversations data
   ConversationsResponseModel? getCachedConversations({
     int page = 1,
@@ -256,6 +332,58 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _conversationsCache.clear();
   }
 
+  /// Load messages in a conversation
+  @override
+  Future<MessageReponseModel> getConversationMessages({
+    required String userId,
+    required String conversationId,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    developer.log(
+      'Loading messages for user: $userId, conversation: $conversationId, page: $page, limit: $limit',
+      name: 'ChatDataSource',
+    );
+
+    // // Wait for connection to be established
+    // try {
+    //   await waitForConnection();
+    // } catch (e) {
+    //   developer.log('Connection not ready: $e', name: 'ChatDataSource');
+    //   throw Exception('Chat connection not ready: $e');
+    // }
+
+    final completer = Completer<MessageReponseModel>();
+
+    // Setup one-time listener for response
+    late StreamSubscription subscription;
+    subscription = _messagesLoadedController.stream.listen((response) {
+      if (response.pagination.currentPage == page &&
+          response.pagination.itemsPerPage == limit) {
+        subscription.cancel();
+        completer.complete(response);
+      }
+    });
+
+    // Emit the request
+    _socketClient.emit('messages:get', {
+      'userId': userId,
+      'conversationId': conversationId,
+      'page': page,
+      'limit': limit,
+    });
+
+    // Set timeout
+    Timer(const Duration(seconds: 10), () {
+      if (!completer.isCompleted) {
+        subscription.cancel();
+        completer.completeError(TimeoutException('Load messages timeout'));
+      }
+    });
+
+    return completer.future;
+  }
+
   /// Disconnect
   @override
   void disconnect() {
@@ -267,6 +395,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   void dispose() {
     _socketClient.dispose();
     _conversationsLoadedController.close();
+    _messagesLoadedController.close();
     // _newMessageController.close();
     // _conversationUpdateController.close();
     // _typingController.close();

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 import '../../domain/entities/chat_entities.dart';
 import '../../domain/entities/conversation_response_entity.dart';
 import '../../domain/repository/chat_repository.dart';
@@ -17,7 +18,9 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<void> waitForConnection({Duration timeout = const Duration(seconds: 10)}) {
+  Future<void> waitForConnection({
+    Duration timeout = const Duration(seconds: 10),
+  }) {
     return _remoteDataSource.waitForConnection(timeout: timeout);
   }
 
@@ -53,8 +56,55 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<MessageResponseEntity>> getConversationMessages({
+    required String userId,
+    required String conversationId,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getConversationMessages(
+        userId: userId,
+        conversationId: conversationId,
+        page: page,
+        limit: limit,
+      );
+      return DataStateSuccess(response.toEntity());
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
+  Future<DataState<void>> joinConversation({
+    required String userId,
+    required String conversationId,
+  }) async {
+    try {
+      await _remoteDataSource.joinConversation(
+        userId: userId,
+        conversationId: conversationId,
+      );
+      return const DataStateSuccess(null);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Stream<ConversationResponseEntity> get onConversationsLoaded {
     return _remoteDataSource.onConversationsLoaded.map((response) {
+      return response.toEntity();
+    });
+  }
+
+  @override
+  Stream<MessageResponseEntity> get onMessagesLoaded {
+    return _remoteDataSource.onMessagesLoaded.map((response) {
       return response.toEntity();
     });
   }
