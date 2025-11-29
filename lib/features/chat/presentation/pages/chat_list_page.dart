@@ -311,6 +311,20 @@ class _ChatListPageState extends State<ChatListPage> {
                     builder: (context, friendState) {
                       if (friendState is FriendLoaded) {
                         final friends = friendState.friends;
+
+                        if (friends.isEmpty) {
+                          return Padding(
+                            padding: EdgeInsets.only(right: 12.w),
+                            child: StoryChatItemWidget(
+                              imageUrl: "https://i.pravatar.cc/200",
+                              name: "Tin của bạn",
+                              showAddButton: true,
+                              onTap: () {
+                                // Handle add story tap
+                              },
+                            ),
+                          );
+                        }
                         return ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: EdgeInsets.symmetric(horizontal: 10.w),

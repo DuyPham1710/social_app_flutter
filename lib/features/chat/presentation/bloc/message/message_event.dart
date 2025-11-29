@@ -23,3 +23,29 @@ class LoadMessagesEvent extends MessageEvent {
   @override
   List<Object?> get props => [userId, conversationId, page, limit];
 }
+
+class TypingStartEvent extends MessageEvent {
+  final String userId;
+  final String conversationId;
+
+  const TypingStartEvent({
+    required this.userId,
+    required this.conversationId,
+  });
+
+  @override
+  List<Object?> get props => [userId, conversationId];
+}
+
+class TypingStopEvent extends MessageEvent {
+  final String userId;
+  final String conversationId;
+
+  const TypingStopEvent({
+    required this.userId,
+    required this.conversationId,
+  });
+
+  @override
+  List<Object?> get props => [userId, conversationId];
+}

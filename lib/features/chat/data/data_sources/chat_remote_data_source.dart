@@ -23,12 +23,24 @@ abstract class ChatRemoteDataSource {
     required String conversationId,
   });
 
+  // Typing events
+  void emitTypingStart({
+    required String userId,
+    required String conversationId,
+  });
+
+  void emitTypingStop({
+    required String userId,
+    required String conversationId,
+  });
+
   // // Real-time events
   Stream<ConversationsResponseModel> get onConversationsLoaded;
   Stream<MessageReponseModel> get onMessagesLoaded;
+  Stream<Map<String, dynamic>> get onTypingStart;
+  Stream<Map<String, dynamic>> get onTypingStop;
   // Stream<MessageModel> get onNewMessage;
   // Stream<ConversationModel> get onConversationUpdate;
-  // Stream<Map<String, dynamic>> get onTyping;
   // Stream<Map<String, dynamic>> get onUserOnline;
 
   // Connection management

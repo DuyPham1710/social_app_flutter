@@ -14,10 +14,13 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       StreamController<ConversationsResponseModel>.broadcast();
   final _messagesLoadedController =
       StreamController<MessageReponseModel>.broadcast();
+  final _typingStartController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final _typingStopController =
+      StreamController<Map<String, dynamic>>.broadcast();
   // final _newMessageController = StreamController<MessageModel>.broadcast();
   // final _conversationUpdateController =
   //     StreamController<ConversationModel>.broadcast();
-  // final _typingController = StreamController<Map<String, dynamic>>.broadcast();
   // final _userOnlineController =
   //     StreamController<Map<String, dynamic>>.broadcast();
 
@@ -38,15 +41,20 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   Stream<MessageReponseModel> get onMessagesLoaded =>
       _messagesLoadedController.stream;
+
+  @override
+  Stream<Map<String, dynamic>> get onTypingStart =>
+      _typingStartController.stream;
+
+  @override
+  Stream<Map<String, dynamic>> get onTypingStop =>
+      _typingStopController.stream;
   // @override
   // Stream<MessageModel> get onNewMessage => _newMessageController.stream;
 
   // @override
   // Stream<ConversationModel> get onConversationUpdate =>
   //     _conversationUpdateController.stream;
-
-  // @override
-  // Stream<Map<String, dynamic>> get onTyping => _typingController.stream;
 
   // @override
   // Stream<Map<String, dynamic>> get onUserOnline => _userOnlineController.stream;
@@ -68,7 +76,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _setupConnectionListeners();
     _setupConversationListeners();
     _setupMessageListeners();
-    // _setupTypingListeners();
+    _setupTypingListeners();
   }
 
   /// Wait for connection to be established
@@ -207,18 +215,18 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     // });
   }
 
-  // /// Setup listeners for typing events
-  // void _setupTypingListeners() {
-  //   _socketClient.on('typing:status').listen((data) {
-  //     developer.log('Typing status event', name: 'ChatDataSource');
-  //     _typingController.add(Map<String, dynamic>.from(data));
-  //   });
+  /// Setup listeners for typing events
+  void _setupTypingListeners() {
+    _socketClient.on('typing:start').listen((data) {
+      developer.log('Typing start event: $data', name: 'ChatDataSource');
+      _typingStartController.add(Map<String, dynamic>.from(data));
+    });
 
-  //   _socketClient.on('user:online').listen((data) {
-  //     developer.log('User online event', name: 'ChatDataSource');
-  //     _userOnlineController.add(Map<String, dynamic>.from(data));
-  //   });
-  // }
+    _socketClient.on('typing:stop').listen((data) {
+      developer.log('Typing stop event: $data', name: 'ChatDataSource');
+      _typingStopController.add(Map<String, dynamic>.from(data));
+    });
+  }
 
   /// Load conversations
   @override
@@ -384,6 +392,50 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return completer.future;
   }
 
+  /// Emit typing start event
+  @override
+  void emitTypingStart({
+    required String userId,
+    required String conversationId,
+  }) {
+    developer.log(
+      'Emitting typing:start for conversation: $conversationId',
+      name: 'ChatDataSource',
+    );
+
+    if (!_isConnected) {
+      developer.log('Connection not ready for typing', name: 'ChatDataSource');
+      return;
+    }
+
+    _socketClient.emit('typing:start', {
+      'userId': userId,
+      'conversationId': conversationId,
+    });
+  }
+
+  /// Emit typing stop event
+  @override
+  void emitTypingStop({
+    required String userId,
+    required String conversationId,
+  }) {
+    developer.log(
+      'Emitting typing:stop for conversation: $conversationId',
+      name: 'ChatDataSource',
+    );
+
+    if (!_isConnected) {
+      developer.log('Connection not ready for typing', name: 'ChatDataSource');
+      return;
+    }
+
+    _socketClient.emit('typing:stop', {
+      'userId': userId,
+      'conversationId': conversationId,
+    });
+  }
+
   /// Disconnect
   @override
   void disconnect() {
@@ -396,9 +448,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _socketClient.dispose();
     _conversationsLoadedController.close();
     _messagesLoadedController.close();
+    _typingStartController.close();
+    _typingStopController.close();
     // _newMessageController.close();
     // _conversationUpdateController.close();
-    // _typingController.close();
     // _userOnlineController.close();
     _conversationsCache.clear();
   }

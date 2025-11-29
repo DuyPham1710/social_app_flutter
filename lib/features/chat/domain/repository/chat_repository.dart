@@ -28,11 +28,23 @@ abstract class ChatRepository {
     required String conversationId,
   });
 
+  // Typing events
+  void emitTypingStart({
+    required String userId,
+    required String conversationId,
+  });
+
+  void emitTypingStop({
+    required String userId,
+    required String conversationId,
+  });
+
   // // Real-time events
   Stream<ConversationResponseEntity> get onConversationsLoaded;
   Stream<MessageResponseEntity> get onMessagesLoaded;
+  Stream<Map<String, dynamic>> get onTypingStart;
+  Stream<Map<String, dynamic>> get onTypingStop;
   // Stream<MessageEntity> get onNewMessage;
   // Stream<ConversationEntity> get onConversationUpdate;
-  // Stream<Map<String, dynamic>> get onTyping;
   // Stream<Map<String, dynamic>> get onUserOnline;
 }

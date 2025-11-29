@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_item.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/chat_typing_indicator.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
@@ -62,6 +64,9 @@ class _ChatDetailPageContent extends StatefulWidget {
 }
 
 class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
+  final TextEditingController _messageController = TextEditingController();
+  Timer? _typingDebounceTimer;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +91,36 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
       );
     } else {
       // nếu không có conversationId nhưng có friendId, tạo cuộc trò chuyện mới
+    }
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _typingDebounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onTextChanged(String text) {
+    if (widget.conversationId == null) return;
+
+    // Cancel previous timer
+    _typingDebounceTimer?.cancel();
+
+    if (text.isEmpty) {
+      // User cleared the text, stop typing immediately
+      final messageBloc = context.read<MessageBloc>();
+      messageBloc.emitTypingStop(widget.userId, widget.conversationId!);
+    } else {
+      // User is typing, emit typing start
+      final messageBloc = context.read<MessageBloc>();
+      messageBloc.emitTypingStart(widget.userId, widget.conversationId!);
+
+      // // Set timer to auto-stop typing after 3 seconds of inactivity
+      // _typingDebounceTimer = Timer(const Duration(seconds: 3), () {
+      //   final messageBloc = context.read<MessageBloc>();
+      //   messageBloc.emitTypingStop(widget.userId, widget.conversationId!);
+      // });
     }
   }
 
@@ -142,6 +177,7 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+
                     Text(
                       "Đang hoạt động",
                       style: TextStyle(
@@ -222,10 +258,23 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
                       vertical: 10.h,
                       horizontal: 12.w,
                     ),
-                    itemCount: messagesList.length + 1,
+                    itemCount:
+                        messagesList.length +
+                        2, // +1 for profile, +1 for typing indicator
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return _buildProfileInfo();
+                      }
+
+                      // Typing indicator ở cuối danh sách
+                      if (index == messagesList.length + 1) {
+                        return ChatTypingIndicator(
+                          friendAvatarUrl: widget.friendInfo?.avatarUrl,
+                          friendName:
+                              widget.friendInfo?.fullName ??
+                              widget.friendInfo?.username,
+                          currentUserId: widget.userId,
+                        );
                       }
 
                       final int currentMessageIndex = index - 1;
@@ -502,6 +551,8 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
                 borderRadius: BorderRadius.circular(24.r),
               ),
               child: TextField(
+                controller: _messageController,
+                onChanged: _onTextChanged,
                 decoration: InputDecoration(
                   hintText: "Nhắn tin...",
                   hintStyle: TextStyle(
@@ -517,7 +568,19 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
           SizedBox(width: 8.w),
           IconButton(
             icon: Icon(CupertinoIcons.paperplane_fill, color: Colors.blue),
-            onPressed: () {},
+            onPressed: () {
+              // Stop typing when sending message
+              if (widget.conversationId != null) {
+                _typingDebounceTimer?.cancel();
+                final messageBloc = context.read<MessageBloc>();
+                messageBloc.emitTypingStop(
+                  widget.userId,
+                  widget.conversationId!,
+                );
+              }
+              // TODO: Send message logic here
+              _messageController.clear();
+            },
           ),
         ],
       ),

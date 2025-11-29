@@ -271,6 +271,14 @@ Future<void> initializeDependencies() async {
     () => JoinConversationUseCase(s1()),
   );
   s1.registerLazySingleton<GetMessagesUseCase>(() => GetMessagesUseCase(s1()));
+  s1.registerLazySingleton<TypingStartUseCase>(() => TypingStartUseCase(s1()));
+  s1.registerLazySingleton<TypingStopUseCase>(() => TypingStopUseCase(s1()));
+  s1.registerLazySingleton<ListenTypingStartUseCase>(
+    () => ListenTypingStartUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenTypingStopUseCase>(
+    () => ListenTypingStopUseCase(s1()),
+  );
 
   // Profile Bloc
   s1.registerFactory(
@@ -384,7 +392,15 @@ Future<void> initializeDependencies() async {
     ),
   );
 
-  s1.registerFactory<MessageBloc>(() => MessageBloc(getMessagesUseCase: s1()));
+  s1.registerFactory<MessageBloc>(
+    () => MessageBloc(
+      getMessagesUseCase: s1(),
+      typingStartUseCase: s1(),
+      typingStopUseCase: s1(),
+      listenTypingStartUseCase: s1(),
+      listenTypingStopUseCase: s1(),
+    ),
+  );
 }
 
 Future<void> resetDependencies() async {

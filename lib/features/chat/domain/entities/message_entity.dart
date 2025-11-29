@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/core/enums/emoji.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 
 class MessageEntity extends Equatable {
@@ -63,12 +64,12 @@ class AttachmentEntity extends Equatable {
 
 class ReactionEntity extends Equatable {
   final UserEntity user;
-  final String reaction;
+  final EmojiType emoji;
 
-  const ReactionEntity({required this.user, required this.reaction});
+  const ReactionEntity({required this.user, required this.emoji});
 
   @override
-  List<Object?> get props => [user, reaction];
+  List<Object?> get props => [user, emoji];
 }
 
 class SeenByEntity extends Equatable {

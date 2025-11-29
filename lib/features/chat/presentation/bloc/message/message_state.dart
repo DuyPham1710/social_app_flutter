@@ -19,11 +19,17 @@ class MessagesLoading extends MessageState {
 
 class MessagesLoaded extends MessageState {
   final MessageResponseEntity messages;
+  final String? typingUserId;
+  final bool isTyping;
 
-  const MessagesLoaded(this.messages);
+  const MessagesLoaded(
+    this.messages, {
+    this.typingUserId,
+    this.isTyping = false,
+  });
 
   @override
-  List<Object?> get props => [messages];
+  List<Object?> get props => [messages, typingUserId, isTyping];
 }
 
 class MessagesError extends MessageState {
@@ -33,4 +39,20 @@ class MessagesError extends MessageState {
 
   @override
   List<Object?> get props => [message];
+}
+
+// Typing states
+class TypingState extends MessageState {
+  final String userId;
+  final String conversationId;
+  final bool isTyping;
+
+  const TypingState({
+    required this.userId,
+    required this.conversationId,
+    required this.isTyping,
+  });
+
+  @override
+  List<Object?> get props => [userId, conversationId, isTyping];
 }

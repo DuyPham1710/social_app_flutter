@@ -109,6 +109,36 @@ class ChatRepositoryImpl implements ChatRepository {
     });
   }
 
+  @override
+  Stream<Map<String, dynamic>> get onTypingStart =>
+      _remoteDataSource.onTypingStart;
+
+  @override
+  Stream<Map<String, dynamic>> get onTypingStop =>
+      _remoteDataSource.onTypingStop;
+
+  @override
+  void emitTypingStart({
+    required String userId,
+    required String conversationId,
+  }) {
+    _remoteDataSource.emitTypingStart(
+      userId: userId,
+      conversationId: conversationId,
+    );
+  }
+
+  @override
+  void emitTypingStop({
+    required String userId,
+    required String conversationId,
+  }) {
+    _remoteDataSource.emitTypingStop(
+      userId: userId,
+      conversationId: conversationId,
+    );
+  }
+
   // @override
   // Stream<MessageEntity> get onNewMessage {
   //   return _remoteDataSource.onNewMessage.map((model) => model.toEntity());
@@ -118,9 +148,6 @@ class ChatRepositoryImpl implements ChatRepository {
   // Stream<ConversationEntity> get onConversationUpdate {
   //   return _remoteDataSource.onConversationUpdate.map((model) => model.toEntity());
   // }
-
-  // @override
-  // Stream<Map<String, dynamic>> get onTyping => _remoteDataSource.onTyping;
 
   // @override
   // Stream<Map<String, dynamic>> get onUserOnline => _remoteDataSource.onUserOnline;

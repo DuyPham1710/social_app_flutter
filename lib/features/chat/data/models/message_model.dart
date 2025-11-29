@@ -1,3 +1,4 @@
+import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
@@ -25,24 +26,29 @@ class AttachmentModel {
 
 class ReactionModel {
   final UserModel user;
-  final String reaction;
+  final EmojiType emoji;
 
-  ReactionModel({required this.user, required this.reaction});
+  ReactionModel({required this.user, required this.emoji});
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
+    EmojiType emoji = EmojiType.values.firstWhere(
+      (e) => e.id == json['id'],
+      orElse: () => EmojiType.like,
+    );
+
     return ReactionModel(
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
-      reaction: json['reaction'] as String,
+      emoji: emoji,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'user': user.toJson(),
-    'reaction': reaction,
+    'emoji': {'id': emoji.id, 'label': emoji.label, 'icon': emoji.icon},
   };
 
   ReactionEntity toEntity() =>
-      ReactionEntity(user: user.toEntity(), reaction: reaction);
+      ReactionEntity(user: user.toEntity(), emoji: emoji);
 }
 
 class SeenByModel {
