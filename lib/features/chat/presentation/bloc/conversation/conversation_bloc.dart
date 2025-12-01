@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/core/usecase/usecase.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
 import 'conversation_event.dart';
 import 'conversation_state.dart';
@@ -8,16 +10,28 @@ import 'conversation_state.dart';
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final GetConversationsUseCase _getConversationsUseCase;
   final JoinConversationUseCase _joinConversationUseCase;
+  final LeaveConversationUseCase _leaveConversationUseCase;
+  final ListenConversationUpdateUseCase _listenConversationUpdateUseCase;
   // bool _isConnected = false;
+
+  StreamSubscription<ConversationEntity>? _conversationUpdateSubscription;
 
   ConversationBloc({
     required GetConversationsUseCase getConversationsUseCase,
     required JoinConversationUseCase joinConversationUseCase,
+    required LeaveConversationUseCase leaveConversationUseCase,
+    required ListenConversationUpdateUseCase listenConversationUpdateUseCase,
   }) : _getConversationsUseCase = getConversationsUseCase,
        _joinConversationUseCase = joinConversationUseCase,
+       _leaveConversationUseCase = leaveConversationUseCase,
+       _listenConversationUpdateUseCase = listenConversationUpdateUseCase,
        super(const ConversationInitial()) {
     on<LoadConversationsEvent>(_onLoadConversations);
     on<JoinConversationEvent>(_onJoinConversation);
+    on<LeaveConversationEvent>(_onLeaveConversation);
+    on<ConversationUpdatedEvent>(_onConversationUpdated);
+
+    _setupConversationUpdateListener();
   }
 
   Future<void> _onLoadConversations(
@@ -36,8 +50,25 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       );
 
       if (result is DataStateSuccess) {
-        emit(ConversationsLoaded(result.data!));
-        print('Loaded ${result.data!.data.length} conversations successfully');
+        // Join vào tất cả conversation rooms để nhận real-time updates
+        // khi user đang ở ChatListPage
+        for (final conversation in result.data!.data) {
+          _joinConversationUseCase(
+            params: JoinConversationParams(
+              userId: event.userId,
+              conversationId: conversation.id,
+            ),
+            // ignore: body_might_complete_normally_catch_error
+          ).catchError((error) {
+            // Log error nhưng không block flow
+            print('Error joining conversation ${conversation.id}: $error');
+          });
+
+          emit(ConversationsLoaded(result.data!));
+          print(
+            'Loaded ${result.data!.data.length} conversations successfully',
+          );
+        }
       } else if (result is DataStateError) {
         emit(
           ConversationsError(
@@ -69,6 +100,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       if (result is DataStateSuccess) {
         emit(JoinConversationSuccess(event.conversationId));
         print('Joined conversation ${event.conversationId} successfully');
+
+        // reload conversations after joining
+        //   add(LoadConversationsEvent(userId: event.userId));
       } else if (result is DataStateError) {
         emit(
           JoinConversationError(
@@ -83,73 +117,65 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     }
   }
 
-  // Future<void> _onConnectChat(
-  //   ConnectChatEvent event,
-  //   Emitter<ChatState> emit,
-  // ) async {
-  //   if (_isConnected) {
-  //     print('Chat already connected');
-  //     return;
-  //   }
+  Future<void> _onLeaveConversation(
+    LeaveConversationEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    try {
+      final result = await _leaveConversationUseCase(
+        params: LeaveConversationParams(conversationId: event.conversationId),
+      );
 
-  //   try {
-  //     emit(const ChatConnecting());
+      if (result is DataStateSuccess) {
+        print('Left conversation ${event.conversationId} successfully');
+        // Optional: emit state nếu cần
+        // emit(ConversationInitial());
+      } else if (result is DataStateError) {
+        print('Error leaving conversation: ${result.error}');
+        // Optional: emit error state nếu muốn bắt UI
+      }
+    } catch (e) {
+      print('Exception leaving conversation: $e');
+    }
+  }
 
-  //     // Lấy userId từ token storage giống như HomeBloc
-  //     final userData = await TokenStorage.getUserData();
-  //     final userId = userData?['id'];
-  //     final username = userData?['username'];
+  void _setupConversationUpdateListener() {
+    _conversationUpdateSubscription =
+        _listenConversationUpdateUseCase(params: const NoParams()).listen((
+          conversation,
+        ) {
+          add(ConversationUpdatedEvent(conversation));
+        });
+  }
 
-  //     if (userId == null) {
-  //       emit(const ChatError('User not found. Please login again.'));
-  //       return;
-  //     }
+  Future<void> _onConversationUpdated(
+    ConversationUpdatedEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    final currentState = state;
 
-  //     print('Connecting to chat with userId: $userId, username: $username');
+    if (currentState is ConversationsLoaded) {
+      final currentList = currentState.conversations.data;
+      final index = currentList.indexWhere(
+        (c) => c.id == event.conversation.id,
+      );
 
-  //     // Connect to chat namespace and wait for connection
-  //     await _connectChatUseCase(
-  //       params: ConnectChatSocketParams(userId, username ?? 'Unknown'),
-  //     );
-  //     _isConnected = true;
+      if (index != -1) {
+        final updatedList = List<ConversationEntity>.from(currentList);
+        updatedList[index] = event.conversation;
 
-  //     emit(ChatConnected(userId: userId, username: username));
+        final updatedResponse = currentState.conversations.copyWith(
+          data: updatedList,
+        );
 
-  //     print('Chat connected successfully');
-  //   } catch (e) {
-  //     print('Error connecting to chat: $e');
-  //     emit(ChatError('Failed to connect to chat: $e'));
-  //   }
-  // }
-
-  // Future<void> _onDisconnectChat(
-  //   DisconnectChatEvent event,
-  //   Emitter<ChatState> emit,
-  // ) async {
-  //   if (!_isConnected) {
-  //     print('Chat already disconnected');
-  //     return;
-  //   }
-
-  //   try {
-  //     print('Disconnecting from chat...');
-
-  //     _disconnectChatUseCase();
-  //     _isConnected = false;
-
-  //     emit(const ChatDisconnected());
-  //     print('Chat disconnected successfully');
-  //   } catch (e) {
-  //     print('Error disconnecting from chat: $e');
-  //     emit(ChatError('Failed to disconnect from chat: $e'));
-  //   }
-  // }
+        emit(ConversationsLoaded(updatedResponse));
+      }
+    }
+  }
 
   @override
   Future<void> close() {
-    // if (_isConnected) {
-    //   _disconnectChatUseCase();
-    // }
+    _conversationUpdateSubscription?.cancel();
     return super.close();
   }
 }

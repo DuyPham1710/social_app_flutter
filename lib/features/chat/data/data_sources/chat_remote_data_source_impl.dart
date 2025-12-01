@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 
 import '../../../../core/network/websocket/socket_client.dart';
 import '../models/chat_models.dart';
@@ -18,9 +19,9 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       StreamController<Map<String, dynamic>>.broadcast();
   final _typingStopController =
       StreamController<Map<String, dynamic>>.broadcast();
-  // final _newMessageController = StreamController<MessageModel>.broadcast();
-  // final _conversationUpdateController =
-  //     StreamController<ConversationModel>.broadcast();
+  final _newMessageController = StreamController<MessageEntity>.broadcast();
+  final _conversationUpdateController =
+      StreamController<ConversationModel>.broadcast();
   // final _userOnlineController =
   //     StreamController<Map<String, dynamic>>.broadcast();
 
@@ -47,14 +48,14 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       _typingStartController.stream;
 
   @override
-  Stream<Map<String, dynamic>> get onTypingStop =>
-      _typingStopController.stream;
-  // @override
-  // Stream<MessageModel> get onNewMessage => _newMessageController.stream;
+  Stream<Map<String, dynamic>> get onTypingStop => _typingStopController.stream;
 
-  // @override
-  // Stream<ConversationModel> get onConversationUpdate =>
-  //     _conversationUpdateController.stream;
+  @override
+  Stream<MessageEntity> get onNewMessage => _newMessageController.stream;
+
+  @override
+  Stream<ConversationModel> get onConversationUpdate =>
+      _conversationUpdateController.stream;
 
   // @override
   // Stream<Map<String, dynamic>> get onUserOnline => _userOnlineController.stream;
@@ -77,6 +78,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _setupConversationListeners();
     _setupMessageListeners();
     _setupTypingListeners();
+    _setupNewMessageListeners();
   }
 
   /// Wait for connection to be established
@@ -165,18 +167,20 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     });
 
     // Listen for conversation updates
-    // _socketClient.on('conversation:updated').listen((data) {
-    //   developer.log('Conversation updated event', name: 'ChatDataSource');
-    //   try {
-    //     final conversation = ConversationModel.fromJson(data);
-    //     _conversationUpdateController.add(conversation);
-    //   } catch (e) {
-    //     developer.log(
-    //       'Error parsing conversation:updated: $e',
-    //       name: 'ChatDataSource',
-    //     );
-    //   }
-    // });
+    _socketClient.on('conversation:updated').listen((data) {
+      developer.log('Conversation updated event', name: 'ChatDataSource');
+      try {
+        final conversation = ConversationModel.fromJson(
+          data as Map<String, dynamic>,
+        );
+        _conversationUpdateController.add(conversation);
+      } catch (e) {
+        developer.log(
+          'Error parsing conversation:updated: $e',
+          name: 'ChatDataSource',
+        );
+      }
+    });
   }
 
   // /// Setup listeners for message events
@@ -203,16 +207,28 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         );
       }
     });
-    // Listen for new messages
-    // _socketClient.on('message:new').listen((data) {
-    //   developer.log('New message event', name: 'ChatDataSource');
-    //   try {
-    //     final message = MessageModel.fromJson(data);
-    //     _newMessageController.add(message);
-    //   } catch (e) {
-    //     developer.log('Error parsing message:new: $e', name: 'ChatDataSource');
-    //   }
-    // });
+  }
+
+  /// Setup listeners for new message events
+  void _setupNewMessageListeners() {
+    _socketClient.on('message:new').listen((data) {
+      developer.log('New message event: $data', name: 'ChatDataSource');
+
+      try {
+        final messageModel = MessageModel.fromJson(data);
+        final messageEntity = messageModel.toEntity();
+        _newMessageController.add(messageEntity);
+
+        developer.log(
+          'New message parsed successfully: ${messageEntity.id}',
+          name: 'ChatDataSource',
+        );
+      } catch (e, stackTrace) {
+        developer.log('Error parsing message:new: $e', name: 'ChatDataSource');
+        developer.log('Raw data: $data', name: 'ChatDataSource');
+        developer.log('Stack trace: $stackTrace', name: 'ChatDataSource');
+      }
+    });
   }
 
   /// Setup listeners for typing events
@@ -322,6 +338,44 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         name: 'ChatDataSource',
       );
       throw Exception('Failed to join conversation: $e');
+    }
+  }
+
+  @override
+  Future<void> leaveConversation({required String conversationId}) async {
+    developer.log(
+      'Leaving conversation: $conversationId',
+      name: 'ChatDataSource',
+    );
+
+    // Wait for connection to be established
+    try {
+      await waitForConnection();
+    } catch (e) {
+      developer.log(
+        'Connection not ready for leave conversation: $e',
+        name: 'ChatDataSource',
+      );
+      throw Exception('Chat connection not ready: $e');
+    }
+
+    try {
+      _socketClient.emit('conversation:leave', {
+        'conversationId': conversationId,
+      });
+
+      developer.log(
+        'Leave conversation request sent successfully',
+        name: 'ChatDataSource',
+      );
+
+      return Future.value();
+    } catch (e) {
+      developer.log(
+        'Error emitting leave conversation: $e',
+        name: 'ChatDataSource',
+      );
+      throw Exception('Failed to leave conversation: $e');
     }
   }
 
@@ -436,6 +490,80 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     });
   }
 
+  /// Send message
+  @override
+  void sendMessage({
+    required String userId,
+    required String conversationId,
+    String? text,
+    List<Map<String, dynamic>>? attachments,
+    String? replyTo,
+  }) {
+    developer.log(
+      'Sending message to conversation: $conversationId',
+      name: 'ChatDataSource',
+    );
+
+    if (!_isConnected) {
+      developer.log(
+        'Connection not ready for sending message',
+        name: 'ChatDataSource',
+      );
+      return;
+    }
+
+    final messageData = <String, dynamic>{
+      'userId': userId,
+      'conversationId': conversationId,
+    };
+
+    if (text != null && text.isNotEmpty) {
+      messageData['text'] = text;
+    }
+
+    if (attachments != null && attachments.isNotEmpty) {
+      messageData['attachments'] = attachments;
+    }
+
+    if (replyTo != null && replyTo.isNotEmpty) {
+      messageData['replyTo'] = replyTo;
+    }
+
+    _socketClient.emit('message:send', messageData);
+  }
+
+  /// Mark messages as read
+  @override
+  void markAsRead({
+    required String userId,
+    required String conversationId,
+    String? messageId,
+  }) {
+    developer.log(
+      'Marking messages as read for conversation: $conversationId${messageId != null ? ', messageId: $messageId' : ''}',
+      name: 'ChatDataSource',
+    );
+
+    if (!_isConnected) {
+      developer.log(
+        'Connection not ready for marking as read',
+        name: 'ChatDataSource',
+      );
+      return;
+    }
+
+    final readData = <String, dynamic>{
+      'userId': userId,
+      'conversationId': conversationId,
+    };
+
+    if (messageId != null && messageId.isNotEmpty) {
+      readData['messageId'] = messageId;
+    }
+
+    _socketClient.emit('message:read', readData);
+  }
+
   /// Disconnect
   @override
   void disconnect() {
@@ -450,7 +578,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _messagesLoadedController.close();
     _typingStartController.close();
     _typingStopController.close();
-    // _newMessageController.close();
+    _newMessageController.close();
     // _conversationUpdateController.close();
     // _userOnlineController.close();
     _conversationsCache.clear();

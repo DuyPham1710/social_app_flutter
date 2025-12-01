@@ -96,6 +96,20 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<void>> leaveConversation({
+    required String conversationId,
+  }) async {
+    try {
+      await _remoteDataSource.leaveConversation(conversationId: conversationId);
+      return const DataStateSuccess(null);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Stream<ConversationResponseEntity> get onConversationsLoaded {
     return _remoteDataSource.onConversationsLoaded.map((response) {
       return response.toEntity();
@@ -116,6 +130,9 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Stream<Map<String, dynamic>> get onTypingStop =>
       _remoteDataSource.onTypingStop;
+
+  @override
+  Stream<MessageEntity> get onNewMessage => _remoteDataSource.onNewMessage;
 
   @override
   void emitTypingStart({
@@ -139,15 +156,47 @@ class ChatRepositoryImpl implements ChatRepository {
     );
   }
 
+  @override
+  void sendMessage({
+    required String userId,
+    required String conversationId,
+    String? text,
+    List<Map<String, dynamic>>? attachments,
+    String? replyTo,
+  }) {
+    _remoteDataSource.sendMessage(
+      userId: userId,
+      conversationId: conversationId,
+      text: text,
+      attachments: attachments,
+      replyTo: replyTo,
+    );
+  }
+
+  @override
+  void markAsRead({
+    required String userId,
+    required String conversationId,
+    String? messageId,
+  }) {
+    _remoteDataSource.markAsRead(
+      userId: userId,
+      conversationId: conversationId,
+      messageId: messageId,
+    );
+  }
+
   // @override
   // Stream<MessageEntity> get onNewMessage {
   //   return _remoteDataSource.onNewMessage.map((model) => model.toEntity());
   // }
 
-  // @override
-  // Stream<ConversationEntity> get onConversationUpdate {
-  //   return _remoteDataSource.onConversationUpdate.map((model) => model.toEntity());
-  // }
+  @override
+  Stream<ConversationEntity> get onConversationUpdate {
+    return _remoteDataSource.onConversationUpdate.map(
+      (model) => model.toEntity(),
+    );
+  }
 
   // @override
   // Stream<Map<String, dynamic>> get onUserOnline => _remoteDataSource.onUserOnline;

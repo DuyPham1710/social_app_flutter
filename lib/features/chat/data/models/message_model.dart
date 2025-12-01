@@ -31,13 +31,44 @@ class ReactionModel {
   ReactionModel({required this.user, required this.emoji});
 
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
-    EmojiType emoji = EmojiType.values.firstWhere(
-      (e) => e.id == json['id'],
-      orElse: () => EmojiType.like,
-    );
+    // Parse emoji - can be object {id, label, icon} or direct id
+    EmojiType emoji = EmojiType.like; // Default
+    
+    if (json['emoji'] != null) {
+      if (json['emoji'] is Map) {
+        final emojiData = json['emoji'] as Map;
+        final emojiId = emojiData['id'] as String?;
+        if (emojiId != null) {
+          emoji = EmojiType.values.firstWhere(
+            (e) => e.id == emojiId,
+            orElse: () => EmojiType.like,
+          );
+        }
+      } else if (json['emoji'] is String) {
+        // Fallback: if emoji is direct string ID
+        emoji = EmojiType.values.firstWhere(
+          (e) => e.id == json['emoji'],
+          orElse: () => EmojiType.like,
+        );
+      }
+    } else if (json['id'] != null) {
+      // Fallback: check if id is at root level (old format)
+      emoji = EmojiType.values.firstWhere(
+        (e) => e.id == json['id'],
+        orElse: () => EmojiType.like,
+      );
+    }
+
+    // Parse user - handle both Map and Map<String, dynamic>
+    final userData = json['user'];
+    final userMap = userData is Map<String, dynamic>
+        ? userData
+        : userData is Map
+            ? Map<String, dynamic>.from(userData)
+            : throw Exception('Invalid user format: ${userData.runtimeType}');
 
     return ReactionModel(
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      user: UserModel.fromJson(userMap),
       emoji: emoji,
     );
   }
@@ -83,7 +114,7 @@ class MessageModel {
   final List<ReactionModel> reactions;
   final List<SeenByModel> seenBy;
   final bool deletedForEveryone;
-  final UserModel? deletedFor;
+  final List<UserModel>? deletedFor;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -102,40 +133,56 @@ class MessageModel {
     this.updatedAt,
   });
 
+  // Helper to safely parse list fields
+  static List<T> _parseList<T>(
+    dynamic data,
+    T Function(Map<String, dynamic>) parser,
+  ) {
+    if (data == null) return [];
+    if (data is! List) return [];
+    if (data.isEmpty) return [];
+
+    return data
+        .whereType<Map>()
+        .map((item) {
+          try {
+            final itemMap = item is Map<String, dynamic>
+                ? item
+                : Map<String, dynamic>.from(item);
+            return parser(itemMap);
+          } catch (e) {
+            print('Error parsing list item: $e');
+            return null;
+          }
+        })
+        .whereType<T>()
+        .toList();
+  }
+
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
       id: json['_id'] as String,
       conversationId: json['conversationId'] as String?,
       sender: UserModel.fromJson(json['senderId'] as Map<String, dynamic>),
       text: json['text'] as String?,
-      attachments: json['attachments'] != []
-          ? (json['attachments'] as List)
-                .map(
-                  (item) =>
-                      AttachmentModel.fromJson(item as Map<String, dynamic>),
-                )
-                .toList()
-          : [],
+      attachments: _parseList<AttachmentModel>(
+        json['attachments'],
+        (item) => AttachmentModel.fromJson(item),
+      ),
       replyTo: json['replyTo'],
-      reactions: json['reactions'] != []
-          ? (json['reactions'] as List)
-                .map(
-                  (item) =>
-                      ReactionModel.fromJson(item as Map<String, dynamic>),
-                )
-                .toList()
-          : [],
-      seenBy: json['seenBy'] != []
-          ? (json['seenBy'] as List)
-                .map(
-                  (item) => SeenByModel.fromJson(item as Map<String, dynamic>),
-                )
-                .toList()
-          : [],
+      reactions: _parseList<ReactionModel>(
+        json['reactions'],
+        (item) => ReactionModel.fromJson(item),
+      ),
+      seenBy: _parseList<SeenByModel>(
+        json['seenBy'],
+        (item) => SeenByModel.fromJson(item),
+      ),
       deletedForEveryone: json['deletedForEveryone'] as bool? ?? false,
-      deletedFor: json['deletedFor'] != null
-          ? UserModel.fromJson(json['deletedFor'] as Map<String, dynamic>)
-          : null,
+      deletedFor: _parseList<UserModel>(
+        json['deletedFor'],
+        (item) => UserModel.fromJson(item),
+      ),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -153,7 +200,7 @@ class MessageModel {
     'reactions': reactions.map((e) => e.toJson()).toList(),
     'seenBy': seenBy.map((e) => e.toJson()).toList(),
     'deletedForEveryone': deletedForEveryone,
-    'deletedFor': deletedFor?.toJson(),
+    'deletedFor': deletedFor?.map((e) => e.toJson()).toList(),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt?.toIso8601String(),
   };
@@ -168,7 +215,7 @@ class MessageModel {
     reactions: reactions.map((e) => e.toEntity()).toList(),
     seenBy: seenBy.map((e) => e.toEntity()).toList(),
     deletedForEveryone: deletedForEveryone,
-    deletedFor: deletedFor?.toEntity(),
+    deletedFor: deletedFor?.map((e) => e.toEntity()).toList(),
     createdAt: createdAt,
     updatedAt: updatedAt,
   );

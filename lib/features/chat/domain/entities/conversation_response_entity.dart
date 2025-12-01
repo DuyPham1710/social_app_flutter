@@ -9,4 +9,14 @@ class ConversationResponseEntity {
     required this.data,
     required this.pagination,
   });
+
+  ConversationResponseEntity copyWith({
+    List<ConversationEntity>? data,
+    PaginatedResponseEntity? pagination,
+  }) {
+    return ConversationResponseEntity(
+      data: data ?? this.data,
+      pagination: pagination ?? this.pagination,
+    );
+  }
 }

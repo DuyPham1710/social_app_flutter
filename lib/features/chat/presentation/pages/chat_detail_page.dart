@@ -7,7 +7,6 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
-import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_item.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/chat_typing_indicator.dart';
 
@@ -30,55 +29,42 @@ class ChatDetailPage extends StatefulWidget {
 }
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
-  @override
-  Widget build(BuildContext context) {
-    // Create a new MessageBloc instance for this conversation
-    // This ensures each conversation has its own state
-    return BlocProvider(
-      create: (context) => s1<MessageBloc>(),
-      child: _ChatDetailPageContent(
-        userId: widget.userId,
-        conversationId: widget.conversationId,
-        friendId: widget.friendId,
-        friendInfo: widget.friendInfo,
-      ),
-    );
-  }
-}
-
-class _ChatDetailPageContent extends StatefulWidget {
-  final String userId;
-  final String? conversationId;
-  final String? friendId;
-  final UserEntity? friendInfo;
-
-  const _ChatDetailPageContent({
-    required this.userId,
-    this.conversationId,
-    this.friendId,
-    this.friendInfo,
-  });
-
-  @override
-  State<_ChatDetailPageContent> createState() => _ChatDetailPageContentState();
-}
-
-class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
   Timer? _typingDebounceTimer;
+
+  //late final ConversationBloc _conversationBloc;
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   // Lấy bloc 1 lần, khi context còn sống
+  //   _conversationBloc = context.read<ConversationBloc>();
+  // }
 
   @override
   void initState() {
     super.initState();
 
+    // Add focus listener to scroll to bottom when TextField is focused
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        // Scroll với delay để đảm bảo bàn phím đã hiện hoàn toàn
+        Future.delayed(const Duration(milliseconds: 300), () {
+          _scrollToBottom();
+        });
+      }
+    });
+
     // Nếu có conversationId, thực hiện join phòng chat và load messages
     if (widget.conversationId != null) {
-      context.read<ConversationBloc>().add(
-        JoinConversationEvent(
-          userId: widget.userId,
-          conversationId: widget.conversationId!,
-        ),
-      );
+      // context.read<ConversationBloc>().add(
+      //   JoinConversationEvent(
+      //     userId: widget.userId,
+      //     conversationId: widget.conversationId!,
+      //   ),
+      // );
 
       // Load messages after joining
       context.read<MessageBloc>().add(
@@ -97,6 +83,8 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
     _typingDebounceTimer?.cancel();
     super.dispose();
   }
@@ -124,10 +112,23 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
     }
   }
 
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: true, // Đảm bảo UI resize khi bàn phím hiện lên
 
       appBar: AppBar(
         elevation: 0,
@@ -218,7 +219,10 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
             onPressed: () {
               Navigator.push(
                 context,
-                CupertinoPageRoute(builder: (context) => const ChatInfoPage()),
+                CupertinoPageRoute(
+                  builder: (context) =>
+                      ChatInfoPage(userInfo: widget.friendInfo),
+                ),
               );
             },
           ),
@@ -237,6 +241,24 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
                 } else if (state is MessagesLoaded) {
                   final messagesList = state.messages.data;
 
+                  final lastMessageId = messagesList.isNotEmpty
+                      ? messagesList.last.id
+                      : null;
+
+                  // Mark as read with the last message ID
+                  context.read<MessageBloc>().add(
+                    MarkAsReadEvent(
+                      userId: widget.userId,
+                      conversationId: widget.conversationId!,
+                      messageId: lastMessageId,
+                    ),
+                  );
+
+                  // Auto scroll to bottom when messages are loaded
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _scrollToBottom();
+                  });
+
                   if (messagesList.isEmpty) {
                     return Column(
                       children: [
@@ -254,6 +276,7 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
                   }
 
                   return ListView.builder(
+                    controller: _scrollController,
                     padding: EdgeInsets.symmetric(
                       vertical: 10.h,
                       horizontal: 12.w,
@@ -445,69 +468,6 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
     );
   }
 
-  // Widget _buildMessageItem(
-  //   Map<String, dynamic> msg,
-  //   bool fromMe,
-  //   bool showAvatar,
-  // ) {
-  //   return Container(
-  //     margin: EdgeInsets.only(
-  //       bottom: 10.h,
-  //       left: fromMe ? 60.w : 0,
-  //       right: fromMe ? 0 : 60.w,
-  //     ),
-  //     //alignment: fromMe ? Alignment.centerRight : Alignment.centerLeft,
-  //     child: Row(
-  //       // Căn chỉnh hàng: fromMe thì nằm phải, người khác thì nằm trái
-  //       mainAxisAlignment: fromMe
-  //           ? MainAxisAlignment.end
-  //           : MainAxisAlignment.start,
-  //       // Căn đáy để Avatar nằm ở dưới cùng của bubble chat
-  //       crossAxisAlignment: CrossAxisAlignment.end,
-  //       children: [
-  //         if (!fromMe) ...[
-  //           if (showAvatar)
-  //             CircleAvatar(
-  //               radius: 14.r,
-  //               backgroundImage: NetworkImage("https://i.pravatar.cc/200"),
-  //             )
-  //           else
-  //             SizedBox(width: 28.r),
-
-  //           SizedBox(width: 8.w),
-  //         ],
-
-  //         // Dùng Flexible để tin nhắn không bị tràn khi có thêm avatar
-  //         Flexible(
-  //           child: Container(
-  //             // Giới hạn chiều rộng tối đa của tin nhắn (khoảng 70% màn hình)
-  //             constraints: BoxConstraints(maxWidth: 0.7.sw),
-  //             padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
-  //             decoration: BoxDecoration(
-  //               color: fromMe
-  //                   ? AppColors.primary
-  //                   : AppColors.textSecondary.withOpacity(0.1),
-  //               borderRadius: BorderRadius.only(
-  //                 topLeft: Radius.circular(14.r),
-  //                 topRight: Radius.circular(14.r),
-  //                 bottomLeft: Radius.circular(fromMe ? 14.r : 0),
-  //                 bottomRight: Radius.circular(fromMe ? 0 : 14.r),
-  //               ),
-  //             ),
-  //             child: Text(
-  //               msg["text"],
-  //               style: TextStyle(
-  //                 color: fromMe ? Colors.white : AppColors.textPrimary,
-  //                 fontSize: 14.sp,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget _buildInputArea() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
@@ -552,7 +512,14 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
               ),
               child: TextField(
                 controller: _messageController,
+                focusNode: _focusNode,
                 onChanged: _onTextChanged,
+                onTap: () {
+                  // Scroll to bottom with delay để đợi bàn phím hiện lên hoàn toàn
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    _scrollToBottom();
+                  });
+                },
                 decoration: InputDecoration(
                   hintText: "Nhắn tin...",
                   hintStyle: TextStyle(
@@ -569,6 +536,11 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
           IconButton(
             icon: Icon(CupertinoIcons.paperplane_fill, color: Colors.blue),
             onPressed: () {
+              final text = _messageController.text.trim();
+
+              // Don't send if empty
+              if (text.isEmpty) return;
+
               // Stop typing when sending message
               if (widget.conversationId != null) {
                 _typingDebounceTimer?.cancel();
@@ -577,8 +549,21 @@ class _ChatDetailPageContentState extends State<_ChatDetailPageContent> {
                   widget.userId,
                   widget.conversationId!,
                 );
+
+                // Send message
+                messageBloc.add(
+                  SendMessageEvent(
+                    userId: widget.userId,
+                    conversationId: widget.conversationId!,
+                    text: text,
+                  ),
+                );
+
+                // Scroll to bottom after sending
+                _scrollToBottom();
               }
-              // TODO: Send message logic here
+
+              // Clear text field
               _messageController.clear();
             },
           ),

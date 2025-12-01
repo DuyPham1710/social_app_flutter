@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 
 abstract class ConversationEvent extends Equatable {
   const ConversationEvent();
@@ -41,4 +42,22 @@ class JoinConversationEvent extends ConversationEvent {
 
   @override
   List<Object?> get props => [userId, conversationId];
+}
+
+class LeaveConversationEvent extends ConversationEvent {
+  final String conversationId;
+
+  const LeaveConversationEvent({required this.conversationId});
+
+  @override
+  List<Object?> get props => [conversationId];
+}
+
+class ConversationUpdatedEvent extends ConversationEvent {
+  final ConversationEntity conversation;
+
+  const ConversationUpdatedEvent(this.conversation);
+
+  @override
+  List<Object?> get props => [conversation];
 }

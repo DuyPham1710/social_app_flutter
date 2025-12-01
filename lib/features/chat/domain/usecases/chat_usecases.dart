@@ -7,3 +7,8 @@ export 'typing_start_usecase.dart';
 export 'typing_stop_usecase.dart';
 export 'listen_typing_start_usecase.dart';
 export 'listen_typing_stop_usecase.dart';
+export 'listen_new_message_usecase.dart';
+export 'send_message_usecase.dart';
+export 'leave_conversation_usecase.dart';
+export 'listen_conversation_update_usecase.dart';
+export 'mark_as_read_usecase.dart';

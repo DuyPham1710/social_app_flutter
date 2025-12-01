@@ -1,4 +1,5 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/conversation_response_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 
@@ -28,15 +29,30 @@ abstract class ChatRepository {
     required String conversationId,
   });
 
+  Future<DataState<void>> leaveConversation({required String conversationId});
+
   // Typing events
   void emitTypingStart({
     required String userId,
     required String conversationId,
   });
 
-  void emitTypingStop({
+  void emitTypingStop({required String userId, required String conversationId});
+
+  // Send message
+  void sendMessage({
     required String userId,
     required String conversationId,
+    String? text,
+    List<Map<String, dynamic>>? attachments,
+    String? replyTo,
+  });
+
+  // Mark messages as read
+  void markAsRead({
+    required String userId,
+    required String conversationId,
+    String? messageId,
   });
 
   // // Real-time events
@@ -44,7 +60,7 @@ abstract class ChatRepository {
   Stream<MessageResponseEntity> get onMessagesLoaded;
   Stream<Map<String, dynamic>> get onTypingStart;
   Stream<Map<String, dynamic>> get onTypingStop;
-  // Stream<MessageEntity> get onNewMessage;
-  // Stream<ConversationEntity> get onConversationUpdate;
+  Stream<MessageEntity> get onNewMessage;
+  Stream<ConversationEntity> get onConversationUpdate;
   // Stream<Map<String, dynamic>> get onUserOnline;
 }

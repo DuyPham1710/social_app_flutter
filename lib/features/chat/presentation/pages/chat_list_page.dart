@@ -17,6 +17,9 @@ import 'package:social_app_fe/features/chat/presentation/widgets/friend_message_
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/message/message_bloc.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/message/message_event.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -27,11 +30,28 @@ class ChatListPage extends StatefulWidget {
 
 class _ChatListPageState extends State<ChatListPage> {
   String? userId;
+  late MessageBloc messageBloc;
+
+  late final ConversationBloc _conversationBloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Lấy bloc 1 lần, khi context còn sống
+    _conversationBloc = context.read<ConversationBloc>();
+  }
 
   @override
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  // này là đang cho rời khỏi trang chat list thì leave tất cả conversation (sẽ không nhận đc update nữa)
+  @override
+  void dispose() {
+    _leaveAllConversations();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -58,6 +78,25 @@ class _ChatListPageState extends State<ChatListPage> {
     context.read<FriendBloc>().add(LoadFriends());
   }
 
+  void _leaveAllConversations() {
+    final chatState = _conversationBloc.state;
+
+    if (chatState is ConversationsLoaded) {
+      final conversations = chatState.conversations.data;
+
+      // Leave tất cả conversations
+      for (final conversation in conversations) {
+        _conversationBloc.add(
+          LeaveConversationEvent(conversationId: conversation.id),
+        );
+      }
+
+      print(
+        'Left ${conversations.length} conversations when exiting chat list page',
+      );
+    }
+  }
+
   Future<void> _joinConversationAndNavigate(
     String conversationId,
     UserEntity friendInfo,
@@ -73,13 +112,27 @@ class _ChatListPageState extends State<ChatListPage> {
       return;
     }
 
+    // Mark all messages as read when navigating to chat detail (without messageId)
+    // This will mark all unread messages in the conversation as read
+    messageBloc = s1<MessageBloc>();
+    messageBloc.add(
+      MarkAsReadEvent(
+        userId: userId!,
+        conversationId: conversationId,
+        // messageId is null to mark all messages as read
+      ),
+    );
+
     Navigator.push(
       context,
       CupertinoPageRoute(
-        builder: (_) => ChatDetailPage(
-          userId: userId!,
-          conversationId: conversationId,
-          friendInfo: friendInfo,
+        builder: (_) => BlocProvider(
+          create: (_) => messageBloc,
+          child: ChatDetailPage(
+            userId: userId!,
+            conversationId: conversationId,
+            friendInfo: friendInfo,
+          ),
         ),
       ),
     );
@@ -254,7 +307,7 @@ class _ChatListPageState extends State<ChatListPage> {
             ],
           ),
           title: Text(
-            "Duy Phạm",
+            "FullName Chat",
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -386,24 +439,24 @@ class _ChatListPageState extends State<ChatListPage> {
                   }
 
                   // Handle loaded state (including when join conversation is successful)
-                  ConversationsLoaded? conversationsState;
-                  if (state is ConversationsLoaded) {
-                    conversationsState = state;
-                  }
-                  // Keep showing conversations even after successful join
-                  else if (state is JoinConversationSuccess) {
-                    // Try to get the last conversations state from bloc
-                    // For now, we'll trigger a reload
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _loadConversations();
-                    });
-                    // return const SliverToBoxAdapter(
-                    //   child: ConversationsLoadingWidget(),
-                    // );
-                  }
+                  // ConversationsLoaded? conversationsState;
+                  // if (state is ConversationsLoaded) {
+                  //   conversationsState = state;
+                  // }
+                  // // Keep showing conversations even after successful join
+                  // else if (state is JoinConversationSuccess) {
+                  //   // Try to get the last conversations state from bloc
+                  //   // For now, we'll trigger a reload
+                  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                  //     _loadConversations();
+                  //   });
+                  //   // return const SliverToBoxAdapter(
+                  //   //   child: ConversationsLoadingWidget(),
+                  //   // );
+                  // }
 
-                  if (conversationsState != null) {
-                    final conversations = conversationsState.conversations.data;
+                  if (state is ConversationsLoaded) {
+                    final conversations = state.conversations.data;
                     if (conversations.isEmpty) {
                       // Show friend suggestions when no conversations
                       return SliverToBoxAdapter(
@@ -413,11 +466,18 @@ class _ChatListPageState extends State<ChatListPage> {
                     return SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final conversation = conversations[index];
+
+                        // Tìm participant khác với user hiện tại
                         final otherParticipant =
-                            conversation.participants.length > 1
-                            ? conversation
-                                  .participants[1] // Assume current user is first participant
-                            : conversation.participants.firstOrNull;
+                            conversation.participants
+                                .where(
+                                  (participant) => participant.userId != userId,
+                                )
+                                .firstOrNull ??
+                            conversation.participants.firstOrNull;
+
+                        final bool fromMe =
+                            conversation.lastMessage?.sender.userId == userId;
 
                         return Padding(
                           padding: EdgeInsets.only(bottom: 6.h),
@@ -433,13 +493,15 @@ class _ChatListPageState extends State<ChatListPage> {
                                       otherParticipant?.username ??
                                       "Unknown",
                             preview:
-                                "${conversation.lastMessage?.text} • ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}",
+                                "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}",
                             isUnread: (conversation.unreadCount ?? 0) > 0,
                             onTap: () {
-                              _joinConversationAndNavigate(
-                                conversation.id,
-                                otherParticipant!,
-                              );
+                              if (otherParticipant != null) {
+                                _joinConversationAndNavigate(
+                                  conversation.id,
+                                  otherParticipant,
+                                );
+                              }
                             },
                           ),
                         );

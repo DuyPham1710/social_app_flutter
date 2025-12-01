@@ -1,5 +1,6 @@
 import 'package:social_app_fe/features/chat/data/models/chat_models.dart';
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 
 abstract class ChatRemoteDataSource {
   // Load conversations
@@ -23,15 +24,31 @@ abstract class ChatRemoteDataSource {
     required String conversationId,
   });
 
+  // Leave conversation
+  Future<void> leaveConversation({required String conversationId});
+
   // Typing events
   void emitTypingStart({
     required String userId,
     required String conversationId,
   });
 
-  void emitTypingStop({
+  void emitTypingStop({required String userId, required String conversationId});
+
+  // Send message
+  void sendMessage({
     required String userId,
     required String conversationId,
+    String? text,
+    List<Map<String, dynamic>>? attachments,
+    String? replyTo,
+  });
+
+  // Mark messages as read
+  void markAsRead({
+    required String userId,
+    required String conversationId,
+    String? messageId,
   });
 
   // // Real-time events
@@ -39,8 +56,8 @@ abstract class ChatRemoteDataSource {
   Stream<MessageReponseModel> get onMessagesLoaded;
   Stream<Map<String, dynamic>> get onTypingStart;
   Stream<Map<String, dynamic>> get onTypingStop;
-  // Stream<MessageModel> get onNewMessage;
-  // Stream<ConversationModel> get onConversationUpdate;
+  Stream<MessageEntity> get onNewMessage;
+  Stream<ConversationModel> get onConversationUpdate;
   // Stream<Map<String, dynamic>> get onUserOnline;
 
   // Connection management

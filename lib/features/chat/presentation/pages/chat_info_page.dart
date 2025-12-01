@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 
 class ChatInfoPage extends StatelessWidget {
-  const ChatInfoPage({super.key});
+  final UserEntity? userInfo;
+  const ChatInfoPage({super.key, this.userInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class ChatInfoPage extends StatelessWidget {
                       CircleAvatar(
                         radius: 50.r,
                         backgroundImage: NetworkImage(
-                          "https://i.pravatar.cc/200",
+                          userInfo?.avatarUrl ?? "https://i.pravatar.cc/200",
                         ),
                       ),
 
@@ -77,7 +79,7 @@ class ChatInfoPage extends StatelessWidget {
                   SizedBox(height: 12.h),
 
                   Text(
-                    "Duy Pham",
+                    userInfo?.fullName ?? userInfo?.username ?? "Unknown User",
                     style: TextStyle(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.bold,

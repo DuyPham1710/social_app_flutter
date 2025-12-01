@@ -16,6 +16,29 @@ class MessageItem extends StatelessWidget {
     required this.showAvatar,
   });
 
+  // Kiểm tra xem text có phải là emoji không
+  bool _isOnlyEmoji(String text) {
+    if (text.trim().isEmpty) return false;
+
+    // Loại bỏ khoảng trắng
+    final trimmedText = text.trim();
+
+    // Kiểm tra xem có phải là emoji không (Unicode emoji range)
+    final emojiRegex = RegExp(
+      r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])',
+    );
+
+    // Kiểm tra xem tất cả kí tự có phải là emoji không
+    final matches = emojiRegex.allMatches(trimmedText);
+    final emojiLength = matches.fold<int>(
+      0,
+      (sum, match) => sum + match.group(0)!.length,
+    );
+
+    // Nếu toàn bộ text là emoji và không quá 5 emoji
+    return emojiLength == trimmedText.length && matches.length <= 5;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -51,58 +74,10 @@ class MessageItem extends StatelessWidget {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Container(
-                      // Giới hạn chiều rộng tối đa của tin nhắn (khoảng 70% màn hình)
-                      constraints: BoxConstraints(maxWidth: 0.7.sw),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8.h,
-                        horizontal: 14.w,
-                      ),
-                      decoration: BoxDecoration(
-                        color: fromMe
-                            ? AppColors.primary
-                            : AppColors.textSecondary.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(14.r),
-                          topRight: Radius.circular(14.r),
-                          bottomLeft: Radius.circular(fromMe ? 14.r : 0),
-                          bottomRight: Radius.circular(fromMe ? 0 : 14.r),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (message.text != null && message.text!.isNotEmpty)
-                            Text(
-                              message.text!,
-                              style: TextStyle(
-                                color: fromMe
-                                    ? Colors.white
-                                    : AppColors.textPrimary,
-                                fontSize: 14.sp,
-                              ),
-                            ),
-
-                          // Show attachments if any
-                          if (message.attachments.isNotEmpty)
-                            ...message.attachments.map(
-                              (attachment) => Container(
-                                margin: EdgeInsets.only(top: 4.h),
-                                child: Text(
-                                  '[${attachment.type.toUpperCase()}] ${attachment.url}',
-                                  style: TextStyle(
-                                    color: fromMe
-                                        ? Colors.white70
-                                        : AppColors.textSecondary,
-                                    fontSize: 12.sp,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                    // Kiểm tra xem có phải là emoji không
+                    message.text != null && _isOnlyEmoji(message.text!)
+                        ? _buildEmojiMessage()
+                        : _buildNormalMessage(),
 
                     // Show reactions if any
                     if (message.reactions.isNotEmpty)
@@ -158,6 +133,96 @@ class MessageItem extends StatelessWidget {
             ? SizedBox(height: 20.h)
             : SizedBox.shrink(),
       ],
+    );
+  }
+
+  // Xây dựng emoji message (không có background)
+  Widget _buildEmojiMessage() {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (message.text != null && message.text!.isNotEmpty)
+            Text(
+              message.text!,
+              style: TextStyle(
+                fontSize: 26.sp, // Cỡ chữ lớn hơn cho emoji
+              ),
+            ),
+
+          // Show attachments if any
+          if (message.attachments.isNotEmpty)
+            ...message.attachments.map(
+              (attachment) => Container(
+                margin: EdgeInsets.only(top: 4.h),
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
+                decoration: BoxDecoration(
+                  color: fromMe
+                      ? AppColors.primary
+                      : AppColors.textSecondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                child: Text(
+                  '[${attachment.type.toUpperCase()}] ${attachment.url}',
+                  style: TextStyle(
+                    color: fromMe ? Colors.white70 : AppColors.textSecondary,
+                    fontSize: 12.sp,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // Xây dựng normal message (có background)
+  Widget _buildNormalMessage() {
+    return Container(
+      // Giới hạn chiều rộng tối đa của tin nhắn (khoảng 70% màn hình)
+      constraints: BoxConstraints(maxWidth: 0.7.sw),
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
+      decoration: BoxDecoration(
+        color: fromMe
+            ? AppColors.primary
+            : AppColors.textSecondary.withOpacity(0.1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(14.r),
+          topRight: Radius.circular(14.r),
+          bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+          bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (message.text != null && message.text!.isNotEmpty)
+            Text(
+              message.text!,
+              style: TextStyle(
+                color: fromMe ? Colors.white : AppColors.textPrimary,
+                fontSize: 14.sp,
+              ),
+            ),
+
+          // Show attachments if any
+          if (message.attachments.isNotEmpty)
+            ...message.attachments.map(
+              (attachment) => Container(
+                margin: EdgeInsets.only(top: 4.h),
+                child: Text(
+                  '[${attachment.type.toUpperCase()}] ${attachment.url}',
+                  style: TextStyle(
+                    color: fromMe ? Colors.white70 : AppColors.textSecondary,
+                    fontSize: 12.sp,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

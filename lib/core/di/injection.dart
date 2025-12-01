@@ -270,6 +270,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<JoinConversationUseCase>(
     () => JoinConversationUseCase(s1()),
   );
+  s1.registerLazySingleton<LeaveConversationUseCase>(
+    () => LeaveConversationUseCase(s1()),
+  );
   s1.registerLazySingleton<GetMessagesUseCase>(() => GetMessagesUseCase(s1()));
   s1.registerLazySingleton<TypingStartUseCase>(() => TypingStartUseCase(s1()));
   s1.registerLazySingleton<TypingStopUseCase>(() => TypingStopUseCase(s1()));
@@ -278,6 +281,14 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<ListenTypingStopUseCase>(
     () => ListenTypingStopUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenNewMessageUseCase>(
+    () => ListenNewMessageUseCase(s1()),
+  );
+  s1.registerLazySingleton<SendMessageUseCase>(() => SendMessageUseCase(s1()));
+  s1.registerLazySingleton<MarkAsReadUseCase>(() => MarkAsReadUseCase(s1()));
+  s1.registerLazySingleton<ListenConversationUpdateUseCase>(
+    () => ListenConversationUpdateUseCase(s1()),
   );
 
   // Profile Bloc
@@ -389,6 +400,8 @@ Future<void> initializeDependencies() async {
     () => ConversationBloc(
       getConversationsUseCase: s1(),
       joinConversationUseCase: s1(),
+      leaveConversationUseCase: s1(),
+      listenConversationUpdateUseCase: s1(),
     ),
   );
 
@@ -399,6 +412,9 @@ Future<void> initializeDependencies() async {
       typingStopUseCase: s1(),
       listenTypingStartUseCase: s1(),
       listenTypingStopUseCase: s1(),
+      listenNewMessageUseCase: s1(),
+      sendMessageUseCase: s1(),
+      markAsReadUseCase: s1(),
     ),
   );
 }

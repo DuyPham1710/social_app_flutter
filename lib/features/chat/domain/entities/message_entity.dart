@@ -12,7 +12,7 @@ class MessageEntity extends Equatable {
   final List<ReactionEntity> reactions;
   final List<SeenByEntity> seenBy;
   final bool deletedForEveryone;
-  final UserEntity? deletedFor;
+  final List<UserEntity>? deletedFor;
   final DateTime createdAt;
   final DateTime? updatedAt;
 

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 
 abstract class MessageEvent extends Equatable {
   const MessageEvent();
@@ -28,10 +29,7 @@ class TypingStartEvent extends MessageEvent {
   final String userId;
   final String conversationId;
 
-  const TypingStartEvent({
-    required this.userId,
-    required this.conversationId,
-  });
+  const TypingStartEvent({required this.userId, required this.conversationId});
 
   @override
   List<Object?> get props => [userId, conversationId];
@@ -41,11 +39,57 @@ class TypingStopEvent extends MessageEvent {
   final String userId;
   final String conversationId;
 
-  const TypingStopEvent({
-    required this.userId,
-    required this.conversationId,
-  });
+  const TypingStopEvent({required this.userId, required this.conversationId});
 
   @override
   List<Object?> get props => [userId, conversationId];
+}
+
+class NewMessageReceivedEvent extends MessageEvent {
+  final MessageEntity messageData;
+
+  const NewMessageReceivedEvent(this.messageData);
+
+  @override
+  List<Object?> get props => [messageData];
+}
+
+class SendMessageEvent extends MessageEvent {
+  final String userId;
+  final String conversationId;
+  final String? text;
+  final List<Map<String, dynamic>>? attachments;
+  final String? replyTo;
+
+  const SendMessageEvent({
+    required this.userId,
+    required this.conversationId,
+    this.text,
+    this.attachments,
+    this.replyTo,
+  });
+
+  @override
+  List<Object?> get props => [
+    userId,
+    conversationId,
+    text,
+    attachments,
+    replyTo,
+  ];
+}
+
+class MarkAsReadEvent extends MessageEvent {
+  final String userId;
+  final String conversationId;
+  final String? messageId;
+
+  const MarkAsReadEvent({
+    required this.userId,
+    required this.conversationId,
+    this.messageId,
+  });
+
+  @override
+  List<Object?> get props => [userId, conversationId, messageId];
 }
