@@ -30,10 +30,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            CupertinoIcons.back,
-            color: Colors.black,
-          ),
+          icon: const Icon(CupertinoIcons.back, color: Colors.black),
         ),
         title: const Text(
           'Lời mời đã gửi',
@@ -49,10 +46,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
             onPressed: () {
               // TODO: Add search functionality
             },
-            icon: const Icon(
-              CupertinoIcons.search,
-              color: Colors.black,
-            ),
+            icon: const Icon(CupertinoIcons.search, color: Colors.black),
           ),
         ],
       ),
@@ -62,11 +56,9 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
           children: [
             // Header section
             _buildHeaderSection(),
-            
+
             // Danh sách lời mời đã gửi
-            Expanded(
-              child: _buildSentRequestsList(),
-            ),
+            Expanded(child: _buildSentRequestsList()),
           ],
         ),
       ),
@@ -77,11 +69,11 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
         int requestCount = 0;
-        
+
         if (state is SentFriendRequestsLoaded) {
           requestCount = state.sentRequests.length;
         }
-        
+
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Text(
@@ -123,7 +115,11 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(state.message)),
                 ],
@@ -146,7 +142,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
             if (state.sentRequests.isEmpty) {
               return _buildEmptyState();
             }
-            
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<FriendBloc>().add(const LoadSentFriendRequests());
@@ -158,20 +154,23 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                 separatorBuilder: (context, index) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
                   final request = state.sentRequests[index];
-                  return _buildSentRequestCard(request, state.cancelledRequestIds);
+                  return _buildSentRequestCard(
+                    request,
+                    state.cancelledRequestIds,
+                  );
                 },
               ),
             );
           } else if (state is FriendError) {
             return _buildErrorState(state.message);
           }
-          
+
           return _buildLoadingState();
         },
       ),
     );
   }
-  
+
   Widget _buildLoadingState() {
     return Center(
       child: Column(
@@ -198,7 +197,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
       ),
     );
   }
-  
+
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
@@ -206,11 +205,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64.r,
-              color: Colors.red[300],
-            ),
+            Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
             SizedBox(height: 16.h),
             Text(
               'Có lỗi xảy ra',
@@ -224,10 +219,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
             ),
             SizedBox(height: 24.h),
             ElevatedButton.icon(
@@ -250,10 +242,13 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
       ),
     );
   }
-  
-  Widget _buildSentRequestCard(dynamic request, Set<String> cancelledRequestIds) {
+
+  Widget _buildSentRequestCard(
+    dynamic request,
+    Set<String> cancelledRequestIds,
+  ) {
     final isCancelled = cancelledRequestIds.contains(request.requestId);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -267,6 +262,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         ],
       ),
       child: SentFriendRequestItem(
+        userId: request.receiverId,
         name: request.displayName,
         mutualFriends: request.displayMutualFriends,
         timeAgo: request.formattedTimeAgo,
@@ -339,4 +335,3 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
     );
   }
 }
-

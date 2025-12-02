@@ -89,11 +89,14 @@ class PostHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  user.fullName ?? "Unknown",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
+                GestureDetector(
+                  onTap: () => _navigateToProfile(context),
+                  child: Text(
+                    user.fullName ?? "Unknown",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
                   ),
                 ),
                 Text(

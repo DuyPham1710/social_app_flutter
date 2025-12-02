@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 abstract class OtherProfileEvent extends Equatable {
   const OtherProfileEvent();
@@ -10,7 +11,6 @@ abstract class OtherProfileEvent extends Equatable {
 class LoadOtherUserProfileEvent extends OtherProfileEvent {
   final String userId;
   const LoadOtherUserProfileEvent({required this.userId});
-
 }
 
 class LoadOtherProfilePostsEvent extends OtherProfileEvent {
@@ -22,7 +22,6 @@ class LoadOtherProfilePostsEvent extends OtherProfileEvent {
 class LoadMoreOtherProfilePostsEvent extends OtherProfileEvent {
   final String userId;
   const LoadMoreOtherProfilePostsEvent({required this.userId});
-
 }
 
 class UpdateOtherProfileCommentCountsEvent extends OtherProfileEvent {
@@ -33,6 +32,7 @@ class UpdateOtherProfileCommentCountsEvent extends OtherProfileEvent {
 class ReloadRelationshipEvent extends OtherProfileEvent {
   final String userId;
   const ReloadRelationshipEvent(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
 }
-
-

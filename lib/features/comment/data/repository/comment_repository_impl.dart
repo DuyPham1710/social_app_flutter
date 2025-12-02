@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
+import 'package:social_app_fe/features/comment/domain/entities/comment-log_loaded_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
@@ -62,6 +63,10 @@ class CommentRepositoryImpl implements CommentRepository {
       );
 
   @override
+  Stream<CommentLogsLoadedEntity> get commentHistoryLoadedStream =>
+      _remoteDataSource.commentHistoryLoadedStream;
+
+  @override
   Future<DataState<CommentsLoadedModel?>> getCommentsLoadedData(
     String postId,
   ) async {
@@ -101,6 +106,11 @@ class CommentRepositoryImpl implements CommentRepository {
   @override
   void updateComment(UpdateCommentParams params) async {
     _remoteDataSource.updateComment(params);
+  }
+
+  @override
+  void loadCommentHistory(String commentId) {
+    _remoteDataSource.loadCommentHistory(commentId);
   }
 
   @override

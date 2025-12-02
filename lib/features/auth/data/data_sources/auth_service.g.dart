@@ -9,11 +9,13 @@ part of 'auth_service.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _AuthService implements AuthService {
-  _AuthService(this._dio, {this.baseUrl});
+  _AuthService(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
   String? baseUrl;
+
+  final ParseErrorLogger? errorLogger;
 
   @override
   Future<AuthResponse> login(AuthRequest request) async {
@@ -36,6 +38,7 @@ class _AuthService implements AuthService {
     try {
       _value = AuthResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -62,6 +65,7 @@ class _AuthService implements AuthService {
     try {
       _value = UserModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -88,6 +92,7 @@ class _AuthService implements AuthService {
     try {
       _value = UserModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -115,6 +120,7 @@ class _AuthService implements AuthService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -141,6 +147,7 @@ class _AuthService implements AuthService {
     try {
       _value = UserModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -167,6 +174,7 @@ class _AuthService implements AuthService {
     try {
       _value = UserModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;

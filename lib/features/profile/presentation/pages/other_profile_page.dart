@@ -7,7 +7,6 @@ import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart
 import 'package:social_app_fe/features/profile/presentation/widgets/friend_list_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_header.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_info.dart';
-import 'package:social_app_fe/features/profile/presentation/widgets/create_post_widget.dart';
 import '../widgets/other_profile_actions.dart';
 import '../bloc/other_profile_bloc.dart';
 import '../bloc/other_profile_state.dart';
@@ -38,6 +37,9 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
     context.read<OtherProfileBloc>().add(
       LoadOtherProfilePostsEvent(userId: widget.userId, page: 1),
     );
+
+    //lấy bạn bè
+    context.read<FriendBloc>().add(LoadFriendsByUserId(widget.userId));
 
     /// Handle load more when scroll
     _scrollController.addListener(() {
@@ -85,6 +87,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             controller: _scrollController,
             slivers: [
               SliverAppBar(
+                surfaceTintColor: Colors.transparent,
                 pinned: true,
                 backgroundColor: AppColors.background,
                 elevation: 0,
@@ -176,7 +179,9 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     ),
 
                   /// End of posts
-                  if (state is OtherProfileLoaded && state.hasNext == false)
+                  if (state is OtherProfileLoaded &&
+                      state.hasNext == false &&
+                      posts.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.h),
                       child: Center(

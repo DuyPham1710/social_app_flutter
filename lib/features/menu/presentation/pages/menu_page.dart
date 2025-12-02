@@ -64,6 +64,7 @@ class _MenuView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: const Text(
           'Menu',

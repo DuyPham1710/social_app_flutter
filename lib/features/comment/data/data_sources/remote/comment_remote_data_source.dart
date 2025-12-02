@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
+import 'package:social_app_fe/features/comment/data/models/comment-log_loaded_model.dart';
 import 'package:social_app_fe/features/comment/data/models/typing_event_model.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
@@ -16,6 +17,8 @@ class CommentRemoteDataSource {
       StreamController<Map<String, int>>.broadcast();
   final _commentsLoadedController =
       StreamController<CommentsLoadedModel>.broadcast();
+  final _commentHistoryLoadedController =
+      StreamController<CommentLogsLoadedModel>.broadcast();
   final _typingController = StreamController<TypingEventModel>.broadcast();
 
   // Map để lưu số comment của mỗi post
@@ -31,6 +34,8 @@ class CommentRemoteDataSource {
       _commentCountController.stream;
   Stream<CommentsLoadedModel> get commentsLoadedStream =>
       _commentsLoadedController.stream;
+  Stream<CommentLogsLoadedModel> get commentHistoryLoadedStream =>
+      _commentHistoryLoadedController.stream;
   Stream<TypingEventModel> get typingStream => _typingController.stream;
 
   /// Connect đến comment namespace
@@ -42,6 +47,7 @@ class CommentRemoteDataSource {
     );
     // Setup listeners
     _setupCommentCountListeners();
+    _setupCommentHistoryListeners();
     _setupTypingListeners();
   }
 
@@ -203,6 +209,30 @@ class CommentRemoteDataSource {
     });
   }
 
+  /// Setup listeners cho comment history events
+  void _setupCommentHistoryListeners() {
+    _socketClient.on('commentHistoryLoaded').listen((data) {
+      developer.log(
+        'Comment history loaded event',
+        name: 'CommentDataSource',
+      );
+      try {
+        final commentHistoryLoadedModel = CommentLogsLoadedModel.fromJson(data);
+        _commentHistoryLoadedController.add(commentHistoryLoadedModel);
+        
+        developer.log(
+          'Loaded ${commentHistoryLoadedModel.count} history entries for comment ${commentHistoryLoadedModel.commentId}',
+          name: 'CommentDataSource',
+        );
+      } catch (e) {
+        developer.log(
+          'Error parsing commentHistoryLoaded: $e',
+          name: 'CommentDataSource',
+        );
+      }
+    });
+  }
+
   /// Setup listeners cho typing events
   void _setupTypingListeners() {
     _socketClient.on('userTyping').listen((data) {
@@ -240,6 +270,15 @@ class CommentRemoteDataSource {
       name: 'CommentDataSource',
     );
     _socketClient.emit('loadComments', {'postId': postId});
+  }
+
+  /// Load comment history của một comment
+  void loadCommentHistory(String commentId) {
+    developer.log(
+      'Loading comment history for comment: $commentId',
+      name: 'CommentDataSource',
+    );
+    _socketClient.emit('loadCommentHistory', {'commentId': commentId});
   }
 
   /// Emit typing event
@@ -315,6 +354,7 @@ class CommentRemoteDataSource {
     disconnect();
     _commentCountController.close();
     _commentsLoadedController.close();
+    _commentHistoryLoadedController.close();
     _typingController.close();
     _commentCounts.clear();
     _commentsLoadedData.clear();

@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/story/data/models/grouped_story_list_model.dart';
 
 part 'story_remote_data_source.g.dart';

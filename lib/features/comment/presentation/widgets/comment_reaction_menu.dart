@@ -1,15 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'dart:ui';
-
-import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
-import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 
 class CommentReactionMenu {
   static OverlayEntry? _overlayEntry;
@@ -22,6 +18,8 @@ class CommentReactionMenu {
     Function(String commentId, EmojiType reaction)? onReactionChanged,
     String? currentUserId,
     Function(String commentId, String newContent)? onUpdateComment,
+    Function(String commentId, String postId)? onDeleteComment,
+    Function(String commentId, String currentContent)? onViewHistory,
   }) {
     if (_overlayEntry != null) return;
 
@@ -70,6 +68,8 @@ class CommentReactionMenu {
                         onReply,
                         currentUserId,
                         onUpdateComment,
+                        onDeleteComment,
+                        onViewHistory,
                       ),
                     ],
                   ),
@@ -156,9 +156,11 @@ class CommentReactionMenu {
     Function(String? parentId, String userDisplayName)? onReply,
     String? currentUserId,
     Function(String commentId, String newContent)? onUpdateComment,
+    Function(String commentId, String postId)? onDeleteComment,
+    Function(String commentId, String currentContent)? onViewHistory,
   ) {
     return Container(
-      width: 200.w,
+      width: 220.w,
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(14.r),
@@ -341,13 +343,7 @@ class CommentReactionMenu {
                       CupertinoDialogAction(
                         isDestructiveAction: true,
                         onPressed: () {
-                          context.read<CommentBloc>().add(
-                            DeleteCommentEvent(
-                              commentId: comment.id,
-                              postId: comment.postId,
-                            ),
-                          );
-
+                          onDeleteComment?.call(comment.id, comment.postId);
                           Navigator.of(dialogContext).pop(); // đóng dialog
                         },
                         child: const Text(
@@ -358,6 +354,17 @@ class CommentReactionMenu {
                     ],
                   ),
                 );
+              },
+            ),
+
+          // Chỉ hiển thị nút xem lịch sử nếu là comment của user hiện tại
+          if (currentUserId != null && comment.user.userId == currentUserId)
+            _menuItem(
+              Icons.visibility,
+              'Xem lịch sử chỉnh sửa',
+              onTap: () {
+                hide();
+                onViewHistory?.call(comment.id, comment.content);
               },
             ),
           _menuItem(Icons.share, 'Chia sẻ bình luận'),

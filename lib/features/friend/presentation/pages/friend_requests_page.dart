@@ -30,10 +30,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            CupertinoIcons.back,
-            color: Colors.black,
-          ),
+          icon: const Icon(CupertinoIcons.back, color: Colors.black),
         ),
         title: const Text(
           'Lời mời kết bạn',
@@ -49,10 +46,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             onPressed: () {
               _showMoreOptions(context);
             },
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.black,
-            ),
+            icon: const Icon(Icons.more_vert, color: Colors.black),
           ),
         ],
       ),
@@ -61,11 +55,9 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           children: [
             // Header section với số lượng lời mời
             _buildHeaderSection(),
-            
+
             // Danh sách lời mời kết bạn
-            Expanded(
-              child: _buildFriendRequestsList(),
-            ),
+            Expanded(child: _buildFriendRequestsList()),
           ],
         ),
       ),
@@ -80,13 +72,13 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
       },
       builder: (context, state) {
         int requestCount = 0;
-        
+
         if (state is FriendRequestsLoaded) {
           requestCount = state.friendRequests.length;
         } else if (state is FriendPageLoaded) {
           requestCount = state.friendRequests.length;
         }
-        
+
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Row(
@@ -104,7 +96,10 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   ),
                   SizedBox(width: 8.w),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(12.r),
@@ -166,7 +161,11 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(state.message)),
                 ],
@@ -192,32 +191,36 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         buildWhen: (previous, current) {
           // Chỉ rebuild khi state liên quan đến friend requests (received) thay đổi
           return current is FriendRequestsLoading ||
-                 current is FriendRequestsLoaded ||
-                 current is FriendPageLoaded ||
-                 (current is FriendError && previous is FriendRequestsLoading);
+              current is FriendRequestsLoaded ||
+              current is FriendPageLoaded ||
+              (current is FriendError && previous is FriendRequestsLoading);
         },
         builder: (context, state) {
-          if (state is FriendRequestsLoading || (state is FriendPageLoaded && state.isLoadingRequests)) {
+          if (state is FriendRequestsLoading ||
+              (state is FriendPageLoaded && state.isLoadingRequests)) {
             return _buildLoadingState();
-          } else if (state is FriendRequestsLoaded || state is FriendPageLoaded) {
-            final friendRequests = state is FriendRequestsLoaded 
-                ? state.friendRequests 
+          } else if (state is FriendRequestsLoaded ||
+              state is FriendPageLoaded) {
+            final friendRequests = state is FriendRequestsLoaded
+                ? state.friendRequests
                 : (state as FriendPageLoaded).friendRequests;
-            final acceptedRequestIds = state is FriendRequestsLoaded 
-                ? state.acceptedRequestIds 
+            final acceptedRequestIds = state is FriendRequestsLoaded
+                ? state.acceptedRequestIds
                 : (state as FriendPageLoaded).acceptedRequestIds;
-            final rejectedRequestIds = state is FriendRequestsLoaded 
-                ? state.rejectedRequestIds 
+            final rejectedRequestIds = state is FriendRequestsLoaded
+                ? state.rejectedRequestIds
                 : (state as FriendPageLoaded).rejectedRequestIds;
-            
+
             if (friendRequests.isEmpty) {
               return _buildEmptyState();
             }
-            
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<FriendBloc>().add(const LoadFriendPage());
-                await Future.delayed(const Duration(seconds: 1)); // Đảm bảo refresh indicator hiển thị
+                await Future.delayed(
+                  const Duration(seconds: 1),
+                ); // Đảm bảo refresh indicator hiển thị
               },
               child: ListView.separated(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -225,20 +228,24 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 separatorBuilder: (context, index) => SizedBox(height: 12.h),
                 itemBuilder: (context, index) {
                   final request = friendRequests[index];
-                  return _buildFriendRequestCard(request, acceptedRequestIds, rejectedRequestIds);
+                  return _buildFriendRequestCard(
+                    request,
+                    acceptedRequestIds,
+                    rejectedRequestIds,
+                  );
                 },
               ),
             );
           } else if (state is FriendError) {
             return _buildErrorState(state.message);
           }
-          
+
           return _buildLoadingState();
         },
       ),
     );
   }
-  
+
   Widget _buildLoadingState() {
     return Center(
       child: Column(
@@ -265,7 +272,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
       ),
     );
   }
-  
+
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
@@ -273,11 +280,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64.r,
-              color: Colors.red[300],
-            ),
+            Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
             SizedBox(height: 16.h),
             Text(
               'Có lỗi xảy ra',
@@ -291,10 +294,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
             ),
             SizedBox(height: 24.h),
             ElevatedButton.icon(
@@ -317,8 +317,12 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
       ),
     );
   }
-  
-  Widget _buildFriendRequestCard(dynamic request, Set<String> acceptedRequestIds, Set<String> rejectedRequestIds) {
+
+  Widget _buildFriendRequestCard(
+    dynamic request,
+    Set<String> acceptedRequestIds,
+    Set<String> rejectedRequestIds,
+  ) {
     final isAccepted = acceptedRequestIds.contains(request.requestId);
     final isRejected = rejectedRequestIds.contains(request.requestId);
 
@@ -335,6 +339,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         ],
       ),
       child: FriendRequestItem(
+        // userId: request.senderId,
+        userId: request.senderId,
         name: request.displayName,
         mutualFriends: request.displayMutualFriends,
         timeAgo: request.formattedTimeAgo,
@@ -472,7 +478,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         } else if (state is FriendPageLoaded) {
           isSelected = state.sortBy == sortBy && state.ascending == ascending;
         }
-        
+
         return ListTile(
           title: Text(
             title,
@@ -482,11 +488,9 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               color: isSelected ? Colors.blue[600] : Colors.black,
             ),
           ),
-          trailing: isSelected ? Icon(
-            Icons.check,
-            color: Colors.blue[600],
-            size: 20,
-          ) : null,
+          trailing: isSelected
+              ? Icon(Icons.check, color: Colors.blue[600], size: 20)
+              : null,
           onTap: () {
             context.read<FriendBloc>().add(
               SortFriendRequests(sortBy: sortBy, ascending: ascending),
@@ -524,7 +528,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
-            
+
             // Option: Xem lời mời đã gửi
             ListTile(
               leading: Icon(
@@ -554,14 +558,11 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 }
               },
             ),
-            
+
             SizedBox(height: 16.h),
           ],
         ),
       ),
     );
   }
-
-
 }
-

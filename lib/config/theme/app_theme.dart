@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 ThemeData theme() {
   return ThemeData(
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: AppColors.background,
     colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
+      backgroundColor: AppColors.background,
+      foregroundColor: AppColors.textPrimary,
       elevation: 0,
     ),
   );

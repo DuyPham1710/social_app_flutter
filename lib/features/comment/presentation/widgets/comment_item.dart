@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/enums/emoji.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_reaction_menu.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class CommentItem extends StatefulWidget {
@@ -16,6 +32,8 @@ class CommentItem extends StatefulWidget {
   final VoidCallback? onToggleReplies;
   final String? currentUserId;
   final Function(String commentId, String newContent)? onUpdateComment;
+  final Function(String commentId, String postId)? onDeleteComment;
+  final Function(String commentId, String currentContent)? onViewHistory;
 
   const CommentItem({
     super.key,
@@ -27,6 +45,8 @@ class CommentItem extends StatefulWidget {
     this.onToggleReplies,
     this.currentUserId,
     this.onUpdateComment,
+    this.onDeleteComment,
+    this.onViewHistory,
   });
 
   @override
@@ -56,6 +76,53 @@ class _CommentItemState extends State<CommentItem> {
     super.dispose();
   }
 
+  Future<void> _navigateToProfile(BuildContext context) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+
+    // Nếu là user hiện tại → My Profile
+    if (currentUserId == widget.comment.user.userId) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => ProfileBloc(
+              getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
+              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
+              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
+              getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
+            )..add(const LoadUserProfileEvent()),
+            child: const ProfilePage(),
+          ),
+        ),
+      );
+    } else {
+      //Nếu là người khác → Other Profile
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                OtherProfileBloc(
+                  getOtherUserProfileUseCase: di
+                      .s1<GetOtherUserProfileUseCase>(),
+                  getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
+                  getFriendRelationshipUseCase: di
+                      .s1<GetFriendRelationshipUseCase>(),
+                  listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
+                  loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
+                )..add(
+                  LoadOtherUserProfileEvent(
+                    userId: widget.comment.user.userId!,
+                  ),
+                ),
+            child: OtherProfilePage(userId: widget.comment.user.userId!),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // print('>>> comment: ${widget.comment.parentId}');
@@ -67,11 +134,14 @@ class _CommentItemState extends State<CommentItem> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: widget.isReply ? 14.r : 18.r,
-            backgroundImage: NetworkImage(
-              widget.comment.user.avatarUrl ??
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+          GestureDetector(
+            onTap: () => _navigateToProfile(context),
+            child: CircleAvatar(
+              radius: widget.isReply ? 14.r : 18.r,
+              backgroundImage: NetworkImage(
+                widget.comment.user.avatarUrl ??
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+              ),
             ),
           ),
 
@@ -82,6 +152,7 @@ class _CommentItemState extends State<CommentItem> {
             child: GestureDetector(
               key: _commentKey,
               onLongPressStart: (details) {
+                FocusScope.of(context).unfocus();
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   final renderBox =
                       _commentKey.currentContext?.findRenderObject()
@@ -101,6 +172,8 @@ class _CommentItemState extends State<CommentItem> {
                     onReactionChanged: _onReactionChanged,
                     currentUserId: widget.currentUserId,
                     onUpdateComment: widget.onUpdateComment,
+                    onDeleteComment: widget.onDeleteComment,
+                    onViewHistory: widget.onViewHistory,
                   );
                 });
               },
@@ -121,12 +194,15 @@ class _CommentItemState extends State<CommentItem> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          widget.comment.user.fullName ?? 'Unknown',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.sp,
-                            color: AppColors.textPrimary,
+                        GestureDetector(
+                          onTap: () => _navigateToProfile(context),
+                          child: Text(
+                            widget.comment.user.fullName ?? 'Unknown',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.sp,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
 
@@ -312,6 +388,8 @@ class _CommentItemState extends State<CommentItem> {
                             isReply: true,
                             currentUserId: widget.currentUserId,
                             onUpdateComment: widget.onUpdateComment,
+                            onDeleteComment: widget.onDeleteComment,
+                            onViewHistory: widget.onViewHistory,
                           ),
                         );
                       }).toList(),

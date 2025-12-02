@@ -37,6 +37,8 @@ class OtherProfileState extends Equatable {
     error,
     isLoadingMore,
   ];
+
+  get errorMessage => null;
 }
 
 class OtherProfileInitial extends OtherProfileState {}

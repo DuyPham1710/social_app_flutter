@@ -1,9 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart' as di;
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 
 class FriendRequestItem extends StatelessWidget {
+  final dynamic userId;
   final String name;
   final int mutualFriends;
   final String timeAgo;
@@ -16,6 +33,7 @@ class FriendRequestItem extends StatelessWidget {
 
   const FriendRequestItem({
     super.key,
+    required this.userId,
     required this.name,
     required this.mutualFriends,
     required this.timeAgo,
@@ -27,6 +45,50 @@ class FriendRequestItem extends StatelessWidget {
     this.isRejected = false,
   });
 
+  Future<void> _navigateToProfile(BuildContext context) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+    print("===========================<<" + userId.toString());
+    final String _userId = userId['_id'].toString();
+
+    print("???????????????>>>>>>>>>>>" + _userId);
+    // Nếu là user hiện tại → My Profile
+    if (currentUserId == _userId) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => ProfileBloc(
+              getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
+              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
+              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
+              getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
+            )..add(const LoadUserProfileEvent()),
+            child: const ProfilePage(),
+          ),
+        ),
+      );
+    } else {
+      //Nếu là người khác → Other Profile
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => OtherProfileBloc(
+              getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
+              getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
+              getFriendRelationshipUseCase: di
+                  .s1<GetFriendRelationshipUseCase>(),
+              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
+              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
+            )..add(LoadOtherUserProfileEvent(userId: _userId!)),
+            child: OtherProfilePage(userId: _userId!),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,9 +97,12 @@ class FriendRequestItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Avatar lớn hơn như trong hình
-          CircleAvatar(
-            radius: 32.r,
-            backgroundImage: NetworkImage(avatarUrl),
+          GestureDetector(
+            onTap: () => _navigateToProfile(context),
+            child: CircleAvatar(
+              radius: 32.r,
+              backgroundImage: NetworkImage(avatarUrl),
+            ),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -47,7 +112,8 @@ class FriendRequestItem extends StatelessWidget {
                 // Tên người dùng và thời gian
                 Row(
                   children: [
-                    Expanded(
+                    GestureDetector(
+                      onTap: () => _navigateToProfile(context),
                       child: Text(
                         name,
                         style: TextStyle(
@@ -74,7 +140,8 @@ class FriendRequestItem extends StatelessWidget {
                 if (mutualFriends > 0)
                   Row(
                     children: [
-                      if (mutualFriendAvatars != null && mutualFriendAvatars!.isNotEmpty)
+                      if (mutualFriendAvatars != null &&
+                          mutualFriendAvatars!.isNotEmpty)
                         _buildMutualFriendAvatars()
                       else
                         Container(
@@ -104,7 +171,10 @@ class FriendRequestItem extends StatelessWidget {
                 // Nút hành động hoặc thông báo
                 if (isAccepted)
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 16.w,
+                    ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.green[50],
@@ -133,7 +203,10 @@ class FriendRequestItem extends StatelessWidget {
                   )
                 else if (isRejected)
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 16.w,
+                    ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
@@ -143,11 +216,7 @@ class FriendRequestItem extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.close,
-                          color: Colors.grey[700],
-                          size: 16.r,
-                        ),
+                        Icon(Icons.close, color: Colors.grey[700], size: 16.r),
                         SizedBox(width: 8.w),
                         Text(
                           'Đã gỡ lời mời',
@@ -181,10 +250,10 @@ class FriendRequestItem extends StatelessWidget {
                         ),
                       ),
                     ],
-                  )
+                  ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -192,10 +261,12 @@ class FriendRequestItem extends StatelessWidget {
 
   Widget _buildMutualFriendAvatars() {
     // Nếu không có avatars hoặc không có bạn chung, return empty widget
-    if (mutualFriends == 0 || mutualFriendAvatars == null || mutualFriendAvatars!.isEmpty) {
+    if (mutualFriends == 0 ||
+        mutualFriendAvatars == null ||
+        mutualFriendAvatars!.isEmpty) {
       return const SizedBox.shrink();
     }
-    
+
     return SizedBox(
       width: 48.w,
       height: 20.h,
@@ -249,6 +320,3 @@ class FriendRequestItem extends StatelessWidget {
     );
   }
 }
-
-
-

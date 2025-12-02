@@ -275,6 +275,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                             final friendStatus = _friendsStatus[friend.userId];
                             
                             return FriendItem(
+                              friendId: friend.userId,
                               name: friend.fullName ?? 'Người dùng',
                               mutualFriends: friend.mutualFriendsCount ?? 0,
                               avatarUrl: friend.avatarUrl,

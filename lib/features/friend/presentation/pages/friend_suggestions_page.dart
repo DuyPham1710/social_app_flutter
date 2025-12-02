@@ -30,10 +30,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            CupertinoIcons.back,
-            color: Colors.black,
-          ),
+          icon: const Icon(CupertinoIcons.back, color: Colors.black),
         ),
         title: const Text(
           'Gợi ý',
@@ -49,10 +46,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             onPressed: () {
               // TODO: Implement search functionality
             },
-            icon: const Icon(
-              CupertinoIcons.search,
-              color: Colors.black,
-            ),
+            icon: const Icon(CupertinoIcons.search, color: Colors.black),
           ),
         ],
       ),
@@ -62,11 +56,9 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
           children: [
             // Header section
             _buildHeaderSection(),
-            
+
             // Danh sách gợi ý bạn bè
-            Expanded(
-              child: _buildFriendSuggestionsList(),
-            ),
+            Expanded(child: _buildFriendSuggestionsList()),
           ],
         ),
       ),
@@ -77,13 +69,13 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
         int suggestionCount = 0;
-        
+
         if (state is FriendSuggestionsLoaded) {
           suggestionCount = state.friendSuggestions.length;
         } else if (state is FriendPageLoaded) {
           suggestionCount = state.friendSuggestions.length;
         }
-        
+
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Text(
@@ -125,7 +117,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(child: Text(state.message)),
                 ],
@@ -149,20 +145,22 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
       },
       child: BlocBuilder<FriendBloc, FriendState>(
         builder: (context, state) {
-          if (state is FriendSuggestionsLoading || (state is FriendPageLoaded && state.isLoadingSuggestions)) {
+          if (state is FriendSuggestionsLoading ||
+              (state is FriendPageLoaded && state.isLoadingSuggestions)) {
             return _buildLoadingState();
-          } else if (state is FriendSuggestionsLoaded || state is FriendPageLoaded) {
-            final friendSuggestions = state is FriendSuggestionsLoaded 
-                ? state.friendSuggestions 
+          } else if (state is FriendSuggestionsLoaded ||
+              state is FriendPageLoaded) {
+            final friendSuggestions = state is FriendSuggestionsLoaded
+                ? state.friendSuggestions
                 : (state as FriendPageLoaded).friendSuggestions;
-            final sentRequestUserIds = state is FriendSuggestionsLoaded 
-                ? state.sentRequestUserIds 
+            final sentRequestUserIds = state is FriendSuggestionsLoaded
+                ? state.sentRequestUserIds
                 : (state as FriendPageLoaded).sentRequestUserIds;
-            
+
             if (friendSuggestions.isEmpty) {
               return _buildEmptyState();
             }
-            
+
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<FriendBloc>().add(const LoadFriendPage());
@@ -174,20 +172,23 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 separatorBuilder: (context, index) => SizedBox(height: 8.h),
                 itemBuilder: (context, index) {
                   final suggestion = friendSuggestions[index];
-                  return _buildFriendSuggestionCard(suggestion, sentRequestUserIds);
+                  return _buildFriendSuggestionCard(
+                    suggestion,
+                    sentRequestUserIds,
+                  );
                 },
               ),
             );
           } else if (state is FriendError) {
             return _buildErrorState(state.message);
           }
-          
+
           return _buildLoadingState();
         },
       ),
     );
   }
-  
+
   Widget _buildLoadingState() {
     return Center(
       child: Column(
@@ -214,7 +215,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
       ),
     );
   }
-  
+
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
@@ -222,11 +223,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64.r,
-              color: Colors.red[300],
-            ),
+            Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
             SizedBox(height: 16.h),
             Text(
               'Có lỗi xảy ra',
@@ -240,10 +237,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
             ),
             SizedBox(height: 24.h),
             ElevatedButton.icon(
@@ -266,10 +260,13 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
       ),
     );
   }
-  
-  Widget _buildFriendSuggestionCard(dynamic suggestion, Set<String> sentRequestUserIds) {
+
+  Widget _buildFriendSuggestionCard(
+    dynamic suggestion,
+    Set<String> sentRequestUserIds,
+  ) {
     final isSent = sentRequestUserIds.contains(suggestion.userId);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -283,6 +280,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         ],
       ),
       child: FriendSuggestionItem(
+        userId: suggestion.userId,
         name: suggestion.fullName ?? 'Người dùng',
         mutualFriends: suggestion.mutualFriends ?? 0,
         avatarUrl: suggestion.avatarUrl ?? 'https://i.pravatar.cc/150?img=30',
@@ -360,7 +358,10 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 12.h,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
@@ -375,4 +376,3 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
     );
   }
 }
-
