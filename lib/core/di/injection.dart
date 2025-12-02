@@ -64,6 +64,7 @@ import 'package:social_app_fe/features/profile/data/repository/user_repository_i
 import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
@@ -330,6 +331,21 @@ Future<void> initializeDependencies() async {
 
   s1.registerFactory<FriendBloc>(
     () => FriendBloc(
+      getFriendsUseCase: s1(),
+      getFriendRequestsUseCase: s1(),
+      getSentFriendRequestsUseCase: s1(),
+      getFriendSuggestionsUseCase: s1(),
+      sendFriendRequestUseCase: s1(),
+      acceptFriendRequestUseCase: s1(),
+      rejectFriendRequestUseCase: s1(),
+      cancelFriendRequestUseCase: s1(),
+      removeFriendUseCase: s1(),
+      getFriendsByUserIdUseCase: s1(),
+    ),
+  );
+
+  s1.registerFactory<FriendProfileBloc>(
+    () => FriendProfileBloc(
       getFriendsUseCase: s1(),
       getFriendRequestsUseCase: s1(),
       getSentFriendRequestsUseCase: s1(),

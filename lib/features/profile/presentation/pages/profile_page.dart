@@ -6,7 +6,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/po
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
-import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_actions.dart';
 import '../widgets/profile_info.dart';
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     context.read<ProfileBloc>().add(const LoadUserProfileEvent());
-    context.read<FriendBloc>().add(const LoadFriends());
+    context.read<FriendProfileBloc>().add(const LoadFriends());
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=

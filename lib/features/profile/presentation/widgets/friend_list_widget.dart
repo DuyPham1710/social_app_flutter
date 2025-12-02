@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
-import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 
 class FriendListWidget extends StatefulWidget {
   final VoidCallback? onViewAll;
@@ -17,7 +17,13 @@ class FriendListWidget extends StatefulWidget {
 class _FriendListWidgetState extends State<FriendListWidget> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<FriendBloc, FriendState>(
+    return BlocBuilder<FriendProfileBloc, FriendState>(
+      // 1. Thêm buildWhen: Chỉ vẽ lại khi state thuộc 3 loại này
+      buildWhen: (previous, current) {
+        return current is FriendLoading ||
+            current is FriendError ||
+            current is FriendLoaded;
+      },
       builder: (context, state) {
         if (state is FriendLoading) {
           return _buildContainer(
@@ -43,7 +49,6 @@ class _FriendListWidgetState extends State<FriendListWidget> {
           );
         } else if (state is FriendLoaded) {
           final friends = state.friends;
-
           if (friends.isEmpty) {
             return _buildContainer(
               child: const Padding(
@@ -57,19 +62,14 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               ),
             );
           }
-
           return _buildFriendList(friends);
         }
 
-        // Trạng thái ban đầu (FriendInitial)
-        return _buildContainer(
-          child: const Center(
-            child: Padding(
-              padding: EdgeInsets.all(12),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          ),
-        );
+        // 2. Sửa phần return mặc định (cho state khởi tạo hoặc các state khác)
+        // Thay vì hiện Loading, ta trả về SizedBox.shrink() (ẩn đi) hoặc Container rỗng
+        // Vì có buildWhen chặn ở trên rồi, dòng này chỉ chạy đúng 1 lần đầu tiên
+        // nếu state ban đầu không phải là 3 loại trên.
+        return const SizedBox.shrink();
       },
     );
   }
