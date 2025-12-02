@@ -48,4 +48,10 @@ abstract class PostRemoteDataSource {
     @Query('page') int page,
     @Query('limit') int limit,
   );
+
+  @POST('/post/{postId}/report')
+  Future<void> reportPost(
+    @Path('postId') String postId,
+    @Body() Map<String, dynamic> body,
+  );
 }

@@ -23,7 +23,13 @@ import 'package:timeago/timeago.dart' as timeago;
 class PostHeader extends StatelessWidget {
   final UserEntity user;
   final DateTime? createdAt;
-  const PostHeader({super.key, required this.user, this.createdAt});
+  final VoidCallback? onReportTap;
+  const PostHeader({
+    super.key,
+    required this.user,
+    this.createdAt,
+    this.onReportTap,
+  });
 
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
@@ -108,7 +114,38 @@ class PostHeader extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.share, size: 20.sp),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_horiz, size: 20.sp),
+            onSelected: (value) {
+              if (value == 'report') {
+                onReportTap?.call();
+              } else if (value == 'share') {
+                // TODO: Thêm logic chia sẻ bài viết nếu cần
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'share',
+                child: Row(
+                  children: [
+                    const Icon(Icons.share, size: 18),
+                    SizedBox(width: 8.w),
+                    const Text('Chia sẻ'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'report',
+                child: Row(
+                  children: [
+                    const Icon(Icons.flag_outlined, size: 18, color: Colors.red),
+                    SizedBox(width: 8.w),
+                    const Text('Báo cáo bài viết'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
