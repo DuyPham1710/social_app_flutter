@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/date_time_extensions.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_item.dart';
@@ -28,12 +32,22 @@ class ChatDetailPage extends StatefulWidget {
   State<ChatDetailPage> createState() => _ChatDetailPageState();
 }
 
-class _ChatDetailPageState extends State<ChatDetailPage> {
+class _ChatDetailPageState extends State<ChatDetailPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
   final FocusNode _focusNode = FocusNode();
   Timer? _typingDebounceTimer;
 
+  String? _highlightedMessageId;
+  Timer? _highlightTimer;
+
+  late AnimationController _highlightController;
+  late Animation<double> _scaleAnimation;
+
+  MessageEntity? _replyingMessage;
   //late final ConversationBloc _conversationBloc;
 
   // @override
@@ -46,6 +60,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   @override
   void initState() {
     super.initState();
+
+    // Khởi tạo AnimationController
+    _highlightController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400), // Thời gian nhún 1 nhịp
+    );
+
+    // Tạo hiệu ứng nhún: 1.0 -> 1.05 -> 1.0
+    _scaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.05), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.05, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _highlightController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     // Add focus listener to scroll to bottom when TextField is focused
     _focusNode.addListener(() {
@@ -83,10 +115,26 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   @override
   void dispose() {
     _messageController.dispose();
-    _scrollController.dispose();
+    _highlightController.dispose();
     _focusNode.dispose();
     _typingDebounceTimer?.cancel();
+    _highlightTimer?.cancel();
     super.dispose();
+  }
+
+  void _setReplyMessage(MessageEntity message) {
+    setState(() {
+      _replyingMessage = message;
+    });
+    // Tự động focus vào ô nhập để bàn phím hiện lên
+    _focusNode.requestFocus();
+  }
+
+  // Hàm hủy trả lời
+  void _clearReplyMessage() {
+    setState(() {
+      _replyingMessage = null;
+    });
   }
 
   void _onTextChanged(String text) {
@@ -113,15 +161,90 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 1),
-          curve: Curves.easeOut,
+    // Lấy state hiện tại để biết độ dài list
+    final state = context.read<MessageBloc>().state;
+    if (state is MessagesLoaded && state.messages.data.isNotEmpty) {
+      // Cuộn tới phần tử cuối cùng
+      _itemScrollController.scrollTo(
+        index: state.messages.data.length + 1, // +1 vì có Header Profile
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  // Jump to specific message với animation highlight
+  void _jumpToMessage(String messageId) {
+    final state = context.read<MessageBloc>().state;
+    if (state is MessagesLoaded) {
+      final messages = state.messages.data;
+      final index = messages.indexWhere((msg) => msg.id == messageId);
+
+      if (index != -1) {
+        // +1 vì có header profile ở đầu danh sách
+        final listViewIndex = index + 1;
+
+        _itemScrollController
+            .scrollTo(
+              index: listViewIndex,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              alignment: 0.3,
+            )
+            .then((_) async {
+              setState(() {
+                _highlightedMessageId = messageId;
+              });
+
+              // Chạy animation nhún (Scale Up -> Down)
+              await _highlightController.forward(from: 0.0);
+              //  await _highlightController.forward(from: 0.0);
+
+              _highlightTimer?.cancel();
+              _highlightTimer = Timer(const Duration(milliseconds: 1000), () {
+                if (mounted) {
+                  setState(() => _highlightedMessageId = null);
+                }
+              });
+            });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tin nhắn cũ chưa được tải')),
         );
       }
-    });
+    }
+  }
+
+  void _sendMessage() {
+    final text = _messageController.text.trim();
+
+    // Don't send if empty
+    if (text.isEmpty) return;
+
+    // Stop typing when sending message
+    if (widget.conversationId != null) {
+      _typingDebounceTimer?.cancel();
+      final messageBloc = context.read<MessageBloc>();
+      messageBloc.emitTypingStop(widget.userId, widget.conversationId!);
+
+      // Send message
+      messageBloc.add(
+        SendMessageEvent(
+          userId: widget.userId,
+          conversationId: widget.conversationId!,
+          text: text,
+          replyTo: _replyingMessage?.id,
+        ),
+      );
+
+      // Scroll to bottom after sending
+      _scrollToBottom();
+    }
+
+    // Clear text field
+    _messageController.clear();
+
+    _clearReplyMessage();
   }
 
   @override
@@ -229,45 +352,278 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         ],
       ),
 
-      body: Column(
-        children: [
-          Expanded(
-            child: BlocBuilder<MessageBloc, MessageState>(
-              builder: (context, state) {
-                if (state is MessagesLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  );
-                } else if (state is MessagesLoaded) {
-                  final messagesList = state.messages.data;
+      body: GestureDetector(
+        onTap: () {
+          // Ấn ngoài để ẩn bàn phím
+          FocusScope.of(context).unfocus();
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: BlocBuilder<MessageBloc, MessageState>(
+                builder: (context, state) {
+                  if (state is MessagesLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
+                  } else if (state is MessagesLoaded) {
+                    final messagesList = state.messages.data;
 
-                  final lastMessageId = messagesList.isNotEmpty
-                      ? messagesList.last.id
-                      : null;
+                    final lastMessageId = messagesList.isNotEmpty
+                        ? messagesList.last.id
+                        : null;
 
-                  // Mark as read with the last message ID
-                  context.read<MessageBloc>().add(
-                    MarkAsReadEvent(
-                      userId: widget.userId,
-                      conversationId: widget.conversationId!,
-                      messageId: lastMessageId,
-                    ),
-                  );
+                    // Mark as read with the last message ID
+                    context.read<MessageBloc>().add(
+                      MarkAsReadEvent(
+                        userId: widget.userId,
+                        conversationId: widget.conversationId!,
+                        messageId: lastMessageId,
+                      ),
+                    );
 
-                  // Auto scroll to bottom when messages are loaded
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _scrollToBottom();
-                  });
+                    // Auto scroll to bottom when messages are loaded
+                    // WidgetsBinding.instance.addPostFrameCallback((_) {
+                    //   _scrollToBottom();
+                    // });
 
-                  if (messagesList.isEmpty) {
+                    if (messagesList.isEmpty) {
+                      return Column(
+                        children: [
+                          _buildProfileInfo(),
+                          const Expanded(
+                            child: Center(
+                              child: Text(
+                                'No messages yet. Start the conversation!',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    return ScrollablePositionedList.builder(
+                      itemScrollController: _itemScrollController,
+                      itemPositionsListener: _itemPositionsListener,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10.h,
+                        horizontal: 12.w,
+                      ),
+                      itemCount:
+                          messagesList.length +
+                          2, // +1 for profile, +1 for typing indicator
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return _buildProfileInfo();
+                        }
+
+                        // Typing indicator ở cuối danh sách
+                        if (index == messagesList.length + 1) {
+                          return ChatTypingIndicator(
+                            friendAvatarUrl: widget.friendInfo?.avatarUrl,
+                            friendName:
+                                widget.friendInfo?.fullName ??
+                                widget.friendInfo?.username,
+                            currentUserId: widget.userId,
+                          );
+                        }
+
+                        final int currentMessageIndex = index - 1;
+                        final message = messagesList[currentMessageIndex];
+                        final fromMe = message.sender.userId == widget.userId;
+
+                        // Kiểm tra xem có phải tin nhắn cuối cùng không
+                        final isLastMessage =
+                            currentMessageIndex == messagesList.length - 1;
+
+                        // Tạo danh sách participants (chỉ bạn bè, không bao gồm mình)
+                        final otherParticipants = widget.friendInfo != null
+                            ? [widget.friendInfo!]
+                            : <UserEntity>[];
+
+                        final isHighlighted =
+                            _highlightedMessageId == message.id;
+
+                        bool showAvatar = false;
+                        if (!fromMe) {
+                          if (currentMessageIndex == messagesList.length - 1) {
+                            showAvatar = true;
+                          } else {
+                            final nextMessage =
+                                messagesList[currentMessageIndex + 1];
+                            final nextFromMe =
+                                nextMessage.sender.userId == widget.userId;
+                            if (nextFromMe) {
+                              showAvatar = true;
+                            }
+                          }
+                        }
+
+                        bool showTimeHeader = false;
+
+                        // Nếu là tin nhắn đầu tiên của list -> Luôn hiện
+                        if (currentMessageIndex == 0) {
+                          showTimeHeader = true;
+                        } else {
+                          // Lấy tin nhắn liền trước đó
+                          final previousMessage =
+                              messagesList[currentMessageIndex - 1];
+
+                          // Kiểm tra null an toàn và so sánh
+                          final difference = message.createdAt.difference(
+                            previousMessage.createdAt,
+                          );
+                          // Nếu cách nhau hơn 15 phút -> Hiện
+                          if (difference.inMinutes > 15) {
+                            showTimeHeader = true;
+                          }
+                        }
+
+                        // Highlight animation container
+                        return Column(
+                          children: [
+                            // widget hiển thị thời gian ngắt quãng
+                            if (showTimeHeader)
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12.h),
+                                child: Center(
+                                  child: Text(
+                                    message.createdAt.formatTimeHeader(),
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                            AnimatedBuilder(
+                              animation: _highlightController,
+                              builder: (context, child) {
+                                // Chỉ scale nếu item này đang được highlight
+                                final scale = isHighlighted
+                                    ? _scaleAnimation.value
+                                    : 1.0;
+
+                                return Transform.scale(
+                                  scale: scale,
+                                  child: Container(
+                                    // AnimatedContainer đổi màu nền
+                                    decoration: BoxDecoration(
+                                      color: isHighlighted
+                                          ? AppColors.primary.withOpacity(
+                                              0.15,
+                                            ) // Màu nền highlight
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+
+                                    child: Dismissible(
+                                      key: ValueKey(message.id),
+
+                                      movementDuration: const Duration(
+                                        milliseconds: 400,
+                                      ),
+
+                                      dragStartBehavior: DragStartBehavior.down,
+
+                                      direction: fromMe
+                                          ? DismissDirection.endToStart
+                                          : DismissDirection.startToEnd,
+
+                                      // Độ nhạy: Kéo 15% chiều rộng là kích hoạt
+                                      dismissThresholds: const {
+                                        DismissDirection.endToStart: 0.15,
+                                        DismissDirection.startToEnd: 0.15,
+                                      },
+
+                                      // Xử lý hành động khi kéo
+                                      confirmDismiss: (direction) async {
+                                        _setReplyMessage(message);
+
+                                        // Trả về FALSE để item KHÔNG bị xóa và tự động búng về chỗ cũ
+                                        return false;
+                                      },
+
+                                      // Giao diện icon nằm bên dưới khi kéo (cho tin nhắn người khác - kéo sang phải)
+                                      background: Container(
+                                        alignment: Alignment.centerLeft,
+                                        padding: EdgeInsets.only(left: 20.w),
+                                        color: Colors
+                                            .transparent, // Nền trong suốt
+                                        child: Icon(
+                                          Icons.reply_rounded,
+                                          color: AppColors.textSecondary,
+                                          size: 24.sp,
+                                        ),
+                                      ),
+
+                                      // Giao diện icon nằm bên dưới khi kéo (cho tin nhắn của mình - kéo sang trái)
+                                      secondaryBackground: Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: EdgeInsets.only(right: 20.w),
+                                        color: Colors.transparent,
+                                        child: Icon(
+                                          Icons.reply_rounded,
+                                          color: AppColors.textSecondary,
+                                          size: 24.sp,
+                                        ),
+                                      ),
+                                      child: MessageItem(
+                                        message: message,
+                                        fromMe: fromMe,
+                                        showAvatar: showAvatar,
+                                        onReplyTap: (replyId) =>
+                                            _jumpToMessage(replyId),
+                                        isLastMessage: isLastMessage,
+                                        currentUserId: widget.userId,
+                                        otherParticipants: otherParticipants,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else if (state is MessagesError) {
                     return Column(
                       children: [
                         _buildProfileInfo(),
-                        const Expanded(
+                        Expanded(
                           child: Center(
-                            child: Text(
-                              'No messages yet. Start the conversation!',
-                              style: TextStyle(color: AppColors.textSecondary),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Error loading messages: ${state.message}',
+                                  style: const TextStyle(color: Colors.red),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (widget.conversationId != null) {
+                                      context.read<MessageBloc>().add(
+                                        LoadMessagesEvent(
+                                          userId: widget.userId,
+                                          conversationId:
+                                              widget.conversationId!,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Retry'),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -275,101 +631,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     );
                   }
 
-                  return ListView.builder(
-                    controller: _scrollController,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10.h,
-                      horizontal: 12.w,
-                    ),
-                    itemCount:
-                        messagesList.length +
-                        2, // +1 for profile, +1 for typing indicator
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return _buildProfileInfo();
-                      }
-
-                      // Typing indicator ở cuối danh sách
-                      if (index == messagesList.length + 1) {
-                        return ChatTypingIndicator(
-                          friendAvatarUrl: widget.friendInfo?.avatarUrl,
-                          friendName:
-                              widget.friendInfo?.fullName ??
-                              widget.friendInfo?.username,
-                          currentUserId: widget.userId,
-                        );
-                      }
-
-                      final int currentMessageIndex = index - 1;
-                      final message = messagesList[currentMessageIndex];
-                      final fromMe = message.sender.userId == widget.userId;
-
-                      bool showAvatar = false;
-                      if (!fromMe) {
-                        if (currentMessageIndex == messagesList.length - 1) {
-                          showAvatar = true;
-                        } else {
-                          final nextMessage =
-                              messagesList[currentMessageIndex + 1];
-                          final nextFromMe =
-                              nextMessage.sender.userId == widget.userId;
-                          if (nextFromMe) {
-                            showAvatar = true;
-                          }
-                        }
-                      }
-
-                      return MessageItem(
-                        message: message,
-                        fromMe: fromMe,
-                        showAvatar: showAvatar,
-                      );
-                    },
-                  );
-                } else if (state is MessagesError) {
-                  return Column(
-                    children: [
-                      _buildProfileInfo(),
-                      Expanded(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Error loading messages: ${state.message}',
-                                style: const TextStyle(color: Colors.red),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (widget.conversationId != null) {
-                                    context.read<MessageBloc>().add(
-                                      LoadMessagesEvent(
-                                        userId: widget.userId,
-                                        conversationId: widget.conversationId!,
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: const Text('Retry'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                // Default state - show profile info only
-                return _buildProfileInfo();
-              },
+                  // Default state - show profile info only
+                  return _buildProfileInfo();
+                },
+              ),
             ),
-          ),
 
-          _buildInputArea(),
-        ],
+            _buildInputArea(),
+          ],
+        ),
       ),
     );
   }
@@ -469,8 +739,106 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   }
 
   Widget _buildInputArea() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_replyingMessage != null) _buildReplyPreview(),
+
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            border: Border(
+              top: BorderSide(color: AppColors.textSecondary.withOpacity(0.2)),
+            ),
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  CupertinoIcons.plus_circle_fill,
+                  color: AppColors.primary,
+                  size: 24.sp,
+                ),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(
+                  CupertinoIcons.camera_fill,
+                  color: AppColors.primary,
+                  size: 24.sp,
+                ),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(
+                  CupertinoIcons.photo_fill,
+                  color: AppColors.primary,
+                  size: 24.sp,
+                ),
+                onPressed: () {},
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.textSecondary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(24.r),
+                  ),
+                  child: TextField(
+                    controller: _messageController,
+                    focusNode: _focusNode,
+                    onChanged: _onTextChanged,
+                    onTap: () {
+                      // Scroll to bottom with delay để đợi bàn phím hiện lên hoàn toàn
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        _scrollToBottom();
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Nhắn tin...",
+                      hintStyle: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.textSecondary,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              IconButton(
+                icon: Icon(CupertinoIcons.paperplane_fill, color: Colors.blue),
+                onPressed: _sendMessage,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReplyPreview() {
+    final replyText = _replyingMessage!.text ?? 'Đã gửi file đính kèm';
+    final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
+
+    String name;
+    if (isReplyingToMe) {
+      // Trường hợp trả lời chính mình
+      name = 'chính mình';
+    } else {
+      // Trả lời người khác, lấy chữ cái cuối của tên
+      final fullName = _replyingMessage!.sender.fullName ?? 'Unknown';
+      final parts = fullName.split(' ');
+      name = parts.isNotEmpty ? parts.last : 'Unknown';
+    }
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(
@@ -478,94 +846,54 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            icon: Icon(
-              CupertinoIcons.plus_circle_fill,
-              color: AppColors.primary,
-              size: 24.sp,
-            ),
-            onPressed: () {},
+          // Dải màu
+          Container(
+            width: 3.w,
+            height: 40.h,
+            color: AppColors.primary,
+            margin: EdgeInsets.only(right: 8.w),
           ),
-          IconButton(
-            icon: Icon(
-              CupertinoIcons.camera_fill,
-              color: AppColors.primary,
-              size: 24.sp,
-            ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(
-              CupertinoIcons.photo_fill,
-              color: AppColors.primary,
-              size: 24.sp,
-            ),
-            onPressed: () {},
-          ),
+
           Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
-              decoration: BoxDecoration(
-                color: AppColors.textSecondary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(24.r),
-              ),
-              child: TextField(
-                controller: _messageController,
-                focusNode: _focusNode,
-                onChanged: _onTextChanged,
-                onTap: () {
-                  // Scroll to bottom with delay để đợi bàn phím hiện lên hoàn toàn
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    _scrollToBottom();
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: "Nhắn tin...",
-                  hintStyle: TextStyle(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Trả lời $name',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.sp,
+                    color: AppColors.primary,
+                  ),
+                ),
+
+                SizedBox(height: 2.h),
+
+                Text(
+                  replyText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textSecondary,
                   ),
-                  border: InputBorder.none,
                 ),
-                style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
-              ),
+              ],
             ),
           ),
-          SizedBox(width: 8.w),
-          IconButton(
-            icon: Icon(CupertinoIcons.paperplane_fill, color: Colors.blue),
-            onPressed: () {
-              final text = _messageController.text.trim();
 
-              // Don't send if empty
-              if (text.isEmpty) return;
-
-              // Stop typing when sending message
-              if (widget.conversationId != null) {
-                _typingDebounceTimer?.cancel();
-                final messageBloc = context.read<MessageBloc>();
-                messageBloc.emitTypingStop(
-                  widget.userId,
-                  widget.conversationId!,
-                );
-
-                // Send message
-                messageBloc.add(
-                  SendMessageEvent(
-                    userId: widget.userId,
-                    conversationId: widget.conversationId!,
-                    text: text,
-                  ),
-                );
-
-                // Scroll to bottom after sending
-                _scrollToBottom();
-              }
-
-              // Clear text field
-              _messageController.clear();
-            },
+          GestureDetector(
+            onTap: _clearReplyMessage,
+            child: Padding(
+              padding: EdgeInsets.only(left: 8.w, top: 4.h),
+              child: Icon(
+                CupertinoIcons.clear_circled_solid,
+                size: 24,
+                color: AppColors.textSecondary.withOpacity(0.5),
+              ),
+            ),
           ),
         ],
       ),

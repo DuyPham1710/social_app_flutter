@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import '../../../auth/domain/entities/user_entity.dart';
+import 'parent_message_entity.dart';
 
 class MessageEntity extends Equatable {
   final String id;
@@ -8,7 +9,7 @@ class MessageEntity extends Equatable {
   final UserEntity sender;
   final String? text;
   final List<AttachmentEntity> attachments;
-  final dynamic replyTo; // Can be expanded to MessageEntity if needed
+  final ParentMessageEntity? replyTo;
   final List<ReactionEntity> reactions;
   final List<SeenByEntity> seenBy;
   final bool deletedForEveryone;

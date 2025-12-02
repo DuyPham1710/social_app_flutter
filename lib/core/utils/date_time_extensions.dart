@@ -26,4 +26,38 @@ extension ChatTimeFormat on DateTime {
       return weekdayMap[weekday] ?? '';
     }
   }
+
+  String formatTimeHeader() {
+    final now = DateTime.now();
+    final time = DateFormat('HH:mm').format(this);
+
+    // Kiểm tra xem có phải là hôm nay không
+    final isToday = year == now.year && month == now.month && day == now.day;
+
+    // NẾU LÀ HÔM NAY: Chỉ trả về giờ
+    if (isToday) {
+      return time;
+    }
+
+    // NẾU LÀ NGÀY KHÁC: Trả về Thứ + LÚC + Giờ
+    String weekday = '';
+    switch (this.weekday) {
+      case 1:
+        weekday = 'T.2';
+      case 2:
+        weekday = 'T.3';
+      case 3:
+        weekday = 'T.4';
+      case 4:
+        weekday = 'T.5';
+      case 5:
+        weekday = 'T.6';
+      case 6:
+        weekday = 'T.7';
+      case 7:
+        weekday = 'CN';
+    }
+
+    return "$weekday LÚC $time";
+  }
 }

@@ -2,6 +2,7 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
+import 'parent_message_model.dart';
 
 class AttachmentModel {
   final String url;
@@ -33,7 +34,7 @@ class ReactionModel {
   factory ReactionModel.fromJson(Map<String, dynamic> json) {
     // Parse emoji - can be object {id, label, icon} or direct id
     EmojiType emoji = EmojiType.like; // Default
-    
+
     if (json['emoji'] != null) {
       if (json['emoji'] is Map) {
         final emojiData = json['emoji'] as Map;
@@ -64,13 +65,10 @@ class ReactionModel {
     final userMap = userData is Map<String, dynamic>
         ? userData
         : userData is Map
-            ? Map<String, dynamic>.from(userData)
-            : throw Exception('Invalid user format: ${userData.runtimeType}');
+        ? Map<String, dynamic>.from(userData)
+        : throw Exception('Invalid user format: ${userData.runtimeType}');
 
-    return ReactionModel(
-      user: UserModel.fromJson(userMap),
-      emoji: emoji,
-    );
+    return ReactionModel(user: UserModel.fromJson(userMap), emoji: emoji);
   }
 
   Map<String, dynamic> toJson() => {
@@ -110,7 +108,7 @@ class MessageModel {
   final UserModel sender;
   final String? text;
   final List<AttachmentModel> attachments;
-  final dynamic replyTo;
+  final ParentMessageModel? replyTo;
   final List<ReactionModel> reactions;
   final List<SeenByModel> seenBy;
   final bool deletedForEveryone;
@@ -160,6 +158,23 @@ class MessageModel {
   }
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
+    // Parse replyTo - can be null, a Map (ParentMessageDto), or a string (messageId)
+    ParentMessageModel? replyTo;
+    if (json['replyTo'] != null) {
+      if (json['replyTo'] is Map) {
+        try {
+          final replyToMap = json['replyTo'] is Map<String, dynamic>
+              ? json['replyTo'] as Map<String, dynamic>
+              : Map<String, dynamic>.from(json['replyTo'] as Map);
+          replyTo = ParentMessageModel.fromJson(replyToMap);
+        } catch (e) {
+          print('Error parsing replyTo: $e');
+          replyTo = null;
+        }
+      }
+      // If replyTo is a string (just messageId), we ignore it as we need full ParentMessageDto
+    }
+
     return MessageModel(
       id: json['_id'] as String,
       conversationId: json['conversationId'] as String?,
@@ -169,7 +184,7 @@ class MessageModel {
         json['attachments'],
         (item) => AttachmentModel.fromJson(item),
       ),
-      replyTo: json['replyTo'],
+      replyTo: replyTo,
       reactions: _parseList<ReactionModel>(
         json['reactions'],
         (item) => ReactionModel.fromJson(item),
@@ -196,7 +211,7 @@ class MessageModel {
     'senderId': sender.toJson(),
     'text': text,
     'attachments': attachments.map((e) => e.toJson()).toList(),
-    'replyTo': replyTo,
+    'replyTo': replyTo?.toJson(),
     'reactions': reactions.map((e) => e.toJson()).toList(),
     'seenBy': seenBy.map((e) => e.toJson()).toList(),
     'deletedForEveryone': deletedForEveryone,
@@ -211,7 +226,7 @@ class MessageModel {
     sender: sender.toEntity(),
     text: text,
     attachments: attachments.map((e) => e.toEntity()).toList(),
-    replyTo: replyTo,
+    replyTo: replyTo?.toEntity(),
     reactions: reactions.map((e) => e.toEntity()).toList(),
     seenBy: seenBy.map((e) => e.toEntity()).toList(),
     deletedForEveryone: deletedForEveryone,
