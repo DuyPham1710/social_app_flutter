@@ -57,7 +57,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'Bạn bè của ' + widget.fullName.trim().split(" ").last,
+            'Bạn bè của ${widget.fullName.trim().split(" ").last}',
             style: TextStyle(
               fontSize: 20.sp,
               fontWeight: FontWeight.w700,
