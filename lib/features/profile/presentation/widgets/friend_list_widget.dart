@@ -64,11 +64,6 @@ class _FriendListWidgetState extends State<FriendListWidget> {
           }
           return _buildFriendList(friends);
         }
-
-        // 2. Sửa phần return mặc định (cho state khởi tạo hoặc các state khác)
-        // Thay vì hiện Loading, ta trả về SizedBox.shrink() (ẩn đi) hoặc Container rỗng
-        // Vì có buildWhen chặn ở trên rồi, dòng này chỉ chạy đúng 1 lần đầu tiên
-        // nếu state ban đầu không phải là 3 loại trên.
         return const SizedBox.shrink();
       },
     );
@@ -110,7 +105,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               const Text(
                 "Bạn bè",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
@@ -126,6 +121,13 @@ class _FriendListWidgetState extends State<FriendListWidget> {
                 ),
               ),
             ],
+          ),
+          Text(
+            friends.length.toString() + " người bạn" ?? "0 người bạn",
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w400,
+            ),
           ),
 
           const SizedBox(height: 8),

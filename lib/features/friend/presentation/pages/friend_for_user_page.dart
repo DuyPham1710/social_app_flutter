@@ -1,0 +1,559 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/friend/presentation/widgets/friend_item.dart';
+
+class FriendForUserPage extends StatefulWidget {
+  final String userId;
+  final String fullName;
+  const FriendForUserPage({
+    super.key,
+    required this.userId,
+    required this.fullName,
+  });
+
+  @override
+  State<FriendForUserPage> createState() => _FriendsListPageState();
+}
+
+class _FriendsListPageState extends State<FriendForUserPage> {
+  String _sortBy = 'name'; // 'name', 'recent', 'online'
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Load danh sách bạn bè khi khởi tạo
+    context.read<FriendBloc>().add(LoadFriendsByUserId(widget.userId ?? ''));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<FriendBloc, FriendState>(
+      listener: (context, state) {
+        if (state is FriendActionSuccess) {
+          _showMessage(context, state.message);
+        } else if (state is FriendActionError) {
+          _showMessage(context, state.message);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(CupertinoIcons.back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'Bạn bè của ' + widget.fullName.trim().split(" ").last,
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(CupertinoIcons.search, color: Colors.black),
+              onPressed: _showSearch,
+            ),
+          ],
+        ),
+        body: BlocBuilder<FriendBloc, FriendState>(
+          builder: (context, state) {
+            if (state is FriendLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is FriendLoaded) {
+              final friends = state.friends;
+              final filteredFriends = friends.where((f) {
+                if (_searchQuery.isEmpty) return true;
+                final q = _searchQuery.toLowerCase();
+                final name = (f.fullName ?? '').toLowerCase();
+                final username = (f.username ?? '').toLowerCase();
+                return name.contains(q) || username.contains(q);
+              }).toList();
+              final onlineFriendsCount =
+                  50; // Tạm thời hardcode, sau có thể lấy từ API
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Search bar
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Tìm kiếm bạn bè',
+                        prefixIcon: const Icon(CupertinoIcons.search),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(
+                                  CupertinoIcons.xmark_circle_fill,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 10.h,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        fillColor: Colors.white,
+                        filled: true,
+                      ),
+                    ),
+                  ),
+                  // Header section
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade200,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${filteredFriends.length} bạn bè',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: _showSortOptions,
+                              child: Text(
+                                'Sắp xếp',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          '$onlineFriendsCount người đang hoạt động',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Friends list
+                  Expanded(
+                    child: filteredFriends.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.person_2,
+                                  size: 64.r,
+                                  color: Colors.grey[400],
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  'Chưa có bạn bè nào',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredFriends.length,
+                            itemBuilder: (context, index) {
+                              final friend = filteredFriends[index];
+                              return FriendItem(
+                                friendId: friend.userId,
+                                name: friend.fullName ?? 'Người dùng',
+                                mutualFriends: friend.mutualFriendsCount ?? 0,
+                                avatarUrl: friend.avatarUrl,
+                                mutualFriendAvatars: friend.mutualFriendAvatars,
+                                onMessage: () {
+                                  _showMessage(
+                                    context,
+                                    'Nhắn tin cho ${friend.fullName}',
+                                  );
+                                },
+                                onMoreOptions: () {
+                                  _showMoreOptions(context, friend);
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              );
+            } else if (state is FriendError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64.r,
+                      color: Colors.red[300],
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'Lỗi tải dữ liệu',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      state.message,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16.h),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<FriendBloc>().add(const LoadFriends());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showSearch() {
+    // TODO: Implement search functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Chức năng tìm kiếm đang được phát triển'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'Sắp xếp theo',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                _buildSortOption('Tên', 'name'),
+                _buildSortOption('Gần đây', 'recent'),
+                _buildSortOption('Đang hoạt động', 'online'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSortOption(String title, String value) {
+    final isSelected = _sortBy == value;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _sortBy = value;
+        });
+        Navigator.pop(context);
+        // TODO: Implement actual sorting logic
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: isSelected ? AppColors.primary : Colors.black,
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check, color: AppColors.primary, size: 24.r),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
+  }
+
+  String _formatFriendsSince(DateTime? friendsSince) {
+    if (friendsSince == null) return 'Là bạn bè từ lâu';
+
+    final months = [
+      'tháng 1',
+      'tháng 2',
+      'tháng 3',
+      'tháng 4',
+      'tháng 5',
+      'tháng 6',
+      'tháng 7',
+      'tháng 8',
+      'tháng 9',
+      'tháng 10',
+      'tháng 11',
+      'tháng 12',
+    ];
+
+    return 'Là bạn bè từ ${months[friendsSince.month - 1]} năm ${friendsSince.year}';
+  }
+
+  void _showMoreOptions(BuildContext context, dynamic friend) {
+    final name = friend.fullName ?? 'Người dùng';
+    final avatarUrl = friend.avatarUrl ?? 'https://i.pravatar.cc/150?img=12';
+    final friendsSince = friend.friendsSince as DateTime?;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                // Friend info header
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 30.r,
+                        backgroundImage: NetworkImage(avatarUrl),
+                        backgroundColor: Colors.grey[300],
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              _formatFriendsSince(friendsSince),
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Divider(height: 1, color: Colors.grey[200]),
+                SizedBox(height: 8.h),
+                _buildOptionItem(
+                  icon: CupertinoIcons.chat_bubble_fill,
+                  title: 'Nhắn tin cho $name',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showMessage(context, 'Nhắn tin cho $name');
+                  },
+                  iconColor: AppColors.primary,
+                ),
+                _buildOptionItem(
+                  icon: CupertinoIcons.person_badge_minus,
+                  title: 'Hủy kết bạn với $name',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showUnfriendDialog(friend);
+                  },
+                  isDestructive: false,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOptionItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    Color? iconColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color:
+                  iconColor ?? (isDestructive ? Colors.red : Colors.grey[700]),
+              size: 24.r,
+            ),
+            SizedBox(width: 16.w),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w400,
+                color: isDestructive ? Colors.red : Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUnfriendDialog(dynamic friend) {
+    final name = friend.fullName ?? 'Người dùng';
+    final friendId = friend.userId;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hủy kết bạn'),
+        content: Text('Bạn có chắc chắn muốn hủy kết bạn với $name?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Gọi RemoveFriend event với friendId
+              context.read<FriendBloc>().add(RemoveFriend(friendId: friendId));
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      ),
+    );
+  }
+}

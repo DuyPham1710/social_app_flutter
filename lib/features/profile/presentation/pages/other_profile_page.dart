@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/friend/presentation/pages/friend_for_user_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/friend_list_widget.dart';
-import 'package:social_app_fe/features/profile/presentation/widgets/profile_header.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/other_profile_header.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_info.dart';
 import '../widgets/other_profile_actions.dart';
 import '../bloc/other_profile_bloc.dart';
@@ -28,18 +29,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
   void initState() {
     super.initState();
 
-    /// Load user & relationship
-    context.read<OtherProfileBloc>().add(
-      LoadOtherUserProfileEvent(userId: widget.userId),
-    );
-
-    /// Load posts page 1
-    context.read<OtherProfileBloc>().add(
-      LoadOtherProfilePostsEvent(userId: widget.userId, page: 1),
-    );
-
-    //lấy bạn bè
-    context.read<FriendProfileBloc>().add(LoadFriendsByUserId(widget.userId));
+    _loadData();
 
     /// Handle load more when scroll
     _scrollController.addListener(() {
@@ -68,6 +58,21 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
     super.dispose();
   }
 
+  void _loadData() {
+    /// Load user & relationship
+    context.read<OtherProfileBloc>().add(
+      LoadOtherUserProfileEvent(userId: widget.userId),
+    );
+
+    /// Load posts page 1
+    context.read<OtherProfileBloc>().add(
+      LoadOtherProfilePostsEvent(userId: widget.userId, page: 1),
+    );
+
+    //lấy bạn bè
+    context.read<FriendProfileBloc>().add(LoadFriendsByUserId(widget.userId));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,118 +88,141 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           final posts = state.posts ?? [];
           final commentCounts = state.commentCounts ?? {};
 
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverAppBar(
-                surfaceTintColor: Colors.transparent,
-                pinned: true,
-                backgroundColor: AppColors.background,
-                elevation: 0,
-                title: Text(
-                  user.fullName ?? "Trang cá nhân",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+          return RefreshIndicator(
+            color: AppColors.primary,
+            backgroundColor: AppColors.background,
+            onRefresh: () async {
+              _loadData();
+              // Cho animation refresh mượt hơn
+              await Future.delayed(const Duration(milliseconds: 300));
+            },
+            child: CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  surfaceTintColor: Colors.transparent,
+                  pinned: true,
+                  backgroundColor: AppColors.background,
+                  elevation: 0,
+                  title: Text(
+                    user.fullName ?? "Trang cá nhân",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
-              ),
 
-              /// Content
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  ProfileHeader(user: user),
+                /// Content
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    OtherProfileHeader(user: user),
 
-                  /// Friend actions
-                  OtherProfileActions(
-                    relationship: state.relationship,
-                    onSendRequest: () {
-                      context.read<FriendProfileBloc>().add(
-                        SendFriendRequest(receiverId: user.userId),
-                      );
-                    },
-                    onCancelRequest: () {
-                      context.read<FriendProfileBloc>().add(
-                        CancelSentFriendRequest(
-                          requestId: state.relationship?.requestId ?? '',
+                    /// Friend actions
+                    OtherProfileActions(
+                      relationship: state.relationship,
+                      onSendRequest: () {
+                        context.read<FriendProfileBloc>().add(
+                          SendFriendRequest(receiverId: user.userId),
+                        );
+                      },
+                      onCancelRequest: () {
+                        context.read<FriendProfileBloc>().add(
+                          CancelSentFriendRequest(
+                            requestId: state.relationship?.requestId ?? '',
+                          ),
+                        );
+                      },
+                      onAcceptRequest: () {
+                        context.read<FriendProfileBloc>().add(
+                          AcceptFriendRequest(
+                            requestId: state.relationship?.requestId ?? '',
+                            userId: user.userId,
+                          ),
+                        );
+                      },
+                      onRejectRequest: () {
+                        context.read<FriendProfileBloc>().add(
+                          RejectFriendRequest(
+                            requestId: state.relationship?.requestId ?? '',
+                          ),
+                        );
+                      },
+                      onUnfriend: () {
+                        context.read<FriendProfileBloc>().add(
+                          RemoveFriend(friendId: user.userId),
+                        );
+                      },
+                      onMessage: () {
+                        // TODO: open chat
+                      },
+                    ),
+
+                    const ProfileInfo(),
+                    Divider(),
+                    FriendListWidget(
+                      onViewAll: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FriendForUserPage(
+                              userId: user.userId,
+                              fullName: user.fullName ?? "Người dùng",
+                            ),
+                          ),
+                        );
+                        // userId: user.userId,
+                      },
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 12),
+
+                    /// Posts
+                    if (posts.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text("Chưa có bài viết nào"),
                         ),
-                      );
-                    },
-                    onAcceptRequest: () {
-                      context.read<FriendProfileBloc>().add(
-                        AcceptFriendRequest(
-                          requestId: state.relationship?.requestId ?? '',
-                          userId: user.userId,
-                        ),
-                      );
-                    },
-                    onRejectRequest: () {
-                      context.read<FriendProfileBloc>().add(
-                        RejectFriendRequest(
-                          requestId: state.relationship?.requestId ?? '',
-                        ),
-                      );
-                    },
-                    onUnfriend: () {
-                      context.read<FriendProfileBloc>().add(
-                        RemoveFriend(friendId: user.userId),
-                      );
-                    },
-                    onMessage: () {
-                      // TODO: open chat
-                    },
-                  ),
+                      ),
 
-                  const ProfileInfo(),
-                  Divider(),
-                  FriendListWidget(
-                    onViewAll: () => Navigator.pushNamed(context, '/friends'),
-                    userId: user.userId,
-                  ),
-                  const Divider(),
-                  const SizedBox(height: 12),
+                    ...posts.map((post) {
+                      final count = commentCounts[post.id] ?? 0;
+                      return PostItem(post: post, commentCount: count);
+                    }),
 
-                  /// Posts
-                  if (posts.isEmpty)
-                    Center(
-                      child: Padding(
+                    /// Loading more indicator
+                    if (state is OtherProfileLoaded && state.isLoadingMore)
+                      const Padding(
                         padding: EdgeInsets.all(16),
-                        child: Text("Chưa có bài viết nào"),
-                      ),
-                    ),
-
-                  ...posts.map((post) {
-                    final count = commentCounts[post.id] ?? 0;
-                    return PostItem(post: post, commentCount: count);
-                  }),
-
-                  /// Loading more indicator
-                  if (state is OtherProfileLoaded && state.isLoadingMore)
-                    const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primary,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
-                    ),
 
-                  /// End of posts
-                  if (state is OtherProfileLoaded &&
-                      state.hasNext == false &&
-                      posts.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      child: Center(
-                        child: Text(
-                          "Đã hiển thị hết bài viết",
-                          style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                    /// End of posts
+                    if (state is OtherProfileLoaded &&
+                        state.hasNext == false &&
+                        posts.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        child: Center(
+                          child: Text(
+                            "Đã hiển thị hết bài viết",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                ]),
-              ),
-            ],
+                  ]),
+                ),
+              ],
+            ),
           );
         },
       ),
