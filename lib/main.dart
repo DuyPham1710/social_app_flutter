@@ -21,6 +21,7 @@ import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/search/presentation/pages/search_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
                 const PersonalInfoPage(),
             '/reset-password': (BuildContext context) =>
                 const ResetPasswordPage(),
+            '/search': (BuildContext context) => const SearchPage(),
           },
         );
       },

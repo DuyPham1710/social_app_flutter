@@ -81,6 +81,11 @@ import 'package:social_app_fe/features/privacy/domain/repository/privacy_reposit
 import 'package:social_app_fe/features/privacy/domain/usecases/get_default_privacy_usecase.dart';
 import 'package:social_app_fe/features/privacy/domain/usecases/set_default_privacy_usecase.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
+import 'package:social_app_fe/features/search/data/data_sources/search_remote_data_source.dart';
+import 'package:social_app_fe/features/search/data/repository/search_repository_impl.dart';
+import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
+import 'package:social_app_fe/features/search/domain/usecases/search_users_usecase.dart';
+import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -110,6 +115,10 @@ Future<void> initializeDependencies() async {
     () => PrivacyRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<SearchRemoteDataSource>(
+    () => SearchRemoteDataSource(s1()),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
@@ -120,6 +129,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<StoryRepository>(() => StoryRepositoryImpl(s1()));
   s1.registerLazySingleton<PrivacyRepository>(
     () => PrivacyRepositoryImpl(s1()),
+  );
+  s1.registerLazySingleton<SearchRepository>(
+    () => SearchRepositoryImpl(s1()),
   );
 
   // Usecases
@@ -273,6 +285,11 @@ Future<void> initializeDependencies() async {
     () => SetDefaultPrivacyUseCase(s1()),
   );
 
+  // Search UseCase
+  s1.registerLazySingleton<SearchUsersUseCase>(
+    () => SearchUsersUseCase(s1()),
+  );
+
   s1.registerFactory(() => MenuBloc(s1()));
 
   // Blocs
@@ -366,6 +383,10 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
+
+  s1.registerFactory<SearchBloc>(
+    () => SearchBloc(searchUsersUseCase: s1()),
+  );
 }
 
 Future<void> resetDependencies() async {

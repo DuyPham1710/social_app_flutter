@@ -36,7 +36,12 @@ class _FriendPageState extends State<FriendPage> {
         automaticallyImplyLeading: false,
         title: const Text('Friend'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.search)),
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
+            icon: const Icon(CupertinoIcons.search),
+          ),
         ],
       ),
       body: SafeArea(
