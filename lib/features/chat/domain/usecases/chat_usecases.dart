@@ -3,6 +3,7 @@ export 'connect_chat_usecase.dart';
 export 'disconnect_chat_usecase.dart';
 export 'join_conversation_usecase.dart';
 export 'get_messages_usecase.dart';
+export 'get_messages_around_id_usecase.dart';
 export 'typing_start_usecase.dart';
 export 'typing_stop_usecase.dart';
 export 'listen_typing_start_usecase.dart';

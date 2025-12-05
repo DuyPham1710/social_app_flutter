@@ -24,6 +24,13 @@ abstract class ChatRepository {
     int limit = 20,
   });
 
+  Future<DataState<MessageResponseEntity>> getMessagesAroundId({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    int limit = 20,
+  });
+
   Future<DataState<void>> joinConversation({
     required String userId,
     required String conversationId,

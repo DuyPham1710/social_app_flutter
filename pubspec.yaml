@@ -41,6 +41,7 @@ dependencies:
   shimmer: ^3.0.0
   bloc_concurrency: ^0.3.0
   flutter_slidable: ^4.0.3
+  swipe_to: ^1.0.6
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -62,6 +63,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/sounds/
     - animations/
     - animations/emoji/
     - .env

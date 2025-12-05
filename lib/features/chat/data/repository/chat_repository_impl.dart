@@ -78,6 +78,28 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<MessageResponseEntity>> getMessagesAroundId({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getMessagesAroundId(
+        userId: userId,
+        conversationId: conversationId,
+        messageId: messageId,
+        limit: limit,
+      );
+      return DataStateSuccess(response.toEntity());
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> joinConversation({
     required String userId,
     required String conversationId,

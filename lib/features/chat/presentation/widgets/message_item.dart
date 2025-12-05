@@ -13,6 +13,7 @@ class MessageItem extends StatelessWidget {
   final bool isLastMessage;
   final String currentUserId;
   final List<UserEntity> otherParticipants;
+  final VoidCallback? onLongPress;
 
   const MessageItem({
     super.key,
@@ -23,6 +24,7 @@ class MessageItem extends StatelessWidget {
     this.isLastMessage = false,
     required this.currentUserId,
     this.otherParticipants = const [],
+    this.onLongPress,
   });
 
   // Kiểm tra xem tin nhắn đã được xem bởi người khác chưa (không tính mình)
@@ -59,6 +61,115 @@ class MessageItem extends StatelessWidget {
 
     // Nếu toàn bộ text là emoji và không quá 5 emoji
     return emojiLength == trimmedText.length && matches.length <= 5;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isReplying = message.replyTo != null;
+    final hasReactions = message.reactions.isNotEmpty;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          margin: EdgeInsets.only(
+            bottom: 4.h,
+            left: fromMe ? 60.w : 0,
+            right: fromMe ? 0 : 60.w,
+          ),
+          child: Row(
+            mainAxisAlignment: fromMe
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (!fromMe) ...[
+                if (showAvatar)
+                  CircleAvatar(
+                    radius: 14.r,
+                    backgroundImage: NetworkImage(
+                      message.sender.avatarUrl ?? "https://i.pravatar.cc/200",
+                    ),
+                  )
+                else
+                  SizedBox(width: 28.r),
+
+                SizedBox(width: 8.w),
+              ],
+
+              Flexible(
+                child: GestureDetector(
+                  onLongPress: onLongPress,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    fit: StackFit.loose,
+                    children: [
+                      isReplying
+                          ? _buildReplyMessage()
+                          :
+                            // Kiểm tra xem có phải là emoji không
+                            message.text != null && _isOnlyEmoji(message.text!)
+                          ? _buildEmojiMessage()
+                          : _buildNormalMessage(),
+
+                      // Show reactions if any
+                      if (hasReactions) _buildReactionBubble(context),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        hasReactions ? SizedBox(height: 20.h) : SizedBox.shrink(),
+
+        // Hiển thị trạng thái tin nhắn
+        _buildMessageStatus(),
+      ],
+    );
+  }
+
+  Positioned _buildReactionBubble(BuildContext context) {
+    return Positioned(
+      bottom: -16.h,
+      right: fromMe ? 0 : -4.w,
+
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ReactionDetailDialog(reactions: message.reactions);
+            },
+          );
+        },
+
+        child: Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: AppColors.secondBackground,
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: message.reactions.map((reaction) {
+              return Text(
+                reaction.emoji.icon,
+                style: TextStyle(fontSize: 12.sp),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildMessageStatus() {
@@ -101,147 +212,42 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isReplying = message.replyTo != null;
-    final hasReactions = message.reactions.isNotEmpty;
-
-    return Column(
-      children: [
-        Container(
-          margin: EdgeInsets.only(
-            bottom: 4.h,
-            left: fromMe ? 60.w : 0,
-            right: fromMe ? 0 : 60.w,
-          ),
-          child: Row(
-            mainAxisAlignment: fromMe
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (!fromMe) ...[
-                if (showAvatar)
-                  CircleAvatar(
-                    radius: 14.r,
-                    backgroundImage: NetworkImage(
-                      message.sender.avatarUrl ?? "https://i.pravatar.cc/200",
-                    ),
-                  )
-                else
-                  SizedBox(width: 28.r),
-
-                SizedBox(width: 8.w),
-              ],
-
-              // Dùng Flexible để tin nhắn không bị tràn khi có thêm avatar
-              Flexible(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    isReplying
-                        ? _buildReplyMessage()
-                        :
-                          // Kiểm tra xem có phải là emoji không
-                          message.text != null && _isOnlyEmoji(message.text!)
-                        ? _buildEmojiMessage()
-                        : _buildNormalMessage(),
-
-                    // Show reactions if any
-                    if (hasReactions)
-                      Positioned(
-                        bottom: -16.h,
-                        right: fromMe ? 0 : -4.w,
-
-                        child: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return ReactionDetailDialog(
-                                  reactions: message.reactions,
-                                );
-                              },
-                            );
-                          },
-
-                          child: Container(
-                            padding: EdgeInsets.all(4.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondBackground,
-                              borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 2,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: message.reactions.map((reaction) {
-                                return Text(
-                                  reaction.emoji.icon,
-                                  style: TextStyle(fontSize: 12.sp),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        hasReactions ? SizedBox(height: 20.h) : SizedBox.shrink(),
-
-        // Hiển thị trạng thái tin nhắn
-        _buildMessageStatus(),
-      ],
-    );
-  }
-
   Widget _buildEmojiMessage() {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (message.text != null && message.text!.isNotEmpty)
-            Text(
-              message.text!,
-              style: TextStyle(
-                fontSize: 26.sp, // Cỡ chữ lớn hơn cho emoji
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (message.text != null && message.text!.isNotEmpty)
+          Text(
+            message.text!,
+            style: TextStyle(
+              fontSize: 26.sp, // Cỡ chữ lớn hơn cho emoji
             ),
+          ),
 
-          // Show attachments if any
-          if (message.attachments.isNotEmpty)
-            ...message.attachments.map(
-              (attachment) => Container(
-                margin: EdgeInsets.only(top: 4.h),
-                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
-                decoration: BoxDecoration(
-                  color: fromMe
-                      ? AppColors.primary
-                      : AppColors.textSecondary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-                child: Text(
-                  '[${attachment.type.toUpperCase()}] ${attachment.url}',
-                  style: TextStyle(
-                    color: fromMe ? Colors.white70 : AppColors.textSecondary,
-                    fontSize: 12.sp,
-                    fontStyle: FontStyle.italic,
-                  ),
+        // Show attachments if any
+        if (message.attachments.isNotEmpty)
+          ...message.attachments.map(
+            (attachment) => Container(
+              margin: EdgeInsets.only(top: 4.h),
+              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
+              decoration: BoxDecoration(
+                color: fromMe
+                    ? AppColors.primary
+                    : AppColors.textSecondary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Text(
+                '[${attachment.type.toUpperCase()}] ${attachment.url}',
+                style: TextStyle(
+                  color: fromMe ? Colors.white70 : AppColors.textSecondary,
+                  fontSize: 12.sp,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
@@ -261,6 +267,7 @@ class MessageItem extends StatelessWidget {
       ),
 
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Replied message container
@@ -375,6 +382,7 @@ class MessageItem extends StatelessWidget {
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (message.text != null && message.text!.isNotEmpty)

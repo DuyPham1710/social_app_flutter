@@ -20,6 +20,8 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/message/message_bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/message/message_event.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -100,6 +102,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _joinConversationAndNavigate(
     String conversationId,
     UserEntity friendInfo,
+    int unreadCount,
   ) async {
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,16 +115,20 @@ class _ChatListPageState extends State<ChatListPage> {
       return;
     }
 
-    // Mark all messages as read when navigating to chat detail (without messageId)
-    // This will mark all unread messages in the conversation as read
+    // Luôn khởi tạo messageBloc
     messageBloc = s1<MessageBloc>();
-    messageBloc.add(
-      MarkAsReadEvent(
-        userId: userId!,
-        conversationId: conversationId,
-        // messageId is null to mark all messages as read
-      ),
-    );
+
+    if (unreadCount > 0) {
+      // Mark all messages as read when navigating to chat detail (without messageId)
+      // This will mark all unread messages in the conversation as read
+      messageBloc.add(
+        MarkAsReadEvent(
+          userId: userId!,
+          conversationId: conversationId,
+          // messageId is null to mark all messages as read
+        ),
+      );
+    }
 
     Navigator.push(
       context,
@@ -140,7 +147,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   /// Find existing 1-1 conversation with a friend
   /// Returns conversationId if found, null if not found
-  Future<String?> _findConversationWithFriend(String friendId) async {
+  Future<Map<String, int>?> _findConversationWithFriend(String friendId) async {
     final chatState = context.read<ConversationBloc>().state;
     final userData = await TokenStorage.getUserData();
     final currentUserId = userData?['id'];
@@ -160,7 +167,7 @@ class _ChatListPageState extends State<ChatListPage> {
           final hasThisFriend = participantIds.contains(friendId);
 
           if (hasCurrentUser && hasThisFriend) {
-            return conversation.id;
+            return {conversation.id: conversation.unreadCount ?? 0};
           }
         }
       }
@@ -193,7 +200,7 @@ class _ChatListPageState extends State<ChatListPage> {
         ),
       );
 
-      final existingConversationId = await _findConversationWithFriend(
+      final existingConversation = await _findConversationWithFriend(
         friend.userId,
       );
 
@@ -207,11 +214,17 @@ class _ChatListPageState extends State<ChatListPage> {
         avatarUrl: friend.avatarUrl,
       );
 
-      if (existingConversationId != null) {
+      if (existingConversation != null) {
+        final existingConversationId = existingConversation.keys.first;
+        final unreadCount = existingConversation[existingConversationId] ?? 0;
         print(
           'Found existing conversation: $existingConversationId with friend: ${friend.userId}',
         );
-        _joinConversationAndNavigate(existingConversationId, friendInfo);
+        _joinConversationAndNavigate(
+          existingConversationId,
+          friendInfo,
+          unreadCount,
+        );
       } else {
         print(
           'No existing conversation with friend: ${friend.userId}, creating new chat',
@@ -289,255 +302,292 @@ class _ChatListPageState extends State<ChatListPage> {
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: AppColors.background,
-          elevation: 0,
+      child: BlocBuilder<MenuBloc, MenuState>(
+        builder: (context, state) {
+          if (state is MenuLoadingState) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is MenuErrorState) {
+            return Text('Lỗi: ${state.message}');
+          }
 
-          leading: Row(
-            children: [
-              IconButton(
-                icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          title: Text(
-            "FullName Chat",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.settings, color: AppColors.textPrimary),
-            ),
-          ],
-        ),
+          if (state is MenuLoadedState) {
+            return Scaffold(
+              backgroundColor: AppColors.background,
+              appBar: AppBar(
+                surfaceTintColor: Colors.transparent,
+                backgroundColor: AppColors.background,
+                elevation: 0,
 
-        body: RefreshIndicator(
-          onRefresh: _loadData,
-          color: AppColors.primary,
-          backgroundColor: AppColors.background,
-          child: CustomScrollView(
-            slivers: [
-              // Ô tìm kiếm
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 8.h,
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Tìm kiếm",
-                      hintStyle: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w400,
+                leading: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        CupertinoIcons.back,
+                        color: AppColors.textPrimary,
                       ),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: AppColors.textSecondary,
-                      ),
-                      filled: true,
-                      fillColor: AppColors.textSecondary.withOpacity(0.05),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
+                  ],
+                ),
+                title: Text(
+                  state.user.fullName ?? "Chats",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
+                actions: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.settings,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
               ),
 
-              // Story List (Friends)
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 95.h,
-                  child: BlocBuilder<FriendBloc, FriendState>(
-                    builder: (context, friendState) {
-                      if (friendState is FriendLoaded) {
-                        final friends = friendState.friends;
-
-                        if (friends.isEmpty) {
-                          return Padding(
-                            padding: EdgeInsets.only(right: 12.w),
-                            child: StoryChatItemWidget(
-                              imageUrl: "https://i.pravatar.cc/200",
-                              name: "Tin của bạn",
-                              showAddButton: true,
-                              onTap: () {
-                                // Handle add story tap
-                              },
+              body: RefreshIndicator(
+                onRefresh: _loadData,
+                color: AppColors.primary,
+                backgroundColor: AppColors.background,
+                child: CustomScrollView(
+                  slivers: [
+                    // Ô tìm kiếm
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 8.h,
+                        ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: "Tìm kiếm",
+                            hintStyle: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w400,
                             ),
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: AppColors.textSecondary,
+                            ),
+                            filled: true,
+                            fillColor: AppColors.textSecondary.withOpacity(
+                              0.05,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Story List (Friends)
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 95.h,
+                        child: BlocBuilder<FriendBloc, FriendState>(
+                          builder: (context, friendState) {
+                            if (friendState is FriendLoaded) {
+                              final friends = friendState.friends;
+
+                              if (friends.isEmpty) {
+                                return Padding(
+                                  padding: EdgeInsets.only(right: 12.w),
+                                  child: StoryChatItemWidget(
+                                    imageUrl: "https://i.pravatar.cc/200",
+                                    name: "Tin của bạn",
+                                    showAddButton: true,
+                                    onTap: () {
+                                      // Handle add story tap
+                                    },
+                                  ),
+                                );
+                              }
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                itemCount:
+                                    friends.length +
+                                    1, // +1 for add story button
+                                itemBuilder: (context, index) {
+                                  if (index == 0) {
+                                    // Add story button
+                                    return Padding(
+                                      padding: EdgeInsets.only(right: 12.w),
+                                      child: StoryChatItemWidget(
+                                        imageUrl:
+                                            state.user.avatarUrl ??
+                                            "https://i.pravatar.cc/200",
+                                        name: "Tạo tin",
+                                        showAddButton: true,
+                                        onTap: () {
+                                          // Handle add story tap
+                                        },
+                                      ),
+                                    );
+                                  }
+
+                                  final friend = friends[index - 1];
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 12.w),
+                                    child: StoryChatItemWidget(
+                                      imageUrl:
+                                          friend.avatarUrl ??
+                                          "https://i.pravatar.cc/200",
+                                      name: friend.fullName!
+                                          .trim()
+                                          .split(' ')
+                                          .last,
+                                      showAddButton: false,
+                                      onTap: () {
+                                        // Check if conversation exists with this friend
+                                        _handleFriendTap(friend);
+                                      },
+                                    ),
+                                  );
+                                },
+                              );
+                            } else if (friendState is FriendLoading) {
+                              return const ListFriendLoading();
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // Spacing
+                    SliverToBoxAdapter(child: SizedBox(height: 4.h)),
+
+                    // Danh sách hội thoại
+                    BlocBuilder<ConversationBloc, ConversationState>(
+                      builder: (context, state) {
+                        // Handle loading state
+                        if (state is ConversationsLoading) {
+                          return const SliverToBoxAdapter(
+                            child: ConversationsLoadingWidget(),
                           );
                         }
-                        return ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: 10.w),
-                          itemCount:
-                              friends.length + 1, // +1 for add story button
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              // Add story button
+
+                        // Handle loaded state (including when join conversation is successful)
+                        // ConversationsLoaded? conversationsState;
+                        // if (state is ConversationsLoaded) {
+                        //   conversationsState = state;
+                        // }
+                        // // Keep showing conversations even after successful join
+                        // else if (state is JoinConversationSuccess) {
+                        //   // Try to get the last conversations state from bloc
+                        //   // For now, we'll trigger a reload
+                        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                        //     _loadConversations();
+                        //   });
+                        //   // return const SliverToBoxAdapter(
+                        //   //   child: ConversationsLoadingWidget(),
+                        //   // );
+                        // }
+
+                        if (state is ConversationsLoaded) {
+                          final conversations = state.conversations.data;
+                          if (conversations.isEmpty) {
+                            // Show friend suggestions when no conversations
+                            return SliverToBoxAdapter(
+                              child: _buildEmptyConversationView(),
+                            );
+                          }
+                          return SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final conversation = conversations[index];
+
+                              // Tìm participant khác với user hiện tại
+                              final otherParticipant =
+                                  conversation.participants
+                                      .where(
+                                        (participant) =>
+                                            participant.userId != userId,
+                                      )
+                                      .firstOrNull ??
+                                  conversation.participants.firstOrNull;
+
+                              final bool fromMe =
+                                  conversation.lastMessage?.sender.userId ==
+                                  userId;
+
                               return Padding(
-                                padding: EdgeInsets.only(right: 12.w),
-                                child: StoryChatItemWidget(
-                                  imageUrl: "https://i.pravatar.cc/200",
-                                  name: "Tin của bạn",
-                                  showAddButton: true,
+                                padding: EdgeInsets.only(bottom: 6.h),
+                                child: ConversationItem(
+                                  avatarUrl: conversation.isGroup
+                                      ? conversation.avatar ??
+                                            "https://i.pravatar.cc/200"
+                                      : otherParticipant?.avatarUrl ??
+                                            "https://i.pravatar.cc/200",
+                                  name: conversation.isGroup
+                                      ? conversation.name ?? "Group Chat"
+                                      : otherParticipant?.fullName ??
+                                            otherParticipant?.username ??
+                                            "Unknown",
+                                  preview:
+                                      "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}",
+                                  isUnread: (conversation.unreadCount ?? 0) > 0,
                                   onTap: () {
-                                    // Handle add story tap
+                                    if (otherParticipant != null) {
+                                      _joinConversationAndNavigate(
+                                        conversation.id,
+                                        otherParticipant,
+                                        conversation.unreadCount ?? 0,
+                                      );
+                                    }
                                   },
                                 ),
                               );
-                            }
-
-                            final friend = friends[index - 1];
-                            return Padding(
-                              padding: EdgeInsets.only(right: 12.w),
-                              child: StoryChatItemWidget(
-                                imageUrl:
-                                    friend.avatarUrl ??
-                                    "https://i.pravatar.cc/200",
-                                name: friend.fullName!.trim().split(' ').last,
-                                showAddButton: false,
-                                onTap: () {
-                                  // Check if conversation exists with this friend
-                                  _handleFriendTap(friend);
-                                },
+                            }, childCount: conversations.length),
+                          );
+                        }
+                        // Handle error state
+                        else if (state is ConversationsError) {
+                          return SliverToBoxAdapter(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Error: ${state.message ?? "Unknown error"}',
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  ElevatedButton(
+                                    onPressed: _loadConversations,
+                                    child: const Text('Retry'),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        );
-                      } else if (friendState is FriendLoading) {
-                        return const ListFriendLoading();
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
+                            ),
+                          );
+                        }
+                        // For any other state (MessagesLoaded, JoinConversationSuccess, etc.)
+                        // Trigger reload of conversations and show loading
+                        else {
+                          return const SliverToBoxAdapter(
+                            child: ConversationsLoadingWidget(),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
+            );
+          }
 
-              // Spacing
-              SliverToBoxAdapter(child: SizedBox(height: 4.h)),
-
-              // Danh sách hội thoại
-              BlocBuilder<ConversationBloc, ConversationState>(
-                builder: (context, state) {
-                  // Handle loading state
-                  if (state is ConversationsLoading) {
-                    return const SliverToBoxAdapter(
-                      child: ConversationsLoadingWidget(),
-                    );
-                  }
-
-                  // Handle loaded state (including when join conversation is successful)
-                  // ConversationsLoaded? conversationsState;
-                  // if (state is ConversationsLoaded) {
-                  //   conversationsState = state;
-                  // }
-                  // // Keep showing conversations even after successful join
-                  // else if (state is JoinConversationSuccess) {
-                  //   // Try to get the last conversations state from bloc
-                  //   // For now, we'll trigger a reload
-                  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-                  //     _loadConversations();
-                  //   });
-                  //   // return const SliverToBoxAdapter(
-                  //   //   child: ConversationsLoadingWidget(),
-                  //   // );
-                  // }
-
-                  if (state is ConversationsLoaded) {
-                    final conversations = state.conversations.data;
-                    if (conversations.isEmpty) {
-                      // Show friend suggestions when no conversations
-                      return SliverToBoxAdapter(
-                        child: _buildEmptyConversationView(),
-                      );
-                    }
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final conversation = conversations[index];
-
-                        // Tìm participant khác với user hiện tại
-                        final otherParticipant =
-                            conversation.participants
-                                .where(
-                                  (participant) => participant.userId != userId,
-                                )
-                                .firstOrNull ??
-                            conversation.participants.firstOrNull;
-
-                        final bool fromMe =
-                            conversation.lastMessage?.sender.userId == userId;
-
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 6.h),
-                          child: ConversationItem(
-                            avatarUrl: conversation.isGroup
-                                ? conversation.avatar ??
-                                      "https://i.pravatar.cc/200"
-                                : otherParticipant?.avatarUrl ??
-                                      "https://i.pravatar.cc/200",
-                            name: conversation.isGroup
-                                ? conversation.name ?? "Group Chat"
-                                : otherParticipant?.fullName ??
-                                      otherParticipant?.username ??
-                                      "Unknown",
-                            preview:
-                                "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}",
-                            isUnread: (conversation.unreadCount ?? 0) > 0,
-                            onTap: () {
-                              if (otherParticipant != null) {
-                                _joinConversationAndNavigate(
-                                  conversation.id,
-                                  otherParticipant,
-                                );
-                              }
-                            },
-                          ),
-                        );
-                      }, childCount: conversations.length),
-                    );
-                  }
-                  // Handle error state
-                  else if (state is ConversationsError) {
-                    return SliverToBoxAdapter(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Error: ${state.message ?? "Unknown error"}'),
-                            SizedBox(height: 16.h),
-                            ElevatedButton(
-                              onPressed: _loadConversations,
-                              child: const Text('Retry'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                  // For any other state (MessagesLoaded, JoinConversationSuccess, etc.)
-                  // Trigger reload of conversations and show loading
-                  else {
-                    return const SliverToBoxAdapter(
-                      child: ConversationsLoadingWidget(),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
+          return const SizedBox();
+        },
       ),
     );
   }

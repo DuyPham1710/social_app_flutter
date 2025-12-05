@@ -446,6 +446,51 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return completer.future;
   }
 
+  /// Load messages around a specific message ID
+  @override
+  Future<MessageReponseModel> getMessagesAroundId({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    int limit = 20,
+  }) async {
+    developer.log(
+      'Loading messages around ID: $messageId for user: $userId, conversation: $conversationId, limit: $limit',
+      name: 'ChatDataSource',
+    );
+
+    final completer = Completer<MessageReponseModel>();
+
+    // Setup one-time listener for response
+    late StreamSubscription subscription;
+    subscription = _messagesLoadedController.stream.listen((response) {
+      // Check if response contains the target message
+      final hasTargetMessage = response.data.any((msg) => msg.id == messageId);
+      if (hasTargetMessage) {
+        subscription.cancel();
+        completer.complete(response);
+      }
+    });
+
+    // Emit the request
+    _socketClient.emit('messages:getAroundId', {
+      'userId': userId,
+      'conversationId': conversationId,
+      'messageId': messageId,
+      'limit': limit,
+    });
+
+    // Set timeout
+    Timer(const Duration(seconds: 10), () {
+      if (!completer.isCompleted) {
+        subscription.cancel();
+        completer.completeError(TimeoutException('Load messages around ID timeout'));
+      }
+    });
+
+    return completer.future;
+  }
+
   /// Emit typing start event
   @override
   void emitTypingStart({

@@ -14,4 +14,22 @@ class PaginatedResponseEntity {
     required this.hasNextPage,
     required this.hasPrevPage,
   });
+
+  PaginatedResponseEntity copyWith({
+    int? currentPage,
+    int? totalPages,
+    int? totalItems,
+    int? itemsPerPage,
+    bool? hasNextPage,
+    bool? hasPrevPage,
+  }) {
+    return PaginatedResponseEntity(
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
+      totalItems: totalItems ?? this.totalItems,
+      itemsPerPage: itemsPerPage ?? this.itemsPerPage,
+      hasNextPage: hasNextPage ?? this.hasNextPage,
+      hasPrevPage: hasPrevPage ?? this.hasPrevPage,
+    );
+  }
 }

@@ -18,6 +18,14 @@ abstract class ChatRemoteDataSource {
     int limit = 20,
   });
 
+  // Load messages around a specific message ID
+  Future<MessageReponseModel> getMessagesAroundId({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    int limit = 20,
+  });
+
   // Join conversation
   Future<void> joinConversation({
     required String userId,

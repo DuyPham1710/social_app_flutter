@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_list_page.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key});
@@ -32,17 +36,22 @@ class HomeHeaderWidget extends StatelessWidget {
                 },
               ),
               SizedBox(width: 8.w),
-              IconButton(
-                icon: const Icon(
-                  CupertinoIcons.chat_bubble_2,
-                  color: AppColors.primary,
+              BlocProvider<MenuBloc>(
+                create: (_) => s1<MenuBloc>()..add(LoadCurrentUserEvent()),
+                child: IconButton(
+                  icon: const Icon(
+                    CupertinoIcons.chat_bubble_2,
+                    color: AppColors.primary,
+                  ),
+
+                  // bọc trong blocProvider để sử dụng   create: (_) => s1<MenuBloc>()..add(LoadCurrentUserEvent()),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(builder: (_) => const ChatListPage()),
+                    );
+                  },
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(builder: (_) => const ChatListPage()),
-                  );
-                },
               ),
             ],
           ),

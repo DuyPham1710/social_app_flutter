@@ -274,6 +274,9 @@ Future<void> initializeDependencies() async {
     () => LeaveConversationUseCase(s1()),
   );
   s1.registerLazySingleton<GetMessagesUseCase>(() => GetMessagesUseCase(s1()));
+  s1.registerLazySingleton<GetMessagesAroundIdUseCase>(
+    () => GetMessagesAroundIdUseCase(s1()),
+  );
   s1.registerLazySingleton<TypingStartUseCase>(() => TypingStartUseCase(s1()));
   s1.registerLazySingleton<TypingStopUseCase>(() => TypingStopUseCase(s1()));
   s1.registerLazySingleton<ListenTypingStartUseCase>(
@@ -408,6 +411,7 @@ Future<void> initializeDependencies() async {
   s1.registerFactory<MessageBloc>(
     () => MessageBloc(
       getMessagesUseCase: s1(),
+      getMessagesAroundIdUseCase: s1(),
       typingStartUseCase: s1(),
       typingStopUseCase: s1(),
       listenTypingStartUseCase: s1(),
