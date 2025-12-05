@@ -20,6 +20,7 @@ import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,7 @@ Future<void> main() async {
           BlocProvider(create: (_) => s1<AuthBloc>()),
           BlocProvider(create: (_) => s1<HomeBloc>()),
           BlocProvider(create: (_) => s1<FriendBloc>()),
+          BlocProvider(create: (_) => s1<FriendProfileBloc>()),
           BlocProvider(create: (_) => s1<HomeStoriesBloc>()),
           BlocProvider(create: (_) => s1<MenuBloc>()),
           BlocProvider(create: (_) => s1<PostBloc>()),
