@@ -56,7 +56,8 @@ class PostReactInfo extends StatelessWidget {
           }
         } else {
           // Nếu current user chưa react
-          final firstUser = reacts!.first.user.username ?? "Someone";
+          final firstUser =
+              reacts!.first.user.fullName?.trim().split(" ").last ?? "Someone";
           final othersCount = reacts!.length - 1;
           if (othersCount > 0) {
             displayText = "$firstUser and $othersCount others";
