@@ -79,7 +79,9 @@ class _MenuView extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.black87),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
           ),
         ],
       ),

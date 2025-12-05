@@ -47,26 +47,43 @@ class _SearchPageState extends State<SearchPage> {
           _scrollController.addListener(_onScroll);
           
           return Scaffold(
-          appBar: AppBar(
-            surfaceTintColor: Colors.transparent,
-            automaticallyImplyLeading: false,
-            title: const Text('Tìm kiếm'),
-          ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                // Search Bar
-                search_widget.SearchBar(
-                  onSearch: (query) {
-                    if (query.trim().isEmpty) {
-                      blocContext.read<SearchBloc>().add(const ClearSearch());
-                    } else {
-                      blocContext.read<SearchBloc>().add(SearchUsers(query: query));
-                    }
-                  },
-                  hintText: 'Tìm kiếm theo tên hoặc username...',
-                ),
-                SizedBox(height: 8.h),
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    child: Row(
+                      children: [
+                        // Icon back
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(
+                            CupertinoIcons.back,
+                            color: Colors.black,
+                            size: 23.r,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        SizedBox(width: 4.w),
+                        // Search Bar
+                        Expanded(
+                          child: search_widget.SearchBar(
+                            onSearch: (query) {
+                              if (query.trim().isEmpty) {
+                                blocContext.read<SearchBloc>().add(const ClearSearch());
+                              } else {
+                                blocContext.read<SearchBloc>().add(SearchUsers(query: query));
+                              }
+                            },
+                            hintText: 'Tìm kiếm',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
                 // Results
                 Expanded(
                   child: BlocBuilder<SearchBloc, SearchState>(

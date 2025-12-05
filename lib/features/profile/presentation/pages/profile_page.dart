@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/search/presentation/pages/search_page.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_actions.dart';
 import '../widgets/profile_info.dart';
@@ -92,11 +93,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  actions: const [
-                    Icon(Icons.settings_outlined, color: AppColors.textPrimary),
-                    SizedBox(width: 12),
-                    Icon(Icons.search, color: AppColors.iconPrimary),
-                    SizedBox(width: 8),
+                  actions: [
+                    const Icon(Icons.settings_outlined, color: AppColors.textPrimary),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: const Icon(Icons.search, color: AppColors.iconPrimary),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SearchPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
                   ],
                 ),
 

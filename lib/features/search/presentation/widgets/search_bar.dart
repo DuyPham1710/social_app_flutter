@@ -43,7 +43,6 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(12.r),
@@ -57,11 +56,6 @@ class _SearchBarState extends State<SearchBar> {
           hintStyle: TextStyle(
             color: Colors.grey[600],
             fontSize: 14.sp,
-          ),
-          prefixIcon: Icon(
-            CupertinoIcons.search,
-            color: Colors.grey[600],
-            size: 20.r,
           ),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(

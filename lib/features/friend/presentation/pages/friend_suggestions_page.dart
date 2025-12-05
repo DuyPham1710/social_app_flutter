@@ -43,8 +43,8 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              // TODO: Implement search functionality
+              onPressed: () {
+              Navigator.pushNamed(context, '/search');
             },
             icon: const Icon(CupertinoIcons.search, color: Colors.black),
           ),

@@ -121,7 +121,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
         actions: [
           IconButton(
             icon: const Icon(CupertinoIcons.search, color: Colors.black),
-            onPressed: _showSearch
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
           ),
         ],
       ),
@@ -343,16 +345,6 @@ class _FriendsListPageState extends State<FriendsListPage> {
             return const SizedBox.shrink();
           },
         ),
-      ),
-    );
-  }
-
-  void _showSearch() {
-    // TODO: Implement search functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Chức năng tìm kiếm đang được phát triển'),
-        duration: Duration(seconds: 2),
       ),
     );
   }

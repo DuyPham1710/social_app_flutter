@@ -43,8 +43,8 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              // TODO: Add search functionality
+              onPressed: () {
+              Navigator.pushNamed(context, '/search');
             },
             icon: const Icon(CupertinoIcons.search, color: Colors.black),
           ),
