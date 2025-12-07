@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/search/data/data_sources/search_remote_data_source.dart';
+import 'package:social_app_fe/features/search/domain/entities/search_history_entity.dart';
 import 'package:social_app_fe/features/search/domain/entities/search_result_entity.dart';
 import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
 
@@ -17,6 +18,30 @@ class SearchRepositoryImpl implements SearchRepository {
   }) async {
     try {
       final response = await remoteDataSource.searchUsers(query, page, limit);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> saveViewedUser({
+    required String viewedUserId,
+  }) async {
+    try {
+      await remoteDataSource.saveViewedUser(viewedUserId);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<List<SearchHistoryEntity>>> getSearchHistory({
+    int limit = 10,
+  }) async {
+    try {
+      final response = await remoteDataSource.getSearchHistory(limit);
       return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);

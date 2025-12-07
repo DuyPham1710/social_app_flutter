@@ -4,7 +4,11 @@ abstract class SearchState {
   const SearchState();
 }
 
-class SearchInitial extends SearchState {}
+class SearchInitial extends SearchState {
+  final List<SearchHistoryEntity>? history;
+
+  const SearchInitial({this.history});
+}
 
 class SearchLoading extends SearchState {}
 
@@ -41,4 +45,5 @@ class SearchError extends SearchState {
 
   const SearchError({required this.message});
 }
+
 

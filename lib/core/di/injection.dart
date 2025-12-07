@@ -84,6 +84,7 @@ import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.da
 import 'package:social_app_fe/features/search/data/data_sources/search_remote_data_source.dart';
 import 'package:social_app_fe/features/search/data/repository/search_repository_impl.dart';
 import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
+import 'package:social_app_fe/features/search/domain/usecases/get_search_history_usecase.dart';
 import 'package:social_app_fe/features/search/domain/usecases/search_users_usecase.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 
@@ -289,6 +290,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<SearchUsersUseCase>(
     () => SearchUsersUseCase(s1()),
   );
+  s1.registerLazySingleton<GetSearchHistoryUseCase>(
+    () => GetSearchHistoryUseCase(s1()),
+  );
 
   s1.registerFactory(() => MenuBloc(s1()));
 
@@ -385,7 +389,10 @@ Future<void> initializeDependencies() async {
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
 
   s1.registerFactory<SearchBloc>(
-    () => SearchBloc(searchUsersUseCase: s1()),
+    () => SearchBloc(
+      searchUsersUseCase: s1(),
+      getSearchHistoryUseCase: s1(),
+    ),
   );
 }
 

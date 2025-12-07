@@ -17,6 +17,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
 
 class SearchResultItem extends StatelessWidget {
   final UserEntity user;
@@ -33,6 +34,18 @@ class SearchResultItem extends StatelessWidget {
     final currentUserId = userData?['id'];
 
     if (!context.mounted) return;
+
+    // Lưu người dùng đã xem vào lịch sử tìm kiếm (chỉ khi không phải chính mình)
+    if (currentUserId != user.userId) {
+      try {
+        final searchRepository = di.s1<SearchRepository>();
+        await searchRepository.saveViewedUser(viewedUserId: user.userId);
+      } catch (e) {
+        // Không hiển thị lỗi nếu không lưu được lịch sử
+        // Chỉ log để debug
+        debugPrint('Error saving viewed user to search history: $e');
+      }
+    }
 
     // Nếu là user hiện tại → My Profile
     if (currentUserId == user.userId) {

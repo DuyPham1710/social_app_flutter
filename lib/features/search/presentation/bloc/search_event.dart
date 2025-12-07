@@ -24,3 +24,10 @@ class ClearSearch extends SearchEvent {
   const ClearSearch();
 }
 
+class LoadSearchHistory extends SearchEvent {
+  final int limit;
+
+  const LoadSearchHistory({this.limit = 10});
+}
+
+

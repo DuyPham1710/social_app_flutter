@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_bar.dart' as search_widget;
+import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_result_item.dart';
 
 class SearchPage extends StatefulWidget {
@@ -89,6 +90,9 @@ class _SearchPageState extends State<SearchPage> {
                   child: BlocBuilder<SearchBloc, SearchState>(
                     builder: (context, state) {
                       if (state is SearchInitial) {
+                        if (state.history != null && state.history!.isNotEmpty) {
+                          return _buildSearchHistory(state.history!, blocContext);
+                        }
                         return _buildEmptyState(
                           icon: CupertinoIcons.search,
                           message: 'Nhập từ khóa để tìm kiếm',
@@ -140,6 +144,55 @@ class _SearchPageState extends State<SearchPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildSearchHistory(
+    List<dynamic> history,
+    BuildContext blocContext,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Mới đây',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // TODO: Navigate to full history page
+                },
+                child: Text(
+                  'Xem tất cả',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: history.length,
+            itemBuilder: (context, index) {
+              return SearchHistoryItem(history: history[index]);
+            },
+          ),
+        ),
+      ],
     );
   }
 
