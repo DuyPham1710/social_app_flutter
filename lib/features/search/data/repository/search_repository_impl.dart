@@ -47,5 +47,27 @@ class SearchRepositoryImpl implements SearchRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> deleteSearchHistory({
+    required String historyId,
+  }) async {
+    try {
+      await remoteDataSource.deleteSearchHistory(historyId);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> clearAllSearchHistory() async {
+    try {
+      await remoteDataSource.clearAllSearchHistory();
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }
 

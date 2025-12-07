@@ -16,6 +16,12 @@ abstract class SearchRepository {
   Future<DataState<List<SearchHistoryEntity>>> getSearchHistory({
     int limit = 10,
   });
+
+  Future<DataState<void>> deleteSearchHistory({
+    required String historyId,
+  });
+
+  Future<DataState<void>> clearAllSearchHistory();
 }
 
 

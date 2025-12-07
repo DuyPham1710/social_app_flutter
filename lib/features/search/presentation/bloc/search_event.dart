@@ -30,4 +30,12 @@ class LoadSearchHistory extends SearchEvent {
   const LoadSearchHistory({this.limit = 10});
 }
 
+class DeleteSearchHistory extends SearchEvent {
+  final String historyId;
 
+  const DeleteSearchHistory({required this.historyId});
+}
+
+class ClearAllSearchHistory extends SearchEvent {
+  const ClearAllSearchHistory();
+}

@@ -25,6 +25,7 @@ class FriendHeaderChips extends StatefulWidget {
 class _FriendHeaderChipsState extends State<FriendHeaderChips> {
   FriendOnlineService? _onlineService;
   StreamSubscription<int>? _onlineCountSubscription;
+  Timer? _refreshTimer;
   int _onlineCount = 0;
   bool _isLoading = true;
 
@@ -84,6 +85,13 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
           });
         }
       });
+
+      // Khởi tạo timer để tự động refresh sau mỗi 10 giây
+      _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        if (mounted && _onlineService != null) {
+          _onlineService!.refreshOnlineCount();
+        }
+      });
     } catch (e) {
       developer.log(
         'Error initializing online service: $e',
@@ -99,6 +107,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _onlineCountSubscription?.cancel();
     _onlineService?.dispose();
     super.dispose();
@@ -112,11 +121,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
           label: _isLoading
               ? 'Đang tải...'
               : '$_onlineCount người đang online',
-          leading: _buildOnlineDot(),
-          onTap: () {
-            // Refresh số lượng online
-            _onlineService?.refreshOnlineCount();
-          },
+          leading: _buildOnlineDot()
         ),
         SizedBox(width: 8.w),
         _buildChip(

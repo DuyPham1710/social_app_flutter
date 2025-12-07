@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
+import 'package:social_app_fe/features/search/presentation/pages/search_history_page.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_bar.dart' as search_widget;
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_result_item.dart';
@@ -169,7 +170,15 @@ class _SearchPageState extends State<SearchPage> {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: Navigate to full history page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (newContext) => BlocProvider<SearchBloc>.value(
+                        value: blocContext.read<SearchBloc>(),
+                        child: const SearchHistoryPage(),
+                      ),
+                    ),
+                  );
                 },
                 child: Text(
                   'Xem tất cả',
