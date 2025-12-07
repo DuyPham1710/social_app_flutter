@@ -113,6 +113,7 @@ class MessageModel {
   final List<SeenByModel> seenBy;
   final bool deletedForEveryone;
   final List<UserModel>? deletedFor;
+  final bool isEdited;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -127,6 +128,7 @@ class MessageModel {
     this.seenBy = const [],
     this.deletedForEveryone = false,
     this.deletedFor,
+    this.isEdited = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -198,6 +200,7 @@ class MessageModel {
         json['deletedFor'],
         (item) => UserModel.fromJson(item),
       ),
+      isEdited: json['isEdited'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -216,6 +219,7 @@ class MessageModel {
     'seenBy': seenBy.map((e) => e.toJson()).toList(),
     'deletedForEveryone': deletedForEveryone,
     'deletedFor': deletedFor?.map((e) => e.toJson()).toList(),
+    'isEdited': isEdited,
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt?.toIso8601String(),
   };
@@ -231,6 +235,7 @@ class MessageModel {
     seenBy: seenBy.map((e) => e.toEntity()).toList(),
     deletedForEveryone: deletedForEveryone,
     deletedFor: deletedFor?.map((e) => e.toEntity()).toList(),
+    isEdited: isEdited,
     createdAt: createdAt,
     updatedAt: updatedAt,
   );

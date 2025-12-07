@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/usecase/usecase.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
@@ -17,11 +18,16 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   final ListenTypingStopUseCase _listenTypingStopUseCase;
   final ListenNewMessageUseCase _listenNewMessageUseCase;
   final SendMessageUseCase _sendMessageUseCase;
+  final EditMessageUseCase _editMessageUseCase;
+  final ListenMessageUpdatedUseCase _listenMessageUpdatedUseCase;
+  final ListenMessageReadUseCase _listenMessageReadUseCase;
   final MarkAsReadUseCase _markAsReadUseCase;
 
   StreamSubscription<Map<String, dynamic>>? _typingStartSubscription;
   StreamSubscription<Map<String, dynamic>>? _typingStopSubscription;
   StreamSubscription<MessageEntity>? _newMessageSubscription;
+  StreamSubscription<MessageEntity>? _messageUpdatedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _messageReadSubscription;
   Timer? _typingDebounce;
   String? _currentConversationId;
   String? _currentUserId;
@@ -35,6 +41,9 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     required ListenTypingStopUseCase listenTypingStopUseCase,
     required ListenNewMessageUseCase listenNewMessageUseCase,
     required SendMessageUseCase sendMessageUseCase,
+    required EditMessageUseCase editMessageUseCase,
+    required ListenMessageUpdatedUseCase listenMessageUpdatedUseCase,
+    required ListenMessageReadUseCase listenMessageReadUseCase,
     required MarkAsReadUseCase markAsReadUseCase,
   }) : _getMessagesUseCase = getMessagesUseCase,
        _getMessagesAroundIdUseCase = getMessagesAroundIdUseCase,
@@ -44,6 +53,9 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
        _listenTypingStopUseCase = listenTypingStopUseCase,
        _listenNewMessageUseCase = listenNewMessageUseCase,
        _sendMessageUseCase = sendMessageUseCase,
+       _editMessageUseCase = editMessageUseCase,
+       _listenMessageUpdatedUseCase = listenMessageUpdatedUseCase,
+       _listenMessageReadUseCase = listenMessageReadUseCase,
        _markAsReadUseCase = markAsReadUseCase,
        super(const MessageInitial()) {
     on<LoadMessagesEvent>(_onLoadMessages);
@@ -54,10 +66,15 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<TypingStopEvent>(_onTypingStop);
     on<NewMessageReceivedEvent>(_onNewMessageReceived);
     on<SendMessageEvent>(_onSendMessage);
+    on<EditMessageEvent>(_onEditMessage);
+    on<MessageUpdatedReceivedEvent>(_onMessageUpdatedReceived);
+    on<MessageReadReceivedEvent>(_onMessageReadReceived);
     on<MarkAsReadEvent>(_onMarkAsRead);
 
     _setupTypingListeners();
     _setupNewMessageListener();
+    _setupMessageUpdatedListener();
+    _setupMessageReadListener();
   }
 
   MessageResponseEntity? _currentMessages;
@@ -95,6 +112,44 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     _newMessageSubscription = _listenNewMessageUseCase(params: const NoParams())
         .listen((messageEntity) {
           add(NewMessageReceivedEvent(messageEntity));
+        });
+  }
+
+  void _setupMessageUpdatedListener() {
+    // Listen to message:updated events through usecase
+    _messageUpdatedSubscription =
+        _listenMessageUpdatedUseCase(params: const NoParams()).listen((
+          messageEntity,
+        ) {
+          add(MessageUpdatedReceivedEvent(messageEntity));
+        });
+  }
+
+  void _setupMessageReadListener() {
+    // Listen to message:read events through usecase
+    _messageReadSubscription =
+        _listenMessageReadUseCase(params: const NoParams()).listen((data) {
+          final messageId = data['messageId'] as String?;
+          final userId = data['userId'] as String?;
+          final userInfo = data['user'] as Map<String, dynamic>?;
+          final readAtStr = data['readAt'] as String?;
+
+          // Allow messageId to be null (when marking all messages as read)
+          if (userId != null && userInfo != null && readAtStr != null) {
+            try {
+              final readAt = DateTime.parse(readAtStr);
+              add(
+                MessageReadReceivedEvent(
+                  messageId: messageId ?? '', // Use empty string if null
+                  userId: userId,
+                  userInfo: userInfo,
+                  readAt: readAt,
+                ),
+              );
+            } catch (e) {
+              print('Error parsing readAt: $e');
+            }
+          }
         });
   }
 
@@ -436,7 +491,15 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
               data: updatedMessages,
               pagination: currentState.messages.pagination,
             );
+            _currentMessages = updatedResponse;
 
+            add(
+              MarkAsReadEvent(
+                userId: _currentUserId!,
+                conversationId: _currentConversationId!,
+                messageId: event.messageData.id,
+              ),
+            );
             // Emit updated state
             emit(
               MessagesLoaded(
@@ -477,6 +540,144 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     // Note: Message will be added to list via message:new event from backend
   }
 
+  void _onEditMessage(EditMessageEvent event, Emitter<MessageState> emit) {
+    // Validate message
+    if (event.newText.isEmpty) {
+      print('Cannot edit message to empty');
+      return;
+    }
+
+    // Edit message through usecase
+    _editMessageUseCase(
+      userId: event.userId,
+      messageId: event.messageId,
+      newText: event.newText,
+    );
+
+    print('Message edited: ${event.messageId}');
+    // Note: Message will be updated in list via message:updated event from backend
+  }
+
+  void _onMessageUpdatedReceived(
+    MessageUpdatedReceivedEvent event,
+    Emitter<MessageState> emit,
+  ) {
+    try {
+      // Check if message is for current conversation
+      if (event.messageData.conversationId == _currentConversationId) {
+        final currentState = state;
+
+        if (currentState is MessagesLoaded) {
+          // Find and update the message in the list
+          final updatedMessages = currentState.messages.data.map((msg) {
+            if (msg.id == event.messageData.id) {
+              return event.messageData; // Replace with updated message
+            }
+            return msg;
+          }).toList();
+
+          // Create new MessageResponseEntity with updated data
+          final updatedResponse = MessageResponseEntity(
+            data: updatedMessages,
+            pagination: currentState.messages.pagination,
+          );
+
+          // Emit updated state
+          emit(
+            MessagesLoaded(
+              updatedResponse,
+              typingUserId: currentState.typingUserId,
+              isTyping: currentState.isTyping,
+            ),
+          );
+
+          print('Message updated: ${event.messageData.id}');
+        }
+      }
+    } catch (e) {
+      print('Error handling message updated: $e');
+    }
+  }
+
+  void _onMessageReadReceived(
+    MessageReadReceivedEvent event,
+    Emitter<MessageState> emit,
+  ) {
+    try {
+      final currentState = state;
+
+      if (currentState is MessagesLoaded) {
+        // Create UserEntity from userInfo
+        final userEntity = UserEntity(
+          userId: event.userInfo['userId'] as String? ?? event.userId,
+          username: event.userInfo['username'] as String? ?? '',
+          fullName: event.userInfo['fullName'] as String?,
+          avatarUrl: event.userInfo['avatarUrl'] as String?,
+        );
+
+        // Create SeenByEntity
+        final seenByEntity = SeenByEntity(
+          user: userEntity,
+          seenAt: event.readAt,
+        );
+
+        final updatedMessages = currentState.messages.data.map((msg) {
+          // Only update messages in current conversation
+          if (msg.conversationId != _currentConversationId) {
+            return msg;
+          }
+
+          // Check if user already in seenBy
+          final alreadySeen = msg.seenBy.any(
+            (seenBy) => seenBy.user.userId == event.userId,
+          );
+
+          if (alreadySeen) {
+            return msg; // Already seen, no update needed
+          }
+
+          // If messageId is provided and not empty, only update that message and messages before it
+          if (event.messageId.isNotEmpty) {
+            // Find the target message to get its createdAt
+            final targetMessage = currentState.messages.data.firstWhere(
+              (m) => m.id == event.messageId,
+              orElse: () => msg,
+            );
+
+            // Only update if this message was created before or at the same time as target
+            if (msg.createdAt.isAfter(targetMessage.createdAt)) {
+              return msg; // Message is newer than target, don't update
+            }
+          }
+          // If messageId is empty, update all messages (mark all as read)
+
+          // Add new seenBy entry
+          return msg.copyWith(seenBy: [...msg.seenBy, seenByEntity]);
+        }).toList();
+
+        // Create new MessageResponseEntity with updated data
+        final updatedResponse = MessageResponseEntity(
+          data: updatedMessages,
+          pagination: currentState.messages.pagination,
+        );
+
+        // Emit updated state
+        _currentMessages = updatedResponse;
+        emit(
+          MessagesLoaded(
+            updatedResponse,
+            typingUserId: currentState.typingUserId,
+            isTyping: currentState.isTyping,
+          ),
+        );
+
+        print('Message read updated: ${event.messageId} by ${event.userId}');
+      }
+    } catch (e) {
+      print('Error handling message read: $e');
+    }
+  }
+
   void _onMarkAsRead(MarkAsReadEvent event, Emitter<MessageState> emit) {
     // Mark messages as read through usecase
     _markAsReadUseCase(
@@ -496,6 +697,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     _typingStartSubscription?.cancel();
     _typingStopSubscription?.cancel();
     _newMessageSubscription?.cancel();
+    _messageUpdatedSubscription?.cancel();
+    _messageReadSubscription?.cancel();
     return super.close();
   }
 }

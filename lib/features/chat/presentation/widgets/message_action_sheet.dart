@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
-import 'package:social_app_fe/features/chat/presentation/widgets/message_more_options_dialog.dart';
 
 class MessageActionSheet {
   static void show({
@@ -18,6 +17,7 @@ class MessageActionSheet {
     required VoidCallback onReply,
     required VoidCallback? onCopy,
     required VoidCallback? onDelete,
+    required VoidCallback? onMore,
   }) {
     final RenderBox? renderBox =
         messageKey.currentContext?.findRenderObject() as RenderBox?;
@@ -55,8 +55,15 @@ class MessageActionSheet {
               : null,
           onDelete: onDelete != null
               ? () {
-                  Navigator.of(context).pop();
+                  Navigator.pop(context);
                   onDelete();
+                }
+              : null,
+
+          onMore: onMore != null
+              ? () {
+                  Navigator.pop(context);
+                  onMore();
                 }
               : null,
         );
@@ -75,6 +82,7 @@ class _MessageActionContent extends StatefulWidget {
   final VoidCallback onReply;
   final VoidCallback? onCopy;
   final VoidCallback? onDelete;
+  final VoidCallback? onMore;
 
   const _MessageActionContent({
     required this.message,
@@ -86,6 +94,7 @@ class _MessageActionContent extends StatefulWidget {
     required this.onReply,
     this.onCopy,
     this.onDelete,
+    this.onMore,
   });
 
   @override
@@ -328,47 +337,7 @@ class _MessageActionContentState extends State<_MessageActionContent>
                       _buildActionItem(
                         icon: CupertinoIcons.line_horizontal_3,
                         label: 'Khác',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          // Hiển thị dialog các tùy chọn khác
-                          MessageMoreOptionsDialog.show(
-                            context: context,
-                            fromMe: widget.fromMe,
-                            onPin: () {
-                              // TODO: Implement pin message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Tính năng ghim tin nhắn đang phát triển',
-                                  ),
-                                  duration: Duration(seconds: 1),
-                                ),
-                              );
-                            },
-                            onForward: () {
-                              // TODO: Implement forward message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Tính năng chuyển tiếp đang phát triển',
-                                  ),
-                                  duration: Duration(seconds: 1),
-                                ),
-                              );
-                            },
-                            onCreateAIImage: () {
-                              // TODO: Implement AI image creation
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Tính năng tạo hình ảnh AI đang phát triển',
-                                  ),
-                                  duration: Duration(seconds: 1),
-                                ),
-                              );
-                            },
-                          );
-                        },
+                        onTap: widget.onMore!,
                       ),
                     ],
                   ),

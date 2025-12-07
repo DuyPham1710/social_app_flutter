@@ -161,3 +161,44 @@ class LoadMessagesAroundIdEvent extends MessageEvent {
   @override
   List<Object?> get props => [userId, conversationId, messageId, limit];
 }
+
+class EditMessageEvent extends MessageEvent {
+  final String userId;
+  final String messageId;
+  final String newText;
+
+  const EditMessageEvent({
+    required this.userId,
+    required this.messageId,
+    required this.newText,
+  });
+
+  @override
+  List<Object?> get props => [userId, messageId, newText];
+}
+
+class MessageUpdatedReceivedEvent extends MessageEvent {
+  final MessageEntity messageData;
+
+  const MessageUpdatedReceivedEvent(this.messageData);
+
+  @override
+  List<Object?> get props => [messageData];
+}
+
+class MessageReadReceivedEvent extends MessageEvent {
+  final String messageId;
+  final String userId;
+  final Map<String, dynamic> userInfo; // { userId, username, fullName, avatarUrl }
+  final DateTime readAt;
+
+  const MessageReadReceivedEvent({
+    required this.messageId,
+    required this.userId,
+    required this.userInfo,
+    required this.readAt,
+  });
+
+  @override
+  List<Object?> get props => [messageId, userId, userInfo, readAt];
+}

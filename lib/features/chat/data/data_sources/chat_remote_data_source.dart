@@ -1,6 +1,7 @@
 import 'package:social_app_fe/features/chat/data/models/chat_models.dart';
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
+import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
 
 abstract class ChatRemoteDataSource {
   // Load conversations
@@ -59,12 +60,27 @@ abstract class ChatRemoteDataSource {
     String? messageId,
   });
 
+  // Edit message
+  void editMessage({
+    required String userId,
+    required String messageId,
+    required String newText,
+  });
+
+  // Get message edit logs
+  Future<List<MessageEditLogEntity>> getMessageEditLogs({
+    required String userId,
+    required String messageId,
+  });
+
   // // Real-time events
   Stream<ConversationsResponseModel> get onConversationsLoaded;
   Stream<MessageReponseModel> get onMessagesLoaded;
   Stream<Map<String, dynamic>> get onTypingStart;
   Stream<Map<String, dynamic>> get onTypingStop;
   Stream<MessageEntity> get onNewMessage;
+  Stream<MessageEntity> get onMessageUpdated;
+  Stream<Map<String, dynamic>> get onMessageRead;
   Stream<ConversationModel> get onConversationUpdate;
   // Stream<Map<String, dynamic>> get onUserOnline;
 

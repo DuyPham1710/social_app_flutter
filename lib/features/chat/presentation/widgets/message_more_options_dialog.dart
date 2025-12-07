@@ -8,8 +8,12 @@ class MessageMoreOptionsDialog {
   static void show({
     required BuildContext context,
     required bool fromMe,
+    required bool isFifteenMinutes,
+    VoidCallback? onDelete,
+    VoidCallback? onEdit,
     VoidCallback? onPin,
     VoidCallback? onForward,
+    VoidCallback? onReport,
     VoidCallback? onCreateAIImage,
   }) {
     showDialog(
@@ -20,8 +24,12 @@ class MessageMoreOptionsDialog {
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
         child: _MessageMoreOptionsContent(
           fromMe: fromMe,
+          isFifteenMinutes: isFifteenMinutes,
+          onDelete: onDelete,
+          onEdit: onEdit,
           onPin: onPin,
           onForward: onForward,
+          onReport: onReport,
           onCreateAIImage: onCreateAIImage,
         ),
       ),
@@ -31,14 +39,22 @@ class MessageMoreOptionsDialog {
 
 class _MessageMoreOptionsContent extends StatelessWidget {
   final bool fromMe;
+  final bool isFifteenMinutes;
+  final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
   final VoidCallback? onPin;
   final VoidCallback? onForward;
+  final VoidCallback? onReport;
   final VoidCallback? onCreateAIImage;
 
   const _MessageMoreOptionsContent({
     required this.fromMe,
+    required this.isFifteenMinutes,
+    this.onDelete,
+    this.onEdit,
     this.onPin,
     this.onForward,
+    this.onReport,
     this.onCreateAIImage,
   });
 
@@ -78,9 +94,19 @@ class _MessageMoreOptionsContent extends StatelessWidget {
             label: 'Xóa',
             onTap: () {
               Navigator.of(context).pop();
-              if (onPin != null) onPin!();
+              if (onDelete != null) onDelete!();
             },
           ),
+
+          if (fromMe && isFifteenMinutes && onEdit != null)
+            _buildOption(
+              icon: CupertinoIcons.pencil,
+              label: 'Chỉnh sửa',
+              onTap: () {
+                Navigator.of(context).pop();
+                if (onEdit != null) onEdit!();
+              },
+            ),
 
           _buildOption(
             icon: CupertinoIcons.pin_fill,
@@ -105,7 +131,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
             label: 'Báo cáo',
             onTap: () {
               Navigator.of(context).pop();
-              if (onPin != null) onPin!();
+              if (onReport != null) onReport!();
             },
           ),
 

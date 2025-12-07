@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
+import 'package:social_app_fe/features/chat/data/models/message-edit-log_model.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
+import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
 
 import '../../../../core/network/websocket/socket_client.dart';
 import '../models/chat_models.dart';
@@ -20,6 +22,9 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   final _typingStopController =
       StreamController<Map<String, dynamic>>.broadcast();
   final _newMessageController = StreamController<MessageEntity>.broadcast();
+  final _messageUpdatedController = StreamController<MessageEntity>.broadcast();
+  final _messageReadController =
+      StreamController<Map<String, dynamic>>.broadcast();
   final _conversationUpdateController =
       StreamController<ConversationModel>.broadcast();
   // final _userOnlineController =
@@ -54,6 +59,14 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Stream<MessageEntity> get onNewMessage => _newMessageController.stream;
 
   @override
+  Stream<MessageEntity> get onMessageUpdated =>
+      _messageUpdatedController.stream;
+
+  @override
+  Stream<Map<String, dynamic>> get onMessageRead =>
+      _messageReadController.stream;
+
+  @override
   Stream<ConversationModel> get onConversationUpdate =>
       _conversationUpdateController.stream;
 
@@ -79,6 +92,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _setupMessageListeners();
     _setupTypingListeners();
     _setupNewMessageListeners();
+    _setupMessageUpdatedListeners();
+    _setupMessageReadListeners();
   }
 
   /// Wait for connection to be established
@@ -225,6 +240,52 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         );
       } catch (e, stackTrace) {
         developer.log('Error parsing message:new: $e', name: 'ChatDataSource');
+        developer.log('Raw data: $data', name: 'ChatDataSource');
+        developer.log('Stack trace: $stackTrace', name: 'ChatDataSource');
+      }
+    });
+  }
+
+  /// Setup listeners for message updated events
+  void _setupMessageUpdatedListeners() {
+    _socketClient.on('message:updated').listen((data) {
+      developer.log('Message updated event: $data', name: 'ChatDataSource');
+
+      try {
+        final messageModel = MessageModel.fromJson(data);
+        final messageEntity = messageModel.toEntity();
+        _messageUpdatedController.add(messageEntity);
+
+        developer.log(
+          'Message updated parsed successfully: ${messageEntity.id}',
+          name: 'ChatDataSource',
+        );
+      } catch (e, stackTrace) {
+        developer.log(
+          'Error parsing message:updated: $e',
+          name: 'ChatDataSource',
+        );
+        developer.log('Raw data: $data', name: 'ChatDataSource');
+        developer.log('Stack trace: $stackTrace', name: 'ChatDataSource');
+      }
+    });
+  }
+
+  /// Setup listeners for message read events
+  void _setupMessageReadListeners() {
+    _socketClient.on('message:read').listen((data) {
+      developer.log('Message read event: $data', name: 'ChatDataSource');
+
+      try {
+        final readData = Map<String, dynamic>.from(data);
+        _messageReadController.add(readData);
+
+        developer.log(
+          'Message read event received: messageId=${readData['messageId']}, userId=${readData['userId']}',
+          name: 'ChatDataSource',
+        );
+      } catch (e, stackTrace) {
+        developer.log('Error parsing message:read: $e', name: 'ChatDataSource');
         developer.log('Raw data: $data', name: 'ChatDataSource');
         developer.log('Stack trace: $stackTrace', name: 'ChatDataSource');
       }
@@ -484,7 +545,9 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     Timer(const Duration(seconds: 10), () {
       if (!completer.isCompleted) {
         subscription.cancel();
-        completer.completeError(TimeoutException('Load messages around ID timeout'));
+        completer.completeError(
+          TimeoutException('Load messages around ID timeout'),
+        );
       }
     });
 
@@ -577,6 +640,86 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _socketClient.emit('message:send', messageData);
   }
 
+  @override
+  void editMessage({
+    required String userId,
+    required String messageId,
+    required String newText,
+  }) {
+    developer.log('Editing message: $messageId', name: 'ChatDataSource');
+    if (!_isConnected) {
+      developer.log(
+        'Connection not ready for editing message',
+        name: 'ChatDataSource',
+      );
+      return;
+    }
+    final editData = <String, dynamic>{
+      'userId': userId,
+      'messageId': messageId,
+      'newText': newText,
+    };
+    _socketClient.emit('message:update', editData);
+  }
+
+  /// Get message edit logs
+  @override
+  Future<List<MessageEditLogEntity>> getMessageEditLogs({
+    required String userId,
+    required String messageId,
+  }) async {
+    developer.log(
+      'Getting edit logs for message: $messageId',
+      name: 'ChatDataSource',
+    );
+
+    // Wait for connection to be established
+    try {
+      await waitForConnection();
+    } catch (e) {
+      developer.log('Connection not ready: $e', name: 'ChatDataSource');
+      throw Exception('Chat connection not ready: $e');
+    }
+
+    final completer = Completer<List<MessageEditLogEntity>>();
+
+    // Setup one-time listener for response
+    late StreamSubscription subscription;
+    subscription = _socketClient.on('message:editLogs:loaded').listen((data) {
+      if (data['messageId'] == messageId) {
+        subscription.cancel();
+        try {
+          final editLogsJson = data['editLogs'] as List<dynamic>;
+          final editLogs = editLogsJson
+              .map(
+                (log) =>
+                    MessageEditLogModel.fromJson(log as Map<String, dynamic>),
+              )
+              .toList();
+          completer.complete(editLogs);
+        } catch (e) {
+          completer.completeError(Exception('Failed to parse edit logs: $e'));
+        }
+      }
+    });
+
+    // Emit the request
+    _socketClient.emit('message:editLogs:get', {
+      'userId': userId,
+      'messageId': messageId,
+    });
+
+    // Set timeout
+    Timer(const Duration(seconds: 10), () {
+      if (!completer.isCompleted) {
+        subscription.cancel();
+        completer.completeError(TimeoutException('Get edit logs timeout'));
+      }
+    });
+
+    return completer.future;
+  }
+
   /// Mark messages as read
   @override
   void markAsRead({
@@ -624,6 +767,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _typingStartController.close();
     _typingStopController.close();
     _newMessageController.close();
+    _messageUpdatedController.close();
+    _messageReadController.close();
     // _conversationUpdateController.close();
     // _userOnlineController.close();
     _conversationsCache.clear();

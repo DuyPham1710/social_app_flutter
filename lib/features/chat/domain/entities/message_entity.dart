@@ -14,6 +14,7 @@ class MessageEntity extends Equatable {
   final List<SeenByEntity> seenBy;
   final bool deletedForEveryone;
   final List<UserEntity>? deletedFor;
+  final bool isEdited;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -28,6 +29,7 @@ class MessageEntity extends Equatable {
     this.seenBy = const [],
     this.deletedForEveryone = false,
     this.deletedFor,
+    this.isEdited = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -43,9 +45,44 @@ class MessageEntity extends Equatable {
     reactions,
     seenBy,
     deletedForEveryone,
+    deletedFor,
+    isEdited,
     createdAt,
     updatedAt,
   ];
+
+  // generate copyWith
+  MessageEntity copyWith({
+    String? id,
+    String? conversationId,
+    UserEntity? sender,
+    String? text,
+    List<AttachmentEntity>? attachments,
+    ParentMessageEntity? replyTo,
+    List<ReactionEntity>? reactions,
+    List<SeenByEntity>? seenBy,
+    bool? deletedForEveryone,
+    List<UserEntity>? deletedFor,
+    bool? isEdited,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return MessageEntity(
+      id: id ?? this.id,
+      conversationId: conversationId ?? this.conversationId,
+      sender: sender ?? this.sender,
+      text: text ?? this.text,
+      attachments: attachments ?? this.attachments,
+      replyTo: replyTo ?? this.replyTo,
+      reactions: reactions ?? this.reactions,
+      seenBy: seenBy ?? this.seenBy,
+      deletedForEveryone: deletedForEveryone ?? this.deletedForEveryone,
+      deletedFor: deletedFor ?? this.deletedFor,
+      isEdited: isEdited ?? this.isEdited,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
 
 class AttachmentEntity extends Equatable {

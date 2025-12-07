@@ -1,6 +1,7 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/conversation_response_entity.dart';
+import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 
 abstract class ChatRepository {
@@ -62,12 +63,27 @@ abstract class ChatRepository {
     String? messageId,
   });
 
+  // Edit message
+  void editMessage({
+    required String userId,
+    required String messageId,
+    required String newText,
+  });
+
+  // Get message edit logs
+  Future<DataState<List<MessageEditLogEntity>>> getMessageEditLogs({
+    required String userId,
+    required String messageId,
+  });
+
   // // Real-time events
   Stream<ConversationResponseEntity> get onConversationsLoaded;
   Stream<MessageResponseEntity> get onMessagesLoaded;
   Stream<Map<String, dynamic>> get onTypingStart;
   Stream<Map<String, dynamic>> get onTypingStop;
   Stream<MessageEntity> get onNewMessage;
+  Stream<MessageEntity> get onMessageUpdated;
+  Stream<Map<String, dynamic>> get onMessageRead;
   Stream<ConversationEntity> get onConversationUpdate;
   // Stream<Map<String, dynamic>> get onUserOnline;
 }

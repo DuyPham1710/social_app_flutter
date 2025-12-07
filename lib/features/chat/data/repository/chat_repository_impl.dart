@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 import '../../domain/entities/chat_entities.dart';
-import '../../domain/entities/conversation_response_entity.dart';
+import '../../domain/entities/message-edit-log_entity.dart';
 import '../../domain/repository/chat_repository.dart';
 import '../data_sources/chat_remote_data_source.dart';
 
@@ -207,6 +207,45 @@ class ChatRepositoryImpl implements ChatRepository {
       messageId: messageId,
     );
   }
+
+  @override
+  void editMessage({
+    required String userId,
+    required String messageId,
+    required String newText,
+  }) {
+    _remoteDataSource.editMessage(
+      userId: userId,
+      messageId: messageId,
+      newText: newText,
+    );
+  }
+
+  @override
+  Future<DataState<List<MessageEditLogEntity>>> getMessageEditLogs({
+    required String userId,
+    required String messageId,
+  }) async {
+    try {
+      final editLogs = await _remoteDataSource.getMessageEditLogs(
+        userId: userId,
+        messageId: messageId,
+      );
+      return DataStateSuccess(editLogs);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
+  Stream<MessageEntity> get onMessageUpdated =>
+      _remoteDataSource.onMessageUpdated;
+
+  @override
+  Stream<Map<String, dynamic>> get onMessageRead =>
+      _remoteDataSource.onMessageRead;
 
   // @override
   // Stream<MessageEntity> get onNewMessage {

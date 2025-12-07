@@ -289,6 +289,16 @@ Future<void> initializeDependencies() async {
     () => ListenNewMessageUseCase(s1()),
   );
   s1.registerLazySingleton<SendMessageUseCase>(() => SendMessageUseCase(s1()));
+  s1.registerLazySingleton<EditMessageUseCase>(() => EditMessageUseCase(s1()));
+  s1.registerLazySingleton<ListenMessageUpdatedUseCase>(
+    () => ListenMessageUpdatedUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenMessageReadUseCase>(
+    () => ListenMessageReadUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMessageEditLogsUseCase>(
+    () => GetMessageEditLogsUseCase(s1()),
+  );
   s1.registerLazySingleton<MarkAsReadUseCase>(() => MarkAsReadUseCase(s1()));
   s1.registerLazySingleton<ListenConversationUpdateUseCase>(
     () => ListenConversationUpdateUseCase(s1()),
@@ -418,6 +428,9 @@ Future<void> initializeDependencies() async {
       listenTypingStopUseCase: s1(),
       listenNewMessageUseCase: s1(),
       sendMessageUseCase: s1(),
+      editMessageUseCase: s1(),
+      listenMessageUpdatedUseCase: s1(),
+      listenMessageReadUseCase: s1(),
       markAsReadUseCase: s1(),
     ),
   );

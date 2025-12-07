@@ -14,6 +14,7 @@ class MessageItem extends StatelessWidget {
   final String currentUserId;
   final List<UserEntity> otherParticipants;
   final VoidCallback? onLongPress;
+  final VoidCallback? onEditHistoryTap;
 
   const MessageItem({
     super.key,
@@ -25,6 +26,7 @@ class MessageItem extends StatelessWidget {
     required this.currentUserId,
     this.otherParticipants = const [],
     this.onLongPress,
+    this.onEditHistoryTap,
   });
 
   // Kiểm tra xem tin nhắn đã được xem bởi người khác chưa (không tính mình)
@@ -67,10 +69,14 @@ class MessageItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isReplying = message.replyTo != null;
     final hasReactions = message.reactions.isNotEmpty;
+    final isEdited = message.isEdited;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Show "Đã chỉnh sửa" nếu tin nhắn đã được chỉnh sửa
+        if (isEdited) _buildEditedText(),
+
         Container(
           margin: EdgeInsets.only(
             bottom: 4.h,
@@ -127,6 +133,36 @@ class MessageItem extends StatelessWidget {
         // Hiển thị trạng thái tin nhắn
         _buildMessageStatus(),
       ],
+    );
+  }
+
+  Widget _buildEditedText() {
+    return GestureDetector(
+      onTap: onEditHistoryTap,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: 10.h,
+          bottom: 2.h,
+          left: fromMe ? 0 : 40.w,
+          right: fromMe ? 10.w : 0,
+        ),
+        child: Row(
+          mainAxisAlignment: fromMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
+          children: [
+            Text(
+              'Đã chỉnh sửa',
+              style: TextStyle(
+                fontSize: 11.sp,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
