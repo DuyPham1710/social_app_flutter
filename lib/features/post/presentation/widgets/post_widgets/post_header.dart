@@ -7,7 +7,6 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friends_by_userid_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';

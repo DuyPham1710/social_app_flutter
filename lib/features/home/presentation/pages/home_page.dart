@@ -9,12 +9,10 @@ import 'package:social_app_fe/features/home/presentation/widgets/home_header_wid
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_creating_progress.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/posts_loading_widget.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/home_stories_widget.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
-import 'package:social_app_fe/shared/component/custom_refresh_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:flutter/cupertino.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,9 +22,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final RefreshController _refreshController = RefreshController(
-    initialRefresh: false,
-  );
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -43,7 +38,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _refreshController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -62,9 +56,8 @@ class _HomePageState extends State<HomePage> {
     return currentScroll >= (maxScroll - 200);
   }
 
-  void _onRefresh() async {
+  Future<void> _onRefresh() async {
     // Load lại posts từ đầu (page 1)
-    await Future.delayed(const Duration(milliseconds: 1000));
     context.read<HomeBloc>().add(LoadPostsEvent(page: 1, limit: 2));
     // Reload stories as well
     try {
@@ -75,30 +68,17 @@ class _HomePageState extends State<HomePage> {
       // Nếu HomeStoriesBloc chưa được provide ở trên (ví dụ provider nằm trong widget khác),
       // thì không làm gì để tránh crash. Caller có thể wrap HomeStoriesWidget với BlocProvider.
     }
-    // Listener sẽ tự động complete refresh khi state thay đổi
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state) {
-          if (state is HomeLoaded || state is HomeError) {
-            // Hoàn thành refresh ngay lập tức
-            _refreshController.refreshCompleted(resetFooterState: true);
-          }
-        },
-
+      child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-          return SmartRefresher(
-            controller: _refreshController,
-            enablePullDown: true,
-            // Tắt hiệu ứng đàn hồi
-            physics: const AlwaysScrollableScrollPhysics(),
-            header: const CustomRefreshHeader(
-              icon: Icon(CupertinoIcons.house_fill, color: Colors.grey),
-            ),
+          return RefreshIndicator(
             onRefresh: _onRefresh,
+            color: AppColors.primary,
+            backgroundColor: AppColors.background,
             child: ListView(
               controller: _scrollController,
               physics: const ClampingScrollPhysics(),
@@ -135,15 +115,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                if (state is HomeLoading)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
+                if (state is HomeLoading) const PostsLoadingWidget(),
 
                 if (state is HomeError)
                   Padding(

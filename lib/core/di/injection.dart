@@ -12,6 +12,12 @@ import 'package:social_app_fe/features/auth/domain/usecases/reset_password_useca
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source.dart';
+import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source_impl.dart';
+import 'package:social_app_fe/features/chat/data/repository/chat_repository_impl.dart';
+import 'package:social_app_fe/features/chat/domain/repository/chat_repository.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
@@ -125,6 +131,10 @@ Future<void> initializeDependencies() async {
     () => SearchRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(s1()),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
@@ -137,6 +147,9 @@ Future<void> initializeDependencies() async {
     () => PrivacyRepositoryImpl(s1()),
   );
   s1.registerLazySingleton<SearchRepository>(() => SearchRepositoryImpl(s1()));
+  s1.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(remoteDataSource: s1()),
+  );
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
@@ -266,6 +279,56 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton(() => GetFriendRelationshipUseCase(s1()));
 
   s1.registerLazySingleton(() => UpdateUserProfileUseCase(s1()));
+  // Chat UseCases
+  s1.registerLazySingleton<ConnectChatUseCase>(() => ConnectChatUseCase(s1()));
+  s1.registerLazySingleton<DisconnectChatUsecase>(
+    () => DisconnectChatUsecase(s1()),
+  );
+  s1.registerLazySingleton<GetConversationsUseCase>(
+    () => GetConversationsUseCase(s1()),
+  );
+  s1.registerLazySingleton<CreateConversationUseCase>(
+    () => CreateConversationUseCase(s1()),
+  );
+  s1.registerLazySingleton<JoinConversationUseCase>(
+    () => JoinConversationUseCase(s1()),
+  );
+  s1.registerLazySingleton<LeaveConversationUseCase>(
+    () => LeaveConversationUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMessagesUseCase>(() => GetMessagesUseCase(s1()));
+  s1.registerLazySingleton<GetMessagesAroundIdUseCase>(
+    () => GetMessagesAroundIdUseCase(s1()),
+  );
+  s1.registerLazySingleton<TypingStartUseCase>(() => TypingStartUseCase(s1()));
+  s1.registerLazySingleton<TypingStopUseCase>(() => TypingStopUseCase(s1()));
+  s1.registerLazySingleton<ListenTypingStartUseCase>(
+    () => ListenTypingStartUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenTypingStopUseCase>(
+    () => ListenTypingStopUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenNewMessageUseCase>(
+    () => ListenNewMessageUseCase(s1()),
+  );
+  s1.registerLazySingleton<SendMessageUseCase>(() => SendMessageUseCase(s1()));
+  s1.registerLazySingleton<EditMessageUseCase>(() => EditMessageUseCase(s1()));
+  s1.registerLazySingleton<DeleteMessageUseCase>(() => DeleteMessageUseCase(s1()));
+  s1.registerLazySingleton<ReactMessageUseCase>(() => ReactMessageUseCase(s1()));
+  s1.registerLazySingleton<ListenMessageUpdatedUseCase>(
+    () => ListenMessageUpdatedUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenMessageReadUseCase>(
+    () => ListenMessageReadUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMessageEditLogsUseCase>(
+    () => GetMessageEditLogsUseCase(s1()),
+  );
+  s1.registerLazySingleton<MarkAsReadUseCase>(() => MarkAsReadUseCase(s1()));
+  s1.registerLazySingleton<ListenConversationUpdateUseCase>(
+    () => ListenConversationUpdateUseCase(s1()),
+  );
+
   // Profile Bloc
   s1.registerFactory(
     () => ProfileBloc(
@@ -334,6 +397,8 @@ Future<void> initializeDependencies() async {
       loadCommentsUseCase: s1(),
       reactPostUseCase: s1(),
       getPostDetailUsecase: s1(),
+      connectChatUseCase: s1(),
+      disconnectChatUseCase: s1(),
     ),
   );
 
@@ -427,6 +492,35 @@ Future<void> initializeDependencies() async {
       getSearchHistoryUseCase: s1(),
       deleteSearchHistoryUseCase: s1(),
       clearAllSearchHistoryUseCase: s1(),
+    ),
+  );
+
+  s1.registerFactory<ConversationBloc>(
+    () => ConversationBloc(
+      getConversationsUseCase: s1(),
+      createConversationUseCase: s1(),
+      joinConversationUseCase: s1(),
+      leaveConversationUseCase: s1(),
+      listenConversationUpdateUseCase: s1(),
+    ),
+  );
+
+  s1.registerFactory<MessageBloc>(
+    () => MessageBloc(
+      getMessagesUseCase: s1(),
+      getMessagesAroundIdUseCase: s1(),
+      typingStartUseCase: s1(),
+      typingStopUseCase: s1(),
+      listenTypingStartUseCase: s1(),
+      listenTypingStopUseCase: s1(),
+      listenNewMessageUseCase: s1(),
+      sendMessageUseCase: s1(),
+      editMessageUseCase: s1(),
+      deleteMessageUseCase: s1(),
+      reactMessageUseCase: s1(),
+      listenMessageUpdatedUseCase: s1(),
+      listenMessageReadUseCase: s1(),
+      markAsReadUseCase: s1(),
     ),
   );
 }

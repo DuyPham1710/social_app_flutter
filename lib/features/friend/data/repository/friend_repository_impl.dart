@@ -280,27 +280,24 @@ class FriendRepositoryImpl implements FriendRepository {
         'page': page,
         'limit': limit,
       });
-      if (response is Map<String, dynamic>) {
-        List<dynamic>? suggestions;
+      List<dynamic>? suggestions;
 
-        if (response.containsKey('suggestions')) {
-          suggestions = response['suggestions'] as List<dynamic>?;
-        } else if (response.containsKey('data')) {
-          final data = response['data'] as Map<String, dynamic>?;
-          suggestions = data?['suggestions'] as List<dynamic>?;
-        }
+      if (response.containsKey('suggestions')) {
+        suggestions = response['suggestions'] as List<dynamic>?;
+      } else if (response.containsKey('data')) {
+        final data = response['data'] as Map<String, dynamic>?;
+        suggestions = data?['suggestions'] as List<dynamic>?;
+      }
 
-        if (suggestions != null) {
-          // Parse each suggestion to FriendSuggestionModel
-          final suggestionModels = suggestions
-              .map(
-                (json) => FriendSuggestionModel.fromJson(
-                  json as Map<String, dynamic>,
-                ),
-              )
-              .toList();
-          return DataStateSuccess(suggestionModels);
-        }
+      if (suggestions != null) {
+        // Parse each suggestion to FriendSuggestionModel
+        final suggestionModels = suggestions
+            .map(
+              (json) =>
+                  FriendSuggestionModel.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+        return DataStateSuccess(suggestionModels);
       }
       return DataStateSuccess([]);
     } on DioException catch (e) {

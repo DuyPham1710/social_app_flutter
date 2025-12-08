@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/utils/error_utils.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/connect_comment_socket_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
@@ -16,12 +17,15 @@ import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.d
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   bool _isWebSocketInitialized = false;
+  bool _isChatConnected = false;
   final GetHomePostsUseCase getHomePostsUseCase;
   final ConnectCommentSocketUseCase connectCommentSocketUseCase;
   final ListenCommentCountUseCase listenCommentCountUseCase;
   final LoadCommentsUseCase loadCommentsUseCase;
   final ReactPostUsecase reactPostUseCase;
   final GetPostDetailUsecase getPostDetailUsecase;
+  final ConnectChatUseCase connectChatUseCase;
+  final DisconnectChatUsecase disconnectChatUseCase;
   StreamSubscription? _commentCountSubscription;
 
   HomeBloc({
@@ -31,8 +35,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     required this.loadCommentsUseCase,
     required this.reactPostUseCase,
     required this.getPostDetailUsecase,
+    required this.connectChatUseCase,
+    required this.disconnectChatUseCase,
   }) : super(HomeInitial()) {
-    print('>>> HomeBloc CREATED');
     on<InitializeWebSocketEvent>(_onInitializeWebSocket);
     on<WebSocketInitializedEvent>(_onWebSocketInitialized);
     on<LoadPostsEvent>(_onLoadPosts);
@@ -40,6 +45,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<UpdateCommentCountsEvent>(_onUpdateCommentCounts);
     on<ReactPostEvent>(_onReactPost);
     on<GetPostDetailEvent>(_onGetPostDetail);
+    on<ConnectChatEvent>(_onConnectChat);
+    on<DisconnectChatEvent>(_onDisconnectChat);
     // Kết nối WebSocket khi khởi tạo HomeBloc
     // _initializeWebSocket();
   }
@@ -74,10 +81,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final username = userData?['username'];
 
       if (userId != null) {
-        // Kết nối WebSocket qua UseCase
+        // Kết nối Comment WebSocket qua UseCase
         connectCommentSocketUseCase(
           params: ConnectCommentSocketParams(userId, username),
         );
+
+        // Kết nối Chat WebSocket
+        add(const ConnectChatEvent());
 
         // Lắng nghe stream comment count updates qua UseCase
         _commentCountSubscription =
@@ -168,9 +178,62 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
+  void _onConnectChat(ConnectChatEvent event, Emitter<HomeState> emit) async {
+    if (_isChatConnected) {
+      print('Chat already connected in HomeBloc');
+      return;
+    }
+
+    try {
+      // Lấy userId từ token storage
+      final userData = await TokenStorage.getUserData();
+      final userId = userData?['id'];
+      final username = userData?['username'];
+
+      if (userId != null) {
+        print(
+          'Connecting to chat from HomeBloc with userId: $userId, username: $username',
+        );
+
+        // Connect to chat namespace and wait for connection
+        await connectChatUseCase(
+          params: ConnectChatSocketParams(userId, username ?? 'Unknown'),
+        );
+        _isChatConnected = true;
+
+        print('Chat connected successfully from HomeBloc');
+      }
+    } catch (e) {
+      print('Error connecting to chat from HomeBloc: $e');
+    }
+  }
+
+  void _onDisconnectChat(
+    DisconnectChatEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    if (!_isChatConnected) {
+      print('Chat already disconnected in HomeBloc');
+      return;
+    }
+
+    try {
+      print('Disconnecting from chat in HomeBloc...');
+      await disconnectChatUseCase();
+      _isChatConnected = false;
+      print('Chat disconnected successfully from HomeBloc');
+    } catch (e) {
+      print('Error disconnecting from chat in HomeBloc: $e');
+    }
+  }
+
   @override
   Future<void> close() {
     _commentCountSubscription?.cancel();
+    // Disconnect chat when HomeBloc is disposed
+    if (_isChatConnected) {
+      disconnectChatUseCase();
+    }
     return super.close();
   }
 

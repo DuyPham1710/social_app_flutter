@@ -6,6 +6,8 @@ import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_use
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
+import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -24,6 +26,14 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     on<LogoutEvent>(_onLogout);
   }
   Future<void> _onLogout(LogoutEvent event, Emitter<MenuState> emit) async {
+    // Disconnect chat before clearing token and resetting dependencies
+    try {
+      final homeBloc = s1<HomeBloc>();
+      homeBloc.add(const DisconnectChatEvent());
+    } catch (e) {
+      print('Error disconnecting chat during logout: $e');
+    }
+
     await TokenStorage.clear();
 
     await resetDependencies();

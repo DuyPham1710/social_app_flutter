@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/stories_loading_widget.dart';
 
 import '../bloc/home_stories_bloc.dart';
 
@@ -69,12 +70,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
     return BlocBuilder<HomeStoriesBloc, HomeStoriesState>(
       builder: (context, state) {
         if (state is HomeStoriesLoading) {
-          return SizedBox(
-            height: 200.w,
-            child: Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
+          return const StoriesLoadingWidget();
         }
         if (state is HomeStoriesLoaded) {
           final groupedStories = state.groupedStories;

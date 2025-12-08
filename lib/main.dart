@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/otp_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/personal_info_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/register_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
@@ -49,6 +50,7 @@ Future<void> main() async {
           BlocProvider(create: (_) => s1<HomeStoriesBloc>()),
           BlocProvider(create: (_) => s1<MenuBloc>()),
           BlocProvider(create: (_) => s1<PostBloc>()),
+          BlocProvider(create: (_) => s1<ConversationBloc>()),
           BlocProvider(create: (_) => s1<FriendForUserBloc>()),
         ],
         child: MyApp(),
