@@ -220,10 +220,7 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
   }
 
   @override
-  Future<void> reportPost(
-    String postId,
-    Map<String, dynamic> body,
-  ) async {
+  Future<void> reportPost(String postId, Map<String, dynamic> body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -240,7 +237,6 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     await _dio.fetch<void>(_options);
-    return;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

@@ -66,7 +66,9 @@ import 'package:social_app_fe/features/profile/data/repository/user_repository_i
 import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/update_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
@@ -134,9 +136,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<PrivacyRepository>(
     () => PrivacyRepositoryImpl(s1()),
   );
-  s1.registerLazySingleton<SearchRepository>(
-    () => SearchRepositoryImpl(s1()),
-  );
+  s1.registerLazySingleton<SearchRepository>(() => SearchRepositoryImpl(s1()));
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
@@ -265,6 +265,7 @@ Future<void> initializeDependencies() async {
 
   s1.registerLazySingleton(() => GetFriendRelationshipUseCase(s1()));
 
+  s1.registerLazySingleton(() => UpdateUserProfileUseCase(s1()));
   // Profile Bloc
   s1.registerFactory(
     () => ProfileBloc(
@@ -272,9 +273,19 @@ Future<void> initializeDependencies() async {
       listenCommentCountUseCase: s1(),
       loadCommentsUseCase: s1(),
       getUserProfileUseCase: s1(),
+      updateUserProfileUseCase: s1(),
     ),
   );
-
+  // Trong injection_container.dart (hoặc file DI)
+  s1.registerFactory(
+    () => OtherProfileBloc(
+      getOtherUserProfileUseCase: s1(),
+      getUserPostsUseCase: s1(),
+      getFriendRelationshipUseCase: s1(),
+      listenCommentCountUseCase: s1(),
+      loadCommentsUseCase: s1(),
+    ),
+  );
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),
@@ -290,9 +301,7 @@ Future<void> initializeDependencies() async {
   );
 
   // Search UseCase
-  s1.registerLazySingleton<SearchUsersUseCase>(
-    () => SearchUsersUseCase(s1()),
-  );
+  s1.registerLazySingleton<SearchUsersUseCase>(() => SearchUsersUseCase(s1()));
   s1.registerLazySingleton<GetSearchHistoryUseCase>(
     () => GetSearchHistoryUseCase(s1()),
   );

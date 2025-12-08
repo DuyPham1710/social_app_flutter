@@ -42,6 +42,18 @@ mixin _$UserModel {
   bool? get isActive => throw _privateConstructorUsedError;
   @JsonKey(includeIfNull: false)
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get coverUrl => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get school => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get currentCity => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get hometown => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get workplace => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get relationshipStatus => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -70,6 +82,12 @@ abstract class $UserModelCopyWith<$Res> {
     @JsonKey(includeIfNull: false) String? username,
     @JsonKey(includeIfNull: false) bool? isActive,
     @JsonKey(includeIfNull: false) DateTime? createdAt,
+    @JsonKey(includeIfNull: false) String? coverUrl,
+    @JsonKey(includeIfNull: false) String? school,
+    @JsonKey(includeIfNull: false) String? currentCity,
+    @JsonKey(includeIfNull: false) String? hometown,
+    @JsonKey(includeIfNull: false) String? workplace,
+    @JsonKey(includeIfNull: false) String? relationshipStatus,
   });
 }
 
@@ -99,6 +117,12 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? username = freezed,
     Object? isActive = freezed,
     Object? createdAt = freezed,
+    Object? coverUrl = freezed,
+    Object? school = freezed,
+    Object? currentCity = freezed,
+    Object? hometown = freezed,
+    Object? workplace = freezed,
+    Object? relationshipStatus = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -146,6 +170,30 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            coverUrl: freezed == coverUrl
+                ? _value.coverUrl
+                : coverUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            school: freezed == school
+                ? _value.school
+                : school // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            currentCity: freezed == currentCity
+                ? _value.currentCity
+                : currentCity // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            hometown: freezed == hometown
+                ? _value.hometown
+                : hometown // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            workplace: freezed == workplace
+                ? _value.workplace
+                : workplace // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            relationshipStatus: freezed == relationshipStatus
+                ? _value.relationshipStatus
+                : relationshipStatus // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -173,6 +221,12 @@ abstract class _$$UserModelImplCopyWith<$Res>
     @JsonKey(includeIfNull: false) String? username,
     @JsonKey(includeIfNull: false) bool? isActive,
     @JsonKey(includeIfNull: false) DateTime? createdAt,
+    @JsonKey(includeIfNull: false) String? coverUrl,
+    @JsonKey(includeIfNull: false) String? school,
+    @JsonKey(includeIfNull: false) String? currentCity,
+    @JsonKey(includeIfNull: false) String? hometown,
+    @JsonKey(includeIfNull: false) String? workplace,
+    @JsonKey(includeIfNull: false) String? relationshipStatus,
   });
 }
 
@@ -201,6 +255,12 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? username = freezed,
     Object? isActive = freezed,
     Object? createdAt = freezed,
+    Object? coverUrl = freezed,
+    Object? school = freezed,
+    Object? currentCity = freezed,
+    Object? hometown = freezed,
+    Object? workplace = freezed,
+    Object? relationshipStatus = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -248,6 +308,30 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        coverUrl: freezed == coverUrl
+            ? _value.coverUrl
+            : coverUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        school: freezed == school
+            ? _value.school
+            : school // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        currentCity: freezed == currentCity
+            ? _value.currentCity
+            : currentCity // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        hometown: freezed == hometown
+            ? _value.hometown
+            : hometown // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        workplace: freezed == workplace
+            ? _value.workplace
+            : workplace // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        relationshipStatus: freezed == relationshipStatus
+            ? _value.relationshipStatus
+            : relationshipStatus // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -268,6 +352,12 @@ class _$UserModelImpl implements _UserModel {
     @JsonKey(includeIfNull: false) this.username,
     @JsonKey(includeIfNull: false) this.isActive,
     @JsonKey(includeIfNull: false) this.createdAt,
+    @JsonKey(includeIfNull: false) this.coverUrl,
+    @JsonKey(includeIfNull: false) this.school,
+    @JsonKey(includeIfNull: false) this.currentCity,
+    @JsonKey(includeIfNull: false) this.hometown,
+    @JsonKey(includeIfNull: false) this.workplace,
+    @JsonKey(includeIfNull: false) this.relationshipStatus,
   });
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -305,10 +395,28 @@ class _$UserModelImpl implements _UserModel {
   @override
   @JsonKey(includeIfNull: false)
   final DateTime? createdAt;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? coverUrl;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? school;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? currentCity;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? hometown;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? workplace;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? relationshipStatus;
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, fullName: $fullName, phoneNumber: $phoneNumber, bio: $bio, avatarUrl: $avatarUrl, dateOfBirth: $dateOfBirth, gender: $gender, email: $email, username: $username, isActive: $isActive, createdAt: $createdAt)';
+    return 'UserModel(userId: $userId, fullName: $fullName, phoneNumber: $phoneNumber, bio: $bio, avatarUrl: $avatarUrl, dateOfBirth: $dateOfBirth, gender: $gender, email: $email, username: $username, isActive: $isActive, createdAt: $createdAt, coverUrl: $coverUrl, school: $school, currentCity: $currentCity, hometown: $hometown, workplace: $workplace, relationshipStatus: $relationshipStatus)';
   }
 
   @override
@@ -333,7 +441,18 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.coverUrl, coverUrl) ||
+                other.coverUrl == coverUrl) &&
+            (identical(other.school, school) || other.school == school) &&
+            (identical(other.currentCity, currentCity) ||
+                other.currentCity == currentCity) &&
+            (identical(other.hometown, hometown) ||
+                other.hometown == hometown) &&
+            (identical(other.workplace, workplace) ||
+                other.workplace == workplace) &&
+            (identical(other.relationshipStatus, relationshipStatus) ||
+                other.relationshipStatus == relationshipStatus));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -351,6 +470,12 @@ class _$UserModelImpl implements _UserModel {
     username,
     isActive,
     createdAt,
+    coverUrl,
+    school,
+    currentCity,
+    hometown,
+    workplace,
+    relationshipStatus,
   );
 
   /// Create a copy of UserModel
@@ -380,6 +505,12 @@ abstract class _UserModel implements UserModel {
     @JsonKey(includeIfNull: false) final String? username,
     @JsonKey(includeIfNull: false) final bool? isActive,
     @JsonKey(includeIfNull: false) final DateTime? createdAt,
+    @JsonKey(includeIfNull: false) final String? coverUrl,
+    @JsonKey(includeIfNull: false) final String? school,
+    @JsonKey(includeIfNull: false) final String? currentCity,
+    @JsonKey(includeIfNull: false) final String? hometown,
+    @JsonKey(includeIfNull: false) final String? workplace,
+    @JsonKey(includeIfNull: false) final String? relationshipStatus,
   }) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -417,6 +548,24 @@ abstract class _UserModel implements UserModel {
   @override
   @JsonKey(includeIfNull: false)
   DateTime? get createdAt;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get coverUrl;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get school;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get currentCity;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get hometown;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get workplace;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get relationshipStatus;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

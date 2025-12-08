@@ -71,6 +71,108 @@ class _UserRemoteDataSource implements UserRemoteDataSource {
     return _value;
   }
 
+  @override
+  Future<UserModel> updateUserProfile({
+    String? fullName,
+    String? phoneNumber,
+    String? dateOfBirth,
+    String? gender,
+    String? bio,
+    String? school,
+    String? currentCity,
+    String? hometown,
+    String? workplace,
+    String? relationshipStatus,
+    File? avatarFile,
+    File? coverFile,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    if (fullName != null) {
+      _data.fields.add(MapEntry('fullName', fullName));
+    }
+    if (phoneNumber != null) {
+      _data.fields.add(MapEntry('phoneNumber', phoneNumber));
+    }
+    if (dateOfBirth != null) {
+      _data.fields.add(MapEntry('dateOfBirth', dateOfBirth));
+    }
+    if (gender != null) {
+      _data.fields.add(MapEntry('gender', gender));
+    }
+    if (bio != null) {
+      _data.fields.add(MapEntry('bio', bio));
+    }
+    if (school != null) {
+      _data.fields.add(MapEntry('school', school));
+    }
+    if (currentCity != null) {
+      _data.fields.add(MapEntry('currentCity', currentCity));
+    }
+    if (hometown != null) {
+      _data.fields.add(MapEntry('hometown', hometown));
+    }
+    if (workplace != null) {
+      _data.fields.add(MapEntry('workplace', workplace));
+    }
+    if (relationshipStatus != null) {
+      _data.fields.add(MapEntry('relationshipStatus', relationshipStatus));
+    }
+    if (avatarFile != null) {
+      if (avatarFile != null) {
+        _data.files.add(
+          MapEntry(
+            'file',
+            MultipartFile.fromFileSync(
+              avatarFile.path,
+              filename: avatarFile.path.split(Platform.pathSeparator).last,
+            ),
+          ),
+        );
+      }
+    }
+    if (coverFile != null) {
+      if (coverFile != null) {
+        _data.files.add(
+          MapEntry(
+            'cover',
+            MultipartFile.fromFileSync(
+              coverFile.path,
+              filename: coverFile.path.split(Platform.pathSeparator).last,
+            ),
+          ),
+        );
+      }
+    }
+    final _options = _setStreamType<UserModel>(
+      Options(
+            method: 'PATCH',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
+          .compose(
+            _dio.options,
+            '/user',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late UserModel _value;
+    try {
+      _value = UserModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

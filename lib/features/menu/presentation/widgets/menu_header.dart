@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import '../../../post/domain/usecases/get_profile_posts_usecase.dart';
@@ -28,16 +29,12 @@ class MenuHeader extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (_) => ProfileBloc(
-                getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
-                listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-                loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-                getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
-              ),
-              child: const ProfilePage(),
-            ),
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+            child: const ProfilePage(),
           ),
+        ),
         );
       },
       child: Row(

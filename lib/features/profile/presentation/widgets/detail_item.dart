@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 
-class EditableTextRow extends StatelessWidget {
+class DetailItem extends StatelessWidget {
+  final IconData icon;
   final String text;
+  final bool isDisabled;
 
-  const EditableTextRow({
+  const DetailItem({
     super.key,
+    required this.icon,
     required this.text,
+    this.isDisabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 15,
-          color: Colors.grey.shade700,
+    return Opacity(
+      opacity: isDisabled ? 0.4 : 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: Colors.black54),
+            const SizedBox(width: 8),
+            Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+          ],
         ),
       ),
     );

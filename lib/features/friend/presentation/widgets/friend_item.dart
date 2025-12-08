@@ -53,12 +53,8 @@ class FriendItem extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => ProfileBloc(
-              getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
-              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-              getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
-            )..add(const LoadUserProfileEvent()),
+            create: (_) =>
+                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
             child: const ProfilePage(),
           ),
         ),
@@ -69,14 +65,9 @@ class FriendItem extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => OtherProfileBloc(
-              getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
-              getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
-              getFriendRelationshipUseCase: di
-                  .s1<GetFriendRelationshipUseCase>(),
-              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-            )..add(LoadOtherUserProfileEvent(userId: friendId!)),
+            create: (_) =>
+                di.s1<OtherProfileBloc>()
+                  ..add(LoadOtherUserProfileEvent(userId: friendId!)),
             child: OtherProfilePage(userId: friendId!),
           ),
         ),
@@ -116,11 +107,7 @@ class FriendItem extends StatelessWidget {
               ),
               // Online indicator hoặc last seen
               if (_shouldShowIndicator())
-                Positioned(
-                  right: 2,
-                  bottom: 2,
-                  child: _buildStatusIndicator(),
-                ),
+                Positioned(right: 2, bottom: 2, child: _buildStatusIndicator()),
             ],
           ),
           SizedBox(width: 12.w),
@@ -272,14 +259,14 @@ class FriendItem extends StatelessWidget {
   bool _shouldShowIndicator() {
     // Hiển thị nếu online
     if (_isOnline()) return true;
-    
+
     // Hiển thị nếu có lastSeen và trong vòng 1 ngày
     if (lastSeen != null) {
       final now = DateTime.now();
       final difference = now.difference(lastSeen!);
       return difference.inDays < 1;
     }
-    
+
     return false;
   }
 
@@ -298,10 +285,7 @@ class FriendItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2CD45C),
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          ),
+          border: Border.all(color: Colors.white, width: 2),
         ),
       );
     } else if (lastSeen != null) {
@@ -312,38 +296,35 @@ class FriendItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.grey[400],
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          ),
+          border: Border.all(color: Colors.white, width: 2),
         ),
       );
     }
-    
+
     return const SizedBox.shrink();
   }
 
   /// Lấy text hiển thị thời gian last seen
   String _getLastSeenText() {
     if (lastSeen == null) return '';
-    
+
     final now = DateTime.now();
     final difference = now.difference(lastSeen!);
-    
+
     // Nếu quá 1 ngày, không hiển thị
     if (difference.inDays >= 1) return '';
-    
+
     // Nếu dưới 1 phút
     if (difference.inMinutes < 1) {
       return 'Vừa hoạt động';
     }
-    
+
     // Nếu dưới 1 giờ
     if (difference.inHours < 1) {
       final minutes = difference.inMinutes;
       return '$minutes phút trước';
     }
-    
+
     // Nếu dưới 1 ngày
     final hours = difference.inHours;
     return '$hours giờ trước';

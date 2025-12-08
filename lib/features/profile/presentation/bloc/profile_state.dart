@@ -46,6 +46,10 @@ class ProfileInitial extends ProfileState {
 class ProfileLoading extends ProfileState {}
 
 class ProfileLoaded extends ProfileState {
+  final bool isUpdating;
+  final bool updateSuccess;
+  final String? updateError;
+
   const ProfileLoaded(
     List<PostEntity> posts, {
     super.commentCounts,
@@ -55,7 +59,19 @@ class ProfileLoaded extends ProfileState {
     super.isLoadingMore,
     super.isUserLoading,
     super.user,
+
+    this.isUpdating = false,
+    this.updateSuccess = false,
+    this.updateError,
   }) : super(posts: posts);
+
+  @override
+  List<Object?> get props => [
+    ...super.props,
+    isUpdating,
+    updateSuccess,
+    updateError,
+  ];
 }
 
 extension ProfileLoadedCopyWith on ProfileLoaded {
@@ -69,6 +85,10 @@ extension ProfileLoadedCopyWith on ProfileLoaded {
     bool? isLoadingMore,
     bool? isUserLoading,
     UserEntity? user,
+
+    bool? isUpdating,
+    bool? updateSuccess,
+    String? updateError,
   }) {
     return ProfileLoaded(
       posts ?? this.posts ?? [],
@@ -79,6 +99,12 @@ extension ProfileLoadedCopyWith on ProfileLoaded {
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       isUserLoading: isUserLoading ?? this.isUserLoading,
       user: user ?? this.user,
+
+      isUpdating: isUpdating ?? this.isUpdating,
+      updateSuccess:
+          updateSuccess ??
+          false, // Reset về false sau khi emit để tránh snackbar hiện lại
+      updateError: updateError,
     );
   }
 }

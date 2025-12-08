@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/detail_item.dart';
 
 class ProfileInfo extends StatelessWidget {
-  const ProfileInfo({super.key});
-
-  Widget _buildInfo(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: Colors.black54),
-          const SizedBox(width: 8),
-          Text(text, style: const TextStyle(fontSize: 14)),
-        ],
-      ),
-    );
-  }
+  final UserEntity? user;
+  ProfileInfo({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +14,50 @@ class ProfileInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfo(Icons.home, 'Sống tại TP Hồ Chí Minh'),
-          _buildInfo(Icons.location_on, 'Đến từ Hà Nội'),
-          _buildInfo(Icons.favorite, 'Độc thân'),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: () {},
-            child: const Text('Xem thông tin giới thiệu', style: TextStyle(color: Colors.blue)),
+          // Học vấn
+          const SizedBox(width: 8),
+          const Text(
+            "Giới thiệu",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
+          if (user != null && user!.school != null && user!.school!.isNotEmpty)
+            DetailItem(icon: Icons.school, text: "Đã học tại: ${user?.school}"),
+          // Nơi sống
+          if (user != null &&
+              user!.currentCity != null &&
+              user!.currentCity!.isNotEmpty)
+            DetailItem(
+              icon: Icons.home,
+              text: "Sống tại: ${user?.currentCity}",
+            ),
+
+          // Quê quán
+          if (user != null &&
+              user!.hometown != null &&
+              user!.hometown!.isNotEmpty)
+            DetailItem(
+              icon: Icons.location_city,
+              text: "Đến từ: ${user?.hometown}",
+            ),
+
+          // Nơi làm việc
+          if (user != null &&
+              user!.workplace != null &&
+              user!.workplace!.isNotEmpty)
+            DetailItem(
+              icon: Icons.work,
+              text: "Làm việc tại: ${user?.workplace}",
+            ),
+
+          // Mối quan hệ
+          if (user != null &&
+              user!.relationshipStatus != null &&
+              user!.relationshipStatus!.isNotEmpty)
+            DetailItem(icon: Icons.favorite, text: user!.relationshipStatus!),
         ],
       ),
     );

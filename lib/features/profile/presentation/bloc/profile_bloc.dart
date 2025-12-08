@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/usecase/usecase.dart';
 import 'package:social_app_fe/core/utils/error_utils.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/update_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
@@ -16,22 +17,64 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ListenCommentCountUseCase listenCommentCountUseCase;
   final LoadCommentsUseCase loadCommentsUseCase;
 
+  final UpdateUserProfileUseCase updateUserProfileUseCase;
+
   StreamSubscription? _commentCountSubscription;
   ProfileBloc({
     required this.getProfilePostsUseCase,
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
     required this.getUserProfileUseCase,
+
+    required this.updateUserProfileUseCase,
   }) : super(ProfileInitial()) {
     on<LoadUserProfileEvent>(_onLoadUserProfile);
     on<LoadProfilePostsEvent>(_onLoadProfilePosts);
     on<LoadMoreProfilePostsEvent>(_onLoadMoreProfilePosts);
     on<UpdateProfileCommentCountsEvent>(_onUpdateCommentCounts);
 
+    on<UpdateUserProfileEvent>(_onUpdateUserProfile);
     _commentCountSubscription =
         listenCommentCountUseCase(params: const NoParams()).listen((counts) {
           add(UpdateProfileCommentCountsEvent(counts));
         });
+  }
+
+  Future<void> _onUpdateUserProfile(
+    UpdateUserProfileEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final currentState = state;
+    
+    // Chỉ thực hiện khi đang ở trạng thái Loaded (đã có data để sửa)
+    if (currentState is ProfileLoaded) {
+      // 1. Emit trạng thái đang update (loading quay vòng)
+      emit(currentState.copyWith(
+        isUpdating: true,
+        updateSuccess: false,
+        updateError: null,
+      ));
+
+      // 2. Gọi API
+      final result = await updateUserProfileUseCase(event.params);
+
+      // 3. Xử lý kết quả
+      if (result is DataStateSuccess && result.data != null) {
+        // Thành công: Cập nhật user mới vào state -> UI tự đổi
+        emit(currentState.copyWith(
+          isUpdating: false,
+          updateSuccess: true,
+          user: result.data, 
+        ));
+      } else {
+        // Thất bại
+        emit(currentState.copyWith(
+          isUpdating: false,
+          updateSuccess: false,
+          updateError: result.error?.message ?? "Cập nhật thất bại",
+        ));
+      }
+    }
   }
 
   Future<void> _onLoadProfilePosts(

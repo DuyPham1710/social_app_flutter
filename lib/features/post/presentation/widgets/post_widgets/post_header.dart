@@ -41,12 +41,8 @@ class PostHeader extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => ProfileBloc(
-              getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
-              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-              getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
-            )..add(const LoadUserProfileEvent()),
+            create: (_) =>
+                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
             child: const ProfilePage(),
           ),
         ),
@@ -57,14 +53,9 @@ class PostHeader extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => OtherProfileBloc(
-              getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
-              getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
-              getFriendRelationshipUseCase: di
-                  .s1<GetFriendRelationshipUseCase>(),
-              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-            )..add(LoadOtherUserProfileEvent(userId: user.userId!)),
+            create: (_) =>
+                di.s1<OtherProfileBloc>()
+                  ..add(LoadOtherUserProfileEvent(userId: user.userId!)),
             child: OtherProfilePage(userId: user.userId!),
           ),
         ),

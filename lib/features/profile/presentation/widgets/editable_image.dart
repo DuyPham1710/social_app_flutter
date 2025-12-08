@@ -4,20 +4,23 @@ class EditableImage extends StatelessWidget {
   final String imageUrl;
   final bool isAvatarCircle;
   final double borderRadius;
+  final VoidCallback? onEditTap;
 
   const EditableImage({
     super.key,
     required this.imageUrl,
     this.isAvatarCircle = false,
     this.borderRadius = 0,
+    this.onEditTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ClipRRect(
-        borderRadius:
-            isAvatarCircle ? BorderRadius.circular(100) : BorderRadius.circular(borderRadius),
+        borderRadius: isAvatarCircle
+            ? BorderRadius.circular(100)
+            : BorderRadius.circular(borderRadius),
         child: Image.network(
           imageUrl,
           height: isAvatarCircle ? 160 : null,

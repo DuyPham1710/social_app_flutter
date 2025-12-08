@@ -60,7 +60,9 @@ class OtherProfileHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.r),
                 image: DecorationImage(
-                  image: NetworkImage('https://picsum.photos/900/300'),
+                  image: NetworkImage(
+                    user?.coverUrl ?? 'https://picsum.photos/200',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),

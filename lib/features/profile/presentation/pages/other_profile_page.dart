@@ -159,7 +159,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                       },
                     ),
 
-                    const ProfileInfo(),
+                    ProfileInfo(user: user),
                     Divider(),
                     FriendListWidget(
                       onViewAll: () async {
@@ -172,6 +172,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                             ),
                           ),
                         );
+                        _loadData();
                         // userId: user.userId,
                       },
                     ),

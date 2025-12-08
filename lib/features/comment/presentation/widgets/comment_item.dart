@@ -86,12 +86,8 @@ class _CommentItemState extends State<CommentItem> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => ProfileBloc(
-              getProfilePostsUseCase: di.s1<GetProfilePostsUseCase>(),
-              listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-              loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-              getUserProfileUseCase: di.s1<GetUserProfileUseCase>(),
-            )..add(const LoadUserProfileEvent()),
+            create: (_) =>
+                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
             child: const ProfilePage(),
           ),
         ),

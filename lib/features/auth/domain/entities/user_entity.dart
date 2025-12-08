@@ -10,8 +10,12 @@ class UserEntity {
   final String? username;
   final bool? isActive;
   final DateTime? createdAt;
-
-  var coverUrl;
+  final String? coverUrl;
+  final String? school;
+  final String? currentCity;
+  final String? hometown;
+  final String? workplace;
+  final String? relationshipStatus;
 
   const UserEntity({
     required this.userId,
@@ -25,5 +29,11 @@ class UserEntity {
     this.username,
     this.isActive,
     this.createdAt,
+    this.coverUrl,
+    this.currentCity,
+    this.school,
+    this.hometown,
+    this.relationshipStatus,
+    this.workplace
   });
 }

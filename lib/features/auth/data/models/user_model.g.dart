@@ -21,6 +21,12 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      coverUrl: json['coverUrl'] as String?,
+      school: json['school'] as String?,
+      currentCity: json['currentCity'] as String?,
+      hometown: json['hometown'] as String?,
+      workplace: json['workplace'] as String?,
+      relationshipStatus: json['relationshipStatus'] as String?,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -37,4 +43,11 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       if (instance.isActive case final value?) 'isActive': value,
       if (instance.createdAt?.toIso8601String() case final value?)
         'createdAt': value,
+      if (instance.coverUrl case final value?) 'coverUrl': value,
+      if (instance.school case final value?) 'school': value,
+      if (instance.currentCity case final value?) 'currentCity': value,
+      if (instance.hometown case final value?) 'hometown': value,
+      if (instance.workplace case final value?) 'workplace': value,
+      if (instance.relationshipStatus case final value?)
+        'relationshipStatus': value,
     };

@@ -125,15 +125,26 @@ class _ProfilePageState extends State<ProfilePage> {
                     ProfileHeader(user: user, isLoading: state.isUserLoading),
                     ProfileActions(
                       onTapEdit: () async {
+                        // 1. Lấy instance của ProfileBloc hiện tại TRƯỚC khi chuyển trang
+                        final profileBloc = context.read<ProfileBloc>();
+
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProfileEditPage(user: user),
+                            builder: (context) => BlocProvider.value(
+                              value: profileBloc,
+                              child: ProfileEditPage(user: user),
+                            ),
                           ),
                         );
+                        if (context.mounted) {
+                          context.read<ProfileBloc>().add(
+                            const LoadUserProfileEvent(),
+                          );
+                        }
                       },
                     ),
-                    const ProfileInfo(),
+                    ProfileInfo(user: user),
                     const Divider(),
                     FriendListWidget(
                       onViewAll: () async {
@@ -143,8 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             builder: (context) => const FriendsListPage(),
                           ),
                         );
-
-                        // Gọi callback để reload dữ liệu
+                        _loadData();
                       },
                     ),
                     const Divider(),

@@ -2,57 +2,61 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
-// Import các widget cũ của bạn
-import 'package:social_app_fe/features/profile/presentation/widgets/detail_item.dart';
-import 'package:social_app_fe/features/profile/presentation/widgets/editable_image.dart';
-import 'package:social_app_fe/features/profile/presentation/widgets/section_header.dart';
-// Import Bloc để gọi sự kiện update
+// Thay đổi đường dẫn theo dự án của bạn
+import 'package:social_app_fe/features/profile/domain/entities/update_user_entity.dart'; 
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart'; // Cần để dùng BlocListener
+import 'package:social_app_fe/features/profile/presentation/pages/profile_detail_edit_page.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/single_image_picker_page.dart';
+// Import các widget cũ của bạn
+import 'package:social_app_fe/features/profile/presentation/widgets/editable_image.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/editable_text_row.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/profile_detail_info_widget.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/section_header.dart';
 
-// Import widget chi tiết mới (nếu bạn đã tách như gợi ý trước)
 
 class ProfileEditPage extends StatefulWidget {
   final UserEntity? user;
 
-  ProfileEditPage({super.key, this.user});
+  const ProfileEditPage({super.key, this.user});
 
   @override
   State<ProfileEditPage> createState() => _ProfileEditPageState();
 }
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
-  // Hàm hiển thị khung nhập Tiểu sử
-  void _showEditBioBottomSheet(BuildContext context, String? currentBio) {
-    final TextEditingController bioController = TextEditingController(
-      text: currentBio,
-    );
+  
+  // --- BottomSheet dùng chung cho Tên và Tiểu sử ---
+  void _showEditBottomSheet({
+    required BuildContext context,
+    required String title,
+    required String? initialValue,
+    required Function(String) onSave,
+    int maxLength = 100,
+    int maxLines = 1,
+  }) {
+    final TextEditingController controller = TextEditingController(text: initialValue);
+    
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Để đẩy khung lên khi bàn phím hiện
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
         return Padding(
-          // Padding bottom theo viewInsets để tránh bị bàn phím che
           padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 16,
+            left: 16, right: 16, top: 16,
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Chỉnh sửa tiểu sử",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -62,22 +66,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               const Divider(),
               const SizedBox(height: 8),
               TextField(
-                controller: bioController,
-                maxLines: 3,
-                maxLength: 100, // Giới hạn ký tự giống FB/Insta
-                autofocus: true, // Tự động focus và bật bàn phím
+                controller: controller,
+                maxLines: maxLines,
+                maxLength: maxLength,
+                autofocus: true,
                 decoration: InputDecoration(
-                  hintText: "Mô tả ngắn về bản thân bạn...",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   filled: true,
                   fillColor: Colors.grey.shade50,
+                  hintText: "Nhập $title...",
                 ),
               ),
               const SizedBox(height: 16),
@@ -88,27 +85,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
-                    // 1. Lấy giá trị mới
-                    final newBio = bioController.text.trim();
-
-                    // 2. Gọi Bloc để update (Bạn cần tạo Event UpdateProfileEvent)
-                    // context.read<ProfileBloc>().add(UpdateProfileEvent(widget.user.copyWith(bio: newBio)));
-
-                    // Ví dụ (Giả lập):
-                    print("Đã lưu tiểu sử mới: $newBio");
-
-                    // 3. Đóng bottom sheet
+                    onSave(controller.text.trim());
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    "Lưu",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text("Lưu", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -118,74 +101,145 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
+  // Điều hướng sang trang chọn ảnh
+  void _navigateToImagePicker(bool isAvatar) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => 
+        // Cần truyền ProfileBloc sang trang con để trang con có thể gọi event update
+        SingleImagePickerPage(
+          isAvatar: isAvatar,
+          profileBloc: context.read<ProfileBloc>(), 
+        ),
+      ),
+    );
+  }
+
+  // Điều hướng sang trang sửa chi tiết
+  void _navigateToDetailEdit() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value( // Cung cấp lại Bloc cho trang con
+          value: context.read<ProfileBloc>(),
+          child: ProfileDetailEditPage(user: widget.user),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+    // BlocListener để lắng nghe kết quả Update (Thành công/Thất bại)
+    return BlocListener<ProfileBloc, ProfileState>(
+      // Lắng nghe trạng thái cập nhật (updateSuccess)
+      listener: (context, state) {
+        if (state is ProfileLoaded) {
+          if (state.updateSuccess) {
+            // Sau khi cập nhật thành công, quay lại trang ProfilePage
+            Navigator.pop(context); 
+            // Trang ProfilePage cha sẽ tự động tải lại dữ liệu (như đã thiết lập ở file trước)
+          } else if (state.updateError != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.updateError!), backgroundColor: Colors.red),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text("Chỉnh sửa trang cá nhân"),
+          centerTitle: true,
         ),
-        title: const Text("Chỉnh sửa trang cá nhân"),
-        centerTitle: true,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          const SizedBox(height: 24),
+        body: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [
+            const SizedBox(height: 24),
+            
+            // --- TÊN NGƯỜI DÙNG ---
+            SectionHeader(
+              title: "Tên người dùng",
+              onEditTap: () => _showEditBottomSheet(
+                context: context,
+                title: "Chỉnh sửa tên",
+                initialValue: widget.user?.fullName,
+                maxLength: 50,
+                onSave: (newName) {
+                  if (newName.isNotEmpty) {
+                    context.read<ProfileBloc>().add(
+                      UpdateUserProfileEvent(UpdateUserEntity(fullName: newName))
+                    );
+                  }
+                },
+              ),
+            ),
+            EditableTextRow(text: widget.user?.fullName ?? "Người dùng"),
+            const SizedBox(height: 24),
 
-          // --- ẢNH ĐẠI DIỆN ---
-          const SectionHeader(
-            title: "Ảnh đại diện",
-            onEditTap: null,
-          ), // TODO: Handle Avatar
-          const SizedBox(height: 8),
-          EditableImage(
-            imageUrl: widget.user?.avatarUrl ?? "https://picsum.photos/400",
-            isAvatarCircle: true,
-          ),
+            // --- ẢNH ĐẠI DIỆN ---
+            SectionHeader(
+              title: "Ảnh đại diện",
+              onEditTap: () => _navigateToImagePicker(true), // isAvatar = true
+            ),
+            const SizedBox(height: 8),
+            Center(
+              child: EditableImage(
+                imageUrl: widget.user?.avatarUrl ?? "https://picsum.photos/400",
+                isAvatarCircle: true,
+                onEditTap: () => _navigateToImagePicker(true),
+              ),
+            ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // --- ẢNH BÌA ---
-          const SectionHeader(
-            title: "Ảnh bìa",
-            onEditTap: null,
-          ), // TODO: Handle Cover
-          const SizedBox(height: 8),
-          EditableImage(
-            imageUrl: widget.user?.coverUrl ?? "https://picsum.photos/600",
-            borderRadius: 12,
-          ),
+            // --- ẢNH BÌA ---
+            SectionHeader(
+              title: "Ảnh bìa",
+              onEditTap: () => _navigateToImagePicker(false), // isAvatar = false
+            ),
+            const SizedBox(height: 8),
+            EditableImage(
+              imageUrl: widget.user?.coverUrl ?? "https://picsum.photos/600",
+              borderRadius: 12,
+              onEditTap: () => _navigateToImagePicker(false),
+            ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // --- TIỂU SỬ (Xử lý phần này) ---
-          SectionHeader(
-            title: "Tiểu sử",
-            onEditTap: () {
-              // Gọi hàm hiển thị BottomSheet
-              _showEditBioBottomSheet(context, widget.user?.bio);
-            },
-          ),
-          EditableTextRow(text: widget.user?.bio ?? "Chưa có tiểu sử"),
+            // --- TIỂU SỬ ---
+            SectionHeader(
+              title: "Tiểu sử",
+              onEditTap: () => _showEditBottomSheet(
+                context: context,
+                title: "Chỉnh sửa tiểu sử",
+                initialValue: widget.user?.bio,
+                maxLines: 3,
+                maxLength: 100, 
+                onSave: (newBio) {
+                  context.read<ProfileBloc>().add(
+                    UpdateUserProfileEvent(UpdateUserEntity(bio: newBio))
+                  );
+                },
+              ),
+            ),
+            EditableTextRow(text: widget.user?.bio ?? "Chưa có tiểu sử"),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // --- CHI TIẾT ---
-          SectionHeader(
-            title: "Chi tiết",
-            onEditTap: () {
-              // Mở trang edit chi tiết riêng (như yêu cầu trước)
-              //Navigator.push(...);
-            },
-          ),
-
-          // Widget gom nhóm chi tiết (sử dụng User để render)
-
-          //ProfileDetailInfoWidget(user: widget.user),
-          const SizedBox(height: 40),
-        ],
+            // --- CHI TIẾT ---
+            SectionHeader(
+              title: "Chi tiết",
+              onEditTap: _navigateToDetailEdit, // Mở trang sửa chi tiết
+            ),
+            ProfileDetailInfoWidget(user: widget.user),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
