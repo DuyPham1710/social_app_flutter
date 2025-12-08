@@ -32,6 +32,14 @@ abstract class ChatRepository {
     int limit = 20,
   });
 
+  Future<DataState<ConversationEntity>> createConversation({
+    required String userId,
+    required List<String> participantIds,
+    bool isGroup = false,
+    String? name,
+    String? avatar,
+  });
+
   Future<DataState<void>> joinConversation({
     required String userId,
     required String conversationId,
@@ -70,6 +78,21 @@ abstract class ChatRepository {
     required String newText,
   });
 
+  // Delete message
+  void deleteMessage({
+    required String userId,
+    required String messageId,
+    required bool deleteForEveryone,
+  });
+
+  // React to message
+  void reactMessage({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    required String emojiId,
+  });
+
   // Get message edit logs
   Future<DataState<List<MessageEditLogEntity>>> getMessageEditLogs({
     required String userId,
@@ -85,5 +108,6 @@ abstract class ChatRepository {
   Stream<MessageEntity> get onMessageUpdated;
   Stream<Map<String, dynamic>> get onMessageRead;
   Stream<ConversationEntity> get onConversationUpdate;
+  Stream<ConversationEntity> get onConversationCreated;
   // Stream<Map<String, dynamic>> get onUserOnline;
 }

@@ -1,4 +1,5 @@
 export 'get_conversations_usecase.dart';
+export 'create_conversation_usecase.dart';
 export 'connect_chat_usecase.dart';
 export 'disconnect_chat_usecase.dart';
 export 'join_conversation_usecase.dart';
@@ -11,6 +12,8 @@ export 'listen_typing_stop_usecase.dart';
 export 'listen_new_message_usecase.dart';
 export 'send_message_usecase.dart';
 export 'edit_message_usecase.dart';
+export 'delete_message_usecase.dart';
+export 'react_message_usecase.dart';
 export 'listen_message_updated_usecase.dart';
 export 'listen_message_read_usecase.dart';
 export 'get_message_edit_logs_usecase.dart';

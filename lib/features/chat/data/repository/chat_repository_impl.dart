@@ -100,6 +100,30 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<ConversationEntity>> createConversation({
+    required String userId,
+    required List<String> participantIds,
+    bool isGroup = false,
+    String? name,
+    String? avatar,
+  }) async {
+    try {
+      final conversation = await _remoteDataSource.createConversation(
+        userId: userId,
+        participantIds: participantIds,
+        isGroup: isGroup,
+        name: name,
+        avatar: avatar,
+      );
+      return DataStateSuccess(conversation.toEntity());
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> joinConversation({
     required String userId,
     required String conversationId,
@@ -222,6 +246,34 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  void reactMessage({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    required String emojiId,
+  }) {
+    _remoteDataSource.reactMessage(
+      userId: userId,
+      conversationId: conversationId,
+      messageId: messageId,
+      emojiId: emojiId,
+    );
+  }
+
+  @override
+  void deleteMessage({
+    required String userId,
+    required String messageId,
+    required bool deleteForEveryone,
+  }) {
+    _remoteDataSource.deleteMessage(
+      userId: userId,
+      messageId: messageId,
+      deleteForEveryone: deleteForEveryone,
+    );
+  }
+
+  @override
   Future<DataState<List<MessageEditLogEntity>>> getMessageEditLogs({
     required String userId,
     required String messageId,
@@ -255,6 +307,13 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Stream<ConversationEntity> get onConversationUpdate {
     return _remoteDataSource.onConversationUpdate.map(
+      (model) => model.toEntity(),
+    );
+  }
+
+  @override
+  Stream<ConversationEntity> get onConversationCreated {
+    return _remoteDataSource.onConversationCreated.map(
       (model) => model.toEntity(),
     );
   }

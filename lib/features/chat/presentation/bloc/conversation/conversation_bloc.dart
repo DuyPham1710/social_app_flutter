@@ -9,6 +9,7 @@ import 'conversation_state.dart';
 
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final GetConversationsUseCase _getConversationsUseCase;
+  final CreateConversationUseCase _createConversationUseCase;
   final JoinConversationUseCase _joinConversationUseCase;
   final LeaveConversationUseCase _leaveConversationUseCase;
   final ListenConversationUpdateUseCase _listenConversationUpdateUseCase;
@@ -18,15 +19,18 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
   ConversationBloc({
     required GetConversationsUseCase getConversationsUseCase,
+    required CreateConversationUseCase createConversationUseCase,
     required JoinConversationUseCase joinConversationUseCase,
     required LeaveConversationUseCase leaveConversationUseCase,
     required ListenConversationUpdateUseCase listenConversationUpdateUseCase,
   }) : _getConversationsUseCase = getConversationsUseCase,
+       _createConversationUseCase = createConversationUseCase,
        _joinConversationUseCase = joinConversationUseCase,
        _leaveConversationUseCase = leaveConversationUseCase,
        _listenConversationUpdateUseCase = listenConversationUpdateUseCase,
        super(const ConversationInitial()) {
     on<LoadConversationsEvent>(_onLoadConversations);
+    on<CreateConversationEvent>(_onCreateConversation);
     on<JoinConversationEvent>(_onJoinConversation);
     on<LeaveConversationEvent>(_onLeaveConversation);
     on<ConversationUpdatedEvent>(_onConversationUpdated);
@@ -38,7 +42,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     LoadConversationsEvent event,
     Emitter<ConversationState> emit,
   ) async {
-    emit(const ConversationsLoading());
+    final currentState = state;
+    final isFirstPage = event.page == 1;
+
+    // Chỉ emit loading state khi load page đầu tiên
+    if (isFirstPage) {
+      emit(const ConversationsLoading());
+    }
 
     try {
       final result = await _getConversationsUseCase(
@@ -63,23 +73,119 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
             // Log error nhưng không block flow
             print('Error joining conversation ${conversation.id}: $error');
           });
+        }
 
+        // Nếu là page đầu tiên, emit data mới
+        if (isFirstPage) {
           emit(ConversationsLoaded(result.data!));
           print(
-            'Loaded ${result.data!.data.length} conversations successfully',
+            'Loaded ${result.data!.data.length} conversations successfully (page ${event.page})',
           );
+        } else {
+          // Nếu là page tiếp theo, merge với data hiện có
+          if (currentState is ConversationsLoaded) {
+            final existingConversations = currentState.conversations.data;
+            final newConversations = result.data!.data;
+
+            // Lọc ra các conversations chưa có trong list hiện tại (tránh duplicate)
+            final existingIds = existingConversations.map((c) => c.id).toSet();
+            final uniqueNewConversations = newConversations
+                .where((c) => !existingIds.contains(c.id))
+                .toList();
+
+            if (uniqueNewConversations.isNotEmpty) {
+              // Merge conversations mới vào cuối list
+              final mergedConversations = [
+                ...existingConversations,
+                ...uniqueNewConversations,
+              ];
+
+              // Cập nhật pagination với thông tin từ page mới
+              final updatedPagination = result.data!.pagination;
+              final mergedResponse = currentState.conversations.copyWith(
+                data: mergedConversations,
+                pagination: updatedPagination,
+              );
+
+              emit(ConversationsLoaded(mergedResponse));
+              print(
+                'Loaded more ${uniqueNewConversations.length} conversations (${newConversations.length - uniqueNewConversations.length} duplicates skipped), total: ${mergedConversations.length} (page ${event.page})',
+              );
+            } else {
+              print(
+                'All conversations from page ${event.page} already loaded, skipping merge',
+              );
+            }
+          } else {
+            // Nếu state không phải ConversationsLoaded, emit data mới
+            emit(ConversationsLoaded(result.data!));
+            print(
+              'Loaded ${result.data!.data.length} conversations successfully (page ${event.page})',
+            );
+          }
         }
       } else if (result is DataStateError) {
-        emit(
-          ConversationsError(
-            message: result.error?.message ?? 'Failed to load conversations',
-          ),
-        );
+        // Chỉ emit error nếu là page đầu tiên
+        if (isFirstPage) {
+          emit(
+            ConversationsError(
+              message: result.error?.message ?? 'Failed to load conversations',
+            ),
+          );
+        }
         print('Error loading conversations: ${result.error}');
       }
     } catch (e) {
-      emit(ConversationsError(message: 'Failed to load conversations: $e'));
+      // Chỉ emit error nếu là page đầu tiên
+      if (isFirstPage) {
+        emit(ConversationsError(message: 'Failed to load conversations: $e'));
+      }
       print('Exception loading conversations: $e');
+    }
+  }
+
+  Future<void> _onCreateConversation(
+    CreateConversationEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    emit(const CreateConversationLoading());
+
+    try {
+      final result = await _createConversationUseCase(
+        params: CreateConversationParams(
+          userId: event.userId,
+          participantIds: event.participantIds,
+          isGroup: event.isGroup,
+          name: event.name,
+          avatar: event.avatar,
+        ),
+      );
+
+      if (result is DataStateSuccess) {
+        // Join vào conversation vừa tạo
+        await _joinConversationUseCase(
+          params: JoinConversationParams(
+            userId: event.userId,
+            conversationId: result.data!.id,
+          ),
+        );
+
+        // Emit success state trước
+        emit(CreateConversationSuccess(result.data!));
+        print('Created conversation successfully: ${result.data!.id}');
+      } else if (result is DataStateError) {
+        emit(
+          CreateConversationError(
+            message: result.error?.message ?? 'Failed to create conversation',
+          ),
+        );
+        print('Error creating conversation: ${result.error}');
+      }
+    } catch (e) {
+      emit(
+        CreateConversationError(message: 'Failed to create conversation: $e'),
+      );
+      print('Exception creating conversation: $e');
     }
   }
 

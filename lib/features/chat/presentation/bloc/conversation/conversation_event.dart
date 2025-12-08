@@ -31,6 +31,25 @@ class LoadConversationsEvent extends ConversationEvent {
   List<Object?> get props => [userId, page, limit];
 }
 
+class CreateConversationEvent extends ConversationEvent {
+  final String userId;
+  final List<String> participantIds;
+  final bool isGroup;
+  final String? name;
+  final String? avatar;
+
+  const CreateConversationEvent({
+    required this.userId,
+    required this.participantIds,
+    this.isGroup = false,
+    this.name,
+    this.avatar,
+  });
+
+  @override
+  List<Object?> get props => [userId, participantIds, isGroup, name, avatar];
+}
+
 class JoinConversationEvent extends ConversationEvent {
   final String userId;
   final String conversationId;

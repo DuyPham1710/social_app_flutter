@@ -27,6 +27,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       StreamController<Map<String, dynamic>>.broadcast();
   final _conversationUpdateController =
       StreamController<ConversationModel>.broadcast();
+  final _conversationCreatedController =
+      StreamController<ConversationModel>.broadcast();
   // final _userOnlineController =
   //     StreamController<Map<String, dynamic>>.broadcast();
 
@@ -70,6 +72,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Stream<ConversationModel> get onConversationUpdate =>
       _conversationUpdateController.stream;
 
+  @override
+  Stream<ConversationModel> get onConversationCreated =>
+      _conversationCreatedController.stream;
+
   // @override
   // Stream<Map<String, dynamic>> get onUserOnline => _userOnlineController.stream;
 
@@ -94,6 +100,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _setupNewMessageListeners();
     _setupMessageUpdatedListeners();
     _setupMessageReadListeners();
+    _setupConversationCreatedListeners();
   }
 
   /// Wait for connection to be established
@@ -194,6 +201,31 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
           'Error parsing conversation:updated: $e',
           name: 'ChatDataSource',
         );
+      }
+    });
+  }
+
+  /// Setup listeners for conversation created events
+  void _setupConversationCreatedListeners() {
+    _socketClient.on('conversation:created').listen((data) {
+      developer.log('Conversation created event', name: 'ChatDataSource');
+      try {
+        final conversationData = data as Map<String, dynamic>;
+        final conversation = ConversationModel.fromJson(
+          conversationData['conversation'] as Map<String, dynamic>,
+        );
+        _conversationCreatedController.add(conversation);
+        developer.log(
+          'Conversation created: ${conversation.id}',
+          name: 'ChatDataSource',
+        );
+      } catch (e, stackTrace) {
+        developer.log(
+          'Error parsing conversation:created: $e',
+          name: 'ChatDataSource',
+        );
+        developer.log('Raw data: $data', name: 'ChatDataSource');
+        developer.log('Stack trace: $stackTrace', name: 'ChatDataSource');
       }
     });
   }
@@ -353,6 +385,92 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     });
 
     return completer.future;
+  }
+
+  /// Create conversation
+  @override
+  Future<ConversationModel> createConversation({
+    required String userId,
+    required List<String> participantIds,
+    bool isGroup = false,
+    String? name,
+    String? avatar,
+  }) async {
+    developer.log(
+      'Creating conversation for user: $userId with participants: $participantIds',
+      name: 'ChatDataSource',
+    );
+
+    // Wait for connection to be established
+    try {
+      await waitForConnection();
+    } catch (e) {
+      developer.log('Connection not ready: $e', name: 'ChatDataSource');
+      throw Exception('Chat connection not ready: $e');
+    }
+
+    final completer = Completer<ConversationModel>();
+
+    // Setup one-time listener for conversation:created event
+    // Backend sẽ emit conversation:created cho tất cả participants (bao gồm cả người tạo)
+    // LƯU Ý: Backend chỉ emit event khi conversation MỚI được tạo
+    // Nếu conversation đã tồn tại, backend chỉ return response trực tiếp (không emit event)
+    // Vì socket.io client trong Dart không hỗ trợ acknowledgment, chúng ta chỉ có thể
+    // nhận conversation qua event conversation:created
+    late StreamSubscription subscription;
+    subscription = _conversationCreatedController.stream.listen((conversation) {
+      // Kiểm tra xem conversation này có chứa userId và participantIds không
+      final participantIdsInConversation = conversation.participants
+          .map((p) => p.userId)
+          .toSet();
+      final expectedParticipants = {userId, ...participantIds}.toSet();
+
+      // Chỉ complete nếu conversation match với request
+      if (participantIdsInConversation.containsAll(expectedParticipants) &&
+          expectedParticipants.containsAll(participantIdsInConversation)) {
+        subscription.cancel();
+        if (!completer.isCompleted) {
+          completer.complete(conversation);
+        }
+      }
+    });
+
+    // Emit the create request
+    _socketClient.emit('conversation:create', {
+      'userId': userId,
+      'participantIds': participantIds,
+      'isGroup': isGroup,
+      if (name != null) 'name': name,
+      if (avatar != null) 'avatar': avatar,
+    });
+
+    // Set timeout - nếu không nhận được event trong 10 giây, có thể:
+    // 1. Conversation đã tồn tại (backend không emit event)
+    // 2. Network error
+    // 3. Backend error
+    Timer(const Duration(seconds: 10), () {
+      if (!completer.isCompleted) {
+        subscription.cancel();
+        completer.completeError(
+          TimeoutException(
+            'Create conversation timeout. Conversation may already exist or network error occurred.',
+          ),
+        );
+      }
+    });
+
+    // Wait for conversation:created event
+    try {
+      return await completer.future;
+    } catch (e) {
+      subscription.cancel();
+      if (e is TimeoutException) {
+        throw TimeoutException(
+          'Create conversation timeout. If conversation already exists, backend should emit conversation:created event.',
+        );
+      }
+      rethrow;
+    }
   }
 
   /// Join conversation
@@ -662,6 +780,58 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _socketClient.emit('message:update', editData);
   }
 
+  @override
+  void reactMessage({
+    required String userId,
+    required String conversationId,
+    required String messageId,
+    required String emojiId,
+  }) {
+    developer.log(
+      'Reacting to message: $messageId with emoji: $emojiId',
+      name: 'ChatDataSource',
+    );
+    if (!_isConnected) {
+      developer.log(
+        'Connection not ready for reacting to message',
+        name: 'ChatDataSource',
+      );
+      return;
+    }
+    final reactData = <String, dynamic>{
+      'userId': userId,
+      'conversationId': conversationId,
+      'messageId': messageId,
+      'emojiId': emojiId,
+    };
+    _socketClient.emit('message:react', reactData);
+  }
+
+  @override
+  void deleteMessage({
+    required String userId,
+    required String messageId,
+    required bool deleteForEveryone,
+  }) {
+    developer.log(
+      'Deleting message: $messageId, deleteForEveryone: $deleteForEveryone',
+      name: 'ChatDataSource',
+    );
+    if (!_isConnected) {
+      developer.log(
+        'Connection not ready for deleting message',
+        name: 'ChatDataSource',
+      );
+      return;
+    }
+    final deleteData = <String, dynamic>{
+      'userId': userId,
+      'messageId': messageId,
+      'deleteForEveryone': deleteForEveryone,
+    };
+    _socketClient.emit('message:delete', deleteData);
+  }
+
   /// Get message edit logs
   @override
   Future<List<MessageEditLogEntity>> getMessageEditLogs({
@@ -769,7 +939,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _newMessageController.close();
     _messageUpdatedController.close();
     _messageReadController.close();
-    // _conversationUpdateController.close();
+    _conversationUpdateController.close();
+    _conversationCreatedController.close();
     // _userOnlineController.close();
     _conversationsCache.clear();
   }

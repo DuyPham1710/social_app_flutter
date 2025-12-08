@@ -267,6 +267,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetConversationsUseCase>(
     () => GetConversationsUseCase(s1()),
   );
+  s1.registerLazySingleton<CreateConversationUseCase>(
+    () => CreateConversationUseCase(s1()),
+  );
   s1.registerLazySingleton<JoinConversationUseCase>(
     () => JoinConversationUseCase(s1()),
   );
@@ -290,6 +293,8 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<SendMessageUseCase>(() => SendMessageUseCase(s1()));
   s1.registerLazySingleton<EditMessageUseCase>(() => EditMessageUseCase(s1()));
+  s1.registerLazySingleton<DeleteMessageUseCase>(() => DeleteMessageUseCase(s1()));
+  s1.registerLazySingleton<ReactMessageUseCase>(() => ReactMessageUseCase(s1()));
   s1.registerLazySingleton<ListenMessageUpdatedUseCase>(
     () => ListenMessageUpdatedUseCase(s1()),
   );
@@ -412,6 +417,7 @@ Future<void> initializeDependencies() async {
   s1.registerFactory<ConversationBloc>(
     () => ConversationBloc(
       getConversationsUseCase: s1(),
+      createConversationUseCase: s1(),
       joinConversationUseCase: s1(),
       leaveConversationUseCase: s1(),
       listenConversationUpdateUseCase: s1(),
@@ -429,6 +435,8 @@ Future<void> initializeDependencies() async {
       listenNewMessageUseCase: s1(),
       sendMessageUseCase: s1(),
       editMessageUseCase: s1(),
+      deleteMessageUseCase: s1(),
+      reactMessageUseCase: s1(),
       listenMessageUpdatedUseCase: s1(),
       listenMessageReadUseCase: s1(),
       markAsReadUseCase: s1(),

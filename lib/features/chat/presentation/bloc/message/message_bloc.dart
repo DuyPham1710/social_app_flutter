@@ -19,6 +19,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   final ListenNewMessageUseCase _listenNewMessageUseCase;
   final SendMessageUseCase _sendMessageUseCase;
   final EditMessageUseCase _editMessageUseCase;
+  final DeleteMessageUseCase _deleteMessageUseCase;
+  final ReactMessageUseCase _reactMessageUseCase;
   final ListenMessageUpdatedUseCase _listenMessageUpdatedUseCase;
   final ListenMessageReadUseCase _listenMessageReadUseCase;
   final MarkAsReadUseCase _markAsReadUseCase;
@@ -42,6 +44,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     required ListenNewMessageUseCase listenNewMessageUseCase,
     required SendMessageUseCase sendMessageUseCase,
     required EditMessageUseCase editMessageUseCase,
+    required DeleteMessageUseCase deleteMessageUseCase,
+    required ReactMessageUseCase reactMessageUseCase,
     required ListenMessageUpdatedUseCase listenMessageUpdatedUseCase,
     required ListenMessageReadUseCase listenMessageReadUseCase,
     required MarkAsReadUseCase markAsReadUseCase,
@@ -54,6 +58,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
        _listenNewMessageUseCase = listenNewMessageUseCase,
        _sendMessageUseCase = sendMessageUseCase,
        _editMessageUseCase = editMessageUseCase,
+       _deleteMessageUseCase = deleteMessageUseCase,
+       _reactMessageUseCase = reactMessageUseCase,
        _listenMessageUpdatedUseCase = listenMessageUpdatedUseCase,
        _listenMessageReadUseCase = listenMessageReadUseCase,
        _markAsReadUseCase = markAsReadUseCase,
@@ -67,6 +73,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<NewMessageReceivedEvent>(_onNewMessageReceived);
     on<SendMessageEvent>(_onSendMessage);
     on<EditMessageEvent>(_onEditMessage);
+    on<DeleteMessageEvent>(_onDeleteMessage);
+    on<ReactMessageEvent>(_onReactMessage);
     on<MessageUpdatedReceivedEvent>(_onMessageUpdatedReceived);
     on<MessageReadReceivedEvent>(_onMessageReadReceived);
     on<MarkAsReadEvent>(_onMarkAsRead);
@@ -555,6 +563,31 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     );
 
     print('Message edited: ${event.messageId}');
+    // Note: Message will be updated in list via message:updated event from backend
+  }
+
+  void _onDeleteMessage(DeleteMessageEvent event, Emitter<MessageState> emit) {
+    // Delete message through usecase
+    _deleteMessageUseCase(
+      userId: event.userId,
+      messageId: event.messageId,
+      deleteForEveryone: event.deleteForEveryone,
+    );
+
+    print('Message deleted: ${event.messageId}, deleteForEveryone: ${event.deleteForEveryone}');
+    // Note: Message will be updated in list via message:deleted event from backend
+  }
+
+  void _onReactMessage(ReactMessageEvent event, Emitter<MessageState> emit) {
+    // React to message through usecase
+    _reactMessageUseCase(
+      userId: event.userId,
+      conversationId: event.conversationId,
+      messageId: event.messageId,
+      emojiId: event.emojiId,
+    );
+
+    print('Message reacted: ${event.messageId} with emoji: ${event.emojiId}');
     // Note: Message will be updated in list via message:updated event from backend
   }
 

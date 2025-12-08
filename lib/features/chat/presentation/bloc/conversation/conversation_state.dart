@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/conversation_response_entity.dart';
+import '../../../domain/entities/chat_entities.dart';
 
 abstract class ConversationState extends Equatable {
   const ConversationState();
@@ -79,6 +80,29 @@ class JoinConversationError extends ConversationState {
   final String message;
 
   const JoinConversationError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// Create conversation states
+class CreateConversationLoading extends ConversationState {
+  const CreateConversationLoading();
+}
+
+class CreateConversationSuccess extends ConversationState {
+  final ConversationEntity conversation;
+
+  const CreateConversationSuccess(this.conversation);
+
+  @override
+  List<Object?> get props => [conversation];
+}
+
+class CreateConversationError extends ConversationState {
+  final String? message;
+
+  const CreateConversationError({this.message});
 
   @override
   List<Object?> get props => [message];

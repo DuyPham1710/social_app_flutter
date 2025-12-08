@@ -14,6 +14,7 @@ class MessageItem extends StatelessWidget {
   final String currentUserId;
   final List<UserEntity> otherParticipants;
   final VoidCallback? onLongPress;
+  final VoidCallback? onDoubleTap;
   final VoidCallback? onEditHistoryTap;
 
   const MessageItem({
@@ -26,6 +27,7 @@ class MessageItem extends StatelessWidget {
     required this.currentUserId,
     this.otherParticipants = const [],
     this.onLongPress,
+    this.onDoubleTap,
     this.onEditHistoryTap,
   });
 
@@ -70,7 +72,8 @@ class MessageItem extends StatelessWidget {
     final isReplying = message.replyTo != null;
     final hasReactions = message.reactions.isNotEmpty;
     final isEdited = message.isEdited;
-
+    final isDeleteforEveryone = message.deletedForEveryone;
+    final lastName = message.sender.fullName!.trim().split(' ').last;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -106,11 +109,14 @@ class MessageItem extends StatelessWidget {
               Flexible(
                 child: GestureDetector(
                   onLongPress: onLongPress,
+                  onDoubleTap: onDoubleTap,
                   child: Stack(
                     clipBehavior: Clip.none,
                     fit: StackFit.loose,
                     children: [
-                      isReplying
+                      isDeleteforEveryone
+                          ? _buildDeletedMessage(lastName, fromMe)
+                          : isReplying
                           ? _buildReplyMessage()
                           :
                             // Kiểm tra xem có phải là emoji không
@@ -133,6 +139,31 @@ class MessageItem extends StatelessWidget {
         // Hiển thị trạng thái tin nhắn
         _buildMessageStatus(),
       ],
+    );
+  }
+
+  Widget _buildDeletedMessage(String lastName, bool fromMe) {
+    return Container(
+      constraints: BoxConstraints(maxWidth: 0.7.sw),
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border.all(color: AppColors.textSecondary.withOpacity(0.4)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(14.r),
+          topRight: Radius.circular(14.r),
+          bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+          bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+        ),
+      ),
+      child: Text(
+        fromMe ? 'Bạn đã xóa tin nhắn này' : '$lastName đã xóa tin nhắn này',
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontStyle: FontStyle.italic,
+          color: AppColors.textSecondary,
+        ),
+      ),
     );
   }
 

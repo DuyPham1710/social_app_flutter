@@ -177,6 +177,38 @@ class EditMessageEvent extends MessageEvent {
   List<Object?> get props => [userId, messageId, newText];
 }
 
+class ReactMessageEvent extends MessageEvent {
+  final String userId;
+  final String conversationId;
+  final String messageId;
+  final String emojiId;
+
+  const ReactMessageEvent({
+    required this.userId,
+    required this.conversationId,
+    required this.messageId,
+    required this.emojiId,
+  });
+
+  @override
+  List<Object?> get props => [userId, conversationId, messageId, emojiId];
+}
+
+class DeleteMessageEvent extends MessageEvent {
+  final String userId;
+  final String messageId;
+  final bool deleteForEveryone;
+
+  const DeleteMessageEvent({
+    required this.userId,
+    required this.messageId,
+    required this.deleteForEveryone,
+  });
+
+  @override
+  List<Object?> get props => [userId, messageId, deleteForEveryone];
+}
+
 class MessageUpdatedReceivedEvent extends MessageEvent {
   final MessageEntity messageData;
 

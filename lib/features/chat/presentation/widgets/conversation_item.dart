@@ -34,7 +34,7 @@ class ConversationItem extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        preview,
+        preview.contains('null') ? 'Đã kết nối' : preview,
         style: TextStyle(
           color: isUnread ? AppColors.textPrimary : AppColors.textSecondary,
           fontWeight: isUnread ? FontWeight.w600 : FontWeight.w400,
