@@ -28,4 +28,10 @@ abstract class PostRepository {
   });
 
   Future<DataState<String>> createPost({required CreatePostEntity post});
+
+  Future<DataState<void>> reportPost({
+    required String postId,
+    required String reason,
+    String? description,
+  });
 }

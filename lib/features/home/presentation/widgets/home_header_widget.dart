@@ -27,7 +27,7 @@ class HomeHeaderWidget extends StatelessWidget {
                   color: AppColors.primary,
                 ),
                 onPressed: () {
-                  // Handle search action
+                  Navigator.pushNamed(context, '/search');
                 },
               ),
               SizedBox(width: 8.w),

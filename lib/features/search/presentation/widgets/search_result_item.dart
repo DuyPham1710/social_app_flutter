@@ -7,7 +7,6 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friends_by_userid_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
@@ -18,22 +17,35 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
 
-class PostHeader extends StatelessWidget {
+class SearchResultItem extends StatelessWidget {
   final UserEntity user;
-  final DateTime? createdAt;
-  final VoidCallback? onReportTap;
-  const PostHeader({
+
+  const SearchResultItem({
     super.key,
     required this.user,
-    this.createdAt,
-    this.onReportTap,
   });
 
   Future<void> _navigateToProfile(BuildContext context) async {
+    if (!context.mounted) return;
+    
     final userData = await TokenStorage.getUserData();
     final currentUserId = userData?['id'];
+
+    if (!context.mounted) return;
+
+    // Lưu người dùng đã xem vào lịch sử tìm kiếm (chỉ khi không phải chính mình)
+    if (currentUserId != user.userId) {
+      try {
+        final searchRepository = di.s1<SearchRepository>();
+        await searchRepository.saveViewedUser(viewedUserId: user.userId);
+      } catch (e) {
+        // Không hiển thị lỗi nếu không lưu được lịch sử
+        // Chỉ log để debug
+        debugPrint('Error saving viewed user to search history: $e');
+      }
+    }
 
     // Nếu là user hiện tại → My Profile
     if (currentUserId == user.userId) {
@@ -52,7 +64,7 @@ class PostHeader extends StatelessWidget {
         ),
       );
     } else {
-      //Nếu là người khác → Other Profile
+      // Nếu là người khác → Other Profile
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -60,12 +72,12 @@ class PostHeader extends StatelessWidget {
             create: (_) => OtherProfileBloc(
               getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
               getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
-              getFriendRelationshipUseCase: di
-                  .s1<GetFriendRelationshipUseCase>(),
+              getFriendRelationshipUseCase:
+                  di.s1<GetFriendRelationshipUseCase>(),
               listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
               loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-            )..add(LoadOtherUserProfileEvent(userId: user.userId!)),
-            child: OtherProfilePage(userId: user.userId!),
+            )..add(LoadOtherUserProfileEvent(userId: user.userId)),
+            child: OtherProfilePage(userId: user.userId),
           ),
         ),
       );
@@ -74,80 +86,75 @@ class PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => _navigateToProfile(context),
-            child: CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage(
-                user.avatarUrl ??
-                    "https://randomuser.me/api/portraits/men/1.jpg",
-              ),
-            ),
-          ),
-
-          SizedBox(width: 10.w),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () => _navigateToProfile(context),
-                  child: Text(
-                    user.fullName ?? "Unknown",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                ),
-                Text(
-                  createdAt != null
-                      ? timeago.format(createdAt!)
-                      : "Unknown date",
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_horiz, size: 20.sp),
-            onSelected: (value) {
-              if (value == 'report') {
-                onReportTap?.call();
-              } else if (value == 'share') {
-                // TODO: Thêm logic chia sẻ bài viết nếu cần
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'share',
-                child: Row(
-                  children: [
-                    const Icon(Icons.share, size: 18),
-                    SizedBox(width: 8.w),
-                    const Text('Chia sẻ'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'report',
-                child: Row(
-                  children: [
-                    const Icon(Icons.flag_outlined, size: 18, color: Colors.red),
-                    SizedBox(width: 8.w),
-                    const Text('Báo cáo bài viết'),
-                  ],
-                ),
-              ),
-            ],
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 6.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8.r,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      child: InkWell(
+        onTap: () => _navigateToProfile(context),
+        borderRadius: BorderRadius.circular(12.r),
+        child: Row(
+          children: [
+            // Avatar
+            CircleAvatar(
+              radius: 32.r,
+              backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+                  ? NetworkImage(user.avatarUrl!)
+                  : null,
+              child: user.avatarUrl == null || user.avatarUrl!.isEmpty
+                  ? Icon(
+                      Icons.person,
+                      size: 32.r,
+                      color: Colors.grey[400],
+                    )
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+            // Thông tin user
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.fullName ?? user.username ?? 'Người dùng',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  if (user.username != null && user.username!.isNotEmpty) ...[
+                    SizedBox(height: 4.h),
+                    Text(
+                      '@${user.username}',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // Icon mũi tên
+            Icon(
+              Icons.chevron_right,
+              color: Colors.grey[400],
+              size: 24.r,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+

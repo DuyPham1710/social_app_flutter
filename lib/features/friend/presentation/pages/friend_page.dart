@@ -39,7 +39,12 @@ class _FriendPageState extends State<FriendPage> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.search)),
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
+            icon: const Icon(CupertinoIcons.search),
+          ),
         ],
       ),
       body: SafeArea(
@@ -373,6 +378,11 @@ class _FriendPageState extends State<FriendPage> {
                   onAddFriend: () {
                     context.read<FriendBloc>().add(
                       SendFriendRequest(receiverId: suggestion.userId),
+                    );
+                  },
+                  onRemove: () {
+                    context.read<FriendBloc>().add(
+                      RemoveFriendSuggestion(userId: suggestion.userId),
                     );
                   },
                 );

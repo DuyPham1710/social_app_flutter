@@ -202,7 +202,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     ),
 
                     // Content header
-                    PostHeader(user: post.user, createdAt: post.createdAt),
+                    PostHeader(
+                      user: post.user,
+                      createdAt: post.createdAt,
+                      onReportTap: () {
+                        // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
+                      },
+                    ),
 
                     SizedBox(height: 10.h),
 

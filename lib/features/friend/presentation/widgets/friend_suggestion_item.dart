@@ -25,6 +25,7 @@ class FriendSuggestionItem extends StatelessWidget {
   final String avatarUrl;
   final List<String>? mutualFriendAvatars;
   final VoidCallback? onAddFriend;
+  final VoidCallback? onRemove;
   final bool isSent;
 
   const FriendSuggestionItem({
@@ -35,6 +36,7 @@ class FriendSuggestionItem extends StatelessWidget {
     required this.avatarUrl,
     this.mutualFriendAvatars,
     this.onAddFriend,
+    this.onRemove,
     this.isSent = false,
   });
 
@@ -195,7 +197,7 @@ class FriendSuggestionItem extends StatelessWidget {
                           label: 'Gỡ',
                           background: const Color(0xFFE7E7E7),
                           foreground: Colors.black,
-                          onTap: () {},
+                          onTap: onRemove ?? () {},
                         ),
                       ),
                     ],

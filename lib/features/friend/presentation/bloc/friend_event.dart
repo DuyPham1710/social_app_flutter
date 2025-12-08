@@ -73,6 +73,12 @@ class RemoveFriend extends FriendEvent {
   const RemoveFriend({required this.friendId});
 }
 
+class RemoveFriendSuggestion extends FriendEvent {
+  final String userId;
+
+  const RemoveFriendSuggestion({required this.userId});
+}
+
 class LoadFriendsByUserId extends FriendEvent {
   final String userId;
   const LoadFriendsByUserId(this.userId);

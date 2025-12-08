@@ -43,8 +43,8 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              // TODO: Implement search functionality
+              onPressed: () {
+              Navigator.pushNamed(context, '/search');
             },
             icon: const Icon(CupertinoIcons.search, color: Colors.black),
           ),
@@ -289,6 +289,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         onAddFriend: () {
           context.read<FriendBloc>().add(
             SendFriendRequest(receiverId: suggestion.userId),
+          );
+        },
+        onRemove: () {
+          context.read<FriendBloc>().add(
+            RemoveFriendSuggestion(userId: suggestion.userId),
           );
         },
       ),

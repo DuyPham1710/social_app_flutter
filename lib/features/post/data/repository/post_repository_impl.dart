@@ -129,4 +129,22 @@ class PostRepositoryImpl implements PostRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> reportPost({
+    required String postId,
+    required String reason,
+    String? description,
+  }) async {
+    try {
+      await remoteDataSource.reportPost(postId, {
+        'reason': reason,
+        if (description != null && description.isNotEmpty)
+          'description': description,
+      });
+      return DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

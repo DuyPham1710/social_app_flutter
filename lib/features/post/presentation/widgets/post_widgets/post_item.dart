@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
-import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/utils/react_post_util.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
@@ -15,6 +14,8 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/po
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
 
 class PostItem extends StatefulWidget {
   final PostEntity post;
@@ -120,7 +121,17 @@ class _PostItemState extends State<PostItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          PostHeader(user: user, createdAt: widget.post.createdAt),
+          PostHeader(
+            user: user,
+            createdAt: widget.post.createdAt,
+            onReportTap: () {
+              ReportPostBottomSheet.show(
+                context,
+                postId: widget.post.id,
+                ownerUserId: user.userId,
+              );
+            },
+          ),
 
           // Caption
           Padding(

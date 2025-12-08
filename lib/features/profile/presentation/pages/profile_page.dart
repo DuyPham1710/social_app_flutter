@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_edit_page.dart';
+import 'package:social_app_fe/features/search/presentation/pages/search_page.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_actions.dart';
 import '../widgets/profile_info.dart';
