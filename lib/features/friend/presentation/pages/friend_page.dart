@@ -34,7 +34,10 @@ class _FriendPageState extends State<FriendPage> {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        title: const Text('Friend'),
+        title: const Text(
+          'Friend',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
         actions: [
           IconButton(
             onPressed: () {

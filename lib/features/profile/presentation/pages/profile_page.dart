@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/profile_edit_page.dart';
 import 'package:social_app_fe/features/search/presentation/pages/search_page.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_actions.dart';
@@ -115,7 +116,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 SliverList(
                   delegate: SliverChildListDelegate([
                     ProfileHeader(user: user, isLoading: state.isUserLoading),
-                    const ProfileActions(),
+                    ProfileActions(
+                      onTapEdit: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileEditPage(),
+                          ),
+                        );
+                      },
+                    ),
                     const ProfileInfo(),
                     const Divider(),
                     FriendListWidget(

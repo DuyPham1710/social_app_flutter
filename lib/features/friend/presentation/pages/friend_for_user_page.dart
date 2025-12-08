@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_item.dart';
 
 class FriendForUserPage extends StatefulWidget {
@@ -28,7 +28,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
   void initState() {
     super.initState();
     // Load danh sách bạn bè khi khởi tạo
-    context.read<FriendBloc>().add(LoadFriendsByUserId(widget.userId ?? ''));
+    context.read<FriendForUserBloc>().add(
+      LoadFriendsByUserId(widget.userId ?? ''),
+    );
   }
 
   @override
@@ -39,7 +41,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<FriendBloc, FriendState>(
+    return BlocListener<FriendForUserBloc, FriendForUserState>(
       listener: (context, state) {
         if (state is FriendActionSuccess) {
           _showMessage(context, state.message);
@@ -71,7 +73,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
             ),
           ],
         ),
-        body: BlocBuilder<FriendBloc, FriendState>(
+        body: BlocBuilder<FriendForUserBloc, FriendForUserState>(
           builder: (context, state) {
             if (state is FriendLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -268,7 +270,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                     SizedBox(height: 16.h),
                     ElevatedButton(
                       onPressed: () {
-                        context.read<FriendBloc>().add(const LoadFriends());
+                        context.read<FriendForUserBloc>().add(
+                          const LoadFriends(),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -547,7 +551,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
             onPressed: () {
               Navigator.pop(context);
               // Gọi RemoveFriend event với friendId
-              context.read<FriendBloc>().add(RemoveFriend(friendId: friendId));
+              context.read<FriendForUserBloc>().add(
+                RemoveFriend(friendId: friendId),
+              );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Xác nhận'),

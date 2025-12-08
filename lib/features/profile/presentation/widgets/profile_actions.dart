@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class ProfileActions extends StatelessWidget {
-  const ProfileActions({super.key});
+  final VoidCallback? onTapEdit;
+  const ProfileActions({super.key, this.onTapEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class ProfileActions extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            onPressed: () {},
+            onPressed: onTapEdit,
             icon: const Icon(Icons.edit_outlined, color: Colors.black),
             label: const Text(
               'Chỉnh sửa thông tin',
