@@ -11,6 +11,8 @@ class UserEntity {
   final bool? isActive;
   final DateTime? createdAt;
 
+  var coverUrl;
+
   const UserEntity({
     required this.userId,
     this.fullName,

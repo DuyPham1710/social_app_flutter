@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friends_list_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -62,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         builder: (context, state) {
           final posts = state.posts ?? [];
-          final user = state.user;
+          final UserEntity? user = state.user;
           if (user == null) {
             return const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
@@ -93,11 +94,27 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  actions: const [
-                    Icon(Icons.settings_outlined, color: AppColors.textPrimary),
-                    SizedBox(width: 12),
-                    Icon(Icons.search, color: AppColors.iconPrimary),
-                    SizedBox(width: 8),
+                  actions: [
+                    const Icon(
+                      Icons.settings_outlined,
+                      color: AppColors.textPrimary,
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.search,
+                        color: AppColors.iconPrimary,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SearchPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
                   ],
                 ),
 
@@ -110,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ProfileEditPage(),
+                            builder: (context) => ProfileEditPage(user: user),
                           ),
                         );
                       },
