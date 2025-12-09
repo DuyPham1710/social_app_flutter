@@ -105,8 +105,17 @@ Future<void> initializeDependencies() async {
   // Dio
   s1.registerSingleton<Dio>(DioClient.instance);
 
-  // WebSocket - Generic SocketClient
-  s1.registerSingleton<SocketClient>(SocketClient());
+  // WebSocket - Tạo instance riêng cho mỗi namespace
+  // Comment namespace
+  s1.registerSingleton<SocketClient>(
+    SocketClient(),
+    instanceName: 'commentSocket',
+  );
+  // Chat namespace
+  s1.registerSingleton<SocketClient>(
+    SocketClient(),
+    instanceName: 'chatSocket',
+  );
 
   // DataSources
   s1.registerLazySingleton<AuthService>(() => AuthService(s1()));
@@ -116,7 +125,7 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerLazySingleton<CommentRemoteDataSource>(
-    () => CommentRemoteDataSource(s1()),
+    () => CommentRemoteDataSource(s1(instanceName: 'commentSocket')),
   );
 
   s1.registerLazySingleton<StoryRemoteDataSource>(
@@ -132,7 +141,7 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerLazySingleton<ChatRemoteDataSource>(
-    () => ChatRemoteDataSourceImpl(s1()),
+    () => ChatRemoteDataSourceImpl(s1(instanceName: 'chatSocket')),
   );
 
   // Repositories
