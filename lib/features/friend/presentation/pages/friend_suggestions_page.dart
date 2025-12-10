@@ -14,11 +14,56 @@ class FriendSuggestionsPage extends StatefulWidget {
 }
 
 class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
+  late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
     // Load tất cả gợi ý kết bạn khi khởi tạo
     context.read<FriendBloc>().add(const LoadFriendPage());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels < position.maxScrollExtent - 200) return;
+
+    final bloc = context.read<FriendBloc>();
+    final currentState = bloc.state;
+
+    bool hasMore = true;
+    bool isLoadingMore = false;
+    int nextPage = 1;
+
+    if (currentState is FriendPageLoaded) {
+      hasMore = currentState.hasMoreSuggestions;
+      isLoadingMore = currentState.isLoadingMoreSuggestions;
+      nextPage = currentState.suggestionPage + 1;
+    } else if (currentState is FriendSuggestionsLoaded) {
+      hasMore = currentState.hasMoreSuggestions;
+      isLoadingMore = currentState.isLoadingMore;
+      nextPage = currentState.suggestionPage + 1;
+    } else {
+      return;
+    }
+
+    if (!hasMore || isLoadingMore) return;
+
+    bloc.add(
+      LoadFriendSuggestions(
+        page: nextPage,
+        limit: 10,
+        append: true,
+      ),
+    );
   }
 
   @override
@@ -167,10 +212,17 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 await Future.delayed(const Duration(seconds: 1));
               },
               child: ListView.separated(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                itemCount: friendSuggestions.length,
+                itemCount: friendSuggestions.length +
+                    (_isLoadingMore(state) ? 1 : 0),
                 separatorBuilder: (context, index) => SizedBox(height: 8.h),
                 itemBuilder: (context, index) {
+                  if (_isLoadingMore(state) &&
+                      index == friendSuggestions.length) {
+                    return _buildLoadMoreIndicator();
+                  }
                   final suggestion = friendSuggestions[index];
                   return _buildFriendSuggestionCard(
                     suggestion,
@@ -296,6 +348,28 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             RemoveFriendSuggestion(userId: suggestion.userId),
           );
         },
+      ),
+    );
+  }
+
+  bool _isLoadingMore(FriendState state) {
+    if (state is FriendPageLoaded) return state.isLoadingMoreSuggestions;
+    if (state is FriendSuggestionsLoaded) return state.isLoadingMore;
+    return false;
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.h),
+      child: Center(
+        child: SizedBox(
+          width: 28.w,
+          height: 28.w,
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          ),
+        ),
       ),
     );
   }

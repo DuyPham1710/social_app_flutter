@@ -17,8 +17,13 @@ class LoadFriendRequests extends FriendEvent {
 class LoadFriendSuggestions extends FriendEvent {
   final int page;
   final int limit;
+  final bool append;
 
-  const LoadFriendSuggestions({this.page = 1, this.limit = 10});
+  const LoadFriendSuggestions({
+    this.page = 1,
+    this.limit = 10,
+    this.append = false,
+  });
 }
 
 class LoadFriendPage extends FriendEvent {

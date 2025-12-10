@@ -135,10 +135,40 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     Emitter<FriendState> emit,
   ) async {
     final currentState = state;
+    final isAppend = event.append;
 
-    // Nếu đã có FriendPageLoaded, chỉ cập nhật loading state
+    // Nếu đã có FriendPageLoaded hoặc FriendSuggestionsLoaded, cập nhật loading state phù hợp
     if (currentState is FriendPageLoaded) {
-      emit(currentState.copyWith(isLoadingSuggestions: true));
+      if (isAppend) {
+        if (currentState.isLoadingMoreSuggestions ||
+            !currentState.hasMoreSuggestions) {
+          return;
+        }
+        emit(currentState.copyWith(isLoadingMoreSuggestions: true));
+      } else {
+        emit(
+          currentState.copyWith(
+            isLoadingSuggestions: true,
+            suggestionPage: 1,
+            hasMoreSuggestions: true,
+          ),
+        );
+      }
+    } else if (currentState is FriendSuggestionsLoaded) {
+      if (isAppend) {
+        if (currentState.isLoadingMore || !currentState.hasMoreSuggestions) {
+          return;
+        }
+        emit(currentState.copyWith(isLoadingMore: true));
+      } else {
+        emit(
+          currentState.copyWith(
+            isLoadingMore: false,
+            suggestionPage: 1,
+            hasMoreSuggestions: true,
+          ),
+        );
+      }
     } else {
       emit(FriendSuggestionsLoading());
     }
@@ -149,15 +179,50 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     );
 
     if (dataState is DataStateSuccess) {
+      final fetchedSuggestions = dataState.data ?? [];
+      final hasMore = fetchedSuggestions.length >= event.limit;
+
       if (currentState is FriendPageLoaded) {
+        final updatedSuggestions = isAppend
+            ? [
+                ...currentState.friendSuggestions,
+                ...fetchedSuggestions,
+              ]
+            : fetchedSuggestions;
+
         emit(
           currentState.copyWith(
-            friendSuggestions: dataState.data!,
+            friendSuggestions: updatedSuggestions,
             isLoadingSuggestions: false,
+            isLoadingMoreSuggestions: false,
+            suggestionPage: event.page,
+            hasMoreSuggestions: hasMore,
+          ),
+        );
+      } else if (currentState is FriendSuggestionsLoaded) {
+        final updatedSuggestions = isAppend
+            ? [
+                ...currentState.friendSuggestions,
+                ...fetchedSuggestions,
+              ]
+            : fetchedSuggestions;
+
+        emit(
+          currentState.copyWith(
+            friendSuggestions: updatedSuggestions,
+            isLoadingMore: false,
+            suggestionPage: event.page,
+            hasMoreSuggestions: hasMore,
           ),
         );
       } else {
-        emit(FriendSuggestionsLoaded(friendSuggestions: dataState.data!));
+        emit(
+          FriendSuggestionsLoaded(
+            friendSuggestions: fetchedSuggestions,
+            suggestionPage: event.page,
+            hasMoreSuggestions: hasMore,
+          ),
+        );
       }
     } else if (dataState is DataStateError) {
       final errorMessage =
@@ -165,9 +230,19 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
           dataState.error?.response?.data?['message'] ??
           'Lỗi không xác định khi tải gợi ý bạn bè';
       if (currentState is FriendPageLoaded) {
-        emit(currentState.copyWith(isLoadingSuggestions: false));
+        emit(
+          currentState.copyWith(
+            isLoadingSuggestions: false,
+            isLoadingMoreSuggestions: false,
+          ),
+        );
+        emit(FriendActionError(message: errorMessage));
+      } else if (currentState is FriendSuggestionsLoaded) {
+        emit(currentState.copyWith(isLoadingMore: false));
+        emit(FriendActionError(message: errorMessage));
+      } else {
+        emit(FriendError(message: errorMessage));
       }
-      emit(FriendError(message: errorMessage));
     }
   }
 
@@ -186,7 +261,9 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
 
     // Load cả friend requests và friend suggestions song song
     final requestsFuture = getFriendRequestsUseCase(received: true);
-    final suggestionsFuture = getFriendSuggestionsUseCase(page: 1, limit: 10);
+    const suggestionLimit = 10;
+    final suggestionsFuture =
+        getFriendSuggestionsUseCase(page: 1, limit: suggestionLimit);
 
     final results = await Future.wait([requestsFuture, suggestionsFuture]);
     final requestsResult = results[0] as dynamic;
@@ -207,6 +284,8 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
       FriendPageLoaded(
         friendRequests: friendRequests,
         friendSuggestions: friendSuggestions,
+        suggestionPage: 1,
+        hasMoreSuggestions: friendSuggestions.length >= suggestionLimit,
         isLoadingRequests: false,
         isLoadingSuggestions: false,
       ),
