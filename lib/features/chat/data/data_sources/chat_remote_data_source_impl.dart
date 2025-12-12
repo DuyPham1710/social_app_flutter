@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:dio/dio.dart';
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
 import 'package:social_app_fe/features/chat/data/models/message-edit-log_model.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
@@ -11,6 +12,7 @@ import 'chat_remote_data_source.dart';
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   final SocketClient _socketClient;
+  final Dio _dio;
 
   // Stream controllers for real-time events
   final _conversationsLoadedController =
@@ -39,7 +41,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   bool _isConnected = false;
   Completer<void>? _connectionCompleter;
 
-  ChatRemoteDataSourceImpl(this._socketClient);
+  ChatRemoteDataSourceImpl(this._socketClient, this._dio);
 
   // Getters
   @override
@@ -716,7 +718,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     });
   }
 
-  /// Send message
+  /// Send message (WebSocket)
   @override
   void sendMessage({
     required String userId,
@@ -756,6 +758,78 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     }
 
     _socketClient.emit('message:send', messageData);
+  }
+
+  /// Upload files and return attachments URLs (HTTP with MultipartFile)
+  @override
+  Future<List<Map<String, dynamic>>> sendMessageWithFiles({
+    required String conversationId,
+    String? text,
+    List<String>? filePaths,
+    String? replyTo,
+  }) async {
+    developer.log(
+      'Uploading files via HTTP for conversation: $conversationId',
+      name: 'ChatDataSource',
+    );
+
+    try {
+      // Create FormData
+      final formData = FormData();
+
+      // Add conversationId
+      formData.fields.add(MapEntry('conversationId', conversationId));
+
+      // Add text if provided
+      if (text != null && text.isNotEmpty) {
+        formData.fields.add(MapEntry('text', text));
+      }
+
+      // Add replyTo if provided
+      if (replyTo != null && replyTo.isNotEmpty) {
+        formData.fields.add(MapEntry('replyTo', replyTo));
+      }
+
+      // Add files if provided
+      if (filePaths != null && filePaths.isNotEmpty) {
+        for (var filePath in filePaths) {
+          final fileName = filePath.split('/').last;
+          formData.files.add(
+            MapEntry(
+              'files',
+              await MultipartFile.fromFile(
+                filePath,
+                filename: fileName,
+              ),
+            ),
+          );
+        }
+      }
+
+      // Send POST request
+      final response = await _dio.post(
+        '/chat/send-message',
+        data: formData,
+      );
+
+      developer.log(
+        'Files uploaded successfully: ${response.data}',
+        name: 'ChatDataSource',
+      );
+
+      // Extract attachments từ response
+      final attachments = (response.data['attachments'] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
+          .toList();
+
+      return attachments;
+    } catch (e) {
+      developer.log(
+        'Error uploading files: $e',
+        name: 'ChatDataSource',
+      );
+      throw Exception('Failed to upload files: $e');
+    }
   }
 
   @override

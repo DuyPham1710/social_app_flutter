@@ -1,9 +1,11 @@
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import '../../domain/entities/parent_message_entity.dart';
+import 'chat_models.dart';
 
 class ParentMessageModel {
   final String id;
   final String text;
+  final List<AttachmentModel> attachments;
   final UserModel sender;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -11,6 +13,7 @@ class ParentMessageModel {
   ParentMessageModel({
     required this.id,
     required this.text,
+    this.attachments = const [],
     required this.sender,
     required this.createdAt,
     required this.updatedAt,
@@ -19,7 +22,12 @@ class ParentMessageModel {
   factory ParentMessageModel.fromJson(Map<String, dynamic> json) {
     return ParentMessageModel(
       id: json['_id'] as String,
-      text: json['text'] as String,
+      text: json['text'] as String? ?? '',
+      attachments: json['attachments'] != null
+          ? (json['attachments'] as List)
+              .map((e) => AttachmentModel.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
       sender: UserModel.fromJson(json['senderId'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -29,6 +37,7 @@ class ParentMessageModel {
   Map<String, dynamic> toJson() => {
     '_id': id,
     'text': text,
+    'attachments': attachments.map((e) => e.toJson()).toList(),
     'senderId': sender.toJson(),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
@@ -37,6 +46,7 @@ class ParentMessageModel {
   ParentMessageEntity toEntity() => ParentMessageEntity(
     id: id,
     text: text,
+    attachments: attachments.map((e) => e.toEntity()).toList(),
     sender: sender.toEntity(),
     createdAt: createdAt,
     updatedAt: updatedAt,

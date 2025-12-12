@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 
 class ConversationEntity extends Equatable {
@@ -44,16 +45,18 @@ class ConversationEntity extends Equatable {
 class LastMessageEntity extends Equatable {
   final String id;
   final String? text;
+  final List<AttachmentEntity> attachments;
   final UserEntity sender;
   final DateTime createdAt;
 
   const LastMessageEntity({
     required this.id,
     this.text,
+    this.attachments = const [],
     required this.sender,
     required this.createdAt,
   });
 
   @override
-  List<Object?> get props => [id, text, sender, createdAt];
+  List<Object?> get props => [id, text, attachments, sender, createdAt];
 }

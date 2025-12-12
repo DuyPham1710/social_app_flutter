@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:photo_manager/photo_manager.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
@@ -24,6 +27,9 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/grid_image_item.dart';
+import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
+import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
@@ -87,6 +93,52 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   String? _currentConversationId;
   bool _isCreatingConversation = false;
 
+  // Track input expansion state
+  bool _isInputExpanded = false;
+
+  // Track photo picker state
+  bool _showPhotoPicker = false;
+  List<AssetEntity> _photoList = [];
+  bool _isLoadingPhotos = false;
+  bool _isLoadingMorePhotos = false;
+  int _currentPhotoPage = 0;
+  static const int _photosPerPage = 50;
+  bool _hasMorePhotos = true;
+
+  // Selected photos
+  List<AssetEntity> _selectedPhotos = [];
+
+  // Cache cho thumbnails
+  final Map<String, Uint8List> _thumbnailCache = {};
+
+  // Photo picker height và drag
+  double _photoPickerHeight = 0.0;
+  final ScrollController _photoPickerScrollController = ScrollController();
+
+  // Captured photo from camera
+  String? _capturedPhotoPath;
+
+  // Helper methods để tính min/max height
+  double _getPhotoPickerMinHeight() {
+    // 50% màn hình
+    return MediaQuery.of(context).size.height * 0.5;
+  }
+
+  double _getPhotoPickerMaxHeight() {
+    // 100% màn hình (trừ safe area top và bottom, app bar, và input area)
+    final screenHeight = MediaQuery.of(context).size.height;
+    final safeAreaTop = MediaQuery.of(context).padding.top;
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+    final appBarHeight = AppBar().preferredSize.height;
+    final inputAreaHeight = 100.0; // Chiều cao input area
+    // Trừ đi app bar, safe area top, input area, và safe area bottom
+    return screenHeight -
+        safeAreaTop -
+        appBarHeight -
+        inputAreaHeight -
+        safeAreaBottom;
+  }
+
   // @override
   // void didChangeDependencies() {
   //   super.didChangeDependencies();
@@ -119,6 +171,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     // Listen to scroll positions để detect khi cần load more
     _itemPositionsListener.itemPositions.addListener(_onScrollPositionChanged);
 
+    // Listen to focus changes để mở rộng input
+    _focusNode.addListener(_onFocusChanged);
+
     // Nếu có conversationId, thực hiện load messages
     if (widget.conversationId != null) {
       _currentConversationId = widget.conversationId;
@@ -144,11 +199,53 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     }
   }
 
+  void _onFocusChanged() {
+    // Không tự động set expanded khi focus, để có thể toggle
+    // Chỉ set expanded = false khi unfocus
+    if (!_focusNode.hasFocus) {
+      setState(() {
+        _isInputExpanded = false;
+      });
+    } else {
+      setState(() {
+        _showPhotoPicker = false;
+      });
+    }
+  }
+
+  void _toggleInputExpansion() {
+    setState(() {
+      _isInputExpanded = !_isInputExpanded;
+    });
+    // Đảm bảo input vẫn được focus
+    if (!_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
+  }
+
+  void _collapseInput() {
+    setState(() {
+      _isInputExpanded = false;
+    });
+  }
+
+  void _onPhotoPickerScroll(ScrollController scrollController) {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent * 0.8) {
+      // Load more khi scroll đến 80% cuối
+      if (!_isLoadingMorePhotos && _hasMorePhotos) {
+        _loadMorePhotos();
+      }
+    }
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
     _highlightController.dispose();
+    _focusNode.removeListener(_onFocusChanged);
     _focusNode.dispose();
+    _photoPickerScrollController.dispose();
     _typingDebounceTimer?.cancel();
     _highlightTimer?.cancel();
     super.dispose();
@@ -1440,6 +1537,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       children: [
         if (_replyingMessage != null) _buildReplyPreview(),
         if (_editMessage != null) _buildEditPreview(),
+        if (_capturedPhotoPath != null) _buildCapturedPhotoPreview(),
 
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
@@ -1451,32 +1549,60 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           ),
           child: Row(
             children: [
-              IconButton(
-                icon: Icon(
-                  CupertinoIcons.plus_circle_fill,
-                  color: AppColors.primary,
-                  size: 24.sp,
+              // Mũi tên bên trái (chỉ hiện khi input expanded)
+              if (_isInputExpanded)
+                IconButton(
+                  icon: Icon(
+                    CupertinoIcons.chevron_right,
+                    color: AppColors.primary,
+                    size: 24.sp,
+                  ),
+                  onPressed: _collapseInput,
                 ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(
-                  CupertinoIcons.camera_fill,
-                  color: AppColors.primary,
-                  size: 24.sp,
+
+              // Các icon chỉ hiện khi input chưa expanded
+              if (!_isInputExpanded) ...[
+                IconButton(
+                  icon: Icon(
+                    CupertinoIcons.plus_circle_fill,
+                    color: AppColors.primary,
+                    size: 24.sp,
+                  ),
+                  onPressed: () {},
                 ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(
-                  CupertinoIcons.photo_fill,
-                  color: AppColors.primary,
-                  size: 24.sp,
+                IconButton(
+                  icon: Icon(
+                    CupertinoIcons.camera_fill,
+                    color: AppColors.primary,
+                    size: 24.sp,
+                  ),
+                  onPressed: _openCamera,
                 ),
-                onPressed: () {},
-              ),
+                IconButton(
+                  icon: Icon(
+                    CupertinoIcons.photo_fill,
+                    color: AppColors.primary,
+                    size: 24.sp,
+                  ),
+                  onPressed: () async {
+                    if (!_showPhotoPicker) {
+                      // Mở photo picker - request permission và load ảnh
+                      await _requestPhotoPermissionAndLoad();
+                    } else {
+                      // Đóng photo picker
+                      setState(() {
+                        _showPhotoPicker = false;
+                      });
+                    }
+                  },
+                ),
+              ],
+
               Expanded(
                 child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: _isInputExpanded ? 120.h : 50.h,
+                  ),
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
                   decoration: BoxDecoration(
                     color: AppColors.textSecondary.withOpacity(0.1),
@@ -1487,6 +1613,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                     focusNode: _focusNode,
                     onChanged: _onTextChanged,
                     onTap: () {
+                      // Toggle expansion khi ấn vào TextField
+                      _toggleInputExpansion();
+
                       // Scroll sau khi keyboard animation hoàn thành
                       Future.delayed(const Duration(milliseconds: 350), () {
                         if (mounted) {
@@ -1494,6 +1623,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                         }
                       });
                     },
+                    maxLines: _isInputExpanded ? null : 1,
+                    minLines: 1,
+                    textInputAction: TextInputAction.newline,
+                    keyboardType: _isInputExpanded
+                        ? TextInputType.multiline
+                        : TextInputType.text,
                     decoration: InputDecoration(
                       hintText: "Nhắn tin...",
                       hintStyle: TextStyle(
@@ -1501,6 +1636,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                         color: AppColors.textSecondary,
                       ),
                       border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 0,
+                        vertical: 8.h,
+                      ),
+                      isDense: true,
                     ),
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -1517,12 +1657,14 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ],
           ),
         ),
+
+        if (_showPhotoPicker) _buildPhotoPicker(),
       ],
     );
   }
 
   Widget _buildReplyPreview() {
-    final replyText = _replyingMessage!.text ?? 'Đã gửi file đính kèm';
+    final replyText = _replyingMessage!.text ?? '[Ảnh]';
     final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
 
     String name;
@@ -1583,6 +1725,15 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ),
           ),
 
+          // how to fix
+          _replyingMessage!.attachments.isNotEmpty
+              ? Image(
+                  image: NetworkImage(_replyingMessage!.attachments.first.url),
+                  width: 30.w,
+                  height: 40.h,
+                  fit: BoxFit.cover,
+                )
+              : SizedBox.shrink(),
           GestureDetector(
             onTap: _clearReplyMessage,
             child: Padding(
@@ -1661,6 +1812,712 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _requestPhotoPermissionAndLoad() async {
+    PermissionStatus status;
+
+    if (Platform.isIOS) {
+      // iOS dùng quyền photos
+      status = await Permission.photos.request();
+    } else {
+      // Android
+      if (Platform.isAndroid) {
+        // Android 13 (SDK 33+) trở lên có quyền riêng cho ảnh
+        if (await Permission.photos.isGranted ||
+            await Permission.photos.request().isGranted) {
+          status = PermissionStatus.granted;
+        } else {
+          // Dự phòng cho các bản Android cũ hơn
+          status = await Permission.storage.request();
+        }
+      } else {
+        status = await Permission.storage.request();
+      }
+    }
+
+    if (status.isGranted) {
+      _focusNode.unfocus();
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      setState(() {
+        _showPhotoPicker = true;
+        _isLoadingPhotos = true;
+        _photoPickerHeight = _getPhotoPickerMinHeight();
+      });
+      await _loadPhotos();
+    } else if (status.isPermanentlyDenied) {
+      // Hiển thị dialog yêu cầu mở settings
+      if (mounted) {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Quyền truy cập ảnh'),
+            content: const Text(
+              'Ứng dụng cần quyền truy cập ảnh để hiển thị ảnh từ thư viện. Vui lòng cấp quyền trong Cài đặt.',
+            ),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('Hủy'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              CupertinoDialogAction(
+                child: const Text('Mở Cài đặt'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  openAppSettings();
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cần quyền truy cập ảnh để tiếp tục'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _loadPhotos() async {
+    try {
+      // Lấy album "Tất cả ảnh"
+      final albums = await PhotoManager.getAssetPathList(
+        type: RequestType.common, // bao gồm cả ảnh và video
+        onlyAll: true,
+        filterOption: FilterOptionGroup(
+          orders: [
+            OrderOption(
+              type: OrderOptionType.updateDate,
+              asc: false, // Load ảnh mới nhất trước
+            ),
+          ],
+        ),
+      );
+
+      if (albums.isEmpty) {
+        setState(() {
+          _isLoadingPhotos = false;
+          _hasMorePhotos = false;
+        });
+        return;
+      }
+
+      final recent = albums.first;
+      // Load 50 ảnh đầu tiên (từ mới nhất)
+      final media = await recent.getAssetListPaged(
+        page: _currentPhotoPage,
+        size: _photosPerPage,
+      );
+
+      setState(() {
+        _photoList = media;
+        _isLoadingPhotos = false;
+        _currentPhotoPage = 0;
+        _hasMorePhotos = media.length == _photosPerPage;
+        _selectedPhotos.clear(); // Clear selection khi load lại
+      });
+    } catch (e) {
+      print('Error loading photos: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingPhotos = false;
+          _hasMorePhotos = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi tải ảnh: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _loadMorePhotos() async {
+    if (_isLoadingMorePhotos || !_hasMorePhotos) return;
+
+    setState(() {
+      _isLoadingMorePhotos = true;
+    });
+
+    try {
+      final albums = await PhotoManager.getAssetPathList(
+        type: RequestType.image,
+        onlyAll: true,
+        filterOption: FilterOptionGroup(
+          orders: [
+            OrderOption(
+              type: OrderOptionType.updateDate,
+              asc: false, // Load ảnh mới nhất trước
+            ),
+          ],
+        ),
+      );
+
+      if (albums.isEmpty) {
+        setState(() {
+          _isLoadingMorePhotos = false;
+          _hasMorePhotos = false;
+        });
+        return;
+      }
+
+      final recent = albums.first;
+      final nextPage = _currentPhotoPage + 1;
+      final media = await recent.getAssetListPaged(
+        page: nextPage,
+        size: _photosPerPage,
+      );
+
+      if (mounted) {
+        setState(() {
+          _photoList.addAll(media);
+          _currentPhotoPage = nextPage;
+          _isLoadingMorePhotos = false;
+          _hasMorePhotos = media.length == _photosPerPage;
+        });
+      }
+    } catch (e) {
+      print('Error loading more photos: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingMorePhotos = false;
+          _hasMorePhotos = false;
+        });
+      }
+    }
+  }
+
+  Future<Uint8List?> _getCachedThumbnail(
+    AssetEntity asset,
+    ThumbnailSize size,
+  ) async {
+    final cacheKey = '${asset.id}_${size.width}_${size.height}';
+
+    if (_thumbnailCache.containsKey(cacheKey)) {
+      return _thumbnailCache[cacheKey];
+    }
+
+    final thumbnail = await asset.thumbnailDataWithSize(size);
+    if (thumbnail != null) {
+      _thumbnailCache[cacheKey] = thumbnail;
+    }
+    return thumbnail;
+  }
+
+  void _togglePhotoSelection(AssetEntity asset) {
+    setState(() {
+      if (_selectedPhotos.contains(asset)) {
+        _selectedPhotos.remove(asset);
+      } else {
+        _selectedPhotos.add(asset);
+      }
+    });
+  }
+
+  int _getPhotoIndex(AssetEntity asset) {
+    return _selectedPhotos.indexOf(asset) + 1;
+  }
+
+  bool _isPhotoSelected(AssetEntity asset) {
+    return _selectedPhotos.contains(asset);
+  }
+
+  Future<void> _openCamera() async {
+    try {
+      // Check camera permissions first
+      final hasPermissions = await CameraHelper.requestCameraPermissions();
+
+      if (!hasPermissions) {
+        if (mounted) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) => CupertinoAlertDialog(
+              title: const Text('Quyền truy cập Camera'),
+              content: const Text(
+                'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('Hủy'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CupertinoDialogAction(
+                  child: const Text('Mở Cài đặt'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    openAppSettings();
+                  },
+                ),
+              ],
+            ),
+          );
+        }
+        return;
+      }
+
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CameraScreen()),
+      );
+
+      if (result != null && result is Map<String, dynamic>) {
+        // Handle camera result - only handle photos for now
+        if (result['type'] == 'photo' && result['path'] != null) {
+          setState(() {
+            _capturedPhotoPath = result['path'] as String;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error opening camera: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi mở camera: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildCapturedPhotoPreview() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border(
+          top: BorderSide(color: AppColors.textSecondary.withOpacity(0.2)),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Preview image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Image.file(
+              File(_capturedPhotoPath!),
+              width: 60.w,
+              height: 60.w,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ảnh vừa chụp',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Nhấn gửi để chia sẻ',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Send button
+          GestureDetector(
+            onTap: _sendCapturedPhoto,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.paperplane_fill,
+                    color: Colors.white,
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    'Gửi',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          // Cancel button
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _capturedPhotoPath = null;
+              });
+            },
+            child: Padding(
+              padding: EdgeInsets.only(left: 4.w, top: 4.h),
+              child: Icon(
+                CupertinoIcons.clear_circled_solid,
+                size: 24,
+                color: AppColors.textSecondary.withOpacity(0.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendCapturedPhoto() async {
+    if (_capturedPhotoPath == null) return;
+
+    try {
+      final conversationId = _currentConversationId ?? widget.conversationId;
+      if (conversationId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể gửi ảnh: thiếu conversation ID'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      // Stop typing when sending message
+      _typingDebounceTimer?.cancel();
+      final messageBloc = context.read<MessageBloc>();
+      messageBloc.emitTypingStop(widget.userId, conversationId);
+
+      // Send message with file via HTTP (MultipartFile)
+      messageBloc.add(
+        SendMessageWithFilesEvent(
+          userId: widget.userId,
+          conversationId: conversationId,
+          filePaths: [_capturedPhotoPath!],
+          replyTo: _replyingMessage?.id,
+        ),
+      );
+
+      // Scroll to bottom after sending
+      _scrollToBottom();
+
+      // Clear captured photo after sending
+      setState(() {
+        _capturedPhotoPath = null;
+        _replyingMessage = null; // Clear reply if any
+      });
+    } catch (e) {
+      print('Error sending captured photo: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi gửi ảnh: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _sendSelectedPhotos() async {
+    if (_selectedPhotos.isEmpty) return;
+
+    try {
+      final conversationId = _currentConversationId ?? widget.conversationId;
+      if (conversationId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể gửi ảnh: thiếu conversation ID'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      // Get file paths from selected photos
+      final List<String> filePaths = [];
+
+      for (final asset in _selectedPhotos) {
+        try {
+          // Get file from asset
+          final file = await asset.file;
+          if (file == null) continue;
+
+          // Add file path
+          filePaths.add(file.path);
+        } catch (e) {
+          print('Error getting file path from asset: $e');
+          // Continue with other photos
+        }
+      }
+
+      if (filePaths.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Không thể xử lý ảnh'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
+
+      // Stop typing when sending message
+      _typingDebounceTimer?.cancel();
+      final messageBloc = context.read<MessageBloc>();
+      messageBloc.emitTypingStop(widget.userId, conversationId);
+
+      // Send message with files via HTTP (MultipartFile)
+      messageBloc.add(
+        SendMessageWithFilesEvent(
+          userId: widget.userId,
+          conversationId: conversationId,
+          filePaths: filePaths,
+        ),
+      );
+
+      // Scroll to bottom after sending
+      _scrollToBottom();
+
+      // Đóng photo picker sau khi gửi
+      setState(() {
+        _showPhotoPicker = false;
+        _selectedPhotos.clear();
+      });
+    } catch (e) {
+      print('Error sending photos: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi gửi ảnh: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildPhotoPicker() {
+    final minHeight = _getPhotoPickerMinHeight();
+    final maxHeight = _getPhotoPickerMaxHeight();
+
+    return GestureDetector(
+      onVerticalDragUpdate: (details) {
+        // Kéo lên/xuống để thay đổi height
+        setState(() {
+          _photoPickerHeight = (_photoPickerHeight - details.delta.dy).clamp(
+            minHeight,
+            maxHeight,
+          );
+        });
+      },
+      onVerticalDragEnd: (details) {
+        // Snap về min hoặc max khi thả
+        final velocity = details.primaryVelocity ?? 0;
+        setState(() {
+          if (velocity > 500) {
+            // Kéo xuống nhanh -> đóng
+            _photoPickerHeight = 0;
+            _showPhotoPicker = false;
+          } else if (velocity < -500) {
+            // Kéo lên nhanh -> mở rộng
+            _photoPickerHeight = maxHeight;
+          } else {
+            // Kéo chậm -> snap về gần nhất
+            if (_photoPickerHeight < (minHeight + maxHeight) / 2) {
+              _photoPickerHeight = minHeight;
+            } else {
+              _photoPickerHeight = maxHeight;
+            }
+          }
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+        height: _photoPickerHeight,
+        constraints: BoxConstraints(maxHeight: _getPhotoPickerMaxHeight()),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          border: Border(
+            top: BorderSide(color: AppColors.textSecondary.withOpacity(0.2)),
+          ),
+        ),
+        child: Column(
+          children: [
+            // Handle bar để kéo
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  final minHeight = _getPhotoPickerMinHeight();
+                  final maxHeight = _getPhotoPickerMaxHeight();
+                  if (_photoPickerHeight == minHeight) {
+                    _photoPickerHeight = maxHeight;
+                  } else {
+                    _photoPickerHeight = minHeight;
+                  }
+                });
+              },
+              child: Container(
+                margin: EdgeInsets.only(top: 8.h, bottom: 8.h),
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondary.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+            ),
+
+            // Header với nút gửi nếu có ảnh được chọn
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              child: Row(
+                children: [
+                  Icon(
+                    CupertinoIcons.photo_on_rectangle,
+                    color: AppColors.primary,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Tất cả ảnh',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (_selectedPhotos.isNotEmpty)
+                    GestureDetector(
+                      onTap: () {
+                        _sendSelectedPhotos();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        child: Text(
+                          'Gửi (${_selectedPhotos.length})',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _photoPickerHeight = 0;
+                          _showPhotoPicker = false;
+                        });
+                      },
+                      child: Icon(
+                        CupertinoIcons.chevron_down,
+                        color: AppColors.textSecondary,
+                        size: 16.sp,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Grid ảnh
+            Flexible(
+              child: _isLoadingPhotos
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : _photoList.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Không có ảnh nào',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    )
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: (notification) {
+                        if (notification is ScrollUpdateNotification) {
+                          _onPhotoPickerScroll(_photoPickerScrollController);
+                        }
+                        return false;
+                      },
+                      child: GridView.builder(
+                        controller: _photoPickerScrollController,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 4.w,
+                          mainAxisSpacing: 4.h,
+                        ),
+                        itemCount:
+                            _photoList.length + (_isLoadingMorePhotos ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          // Loading indicator ở cuối
+                          if (index == _photoList.length) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primary,
+                              ),
+                            );
+                          }
+
+                          final asset = _photoList[index];
+                          return GridImageItem(
+                            key: ValueKey(asset.id),
+                            asset: asset,
+                            isSelected: _isPhotoSelected(asset),
+                            selectedIndex: _isPhotoSelected(asset)
+                                ? _getPhotoIndex(asset)
+                                : 0,
+                            onTap: () => _togglePhotoSelection(asset),
+                            getCachedThumbnail: _getCachedThumbnail,
+                          );
+                        },
+                      ),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
