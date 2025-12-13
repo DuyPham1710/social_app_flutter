@@ -3,17 +3,11 @@ import 'package:social_app_fe/features/notification/domain/entities/notification
 abstract class NotificationRepository {
   void connect(String userId);
 
-  Stream<NotificationEntity> get newNotificationStream;
-
-  Stream<int> get unreadCountStream;
-
-  Stream<List<NotificationEntity>> get notificationsLoadedStream;
-
-  void loadNotifications();
+  Stream<List<NotificationEntity>> get notifications;
+  Stream<NotificationEntity> get newNotification;
+  Stream<int> get unreadCount;
 
   void markRead(String notificationId);
-
   void markAllRead();
-
-  void disconnect();
 }
+

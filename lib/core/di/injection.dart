@@ -56,6 +56,14 @@ import 'package:social_app_fe/features/friend/domain/usecases/send_friend_reques
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
+import 'package:social_app_fe/features/notification/data/data_sources/remote/notification_socket_datasource.dart';
+import 'package:social_app_fe/features/notification/data/repository/notification_repository_impl.dart';
+import 'package:social_app_fe/features/notification/domain/repository/notification_repository.dart';
+import 'package:social_app_fe/features/notification/domain/usecases/connect_notification_socket_usecase.dart';
+import 'package:social_app_fe/features/notification/domain/usecases/load_notifications_usecase.dart';
+import 'package:social_app_fe/features/notification/domain/usecases/mark_all_notifications_read_usecase.dart';
+import 'package:social_app_fe/features/notification/domain/usecases/mark_notification_read_usecase.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
@@ -322,8 +330,12 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<SendMessageUseCase>(() => SendMessageUseCase(s1()));
   s1.registerLazySingleton<EditMessageUseCase>(() => EditMessageUseCase(s1()));
-  s1.registerLazySingleton<DeleteMessageUseCase>(() => DeleteMessageUseCase(s1()));
-  s1.registerLazySingleton<ReactMessageUseCase>(() => ReactMessageUseCase(s1()));
+  s1.registerLazySingleton<DeleteMessageUseCase>(
+    () => DeleteMessageUseCase(s1()),
+  );
+  s1.registerLazySingleton<ReactMessageUseCase>(
+    () => ReactMessageUseCase(s1()),
+  );
   s1.registerLazySingleton<ListenMessageUpdatedUseCase>(
     () => ListenMessageUpdatedUseCase(s1()),
   );
@@ -358,6 +370,34 @@ Future<void> initializeDependencies() async {
       loadCommentsUseCase: s1(),
     ),
   );
+
+  // Notification namespace
+  s1.registerSingleton<SocketClient>(
+    SocketClient(),
+    instanceName: 'notificationSocket',
+  );
+
+  // UseCases
+  // s1.registerLazySingleton(() => ConnectNotificationSocketUseCase(s1()));
+  // s1.registerLazySingleton(() => LoadNotificationsUseCase(s1()));
+  // s1.registerLazySingleton(() => MarkNotificationReadUseCase(s1()));
+  // s1.registerLazySingleton(() => MarkAllNotificationsReadUseCase(s1()));
+
+  // Repository
+  s1.registerLazySingleton<NotificationSocketDataSource>(
+    () => NotificationSocketDataSource(
+      s1<SocketClient>(instanceName: 'notificationSocket'),
+    ),
+  );
+
+  s1.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(s1()),
+  );
+
+  s1.registerFactory<NotificationBloc>(
+    () => NotificationBloc(s1<NotificationRepository>()),
+  );
+
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),

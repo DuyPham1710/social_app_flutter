@@ -16,7 +16,7 @@ class SocketClient {
   void connect({
     required String namespace,
     required String userId,
-    required String username,
+    String? username,
   }) {
     if (_socket != null &&
         _socket!.connected &&

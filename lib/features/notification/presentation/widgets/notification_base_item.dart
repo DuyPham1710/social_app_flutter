@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class NotificationBaseItem extends StatelessWidget {
   final String avatarUrl;
   final Widget iconOverlay;
-  final String title;
+  final Widget title; // ✅ đổi từ String -> Widget
   final String? preview;
   final String time;
   final bool isRead;
@@ -22,13 +22,13 @@ class NotificationBaseItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: isRead
-          ? const Color(0xFFFFFFFF)
-          : const Color(0xFFEAF3FF), // màu nền khi chưa đọc
+          ? Colors.white
+          : const Color(0xFFEAF3FF), // chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar + icon overlay
+          // Avatar + icon
           Stack(
             children: [
               ClipOval(
@@ -45,18 +45,12 @@ class NotificationBaseItem extends StatelessWidget {
 
           const SizedBox(width: 12),
 
-          // Text
+          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                title,
 
                 if (preview != null)
                   Padding(
@@ -72,7 +66,10 @@ class NotificationBaseItem extends StatelessWidget {
 
                 const SizedBox(height: 4),
 
-                Text(time, style: TextStyle(color: Colors.grey.shade600)),
+                Text(
+                  time,
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
               ],
             ),
           ),

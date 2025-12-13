@@ -1,45 +1,34 @@
-import 'package:social_app_fe/features/notification/data/data_sources/remote/notification_remote_data_source.dart';
-import 'package:social_app_fe/features/notification/domain/entities/notification_entity.dart';
+import 'package:social_app_fe/features/notification/data/data_sources/remote/notification_socket_datasource.dart';
+import 'package:social_app_fe/features/notification/data/models/notification_model.dart';
 import 'package:social_app_fe/features/notification/domain/repository/notification_repository.dart';
 
+import '../../domain/entities/notification_entity.dart';
+
 class NotificationRepositoryImpl implements NotificationRepository {
-  final NotificationRemoteDataSource _remote;
+  final NotificationSocketDataSource datasource;
 
-  NotificationRepositoryImpl(this._remote);
-
-  @override
-  void connect(String userId) {
-    _remote.connect(userId);
-  }
+  NotificationRepositoryImpl(this.datasource);
 
   @override
-  Stream<NotificationEntity> get newNotificationStream =>
-      _remote.newNotificationStream;
+  void connect(String userId) => datasource.connect(userId);
 
   @override
-  Stream<int> get unreadCountStream => _remote.unreadCountStream;
+  Stream<List<NotificationEntity>> get notifications =>
+      datasource.notifications.map(
+        (list) => list.map((e) => e.toEntity()).toList(),
+      );
 
   @override
-  Stream<List<NotificationEntity>> get notificationsLoadedStream =>
-      _remote.notificationsLoadedStream;
+  Stream<NotificationEntity> get newNotification =>
+      datasource.newNotification.map((e) => e.toEntity());
 
   @override
-  void loadNotifications() {
-    _remote.loadNotifications();
-  }
+  Stream<int> get unreadCount => datasource.unreadCount;
 
   @override
-  void markRead(String notificationId) {
-    _remote.markRead(notificationId);
-  }
+  void markRead(String notificationId) =>
+      datasource.markRead(notificationId);
 
   @override
-  void markAllRead() {
-    _remote.markAllRead();
-  }
-
-  @override
-  void disconnect() {
-    _remote.disconnect();
-  }
+  void markAllRead() => datasource.markAllRead();
 }
