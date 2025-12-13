@@ -89,7 +89,10 @@ class FriendRequestNotificationItem extends StatelessWidget {
 
                 Row(
                   children: [
-                    Text(time, style: TextStyle(color: Colors.grey.shade700)),
+                    Text(
+                      time == "0 phút" ? "Vừa xong" : time,
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
                   ],
                 ),
 
