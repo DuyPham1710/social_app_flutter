@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/stories_loading_widget.dart';
 
@@ -125,37 +126,44 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
   }
 
   Widget _buildAddStory() {
-    return Column(
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              width: 80.w,
-              height: 120.w,
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: AppColors.textSecondary, width: 1),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const StoryCreatePage()),
+        );
+      },
+      child: Column(
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                width: 80.w,
+                height: 120.w,
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: AppColors.textSecondary, width: 1),
+                ),
               ),
-            ),
-            Positioned(
-              bottom: -18.h,
-              child: CircleAvatar(
-                radius: 20.r,
-                backgroundColor: AppColors.primary,
-                child: Icon(Icons.add, size: 24.sp, color: Colors.white),
+              Positioned(
+                bottom: -18.h,
+                child: CircleAvatar(
+                  radius: 20.r,
+                  backgroundColor: AppColors.primary,
+                  child: Icon(Icons.add, size: 24.sp, color: Colors.white),
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 30.h),
-        Text(
-          "Add Story",
-          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
-        ),
-      ],
+            ],
+          ),
+          SizedBox(height: 30.h),
+          Text(
+            "Add Story",
+            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
     );
   }
 
