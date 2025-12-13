@@ -15,9 +15,10 @@ class SearchRepositoryImpl implements SearchRepository {
     required String query,
     int page = 1,
     int limit = 10,
+    bool saveToHistory = true,
   }) async {
     try {
-      final response = await remoteDataSource.searchUsers(query, page, limit);
+      final response = await remoteDataSource.searchUsers(query, page, limit, saveToHistory);
       return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);

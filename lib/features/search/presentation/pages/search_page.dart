@@ -73,10 +73,25 @@ class _SearchPageState extends State<SearchPage> {
                         Expanded(
                           child: search_widget.SearchBar(
                             onSearch: (query) {
+                              // Khi nhập từng ký tự: tìm kiếm để hiển thị kết quả (không lưu lịch sử)
                               if (query.trim().isEmpty) {
                                 blocContext.read<SearchBloc>().add(const ClearSearch());
                               } else {
-                                blocContext.read<SearchBloc>().add(SearchUsers(query: query));
+                                blocContext.read<SearchBloc>().add(SearchUsers(
+                                  query: query,
+                                  saveToHistory: false,
+                                ));
+                              }
+                            },
+                            onSearchSubmitted: (query) {
+                              // Khi nhấn Enter: tìm kiếm và lưu vào lịch sử
+                              if (query.trim().isEmpty) {
+                                blocContext.read<SearchBloc>().add(const ClearSearch());
+                              } else {
+                                blocContext.read<SearchBloc>().add(SearchUsers(
+                                  query: query,
+                                  saveToHistory: true,
+                                ));
                               }
                             },
                             hintText: 'Tìm kiếm',

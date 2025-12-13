@@ -22,12 +22,14 @@ class _SearchRemoteDataSource implements SearchRemoteDataSource {
     String query,
     int page,
     int limit,
+    bool? saveToHistory,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'query': query,
       r'page': page,
       r'limit': limit,
+      if (saveToHistory != null) r'saveToHistory': saveToHistory.toString(),
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

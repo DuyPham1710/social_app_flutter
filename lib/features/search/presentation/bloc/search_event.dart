@@ -7,10 +7,12 @@ abstract class SearchEvent {
 class SearchUsers extends SearchEvent {
   final String query;
   final int limit;
+  final bool saveToHistory;
 
   const SearchUsers({
     required this.query,
     this.limit = 10,
+    this.saveToHistory = true,
   });
 }
 

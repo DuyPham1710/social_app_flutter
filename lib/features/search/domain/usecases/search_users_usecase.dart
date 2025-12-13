@@ -11,11 +11,13 @@ class SearchUsersUseCase {
     required String query,
     int page = 1,
     int limit = 10,
+    bool saveToHistory = true,
   }) {
     return repository.searchUsers(
       query: query,
       page: page,
       limit: limit,
+      saveToHistory: saveToHistory,
     );
   }
 }
