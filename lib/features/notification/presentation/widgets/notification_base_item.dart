@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class NotificationBaseItem extends StatelessWidget {
   final String avatarUrl;
   final Widget iconOverlay;
-  final Widget title; // ✅ đổi từ String -> Widget
+  final Widget title;
   final String? preview;
   final String time;
   final bool isRead;
@@ -21,10 +21,9 @@ class NotificationBaseItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: isRead
-          ? Colors.white
-          : const Color(0xFFEAF3FF), // chưa đọc
+      color: isRead ? Colors.white : const Color(0xFFEAF3FF), // chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      // ignore: sort_child_properties_last
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -65,9 +64,8 @@ class NotificationBaseItem extends StatelessWidget {
                   ),
 
                 const SizedBox(height: 4),
-
                 Text(
-                  time,
+                  time == "0 phút" ? "Vừa xong" : time,
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
               ],
@@ -77,6 +75,7 @@ class NotificationBaseItem extends StatelessWidget {
           const Icon(Icons.more_horiz),
         ],
       ),
+      margin: const EdgeInsets.only(bottom: 2),
     );
   }
 }
