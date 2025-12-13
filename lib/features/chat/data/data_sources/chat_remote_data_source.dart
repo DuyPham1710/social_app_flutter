@@ -53,12 +53,20 @@ abstract class ChatRemoteDataSource {
 
   void emitTypingStop({required String userId, required String conversationId});
 
-  // Send message
+  // Send message (WebSocket)
   void sendMessage({
     required String userId,
     required String conversationId,
     String? text,
     List<Map<String, dynamic>>? attachments,
+    String? replyTo,
+  });
+
+  // Upload files and return attachments URLs (HTTP with MultipartFile)
+  Future<List<Map<String, dynamic>>> sendMessageWithFiles({
+    required String conversationId,
+    String? text,
+    List<String>? filePaths,
     String? replyTo,
   });
 

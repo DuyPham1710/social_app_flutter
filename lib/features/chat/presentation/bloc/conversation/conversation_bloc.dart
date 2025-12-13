@@ -47,7 +47,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
     // Chỉ emit loading state khi load page đầu tiên
     if (isFirstPage) {
-      emit(const ConversationsLoading());
+    emit(const ConversationsLoading());
     }
 
     try {
@@ -127,18 +127,18 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       } else if (result is DataStateError) {
         // Chỉ emit error nếu là page đầu tiên
         if (isFirstPage) {
-          emit(
-            ConversationsError(
-              message: result.error?.message ?? 'Failed to load conversations',
-            ),
-          );
+        emit(
+          ConversationsError(
+            message: result.error?.message ?? 'Failed to load conversations',
+          ),
+        );
         }
         print('Error loading conversations: ${result.error}');
       }
     } catch (e) {
       // Chỉ emit error nếu là page đầu tiên
       if (isFirstPage) {
-        emit(ConversationsError(message: 'Failed to load conversations: $e'));
+      emit(ConversationsError(message: 'Failed to load conversations: $e'));
       }
       print('Exception loading conversations: $e');
     }

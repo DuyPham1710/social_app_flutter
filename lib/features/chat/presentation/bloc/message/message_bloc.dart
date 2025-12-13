@@ -7,6 +7,7 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message_response_entity.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/send_message_with_files_usecase.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 
 class MessageBloc extends Bloc<MessageEvent, MessageState> {
@@ -18,6 +19,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   final ListenTypingStopUseCase _listenTypingStopUseCase;
   final ListenNewMessageUseCase _listenNewMessageUseCase;
   final SendMessageUseCase _sendMessageUseCase;
+  final SendMessageWithFilesUseCase _sendMessageWithFilesUseCase;
   final EditMessageUseCase _editMessageUseCase;
   final DeleteMessageUseCase _deleteMessageUseCase;
   final ReactMessageUseCase _reactMessageUseCase;
@@ -43,6 +45,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     required ListenTypingStopUseCase listenTypingStopUseCase,
     required ListenNewMessageUseCase listenNewMessageUseCase,
     required SendMessageUseCase sendMessageUseCase,
+    required SendMessageWithFilesUseCase sendMessageWithFilesUseCase,
     required EditMessageUseCase editMessageUseCase,
     required DeleteMessageUseCase deleteMessageUseCase,
     required ReactMessageUseCase reactMessageUseCase,
@@ -57,6 +60,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
        _listenTypingStopUseCase = listenTypingStopUseCase,
        _listenNewMessageUseCase = listenNewMessageUseCase,
        _sendMessageUseCase = sendMessageUseCase,
+       _sendMessageWithFilesUseCase = sendMessageWithFilesUseCase,
        _editMessageUseCase = editMessageUseCase,
        _deleteMessageUseCase = deleteMessageUseCase,
        _reactMessageUseCase = reactMessageUseCase,
@@ -72,6 +76,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     on<TypingStopEvent>(_onTypingStop);
     on<NewMessageReceivedEvent>(_onNewMessageReceived);
     on<SendMessageEvent>(_onSendMessage);
+    on<SendMessageWithFilesEvent>(_onSendMessageWithFiles);
     on<EditMessageEvent>(_onEditMessage);
     on<DeleteMessageEvent>(_onDeleteMessage);
     on<ReactMessageEvent>(_onReactMessage);
@@ -527,12 +532,11 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<MessageState> emit) {
-    // Validate message
-    if (event.text == null || event.text!.isEmpty) {
-      if (event.attachments == null || event.attachments!.isEmpty) {
-        print('Cannot send empty message');
-        return;
-      }
+    // Validate message - phải có text hoặc attachments
+    if ((event.text == null || event.text!.isEmpty) &&
+        (event.attachments == null || event.attachments!.isEmpty)) {
+      print('Cannot send empty message');
+      return;
     }
 
     // Send message through usecase
@@ -546,6 +550,41 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
 
     print('Message sent to conversation: ${event.conversationId}');
     // Note: Message will be added to list via message:new event from backend
+  }
+
+  Future<void> _onSendMessageWithFiles(
+    SendMessageWithFilesEvent event,
+    Emitter<MessageState> emit,
+  ) async {
+    try {
+      print('Uploading files for conversation: ${event.conversationId}');
+
+      // Upload files và nhận về attachments URLs
+      final attachments = await _sendMessageWithFilesUseCase(
+        conversationId: event.conversationId,
+        text: event.text,
+        filePaths: event.filePaths,
+        replyTo: event.replyTo,
+      );
+
+      print('Files uploaded successfully, attachments: $attachments');
+
+      // Sau khi có attachments URLs, gửi message qua WebSocket
+      if (attachments.isNotEmpty) {
+        add(
+          SendMessageEvent(
+            userId: event.userId,
+            conversationId: event.conversationId,
+            text: event.text,
+            attachments: attachments,
+            replyTo: event.replyTo,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error uploading files: $e');
+      // Optionally emit error state
+    }
   }
 
   void _onEditMessage(EditMessageEvent event, Emitter<MessageState> emit) {
@@ -574,7 +613,9 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       deleteForEveryone: event.deleteForEveryone,
     );
 
-    print('Message deleted: ${event.messageId}, deleteForEveryone: ${event.deleteForEveryone}');
+    print(
+      'Message deleted: ${event.messageId}, deleteForEveryone: ${event.deleteForEveryone}',
+    );
     // Note: Message will be updated in list via message:deleted event from backend
   }
 
