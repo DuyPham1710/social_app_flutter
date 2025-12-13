@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +17,22 @@ class StoryMusicPickerPage extends StatefulWidget {
 class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   final TextEditingController _searchController = TextEditingController();
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final ScrollController _scrollController = ScrollController();
+  Timer? _searchDebounce;
 
   bool _isLoading = true;
   String? _error;
   List<DeezerMusicModel> _tracks = [];
+  
+  // Search state
+  bool _isSearching = false;
+  bool _isSearchLoading = false;
+  String? _searchError;
+  List<DeezerMusicModel> _searchResults = [];
+  int _searchCurrentPage = 0;
+  bool _hasMoreSearchResults = true;
+  String? _currentSearchQuery;
+  
   int? _playingId;
   bool _isPaused = false;
   Duration _position = Duration.zero;
@@ -29,6 +42,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   void initState() {
     super.initState();
     _fetchTracks();
+    _scrollController.addListener(_onScroll);
     _audioPlayer.onPlayerComplete.listen((_) {
       if (mounted) {
         setState(() {
@@ -53,6 +67,22 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
         });
       }
     });
+  }
+
+  void _onScroll() {
+    if (!_isSearching || !_hasMoreSearchResults || _isSearchLoading) {
+      return;
+    }
+
+    if (!_scrollController.hasClients) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final delta = 200.0; // Tải thêm khi còn cách cuối 200px
+
+    if (currentScroll >= (maxScroll - delta)) {
+      _loadMoreSearchResults();
+    }
   }
 
   Future<void> _fetchTracks() async {
@@ -100,18 +130,126 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     }
   }
 
-  List<DeezerMusicModel> get _filtered {
-    final q = _searchController.text.trim().toLowerCase();
-    if (q.isEmpty) return _tracks;
-    return _tracks
-        .where((item) =>
-            item.title.toLowerCase().contains(q) ||
-            item.artist.name.toLowerCase().contains(q))
-        .toList();
+  List<DeezerMusicModel> get _displayTracks {
+    if (_isSearching) {
+      return _searchResults;
+    }
+    return _tracks;
+  }
+
+  Future<void> _searchTracks(String query, {int page = 0, bool loadMore = false}) async {
+    if (query.trim().isEmpty) {
+      setState(() {
+        _isSearching = false;
+        _searchResults = [];
+        _searchCurrentPage = 0;
+        _hasMoreSearchResults = true;
+        _currentSearchQuery = null;
+      });
+      return;
+    }
+
+    setState(() {
+      if (!loadMore) {
+        _isSearchLoading = true;
+        _searchError = null;
+        _searchResults = [];
+        _searchCurrentPage = 0;
+        _hasMoreSearchResults = true;
+        _currentSearchQuery = query;
+      }
+    });
+
+    try {
+      final index = page * 10;
+      final res = await Dio().get(
+        'https://api.deezer.com/search',
+        queryParameters: {
+          'q': query,
+          'limit': 10,
+          'index': index,
+        },
+      );
+      
+      final data = res.data['data'] as List<dynamic>? ?? [];
+      final total = res.data['total'] as int? ?? 0;
+      
+      final parsed = data
+          .map((e) => DeezerMusicModel.fromJson({
+                'id': e['id'],
+                'title': e['title'],
+                'preview': e['preview'] ?? '',
+                'artist': {
+                  'id': e['artist']?['id'] ?? 0,
+                  'name': e['artist']?['name'] ?? '',
+                  'picture': e['artist']?['picture'] ??
+                      e['artist']?['picture_medium'] ??
+                      '',
+                },
+                'album': {
+                  'id': e['album']?['id'] ?? 0,
+                  'title': e['album']?['title'] ?? '',
+                  'cover': e['album']?['cover'] ??
+                      e['album']?['cover_medium'] ??
+                      '',
+                },
+              }))
+          .toList();
+
+      if (mounted && _currentSearchQuery == query) {
+        setState(() {
+          if (loadMore) {
+            _searchResults.addAll(parsed);
+          } else {
+            _searchResults = parsed;
+          }
+          _searchCurrentPage = page;
+          _hasMoreSearchResults = _searchResults.length < total;
+          _isSearching = true;
+          _isSearchLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted && _currentSearchQuery == query) {
+        setState(() {
+          _searchError = 'Không tìm thấy kết quả. Vui lòng thử lại.';
+          _isSearchLoading = false;
+          if (!loadMore) {
+            _searchResults = [];
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> _loadMoreSearchResults() async {
+    if (_isSearchLoading || !_hasMoreSearchResults || _currentSearchQuery == null) {
+      return;
+    }
+    
+    setState(() {
+      _isSearchLoading = true;
+    });
+    
+    await _searchTracks(
+      _currentSearchQuery!,
+      page: _searchCurrentPage + 1,
+      loadMore: true,
+    );
+  }
+
+  void _onSearchChanged(String query) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 500), () {
+      _searchTracks(query);
+    });
   }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _searchController.dispose();
     _audioPlayer.dispose();
     super.dispose();
@@ -126,30 +264,31 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildSearchBar(context),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
-              child: Row(
-                children: [
-                  Text(
-                    "Dành cho bạn",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
+            if (!_isSearching)
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
+                child: Row(
+                  children: [
+                    Text(
+                      "Dành cho bạn",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    "Xem tất cả",
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
+                    const Spacer(),
+                    Text(
+                      "Xem tất cả",
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
             Expanded(child: _buildList()),
           ],
         ),
@@ -181,7 +320,10 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
-                      onChanged: (_) => setState(() {}),
+                      onChanged: (value) {
+                        setState(() {});
+                        _onSearchChanged(value);
+                      },
                       style: TextStyle(color: Colors.white, fontSize: 14.sp),
                       decoration: const InputDecoration(
                         hintText: "Tìm kiếm nhạc",
@@ -191,6 +333,17 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                       ),
                     ),
                   ),
+                  if (_searchController.text.isNotEmpty)
+                    IconButton(
+                      splashRadius: 18,
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.clear, color: Colors.white70, size: 20),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                        _onSearchChanged('');
+                      },
+                    ),
                   IconButton(
                     splashRadius: 18,
                     padding: EdgeInsets.zero,
@@ -207,12 +360,15 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   }
 
   Widget _buildList() {
-    if (_isLoading) {
+    // Show loading for initial chart load
+    if (!_isSearching && _isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );
     }
-    if (_error != null) {
+    
+    // Show error for initial chart load
+    if (!_isSearching && _error != null) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -231,24 +387,70 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
         ),
       );
     }
-    if (_filtered.isEmpty) {
+    
+    // Show loading for search
+    if (_isSearching && _isSearchLoading && _searchResults.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
+    }
+    
+    // Show search error
+    if (_isSearching && _searchError != null && _searchResults.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _searchError!,
+              style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12.h),
+            TextButton(
+              onPressed: () => _searchTracks(_currentSearchQuery ?? ''),
+              child: const Text('Thử lại'),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    // Show empty state
+    if (_displayTracks.isEmpty) {
       return Center(
         child: Text(
-          'Không tìm thấy bài hát phù hợp.',
+          _isSearching 
+              ? 'Không tìm thấy bài hát phù hợp.'
+              : 'Không có bài hát nào.',
           style: TextStyle(color: Colors.white70, fontSize: 14.sp),
         ),
       );
     }
+    
     return RefreshIndicator(
       color: AppColors.primary,
       backgroundColor: const Color(0xFF111315),
-      onRefresh: _fetchTracks,
+      onRefresh: _isSearching 
+          ? () => _searchTracks(_currentSearchQuery ?? '')
+          : _fetchTracks,
       child: ListView.separated(
+        controller: _scrollController,
         padding: EdgeInsets.symmetric(horizontal: 12.w),
-        itemCount: _filtered.length,
+        itemCount: _displayTracks.length + (_isSearching && _hasMoreSearchResults && _isSearchLoading ? 1 : 0),
         separatorBuilder: (_, __) => SizedBox(height: 6.h),
         itemBuilder: (context, index) {
-          final item = _filtered[index];
+          // Loading indicator khi đang tải thêm
+          if (_isSearching && _hasMoreSearchResults && _isSearchLoading && index == _displayTracks.length) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            );
+          }
+          
+          final item = _displayTracks[index];
           final isCurrentPlaying = _playingId == item.id && !_isPaused;
           final progress = isCurrentPlaying && _duration.inMilliseconds > 0
               ? _position.inMilliseconds / _duration.inMilliseconds
