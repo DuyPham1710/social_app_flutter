@@ -591,31 +591,45 @@ class _ChatListPageState extends State<ChatListPage> {
                                     conversation.lastMessage?.sender.userId ==
                                     userId;
 
+                                final String lastName = otherParticipant!
+                                    .fullName!
+                                    .trim()
+                                    .split(' ')
+                                    .last;
+                                final String previewText;
+
+                                if (conversation
+                                    .lastMessage!
+                                    .attachments
+                                    .isNotEmpty) {
+                                  previewText =
+                                      "${fromMe ? "Bạn " : " $lastName"}đã gửi ${conversation.lastMessage?.attachments.first.type}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";
+                                } else {
+                                  previewText =
+                                      "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";
+                                }
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: 6.h),
                                   child: ConversationItem(
                                     avatarUrl: conversation.isGroup
                                         ? conversation.avatar ??
                                               "https://i.pravatar.cc/200"
-                                        : otherParticipant?.avatarUrl ??
+                                        : otherParticipant.avatarUrl ??
                                               "https://i.pravatar.cc/200",
                                     name: conversation.isGroup
                                         ? conversation.name ?? "Group Chat"
-                                        : otherParticipant?.fullName ??
-                                              otherParticipant?.username ??
+                                        : otherParticipant.fullName ??
+                                              otherParticipant.username ??
                                               "Unknown",
-                                    preview:
-                                        "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}",
+                                    preview: previewText,
                                     isUnread:
                                         (conversation.unreadCount ?? 0) > 0,
                                     onTap: () {
-                                      if (otherParticipant != null) {
-                                        _joinConversationAndNavigate(
-                                          conversation.id,
-                                          otherParticipant,
-                                          conversation.unreadCount ?? 0,
-                                        );
-                                      }
+                                      _joinConversationAndNavigate(
+                                        conversation.id,
+                                        otherParticipant,
+                                        conversation.unreadCount ?? 0,
+                                      );
                                     },
                                   ),
                                 );

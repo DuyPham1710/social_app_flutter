@@ -7,6 +7,7 @@ abstract class SearchRepository {
     required String query,
     int page = 1,
     int limit = 10,
+    bool saveToHistory = true,
   });
 
   Future<DataState<void>> saveViewedUser({

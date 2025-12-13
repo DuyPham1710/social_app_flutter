@@ -14,6 +14,7 @@ abstract class SearchRemoteDataSource {
     @Query('query') String query,
     @Query('page') int page,
     @Query('limit') int limit,
+    @Query('saveToHistory') bool? saveToHistory,
   );
 
   @GET('/user/search/history/viewed/{viewedUserId}')

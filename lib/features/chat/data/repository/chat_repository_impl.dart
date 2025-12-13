@@ -220,6 +220,21 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> sendMessageWithFiles({
+    required String conversationId,
+    String? text,
+    List<String>? filePaths,
+    String? replyTo,
+  }) async {
+    return await _remoteDataSource.sendMessageWithFiles(
+      conversationId: conversationId,
+      text: text,
+      filePaths: filePaths,
+      replyTo: replyTo,
+    );
+  }
+
+  @override
   void markAsRead({
     required String userId,
     required String conversationId,

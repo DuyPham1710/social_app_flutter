@@ -67,19 +67,31 @@ class FriendSuggestionsLoading extends FriendState {}
 class FriendSuggestionsLoaded extends FriendState {
   final List<FriendSuggestionEntity> friendSuggestions;
   final Set<String> sentRequestUserIds;
+  final int suggestionPage;
+  final bool hasMoreSuggestions;
+  final bool isLoadingMore;
 
   const FriendSuggestionsLoaded({
     required this.friendSuggestions,
     this.sentRequestUserIds = const {},
+    this.suggestionPage = 1,
+    this.hasMoreSuggestions = true,
+    this.isLoadingMore = false,
   });
 
   FriendSuggestionsLoaded copyWith({
     List<FriendSuggestionEntity>? friendSuggestions,
     Set<String>? sentRequestUserIds,
+    int? suggestionPage,
+    bool? hasMoreSuggestions,
+    bool? isLoadingMore,
   }) {
     return FriendSuggestionsLoaded(
       friendSuggestions: friendSuggestions ?? this.friendSuggestions,
       sentRequestUserIds: sentRequestUserIds ?? this.sentRequestUserIds,
+      suggestionPage: suggestionPage ?? this.suggestionPage,
+      hasMoreSuggestions: hasMoreSuggestions ?? this.hasMoreSuggestions,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 }
@@ -92,6 +104,9 @@ class FriendPageLoaded extends FriendState {
   final Set<String> sentRequestUserIds;
   final bool isLoadingRequests;
   final bool isLoadingSuggestions;
+  final bool isLoadingMoreSuggestions;
+  final int suggestionPage;
+  final bool hasMoreSuggestions;
   final String sortBy;
   final bool ascending;
   final String? searchQuery;
@@ -105,6 +120,9 @@ class FriendPageLoaded extends FriendState {
     this.sentRequestUserIds = const {},
     this.isLoadingRequests = false,
     this.isLoadingSuggestions = false,
+    this.isLoadingMoreSuggestions = false,
+    this.suggestionPage = 1,
+    this.hasMoreSuggestions = true,
     this.sortBy = 'time',
     this.ascending = false,
     this.searchQuery,
@@ -119,6 +137,9 @@ class FriendPageLoaded extends FriendState {
     Set<String>? sentRequestUserIds,
     bool? isLoadingRequests,
     bool? isLoadingSuggestions,
+    bool? isLoadingMoreSuggestions,
+    int? suggestionPage,
+    bool? hasMoreSuggestions,
     String? sortBy,
     bool? ascending,
     String? searchQuery,
@@ -132,6 +153,10 @@ class FriendPageLoaded extends FriendState {
       sentRequestUserIds: sentRequestUserIds ?? this.sentRequestUserIds,
       isLoadingRequests: isLoadingRequests ?? this.isLoadingRequests,
       isLoadingSuggestions: isLoadingSuggestions ?? this.isLoadingSuggestions,
+      isLoadingMoreSuggestions:
+          isLoadingMoreSuggestions ?? this.isLoadingMoreSuggestions,
+      suggestionPage: suggestionPage ?? this.suggestionPage,
+      hasMoreSuggestions: hasMoreSuggestions ?? this.hasMoreSuggestions,
       sortBy: sortBy ?? this.sortBy,
       ascending: ascending ?? this.ascending,
       searchQuery: searchQuery ?? this.searchQuery,

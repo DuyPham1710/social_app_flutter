@@ -53,6 +53,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       query: event.query,
       page: 1,
       limit: event.limit,
+      saveToHistory: event.saveToHistory,
     );
 
     // Chỉ emit kết quả nếu query vẫn còn là query hiện tại (tránh race condition)
@@ -86,6 +87,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       query: currentState.query,
       page: currentState.currentPage + 1,
       limit: event.limit,
+      saveToHistory: false,
     );
 
     if (dataState is DataStateSuccess) {

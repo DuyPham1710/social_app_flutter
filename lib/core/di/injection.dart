@@ -17,6 +17,7 @@ import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_s
 import 'package:social_app_fe/features/chat/data/repository/chat_repository_impl.dart';
 import 'package:social_app_fe/features/chat/domain/repository/chat_repository.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/send_message_with_files_usecase.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
@@ -149,7 +150,7 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerLazySingleton<ChatRemoteDataSource>(
-    () => ChatRemoteDataSourceImpl(s1(instanceName: 'chatSocket')),
+    () => ChatRemoteDataSourceImpl(s1(instanceName: 'chatSocket'), s1()),
   );
 
   // Repositories
@@ -329,6 +330,9 @@ Future<void> initializeDependencies() async {
     () => ListenNewMessageUseCase(s1()),
   );
   s1.registerLazySingleton<SendMessageUseCase>(() => SendMessageUseCase(s1()));
+  s1.registerLazySingleton<SendMessageWithFilesUseCase>(
+    () => SendMessageWithFilesUseCase(s1()),
+  );
   s1.registerLazySingleton<EditMessageUseCase>(() => EditMessageUseCase(s1()));
   s1.registerLazySingleton<DeleteMessageUseCase>(
     () => DeleteMessageUseCase(s1()),
@@ -564,6 +568,7 @@ Future<void> initializeDependencies() async {
       listenTypingStopUseCase: s1(),
       listenNewMessageUseCase: s1(),
       sendMessageUseCase: s1(),
+      sendMessageWithFilesUseCase: s1(),
       editMessageUseCase: s1(),
       deleteMessageUseCase: s1(),
       reactMessageUseCase: s1(),

@@ -4,12 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SearchBar extends StatefulWidget {
   final Function(String) onSearch;
+  final Function(String)? onSearchSubmitted;
   final String? initialQuery;
   final String? hintText;
 
   const SearchBar({
     super.key,
     required this.onSearch,
+    this.onSearchSubmitted,
     this.initialQuery,
     this.hintText,
   });
@@ -36,8 +38,17 @@ class _SearchBarState extends State<SearchBar> {
   }
 
   void _handleSearch(String query) {
-    // Gọi search ngay lập tức khi người dùng nhập từng ký tự
+    // Gọi search ngay lập tức khi người dùng nhập từng ký tự (chỉ để hiển thị kết quả)
     widget.onSearch(query);
+  }
+
+  void _handleSearchSubmitted(String query) {
+    // Gọi search khi người dùng nhấn Enter (để lưu vào lịch sử)
+    if (widget.onSearchSubmitted != null) {
+      widget.onSearchSubmitted!(query);
+    } else {
+      widget.onSearch(query);
+    }
   }
 
   @override
@@ -79,10 +90,9 @@ class _SearchBarState extends State<SearchBar> {
         style: TextStyle(fontSize: 14.sp),
         onChanged: (value) {
           setState(() {});
-          // Gọi search ngay lập tức khi người dùng nhập từng ký tự
           _handleSearch(value);
         },
-        onSubmitted: _handleSearch,
+        onSubmitted: _handleSearchSubmitted,
       ),
     );
   }

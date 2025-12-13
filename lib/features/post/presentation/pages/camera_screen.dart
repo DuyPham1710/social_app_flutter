@@ -83,37 +83,50 @@ class _CameraScreenState extends State<CameraScreen> {
 
       if (_controller != null) {
         await _controller!.dispose();
-        setState(() {
-          _isInitialized = false;
-        });
+        _controller = null;
       }
 
       _controller = CameraController(
         _cameras[cameraIndex],
         ResolutionPreset.high,
         enableAudio: true,
+        imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
       print('Initializing camera controller...');
       await _controller!.initialize();
 
+      if (!mounted) return;
+
       print('Camera initialized successfully');
       print('Camera aspect ratio: ${_controller!.value.aspectRatio}');
+      print('Camera description: ${_cameras[cameraIndex].lensDirection}');
 
-      await _controller!.setFlashMode(_flashMode);
-
-      if (mounted) {
-        setState(() {
-          _isInitialized = true;
-        });
-        print('Camera state updated, isInitialized: $_isInitialized');
+      try {
+        await _controller!.setFlashMode(_flashMode);
+      } catch (e) {
+        print('Error setting flash mode: $e');
       }
+
+      setState(() {
+        _isInitialized = true;
+      });
+      print('Camera state updated, isInitialized: $_isInitialized');
     } catch (e) {
       print('Error setting up camera: $e');
+      print('Stack trace: ${StackTrace.current}');
       if (mounted) {
         setState(() {
           _isInitialized = false;
         });
+        
+        // Show error to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khởi tạo camera: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -126,19 +139,23 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _toggleFlash() async {
-    if (_controller != null) {
-      switch (_flashMode) {
-        case FlashMode.off:
-          _flashMode = FlashMode.auto;
-        case FlashMode.auto:
-          _flashMode = FlashMode.always;
-        case FlashMode.always:
-          _flashMode = FlashMode.torch;
-        case FlashMode.torch:
-          _flashMode = FlashMode.off;
+    if (_controller != null && _controller!.value.isInitialized) {
+      try {
+        switch (_flashMode) {
+          case FlashMode.off:
+            _flashMode = FlashMode.auto;
+          case FlashMode.auto:
+            _flashMode = FlashMode.always;
+          case FlashMode.always:
+            _flashMode = FlashMode.torch;
+          case FlashMode.torch:
+            _flashMode = FlashMode.off;
+        }
+        await _controller!.setFlashMode(_flashMode);
+        setState(() {});
+      } catch (e) {
+        print('Error toggling flash: $e');
       }
-      await _controller!.setFlashMode(_flashMode);
-      setState(() {});
     }
   }
 
@@ -209,42 +226,38 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized || _controller == null) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.black,
         body: const Center(
-          child: CupertinoActivityIndicator(color: AppColors.textPrimary),
+          child: CupertinoActivityIndicator(color: Colors.white),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           // Camera preview full screen
-          Positioned.fill(
-            child: _controller!.value.isInitialized
-                ? OverflowBox(
-                    alignment: Alignment.center,
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height:
-                            MediaQuery.of(context).size.width *
-                            _controller!.value.aspectRatio,
-                        child: CameraPreview(_controller!),
-                      ),
-                    ),
-                  )
-                : Container(
-                    color: AppColors.background,
-                    child: const Center(
-                      child: CupertinoActivityIndicator(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-          ),
+          if (_controller!.value.isInitialized)
+            SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _controller!.value.previewSize!.height,
+                  height: _controller!.value.previewSize!.width,
+                  child: CameraPreview(_controller!),
+                ),
+              ),
+            )
+          else
+            Container(
+              color: Colors.black,
+              child: const Center(
+                child: CupertinoActivityIndicator(
+                  color: Colors.white,
+                ),
+              ),
+            ),
 
           // Top controls
           SafeArea(

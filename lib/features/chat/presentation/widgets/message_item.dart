@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/enums/attachment_type.dart';
+import 'package:social_app_fe/core/utils/date_time_extensions.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/reaction_detail_dialog.dart';
+import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
 class MessageItem extends StatelessWidget {
   final MessageEntity message;
@@ -69,11 +72,16 @@ class MessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(
+      'Building MessageItem for message ID: ${message.replyTo?.attachments}',
+    );
     final isReplying = message.replyTo != null;
     final hasReactions = message.reactions.isNotEmpty;
     final isEdited = message.isEdited;
     final isDeleteforEveryone = message.deletedForEveryone;
     final lastName = message.sender.fullName!.trim().split(' ').last;
+    final isAttachment = message.attachments.isNotEmpty;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -117,11 +125,13 @@ class MessageItem extends StatelessWidget {
                       isDeleteforEveryone
                           ? _buildDeletedMessage(lastName, fromMe)
                           : isReplying
-                          ? _buildReplyMessage()
+                          ? _buildReplyMessage(context)
                           :
                             // Kiểm tra xem có phải là emoji không
                             message.text != null && _isOnlyEmoji(message.text!)
                           ? _buildEmojiMessage()
+                          : isAttachment
+                          ? _buildAttachmentsGrid(context, message.attachments)
                           : _buildNormalMessage(),
 
                       // Show reactions if any
@@ -267,7 +277,7 @@ class MessageItem extends StatelessWidget {
           else
             // Hiển thị text "Đã gửi"
             Text(
-              'Đã gửi',
+              'Đã gửi ${message.createdAt.formatRelativeTime()}',
               style: TextStyle(
                 fontSize: 11.sp,
                 color: AppColors.textSecondary,
@@ -293,32 +303,13 @@ class MessageItem extends StatelessWidget {
           ),
 
         // Show attachments if any
-        if (message.attachments.isNotEmpty)
-          ...message.attachments.map(
-            (attachment) => Container(
-              margin: EdgeInsets.only(top: 4.h),
-              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
-              decoration: BoxDecoration(
-                color: fromMe
-                    ? AppColors.primary
-                    : AppColors.textSecondary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(14.r),
-              ),
-              child: Text(
-                '[${attachment.type.toUpperCase()}] ${attachment.url}',
-                style: TextStyle(
-                  color: fromMe ? Colors.white70 : AppColors.textSecondary,
-                  fontSize: 12.sp,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-          ),
+        // if (message.attachments.isNotEmpty)
+        //   _buildAttachmentsGrid(context, message.attachments),
       ],
     );
   }
 
-  Widget _buildReplyMessage() {
+  Widget _buildReplyMessage(BuildContext context) {
     return Container(
       constraints: BoxConstraints(maxWidth: 0.7.sw),
       decoration: BoxDecoration(
@@ -358,32 +349,53 @@ class MessageItem extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Replied name
-                  Text(
-                    message.replyTo!.sender.fullName ??
-                        message.replyTo!.sender.username ??
-                        'Unknown',
-                    style: TextStyle(
-                      color: fromMe ? Colors.white : AppColors.primary,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  // Replied message text
-                  Text(
-                    message.replyTo!.text,
-                    style: TextStyle(
-                      color: fromMe
-                          ? Colors.white.withOpacity(0.8)
-                          : AppColors.textSecondary,
-                      fontSize: 12.sp,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
+                  message.replyTo!.attachments.isNotEmpty
+                      ? Image.network(
+                          message.replyTo!.attachments.first.url,
+                          width: 40.w,
+                          height: 40.w,
+                          fit: BoxFit.cover,
+                        )
+                      : SizedBox.shrink(),
+
+                  message.replyTo!.attachments.isNotEmpty
+                      ? SizedBox(width: 8.w)
+                      : SizedBox.shrink(),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Replied name
+                      Text(
+                        message.replyTo!.sender.fullName ??
+                            message.replyTo!.sender.username ??
+                            'Unknown',
+                        style: TextStyle(
+                          color: fromMe ? Colors.white : AppColors.primary,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+
+                      // Replied message text
+                      Text(
+                        message.replyTo!.attachments.isNotEmpty
+                            ? '[${message.replyTo!.attachments.first.type}]'
+                            : message.replyTo!.text,
+                        style: TextStyle(
+                          color: fromMe
+                              ? Colors.white.withOpacity(0.8)
+                              : AppColors.textSecondary,
+                          fontSize: 12.sp,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -408,21 +420,7 @@ class MessageItem extends StatelessWidget {
 
                 // Show attachments if any
                 if (message.attachments.isNotEmpty)
-                  ...message.attachments.map(
-                    (attachment) => Container(
-                      margin: EdgeInsets.only(top: 4.h),
-                      child: Text(
-                        '[${attachment.type.toUpperCase()}] ${attachment.url}',
-                        style: TextStyle(
-                          color: fromMe
-                              ? Colors.white70
-                              : AppColors.textSecondary,
-                          fontSize: 12.sp,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildAttachmentsGrid(context, message.attachments),
               ],
             ),
           ),
@@ -448,35 +446,118 @@ class MessageItem extends StatelessWidget {
           bottomRight: Radius.circular(fromMe ? 0 : 14.r),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (message.text != null && message.text!.isNotEmpty)
-            Text(
-              message.text!,
-              style: TextStyle(
-                color: fromMe ? Colors.white : AppColors.textPrimary,
-                fontSize: 14.sp,
-              ),
-            ),
+      child: Text(
+        message.text!,
+        style: TextStyle(
+          color: fromMe ? Colors.white : AppColors.textPrimary,
+          fontSize: 14.sp,
+        ),
+      ),
+    );
+  }
 
-          // Show attachments if any
-          if (message.attachments.isNotEmpty)
-            ...message.attachments.map(
-              (attachment) => Container(
-                margin: EdgeInsets.only(top: 4.h),
-                child: Text(
-                  '[${attachment.type.toUpperCase()}] ${attachment.url}',
-                  style: TextStyle(
-                    color: fromMe ? Colors.white70 : AppColors.textSecondary,
-                    fontSize: 12.sp,
-                    fontStyle: FontStyle.italic,
+  // Build grid of image attachments (max 3 per row)
+  Widget _buildAttachmentsGrid(
+    BuildContext context,
+    List<AttachmentEntity> attachments,
+  ) {
+    // Filter only image attachments
+    final imageAttachments = attachments
+        .where(
+          (att) =>
+              att.type == AttachmentType.image.name ||
+              att.type == AttachmentType.video.name,
+        )
+        .toList();
+
+    // Get image URLs
+    final imageUrls = imageAttachments.map((att) => att.url).toList();
+
+    // Calculate grid layout
+    final imageCount = imageAttachments.length;
+    final maxWidth = 0.7.sw;
+    final spacing = 4.w;
+    final itemSize = (maxWidth - (spacing * 2)) / 3; // 3 items per row
+
+    return Container(
+      margin: EdgeInsets.only(top: 4.h),
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Wrap(
+        spacing: spacing,
+        runSpacing: spacing,
+        children: List.generate(imageCount, (index) {
+          final attachment = imageAttachments[index];
+
+          // Calculate width for last row items if not full
+          final rowIndex = index ~/ 3;
+          final isLastRow = rowIndex == ((imageCount - 1) ~/ 3);
+
+          double itemWidth = itemSize;
+          if (isLastRow && imageCount % 3 != 0) {
+            // Last row with less than 3 items
+            final itemsInLastRow = imageCount % 3;
+            itemWidth =
+                (maxWidth - (spacing * (itemsInLastRow - 1))) / itemsInLastRow;
+          }
+
+          return GestureDetector(
+            onTap: () {
+              // image viewer
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FullScreenImageViewer(
+                    imageUrls: imageUrls,
+                    initialIndex: index,
                   ),
+                ),
+              );
+            },
+
+            child: Container(
+              width: itemWidth,
+              height: itemWidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.r),
+                color: AppColors.textSecondary.withOpacity(0.1),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: Image.network(
+                  attachment.url,
+                  fit: BoxFit.cover,
+
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: AppColors.textSecondary.withOpacity(0.1),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                              : null,
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    );
+                  },
+
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: AppColors.textSecondary.withOpacity(0.1),
+                      child: Icon(
+                        Icons.broken_image,
+                        color: AppColors.textSecondary,
+                        size: 24.sp,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
-        ],
+          );
+        }),
       ),
     );
   }

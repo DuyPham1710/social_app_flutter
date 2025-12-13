@@ -109,7 +109,7 @@ class SendMessageEvent extends MessageEvent {
   final String userId;
   final String conversationId;
   final String? text;
-  final List<Map<String, dynamic>>? attachments;
+  final List<Map<String, dynamic>>? attachments; // Attachments URLs từ upload
   final String? replyTo;
 
   const SendMessageEvent({
@@ -128,6 +128,25 @@ class SendMessageEvent extends MessageEvent {
     attachments,
     replyTo,
   ];
+}
+
+class SendMessageWithFilesEvent extends MessageEvent {
+  final String userId;
+  final String conversationId;
+  final String? text;
+  final List<String> filePaths; // File paths for MultipartFile
+  final String? replyTo;
+
+  const SendMessageWithFilesEvent({
+    required this.userId,
+    required this.conversationId,
+    this.text,
+    required this.filePaths,
+    this.replyTo,
+  });
+
+  @override
+  List<Object?> get props => [userId, conversationId, text, filePaths, replyTo];
 }
 
 class MarkAsReadEvent extends MessageEvent {
@@ -221,7 +240,8 @@ class MessageUpdatedReceivedEvent extends MessageEvent {
 class MessageReadReceivedEvent extends MessageEvent {
   final String messageId;
   final String userId;
-  final Map<String, dynamic> userInfo; // { userId, username, fullName, avatarUrl }
+  final Map<String, dynamic>
+  userInfo; // { userId, username, fullName, avatarUrl }
   final DateTime readAt;
 
   const MessageReadReceivedEvent({

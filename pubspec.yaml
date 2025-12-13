@@ -42,6 +42,7 @@ dependencies:
   bloc_concurrency: ^0.3.0
   flutter_slidable: ^4.0.3
   swipe_to: ^1.0.6
+  agora_rtc_engine: ^6.5.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
