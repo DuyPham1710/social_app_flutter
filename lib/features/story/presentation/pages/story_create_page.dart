@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_music_picker_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_editor_page.dart';
 
@@ -161,7 +162,13 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
           ),
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const StoryPrivacySettingsPage(),
+                ),
+              );
+            },
           ),
         ],
       ),

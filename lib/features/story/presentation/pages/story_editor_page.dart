@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/story/data/models/deezer_music_model.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_music_picker_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:video_player/video_player.dart';
 
@@ -24,11 +27,25 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   bool _isVideoInitialized = false;
   bool _isVideoPlaying = false;
   bool _isPrivacyOff = false;
+  
+  // Music state
+  DeezerMusicModel? _selectedMusic;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
     _initializeMedia();
+    _setupAudioPlayer();
+  }
+
+  void _setupAudioPlayer() {
+    _audioPlayer.onPlayerComplete.listen((_) {
+      // Phát lại theo vòng lặp
+      if (_selectedMusic != null && _selectedMusic!.preview.isNotEmpty) {
+        _audioPlayer.play(UrlSource(_selectedMusic!.preview));
+      }
+    });
   }
 
   Future<void> _initializeMedia() async {
@@ -54,6 +71,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   @override
   void dispose() {
     _videoController?.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -149,6 +167,8 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   }
 
   Widget _buildRightMenu() {
+    final isVideo = widget.asset.type == AssetType.video;
+    
     return Container(
       width: 80.w,
       padding: EdgeInsets.symmetric(vertical: 20.h),
@@ -166,12 +186,11 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
             label: "Văn bản",
             onTap: () {},
           ),
-          SizedBox(height: 20.h),
-          _buildMenuButton(
-            icon: Icons.music_note,
-            label: "Nhạc",
-            onTap: () {},
-          ),
+          // Chỉ hiển thị option Nhạc nếu không phải video
+          if (!isVideo) ...[
+            SizedBox(height: 20.h),
+            _buildMusicButton(),
+          ],
           SizedBox(height: 20.h),
           _buildMenuButton(
             icon: Icons.auto_awesome,
@@ -189,6 +208,73 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
             icon: Icons.alternate_email,
             label: "Gắn thẻ\nngười khác",
             onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMusicButton() {
+    return GestureDetector(
+      onTap: () async {
+        final selectedMusic = await Navigator.of(context).push<DeezerMusicModel>(
+          MaterialPageRoute(
+            builder: (_) => const StoryMusicPickerPage(),
+          ),
+        );
+
+        if (selectedMusic != null) {
+          setState(() {
+            _selectedMusic = selectedMusic;
+          });
+          
+          // Phát nhạc theo vòng lặp
+          if (selectedMusic.preview.isNotEmpty) {
+            await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+            await _audioPlayer.play(UrlSource(selectedMusic.preview));
+          }
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 50.w,
+            height: 50.w,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
+              shape: BoxShape.circle,
+              border: _selectedMusic != null
+                  ? Border.all(color: AppColors.primary, width: 2)
+                  : null,
+            ),
+            child: _selectedMusic != null
+                ? ClipOval(
+                    child: Image.network(
+                      _selectedMusic!.album.cover,
+                      width: 50.w,
+                      height: 50.w,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.music_note, color: Colors.white, size: 24.sp);
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Icon(Icons.music_note, color: Colors.white, size: 24.sp);
+                      },
+                    ),
+                  )
+                : Icon(Icons.music_note, color: Colors.white, size: 24.sp),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            "Nhạc",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -281,5 +367,4 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       ),
     );
   }
-
 }
