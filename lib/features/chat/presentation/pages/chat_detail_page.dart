@@ -25,14 +25,19 @@ import 'package:social_app_fe/features/chat/presentation/widgets/delete_message_
 import 'package:social_app_fe/features/chat/domain/usecases/get_message_edit_logs_usecase.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/video_call/domain/entities/video_call_entities.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/grid_image_item.dart';
 import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
+import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
+import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
+import 'package:social_app_fe/features/video_call/presentation/pages/incoming_call_screen.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
+  final String username;
   final String? conversationId;
   final String? friendId;
   final UserEntity? friendInfo;
@@ -40,6 +45,7 @@ class ChatDetailPage extends StatefulWidget {
   ChatDetailPage({
     super.key,
     required this.userId,
+    required this.username,
     this.conversationId,
     this.friendId,
     this.friendInfo,
@@ -118,6 +124,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   // Captured photo from camera
   String? _capturedPhotoPath;
 
+  // Video call bloc
+  late VideoCallBloc _videoCallBloc;
+
   // Helper methods để tính min/max height
   double _getPhotoPickerMinHeight() {
     // 50% màn hình
@@ -173,6 +182,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
     // Listen to focus changes để mở rộng input
     _focusNode.addListener(_onFocusChanged);
+
+    // Initialize and connect video call
+    // BLoC tự động setup listeners trong constructor
+    _videoCallBloc = s1<VideoCallBloc>();
+    _videoCallBloc.add(
+      ConnectVideoCall(userId: widget.userId, username: widget.username),
+    );
 
     // Nếu có conversationId, thực hiện load messages
     if (widget.conversationId != null) {
@@ -248,7 +264,111 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     _photoPickerScrollController.dispose();
     _typingDebounceTimer?.cancel();
     _highlightTimer?.cancel();
+    _videoCallBloc.add(const DisconnectVideoCall());
+    _videoCallBloc.close();
     super.dispose();
+  }
+
+  void _handleIncomingCall(IncomingCallEntity incomingCallModel) {
+    if (!mounted) return;
+
+    // Navigate to incoming call screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IncomingCallScreen(
+          callData: incomingCallModel,
+          userId: widget.userId,
+        ),
+      ),
+    ).then((_) {
+      // Clear call state after returning
+      _videoCallBloc.add(const ClearCallState());
+    });
+  }
+
+  void _handleCallCreated(callResponse) {
+    if (!mounted) return;
+
+    //Đợi 1 frame để đảm bảo không conflict với loading dialog
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoCallScreen(
+            channelId: callResponse.channelId,
+            token: callResponse.token,
+            appId: callResponse.appId,
+            callId: callResponse.callId,
+            userId: widget.userId,
+            isVideo: callResponse.callType == 'video',
+            isCaller: true,
+            callerName:
+                widget.friendInfo?.fullName ?? widget.friendInfo?.username,
+            callerAvatar: widget.friendInfo?.avatarUrl,
+            receiverName:
+                widget.friendInfo?.fullName ?? widget.friendInfo?.username,
+            receiverAvatar: widget.friendInfo?.avatarUrl,
+          ),
+        ),
+      ).then((_) {
+        // Clear call state after returning
+        _videoCallBloc.add(const ClearCallState());
+      });
+    });
+  }
+
+  Future<void> _initiateCall(String callType) async {
+    try {
+      // Check permissions
+      final hasPermissions = await _checkCallPermissions(callType);
+      if (!hasPermissions) {
+        if (mounted) {
+          _showError(
+            callType == 'video'
+                ? 'Cần quyền camera và microphone để gọi video'
+                : 'Cần quyền microphone để gọi thoại',
+          );
+        }
+        return;
+      }
+
+      // Create call via BLoC TRƯỚC
+      _videoCallBloc.add(
+        CreateCall(
+          userId: widget.userId,
+          receiverId: widget.friendInfo!.userId,
+          callType: callType,
+          conversationId: _currentConversationId,
+        ),
+      );
+
+      // KHÔNG show loading dialog vì nó sẽ block navigation
+      // BlocListener sẽ tự động navigate khi state thay đổi
+    } catch (e) {
+      _showError('Không thể thực hiện cuộc gọi: $e');
+    }
+  }
+
+  void _showError(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<bool> _checkCallPermissions(String callType) async {
+    if (callType == 'video') {
+      final cameraStatus = await Permission.camera.request();
+      final micStatus = await Permission.microphone.request();
+      return cameraStatus.isGranted && micStatus.isGranted;
+    } else {
+      final micStatus = await Permission.microphone.request();
+      return micStatus.isGranted;
+    }
   }
 
   void _setReplyMessage(MessageEntity message) {
@@ -783,536 +903,589 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      resizeToAvoidBottomInset: true, // Đảm bảo UI resize khi bàn phím hiện lên
+    return BlocListener<VideoCallBloc, VideoCallState>(
+      bloc: _videoCallBloc,
+      listener: (context, state) {
+        // Listen to video call state changes (tương tự MessageBloc)
+        if (state.status == VideoCallStatus.incomingCall &&
+            state.incomingCall != null) {
+          _handleIncomingCall(state.incomingCall!);
+        } else if (state.status == VideoCallStatus.callCreated &&
+            state.activeCall != null) {
+          _handleCallCreated(state.activeCall!);
+        } else if (state.status == VideoCallStatus.error) {
+          _showError(state.errorMessage ?? 'Unknown error');
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        resizeToAvoidBottomInset:
+            true, // Đảm bảo UI resize khi bàn phím hiện lên
 
-      appBar: _buildAppBar(context),
+        appBar: _buildAppBar(context),
 
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            // Ấn ngoài để ẩn bàn phím
-            FocusScope.of(context).unfocus();
-          },
-          child: Column(
-            children: [
-              Expanded(
-                child: BlocListener<ConversationBloc, ConversationState>(
-                  listener: (context, state) {
-                    // Listen kết quả tạo conversation
-                    if (state is CreateConversationSuccess) {
-                      setState(() {
-                        _currentConversationId = state.conversation.id;
-                        _isCreatingConversation = false;
-                      });
-                      // Load messages sau khi có conversationId
-                      context.read<MessageBloc>().add(
-                        LoadMessagesEvent(
-                          userId: widget.userId,
-                          conversationId: state.conversation.id,
-                          page: 1,
-                          limit: _chatLoadLimit,
-                        ),
-                      );
-                      state is MessagesLoaded
-                          ? print('true state is: $state')
-                          : print('flase state is: $state');
-                    } else if (state is CreateConversationError) {
-                      setState(() {
-                        _isCreatingConversation = false;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Lỗi tạo cuộc trò chuyện: ${state.message}',
-                          ),
-                          backgroundColor: Colors.red,
-                          duration: const Duration(seconds: 3),
-                        ),
-                      );
-                    }
-                  },
-                  child: BlocListener<MessageBloc, MessageState>(
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () {
+              // Ấn ngoài để ẩn bàn phím
+              FocusScope.of(context).unfocus();
+            },
+            child: Column(
+              children: [
+                Expanded(
+                  child: BlocListener<ConversationBloc, ConversationState>(
                     listener: (context, state) {
-                      // Listen để detect khi message được update và reload edit logs
-                      if (state is MessagesLoaded) {
-                        final currentMessages = state.messages.data;
-
-                        // Nếu có previous messages, so sánh để tìm message được update
-                        if (_previousMessages != null) {
-                          for (final currentMsg in currentMessages) {
-                            final previousMsg = _previousMessages!.firstWhere(
-                              (msg) => msg.id == currentMsg.id,
-                              orElse: () => currentMsg,
-                            );
-
-                            // Kiểm tra xem message có bị xóa không (deletedForEveryone hoặc deletedFor thay đổi)
-                            final wasDeletedForEveryone =
-                                previousMsg.deletedForEveryone;
-                            final isDeletedForEveryone =
-                                currentMsg.deletedForEveryone;
-                            final wasDeletedForMe =
-                                previousMsg.deletedFor?.any(
-                                  (user) => user.userId == widget.userId,
-                                ) ??
-                                false;
-                            final isDeletedForMe =
-                                currentMsg.deletedFor?.any(
-                                  (user) => user.userId == widget.userId,
-                                ) ??
-                                false;
-
-                            // Nếu message vừa bị xóa (cho tôi hoặc cho mọi người) bởi chính user này
-                            // Chỉ show snackbar nếu là message của chính user này hoặc user này vừa xóa
-                            final isMyMessage =
-                                currentMsg.sender.userId == widget.userId;
-                            if (isMyMessage &&
-                                ((!wasDeletedForEveryone &&
-                                        isDeletedForEveryone) ||
-                                    (!wasDeletedForMe && isDeletedForMe))) {
-                              // Show success snackbar
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) {
-                                  showSuccessSnackBar(
-                                    context,
-                                    isDeletedForEveryone
-                                        ? 'Đã xóa tin nhắn cho mọi người'
-                                        : 'Đã xóa tin nhắn cho tôi',
-                                  );
-                                }
-                              });
-                            }
-
-                            // Nếu message được update và isEdited = true, invalidate cache và reload
-                            if (previousMsg.id == currentMsg.id &&
-                                currentMsg.isEdited &&
-                                (previousMsg.text != currentMsg.text ||
-                                    previousMsg.updatedAt !=
-                                        currentMsg.updatedAt)) {
-                              // Invalidate cache cho message này
-                              _editLogsCache.remove(currentMsg.id);
-                              _loadingEditLogs.remove(currentMsg.id);
-
-                              // Reload edit logs trong background
-                              _reloadEditLogsForMessage(currentMsg);
-                            }
-                          }
-                        }
-
-                        // Update previous messages
-                        if (_previousMessages != null) {
-                          _previousMessages = List.from(currentMessages);
-                        }
+                      // Listen kết quả tạo conversation
+                      if (state is CreateConversationSuccess) {
+                        setState(() {
+                          _currentConversationId = state.conversation.id;
+                          _isCreatingConversation = false;
+                        });
+                        // Load messages sau khi có conversationId
+                        context.read<MessageBloc>().add(
+                          LoadMessagesEvent(
+                            userId: widget.userId,
+                            conversationId: state.conversation.id,
+                            page: 1,
+                            limit: _chatLoadLimit,
+                          ),
+                        );
+                        state is MessagesLoaded
+                            ? print('true state is: $state')
+                            : print('flase state is: $state');
+                      } else if (state is CreateConversationError) {
+                        setState(() {
+                          _isCreatingConversation = false;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Lỗi tạo cuộc trò chuyện: ${state.message}',
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
                       }
                     },
-                    child: BlocBuilder<MessageBloc, MessageState>(
-                      builder: (context, state) {
-                        if (state is MessagesLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          );
-                        } else if (state is MessagesLoaded) {
-                          // Không reverse list vì backend đã sort từ mới nhất đến cũ nhất
-                          final messagesList = state.messages.data;
-                          // Message mới nhất là phần tử đầu tiên trong list
-                          // final lastMessageId = messagesList.isNotEmpty
-                          //     ? messagesList.first.id
-                          //     : null;
+                    child: BlocListener<MessageBloc, MessageState>(
+                      listener: (context, state) {
+                        // Listen để detect khi message được update và reload edit logs
+                        if (state is MessagesLoaded) {
+                          final currentMessages = state.messages.data;
 
-                          // Xử lý jump khi load around ID xong
-                          if (_pendingJumpMessageId != null) {
-                            _messageKeys
-                                .clear(); // Clear keys cũ để tránh duplicate GlobalKey
-                            _loadedPages
-                                .clear(); // Clear để có thể load các page khác
-                            final currentPage =
-                                state.messages.pagination.currentPage;
-                            _loadedPages.add(
-                              currentPage,
-                            ); // Đánh dấu page hiện tại đã load
-                            // Set min và max loaded page = currentPage khi load around ID
-                            _minLoadedPage = currentPage;
-                            _maxLoadedPage = currentPage;
+                          // Nếu có previous messages, so sánh để tìm message được update
+                          if (_previousMessages != null) {
+                            for (final currentMsg in currentMessages) {
+                              final previousMsg = _previousMessages!.firstWhere(
+                                (msg) => msg.id == currentMsg.id,
+                                orElse: () => currentMsg,
+                              );
 
-                            final index = messagesList.indexWhere(
-                              (msg) => msg.id == _pendingJumpMessageId,
+                              // Kiểm tra xem message có bị xóa không (deletedForEveryone hoặc deletedFor thay đổi)
+                              final wasDeletedForEveryone =
+                                  previousMsg.deletedForEveryone;
+                              final isDeletedForEveryone =
+                                  currentMsg.deletedForEveryone;
+                              final wasDeletedForMe =
+                                  previousMsg.deletedFor?.any(
+                                    (user) => user.userId == widget.userId,
+                                  ) ??
+                                  false;
+                              final isDeletedForMe =
+                                  currentMsg.deletedFor?.any(
+                                    (user) => user.userId == widget.userId,
+                                  ) ??
+                                  false;
+
+                              // Nếu message vừa bị xóa (cho tôi hoặc cho mọi người) bởi chính user này
+                              // Chỉ show snackbar nếu là message của chính user này hoặc user này vừa xóa
+                              final isMyMessage =
+                                  currentMsg.sender.userId == widget.userId;
+                              if (isMyMessage &&
+                                  ((!wasDeletedForEveryone &&
+                                          isDeletedForEveryone) ||
+                                      (!wasDeletedForMe && isDeletedForMe))) {
+                                // Show success snackbar
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  if (mounted) {
+                                    showSuccessSnackBar(
+                                      context,
+                                      isDeletedForEveryone
+                                          ? 'Đã xóa tin nhắn cho mọi người'
+                                          : 'Đã xóa tin nhắn cho tôi',
+                                    );
+                                  }
+                                });
+                              }
+
+                              // Nếu message được update và isEdited = true, invalidate cache và reload
+                              if (previousMsg.id == currentMsg.id &&
+                                  currentMsg.isEdited &&
+                                  (previousMsg.text != currentMsg.text ||
+                                      previousMsg.updatedAt !=
+                                          currentMsg.updatedAt)) {
+                                // Invalidate cache cho message này
+                                _editLogsCache.remove(currentMsg.id);
+                                _loadingEditLogs.remove(currentMsg.id);
+
+                                // Reload edit logs trong background
+                                _reloadEditLogsForMessage(currentMsg);
+                              }
+                            }
+                          }
+
+                          // Update previous messages
+                          if (_previousMessages != null) {
+                            _previousMessages = List.from(currentMessages);
+                          }
+                        }
+                      },
+                      child: BlocBuilder<MessageBloc, MessageState>(
+                        builder: (context, state) {
+                          if (state is MessagesLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
                             );
+                          } else if (state is MessagesLoaded) {
+                            // Không reverse list vì backend đã sort từ mới nhất đến cũ nhất
+                            final messagesList = state.messages.data;
+                            // Message mới nhất là phần tử đầu tiên trong list
+                            // final lastMessageId = messagesList.isNotEmpty
+                            //     ? messagesList.first.id
+                            //     : null;
 
-                            if (index != -1) {
-                              // Đã tìm thấy tin nhắn sau khi load xong -> Thực hiện Jump
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) {
-                                  _performJump(
-                                    _pendingJumpMessageId!,
-                                    messagesList,
-                                    index,
-                                  );
-                                }
-                              });
+                            // Xử lý jump khi load around ID xong
+                            if (_pendingJumpMessageId != null) {
+                              _messageKeys
+                                  .clear(); // Clear keys cũ để tránh duplicate GlobalKey
+                              _loadedPages
+                                  .clear(); // Clear để có thể load các page khác
+                              final currentPage =
+                                  state.messages.pagination.currentPage;
+                              _loadedPages.add(
+                                currentPage,
+                              ); // Đánh dấu page hiện tại đã load
+                              // Set min và max loaded page = currentPage khi load around ID
+                              _minLoadedPage = currentPage;
+                              _maxLoadedPage = currentPage;
+
+                              final index = messagesList.indexWhere(
+                                (msg) => msg.id == _pendingJumpMessageId,
+                              );
+
+                              if (index != -1) {
+                                // Đã tìm thấy tin nhắn sau khi load xong -> Thực hiện Jump
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  if (mounted) {
+                                    _performJump(
+                                      _pendingJumpMessageId!,
+                                      messagesList,
+                                      index,
+                                    );
+                                  }
+                                });
+                              } else {
+                                // Load xong vẫn không thấy (có thể do tin nhắn bị xóa hoặc ID sai)
+                                setState(() {
+                                  _pendingJumpMessageId = null;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Không tìm thấy tin nhắn gốc',
+                                    ),
+                                  ),
+                                );
+                              }
                             } else {
-                              // Load xong vẫn không thấy (có thể do tin nhắn bị xóa hoặc ID sai)
-                              setState(() {
-                                _pendingJumpMessageId = null;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Không tìm thấy tin nhắn gốc'),
+                              // Clean up keys cho messages không còn trong list (chỉ khi không jump)
+                              final currentMessageIds = messagesList
+                                  .map((m) => m.id)
+                                  .toSet();
+                              _messageKeys.removeWhere(
+                                (key, value) =>
+                                    !currentMessageIds.contains(key),
+                              );
+
+                              // Reset loaded pages khi messages được load mới (không phải load more)
+                              // Chỉ reset khi pagination.currentPage = 1 (load lần đầu)
+                              if (state.messages.pagination.currentPage == 1) {
+                                _loadedPages.clear();
+                                _loadedPages.add(1); // Đánh dấu page 1 đã load
+                                _minLoadedPage = 1;
+                                _maxLoadedPage = 1;
+                              } else {
+                                // Nếu không phải page 1, thêm page hiện tại vào loadedPages
+                                final currentPage =
+                                    state.messages.pagination.currentPage;
+                                _loadedPages.add(currentPage);
+                                // Cập nhật min/max nếu cần
+                                if (_minLoadedPage == null ||
+                                    currentPage < _minLoadedPage!) {
+                                  _minLoadedPage = currentPage;
+                                }
+                                if (_maxLoadedPage == null ||
+                                    currentPage > _maxLoadedPage!) {
+                                  _maxLoadedPage = currentPage;
+                                }
+                              }
+                            }
+
+                            // Mark as read with the last message ID
+                            // context.read<MessageBloc>().add(
+                            //   MarkAsReadEvent(
+                            //     userId: widget.userId,
+                            //     conversationId: widget.conversationId!,
+                            //     messageId: lastMessageId,
+                            //   ),
+                            // );
+
+                            // Preload edit logs for edited messages (chỉ khi load lần đầu)
+                            if (_previousMessages == null) {
+                              _preloadEditLogs(messagesList);
+                              _previousMessages = List.from(messagesList);
+                            }
+
+                            _isLoadingMore = false;
+
+                            if (messagesList.isEmpty) {
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    _buildProfileInfo(),
+                                    Center(
+                                      child: Text(
+                                        'không có tin nhắn nào. Bắt đầu cuộc trò chuyện ngay!',
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             }
-                          } else {
-                            // Clean up keys cho messages không còn trong list (chỉ khi không jump)
-                            final currentMessageIds = messagesList
-                                .map((m) => m.id)
-                                .toSet();
-                            _messageKeys.removeWhere(
-                              (key, value) => !currentMessageIds.contains(key),
-                            );
 
-                            // Reset loaded pages khi messages được load mới (không phải load more)
-                            // Chỉ reset khi pagination.currentPage = 1 (load lần đầu)
-                            if (state.messages.pagination.currentPage == 1) {
-                              _loadedPages.clear();
-                              _loadedPages.add(1); // Đánh dấu page 1 đã load
-                              _minLoadedPage = 1;
-                              _maxLoadedPage = 1;
-                            } else {
-                              // Nếu không phải page 1, thêm page hiện tại vào loadedPages
-                              final currentPage =
-                                  state.messages.pagination.currentPage;
-                              _loadedPages.add(currentPage);
-                              // Cập nhật min/max nếu cần
-                              if (_minLoadedPage == null ||
-                                  currentPage < _minLoadedPage!) {
-                                _minLoadedPage = currentPage;
-                              }
-                              if (_maxLoadedPage == null ||
-                                  currentPage > _maxLoadedPage!) {
-                                _maxLoadedPage = currentPage;
-                              }
-                            }
-                          }
-
-                          // Mark as read with the last message ID
-                          // context.read<MessageBloc>().add(
-                          //   MarkAsReadEvent(
-                          //     userId: widget.userId,
-                          //     conversationId: widget.conversationId!,
-                          //     messageId: lastMessageId,
-                          //   ),
-                          // );
-
-                          // Preload edit logs for edited messages (chỉ khi load lần đầu)
-                          if (_previousMessages == null) {
-                            _preloadEditLogs(messagesList);
-                            _previousMessages = List.from(messagesList);
-                          }
-
-                          _isLoadingMore = false;
-
-                          if (messagesList.isEmpty) {
-                            return SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  _buildProfileInfo(),
-                                  Center(
-                                    child: Text(
-                                      'không có tin nhắn nào. Bắt đầu cuộc trò chuyện ngay!',
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            return ScrollablePositionedList.builder(
+                              itemScrollController: _itemScrollController,
+                              itemPositionsListener: _itemPositionsListener,
+                              reverse:
+                                  true, // Reverse để hiển thị messages mới nhất ở dưới
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10.h,
+                                horizontal: 12.w,
                               ),
-                            );
-                          }
+                              itemCount:
+                                  messagesList.length +
+                                  2, // +1 for profile, +1 for typing indicator
+                              itemBuilder: (context, index) {
+                                // Với reverse: true, index 0 là item cuối cùng trong list (hiển thị ở dưới cùng)
+                                // index cuối là item đầu tiên trong list (hiển thị ở trên cùng)
+                                // itemCount - 1 - index sẽ là index thực tế trong list
+                                final itemCount = messagesList.length + 2;
+                                final actualIndex = itemCount - 1 - index;
+                                final pagination = state.messages.pagination;
 
-                          return ScrollablePositionedList.builder(
-                            itemScrollController: _itemScrollController,
-                            itemPositionsListener: _itemPositionsListener,
-                            reverse:
-                                true, // Reverse để hiển thị messages mới nhất ở dưới
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10.h,
-                              horizontal: 12.w,
-                            ),
-                            itemCount:
-                                messagesList.length +
-                                2, // +1 for profile, +1 for typing indicator
-                            itemBuilder: (context, index) {
-                              // Với reverse: true, index 0 là item cuối cùng trong list (hiển thị ở dưới cùng)
-                              // index cuối là item đầu tiên trong list (hiển thị ở trên cùng)
-                              // itemCount - 1 - index sẽ là index thực tế trong list
-                              final itemCount = messagesList.length + 2;
-                              final actualIndex = itemCount - 1 - index;
-                              final pagination = state.messages.pagination;
-
-                              // Profile header ở actualIndex = 0 (index cuối - hiển thị ở trên cùng khi reverse)
-                              // Chỉ hiện khi không còn tin nhắn để load
-                              if (actualIndex == 0 && !pagination.hasNextPage) {
-                                return _buildProfileInfo();
-                              }
-
-                              // Typing indicator ở actualIndex = itemCount - 1 (index 0 - hiển thị ở dưới cùng khi reverse)
-                              if (actualIndex == itemCount - 1) {
-                                return ChatTypingIndicator(
-                                  friendAvatarUrl: widget.friendInfo?.avatarUrl,
-                                  friendName:
-                                      widget.friendInfo?.fullName ??
-                                      widget.friendInfo?.username,
-                                  currentUserId: widget.userId,
-                                );
-                              }
-
-                              // Messages: actualIndex từ 1 đến messagesList.length
-                              // actualIndex = 1 -> message cũ nhất (messagesList[messagesList.length - 1])
-                              // actualIndex = messagesList.length -> message mới nhất (messagesList[0])
-                              if (actualIndex >= 1 &&
-                                  actualIndex <= messagesList.length) {
-                                // Convert actualIndex thành message index
-                                // actualIndex = 1 -> messageIndex = messagesList.length - 1 (cũ nhất)
-                                // actualIndex = messagesList.length -> messageIndex = 0 (mới nhất)
-                                final int currentMessageIndex =
-                                    messagesList.length - actualIndex;
-                                final message =
-                                    messagesList[currentMessageIndex];
-
-                                // Kiểm tra xem message có bị xóa cho tôi không
-                                final isDeletedForMe =
-                                    message.deletedFor?.any(
-                                      (user) => user.userId == widget.userId,
-                                    ) ??
-                                    false;
-
-                                // Nếu bị xóa cho tôi thì không hiển thị
-                                if (isDeletedForMe) {
-                                  return const SizedBox.shrink();
+                                // Profile header ở actualIndex = 0 (index cuối - hiển thị ở trên cùng khi reverse)
+                                // Chỉ hiện khi không còn tin nhắn để load
+                                if (actualIndex == 0 &&
+                                    !pagination.hasNextPage) {
+                                  return _buildProfileInfo();
                                 }
 
-                                final fromMe =
-                                    message.sender.userId == widget.userId;
-
-                                // Kiểm tra xem có phải tin nhắn mới nhất không (index 0 trong list)
-                                final isLastMessage = currentMessageIndex == 0;
-
-                                // Tạo danh sách participants (chỉ bạn bè, không bao gồm mình)
-                                final otherParticipants =
-                                    widget.friendInfo != null
-                                    ? [widget.friendInfo!]
-                                    : <UserEntity>[];
-
-                                final isHighlighted =
-                                    _highlightedMessageId == message.id;
-
-                                // Lấy hoặc tạo GlobalKey cho message - đảm bảo chỉ tạo 1 lần
-                                final messageKey = _messageKeys.putIfAbsent(
-                                  message.id,
-                                  () => GlobalKey(
-                                    debugLabel: 'message_${message.id}',
-                                  ),
-                                );
-
-                                bool showAvatar = false;
-                                if (!fromMe) {
-                                  MessageEntity? nextVisibleMessage;
-                                  for (
-                                    int i = currentMessageIndex - 1;
-                                    i >= 0;
-                                    i--
-                                  ) {
-                                    final nextMsg = messagesList[i];
-                                    final isNextDeletedForMe =
-                                        nextMsg.deletedFor?.any(
-                                          (user) =>
-                                              user.userId == widget.userId,
-                                        ) ??
-                                        false;
-                                    if (!isNextDeletedForMe) {
-                                      nextVisibleMessage = nextMsg;
-                                      break;
-                                    }
-                                  }
-
-                                  if (nextVisibleMessage == null) {
-                                    showAvatar = true;
-                                  } else {
-                                    // Kiểm tra message tiếp theo có phải từ tôi không
-                                    final nextFromMe =
-                                        nextVisibleMessage.sender.userId ==
-                                        widget.userId;
-                                    if (nextFromMe) {
-                                      showAvatar = true;
-                                    }
-                                  }
+                                // Typing indicator ở actualIndex = itemCount - 1 (index 0 - hiển thị ở dưới cùng khi reverse)
+                                if (actualIndex == itemCount - 1) {
+                                  return ChatTypingIndicator(
+                                    friendAvatarUrl:
+                                        widget.friendInfo?.avatarUrl,
+                                    friendName:
+                                        widget.friendInfo?.fullName ??
+                                        widget.friendInfo?.username,
+                                    currentUserId: widget.userId,
+                                  );
                                 }
 
-                                bool showTimeHeader = false;
+                                // Messages: actualIndex từ 1 đến messagesList.length
+                                // actualIndex = 1 -> message cũ nhất (messagesList[messagesList.length - 1])
+                                // actualIndex = messagesList.length -> message mới nhất (messagesList[0])
+                                if (actualIndex >= 1 &&
+                                    actualIndex <= messagesList.length) {
+                                  // Convert actualIndex thành message index
+                                  // actualIndex = 1 -> messageIndex = messagesList.length - 1 (cũ nhất)
+                                  // actualIndex = messagesList.length -> messageIndex = 0 (mới nhất)
+                                  final int currentMessageIndex =
+                                      messagesList.length - actualIndex;
+                                  final message =
+                                      messagesList[currentMessageIndex];
 
-                                // Nếu là tin nhắn mới nhất (index 0) -> Luôn hiện
-                                if (currentMessageIndex ==
-                                    messagesList.length - 1) {
-                                  showTimeHeader = true;
-                                } else {
-                                  // Lấy tin nhắn mới hơn (index nhỏ hơn)
-                                  final nextMessage =
-                                      messagesList[currentMessageIndex + 1];
+                                  // Kiểm tra xem message có bị xóa cho tôi không
+                                  final isDeletedForMe =
+                                      message.deletedFor?.any(
+                                        (user) => user.userId == widget.userId,
+                                      ) ??
+                                      false;
 
-                                  // Kiểm tra null an toàn và so sánh
-                                  final difference = message.createdAt
-                                      .difference(nextMessage.createdAt);
-                                  // Nếu cách nhau hơn 15 phút -> Hiện
-                                  if (difference.inMinutes > 15) {
-                                    showTimeHeader = true;
+                                  // Nếu bị xóa cho tôi thì không hiển thị
+                                  if (isDeletedForMe) {
+                                    return const SizedBox.shrink();
                                   }
-                                }
 
-                                // Highlight animation container
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // widget hiển thị thời gian ngắt quãng
-                                    if (showTimeHeader)
-                                      _showTimeHeader(message),
+                                  final fromMe =
+                                      message.sender.userId == widget.userId;
 
-                                    AnimatedBuilder(
-                                      animation: _highlightController,
-                                      builder: (context, child) {
-                                        // Chỉ scale nếu item này đang được highlight
-                                        final scale = isHighlighted
-                                            ? _scaleAnimation.value
-                                            : 1.0;
+                                  // Kiểm tra xem có phải tin nhắn mới nhất không (index 0 trong list)
+                                  final isLastMessage =
+                                      currentMessageIndex == 0;
 
-                                        return Transform.scale(
-                                          scale: scale,
-                                          child: Container(
-                                            // AnimatedContainer đổi màu nền
-                                            decoration: BoxDecoration(
-                                              color: isHighlighted
-                                                  ? AppColors.primary
-                                                        .withOpacity(
-                                                          0.15,
-                                                        ) // Màu nền highlight
-                                                  : Colors.transparent,
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                            ),
+                                  // Tạo danh sách participants (chỉ bạn bè, không bao gồm mình)
+                                  final otherParticipants =
+                                      widget.friendInfo != null
+                                      ? [widget.friendInfo!]
+                                      : <UserEntity>[];
 
-                                            child: SwipeTo(
-                                              key: messageKey,
+                                  final isHighlighted =
+                                      _highlightedMessageId == message.id;
 
-                                              onRightSwipe: !fromMe
-                                                  ? (details) {
-                                                      _setReplyMessage(message);
-                                                    }
-                                                  : null, // null nghĩa là disable hướng này
-
-                                              onLeftSwipe: fromMe
-                                                  ? (details) {
-                                                      _setReplyMessage(message);
-                                                    }
-                                                  : null,
-
-                                              iconOnRightSwipe: Icons.reply,
-                                              iconOnLeftSwipe: Icons.reply,
-
-                                              // Màu sắc icon
-                                              iconColor:
-                                                  AppColors.textSecondary,
-
-                                              child: MessageItem(
-                                                message: message,
-                                                fromMe: fromMe,
-                                                showAvatar: showAvatar,
-                                                onReplyTap: (replyId) =>
-                                                    _jumpToMessage(replyId),
-                                                isLastMessage: isLastMessage,
-                                                currentUserId: widget.userId,
-                                                otherParticipants:
-                                                    otherParticipants,
-                                                onLongPress: () =>
-                                                    _handleMessageLongPress(
-                                                      message,
-                                                      fromMe,
-                                                    ),
-                                                onDoubleTap: () =>
-                                                    _handleReactionSelected(
-                                                      message,
-                                                      EmojiType.love,
-                                                    ),
-                                                onEditHistoryTap:
-                                                    message.isEdited
-                                                    ? () => _showEditHistory(
-                                                        message,
-                                                      )
-                                                    : null,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                  // Lấy hoặc tạo GlobalKey cho message - đảm bảo chỉ tạo 1 lần
+                                  final messageKey = _messageKeys.putIfAbsent(
+                                    message.id,
+                                    () => GlobalKey(
+                                      debugLabel: 'message_${message.id}',
                                     ),
-                                  ],
-                                );
-                              }
+                                  );
 
-                              // Fallback (không nên xảy ra)
-                              return const SizedBox.shrink();
-                            },
-                          );
-                        } else if (state is MessagesError) {
-                          return Column(
-                            children: [
-                              _buildProfileInfo(),
-                              Expanded(
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                  bool showAvatar = false;
+                                  if (!fromMe) {
+                                    MessageEntity? nextVisibleMessage;
+                                    for (
+                                      int i = currentMessageIndex - 1;
+                                      i >= 0;
+                                      i--
+                                    ) {
+                                      final nextMsg = messagesList[i];
+                                      final isNextDeletedForMe =
+                                          nextMsg.deletedFor?.any(
+                                            (user) =>
+                                                user.userId == widget.userId,
+                                          ) ??
+                                          false;
+                                      if (!isNextDeletedForMe) {
+                                        nextVisibleMessage = nextMsg;
+                                        break;
+                                      }
+                                    }
+
+                                    if (nextVisibleMessage == null) {
+                                      showAvatar = true;
+                                    } else {
+                                      // Kiểm tra message tiếp theo có phải từ tôi không
+                                      final nextFromMe =
+                                          nextVisibleMessage.sender.userId ==
+                                          widget.userId;
+                                      if (nextFromMe) {
+                                        showAvatar = true;
+                                      }
+                                    }
+                                  }
+
+                                  bool showTimeHeader = false;
+
+                                  // Nếu là tin nhắn mới nhất (index 0) -> Luôn hiện
+                                  if (currentMessageIndex ==
+                                      messagesList.length - 1) {
+                                    showTimeHeader = true;
+                                  } else {
+                                    // Lấy tin nhắn mới hơn (index nhỏ hơn)
+                                    final nextMessage =
+                                        messagesList[currentMessageIndex + 1];
+
+                                    // Kiểm tra null an toàn và so sánh
+                                    final difference = message.createdAt
+                                        .difference(nextMessage.createdAt);
+                                    // Nếu cách nhau hơn 15 phút -> Hiện
+                                    if (difference.inMinutes > 15) {
+                                      showTimeHeader = true;
+                                    }
+                                  }
+
+                                  // Highlight animation container
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        'Error loading messages: ${state.message}',
-                                        style: const TextStyle(
-                                          color: Colors.red,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          final conversationId =
-                                              _currentConversationId ??
-                                              widget.conversationId;
-                                          if (conversationId != null) {
-                                            context.read<MessageBloc>().add(
-                                              LoadMessagesEvent(
-                                                userId: widget.userId,
-                                                conversationId: conversationId,
+                                      // widget hiển thị thời gian ngắt quãng
+                                      if (showTimeHeader)
+                                        _showTimeHeader(message),
+
+                                      AnimatedBuilder(
+                                        animation: _highlightController,
+                                        builder: (context, child) {
+                                          // Chỉ scale nếu item này đang được highlight
+                                          final scale = isHighlighted
+                                              ? _scaleAnimation.value
+                                              : 1.0;
+
+                                          return Transform.scale(
+                                            scale: scale,
+                                            child: Container(
+                                              // AnimatedContainer đổi màu nền
+                                              decoration: BoxDecoration(
+                                                color: isHighlighted
+                                                    ? AppColors.primary
+                                                          .withOpacity(
+                                                            0.15,
+                                                          ) // Màu nền highlight
+                                                    : Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
                                               ),
-                                            );
-                                          }
+
+                                              child: SwipeTo(
+                                                key: messageKey,
+
+                                                onRightSwipe: !fromMe
+                                                    ? (details) {
+                                                        _setReplyMessage(
+                                                          message,
+                                                        );
+                                                      }
+                                                    : null, // null nghĩa là disable hướng này
+
+                                                onLeftSwipe: fromMe
+                                                    ? (details) {
+                                                        _setReplyMessage(
+                                                          message,
+                                                        );
+                                                      }
+                                                    : null,
+
+                                                iconOnRightSwipe: Icons.reply,
+                                                iconOnLeftSwipe: Icons.reply,
+
+                                                // Màu sắc icon
+                                                iconColor:
+                                                    AppColors.textSecondary,
+
+                                                child: MessageItem(
+                                                  message: message,
+                                                  fromMe: fromMe,
+                                                  showAvatar: showAvatar,
+                                                  onReplyTap: (replyId) =>
+                                                      _jumpToMessage(replyId),
+                                                  isLastMessage: isLastMessage,
+                                                  currentUserId: widget.userId,
+                                                  otherParticipants:
+                                                      otherParticipants,
+                                                  onLongPress: () =>
+                                                      _handleMessageLongPress(
+                                                        message,
+                                                        fromMe,
+                                                      ),
+                                                  onDoubleTap: () =>
+                                                      _handleReactionSelected(
+                                                        message,
+                                                        EmojiType.love,
+                                                      ),
+                                                  onEditHistoryTap:
+                                                      message.isEdited
+                                                      ? () => _showEditHistory(
+                                                          message,
+                                                        )
+                                                      : null,
+                                                  onCallAgain:
+                                                      message.metadata !=
+                                                              null &&
+                                                          message
+                                                                  .metadata!
+                                                                  .callStatus ==
+                                                              'completed'
+                                                      ? () {
+                                                          // Convert metadata type to call type
+                                                          final callType =
+                                                              message
+                                                                      .metadata!
+                                                                      .type ==
+                                                                  'video_call'
+                                                              ? 'video'
+                                                              : 'audio';
+                                                          _initiateCall(
+                                                            callType,
+                                                          );
+                                                        }
+                                                      : null,
+                                                ),
+                                              ),
+                                            ),
+                                          );
                                         },
-                                        child: const Text('Retry'),
                                       ),
                                     ],
+                                  );
+                                }
+
+                                // Fallback (không nên xảy ra)
+                                return const SizedBox.shrink();
+                              },
+                            );
+                          } else if (state is MessagesError) {
+                            return Column(
+                              children: [
+                                _buildProfileInfo(),
+                                Expanded(
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Error loading messages: ${state.message}',
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            final conversationId =
+                                                _currentConversationId ??
+                                                widget.conversationId;
+                                            if (conversationId != null) {
+                                              context.read<MessageBloc>().add(
+                                                LoadMessagesEvent(
+                                                  userId: widget.userId,
+                                                  conversationId:
+                                                      conversationId,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: const Text('Retry'),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        }
+                              ],
+                            );
+                          }
 
-                        // Default state - show profile info only
-                        return _buildProfileInfo();
-                      },
+                          // Default state - show profile info only
+                          return _buildProfileInfo();
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              _buildInputArea(),
-            ],
+                _buildInputArea(),
+              ],
+            ),
           ),
         ),
       ),
@@ -1392,7 +1565,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             color: AppColors.primary,
             size: 24.sp,
           ),
-          onPressed: () {},
+          onPressed: () => _initiateCall('audio'),
         ),
         IconButton(
           icon: Icon(
@@ -1400,7 +1573,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             color: AppColors.primary,
             size: 30.sp,
           ),
-          onPressed: () {},
+          onPressed: () => _initiateCall('video'),
         ),
         IconButton(
           icon: Icon(

@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/reaction_detail_dialog.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/call_message_item.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 
 class MessageItem extends StatelessWidget {
@@ -19,6 +20,7 @@ class MessageItem extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onEditHistoryTap;
+  final VoidCallback? onCallAgain;
 
   const MessageItem({
     super.key,
@@ -32,6 +34,7 @@ class MessageItem extends StatelessWidget {
     this.onLongPress,
     this.onDoubleTap,
     this.onEditHistoryTap,
+    this.onCallAgain,
   });
 
   // Kiểm tra xem tin nhắn đã được xem bởi người khác chưa (không tính mình)
@@ -72,15 +75,16 @@ class MessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(
-      'Building MessageItem for message ID: ${message.replyTo?.attachments}',
-    );
     final isReplying = message.replyTo != null;
     final hasReactions = message.reactions.isNotEmpty;
     final isEdited = message.isEdited;
     final isDeleteforEveryone = message.deletedForEveryone;
     final lastName = message.sender.fullName!.trim().split(' ').last;
     final isAttachment = message.attachments.isNotEmpty;
+    final isHasMetaData =
+        message.metadata != null &&
+        (message.metadata!.type == 'video_call' ||
+            message.metadata!.type == 'audio_call');
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -126,6 +130,18 @@ class MessageItem extends StatelessWidget {
                           ? _buildDeletedMessage(lastName, fromMe)
                           : isReplying
                           ? _buildReplyMessage(context)
+                          : isHasMetaData
+                          ? VideoCallMessageItem(
+                              fromMe: fromMe,
+                              callType: message.metadata!.type == 'video_call'
+                                  ? 'video'
+                                  : 'audio',
+                              callStatus:
+                                  message.metadata!.callStatus ?? 'completed',
+                              duration: message.metadata!.duration,
+                              timestamp: message.createdAt,
+                              onCallAgain: onCallAgain,
+                            )
                           :
                             // Kiểm tra xem có phải là emoji không
                             message.text != null && _isOnlyEmoji(message.text!)

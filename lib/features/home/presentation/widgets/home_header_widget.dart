@@ -20,8 +20,8 @@ class HomeHeaderWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Home',
-            style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+            'CommonsHub',
+            style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
           ),
 
           Row(

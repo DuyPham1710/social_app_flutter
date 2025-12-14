@@ -19,6 +19,11 @@ import 'package:social_app_fe/features/chat/domain/repository/chat_repository.da
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/send_message_with_files_usecase.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
+import 'package:social_app_fe/features/video_call/data/data_sources/video_call_remote_data_source.dart';
+import 'package:social_app_fe/features/video_call/data/repository/video_call_repository_impl.dart';
+import 'package:social_app_fe/features/video_call/domain/repository/video_call_repository.dart';
+import 'package:social_app_fe/features/video_call/domain/usecases/video_call_usecases.dart';
+import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/repository/comment_repository_impl.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
@@ -117,6 +122,11 @@ Future<void> initializeDependencies() async {
     SocketClient(),
     instanceName: 'chatSocket',
   );
+  // Video call namespace
+  s1.registerSingleton<SocketClient>(
+    SocketClient(),
+    instanceName: 'videoCallSocket',
+  );
 
   // DataSources
   s1.registerLazySingleton<AuthService>(() => AuthService(s1()));
@@ -145,6 +155,10 @@ Future<void> initializeDependencies() async {
     () => ChatRemoteDataSourceImpl(s1(instanceName: 'chatSocket'), s1()),
   );
 
+  s1.registerLazySingleton<VideoCallRemoteDataSource>(
+    () => VideoCallRemoteDataSource(s1(instanceName: 'videoCallSocket')),
+  );
+
   // Repositories
   s1.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(s1()));
   s1.registerLazySingleton<FriendRepository>(() => FriendRepositoryImpl(s1()));
@@ -159,6 +173,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<SearchRepository>(() => SearchRepositoryImpl(s1()));
   s1.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(remoteDataSource: s1()),
+  );
+  s1.registerLazySingleton<VideoCallRepository>(
+    () => VideoCallRepositoryImpl(remoteDataSource: s1()),
   );
 
   // Usecases
@@ -340,6 +357,46 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<MarkAsReadUseCase>(() => MarkAsReadUseCase(s1()));
   s1.registerLazySingleton<ListenConversationUpdateUseCase>(
     () => ListenConversationUpdateUseCase(s1()),
+  );
+
+  // Video Call UseCases
+  s1.registerLazySingleton<ConnectVideoCallUseCase>(
+    () => ConnectVideoCallUseCase(s1()),
+  );
+  s1.registerLazySingleton<CreateCallUseCase>(() => CreateCallUseCase(s1()));
+  s1.registerLazySingleton<AcceptCallUseCase>(() => AcceptCallUseCase(s1()));
+  s1.registerLazySingleton<RejectCallUseCase>(() => RejectCallUseCase(s1()));
+  s1.registerLazySingleton<EndCallUseCase>(() => EndCallUseCase(s1()));
+  s1.registerLazySingleton<ListenIncomingCallUseCase>(
+    () => ListenIncomingCallUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenCallAcceptedUseCase>(
+    () => ListenCallAcceptedUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenCallRejectedUseCase>(
+    () => ListenCallRejectedUseCase(s1()),
+  );
+  s1.registerLazySingleton<ListenCallEndedUseCase>(
+    () => ListenCallEndedUseCase(s1()),
+  );
+  s1.registerLazySingleton<DisconnectVideoCallUseCase>(
+    () => DisconnectVideoCallUseCase(s1()),
+  );
+
+  // Video Call Bloc
+  s1.registerFactory<VideoCallBloc>(
+    () => VideoCallBloc(
+      connectVideoCallUseCase: s1(),
+      createCallUseCase: s1(),
+      acceptCallUseCase: s1(),
+      rejectCallUseCase: s1(),
+      endCallUseCase: s1(),
+      listenIncomingCallUseCase: s1(),
+      listenCallAcceptedUseCase: s1(),
+      listenCallRejectedUseCase: s1(),
+      listenCallEndedUseCase: s1(),
+      disconnectVideoCallUseCase: s1(),
+    ),
   );
 
   // Profile Bloc

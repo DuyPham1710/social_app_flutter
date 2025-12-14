@@ -3,6 +3,23 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import 'parent_message_entity.dart';
 
+class MessageMetadataEntity extends Equatable {
+  final String? type;
+  final String? callStatus;
+  final int? duration;
+  final String? callId;
+
+  const MessageMetadataEntity({
+    this.type,
+    this.callStatus,
+    this.duration,
+    this.callId,
+  });
+
+  @override
+  List<Object?> get props => [type, callStatus, duration, callId];
+}
+
 class MessageEntity extends Equatable {
   final String id;
   final String? conversationId;
@@ -15,6 +32,7 @@ class MessageEntity extends Equatable {
   final bool deletedForEveryone;
   final List<UserEntity>? deletedFor;
   final bool isEdited;
+  final MessageMetadataEntity? metadata;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -30,6 +48,7 @@ class MessageEntity extends Equatable {
     this.deletedForEveryone = false,
     this.deletedFor,
     this.isEdited = false,
+    this.metadata,
     required this.createdAt,
     this.updatedAt,
   });
@@ -47,6 +66,7 @@ class MessageEntity extends Equatable {
     deletedForEveryone,
     deletedFor,
     isEdited,
+    metadata,
     createdAt,
     updatedAt,
   ];
@@ -64,6 +84,7 @@ class MessageEntity extends Equatable {
     bool? deletedForEveryone,
     List<UserEntity>? deletedFor,
     bool? isEdited,
+    MessageMetadataEntity? metadata,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -79,6 +100,7 @@ class MessageEntity extends Equatable {
       deletedForEveryone: deletedForEveryone ?? this.deletedForEveryone,
       deletedFor: deletedFor ?? this.deletedFor,
       isEdited: isEdited ?? this.isEdited,
+      metadata: metadata ?? this.metadata,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
