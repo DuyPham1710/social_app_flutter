@@ -1,0 +1,463 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/local/story_privacy_storage.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_friend_selection_page.dart';
+
+class StoryPrivacySettingsPage extends StatefulWidget {
+  const StoryPrivacySettingsPage({super.key});
+
+  @override
+  State<StoryPrivacySettingsPage> createState() =>
+      _StoryPrivacySettingsPageState();
+}
+
+class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
+  String _selectedPrivacy = "Bạn bè"; // Default: Friends
+  List<String> _hiddenFriendIds = [];
+  List<String> _allowedFriendIds = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final savedPrivacy = await StoryPrivacyStorage.getPrivacy();
+    final savedHiddenIds = await StoryPrivacyStorage.getHiddenFriendIds();
+    final savedAllowedIds = await StoryPrivacyStorage.getAllowedFriendIds();
+    
+    if (mounted) {
+      setState(() {
+        if (savedPrivacy != null) {
+          _selectedPrivacy = savedPrivacy;
+        }
+        _hiddenFriendIds = savedHiddenIds;
+        _allowedFriendIds = savedAllowedIds;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _savePrivacy(String privacy) async {
+    await StoryPrivacyStorage.savePrivacy(privacy);
+  }
+
+  Future<void> _saveHiddenFriendIds(List<String> friendIds) async {
+    await StoryPrivacyStorage.saveHiddenFriendIds(friendIds);
+  }
+
+  Future<void> _saveAllowedFriendIds(List<String> friendIds) async {
+    await StoryPrivacyStorage.saveAllowedFriendIds(friendIds);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: Text(
+          "Quyền riêng tư của tin",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 24.h),
+              // Who can see your story section
+              _buildWhoCanSeeSection(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWhoCanSeeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Ai có thể xem tin của bạn?",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          "Tin của bạn sẽ hiển thị trong 24 giờ.",
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 14.sp,
+          ),
+        ),
+        SizedBox(height: 20.h),
+        _buildPrivacyOption(
+          icon: Icons.public,
+          title: "Công khai",
+          description: "Bất kỳ ai",
+          value: "Công khai",
+        ),
+        SizedBox(height: 16.h),
+        _buildPrivacyOption(
+          icon: Icons.people,
+          title: "Bạn bè",
+          description: "Chỉ bạn bè của bạn",
+          value: "Bạn bè",
+        ),
+        SizedBox(height: 16.h),
+        _buildHideStoryOption(),
+        SizedBox(height: 16.h),
+        _buildCustomPrivacyOption(),
+      ],
+    );
+  }
+
+  Widget _buildPrivacyOption({
+    required IconData icon,
+    required String title,
+    required String description,
+    required String value,
+  }) {
+    final isSelected = _selectedPrivacy == value;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedPrivacy = value;
+        });
+        _savePrivacy(value);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.grey[900]!.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: Colors.grey[800]!.withOpacity(0.5),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.white, size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 24.w,
+              height: 24.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : Colors.white54,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 14.w,
+                        height: 14.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHideStoryOption() {
+    return BlocBuilder<FriendBloc, FriendState>(
+      builder: (context, state) {
+        // Get friend names from selected IDs
+        String displayText = "Chưa chọn ai";
+        if (state is FriendLoaded && _hiddenFriendIds.isNotEmpty) {
+          final selectedFriends = state.friends
+              .where((f) => _hiddenFriendIds.contains(f.userId))
+              .toList();
+          
+          if (selectedFriends.isEmpty) {
+            displayText = "Chưa chọn ai";
+          } else if (selectedFriends.length == 1) {
+            displayText = selectedFriends.first.fullName ?? 
+                         selectedFriends.first.username ?? 
+                         "1 người";
+          } else if (selectedFriends.length <= 3) {
+            final names = selectedFriends
+                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .join(", ");
+            displayText = names;
+          } else {
+            final firstNames = selectedFriends
+                .take(2)
+                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .join(", ");
+            final remaining = selectedFriends.length - 2;
+            displayText = "$firstNames và $remaining người khác";
+          }
+        } else if (_hiddenFriendIds.isEmpty) {
+          displayText = "Chưa chọn ai";
+        }
+
+        return GestureDetector(
+          onTap: () async {
+            final selectedIds = await Navigator.of(context).push<List<String>>(
+              MaterialPageRoute(
+                builder: (_) => StoryFriendSelectionPage(
+                  initialSelectedIds: _hiddenFriendIds,
+                ),
+              ),
+            );
+
+            if (selectedIds != null) {
+              setState(() {
+                _hiddenFriendIds = selectedIds;
+              });
+              _saveHiddenFriendIds(selectedIds);
+            }
+          },
+          child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.grey[900]!.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Ẩn tin với",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    displayText,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13.sp,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: Colors.white70,
+              size: 24.sp,
+            ),
+          ],
+        ),
+      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomPrivacyOption() {
+    return BlocBuilder<FriendBloc, FriendState>(
+      builder: (context, state) {
+        // Get friend names from selected IDs
+        String displayText = "Chưa chọn ai";
+        if (state is FriendLoaded && _allowedFriendIds.isNotEmpty) {
+          final selectedFriends = state.friends
+              .where((f) => _allowedFriendIds.contains(f.userId))
+              .toList();
+          
+          if (selectedFriends.isEmpty) {
+            displayText = "Chưa chọn ai";
+          } else if (selectedFriends.length == 1) {
+            displayText = selectedFriends.first.fullName ?? 
+                         selectedFriends.first.username ?? 
+                         "1 người";
+          } else if (selectedFriends.length <= 3) {
+            final names = selectedFriends
+                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .join(", ");
+            displayText = names;
+          } else {
+            final firstNames = selectedFriends
+                .take(2)
+                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .join(", ");
+            final remaining = selectedFriends.length - 2;
+            displayText = "$firstNames và $remaining người khác";
+          }
+        } else if (_allowedFriendIds.isEmpty) {
+          displayText = "Chưa chọn ai";
+        }
+
+        final isSelected = _selectedPrivacy == "Tùy chỉnh";
+        
+        return GestureDetector(
+          onTap: () async {
+            // First select "Tùy chỉnh" option
+            setState(() {
+              _selectedPrivacy = "Tùy chỉnh";
+            });
+            await _savePrivacy("Tùy chỉnh");
+            
+            // Then navigate to friend selection page
+            final selectedIds = await Navigator.of(context).push<List<String>>(
+              MaterialPageRoute(
+                builder: (_) => StoryFriendSelectionPage(
+                  initialSelectedIds: _allowedFriendIds,
+                  title: "Chọn người để chia sẻ tin",
+                  allowEmptySelection: false,
+                ),
+              ),
+            );
+
+            if (selectedIds != null) {
+              setState(() {
+                _allowedFriendIds = selectedIds;
+              });
+              await _saveAllowedFriendIds(selectedIds);
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+            decoration: BoxDecoration(
+              color: Colors.grey[900]!.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 40.w,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800]!.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.person_outline, color: Colors.white, size: 20.sp),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Tùy chỉnh",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        displayText,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13.sp,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 24.w,
+                  height: 24.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : Colors.white54,
+                      width: 2,
+                    ),
+                  ),
+                  child: isSelected
+                      ? Center(
+                          child: Container(
+                            width: 14.w,
+                            height: 14.w,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
