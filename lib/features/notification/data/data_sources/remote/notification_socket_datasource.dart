@@ -27,6 +27,7 @@ class NotificationSocketDataSource {
 
       for (final e in data['items']) {
         try {
+          print('📦 Raw notification item: $e');
           items.add(NotificationModel.fromJson(Map<String, dynamic>.from(e)));
         } catch (err) {
           print('❌ Notification parse error: $err');
@@ -34,7 +35,8 @@ class NotificationSocketDataSource {
         }
       }
 
-      print('Notifications received: ${items.length}');
+      print('✅ Notifications received: ${items.length}');
+      print('📋 Items content field: ${items.map((i) => i.content).toList()}');
       _listController.add(items);
       _unreadController.add(data['unread'] ?? 0);
     });

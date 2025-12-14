@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/features/notification/domain/entities/notification_entity.dart';
 import 'package:social_app_fe/features/notification/domain/repository/notification_repository.dart';
 import 'notification_event.dart';
 import 'notification_state.dart';
+import 'package:social_app_fe/features/notification/presentation/services/notification_sound_service.dart';
 
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final NotificationRepository repository;
@@ -33,15 +35,18 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     });
 
     on<NotificationsLoaded>((event, emit) {
+      // Count unread notifications from the loaded list
+      final unreadCount = event.notifications.where((n) => !n.isRead).length;
       emit(
         NotificationState(
           notifications: event.notifications,
-          unread: state.unread,
+          unread: unreadCount,
         ),
       );
     });
 
     on<NewNotificationReceived>((event, emit) {
+      NotificationSoundService.play();
       emit(
         NotificationState(
           notifications: [event.notification, ...state.notifications],
@@ -61,7 +66,27 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     on<MarkNotificationRead>((event, emit) => repository.markRead(event.id));
 
-    on<MarkAllNotificationsRead>((event, emit) => repository.markAllRead());
+    on<MarkAllNotificationsRead>((event, emit) async {
+      // Update all notifications to be read immediately
+      final updatedNotifications = state.notifications
+          .map(
+            (n) => NotificationEntity(
+              id: n.id,
+              type: n.type,
+              message: n.message,
+              content: n.content,
+              isRead: true,
+              createdAt: n.createdAt,
+              sender: n.sender,
+              targetId: n.targetId,
+            ),
+          )
+          .toList();
+      emit(NotificationState(notifications: updatedNotifications, unread: 0));
+
+      // Then send to server
+      repository.markAllRead();
+    });
   }
 
   @override
