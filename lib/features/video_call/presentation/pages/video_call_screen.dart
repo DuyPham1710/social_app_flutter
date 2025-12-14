@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/services/call_sound_service.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/call_feedback_screen.dart';
 
@@ -51,8 +51,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   Timer? _callTimer;
   Timer? _callTimeoutTimer;
   int _callDuration = 0;
-  late VideoCallBloc _videoCallBloc;
+  // late VideoCallBloc _videoCallBloc;
   bool _isConnecting = true;
+  bool _hasRemoteUserJoined = false; // Track if remote user has EVER joined
+  final CallSoundService _soundService = CallSoundService();
 
   static const int _callTimeoutSeconds = 45;
 
@@ -60,14 +62,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   void initState() {
     super.initState();
 
-    _videoCallBloc = s1<VideoCallBloc>();
+    // _videoCallBloc = s1<VideoCallBloc>();
 
     _initAgora();
     _startCallTimer();
 
-    // Nếu là caller, bắt đầu timer để tự động timeout cuộc gọi
+    // Nếu là caller, bắt đầu timer và play ringtone
     if (widget.isCaller) {
       _startCallTimeoutTimer();
+      _soundService.playRingtone(); // Play "tút tút" sound for caller
     }
   }
 
@@ -98,9 +101,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               setState(() {
                 _remoteUid = remoteUid;
                 _isConnecting = false;
+                _hasRemoteUserJoined = true; // Mark that remote user has joined
               });
             }
             _callTimeoutTimer?.cancel();
+            _soundService.stop(); // Stop ringtone when remote user joins
           },
           onUserOffline:
               (
@@ -208,23 +213,26 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   Future<void> _endCall() async {
     try {
-      // Determine call status based on whether remote user joined
-      // If _remoteUid is null, the other person never joined = missed call
+      // Stop sound when ending call
+      await _soundService.stop();
+      
       String callStatus;
-      if (_remoteUid == null && widget.isCaller) {
-        // Caller ending before receiver joined = missed
+      if (!_hasRemoteUserJoined && widget.isCaller) {
+        // Caller ending before receiver EVER joined = missed
         callStatus = 'missed';
       } else {
-        // Normal call end (both joined) = completed
+        // Remote user joined at some point = completed
         callStatus = 'completed';
       }
 
-      _videoCallBloc.add(EndCall(
-        userId: widget.userId,
-        callId: widget.callId,
-        duration: _callDuration,
-        callStatus: callStatus, // Pass determined status
-      ));
+      context.read<VideoCallBloc>().add(
+        EndCall(
+          userId: widget.userId,
+          callId: widget.callId,
+          duration: _callDuration,
+          callStatus: callStatus, // Pass determined status
+        ),
+      );
       await _engine.leaveChannel();
 
       if (mounted) {
@@ -279,6 +287,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _isDisposing = true;
     _callTimer?.cancel();
     _callTimeoutTimer?.cancel();
+    _soundService.stop(); // Stop sound when disposing
 
     try {
       _engine.leaveChannel();
@@ -293,7 +302,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<VideoCallBloc, VideoCallState>(
-      bloc: _videoCallBloc,
+      //  bloc: _videoCallBloc,
       listener: (context, state) {
         // Khi bị reject, hiện feedback screen
         if (state.status == VideoCallStatus.callRejected) {

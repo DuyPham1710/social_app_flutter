@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
@@ -33,25 +32,21 @@ class _HomePageState extends State<HomePage> {
 
     // Chỉ khởi tạo WebSocket, việc load posts sẽ được tự động trigger
     // sau khi WebSocket connect xong
-    // context.read()<VideoCallBloc>().add(ConnectVideoCall(userId: , username: ));
+    _connectVideoCall();
     context.read<HomeBloc>().add(const InitializeWebSocketEvent());
 
     // Lắng nghe sự kiện scroll để load more
     _scrollController.addListener(_onScroll);
   }
 
-  // void _connectVideoCall() {
-  //   final authState = context.read<AuthBloc>().state;
-  //   if (authState is AuthLoaded && authState.user != null) {
-  //     final user = authState.user!;
-  //     context.read<VideoCallBloc>().add(
-  //           ConnectVideoCall(
-  //             userId: user.userId,
-  //             username: user.username,
-  //           ),
-  //         );
-  //   }
-  // }
+  Future<void> _connectVideoCall() async {
+    final userData = await TokenStorage.getUserData();
+    String userId = userData?['id'];
+    String username = userData?['username'];
+    context.read<VideoCallBloc>().add(
+      ConnectVideoCall(userId: userId, username: username),
+    );
+  }
 
   @override
   void dispose() {

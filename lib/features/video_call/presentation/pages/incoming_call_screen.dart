@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/services/call_sound_service.dart';
 import 'package:social_app_fe/features/video_call/domain/entities/video_call_entities.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
@@ -26,7 +26,8 @@ class _IncomingCallScreenState extends State<IncomingCallScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  late VideoCallBloc _videoCallBloc;
+  // late VideoCallBloc _videoCallBloc;
+  final CallSoundService _soundService = CallSoundService();
 
   @override
   void initState() {
@@ -42,17 +43,24 @@ class _IncomingCallScreenState extends State<IncomingCallScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    _videoCallBloc = s1<VideoCallBloc>();
+    // _videoCallBloc = s1<VideoCallBloc>();
+    
+    // Play incoming call sound
+    _soundService.playIncomingCall();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _soundService.stop(); // Stop incoming call sound
     super.dispose();
   }
 
   void _navigateToCallScreen(tokenEntity) {
     if (!mounted) return;
+
+    // Stop incoming call sound before navigating
+    _soundService.stop();
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -74,13 +82,16 @@ class _IncomingCallScreenState extends State<IncomingCallScreen>
   }
 
   void _acceptCall() {
-    _videoCallBloc.add(
+    context.read<VideoCallBloc>().add(
       AcceptCall(userId: widget.userId, callId: widget.callData.callId),
     );
   }
 
   void _rejectCall() {
-    _videoCallBloc.add(
+    // Stop sound before rejecting
+    _soundService.stop();
+    
+    context.read<VideoCallBloc>().add(
       RejectCall(userId: widget.userId, callId: widget.callData.callId),
     );
 
@@ -106,17 +117,19 @@ class _IncomingCallScreenState extends State<IncomingCallScreen>
     final isVideoCall = widget.callData.callType == 'video';
 
     return BlocListener<VideoCallBloc, VideoCallState>(
-      bloc: _videoCallBloc,
+      //  bloc: _videoCallBloc,
       listener: (context, state) {
         if (state.status == VideoCallStatus.inCall &&
             state.tokenEntity != null) {
           _navigateToCallScreen(state.tokenEntity!);
         } else if (state.status == VideoCallStatus.callEnded) {
           // Caller ended the call before receiver picked up (missed call)
+          _soundService.stop(); // Stop sound
           if (mounted) {
             Navigator.of(context).pop();
           }
         } else if (state.status == VideoCallStatus.error) {
+          _soundService.stop(); // Stop sound on error
           _showError(state.errorMessage ?? 'Unknown error');
         }
       },

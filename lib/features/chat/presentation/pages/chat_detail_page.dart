@@ -125,7 +125,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   String? _capturedPhotoPath;
 
   // Video call bloc
-  late VideoCallBloc _videoCallBloc;
+  // late VideoCallBloc _videoCallBloc;
 
   // Helper methods để tính min/max height
   double _getPhotoPickerMinHeight() {
@@ -185,10 +185,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
     // Initialize and connect video call
     // BLoC tự động setup listeners trong constructor
-    _videoCallBloc = s1<VideoCallBloc>();
-    _videoCallBloc.add(
-      ConnectVideoCall(userId: widget.userId, username: widget.username),
-    );
+    // _videoCallBloc = s1<VideoCallBloc>();
+    // _videoCallBloc.add(
+    //   ConnectVideoCall(userId: widget.userId, username: widget.username),
+    // );
 
     // Nếu có conversationId, thực hiện load messages
     if (widget.conversationId != null) {
@@ -264,8 +264,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     _photoPickerScrollController.dispose();
     _typingDebounceTimer?.cancel();
     _highlightTimer?.cancel();
-    _videoCallBloc.add(const DisconnectVideoCall());
-    _videoCallBloc.close();
+    // _videoCallBloc.add(const DisconnectVideoCall());
+    // _videoCallBloc.close();
     super.dispose();
   }
 
@@ -283,7 +283,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       ),
     ).then((_) {
       // Clear call state after returning
-      _videoCallBloc.add(const ClearCallState());
+      // _videoCallBloc.add(const ClearCallState());
     });
   }
 
@@ -315,7 +315,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         ),
       ).then((_) {
         // Clear call state after returning
-        _videoCallBloc.add(const ClearCallState());
+        // _videoCallBloc.add(const ClearCallState());
       });
     });
   }
@@ -336,7 +336,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       }
 
       // Create call via BLoC TRƯỚC
-      _videoCallBloc.add(
+      context.read<VideoCallBloc>().add(
         CreateCall(
           userId: widget.userId,
           receiverId: widget.friendInfo!.userId,
@@ -904,7 +904,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   @override
   Widget build(BuildContext context) {
     return BlocListener<VideoCallBloc, VideoCallState>(
-      bloc: _videoCallBloc,
+    //  bloc: _videoCallBloc,
       listener: (context, state) {
         // Listen to video call state changes (tương tự MessageBloc)
         if (state.status == VideoCallStatus.incomingCall &&
