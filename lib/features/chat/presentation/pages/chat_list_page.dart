@@ -33,6 +33,7 @@ class ChatListPage extends StatefulWidget {
 
 class _ChatListPageState extends State<ChatListPage> {
   String? userId;
+  String? username;
   late MessageBloc messageBloc;
 
   late final ConversationBloc _conversationBloc;
@@ -107,6 +108,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _loadUserInfo() async {
     final userData = await TokenStorage.getUserData();
     userId = userData?['id'];
+    username = userData?['username'];
   }
 
   Future<void> _loadConversations() async {
@@ -177,6 +179,7 @@ class _ChatListPageState extends State<ChatListPage> {
           create: (_) => messageBloc,
           child: ChatDetailPage(
             userId: userId!,
+            username: username!,
             conversationId: conversationId,
             friendInfo: friendInfo,
           ),
@@ -279,6 +282,7 @@ class _ChatListPageState extends State<ChatListPage> {
               child: ChatDetailPage(
                 // Pass friendId to create new conversation
                 userId: userId!,
+                username: username!,
                 friendId: friend.userId,
                 friendInfo: friendInfo,
               ),
@@ -603,7 +607,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                     .attachments
                                     .isNotEmpty) {
                                   previewText =
-                                      "${fromMe ? "Bạn " : " $lastName"}đã gửi ${conversation.lastMessage?.attachments.first.type}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";
+                                      "${fromMe ? "Bạn" : " $lastName"} đã gửi ${conversation.lastMessage?.attachments.first.type}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";
                                 } else {
                                   previewText =
                                       "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";

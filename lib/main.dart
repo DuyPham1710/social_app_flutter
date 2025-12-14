@@ -25,6 +25,7 @@ import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/pages/search_page.dart';
+import 'package:social_app_fe/features/video_call/presentation/bloc/video_call_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +56,7 @@ Future<void> main() async {
           BlocProvider(create: (_) => s1<FriendForUserBloc>()),
           BlocProvider(create: (_) => s1<NotificationBloc>()),
 
+          BlocProvider(create: (_) => s1<VideoCallBloc>()),
         ],
         child: MyApp(),
       ),

@@ -102,6 +102,43 @@ class SeenByModel {
       SeenByEntity(user: user.toEntity(), seenAt: seenAt);
 }
 
+class MessageMetadataModel {
+  final String? type; // 'video_call' or 'audio_call'
+  final String? callStatus; // 'completed', 'missed', 'rejected'
+  final int? duration; // in seconds
+  final String? callId;
+
+  MessageMetadataModel({
+    this.type,
+    this.callStatus,
+    this.duration,
+    this.callId,
+  });
+
+  factory MessageMetadataModel.fromJson(Map<String, dynamic> json) {
+    return MessageMetadataModel(
+      type: json['type'] as String?,
+      callStatus: json['callStatus'] as String?,
+      duration: json['duration'] as int?,
+      callId: json['callId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'type': type,
+    'callStatus': callStatus,
+    'duration': duration,
+    'callId': callId,
+  };
+
+  MessageMetadataEntity toEntity() => MessageMetadataEntity(
+    type: type,
+    callStatus: callStatus,
+    duration: duration,
+    callId: callId,
+  );
+}
+
 class MessageModel {
   final String id;
   final String? conversationId;
@@ -114,6 +151,7 @@ class MessageModel {
   final bool deletedForEveryone;
   final List<UserModel>? deletedFor;
   final bool isEdited;
+  final MessageMetadataModel? metadata;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -129,6 +167,7 @@ class MessageModel {
     this.deletedForEveryone = false,
     this.deletedFor,
     this.isEdited = false,
+    this.metadata,
     required this.createdAt,
     this.updatedAt,
   });
@@ -177,6 +216,20 @@ class MessageModel {
       // If replyTo is a string (just messageId), we ignore it as we need full ParentMessageDto
     }
 
+    // Parse metadata if present
+    MessageMetadataModel? metadata;
+    if (json['metadata'] != null && json['metadata'] is Map) {
+      try {
+        final metadataMap = json['metadata'] is Map<String, dynamic>
+            ? json['metadata'] as Map<String, dynamic>
+            : Map<String, dynamic>.from(json['metadata'] as Map);
+        metadata = MessageMetadataModel.fromJson(metadataMap);
+      } catch (e) {
+        print('Error parsing metadata: $e');
+        metadata = null;
+      }
+    }
+
     return MessageModel(
       id: json['_id'] as String,
       conversationId: json['conversationId'] as String?,
@@ -201,6 +254,7 @@ class MessageModel {
         (item) => UserModel.fromJson(item),
       ),
       isEdited: json['isEdited'] as bool? ?? false,
+      metadata: metadata,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -220,6 +274,7 @@ class MessageModel {
     'deletedForEveryone': deletedForEveryone,
     'deletedFor': deletedFor?.map((e) => e.toJson()).toList(),
     'isEdited': isEdited,
+    'metadata': metadata?.toJson(),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt?.toIso8601String(),
   };
@@ -236,6 +291,7 @@ class MessageModel {
     deletedForEveryone: deletedForEveryone,
     deletedFor: deletedFor?.map((e) => e.toEntity()).toList(),
     isEdited: isEdited,
+    metadata: metadata?.toEntity(),
     createdAt: createdAt,
     updatedAt: updatedAt,
   );
