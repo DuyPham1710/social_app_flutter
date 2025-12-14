@@ -1,111 +1,129 @@
 import 'package:flutter/material.dart';
-import 'package:social_app_fe/features/notification/presentation/widgets/comment_notification_item.dart';
-import 'package:social_app_fe/features/notification/presentation/widgets/friend_request_notification_item.dart';
-import 'package:social_app_fe/features/notification/presentation/widgets/message_notification_item.dart';
-import 'package:social_app_fe/features/notification/presentation/widgets/share_notification_item.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/enums/notification_type.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
+import '../bloc/notification_bloc.dart';
+import '../bloc/notification_state.dart';
+import '../widgets/comment_notification_item.dart';
+import '../widgets/friend_request_notification_item.dart';
 
-class NotificationPage extends StatelessWidget {
+class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
+
+  @override
+  State<NotificationPage> createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<NotificationPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  String _timeAgo(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes < 60) return '${diff.inMinutes} phút';
+    if (diff.inHours < 24) return '${diff.inHours} giờ';
+    return '${diff.inDays} ngày';
+  }
+
+  Widget _buildNotificationItem(dynamic notification) {
+    switch (notification.type) {
+      case NotificationType.FRIEND_REQUEST:
+        return FriendRequestNotificationItem(
+          avatarUrl: notification.sender?.avatarUrl ?? '',
+          userName: notification.sender?.fullName ?? '',
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+          mutualFriends: '',
+          onAccept: () {},
+          onRemove: () {},
+        );
+
+      case NotificationType.POST_COMMENT:
+        return CommentNotificationItem(
+          avatarUrl: notification.sender?.avatarUrl ?? '',
+          userName: notification.sender?.fullName ?? '',
+          content: notification.message,
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+        );
+      case NotificationType.UNKNOWN:
+        throw UnimplementedError();
+      case NotificationType.POST_REACTION:
+        return ReactPostNotificationItem(
+          avatarUrl: notification.sender?.avatarUrl ?? '',
+          userName: notification.sender?.fullName ?? '',
+          message: notification.message,
+          content: notification.content ?? 'like',
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+        );
+      default:
+        throw UnimplementedError(
+          'Unknown notification type: ${notification.type}',
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          "Thông báo",
+          'Thông báo',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        actions: const [
-          Icon(Icons.more_horiz, size: 28),
-          SizedBox(width: 16),
-          Icon(Icons.search, size: 28),
-          SizedBox(width: 16),
-        ],
       ),
+      body: BlocBuilder<NotificationBloc, NotificationState>(
+        builder: (context, state) {
+          if (state.notifications.isEmpty) {
+            return const Center(child: Text('Chưa có thông báo'));
+          }
 
-      body: ListView(
-        children: [
-          const NotificationSectionTitle(title: "Mới"),
+          // Separate unread and read notifications
+          final unreadNotifications = state.notifications
+              .where((n) => !n.isRead)
+              .toList();
+          final readNotifications = state.notifications
+              .where((n) => n.isRead)
+              .toList();
 
-          // ======= NEW NOTIFICATIONS =======
-          FriendRequestNotificationItem(
-            avatarUrl: "https://picsum.photos/200?10",
-            userName: "Duy Phạm",
-            time: "38 phút",
-            isRead: false,
-            mutualFriends: "33 bạn chung",
-            onAccept: () {},
-            onRemove: () {},
-          ),
-
-          MessageNotificationItem(
-            isRead: false,
-            avatarUrl: "https://picsum.photos/200?1",
-            title: "Mê Tiki: Ủa, sao Tiki biết mấy con mọt sách như tui...",
-            time: "24 phút",
-          ),
-
-          CommentNotificationItem(
-            isRead: false,
-            avatarUrl: "https://picsum.photos/200?2",
-            title: "Võ Trung Tuấn Kiệt đã bình luận về bài viết của bạn...",
-            preview: "\"Hồ ở đâu ạ\"",
-            time: "1 giờ",
-          ),
-
-          ShareNotificationItem(
-            isRead: false,
-            avatarUrl: "https://picsum.photos/200?3",
-            title: "BLV Anh Quân - News gần đây đã chia sẻ 1 bài viết.",
-            time: "1 giờ",
-          ),
-
-          const SizedBox(height: 12),
-          const NotificationSectionTitle(title: "Trước đó"),
-
-          // ======= OLD NOTIFICATIONS =======
-          MessageNotificationItem(
-            isRead: true,
-            avatarUrl: "https://picsum.photos/200?4",
-            title: "Gia Sư Nhân Văn đã đăng một cập nhật: Lớp cần gia sư...",
-            time: "5 giờ",
-          ),
-
-          MessageNotificationItem(
-            isRead: true,
-            avatarUrl: "https://picsum.photos/200?5",
-            title: "Gia Sư Nhân Văn đã đăng một cập nhật: Lớp cần gia sư...",
-            time: "6 giờ",
-          ),
-
-          CommentNotificationItem(
-            isRead: true,
-            avatarUrl: "https://picsum.photos/200?6",
-            title:
-                "Andy Thái Bùi và Minh Đức đã bình luận về bài viết của bạn...",
-            preview: "Andy: \"Ib em với\"",
-            time: "7 giờ",
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class NotificationSectionTitle extends StatelessWidget {
-  final String title;
-  const NotificationSectionTitle({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          return ListView(
+            children: [
+              // "Mới" section (unread notifications)
+              if (unreadNotifications.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    'Mới',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ...unreadNotifications.map((n) => _buildNotificationItem(n)),
+              ],
+              // "Cũ hơn" section (read notifications)
+              // Only show title if there are both unread and read notifications
+              if (readNotifications.isNotEmpty &&
+                  unreadNotifications.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                  child: Text(
+                    'Cũ hơn',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+              // Show read notifications (with or without title)
+              if (readNotifications.isNotEmpty)
+                ...readNotifications.map((n) => _buildNotificationItem(n)),
+            ],
+          );
+        },
       ),
     );
   }

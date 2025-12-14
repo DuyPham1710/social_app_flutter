@@ -19,6 +19,7 @@ import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
@@ -52,6 +53,8 @@ Future<void> main() async {
           BlocProvider(create: (_) => s1<PostBloc>()),
           BlocProvider(create: (_) => s1<ConversationBloc>()),
           BlocProvider(create: (_) => s1<FriendForUserBloc>()),
+          BlocProvider(create: (_) => s1<NotificationBloc>()),
+
         ],
         child: MyApp(),
       ),

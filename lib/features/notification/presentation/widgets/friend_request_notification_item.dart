@@ -28,6 +28,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
           ? const Color(0xFFFFFFFF)
           : const Color(0xFFEAF3FF), // màu nền khi chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      // ignore: sort_child_properties_last
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -88,7 +89,10 @@ class FriendRequestNotificationItem extends StatelessWidget {
 
                 Row(
                   children: [
-                    Text(time, style: TextStyle(color: Colors.grey.shade700)),
+                    Text(
+                      time == "0 phút" ? "Vừa xong" : time,
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
                   ],
                 ),
 
@@ -151,6 +155,9 @@ class FriendRequestNotificationItem extends StatelessWidget {
           const Icon(Icons.more_horiz),
         ],
       ),
+
+      //khoảng cách giữa các item
+      margin: const EdgeInsets.only(bottom: 4),
     );
   }
 }
