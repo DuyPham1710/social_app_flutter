@@ -1,4 +1,6 @@
 enum NotificationType {
   FRIEND_REQUEST,
-  POST_COMMENT, UNKNOWN,
+  POST_COMMENT, 
+  POST_REACTION,
+  UNKNOWN,
 }

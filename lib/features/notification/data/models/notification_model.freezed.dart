@@ -25,6 +25,7 @@ mixin _$NotificationModel {
   String get id => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
+  String? get content => throw _privateConstructorUsedError;
   bool get isRead => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _dateTimeFromJson)
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -52,6 +53,7 @@ abstract class $NotificationModelCopyWith<$Res> {
     @JsonKey(name: '_id') String id,
     String type,
     String message,
+    String? content,
     bool isRead,
     @JsonKey(fromJson: _dateTimeFromJson) DateTime? createdAt,
     UserModel? sender,
@@ -79,6 +81,7 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
     Object? id = null,
     Object? type = null,
     Object? message = null,
+    Object? content = freezed,
     Object? isRead = null,
     Object? createdAt = freezed,
     Object? sender = freezed,
@@ -98,6 +101,10 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
                       as String,
+            content: freezed == content
+                ? _value.content
+                : content // ignore: cast_nullable_to_non_nullable
+                      as String?,
             isRead: null == isRead
                 ? _value.isRead
                 : isRead // ignore: cast_nullable_to_non_nullable
@@ -147,6 +154,7 @@ abstract class _$$NotificationModelImplCopyWith<$Res>
     @JsonKey(name: '_id') String id,
     String type,
     String message,
+    String? content,
     bool isRead,
     @JsonKey(fromJson: _dateTimeFromJson) DateTime? createdAt,
     UserModel? sender,
@@ -174,6 +182,7 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
     Object? id = null,
     Object? type = null,
     Object? message = null,
+    Object? content = freezed,
     Object? isRead = null,
     Object? createdAt = freezed,
     Object? sender = freezed,
@@ -193,6 +202,10 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
                   as String,
+        content: freezed == content
+            ? _value.content
+            : content // ignore: cast_nullable_to_non_nullable
+                  as String?,
         isRead: null == isRead
             ? _value.isRead
             : isRead // ignore: cast_nullable_to_non_nullable
@@ -221,6 +234,7 @@ class _$NotificationModelImpl implements _NotificationModel {
     @JsonKey(name: '_id') required this.id,
     required this.type,
     required this.message,
+    this.content,
     required this.isRead,
     @JsonKey(fromJson: _dateTimeFromJson) this.createdAt,
     this.sender,
@@ -238,6 +252,8 @@ class _$NotificationModelImpl implements _NotificationModel {
   @override
   final String message;
   @override
+  final String? content;
+  @override
   final bool isRead;
   @override
   @JsonKey(fromJson: _dateTimeFromJson)
@@ -249,7 +265,7 @@ class _$NotificationModelImpl implements _NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, type: $type, message: $message, isRead: $isRead, createdAt: $createdAt, sender: $sender, targetId: $targetId)';
+    return 'NotificationModel(id: $id, type: $type, message: $message, content: $content, isRead: $isRead, createdAt: $createdAt, sender: $sender, targetId: $targetId)';
   }
 
   @override
@@ -260,6 +276,7 @@ class _$NotificationModelImpl implements _NotificationModel {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.message, message) || other.message == message) &&
+            (identical(other.content, content) || other.content == content) &&
             (identical(other.isRead, isRead) || other.isRead == isRead) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -275,6 +292,7 @@ class _$NotificationModelImpl implements _NotificationModel {
     id,
     type,
     message,
+    content,
     isRead,
     createdAt,
     sender,
@@ -303,6 +321,7 @@ abstract class _NotificationModel implements NotificationModel {
     @JsonKey(name: '_id') required final String id,
     required final String type,
     required final String message,
+    final String? content,
     required final bool isRead,
     @JsonKey(fromJson: _dateTimeFromJson) final DateTime? createdAt,
     final UserModel? sender,
@@ -319,6 +338,8 @@ abstract class _NotificationModel implements NotificationModel {
   String get type;
   @override
   String get message;
+  @override
+  String? get content;
   @override
   bool get isRead;
   @override

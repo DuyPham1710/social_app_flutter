@@ -13,6 +13,7 @@ class NotificationModel with _$NotificationModel {
 
     required String type,
     required String message,
+    String? content,
     required bool isRead,
 
     @JsonKey(fromJson: _dateTimeFromJson) DateTime? createdAt,
@@ -41,6 +42,7 @@ extension NotificationModelMapper on NotificationModel {
       orElse: () => NotificationType.UNKNOWN,
     ),
     message: message,
+    content: content,
     isRead: isRead,
     createdAt: createdAt ?? DateTime.now(), // 👈 fallback an toàn
     sender: sender?.toEntity(),

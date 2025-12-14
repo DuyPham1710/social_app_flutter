@@ -5,6 +5,7 @@ class NotificationEntity {
   final String id;
   final NotificationType type;
   final String message;
+  final String? content;
   final bool isRead;
   final DateTime createdAt;
   final UserEntity? sender;
@@ -14,6 +15,7 @@ class NotificationEntity {
     required this.id,
     required this.type,
     required this.message,
+    this.content,
     required this.isRead,
     required this.createdAt,
     this.sender,

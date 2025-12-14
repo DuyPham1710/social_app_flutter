@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
 import '../bloc/notification_bloc.dart';
 import '../bloc/notification_state.dart';
-import '../../domain/entities/notification_entity.dart';
 import '../widgets/comment_notification_item.dart';
 import '../widgets/friend_request_notification_item.dart';
 
@@ -57,6 +57,15 @@ class NotificationPage extends StatelessWidget {
                 case NotificationType.UNKNOWN:
                   // TODO: Handle this case.
                   throw UnimplementedError();
+                case NotificationType.POST_REACTION:
+                  return ReactPostNotificationItem(
+                    avatarUrl: n.sender?.avatarUrl ?? '',
+                    userName: n.sender?.fullName ?? '',
+                    message: n.message,
+                    content: n.content ?? '',
+                    time: _timeAgo(n.createdAt),
+                    isRead: n.isRead,
+                  );
               }
             }).toList(),
           );
