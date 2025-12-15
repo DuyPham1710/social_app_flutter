@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/core/network/interceptors/auth_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/log_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/response_interceptor.dart';
+import 'dart:io';
 import 'package:dio/io.dart';
 
 class DioClient {
@@ -27,18 +26,6 @@ class DioClient {
         },
       ),
     );
-
-    // ************ GIẢI PHÁP TẠM THỜI BỎ QUA SSL CHO MỤC ĐÍCH TEST ************
-  // Lưu ý: Chỉ dùng trong môi trường DEV/TESTING
-  if (dio.httpClientAdapter is DefaultHttpClientAdapter) {
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-        // Hàm callback này trả về true để bỏ qua việc xác minh chứng chỉ (SSL Validation)
-        client.badCertificateCallback = 
-            (X509Certificate cert, String host, int port) => true; 
-        return client;
-      };
-  }
-  // ************************************************************************
 
     dio.interceptors.addAll([
       AuthInterceptor(),
