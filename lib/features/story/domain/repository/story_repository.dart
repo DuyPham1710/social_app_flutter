@@ -1,9 +1,15 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/story/domain/entities/create_story_entity.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 
 abstract class StoryRepository {
   Future<DataState<GroupedStoryListEntity>> getHomeStories({
     int page = 1,
     int limit = 10,
+  });
+
+  /// Tạo story, không cần trả về dữ liệu chi tiết, chỉ cần biết thành công/thất bại.
+  Future<DataState<void>> createStory({
+    required CreateStoryEntity story,
   });
 }

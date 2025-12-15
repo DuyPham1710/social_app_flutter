@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_music_picker_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_editor_page.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/story_create_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StoryCreatePage extends StatefulWidget {
   const StoryCreatePage({super.key});
@@ -102,7 +105,10 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
     // Khi chọn 1 ảnh/video, navigate đến màn hình editor
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => StoryEditorPage(asset: asset),
+        builder: (_) => BlocProvider(
+          create: (_) => s1<StoryCreateBloc>(),
+          child: StoryEditorPage(asset: asset),
+        ),
       ),
     );
   }

@@ -2,12 +2,21 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/enums/media_type.dart' as core_media;
+import 'package:social_app_fe/core/enums/privacy_type.dart' as core_privacy;
+import 'package:social_app_fe/core/local/story_privacy_storage.dart';
 import 'package:social_app_fe/features/story/data/models/deezer_music_model.dart';
+import 'package:social_app_fe/features/story/domain/entities/create_story_entity.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/story_create_bloc.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/story_create_event.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/story_create_state.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_music_picker_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:video_player/video_player.dart';
 
 class StoryEditorPage extends StatefulWidget {
@@ -81,39 +90,51 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Stack(
-          children: [
-            // Main content - Image/Video
-            Center(
-              child: _buildMediaContent(isVideo),
-            ),
-            // Top bar - Close button
-            Positioned(
-              top: 0,
-              left: 0,
-              child: Padding(
-                padding: EdgeInsets.all(12.w),
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () => Navigator.of(context).maybePop(),
+        child: BlocListener<StoryCreateBloc, StoryCreateState>(
+          listener: (context, state) {
+            if (state is StoryCreated) {
+              showSuccessSnackBar(context, "Tạo tin thành công");
+              Navigator.of(context).maybePop();
+            } else if (state is StoryCreateError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
+          child: Stack(
+            children: [
+              // Main content - Image/Video
+              Center(
+                child: _buildMediaContent(isVideo),
+              ),
+              // Top bar - Close button
+              Positioned(
+                top: 0,
+                left: 0,
+                child: Padding(
+                  padding: EdgeInsets.all(12.w),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
                 ),
               ),
-            ),
-            // Right side menu - Editing tools
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              child: _buildRightMenu(),
-            ),
-            // Bottom bar
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildBottomBar(),
-            ),
-          ],
+              // Right side menu - Editing tools
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: _buildRightMenu(),
+              ),
+              // Bottom bar
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: _buildBottomBar(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -341,30 +362,105 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
               SizedBox(width: 8.w),
               const Spacer(),
               // Share button
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement share functionality
+              BlocBuilder<StoryCreateBloc, StoryCreateState>(
+                builder: (context, state) {
+                  final isLoading = state is StoryCreating;
+                  return ElevatedButton(
+                    onPressed: isLoading ? null : _onSharePressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    child: isLoading
+                        ? SizedBox(
+                            width: 20.w,
+                            height: 20.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : Text(
+                            "Chia sẻ",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                ),
-                child: Text(
-                  "Chia sẻ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _onSharePressed() async {
+    // Lấy file ảnh/video từ AssetEntity
+    final file = await widget.asset.file;
+    if (file == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể đọc file từ thiết bị')),
+      );
+      return;
+    }
+
+    // Xác định loại media
+    final isVideo = widget.asset.type == AssetType.video;
+    final mediaType =
+        isVideo ? core_media.MediaType.video : core_media.MediaType.image;
+
+    // Lấy cài đặt quyền riêng tư đã lưu
+    final privacyLabel = await StoryPrivacyStorage.getPrivacy();
+    final hiddenFriendIds = await StoryPrivacyStorage.getHiddenFriendIds();
+    final allowedFriendIds = await StoryPrivacyStorage.getAllowedFriendIds();
+
+    // Mặc định: bạn bè nếu chưa cấu hình
+    core_privacy.PrivacyType privacyType = core_privacy.PrivacyType.friends;
+    List<String>? friendsExcept;
+    List<String>? friendsDetail;
+
+    switch (privacyLabel) {
+      case "Công khai":
+        privacyType = core_privacy.PrivacyType.public;
+        break;
+      case "Tùy chỉnh":
+        privacyType = core_privacy.PrivacyType.friendsDetail;
+        friendsDetail =
+            allowedFriendIds.isNotEmpty ? List.of(allowedFriendIds) : null;
+        break;
+      case "Bạn bè":
+      default:
+        if (hiddenFriendIds.isNotEmpty) {
+          privacyType = core_privacy.PrivacyType.friendsExcept;
+          friendsExcept = List.of(hiddenFriendIds);
+        } else {
+          privacyType = core_privacy.PrivacyType.friends;
+        }
+        break;
+    }
+
+    final storyEntity = CreateStoryEntity(
+      title: null,
+      mediaUrl: null,
+      mediaType: mediaType,
+      music: _selectedMusic,
+      privacyType: privacyType,
+      friendsExcept: friendsExcept,
+      friendsDetail: friendsDetail,
+      file: file,
+    );
+
+    context
+        .read<StoryCreateBloc>()
+        .add(CreateStoryRequested(story: storyEntity));
   }
 }
