@@ -2,16 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -44,10 +36,10 @@ class SentFriendRequestItem extends StatelessWidget {
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
     final currentUserId = userData?['id'];
-    final String _userId = userId['_id'];
-    print(">>>>>>>>>>>>>>>>>><<<<<<<" + _userId);
+    final String userId1 = userId['_id'];
+    //print(">>>>>>>>>>>>>>>>>><<<<<<<$userId");
     // Nếu là user hiện tại → My Profile
-    if (currentUserId == _userId) {
+    if (currentUserId == userId1) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -66,8 +58,8 @@ class SentFriendRequestItem extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<OtherProfileBloc>()
-                  ..add(LoadOtherUserProfileEvent(userId: _userId!)),
-            child: OtherProfilePage(userId: _userId!),
+                  ..add(LoadOtherUserProfileEvent(userId: userId)),
+            child: OtherProfilePage(userId: userId),
           ),
         ),
       );
@@ -96,6 +88,7 @@ class SentFriendRequestItem extends StatelessWidget {
               children: [
                 // Tên người dùng và thời gian
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
                       onTap: () => _navigateToProfile(context),
@@ -117,6 +110,8 @@ class SentFriendRequestItem extends StatelessWidget {
                         color: Colors.grey[500],
                         fontWeight: FontWeight.w400,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

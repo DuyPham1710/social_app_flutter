@@ -106,7 +106,8 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                   elevation: 0,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  // Return danh sách files đã được edit
+                  Navigator.pop(context, widget.imageFiles);
                 },
                 child: Text(
                   'Xong',

@@ -5,13 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -67,8 +60,8 @@ class FriendItem extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<OtherProfileBloc>()
-                  ..add(LoadOtherUserProfileEvent(userId: friendId!)),
-            child: OtherProfilePage(userId: friendId!),
+                  ..add(LoadOtherUserProfileEvent(userId: friendId)),
+            child: OtherProfilePage(userId: friendId),
           ),
         ),
       );

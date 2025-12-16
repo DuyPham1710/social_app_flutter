@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 
 class ProfileActions extends StatelessWidget {
   final VoidCallback? onTapEdit;
@@ -19,7 +21,16 @@ class ProfileActions extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) {
+                    return StoryCreatePage();
+                  },
+                ),
+              );
+            },
             icon: const Icon(Icons.add_circle_outline, color: Colors.white),
             label: const Text(
               'Thêm vào tin',

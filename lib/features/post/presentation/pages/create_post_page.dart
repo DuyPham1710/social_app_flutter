@@ -24,6 +24,7 @@ import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_state.d
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
 import 'package:social_app_fe/features/post/presentation/pages/gallery_picker_screen.dart';
+import 'package:social_app_fe/features/post/presentation/pages/edit_selected_image_page.dart';
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
@@ -186,13 +187,79 @@ class _CreatePostPageState extends State<CreatePostPage> {
       );
 
       if (result != null && result is Map<String, dynamic>) {
-        // Handle camera result
-        print('Camera result: $result');
-        // You can process the captured photo/video here
-        // For example, convert to AssetEntity and add to selectedAssets
+        await _handleCameraResult(result);
       }
     } catch (e) {
       print('Error opening camera: $e');
+    }
+  }
+
+  // Handle camera result và navigate đến ImageEditor
+  Future<void> _handleCameraResult(Map<String, dynamic> result) async {
+    final String filePath = result['path'];
+    final String fileType = result['type'];
+    
+    // Chỉ xử lý ảnh, bỏ qua video
+    if (fileType == 'photo') {
+      final File imageFile = File(filePath);
+      
+      // Navigate đến EditSelectedImagePage để chỉnh sửa ảnh
+      final editedFiles = await Navigator.push<List<File>>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditSelectedImagePage(
+            imageFiles: [imageFile],
+            initialIndex: 0,
+            onAdd: null, // Không cần thêm ảnh trong trường hợp này
+            onRemoveAtIndex: null, // Không cần xóa trong trường hợp này
+          ),
+        ),
+      );
+      
+      // Nếu có file được edit, convert thành AssetEntity
+      if (editedFiles != null && editedFiles.isNotEmpty) {
+        for (final file in editedFiles) {
+          try {
+            final AssetEntity? asset = await _createAssetFromFile(file);
+            if (asset != null) {
+              setState(() {
+                _selectedAssets.add(asset);
+              });
+            }
+          } catch (e) {
+            print('Error creating AssetEntity from file: $e');
+            // Fallback: Show error message
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Không thể thêm ảnh: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        }
+      }
+    } else if (fileType == 'video') {
+      // Handle video nếu cần
+      print('Video captured: $filePath');
+      // TODO: Implement video handling if needed
+    }
+  }
+
+  // Helper method để tạo AssetEntity từ File
+  Future<AssetEntity?> _createAssetFromFile(File file) async {
+    try {
+      // Lưu file vào gallery
+      final AssetEntity? asset = await PhotoManager.editor.saveImageWithPath(
+        file.path,
+        title: "camera_${DateTime.now().millisecondsSinceEpoch}",
+      );
+      
+      return asset;
+    } catch (e) {
+      print('Error creating AssetEntity: $e');
+      return null;
     }
   }
 

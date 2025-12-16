@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
-import 'package:social_app_fe/core/utils/error_utils.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
 
@@ -91,9 +90,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
 
     if (finalReason == null || finalReason.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn hoặc nhập lý do báo cáo'),
-        ),
+        const SnackBar(content: Text('Vui lòng chọn hoặc nhập lý do báo cáo')),
       );
       return;
     }
@@ -120,20 +117,14 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Đã gửi báo cáo. Cảm ơn bạn đã đóng góp!',
-            ),
+            content: Text('Đã gửi báo cáo. Cảm ơn bạn đã đóng góp!'),
           ),
         );
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Gửi báo cáo thất bại. Vui lòng thử lại.'
-            ),
-          ),
+          SnackBar(content: Text('Gửi báo cáo thất bại. Vui lòng thử lại.')),
         );
       }
     }
@@ -154,10 +145,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                 color: Colors.red.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.flag_outlined,
-                color: Colors.red,
-              ),
+              child: const Icon(Icons.flag_outlined, color: Colors.red),
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -174,10 +162,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                   SizedBox(height: 4.h),
                   Text(
                     'Hãy cho chúng tôi biết vấn đề của bài viết này để cải thiện trải nghiệm cộng đồng.',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -187,10 +172,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         SizedBox(height: 16.h),
         Text(
           'Lý do nhanh',
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 8.h),
         Wrap(
@@ -224,10 +206,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         SizedBox(height: 16.h),
         Text(
           'Lý do chi tiết',
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 8.h),
         TextField(
@@ -240,17 +219,15 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         SizedBox(height: 12.h),
         Text(
           'Mô tả thêm (không bắt buộc)',
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 8.h),
         TextField(
           controller: _descriptionController,
           maxLines: 3,
           decoration: const InputDecoration(
-            hintText: 'Bạn có thể cung cấp thêm chi tiết để chúng tôi hiểu rõ hơn...',
+            hintText:
+                'Bạn có thể cung cấp thêm chi tiết để chúng tôi hiểu rõ hơn...',
             border: OutlineInputBorder(),
           ),
         ),
@@ -277,8 +254,9 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                         height: 18.w,
                         child: const CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Text('Gửi báo cáo'),

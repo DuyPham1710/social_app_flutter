@@ -8,4 +8,3 @@ abstract class FriendEntity {
   List<String>? get mutualFriendAvatars;
   DateTime? get friendsSince;
 }
-

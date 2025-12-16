@@ -23,6 +23,7 @@ import 'package:social_app_fe/features/chat/presentation/bloc/message/message_bl
 import 'package:social_app_fe/features/chat/presentation/bloc/message/message_event.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
+import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -304,10 +305,11 @@ class _ChatListPageState extends State<ChatListPage> {
     }
   }
 
-  Route _searchRoute() {
+  Route _searchRoute(List<FriendEntity> friends) {
     return PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (_, __, ___) => const ChatSearchPage(),
+      pageBuilder: (_, __, ___) =>
+          ChatSearchPage(friends: friends, onNavigateToChat: _handleFriendTap),
       transitionsBuilder: (_, animation, __, child) {
         final offsetAnimation = Tween(
           begin: const Offset(0, 1),
@@ -427,7 +429,18 @@ class _ChatListPageState extends State<ChatListPage> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(30),
                           onTap: () {
-                            Navigator.of(context).push(_searchRoute());
+                            final friendState = context
+                                .read<FriendBloc>()
+                                .state;
+                            List<FriendEntity> friendsList = [];
+
+                            if (friendState is FriendLoaded) {
+                              friendsList = friendState.friends;
+                            }
+
+                            Navigator.of(
+                              context,
+                            ).push(_searchRoute(friendsList));
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -500,7 +513,14 @@ class _ChatListPageState extends State<ChatListPage> {
                                         name: "Tạo tin",
                                         showAddButton: true,
                                         onTap: () {
-                                          // Handle add story tap
+                                          Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) {
+                                                return StoryCreatePage();
+                                              },
+                                            ),
+                                          );
                                         },
                                       ),
                                     );
