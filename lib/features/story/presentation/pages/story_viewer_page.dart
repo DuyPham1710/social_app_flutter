@@ -165,7 +165,10 @@ class _StoryViewerPageState extends State<StoryViewerPage>
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: _onTapDown,
-          onLongPressStart: (_) => _controller.stop(),
+          onLongPressStart: (_) {
+            _controller.stop();
+            _audioPlayer.pause();
+          },
           onLongPressEnd: (_) {
             _controller.forward();
             _audioPlayer.resume();
@@ -282,8 +285,11 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                 children: [
                   // Media
                   StoryBackgroundWidget(
+                    key: ValueKey('${_currentGroupIndex}_${_currentStoryIndex}_${_currentStory.mediaUrl}'),
                     mediaUrl: _currentStory.mediaUrl,
+                    mediaType: _currentStory.mediaType,
                     dragOffset: _dragOffset,
+                    shouldPlay: true,
                   ),
 
                   // Header
