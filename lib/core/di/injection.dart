@@ -65,10 +65,6 @@ import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/notification/data/data_sources/remote/notification_socket_datasource.dart';
 import 'package:social_app_fe/features/notification/data/repository/notification_repository_impl.dart';
 import 'package:social_app_fe/features/notification/domain/repository/notification_repository.dart';
-import 'package:social_app_fe/features/notification/domain/usecases/connect_notification_socket_usecase.dart';
-import 'package:social_app_fe/features/notification/domain/usecases/load_notifications_usecase.dart';
-import 'package:social_app_fe/features/notification/domain/usecases/mark_all_notifications_read_usecase.dart';
-import 'package:social_app_fe/features/notification/domain/usecases/mark_notification_read_usecase.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
@@ -97,6 +93,8 @@ import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_us
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/chat_search/chat_search_bloc.dart';
+import 'package:social_app_fe/features/chat/data/services/recent_search_service.dart';
 import 'package:social_app_fe/features/profile/data/data_sources/user_remote_data_source.dart';
 import 'package:social_app_fe/features/privacy/data/data_sources/remote/privacy_remote_data_source.dart';
 import 'package:social_app_fe/features/privacy/data/repository/privacy_repository_impl.dart';
@@ -633,6 +631,19 @@ Future<void> initializeDependencies() async {
       listenMessageReadUseCase: s1(),
       markAsReadUseCase: s1(),
     ),
+  );
+
+  s1.registerFactory<ChatSearchBloc>(
+    () => ChatSearchBloc(
+      getFriendSuggestionsUseCase: s1(),
+      sendFriendRequestUseCase: s1(),
+      cancelFriendRequestUseCase: s1(),
+    ),
+  );
+
+  // Chat Services
+  s1.registerLazySingleton<RecentSearchService>(
+    () => RecentSearchService(),
   );
 }
 

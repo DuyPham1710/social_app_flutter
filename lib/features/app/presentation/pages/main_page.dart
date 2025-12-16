@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/notification/presentation/bloc/notificati
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_state.dart';
 import 'package:social_app_fe/features/notification/presentation/pages/notification_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/create_post_page.dart';
+import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -33,7 +34,11 @@ class _MainPageState extends State<MainPage> {
     if (userData == null) return;
 
     final userId = userData['id'];
+    final username = userData['username'];
 
+    context.read<VideoCallBloc>().add(
+      ConnectVideoCall(userId: userId, username: username),
+    );
     context.read<NotificationBloc>().add(ConnectNotificationSocket(userId));
   }
 
@@ -76,7 +81,7 @@ class _MainPageState extends State<MainPage> {
           return CustomBottomNavigation(
             currentIndex: _currentIndex,
             onTabSelected: _onTabSelected,
-            unreadCount: notificationState!.unread,
+            unreadCount: notificationState.unread,
           );
         },
       ),

@@ -4,13 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -64,8 +57,8 @@ class FriendSuggestionItem extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<OtherProfileBloc>()
-                  ..add(LoadOtherUserProfileEvent(userId: userId!)),
-            child: OtherProfilePage(userId: userId!),
+                  ..add(LoadOtherUserProfileEvent(userId: userId)),
+            child: OtherProfilePage(userId: userId),
           ),
         ),
       );
@@ -235,20 +228,20 @@ class FriendSuggestionItem extends StatelessWidget {
     );
   }
 
-  Widget _smallAvatar(String url, {required double left}) {
-    return Positioned(
-      left: left,
-      child: Container(
-        width: 20.r,
-        height: 20.r,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 2),
-          shape: BoxShape.circle,
-          image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
-        ),
-      ),
-    );
-  }
+  // Widget _smallAvatar(String url, {required double left}) {
+  //   return Positioned(
+  //     left: left,
+  //     child: Container(
+  //       width: 20.r,
+  //       height: 20.r,
+  //       decoration: BoxDecoration(
+  //         border: Border.all(color: Colors.white, width: 2),
+  //         shape: BoxShape.circle,
+  //         image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildActionButton({
     required String label,

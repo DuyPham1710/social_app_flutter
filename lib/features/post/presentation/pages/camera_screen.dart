@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -119,7 +118,7 @@ class _CameraScreenState extends State<CameraScreen> {
         setState(() {
           _isInitialized = false;
         });
-        
+
         // Show error to user
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -253,9 +252,7 @@ class _CameraScreenState extends State<CameraScreen> {
             Container(
               color: Colors.black,
               child: const Center(
-                child: CupertinoActivityIndicator(
-                  color: Colors.white,
-                ),
+                child: CupertinoActivityIndicator(color: Colors.white),
               ),
             ),
 
