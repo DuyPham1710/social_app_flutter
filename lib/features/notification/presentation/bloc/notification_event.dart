@@ -17,7 +17,6 @@ class NewNotificationReceived extends NotificationEvent {
   NewNotificationReceived(this.notification);
 }
 
-
 class UnreadCountUpdated extends NotificationEvent {
   final int unread;
   UnreadCountUpdated(this.unread);
@@ -29,3 +28,20 @@ class MarkNotificationRead extends NotificationEvent {
 }
 
 class MarkAllNotificationsRead extends NotificationEvent {}
+
+class RemoveNotification extends NotificationEvent {
+  final String id;
+  RemoveNotification(this.id);
+}
+
+class LoadMoreNotificationsEvent extends NotificationEvent {
+  final int page;
+  final int limit;
+
+  LoadMoreNotificationsEvent({this.page = 1, this.limit = 10});
+}
+
+class HasMoreUpdated extends NotificationEvent {
+  final bool hasMore;
+  HasMoreUpdated(this.hasMore);
+}

@@ -53,7 +53,10 @@ class _MainPageState extends State<MainPage> {
         onPageChanged: (index) {
           // Mark all notifications as read when leaving notification page
           if (_currentIndex == 3 && index != 3) {
-            context.read<NotificationBloc>().add(MarkAllNotificationsRead());
+            final unread = context.read<NotificationBloc>().state.unread;
+            if (unread > 0) {
+              context.read<NotificationBloc>().add(MarkAllNotificationsRead());
+            }
           }
           setState(() => _currentIndex = index);
         },

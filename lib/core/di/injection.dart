@@ -69,6 +69,7 @@ import 'package:social_app_fe/features/notification/domain/usecases/connect_noti
 import 'package:social_app_fe/features/notification/domain/usecases/load_notifications_usecase.dart';
 import 'package:social_app_fe/features/notification/domain/usecases/mark_all_notifications_read_usecase.dart';
 import 'package:social_app_fe/features/notification/domain/usecases/mark_notification_read_usecase.dart';
+import 'package:social_app_fe/features/notification/domain/usecases/delete_notification_usecase.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
@@ -445,6 +446,9 @@ Future<void> initializeDependencies() async {
   // s1.registerLazySingleton(() => LoadNotificationsUseCase(s1()));
   // s1.registerLazySingleton(() => MarkNotificationReadUseCase(s1()));
   // s1.registerLazySingleton(() => MarkAllNotificationsReadUseCase(s1()));
+  s1.registerLazySingleton<DeleteNotificationUseCase>(
+    () => DeleteNotificationUseCase(s1()),
+  );
 
   // Repository
   s1.registerLazySingleton<NotificationSocketDataSource>(
