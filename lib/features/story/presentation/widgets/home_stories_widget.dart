@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
@@ -24,6 +25,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
   late ScrollController _scrollController;
   int _currentPage = 1;
   bool _isLoadingMore = false;
+  String? _currentUserId;
 
   @override
   void initState() {
@@ -31,9 +33,19 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
     _currentPage = widget.page;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
+    _loadCurrentUserId();
     context.read<HomeStoriesBloc>().add(
       LoadHomeStoriesEvent(page: _currentPage, limit: widget.limit),
     );
+  }
+
+  Future<void> _loadCurrentUserId() async {
+    final userData = await TokenStorage.getUserData();
+    if (userData != null && mounted) {
+      setState(() {
+        _currentUserId = userData['id'];
+      });
+    }
   }
 
   @override
@@ -271,7 +283,9 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
           SizedBox(height: 30.h),
 
           Text(
-            story.user.fullName ?? "Unknown",
+            (_currentUserId != null && story.user.userId == _currentUserId)
+                ? "Tin của bạn"
+                : (story.user.fullName ?? "Unknown"),
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
           ),
         ],
