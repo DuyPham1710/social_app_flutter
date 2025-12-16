@@ -7,6 +7,7 @@ class StoryBackgroundWidget extends StatefulWidget {
   final MediaType mediaType;
   final Offset dragOffset;
   final VoidCallback? onVideoInitialized;
+  final Function(int durationSeconds)? onVideoDurationChanged;
   final bool shouldPlay;
 
   const StoryBackgroundWidget({
@@ -15,6 +16,7 @@ class StoryBackgroundWidget extends StatefulWidget {
     required this.mediaType,
     required this.dragOffset,
     this.onVideoInitialized,
+    this.onVideoDurationChanged,
     this.shouldPlay = true,
   });
 
@@ -100,6 +102,12 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
 
       _videoController!.setLooping(true);
       _videoController!.setVolume(1.0);
+      
+      // Lấy duration của video và gửi về parent
+      final videoDuration = _videoController!.value.duration;
+      if (videoDuration.inSeconds > 0 && widget.onVideoDurationChanged != null) {
+        widget.onVideoDurationChanged!(videoDuration.inSeconds);
+      }
       
       // Đảm bảo video được play sau khi khởi tạo
       if (mounted) {
