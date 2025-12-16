@@ -11,23 +11,54 @@ class NotificationSocketDataSource {
 
   NotificationSocketDataSource(this.socket);
 
-  Stream<List<NotificationModel>> get notifications => _listController.stream;
+  Stream<List<NotificationModel>> get notifications async* {
+    // replay current cache to new subscribers
+    yield List.unmodifiable(_cache);
+    yield* _listController.stream;
+  }
+
   Stream<NotificationModel> get newNotification => _newController.stream;
-  Stream<int> get unreadCount => _unreadController.stream;
+
+  Stream<int> get unreadCount async* {
+    // replay current unread count to new subscribers
+    yield _unreadCount;
+    yield* _unreadController.stream;
+  }
+
+  // Internal cache to support pagination (append pages)
+  final List<NotificationModel> _cache = [];
+  int _lastRequestedPage = 1;
+  bool _hasMore = true; // track if more pages available
+
+  bool get hasMore => _hasMore;
+  int _unreadCount = 0;
+  final _hasMoreController = StreamController<bool>.broadcast();
+
+  Stream<bool> get hasMoreStream async* {
+    // replay current hasMore state to new subscribers
+    yield _hasMore;
+    yield* _hasMoreController.stream;
+  }
 
   void connect(String userId) {
     socket.connect(namespace: 'notification', userId: userId);
 
     socket.on('register:ack').listen((_) {
-      socket.emit('getNotifications', {});
+      // request first page on register
+      loadPage(page: 1, limit: 10);
     });
 
     socket.on('notifications:list').listen((data) {
       final List<NotificationModel> items = [];
+      // prefer explicit page from server; otherwise fall back to last requested
+      final page = (data != null && data['page'] != null)
+          ? (data['page'] is int
+                ? data['page'] as int
+                : int.tryParse(data['page'].toString()) ?? _lastRequestedPage)
+          : _lastRequestedPage;
 
       for (final e in data['items']) {
         try {
-          print('📦 Raw notification item: $e');
           items.add(NotificationModel.fromJson(Map<String, dynamic>.from(e)));
         } catch (err) {
           print('❌ Notification parse error: $err');
@@ -35,24 +66,68 @@ class NotificationSocketDataSource {
         }
       }
 
-      print('✅ Notifications received: ${items.length}');
-      print('📋 Items content field: ${items.map((i) => i.content).toList()}');
-      _listController.add(items);
-      _unreadController.add(data['unread'] ?? 0);
+      // Determine if more pages available: items < limit means no more data
+      final limit = data['limit'] ?? 10;
+      _hasMore = items.length >= limit;
+      _hasMoreController.add(_hasMore);
+
+      // Merge incoming items into cache by id to avoid losing previously loaded pages.
+      final incomingIds = items.map((e) => e.id).toSet();
+
+      if (page == 1) {
+        // For page 1, keep incoming items in front but preserve any existing items
+        // that are not present in this page (e.g., older pages already loaded).
+        final Map<String, NotificationModel> existingById = {
+          for (var e in _cache) e.id: e,
+        };
+
+        final List<NotificationModel> merged = [];
+        // add/replace with incoming (preserve incoming order)
+        for (var it in items) {
+          merged.add(it);
+        }
+        // append older existing items that weren't in incoming
+        for (var e in _cache) {
+          if (!incomingIds.contains(e.id)) merged.add(e);
+        }
+
+        _cache
+          ..clear()
+          ..addAll(merged);
+      } else {
+        // For pages >1, append only new items (avoid duplicates)
+        final existingIds = _cache.map((e) => e.id).toSet();
+        for (var it in items) {
+          if (!existingIds.contains(it.id)) _cache.add(it);
+        }
+      }
+
+      _listController.add(List.unmodifiable(_cache));
+      _unreadCount = data['unread'] ?? _unreadCount;
+      _unreadController.add(_unreadCount);
     });
 
     socket.on('notification:new').listen((data) {
       final model = NotificationModel.fromJson(data);
+
+      // Add to new stream
       _newController.add(model);
+
+      // Also insert into cache (at front) so later `notifications:list` merges will
+      // include this new item and UI won't lose it when server sends lists.
+      final exists = _cache.any((c) => c.id == model.id);
+      if (!exists) {
+        _cache.insert(0, model);
+      }
+
+      // update unread counter and emit updated list/unread
+      _unreadCount = _unreadCount + 1;
+      _listController.add(List.unmodifiable(_cache));
+      _unreadController.add(_unreadCount);
     });
 
-    socket.on('notification:read').listen((_) {
-      socket.emit('getNotifications', {});
-    });
-
-    socket.on('notification:markAllRead').listen((_) {
-      socket.emit('getNotifications', {});
-    });
+    // Don't emit getNotifications on read/markAllRead events - it causes loops
+    // Server will handle updates internally; UI will refresh via explicit loadPage calls
   }
 
   void markRead(String id) {
@@ -61,5 +136,18 @@ class NotificationSocketDataSource {
 
   void markAllRead() {
     socket.emit('markAllRead', {});
+  }
+
+  /// Request a specific page of notifications. Server should respond with
+  /// `notifications:list` including `page` so datasource can append/replace.
+  void loadPage({int page = 1, int limit = 10}) {
+    _lastRequestedPage = page;
+    socket.emit('getNotifications', {'page': page, 'limit': limit});
+  }
+
+  /// Request server to delete a notification from DB. Server should emit
+  /// updated list or an acknowledgement which will trigger a refresh.
+  void deleteNotification(String id) {
+    socket.emit('deleteNotification', {'notificationId': id});
   }
 }

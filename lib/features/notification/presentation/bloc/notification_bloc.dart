@@ -12,14 +12,17 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   StreamSubscription? _listSub;
   StreamSubscription? _newSub;
   StreamSubscription? _unreadSub;
+  StreamSubscription? _hasMoreSub;
 
   NotificationBloc(this.repository) : super(NotificationState.initial()) {
+    on<LoadMoreNotificationsEvent>(_onLoadMoreNotifications);
     on<ConnectNotificationSocket>((event, emit) {
       repository.connect(event.userId);
 
       _listSub?.cancel();
       _newSub?.cancel();
       _unreadSub?.cancel();
+      _hasMoreSub?.cancel();
 
       _listSub = repository.notifications.listen(
         (list) => add(NotificationsLoaded(list)),
@@ -32,6 +35,9 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       _unreadSub = repository.unreadCount.listen(
         (u) => add(UnreadCountUpdated(u)),
       );
+
+      // Listen to hasMore updates so UI can stop requesting pages
+      _hasMoreSub = repository.hasMore.listen((b) => add(HasMoreUpdated(b)));
     });
 
     on<NotificationsLoaded>((event, emit) {
@@ -41,6 +47,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         NotificationState(
           notifications: event.notifications,
           unread: unreadCount,
+          hasMore: state.hasMore,
+          isLoadingMore: false,
         ),
       );
     });
@@ -51,6 +59,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         NotificationState(
           notifications: [event.notification, ...state.notifications],
           unread: state.unread + 1,
+          hasMore: state.hasMore,
+          isLoadingMore: state.isLoadingMore,
         ),
       );
     });
@@ -60,6 +70,19 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         NotificationState(
           notifications: state.notifications,
           unread: event.unread,
+          hasMore: state.hasMore,
+          isLoadingMore: state.isLoadingMore,
+        ),
+      );
+    });
+
+    on<HasMoreUpdated>((event, emit) {
+      emit(
+        NotificationState(
+          notifications: state.notifications,
+          unread: state.unread,
+          hasMore: event.hasMore,
+          isLoadingMore: false,
         ),
       );
     });
@@ -82,11 +105,75 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             ),
           )
           .toList();
-      emit(NotificationState(notifications: updatedNotifications, unread: 0));
+      emit(
+        NotificationState(
+          notifications: updatedNotifications,
+          unread: 0,
+          hasMore: state.hasMore,
+          isLoadingMore: state.isLoadingMore,
+        ),
+      );
 
       // Then send to server
       repository.markAllRead();
     });
+
+    on<RemoveNotification>((event, emit) {
+      final updatedNotifications = state.notifications
+          .where((n) => n.id != event.id)
+          .toList();
+      final unreadCount = updatedNotifications.where((n) => !n.isRead).length;
+
+      // Emit updated list immediately
+      emit(
+        NotificationState(
+          notifications: updatedNotifications,
+          unread: unreadCount,
+          hasMore: state.hasMore,
+          isLoadingMore: state.isLoadingMore,
+        ),
+      );
+
+      // Also tell repository to mark it read/handled if supported
+      try {
+        repository.markRead(event.id);
+      } catch (_) {}
+    });
+  }
+
+  Future<void> _onLoadMoreNotifications(
+    LoadMoreNotificationsEvent event,
+    Emitter<NotificationState> emit,
+  ) async {
+    // Don't load more if already loading or no more data
+    if (state.isLoadingMore || !state.hasMore) {
+      return;
+    }
+
+    // Emit state with isLoadingMore = true
+    emit(
+      NotificationState(
+        notifications: state.notifications,
+        unread: state.unread,
+        hasMore: state.hasMore,
+        isLoadingMore: true,
+      ),
+    );
+
+    // Request next page
+    try {
+      repository.loadPage(page: event.page, limit: event.limit);
+    } catch (_) {
+      // On error, reset isLoadingMore and keep data
+      emit(
+        NotificationState(
+          notifications: state.notifications,
+          unread: state.unread,
+          hasMore: state.hasMore,
+          isLoadingMore: false,
+        ),
+      );
+    }
   }
 
   @override
@@ -94,6 +181,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     _listSub?.cancel();
     _newSub?.cancel();
     _unreadSub?.cancel();
+    _hasMoreSub?.cancel();
     return super.close();
   }
 }

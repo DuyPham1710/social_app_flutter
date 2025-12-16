@@ -6,8 +6,10 @@ abstract class NotificationRepository {
   Stream<List<NotificationEntity>> get notifications;
   Stream<NotificationEntity> get newNotification;
   Stream<int> get unreadCount;
+  Stream<bool> get hasMore;
 
   void markRead(String notificationId);
   void markAllRead();
+  void loadPage({int page = 1, int limit = 10});
+  void deleteNotification(String notificationId);
 }
-

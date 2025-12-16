@@ -13,10 +13,8 @@ class NotificationRepositoryImpl implements NotificationRepository {
   void connect(String userId) => datasource.connect(userId);
 
   @override
-  Stream<List<NotificationEntity>> get notifications =>
-      datasource.notifications.map(
-        (list) => list.map((e) => e.toEntity()).toList(),
-      );
+  Stream<List<NotificationEntity>> get notifications => datasource.notifications
+      .map((list) => list.map((e) => e.toEntity()).toList());
 
   @override
   Stream<NotificationEntity> get newNotification =>
@@ -26,9 +24,19 @@ class NotificationRepositoryImpl implements NotificationRepository {
   Stream<int> get unreadCount => datasource.unreadCount;
 
   @override
-  void markRead(String notificationId) =>
-      datasource.markRead(notificationId);
+  Stream<bool> get hasMore => datasource.hasMoreStream;
+
+  @override
+  void markRead(String notificationId) => datasource.markRead(notificationId);
 
   @override
   void markAllRead() => datasource.markAllRead();
+
+  @override
+  void loadPage({int page = 1, int limit = 10}) =>
+      datasource.loadPage(page: page, limit: limit);
+
+  @override
+  void deleteNotification(String notificationId) =>
+      datasource.deleteNotification(notificationId);
 }
