@@ -44,6 +44,56 @@ class _StoryRemoteDataSource implements StoryRemoteDataSource {
     return _value;
   }
 
+  @override
+  Future<void> createStory(
+    String? title,
+    String mediaType,
+    String? music,
+    String privacyType,
+    String? friendsExcept,
+    String? friendsDetail,
+    List<MultipartFile>? file,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    if (title != null) {
+      _data.fields.add(MapEntry('title', title));
+    }
+    _data.fields.add(MapEntry('mediaType', mediaType));
+    if (music != null) {
+      _data.fields.add(MapEntry('music', music));
+    }
+    _data.fields.add(MapEntry('privacy_type', privacyType));
+    if (friendsExcept != null) {
+      _data.fields.add(MapEntry('friends_except', friendsExcept));
+    }
+    if (friendsDetail != null) {
+      _data.fields.add(MapEntry('friends_detail', friendsDetail));
+    }
+    if (file != null) {
+      _data.files.addAll(file.map((i) => MapEntry('file', i)));
+    }
+    final _options = _setStreamType<void>(
+      Options(
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
+          .compose(
+            _dio.options,
+            '/story',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

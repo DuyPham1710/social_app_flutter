@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:social_app_fe/core/enums/media_type.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_background_widget.dart';
@@ -33,6 +34,12 @@ class _StoryViewerPageState extends State<StoryViewerPage>
 
   // Audio player for Deezer preview
   late final AudioPlayer _audioPlayer;
+  
+  int _currentMusicDurationSeconds = 10; // Mặc định 10 giây nếu không có nhạc
+  
+  int _currentVideoDurationSeconds = 0; // 0 = chưa có video hoặc chưa load
+  
+  bool _durationUpdatedForCurrentStory = false;
 
   // Thêm biến để theo dõi vị trí kéo
   Offset _dragOffset = Offset.zero;
@@ -50,6 +57,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
+    _setupAudioPlayerListeners();
     _currentGroupIndex = widget.initialGroupIndex.clamp(
       0,
       widget.groups.length - 1,
@@ -62,17 +70,95 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     _controller.forward();
     _playCurrentPreview();
   }
+  
+  void _setupAudioPlayerListeners() {
+    _audioPlayer.onDurationChanged.listen((duration) {
+      if (mounted && duration.inSeconds > 0) {
+        final newDuration = duration.inSeconds;
+        final isFirstUpdate = !_durationUpdatedForCurrentStory;
+        
+        setState(() {
+          _currentMusicDurationSeconds = newDuration;
+          _durationUpdatedForCurrentStory = true;
+        });
+        
+        if (_currentStory.mediaType != MediaType.video) {
+          // Cập nhật duration của AnimationController
+          if (isFirstUpdate) {
+            _controller.duration = Duration(seconds: newDuration);
+            _controller.reset();
+            _controller.forward();
+          } else {
+            _updateControllerDuration(newDuration);
+          }
+        }
+      }
+    });
+  }
+  
+  void _onVideoDurationChanged(int durationSeconds) {
+    if (mounted && durationSeconds > 0) {
+      final isFirstUpdate = !_durationUpdatedForCurrentStory;
+      
+      setState(() {
+        _currentVideoDurationSeconds = durationSeconds;
+        _durationUpdatedForCurrentStory = true;
+      });
+      
+      if (isFirstUpdate) {
+        _controller.duration = Duration(seconds: durationSeconds);
+        _controller.reset();
+        _controller.forward();
+      } else {
+        _updateControllerDuration(durationSeconds);
+      }
+    }
+  }
 
   void _initController() {
+    final initialDuration = _getStoryDuration();
     _controller =
         AnimationController(
           vsync: this,
-          duration: Duration(seconds: widget.durationSeconds),
+          duration: Duration(seconds: initialDuration),
         )..addStatusListener((status) {
           if (status == AnimationStatus.completed) {
             _onNext();
           }
         });
+  }
+  
+  int _getStoryDuration() {
+    if (_currentStory.mediaType == MediaType.video && _currentVideoDurationSeconds > 0) {
+      return _currentVideoDurationSeconds;
+    }
+    if (_currentStory.music != null && _currentMusicDurationSeconds > 0) {
+      return _currentMusicDurationSeconds;
+    }
+    return widget.durationSeconds;
+  }
+  
+  void _updateControllerDuration(int durationSeconds) {
+    if (_controller.duration?.inSeconds != durationSeconds) {
+      final wasPlaying = _controller.isAnimating;
+      final wasCompleted = _controller.status == AnimationStatus.completed;
+      
+      double newValue = 0.0;
+      if (wasPlaying && !wasCompleted) {
+        final oldDuration = _controller.duration?.inSeconds ?? widget.durationSeconds;
+        if (oldDuration > 0) {
+          newValue = (_controller.value * oldDuration) / durationSeconds;
+          newValue = newValue.clamp(0.0, 1.0);
+        }
+      }
+      
+      _controller.duration = Duration(seconds: durationSeconds);
+      _controller.value = newValue;
+      
+      if (wasPlaying && !wasCompleted) {
+        _controller.forward();
+      }
+    }
   }
 
   @override
@@ -84,6 +170,13 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   }
 
   void _resetAndPlay() {
+    setState(() {
+      _currentMusicDurationSeconds = widget.durationSeconds;
+      _currentVideoDurationSeconds = 0; // Reset video duration
+      _durationUpdatedForCurrentStory = false;
+    });
+    _updateControllerDuration(widget.durationSeconds);
+    
     _controller.stop();
     _controller.reset();
     _controller.forward();
@@ -136,6 +229,11 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     final previewUrl = _currentStory.music?.preview;
     if (previewUrl == null || previewUrl.isEmpty) {
       await _audioPlayer.stop();
+      setState(() {
+        _currentMusicDurationSeconds = widget.durationSeconds;
+        _durationUpdatedForCurrentStory = true; 
+      });
+      _updateControllerDuration(widget.durationSeconds);
       return;
     }
     try {
@@ -143,7 +241,11 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       await _audioPlayer.setSource(UrlSource(previewUrl));
       await _audioPlayer.resume();
     } catch (_) {
-      // Silently ignore playback errors for now
+      setState(() {
+        _currentMusicDurationSeconds = widget.durationSeconds;
+        _durationUpdatedForCurrentStory = true; 
+      });
+      _updateControllerDuration(widget.durationSeconds);
     }
   }
 
@@ -165,7 +267,10 @@ class _StoryViewerPageState extends State<StoryViewerPage>
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: _onTapDown,
-          onLongPressStart: (_) => _controller.stop(),
+          onLongPressStart: (_) {
+            _controller.stop();
+            _audioPlayer.pause();
+          },
           onLongPressEnd: (_) {
             _controller.forward();
             _audioPlayer.resume();
@@ -282,8 +387,12 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                 children: [
                   // Media
                   StoryBackgroundWidget(
+                    key: ValueKey('${_currentGroupIndex}_${_currentStoryIndex}_${_currentStory.mediaUrl}'),
                     mediaUrl: _currentStory.mediaUrl,
+                    mediaType: _currentStory.mediaType,
                     dragOffset: _dragOffset,
+                    shouldPlay: true,
+                    onVideoDurationChanged: _onVideoDurationChanged,
                   ),
 
                   // Header

@@ -94,8 +94,10 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/repository/story_repository_impl.dart';
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
+import 'package:social_app_fe/features/story/domain/usecases/create_story_usecase.dart';
 import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_usecase.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
+import 'package:social_app_fe/features/story/presentation/bloc/story_create_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:social_app_fe/features/profile/data/data_sources/user_remote_data_source.dart';
@@ -467,6 +469,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),
   );
+  s1.registerLazySingleton<CreateStoryUsecase>(
+    () => CreateStoryUsecase(s1()),
+  );
 
   // Privacy UseCases
   s1.registerLazySingleton<GetDefaultPrivacyUseCase>(
@@ -596,6 +601,9 @@ Future<void> initializeDependencies() async {
 
   s1.registerFactory<HomeStoriesBloc>(
     () => HomeStoriesBloc(getHomeStoriesUseCase: s1()),
+  );
+  s1.registerFactory<StoryCreateBloc>(
+    () => StoryCreateBloc(s1()),
   );
 
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
