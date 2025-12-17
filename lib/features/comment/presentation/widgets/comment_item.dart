@@ -6,16 +6,11 @@ import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
-import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_reaction_menu.dart';
 import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
-import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -66,13 +61,11 @@ class _CommentItemState extends State<CommentItem> {
   void initState() {
     super.initState();
     _showReplies = widget.showReplies;
-    // ĐÃ XÓA logic _localReacts ở đây
   }
 
   @override
   void didUpdateWidget(covariant CommentItem oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // ĐÃ XÓA logic _localReacts ở đây
   }
 
   void _onReactionChanged(
@@ -112,44 +105,7 @@ class _CommentItemState extends State<CommentItem> {
   }
 
   Future<void> _navigateToProfile(BuildContext context) async {
-    final userData = await TokenStorage.getUserData();
-    final currentUserId = userData?['id'];
-
-    if (currentUserId == widget.comment.user.userId) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
-          ),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                OtherProfileBloc(
-                  getOtherUserProfileUseCase: di
-                      .s1<GetOtherUserProfileUseCase>(),
-                  getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
-                  getFriendRelationshipUseCase: di
-                      .s1<GetFriendRelationshipUseCase>(),
-                  listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
-                  loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
-                )..add(
-                  LoadOtherUserProfileEvent(
-                    userId: widget.comment.user.userId!,
-                  ),
-                ),
-            child: OtherProfilePage(userId: widget.comment.user.userId!),
-          ),
-        ),
-      );
-    }
+    _navigateToUserProfile(context, widget.comment.user.userId);
   }
 
   @override
@@ -505,12 +461,9 @@ class _CommentItemState extends State<CommentItem> {
                   itemBuilder: (context, index) {
                     final react = _reacts[index];
                     return Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8.h,
-                      ),
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
                       child: ListTile(
-                        contentPadding: EdgeInsets
-                            .zero, 
+                        contentPadding: EdgeInsets.zero,
                         leading: CircleAvatar(
                           radius: 20.r,
                           backgroundColor: Colors.grey[200],
@@ -520,7 +473,10 @@ class _CommentItemState extends State<CommentItem> {
                           ),
                         ),
                         title: Text(
-                          react.user.fullName ?? 'Unknown',
+                          //nếu id = id user hiện tại thì hiển thị "Bạn"
+                          react.user.userId == widget.currentUserId
+                              ? 'Bạn'
+                              : react.user.fullName ?? 'Unknown',
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
@@ -554,5 +510,36 @@ class _CommentItemState extends State<CommentItem> {
     );
   }
 
-  void _navigateToUserProfile(BuildContext context, String userId) {}
+  Future<void> _navigateToUserProfile(
+    BuildContext context,
+    String userId,
+  ) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+
+    if (currentUserId == userId) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+            child: const ProfilePage(),
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                di.s1<OtherProfileBloc>()
+                  ..add(LoadOtherUserProfileEvent(userId: userId)),
+            child: OtherProfilePage(userId: userId),
+          ),
+        ),
+      );
+    }
+  }
 }
