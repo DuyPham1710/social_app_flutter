@@ -31,11 +31,25 @@ class _ReactionTextState extends State<ReactionText> {
   }
 
   @override
+  void didUpdateWidget(covariant ReactionText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Nếu widget cha truyền vào giá trị mới khác với giá trị cũ
+    if (widget.initialReaction != oldWidget.initialReaction) {
+      setState(() {
+        _currentReaction = widget.initialReaction;
+      });
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
 
   void _onReactionSelected(EmojiType reaction) {
+    // Lưu lại giá trị cũ để xử lý callback
+    final oldReaction = _currentReaction;
+    
     setState(() {
       if (_currentReaction == reaction) {
         _currentReaction = null;
@@ -45,18 +59,26 @@ class _ReactionTextState extends State<ReactionText> {
     });
 
     if (widget.onReactionChanged != null) {
-      if (_currentReaction != null) {
-        widget.onReactionChanged!(widget.commentId, _currentReaction!);
-      }
+      widget.onReactionChanged!(widget.commentId, reaction);
     }
   }
 
   void _onTap() {
     if (_currentReaction != null) {
+      // Trường hợp đang có react -> bấm vào để bỏ (Unlike)
+      final reactionToRemove = _currentReaction!; // Lưu lại để gửi lên parent
+      
       setState(() {
         _currentReaction = null;
       });
+      
+      // Cần gọi callback để Parent biết và xóa khỏi list & gọi API
+      if (widget.onReactionChanged != null) {
+         widget.onReactionChanged!(widget.commentId, reactionToRemove);
+      }
+      
     } else {
+      // Trường hợp chưa có react -> bấm vào để Like mặc định
       setState(() {
         _currentReaction = EmojiType.like;
       });

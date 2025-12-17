@@ -1,5 +1,6 @@
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/parent_comment_entity.dart';
+import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
 
 class CommentEntity {
   final String id;
@@ -9,6 +10,7 @@ class CommentEntity {
   final ParentCommentEntity? parentId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<ReactCommentEntity>? reacts;
 
   const CommentEntity({
     required this.id,
@@ -18,10 +20,11 @@ class CommentEntity {
     this.parentId,
     this.createdAt,
     this.updatedAt,
+    this.reacts,
   });
 
   @override
   String toString() {
-    return 'CommentEntity(id: $id, content: $content, user: $user, postId: $postId, parentId: $parentId)';
+    return 'CommentEntity(id: $id, content: $content, user: $user, postId: $postId, parentId: $parentId, reacts: ${reacts?.length ?? 0})';
   }
 }

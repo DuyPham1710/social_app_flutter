@@ -60,10 +60,37 @@ class CommentRemoteDataSource {
         name: 'CommentDataSource',
       );
       try {
+        // Log raw reacts info từ payload để kiểm tra
+        try {
+          final rawComments = data['comments'] as List<dynamic>?;
+          if (rawComments != null && rawComments.isNotEmpty) {
+            final first = rawComments.first as Map<String, dynamic>;
+            final reacts = first['reacts'] as List<dynamic>?;
+            developer.log(
+              'Raw commentsLoaded first commentId=${first['_id']} has reacts(raw) length=${reacts?.length ?? 0}',
+              name: 'CommentDataSource',
+            );
+          }
+        } catch (e) {
+          developer.log(
+            'Error inspecting raw commentsLoaded reacts: $e',
+            name: 'CommentDataSource',
+          );
+        }
+
         // Parse toàn bộ dữ liệu comments loaded
         final commentsLoadedModel = CommentsLoadedModel.fromJson(data);
         final postId = commentsLoadedModel.postId;
         final count = commentsLoadedModel.count;
+
+        // Log thêm về reacts cho comment đầu tiên (nếu có)
+        if (commentsLoadedModel.comments.isNotEmpty) {
+          final firstComment = commentsLoadedModel.comments.first;
+          developer.log(
+            'First comment ${firstComment.id} has ${firstComment.reacts?.length ?? 0} reacts after loadComments',
+            name: 'CommentDataSource',
+          );
+        }
 
         // Cập nhật số lượng comment cho post này
         _commentCounts[postId] = count;

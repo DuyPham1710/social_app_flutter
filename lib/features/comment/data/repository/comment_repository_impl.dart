@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:social_app_fe/core/network/dio_client.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/data/data_sources/remote/comment_remote_data_source.dart';
 import 'package:social_app_fe/features/comment/data/models/comments_loaded_model.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment-log_loaded_entity.dart';
+import 'package:social_app_fe/features/comment/data/models/react_comment_model.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
@@ -91,6 +93,26 @@ class CommentRepositoryImpl implements CommentRepository {
   @override
   Future<void> clearCommentsCache(String postId) async {
     _remoteDataSource.clearCommentsCache(postId);
+  }
+
+  @override
+  Future<DataState<ReactCommentModel>> reactComment({
+    required String commentId,
+    required String emoji,
+  }) async {
+    try {
+      final dio = DioClient.instance;
+      final response = await dio.post(
+        '/react-comment',
+        data: {
+          'commentId': commentId,
+          'emojiId': emoji,
+        },
+      );
+      return DataStateSuccess(ReactCommentModel.fromJson(response.data));
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
   }
 
   @override

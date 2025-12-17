@@ -8,13 +8,14 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
+import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_reaction_menu.dart';
+import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -22,6 +23,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:collection/collection.dart';
 
 class CommentItem extends StatefulWidget {
   final CommentEntity comment;
@@ -57,17 +59,50 @@ class _CommentItemState extends State<CommentItem> {
   final GlobalKey _commentKey = GlobalKey();
   bool _showReplies = false;
 
+  // Getter tiện ích để lấy danh sách reacts trực tiếp từ entity
+  List<ReactCommentEntity> get _reacts => widget.comment.reacts ?? [];
+
   @override
   void initState() {
     super.initState();
     _showReplies = widget.showReplies;
+    // ĐÃ XÓA logic _localReacts ở đây
   }
 
-  void _onReactionChanged(String commentId, EmojiType reaction) {
-    // TODO: Implement reaction logic với server
-    print('Comment $commentId reacted with ${reaction.label}');
-    // Có thể emit event để cập nhật server
-    // _commentBloc.add(ReactToCommentEvent(commentId: commentId, reaction: reaction));
+  @override
+  void didUpdateWidget(covariant CommentItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // ĐÃ XÓA logic _localReacts ở đây
+  }
+
+  void _onReactionChanged(
+    BuildContext context,
+    String commentId,
+    EmojiType reaction,
+  ) {
+    if (widget.currentUserId == null) return;
+
+    // Gửi sự kiện vào Bloc - Bloc sẽ lo việc update list và gọi API
+    context.read<CommentDetailsBloc>().add(
+      ReactCommentEvent(
+        commentId: commentId,
+        emoji: reaction,
+        currentUserId: widget.currentUserId!,
+      ),
+    );
+  }
+
+  // Đã bỏ comment và sửa logic để lấy từ widget.comment.reacts
+  EmojiType? _getCurrentUserReaction() {
+    if (widget.currentUserId == null || _reacts.isEmpty) {
+      return null;
+    }
+
+    // Tìm react của user hiện tại trong list
+    final react = _reacts.firstWhereOrNull(
+      (r) => r.user.userId == widget.currentUserId,
+    );
+    return react?.emoji;
   }
 
   @override
@@ -80,7 +115,6 @@ class _CommentItemState extends State<CommentItem> {
     final userData = await TokenStorage.getUserData();
     final currentUserId = userData?['id'];
 
-    // Nếu là user hiện tại → My Profile
     if (currentUserId == widget.comment.user.userId) {
       Navigator.push(
         context,
@@ -93,7 +127,6 @@ class _CommentItemState extends State<CommentItem> {
         ),
       );
     } else {
-      //Nếu là người khác → Other Profile
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -121,7 +154,10 @@ class _CommentItemState extends State<CommentItem> {
 
   @override
   Widget build(BuildContext context) {
-    // print('>>> comment: ${widget.comment.parentId}');
+    debugPrint(
+      '[CommentItem] build commentId=${widget.comment.id} reactsCount=${_reacts.length}',
+    );
+
     return Container(
       padding: widget.isReply
           ? EdgeInsets.fromLTRB(0.w, 8.h, 4.w, 8.h)
@@ -159,13 +195,11 @@ class _CommentItemState extends State<CommentItem> {
 
                   CommentReactionMenu.show(
                     context,
-                    Offset(
-                      position.dx,
-                      position.dy - 66.h,
-                    ), // canh chỉnh menu ở đầu comment
+                    Offset(position.dx, position.dy - 66.h),
                     widget.comment,
                     onReply: widget.onReply,
-                    onReactionChanged: _onReactionChanged,
+                    onReactionChanged: (commentId, emoji) =>
+                        _onReactionChanged(context, commentId, emoji),
                     currentUserId: widget.currentUserId,
                     onUpdateComment: widget.onUpdateComment,
                     onDeleteComment: widget.onDeleteComment,
@@ -201,9 +235,7 @@ class _CommentItemState extends State<CommentItem> {
                             ),
                           ),
                         ),
-
                         SizedBox(height: 3.h),
-
                         Text(
                           widget.comment.content,
                           style: TextStyle(
@@ -227,34 +259,32 @@ class _CommentItemState extends State<CommentItem> {
                               widget.comment.updatedAt != null
                                   ? timeago.format(widget.comment.updatedAt!)
                                   : "Unknown date",
-
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-
                             SizedBox(width: 10.w),
 
+                            // ReactionText giờ dùng logic từ entity
                             ReactionText(
                               commentId: widget.comment.id,
-                              onReactionChanged: _onReactionChanged,
+                              initialReaction: _getCurrentUserReaction(),
+                              // Truyền context để gọi hàm _onReactionChanged
+                              onReactionChanged: (id, emoji) =>
+                                  _onReactionChanged(context, id, emoji),
                             ),
 
                             SizedBox(width: 10.w),
-
                             GestureDetector(
                               onTap: () {
-                                // Handle reply action
                                 if (widget.onReply != null) {
                                   final userName =
                                       widget.comment.user.fullName ??
                                       widget.comment.user.username ??
                                       'Unknown';
-
                                   if (widget.comment.parentId != null) {
-                                    // Nếu đã là reply thì trả về parentId gốc
                                     widget.onReply!(
                                       widget.comment.parentId!.id,
                                       userName,
@@ -279,62 +309,12 @@ class _CommentItemState extends State<CommentItem> {
                           ],
                         ),
                       ),
-
-                      // Reaction badge (bottom right corner)
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.h, left: 8.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 4.w,
-                                vertical: 2.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    EmojiType.love.icon,
-                                    style: TextStyle(fontSize: 12.sp),
-                                  ),
-
-                                  SizedBox(width: 2.w),
-
-                                  Text(
-                                    EmojiType.haha.icon,
-                                    style: TextStyle(fontSize: 12.sp),
-                                  ),
-                                  SizedBox(width: 4.w),
-
-                                  Text(
-                                    '5',
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Reaction badge
+                      _buildReactionBadge(),
                     ],
                   ),
 
-                  // Show reply count and toggle if this comment has replies
+                  // Show reply count and toggle
                   if (widget.replies != null && widget.replies!.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(top: 8.h, left: 6.w),
@@ -354,9 +334,7 @@ class _CommentItemState extends State<CommentItem> {
                               size: 16.sp,
                               color: AppColors.textSecondary,
                             ),
-
                             SizedBox(width: 4.w),
-
                             Text(
                               'Xem ${widget.replies!.length} phản hồi',
                               style: TextStyle(
@@ -370,7 +348,7 @@ class _CommentItemState extends State<CommentItem> {
                       ),
                     ),
 
-                  // Show replies if expanded
+                  // Show replies
                   if (_showReplies &&
                       widget.replies != null &&
                       widget.replies!.isNotEmpty)
@@ -398,4 +376,183 @@ class _CommentItemState extends State<CommentItem> {
       ),
     );
   }
+
+  Widget _buildReactionBadge() {
+    if (_reacts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final Map<EmojiType, int> emojiCount = {};
+    for (final react in _reacts) {
+      emojiCount[react.emoji] = (emojiCount[react.emoji] ?? 0) + 1;
+    }
+
+    final sortedEmojis = emojiCount.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final topEmojis = sortedEmojis.take(2).toList();
+    final totalCount = _reacts.length;
+
+    return GestureDetector(
+      onTap: () => _showReactListModal(context),
+      child: Padding(
+        padding: EdgeInsets.only(top: 4.h, left: 8.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 26.w,
+                    height: 18.h,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        for (int i = 0; i < topEmojis.length; i++)
+                          Positioned(
+                            left: (i * 14),
+                            child: Text(
+                              topEmojis[i].key.icon,
+                              style: TextStyle(fontSize: 12.sp),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    '$totalCount',
+                    style: TextStyle(fontSize: 11.sp, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReactListModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      //surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.only(
+            left: 16.w,
+            right: 16.w,
+            top: 16.h,
+            // Thêm padding bottom để tránh bị cấn nút home ảo trên iOS/Android
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20.h,
+          ),
+          height: 400.h,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Thanh nắm kéo nhỏ ở trên cùng cho đẹp (tùy chọn)
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  margin: EdgeInsets.only(bottom: 16.h),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+              ),
+
+              Text(
+                'Biểu cảm về bình luận',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+
+              SizedBox(height: 10.h),
+
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _reacts.length,
+                  separatorBuilder: (context, index) =>
+                      Divider(color: Colors.grey[200], height: 1, thickness: 1),
+                  itemBuilder: (context, index) {
+                    final react = _reacts[index];
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8.h,
+                      ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets
+                            .zero, 
+                        leading: CircleAvatar(
+                          radius: 20.r,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: NetworkImage(
+                            react.user.avatarUrl ??
+                                'https://via.placeholder.com/150',
+                          ),
+                        ),
+                        title: Text(
+                          react.user.fullName ?? 'Unknown',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+
+                        trailing: Container(
+                          padding: EdgeInsets.all(6.r),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            react.emoji.icon,
+                            style: TextStyle(fontSize: 18.sp),
+                          ),
+                        ),
+                        onTap: () {
+                          _navigateToUserProfile(context, react.user.userId);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _navigateToUserProfile(BuildContext context, String userId) {}
 }
