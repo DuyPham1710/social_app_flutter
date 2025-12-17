@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
+import 'package:social_app_fe/features/comment/presentation/widgets/reaction_list_modal.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_reaction_menu.dart';
 import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
@@ -28,6 +29,7 @@ class CommentItem extends StatefulWidget {
   final bool showReplies;
   final VoidCallback? onToggleReplies;
   final String? currentUserId;
+  final String? currentUserAvatar;
   final Function(String commentId, String newContent)? onUpdateComment;
   final Function(String commentId, String postId)? onDeleteComment;
   final Function(String commentId, String currentContent)? onViewHistory;
@@ -41,6 +43,7 @@ class CommentItem extends StatefulWidget {
     this.showReplies = false,
     this.onToggleReplies,
     this.currentUserId,
+    this.currentUserAvatar,
     this.onUpdateComment,
     this.onDeleteComment,
     this.onViewHistory,
@@ -68,19 +71,22 @@ class _CommentItemState extends State<CommentItem> {
     super.didUpdateWidget(oldWidget);
   }
 
-  void _onReactionChanged(
+  Future<void> _onReactionChanged(
     BuildContext context,
     String commentId,
     EmojiType reaction,
-  ) {
+  ) async {
     if (widget.currentUserId == null) return;
 
+    final userData = await TokenStorage.getUserData();
+    final avatarUrl = userData?['avatarUrl'];
     // Gửi sự kiện vào Bloc - Bloc sẽ lo việc update list và gọi API
     context.read<CommentDetailsBloc>().add(
       ReactCommentEvent(
         commentId: commentId,
         emoji: reaction,
         currentUserId: widget.currentUserId!,
+        currentUserAvatar: avatarUrl,
       ),
     );
   }
@@ -403,111 +409,12 @@ class _CommentItemState extends State<CommentItem> {
     );
   }
 
-  void _showReactListModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      //surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.only(
-            left: 16.w,
-            right: 16.w,
-            top: 16.h,
-            // Thêm padding bottom để tránh bị cấn nút home ảo trên iOS/Android
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20.h,
-          ),
-          height: 400.h,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Thanh nắm kéo nhỏ ở trên cùng cho đẹp (tùy chọn)
-              Center(
-                child: Container(
-                  width: 40.w,
-                  height: 4.h,
-                  margin: EdgeInsets.only(bottom: 16.h),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
-                ),
-              ),
-
-              Text(
-                'Biểu cảm về bình luận',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-
-              SizedBox(height: 10.h),
-
-              Expanded(
-                child: ListView.separated(
-                  itemCount: _reacts.length,
-                  separatorBuilder: (context, index) =>
-                      Divider(color: Colors.grey[200], height: 1, thickness: 1),
-                  itemBuilder: (context, index) {
-                    final react = _reacts[index];
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.h),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: CircleAvatar(
-                          radius: 20.r,
-                          backgroundColor: Colors.grey[200],
-                          backgroundImage: NetworkImage(
-                            react.user.avatarUrl ??
-                                'https://via.placeholder.com/150',
-                          ),
-                        ),
-                        title: Text(
-                          //nếu id = id user hiện tại thì hiển thị "Bạn"
-                          react.user.userId == widget.currentUserId
-                              ? 'Bạn'
-                              : react.user.fullName ?? 'Unknown',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-
-                        trailing: Container(
-                          padding: EdgeInsets.all(6.r),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            react.emoji.icon,
-                            style: TextStyle(fontSize: 18.sp),
-                          ),
-                        ),
-                        onTap: () {
-                          _navigateToUserProfile(context, react.user.userId);
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  Future<void> _showReactListModal(BuildContext context) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+    ReactionListModal.show(context, _reacts, currentUserId, (userId) {
+      _navigateToUserProfile(context, userId);
+    });
   }
 
   Future<void> _navigateToUserProfile(

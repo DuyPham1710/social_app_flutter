@@ -62,11 +62,13 @@ class ReactCommentEvent extends CommentDetailsEvent {
   final String commentId;
   final EmojiType emoji;
   final String currentUserId; 
+  final String? currentUserAvatar;
 
   const ReactCommentEvent({
     required this.commentId,
     required this.emoji,
     required this.currentUserId,
+    this.currentUserAvatar,
   });
 
   @override

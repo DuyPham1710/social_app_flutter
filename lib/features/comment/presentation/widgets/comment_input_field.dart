@@ -7,16 +7,19 @@ class CommentInputField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final VoidCallback onSend;
+  final String ? currentUserAvatar;
 
   const CommentInputField({
     super.key,
     required this.controller,
     required this.focusNode,
     required this.onSend,
+    required this.currentUserAvatar,
   });
 
   @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(
@@ -32,7 +35,8 @@ class CommentInputField extends StatelessWidget {
           CircleAvatar(
             radius: 18.r,
             backgroundImage: NetworkImage(
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+              currentUserAvatar ??
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
             ),
           ),
           SizedBox(width: 10.w),

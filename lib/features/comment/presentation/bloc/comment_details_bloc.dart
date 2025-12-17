@@ -152,32 +152,20 @@ class CommentDetailsBloc
   ) async {
     final currentState = state;
     if (currentState is CommentDetailsLoaded) {
-      // 1. Get the list of comments.
-      // If your state holds CommentsLoadedEntity which holds List<CommentEntity>
+
       final currentEntities = currentState.commentsData?.comments;
       if (currentEntities == null) return;
 
-      // Find the index
       final index = currentEntities.indexWhere((c) => c.id == event.commentId);
       if (index == -1) return;
 
       final commentEntity = currentEntities[index];
 
-      // 2. CAST TO MODEL to use copyWith.
-      // Ideally, your repository should return Models if you need this power,
-      // or you strictly map back and forth.
-
-      // Assuming 'commentEntity' is actually an instance of 'CommentModel'
-      // (which is common if your repo returns Models as Entities)
-      // We can try casting. If not, we use the mapper.
 
       CommentModel commentModel;
       if (commentEntity is CommentModel) {
         commentModel = commentEntity;
       } else {
-        // Fallback: If it's a pure Entity, use the mapper we created in Step 2.
-        // commentModel = commentEntity.toModel();
-        // For now, assuming you might not have added the mapper yet, let's look at the User logic.
         return; // Or handle error
       }
 
@@ -190,16 +178,15 @@ class CommentDetailsBloc
       );
 
       if (reactIndex == -1) {
-        // --- ADD NEW REACT ---
-
         // Use the User mapper here!
         final userModel = commentModel.user is UserModel
             ? commentModel.user as UserModel
-            : commentModel.user.toModel(); // Uses the extension from Step 1
+            : commentModel.user.toModel();
 
         final currentUserFake = userModel.copyWith(
           userId: event.currentUserId,
           fullName: 'Bạn',
+          avatarUrl: event.currentUserAvatar,
         );
 
         currentReacts.add(
@@ -212,7 +199,6 @@ class CommentDetailsBloc
           ),
         );
       } else {
-        // --- UPDATE / REMOVE ---
         final currentReact = currentReacts[reactIndex];
         if (currentReact.emoji == event.emoji) {
           currentReacts.removeAt(reactIndex);
@@ -226,17 +212,9 @@ class CommentDetailsBloc
 
       // 4. Update the CommentModel
       final updatedCommentModel = commentModel.copyWith(reacts: currentReacts);
-
-      // 5. Update the List
-      // We need a mutable list of Entities to update the state
       final updatedList = List<CommentEntity>.from(currentEntities);
       updatedList[index] =
           updatedCommentModel; // Polymorphism: Model is an Entity
-
-      // 6. Update the State
-      // Assuming CommentsLoadedEntity is just a wrapper, we might need to cast or copy it too.
-      // If CommentsLoadedEntity doesn't have copyWith, you might need to recreate it or use CommentsLoadedModel.
-
       CommentsLoadedEntity updatedData;
       if (currentState.commentsData is CommentsLoadedModel) {
         updatedData = (currentState.commentsData as CommentsLoadedModel)
@@ -247,16 +225,13 @@ class CommentDetailsBloc
                   >(), // Ensure type safety if list expects Models
             );
       } else {
-        // If it's pure entity without copyWith, you have to reconstruct it manually
-        // or implement copyWith on the Entity as discussed before.
-        // Since you have CommentsLoadedModel, casting is the easiest way.
+
         updatedData = (currentState.commentsData as CommentsLoadedModel)
             .copyWith(comments: updatedList.cast<CommentModel>());
       }
 
       emit(CommentDetailsLoaded(updatedData));
 
-      // 7. Call API
       try {
         await reactCommentUseCase(
           params: ReactCommentParams(

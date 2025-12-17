@@ -40,6 +40,7 @@ class _ModalCommentState extends State<ModalComment> {
   late CommentBloc _commentBloc;
   late CommentDetailsBloc _commentDetailsBloc;
   late String? _parentId;
+  String? _currentUserAvatar;
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _ModalCommentState extends State<ModalComment> {
     _controller = TextEditingController();
     _focusNode = FocusNode();
     _parentId = null;
+    _loadCurrentUser();
 
     // Tạo CommentBloc và CommentDetailsBloc từ DI
     _commentBloc = s1<CommentBloc>();
@@ -65,6 +67,15 @@ class _ModalCommentState extends State<ModalComment> {
       // Nếu mở modal từ việc nhấn vào biểu tượng bình luận, focus ngay
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _focusNode.requestFocus();
+      });
+    }
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final userData = await TokenStorage.getUserData();
+    if (mounted) {
+      setState(() {
+        _currentUserAvatar = userData?['avatarUrl'];
       });
     }
   }
@@ -311,6 +322,7 @@ class _ModalCommentState extends State<ModalComment> {
                 const TypingIndicator(),
 
                 CommentInputField(
+                  currentUserAvatar: _currentUserAvatar,
                   controller: _controller,
                   focusNode: _focusNode,
                   onSend: () async {
