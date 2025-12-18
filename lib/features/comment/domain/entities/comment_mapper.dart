@@ -9,14 +9,11 @@ extension CommentEntityX on CommentEntity {
     return CommentModel(
       id: id,
       content: content,
-      // Assuming your CommentEntity has a UserEntity field named 'user'
       user: user.toModel(), 
       postId: postId,
-      // Map other fields. If fields are Entities, map them to Models.
-      // parentId: parentId?.toModel(), 
+      taggedUsers: taggedUsers?.map((e) => e.toModel()).toList(),
       createdAt: createdAt,
       updatedAt: updatedAt,
-      // reacts: reacts?.map((e) => e.toModel()).toList(),
     );
   }
 }

@@ -43,6 +43,9 @@ dependencies:
   flutter_slidable: ^4.0.3
   swipe_to: ^1.0.6
   agora_rtc_engine: ^6.5.3
+  flutter_mentions: ^2.0.1
+  flutter_portal: ^0.4.0
+  flutter_parsed_text: ^2.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

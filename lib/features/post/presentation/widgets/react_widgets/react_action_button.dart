@@ -7,8 +7,9 @@ class ReactActionButton extends StatelessWidget {
   final bool? isFriend;
   final bool isSend;
   final String? requestId;
-  final Function(String? parentId, String userDisplayName)? onMention;
+  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
   final String userDisplayName;
+  final String userAvatar;
 
   const ReactActionButton({
     super.key,
@@ -18,6 +19,7 @@ class ReactActionButton extends StatelessWidget {
     this.requestId,
     this.onMention,
     required this.userDisplayName,
+    required this.userAvatar,
   });
 
   @override
@@ -38,7 +40,7 @@ class ReactActionButton extends StatelessWidget {
       onPressed: () {
         // Gọi callback onMention và đóng ReactionDetailsPage
         if (onMention != null) {
-          onMention!(null, userDisplayName);
+          onMention!(userId, userDisplayName, null, userDisplayName);
           Navigator.pop(context);
         }
       },

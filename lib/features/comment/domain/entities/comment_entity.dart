@@ -11,6 +11,7 @@ class CommentEntity {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<ReactCommentEntity>? reacts;
+  final List<UserEntity>? taggedUsers;
 
   const CommentEntity({
     required this.id,
@@ -21,6 +22,7 @@ class CommentEntity {
     this.createdAt,
     this.updatedAt,
     this.reacts,
+    this.taggedUsers,
   });
 
   @override

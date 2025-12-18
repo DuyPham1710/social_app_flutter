@@ -18,6 +18,7 @@ class CommentModel extends CommentEntity with _$CommentModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     @JsonKey(name: 'reacts') List<ReactCommentModel>? reacts,
+    @JsonKey(name: 'taggedUserIds') List<UserModel>? taggedUsers,
   }) = _CommentModel;
 
   factory CommentModel.fromJson(Map<String, dynamic> json) =>

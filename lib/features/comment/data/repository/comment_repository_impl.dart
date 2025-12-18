@@ -104,10 +104,7 @@ class CommentRepositoryImpl implements CommentRepository {
       final dio = DioClient.instance;
       final response = await dio.post(
         '/react-comment',
-        data: {
-          'commentId': commentId,
-          'emojiId': emoji,
-        },
+        data: {'commentId': commentId, 'emojiId': emoji},
       );
       return DataStateSuccess(ReactCommentModel.fromJson(response.data));
     } on DioException catch (e) {

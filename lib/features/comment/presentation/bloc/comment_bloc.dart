@@ -120,6 +120,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         postId: event.postId,
         content: event.content,
         parentId: event.parentId,
+        taggedUserIds: event.taggedUserIds,
       ),
     );
   }

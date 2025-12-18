@@ -26,6 +26,9 @@ _$CommentModelImpl _$$CommentModelImplFromJson(Map<String, dynamic> json) =>
       reacts: (json['reacts'] as List<dynamic>?)
           ?.map((e) => ReactCommentModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      taggedUsers: (json['taggedUserIds'] as List<dynamic>?)
+          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$CommentModelImplToJson(_$CommentModelImpl instance) =>
@@ -38,4 +41,5 @@ Map<String, dynamic> _$$CommentModelImplToJson(_$CommentModelImpl instance) =>
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'reacts': instance.reacts,
+      'taggedUserIds': instance.taggedUsers,
     };

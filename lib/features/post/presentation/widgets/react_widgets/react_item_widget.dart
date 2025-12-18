@@ -8,7 +8,7 @@ class ReactItemWidget extends StatelessWidget {
   final ReactPostEntity react;
   final bool isSend;
   final String? requestId;
-  final Function(String? parentId, String userDisplayName)? onMention;
+  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
   const ReactItemWidget({
     super.key,
     required this.react,
@@ -112,6 +112,7 @@ class ReactItemWidget extends StatelessWidget {
               onMention: onMention,
               userDisplayName:
                   react.user.fullName ?? react.user.username ?? 'Unknown',
+              userAvatar: react.user.avatarUrl ?? '',
             ),
           ],
         ],

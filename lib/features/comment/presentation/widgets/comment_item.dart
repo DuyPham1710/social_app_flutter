@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_event.dart';
+import 'package:social_app_fe/features/comment/presentation/widgets/comment_content_bubble.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_list_modal.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_text.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_reaction_menu.dart';
@@ -23,7 +24,13 @@ import 'package:collection/collection.dart';
 
 class CommentItem extends StatefulWidget {
   final CommentEntity comment;
-  final Function(String? parentId, String userDisplayName)? onReply;
+  final Function(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  )?
+  onReply;
   final List<CommentEntity>? replies;
   final bool isReply;
   final bool showReplies;
@@ -174,39 +181,15 @@ class _CommentItemState extends State<CommentItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Comment container
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 8.h,
+                  CommentContentBubble(
+                    user: widget.comment.user,
+                    content: widget.comment.content,
+                    onTapProfile: () => _navigateToUserProfile(
+                      context,
+                      widget.comment.user.userId,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundCommentItem,
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () => _navigateToProfile(context),
-                          child: Text(
-                            widget.comment.user.fullName ?? 'Unknown',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13.sp,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 3.h),
-                        Text(
-                          widget.comment.content,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
+                    onMentionTap: (userId) =>
+                        _navigateToUserProfile(context, userId),
                   ),
 
                   Row(
@@ -241,22 +224,23 @@ class _CommentItemState extends State<CommentItem> {
                             SizedBox(width: 10.w),
                             GestureDetector(
                               onTap: () {
-                                if (widget.onReply != null) {
-                                  final userName =
-                                      widget.comment.user.fullName ??
-                                      widget.comment.user.username ??
-                                      'Unknown';
-                                  if (widget.comment.parentId != null) {
-                                    widget.onReply!(
-                                      widget.comment.parentId!.id,
-                                      userName,
-                                    );
-                                  } else {
-                                    widget.onReply!(
-                                      widget.comment.id,
-                                      userName,
-                                    );
-                                  }
+                                final user = widget.comment.user;
+                                final userName =
+                                    user.fullName ?? user.username ?? 'Unknown';
+                                if (widget.comment.parentId != null) {
+                                  widget.onReply!(
+                                    user.userId,
+                                    user.avatarUrl ?? '',
+                                    widget.comment.parentId!.id,
+                                    userName,
+                                  );
+                                } else {
+                                  widget.onReply!(
+                                    user.userId,
+                                    user.avatarUrl ?? '',
+                                    widget.comment.id,
+                                    userName,
+                                  );
                                 }
                               },
                               child: Text(
