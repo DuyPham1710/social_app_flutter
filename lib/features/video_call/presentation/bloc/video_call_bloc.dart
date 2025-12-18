@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/video_call/domain/entities/video_call_entities.dart';
 import 'package:social_app_fe/features/video_call/domain/usecases/video_call_usecases.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/video_call_event.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/video_call_state.dart';
@@ -140,7 +143,7 @@ class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
 
       emit(
         state.copyWith(
-          status: VideoCallStatus.inCall,
+          status: VideoCallStatus.acceptingCall,
           tokenEntity: tokenEntity,
         ),
       );
@@ -213,7 +216,75 @@ class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
   }
 
   void _onCallAccepted(CallAccepted event, Emitter<VideoCallState> emit) {
-    emit(state.copyWith(status: VideoCallStatus.inCall));
+    try {
+      final data = event.data;
+
+      // Check if this is for the receiver (acceptedBy field indicates who accepted)
+      final acceptedBy = data['acceptedBy'] as String?;
+      final isReceiver =
+          acceptedBy !=
+          null; // If acceptedBy exists, this event is for the caller
+
+      if (isReceiver) {
+        // This is the caller receiving notification that receiver accepted
+        // Just update status, don't navigate (caller already has VideoCallScreen open)
+        debugPrint(
+          '[VideoCallBloc] Call accepted by receiver, staying in current screen',
+        );
+        emit(state.copyWith(status: VideoCallStatus.callAccepted));
+        return;
+      }
+
+      // This is the receiver getting their token after accepting
+      // Use token from state (from AcceptCall API response) if available,
+      // otherwise parse from socket event
+      final tokenEntity =
+          state.tokenEntity ??
+          CallTokenEntity(
+            token: data['token'] as String? ?? '',
+            appId: data['appId'] as String? ?? '',
+            channelId: data['channelId'] as String? ?? '',
+            callId: data['callId'] as String? ?? '',
+          );
+
+      // Parse caller info to create IncomingCallEntity (for receiver to display)
+      IncomingCallEntity? incomingCall;
+      if (data['callerInfo'] != null) {
+        final callerInfoData = data['callerInfo'] as Map<String, dynamic>;
+        incomingCall = IncomingCallEntity(
+          callId: data['callId'] as String? ?? '',
+          channelId: data['channelId'] as String? ?? '',
+          callerId: data['callerId'] as String? ?? '',
+          callerInfo: UserEntity(
+            userId: callerInfoData['userId'] as String? ?? '',
+            username: callerInfoData['username'] as String? ?? '',
+            fullName: callerInfoData['fullName'] as String?,
+            avatarUrl: callerInfoData['avatarUrl'] as String?,
+            email: callerInfoData['email'] as String?,
+          ),
+          callType: data['callType'] as String? ?? 'video',
+          conversationId: data['conversationId'] as String?,
+        );
+      }
+
+      debugPrint(
+        '[VideoCallBloc] Receiver accepted call, navigating to VideoCallScreen',
+      );
+      debugPrint(
+        '[VideoCallBloc] - Caller: ${incomingCall?.callerInfo?.fullName ?? "Unknown"}',
+      );
+      emit(
+        state.copyWith(
+          status: VideoCallStatus.inCall,
+          tokenEntity: tokenEntity,
+          incomingCall:
+              incomingCall ?? state.incomingCall, // Keep existing if available
+        ),
+      );
+    } catch (e) {
+      debugPrint('[VideoCallBloc] Error parsing call accepted data: $e');
+      emit(state.copyWith(status: VideoCallStatus.inCall));
+    }
   }
 
   void _onCallRejected(CallRejected event, Emitter<VideoCallState> emit) {
