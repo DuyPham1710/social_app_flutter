@@ -219,15 +219,21 @@ class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
     try {
       final data = event.data;
 
-      // Check if this is for the receiver (acceptedBy field indicates who accepted)
+      // Prevent duplicate processing if already in call or navigating
+      if (state.status == VideoCallStatus.inCall ||
+          state.status == VideoCallStatus.callAccepted) {
+        debugPrint(
+          '[VideoCallBloc] Already in call or accepted, ignoring duplicate event',
+        );
+        return;
+      }
+
       final acceptedBy = data['acceptedBy'] as String?;
       final isReceiver =
           acceptedBy !=
           null; // If acceptedBy exists, this event is for the caller
 
       if (isReceiver) {
-        // This is the caller receiving notification that receiver accepted
-        // Just update status, don't navigate (caller already has VideoCallScreen open)
         debugPrint(
           '[VideoCallBloc] Call accepted by receiver, staying in current screen',
         );
@@ -235,9 +241,6 @@ class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
         return;
       }
 
-      // This is the receiver getting their token after accepting
-      // Use token from state (from AcceptCall API response) if available,
-      // otherwise parse from socket event
       final tokenEntity =
           state.tokenEntity ??
           CallTokenEntity(

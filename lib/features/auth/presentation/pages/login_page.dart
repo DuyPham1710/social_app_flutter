@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
@@ -61,10 +62,13 @@ class _LoginPageState extends State<LoginPage> {
     return SafeArea(
       child: Scaffold(
         body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             // Chỉ xử lý state từ login flow
             if (state is AuthLoaded && state.flowType == 'login') {
               context.read<MenuBloc>().add(LoadCurrentUserEvent());
+
+              // Update FCM token after successful login
+              await FcmService().updateFcmToken();
               Navigator.pushReplacementNamed(context, '/main');
             } else if (state is AuthError && state.flowType == 'login') {
               final errorMsg = state.errorMessage ?? 'Đăng nhập thất bại';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
@@ -99,6 +100,7 @@ class PostHeader extends StatelessWidget {
           ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_horiz, size: 20.sp),
+            color: AppColors.background,
             onSelected: (value) {
               if (value == 'report') {
                 onReportTap?.call();

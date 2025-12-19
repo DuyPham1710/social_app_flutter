@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/config/theme/app_theme.dart';
+import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/network/my_http_overrides.dart';
@@ -101,6 +102,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _init() async {
     await _getUserInfo();
     await _initializeServices();
+    // await _checkPendingCall();
   }
 
   Future<void> _getUserInfo() async {
@@ -129,8 +131,149 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  // Future<void> _checkPendingCall() async {
+  //   try {
+  //     // Check if app was opened by accepting a call from killed state
+  //     final activeCalls = await CallKitService().getActiveCalls();
+
+  //     if (activeCalls.isEmpty) {
+  //       debugPrint('[App] No active calls found');
+  //       return;
+  //     }
+
+  //     debugPrint('[App] Active calls found: ${activeCalls.length}');
+
+  //     // Get the first active call - safely convert to Map<String, dynamic>
+  //     final activeCallRaw = activeCalls.first;
+  //     if (activeCallRaw is! Map) {
+  //       debugPrint('[App] Invalid active call format, skipping');
+  //       return;
+  //     }
+
+  //     final activeCall = Map<String, dynamic>.from(activeCallRaw);
+
+  //     // Check if app was opened from notification (not just normal app start)
+  //     final from = activeCall['from'] as String?;
+  //     debugPrint('[App] Call opened from: $from');
+
+  //     if (from != 'notification') {
+  //       debugPrint(
+  //         '[App] App opened normally, not from notification. Ignoring old call data.',
+  //       );
+  //       return;
+  //     }
+
+  //     // Extract call data - structure matches what we passed in showIncomingCall
+  //     final callId = activeCall['id'] as String?;
+  //     final extraRaw = activeCall['extra'];
+
+  //     if (callId == null || extraRaw == null || extraRaw is! Map) {
+  //       debugPrint('[App] Invalid call data format, skipping');
+  //       return;
+  //     }
+
+  //     // Convert to Map<String, dynamic> safely
+  //     final extra = Map<String, dynamic>.from(extraRaw);
+
+  //     final receiverId = extra['receiverId'] as String?;
+  //     final callType = extra['callType'] as String? ?? 'video';
+
+  //     if (receiverId == null || userData == null || userData!['id'] == null) {
+  //       debugPrint(
+  //         '[App] Skipping pending call - missing receiverId or user not logged in',
+  //       );
+  //       return;
+  //     }
+
+  //     debugPrint('[App] Processing pending call: $callId');
+
+  //     // Check permissions
+  //     final hasPermissions = await PermissionHelper.checkCallPermissions(
+  //       callType,
+  //     );
+
+  //     if (!hasPermissions) {
+  //       debugPrint('[App] Permissions denied for pending call');
+  //       await CallKitService().endCall(callId);
+  //       return;
+  //     }
+
+  //     // Wait a bit for app to fully initialize
+  //     await Future.delayed(const Duration(seconds: 1));
+
+  //     // Connect to socket and accept call
+  //     if (mounted) {
+  //       final videoCallBloc = context.read<VideoCallBloc>();
+
+  //       final currentUserId = userData!['id'];
+  //       final username = userData!['username'] ?? 'User';
+
+  //       videoCallBloc.add(
+  //         ConnectVideoCall(userId: currentUserId, username: username),
+  //       );
+
+  //       await Future.delayed(const Duration(seconds: 2));
+
+  //       videoCallBloc.add(AcceptCall(userId: receiverId, callId: callId));
+  //     }
+  //   } catch (e, stackTrace) {
+  //     debugPrint('[App] Error checking pending call: $e');
+  //     debugPrint('[App] Stack trace: $stackTrace');
+  //   }
+  // }
+
   void _handleCallAccepted(Map<String, dynamic> callData) async {
     debugPrint('[App] Call accepted from CallKit: $callData');
+
+    final callId = callData['callId'] as String?;
+    final userId = callData['receiverId'] as String?;
+    final callType = callData['callType'] as String? ?? 'video';
+
+    if (callId == null || userId == null) {
+      debugPrint('[App] Missing callId or userId, cannot accept call');
+      return;
+    }
+
+    // Check permissions before accepting call
+    final hasPermissions = await PermissionHelper.checkCallPermissions(
+      callType,
+    );
+    if (!hasPermissions) {
+      debugPrint('[App] Permissions denied, rejecting call');
+      // End the call if permissions are denied
+      await CallKitService().endCall(callId);
+
+      // Show error message to user
+      final context = _navigatorKey.currentContext;
+      if (context != null) {
+        PermissionHelper.showPermissionDeniedError(context, callType);
+      }
+      return;
+    }
+
+    final videoCallBloc = context.read<VideoCallBloc>();
+
+    if (videoCallBloc.state.status != VideoCallStatus.connected) {
+      debugPrint('[App] Socket not connected, connecting first...');
+
+      final currentUserId = userData?['id'] ?? userId;
+      final username = userData?['username'] ?? 'User';
+
+      videoCallBloc.add(
+        ConnectVideoCall(userId: currentUserId, username: username),
+      );
+
+      await Future.delayed(const Duration(seconds: 2));
+    }
+
+    // Dispatch AcceptCall event
+    videoCallBloc.add(AcceptCall(userId: userId, callId: callId));
+
+    // Navigation will be handled by BlocListener in ChatDetailPage or global listener
+  }
+
+  void _handleCallRejected(Map<String, dynamic> callData) async {
+    debugPrint('[App] Call rejected from CallKit: $callData');
 
     final callId = callData['callId'] as String?;
     final userId = callData['receiverId'] as String?;
@@ -141,36 +284,6 @@ class _MyAppState extends State<MyApp> {
       if (videoCallBloc.state.status != VideoCallStatus.connected) {
         debugPrint('[App] Socket not connected, connecting first...');
 
-        final currentUserId = userData?['id'] ?? userId;
-        final username = userData?['username'] ?? 'User';
-
-        videoCallBloc.add(
-          ConnectVideoCall(userId: currentUserId, username: username),
-        );
-
-        await Future.delayed(const Duration(seconds: 2));
-      }
-
-      // Dispatch AcceptCall event
-      videoCallBloc.add(AcceptCall(userId: userId, callId: callId));
-
-      // Navigation will be handled by BlocListener in ChatDetailPage or global listener
-    }
-  }
-
-  void _handleCallRejected(Map<String, dynamic> callData) async {
-    debugPrint('[App] Call rejected from CallKit: $callData');
-
-    final callId = callData['callId'] as String?;
-    final userId = callData['userId'] as String?;
-
-    if (callId != null && userId != null) {
-      final videoCallBloc = context.read<VideoCallBloc>();
-
-      if (videoCallBloc.state.status != VideoCallStatus.connected) {
-        debugPrint('[App] Socket not connected, connecting first...');
-
-        // Lấy thông tin user hiện tại từ userData đã load trong _init()
         final currentUserId = userData?['id'] ?? userId;
         final username = userData?['username'] ?? 'User';
 
@@ -193,14 +306,19 @@ class _MyAppState extends State<MyApp> {
     // The call already ended on the other side
   }
 
+  bool _isNavigatingToCall = false;
+
   void _handleVideoCallStateChange(BuildContext context, VideoCallState state) {
     debugPrint('[App] VideoCall state changed: ${state.status}');
 
-    // if (state.status == VideoCallStatus.incomingCall &&
-    //     state.incomingCall != null) {
-    //   _showCallKitUI(state.incomingCall!);
-    // } else
     if (state.status == VideoCallStatus.inCall && state.tokenEntity != null) {
+      // Prevent duplicate navigation
+      if (_isNavigatingToCall) {
+        debugPrint('[App] Already navigating to VideoCallScreen, ignoring...');
+        return;
+      }
+      _isNavigatingToCall = true;
+
       final tokenEntity = state.tokenEntity!;
       final incomingCall = state.incomingCall;
 
@@ -209,54 +327,37 @@ class _MyAppState extends State<MyApp> {
       debugPrint('[App] - callId: ${tokenEntity.callId}');
       debugPrint('[App] - isCaller: false (accepting call)');
 
-      _navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (_) => VideoCallScreen(
-            channelId: tokenEntity.channelId,
-            token: tokenEntity.token,
-            appId: tokenEntity.appId,
-            callId: tokenEntity.callId,
-            userId: userData?['id'] ?? '', // Current user (receiver)
-            isVideo: incomingCall?.callType == 'video',
-            isCaller: false, // Always false when accepting
-            callerName:
-                incomingCall?.callerInfo?.fullName ??
-                incomingCall?.callerInfo?.username ??
-                'Unknown',
-            callerAvatar: incomingCall?.callerInfo?.avatarUrl,
-            receiverName:
-                userData?['fullName'] ?? userData?['username'] ?? 'You',
-            receiverAvatar: userData?['avatarUrl'],
-          ),
-        ),
-      );
-      // .then((_) {
-      //   // Disconnect socket after call ends (for receiver)
-      //   context.read<VideoCallBloc>().add(const DisconnectVideoCall());
-      // });
+      _navigatorKey.currentState
+          ?.push(
+            MaterialPageRoute(
+              builder: (_) => VideoCallScreen(
+                channelId: tokenEntity.channelId,
+                token: tokenEntity.token,
+                appId: tokenEntity.appId,
+                callId: tokenEntity.callId,
+                userId: userData?['id'] ?? '', // Current user (receiver)
+                isVideo: incomingCall?.callType == 'video',
+                isCaller: false, // Always false when accepting
+                callerName:
+                    incomingCall?.callerInfo?.fullName ??
+                    incomingCall?.callerInfo?.username ??
+                    'Unknown',
+                callerAvatar: incomingCall?.callerInfo?.avatarUrl,
+                receiverName:
+                    userData?['fullName'] ?? userData?['username'] ?? 'You',
+                receiverAvatar: userData?['avatarUrl'],
+              ),
+            ),
+          )
+          .then((_) {
+            _isNavigatingToCall = false;
+            // Disconnect socket after call ends (for receiver)
+            // context.read<VideoCallBloc>().add(const DisconnectVideoCall());
+          });
     } else if (state.status == VideoCallStatus.error) {
       debugPrint('[App] Video call error occurred: ${state.errorMessage}');
     }
   }
-
-  /// Show CallKit UI for incoming call
-  // void _showCallKitUI(IncomingCallEntity incomingCall) {
-  //   debugPrint('[App] Showing CallKit UI for: ${incomingCall.callId}');
-
-  //   final callData = {
-  //     'callId': incomingCall.callId,
-  //     'callerName':
-  //         incomingCall.callerInfo?.fullName ??
-  //         incomingCall.callerInfo?.username ??
-  //         'Unknown',
-  //     'callerAvatar': incomingCall.callerInfo?.avatarUrl ?? '',
-  //     'callType': incomingCall.callType,
-  //     'receiverId': userData?['id'] ?? '',
-  //     'callerId': incomingCall.callerId,
-  //   };
-
-  //   CallKitService().showIncomingCall(callData);
-  // }
 
   @override
   Widget build(BuildContext context) {

@@ -136,6 +136,22 @@ class FcmService {
     }
   }
 
+  /// Manually update FCM token (call after login/register)
+  Future<void> updateFcmToken() async {
+    try {
+      final token = _fcmToken ?? await _firebaseMessaging.getToken();
+      if (token != null) {
+        _fcmToken = token;
+        await _sendTokenToBackend(token);
+        debugPrint('[FCM] Manual token update completed');
+      } else {
+        debugPrint('[FCM] No FCM token available for manual update');
+      }
+    } catch (e) {
+      debugPrint('[FCM] Error in manual token update: $e');
+    }
+  }
+
   /// Subscribe to a topic
   Future<void> subscribeToTopic(String topic) async {
     try {

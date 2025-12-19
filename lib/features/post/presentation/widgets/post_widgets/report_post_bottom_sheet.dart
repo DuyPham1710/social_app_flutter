@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
@@ -38,6 +39,7 @@ class ReportPostBottomSheet extends StatefulWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AppColors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -241,12 +243,21 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                     : () {
                         Navigator.of(context).pop();
                       },
-                child: const Text('Hủy'),
+                child: Text(
+                  'Hủy',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14.sp,
+                  ),
+                ),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(AppColors.primary),
+                ),
                 onPressed: _isSubmitting ? null : _handleSubmit,
                 child: _isSubmitting
                     ? SizedBox(
@@ -259,7 +270,13 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                           ),
                         ),
                       )
-                    : const Text('Gửi báo cáo'),
+                    : Text(
+                        'Gửi báo cáo',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: AppColors.background,
+                        ),
+                      ),
               ),
             ),
           ],

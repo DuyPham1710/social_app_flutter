@@ -56,7 +56,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   bool _hasRemoteUserJoined = false; // Track if remote user has EVER joined
   final CallSoundService _soundService = CallSoundService();
 
-  static const int _callTimeoutSeconds = 45;
+  static const int _callTimeoutSeconds = 30;
 
   @override
   void initState() {
@@ -173,7 +173,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   void _startCallTimeoutTimer() {
     _callTimeoutTimer = Timer(const Duration(seconds: _callTimeoutSeconds), () {
-      if (mounted && _isConnecting && _remoteUid == null) {
+      if (mounted && _remoteUid == null && !_hasRemoteUserJoined) {
         _showError('Không có phản hồi');
         _endCall();
       }
@@ -215,7 +215,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     try {
       // Stop sound when ending call
       await _soundService.stop();
-      
+
       String callStatus;
       if (!_hasRemoteUserJoined && widget.isCaller) {
         // Caller ending before receiver EVER joined = missed

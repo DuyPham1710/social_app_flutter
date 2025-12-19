@@ -9,6 +9,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
@@ -323,14 +324,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   Future<void> _initiateCall(String callType) async {
     try {
       // Check permissions
-      final hasPermissions = await _checkCallPermissions(callType);
+      final hasPermissions = await PermissionHelper.checkCallPermissions(
+        callType,
+      );
       if (!hasPermissions) {
         if (mounted) {
-          _showError(
-            callType == 'video'
-                ? 'Cần quyền camera và microphone để gọi video'
-                : 'Cần quyền microphone để gọi thoại',
-          );
+          PermissionHelper.showPermissionDeniedError(context, callType);
         }
         return;
       }
@@ -355,17 +354,6 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
-    }
-  }
-
-  Future<bool> _checkCallPermissions(String callType) async {
-    if (callType == 'video') {
-      final cameraStatus = await Permission.camera.request();
-      final micStatus = await Permission.microphone.request();
-      return cameraStatus.isGranted && micStatus.isGranted;
-    } else {
-      final micStatus = await Permission.microphone.request();
-      return micStatus.isGranted;
     }
   }
 

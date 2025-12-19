@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'package:uuid/uuid.dart';
 
 /// CallKit Service to handle native incoming call UI
 class CallKitService {
@@ -10,7 +9,7 @@ class CallKitService {
   factory CallKitService() => _instance;
   CallKitService._internal();
 
-  final _uuid = const Uuid();
+  // final _uuid = const Uuid();
   StreamSubscription<CallEvent?>? _callEventSubscription;
 
   // Callbacks for call actions
@@ -95,7 +94,11 @@ class CallKitService {
   /// Show incoming call UI
   Future<void> showIncomingCall(Map<String, dynamic> callData) async {
     try {
-      final callId = callData['callId'] ?? _uuid.v4();
+      final callId = callData['callId'];
+      if (callId == null) {
+        debugPrint('[CallKit] Missing callId in callData');
+        return;
+      }
       final callerName = callData['callerName'] ?? 'Unknown';
       final callerAvatar = callData['callerAvatar'] ?? '';
       final callType = callData['callType'] ?? 'video';
@@ -103,12 +106,12 @@ class CallKitService {
       final params = CallKitParams(
         id: callId,
         nameCaller: callerName,
-        appName: 'Social App',
+        appName: 'CommonsHub',
         avatar: callerAvatar,
         handle: callType == 'video' ? 'Video Call' : 'Audio Call',
         type: callType == 'video' ? 1 : 0, // 0: audio, 1: video
         duration: 30000, // 30 seconds timeout
-        textAccept: 'Accept',
+        textAccept: 'Answer',
         textDecline: 'Decline',
         missedCallNotification: const NotificationParams(
           showNotification: true,
@@ -121,8 +124,8 @@ class CallKitService {
         android: const AndroidParams(
           isCustomNotification: true,
           isShowLogo: false,
-          ringtonePath: 'system_ringtone_default',
-          backgroundColor: '#0955fa',
+          ringtonePath: 'ringtone_call',
+          backgroundColor: '#FF006175',
           backgroundUrl: '',
           actionColor: '#4CAF50',
           incomingCallNotificationChannelName: "Incoming Call",
@@ -156,7 +159,11 @@ class CallKitService {
   /// Start an outgoing call
   Future<void> startCall(Map<String, dynamic> callData) async {
     try {
-      final callId = callData['callId'] ?? _uuid.v4();
+      final callId = callData['callId'];
+      if (callId == null) {
+        debugPrint('[CallKit] Missing callId in callData');
+        return;
+      }
       final receiverName = callData['receiverName'] ?? 'Unknown';
       final callType = callData['callType'] ?? 'video';
 
