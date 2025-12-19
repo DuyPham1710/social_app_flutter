@@ -44,6 +44,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   LayoutType _selectedLayout = LayoutType.classic;
   late PrivacyType _selectedPrivacy;
   String _selectedPrivacyLabel = '';
+  List<String> _friendsExceptIds = [];
+  List<String> _friendsDetailIds = [];
   bool _isCreatingPost = false;
 
   @override
@@ -62,6 +64,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
     // ẩn bàn phím
     FocusScope.of(context).unfocus();
 
+    // Validation: Nếu chọn friends_except hoặc friends_detail, phải có danh sách bạn bè
+    if (_selectedPrivacy == PrivacyType.friendsExcept && _friendsExceptIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng chọn bạn bè cần ẩn bài viết'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_selectedPrivacy == PrivacyType.friendsDetail && _friendsDetailIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng chọn bạn bè được phép xem bài viết'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isCreatingPost = true;
     });
@@ -74,6 +97,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
         if (file != null) {
           files.add(file);
         }
+      }
+
+      // Chỉ gửi friendsExcept/friendsDetail nếu privacy type tương ứng
+      List<String>? friendsExcept;
+      List<String>? friendsDetail;
+      
+      if (_selectedPrivacy == PrivacyType.friendsExcept && _friendsExceptIds.isNotEmpty) {
+        friendsExcept = _friendsExceptIds;
+      }
+      if (_selectedPrivacy == PrivacyType.friendsDetail && _friendsDetailIds.isNotEmpty) {
+        friendsDetail = _friendsDetailIds;
       }
 
       // Create post entity
@@ -89,8 +123,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ? List.generate(files.length, (index) => index)
             : null,
         titles: null, // Can be added if needed
-        friendsExcept: null, // Can be added based on privacy settings
-        friendsDetail: null, // Can be added based on privacy settings
+        friendsExcept: friendsExcept,
+        friendsDetail: friendsDetail,
       );
 
       // Trigger BLoC event
@@ -559,12 +593,25 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                                                     if (result != null) {
                                                       setState(() {
-                                                        _selectedPrivacyLabel =
-                                                            result;
+                                                        // result có thể là String (cũ) hoặc Map (mới)
+                                                        if (result is Map) {
+                                                          _selectedPrivacyLabel = result['label'] as String;
+                                                          _friendsExceptIds = (result['friendsExcept'] as List<dynamic>?)
+                                                              ?.map((e) => e.toString())
+                                                              .toList() ?? [];
+                                                          _friendsDetailIds = (result['friendsDetail'] as List<dynamic>?)
+                                                              ?.map((e) => e.toString())
+                                                              .toList() ?? [];
+                                                        } else if (result is String) {
+                                                          // Backward compatibility
+                                                          _selectedPrivacyLabel = result;
+                                                          _friendsExceptIds = [];
+                                                          _friendsDetailIds = [];
+                                                        }
 
                                                         _selectedPrivacy =
                                                             PrivacyUtil.labelToPrivacyType(
-                                                              result,
+                                                              _selectedPrivacyLabel,
                                                             );
                                                       });
                                                     }

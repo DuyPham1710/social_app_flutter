@@ -33,4 +33,20 @@ class PrivacyUtil {
         return PrivacyType.public;
     }
   }
+
+  // Helper method để convert PrivacyType sang string cho API
+  static String privacyTypeToApiString(PrivacyType privacyType) {
+    switch (privacyType) {
+      case PrivacyType.public:
+        return 'public';
+      case PrivacyType.friends:
+        return 'friends';
+      case PrivacyType.friendsExcept:
+        return 'friends_except';
+      case PrivacyType.friendsDetail:
+        return 'friends_detail';
+      case PrivacyType.private:
+        return 'private';
+    }
+  }
 }

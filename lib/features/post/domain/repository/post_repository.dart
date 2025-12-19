@@ -1,3 +1,4 @@
+import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
@@ -33,5 +34,18 @@ abstract class PostRepository {
     required String postId,
     required String reason,
     String? description,
+  });
+
+  /// Cập nhật quyền riêng tư của post
+  Future<DataState<void>> updatePostPrivacy({
+    required String postId,
+    required PrivacyType privacyType,
+    List<String>? friendsExcept,
+    List<String>? friendsDetail,
+  });
+
+  /// Xóa post
+  Future<DataState<void>> deletePost({
+    required String postId,
   });
 }

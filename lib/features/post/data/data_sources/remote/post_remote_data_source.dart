@@ -54,4 +54,17 @@ abstract class PostRemoteDataSource {
     @Path('postId') String postId,
     @Body() Map<String, dynamic> body,
   );
+
+  /// Cập nhật quyền riêng tư của post
+  @PATCH('/post/privacy/{postId}')
+  Future<void> updatePostPrivacy(
+    @Path('postId') String postId,
+    @Body() Map<String, dynamic> updatePrivacyDto,
+  );
+
+  /// Xóa post
+  @DELETE('/post/{postId}')
+  Future<void> deletePost(
+    @Path('postId') String postId,
+  );
 }

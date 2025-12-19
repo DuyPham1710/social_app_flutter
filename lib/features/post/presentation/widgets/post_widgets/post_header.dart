@@ -16,12 +16,20 @@ class PostHeader extends StatelessWidget {
   final UserEntity user;
   final DateTime? createdAt;
   final VoidCallback? onReportTap;
+  final VoidCallback? onOptionsTap;
   const PostHeader({
     super.key,
     required this.user,
     this.createdAt,
     this.onReportTap,
+    this.onOptionsTap,
   });
+
+  Future<bool> _isCurrentUser() async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+    return currentUserId == user.userId;
+  }
 
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
@@ -97,41 +105,57 @@ class PostHeader extends StatelessWidget {
               ],
             ),
           ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_horiz, size: 20.sp),
-            onSelected: (value) {
-              if (value == 'report') {
-                onReportTap?.call();
-              } else if (value == 'share') {
-                // TODO: Thêm logic chia sẻ bài viết nếu cần
+          FutureBuilder<bool>(
+            future: _isCurrentUser(),
+            builder: (context, snapshot) {
+              final isOwner = snapshot.data ?? false;
+              
+              if (isOwner) {
+                // Nếu là chủ sở hữu, hiển thị icon để mở options
+                return IconButton(
+                  icon: Icon(Icons.more_horiz, size: 20.sp),
+                  onPressed: onOptionsTap,
+                );
+              } else {
+                // Nếu không phải chủ sở hữu, hiển thị menu report/share
+                return PopupMenuButton<String>(
+                  icon: Icon(Icons.more_horiz, size: 20.sp),
+                  onSelected: (value) {
+                    if (value == 'report') {
+                      onReportTap?.call();
+                    } else if (value == 'share') {
+                      // TODO: Thêm logic chia sẻ bài viết nếu cần
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'share',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.share, size: 18),
+                          SizedBox(width: 8.w),
+                          const Text('Chia sẻ'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'report',
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.flag_outlined,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 8.w),
+                          const Text('Báo cáo bài viết'),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'share',
-                child: Row(
-                  children: [
-                    const Icon(Icons.share, size: 18),
-                    SizedBox(width: 8.w),
-                    const Text('Chia sẻ'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'report',
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.flag_outlined,
-                      size: 18,
-                      color: Colors.red,
-                    ),
-                    SizedBox(width: 8.w),
-                    const Text('Báo cáo bài viết'),
-                  ],
-                ),
-              ),
-            ],
           ),
         ],
       ),

@@ -15,6 +15,7 @@ import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_options_bottom_sheet.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
 
 class PostItem extends StatefulWidget {
@@ -124,6 +125,12 @@ class _PostItemState extends State<PostItem> {
           PostHeader(
             user: user,
             createdAt: widget.post.createdAt,
+            onOptionsTap: () {
+              PostOptionsBottomSheet.show(
+                context,
+                post: widget.post,
+              );
+            },
             onReportTap: () {
               ReportPostBottomSheet.show(
                 context,

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/core/utils/privacy_util.dart';
 import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote_data_source.dart';
 import 'package:social_app_fe/features/post/data/models/create_post_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
@@ -101,7 +103,7 @@ class PostRepositoryImpl implements PostRepository {
       }
 
       String? layoutString = post.layout!.name;
-      String? privacyString = post.privacyType!.name;
+      String? privacyString = PrivacyUtil.privacyTypeToApiString(post.privacyType!);
 
       // Convert lists to JSON strings
       final ordersString = post.orders != null ? jsonEncode(post.orders) : null;
@@ -143,6 +145,74 @@ class PostRepositoryImpl implements PostRepository {
           'description': description,
       });
       return DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> updatePostPrivacy({
+    required String postId,
+    required PrivacyType privacyType,
+    List<String>? friendsExcept,
+    List<String>? friendsDetail,
+  }) async {
+    try {
+      // Map privacy type to string
+      String privacyTypeString;
+      switch (privacyType) {
+        case PrivacyType.public:
+          privacyTypeString = 'public';
+          break;
+        case PrivacyType.friends:
+          privacyTypeString = 'friends';
+          break;
+        case PrivacyType.friendsExcept:
+          privacyTypeString = 'friends_except';
+          break;
+        case PrivacyType.friendsDetail:
+          privacyTypeString = 'friends_detail';
+          break;
+        case PrivacyType.private:
+          privacyTypeString = 'private';
+          break;
+      }
+
+      // Build request body - luôn gửi cả hai field để backend có thể clear đúng
+      final Map<String, dynamic> body = {
+        'privacy_type': privacyTypeString,
+      };
+
+      // Gửi friends_except nếu privacy_type là friendsExcept và có dữ liệu
+      if (privacyType == PrivacyType.friendsExcept && friendsExcept != null && friendsExcept.isNotEmpty) {
+        body['friends_except'] = friendsExcept;
+      } else {
+        // Gửi null để backend clear field này
+        body['friends_except'] = null;
+      }
+
+      // Gửi friends_detail nếu privacy_type là friendsDetail và có dữ liệu
+      if (privacyType == PrivacyType.friendsDetail && friendsDetail != null && friendsDetail.isNotEmpty) {
+        body['friends_detail'] = friendsDetail;
+      } else {
+        // Gửi null để backend clear field này
+        body['friends_detail'] = null;
+      }
+
+      await remoteDataSource.updatePostPrivacy(postId, body);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> deletePost({
+    required String postId,
+  }) async {
+    try {
+      await remoteDataSource.deletePost(postId);
+      return const DataStateSuccess(null);
     } on DioException catch (e) {
       return DataStateError(e);
     }
