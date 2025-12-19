@@ -108,4 +108,52 @@ class StoryRepositoryImpl implements StoryRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> updateStoryPrivacy({
+    required String storyId,
+    required PrivacyType privacyType,
+    List<String>? friendsExcept,
+    List<String>? friendsDetail,
+  }) async {
+    try {
+      // Map privacy type to string
+      String privacyTypeString;
+      switch (privacyType) {
+        case PrivacyType.public:
+          privacyTypeString = 'public';
+          break;
+        case PrivacyType.friends:
+          privacyTypeString = 'friends';
+          break;
+        case PrivacyType.friendsExcept:
+          privacyTypeString = 'friends_except';
+          break;
+        case PrivacyType.friendsDetail:
+          privacyTypeString = 'friends_detail';
+          break;
+        case PrivacyType.private:
+          privacyTypeString = 'private';
+          break;
+      }
+
+      // Build request body
+      final Map<String, dynamic> body = {
+        'privacy_type': privacyTypeString,
+      };
+
+      if (friendsExcept != null && friendsExcept.isNotEmpty) {
+        body['friends_except'] = friendsExcept;
+      }
+
+      if (friendsDetail != null && friendsDetail.isNotEmpty) {
+        body['friends_detail'] = friendsDetail;
+      }
+
+      await remoteDataSource.updateStoryPrivacy(storyId, body);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

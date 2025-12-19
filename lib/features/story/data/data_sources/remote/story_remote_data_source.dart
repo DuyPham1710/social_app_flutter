@@ -27,4 +27,11 @@ abstract class StoryRemoteDataSource {
     @Part(name: 'friends_detail') String? friendsDetail,
     @Part(name: 'file') List<MultipartFile>? file,
   );
+
+  /// Cập nhật quyền riêng tư của story
+  @PATCH('/story/privacy/{storyId}')
+  Future<void> updateStoryPrivacy(
+    @Path('storyId') String storyId,
+    @Body() Map<String, dynamic> updatePrivacyDto,
+  );
 }

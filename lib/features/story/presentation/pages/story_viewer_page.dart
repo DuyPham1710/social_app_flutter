@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:social_app_fe/core/enums/media_type.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_background_widget.dart';
@@ -49,6 +50,9 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       1.0; // 1.0 = trượt sang trái (Next), -1.0 = trượt sang phải (Prev)
   // biến theo dõi vị trí kéo ngang khi vuốt giữa các nhóm
   double _horizontalOffset = 0.0;
+  
+  // Current user ID để kiểm tra story của chính user
+  String? _currentUserId;
 
   GroupedUserStoryEntity get _currentGroup => widget.groups[_currentGroupIndex];
   StoryEntity get _currentStory => _currentGroup.stories[_currentStoryIndex];
@@ -66,9 +70,19 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       0,
       widget.groups[_currentGroupIndex].stories.length - 1,
     );
+    _loadCurrentUserId();
     _initController();
     _controller.forward();
     _playCurrentPreview();
+  }
+  
+  Future<void> _loadCurrentUserId() async {
+    final userData = await TokenStorage.getUserData();
+    if (userData != null && mounted) {
+      setState(() {
+        _currentUserId = userData['id'];
+      });
+    }
   }
   
   void _setupAudioPlayerListeners() {
@@ -401,6 +415,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                     currentGroup: _currentGroup,
                     currentStoryIndex: _currentStoryIndex,
                     onClose: _close,
+                    currentUserId: _currentUserId,
                   ),
 
                   // Bottom: comment input + reactions
