@@ -34,4 +34,10 @@ abstract class StoryRemoteDataSource {
     @Path('storyId') String storyId,
     @Body() Map<String, dynamic> updatePrivacyDto,
   );
+
+  /// Xóa story
+  @DELETE('/story/{storyId}')
+  Future<void> deleteStory(
+    @Path('storyId') String storyId,
+  );
 }

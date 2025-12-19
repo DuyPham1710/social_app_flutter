@@ -21,4 +21,9 @@ abstract class StoryRepository {
     List<String>? friendsExcept,
     List<String>? friendsDetail,
   });
+
+  /// Xóa story
+  Future<DataState<void>> deleteStory({
+    required String storyId,
+  });
 }

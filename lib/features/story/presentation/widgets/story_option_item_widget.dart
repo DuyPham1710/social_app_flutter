@@ -5,7 +5,7 @@ class StoryOptionItemWidget extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const StoryOptionItemWidget({
     super.key,

@@ -156,4 +156,16 @@ class StoryRepositoryImpl implements StoryRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> deleteStory({
+    required String storyId,
+  }) async {
+    try {
+      await remoteDataSource.deleteStory(storyId);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }
