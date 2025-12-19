@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 
 class PostReactInfo extends StatelessWidget {
   final List<ReactPostEntity>? reacts;
+
   const PostReactInfo({super.key, this.reacts});
 
   @override

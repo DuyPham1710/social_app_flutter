@@ -12,6 +12,7 @@ import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
+import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
@@ -28,10 +29,12 @@ import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 class PostDetailPage extends StatefulWidget {
   final PostEntity post;
   final int initialImageIndex;
+  final String? initialCommentId;
   const PostDetailPage({
     super.key,
     required this.post,
     this.initialImageIndex = 0,
+    this.initialCommentId,
   });
 
   @override
@@ -43,13 +46,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
   late CommentBloc _commentBloc;
   late PostDetailBloc _postDetailBloc;
   late List<ReactPostEntity> _localReacts;
-  late EmojiType? _currentUserReaction;
+  EmojiType? _currentUserReaction;
 
   @override
   void initState() {
     super.initState();
     _localReacts = List.from(widget.post.reacts ?? []);
-    _currentUserReaction = widget.post.isReact;
+    _currentUserReaction = null;
+    _initCurrentUserReaction();
 
     // Khởi tạo các Blocs
     _commentBloc = s1<CommentBloc>();
@@ -57,6 +61,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     // Initialize post detail để join post và lắng nghe comment count
     _postDetailBloc.add(InitializePostDetailEvent(widget.post.id));
+
+    // If initialCommentId is provided, scroll to comments and open modal
+    if (widget.initialCommentId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToCommentAndOpen(widget.initialCommentId!);
+      });
+    }
   }
 
   @override
@@ -65,8 +76,51 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     if (oldWidget.post != widget.post) {
       _localReacts = List.from(widget.post.reacts ?? []);
-      _currentUserReaction = widget.post.isReact;
+      _initCurrentUserReaction();
     }
+  }
+
+  Future<void> _initCurrentUserReaction() async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+
+    // Tìm reaction của user hiện tại từ reacts array
+    ReactPostEntity? userReaction;
+    for (final react in _localReacts) {
+      if (react.user.userId == currentUserId) {
+        userReaction = react;
+        break;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _currentUserReaction = userReaction?.emoji;
+      });
+    }
+  }
+
+  void _scrollToCommentAndOpen(String commentId) {
+    print('[PostDetail] _scrollToCommentAndOpen called with commentId: $commentId');
+    // Delay to ensure UI is fully built
+    Future.delayed(const Duration(milliseconds: 800), () {
+      print('[PostDetail] Opening modal after 800ms delay');
+      if (mounted) {
+        // Auto-open comment modal
+        showModalBottomSheet(
+          isScrollControlled: true,
+          context: context,
+          builder: (BuildContext context) {
+            print('[PostDetail] ModalComment builder called with initialCommentId: $commentId');
+            return ModalComment(
+              postId: widget.post.id,
+              reacts: _localReacts,
+              initialCommentId: commentId,
+            );
+          },
+        );
+      }
+    });
   }
 
   void _onReactionChanged(EmojiType? newReaction) async {
@@ -234,7 +288,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           isScrollControlled: true,
                           context: context,
                           builder: (BuildContext context) {
-                            return ModalComment(postId: widget.post.id);
+                            return ModalComment(
+                              postId: widget.post.id,
+                              reacts: _localReacts,
+                            );
                           },
                         );
                       },
@@ -253,6 +310,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           reactCount: _localReacts
                               .length, // ← Sử dụng _localReacts thay vì post.reacts
                           isReact: _currentUserReaction,
+                          reacts: _localReacts,
                           commentCount: commentCount,
                           onReactionChanged: _onReactionChanged,
                         );
