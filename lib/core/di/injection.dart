@@ -43,6 +43,7 @@ import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usec
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_history_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_history_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/update_comment_usecase.dart';
+import 'package:social_app_fe/features/comment/domain/usecases/react_comment_usecase.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_service.dart';
@@ -253,6 +254,9 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<DeleteCommentUsecase>(
     () => DeleteCommentUsecase(s1()),
+  );
+  s1.registerLazySingleton<ReactCommentUsecase>(
+    () => ReactCommentUsecase(s1()),
   );
   s1.registerLazySingleton<LoadCommentHistoryUseCase>(
     () => LoadCommentHistoryUseCase(s1()),
@@ -549,6 +553,7 @@ Future<void> initializeDependencies() async {
       getCommentsLoadedDataUseCase: s1(),
       listenCommentsLoadedUseCase: s1(),
       clearCommentsCacheUseCase: s1(),
+      reactCommentUseCase: s1(),
     ),
   );
 

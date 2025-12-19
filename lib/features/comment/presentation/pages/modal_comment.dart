@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_details_bloc.dart';
@@ -16,6 +18,7 @@ import 'package:social_app_fe/features/comment/presentation/widgets/comment_inpu
 import 'package:social_app_fe/features/comment/presentation/widgets/comment_item.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/empty_comments_widget.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/typing_indicator.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 
 class ModalComment extends StatefulWidget {
@@ -35,18 +38,30 @@ class ModalComment extends StatefulWidget {
 }
 
 class _ModalCommentState extends State<ModalComment> {
-  late TextEditingController _controller;
+  //late TextEditingController _controller;
   late FocusNode _focusNode;
   late CommentBloc _commentBloc;
   late CommentDetailsBloc _commentDetailsBloc;
   late String? _parentId;
+  String? _replyingToUserName;
+
+  String? _currentUserAvatar;
+  final GlobalKey<FlutterMentionsState> _mentionKey =
+      GlobalKey<FlutterMentionsState>();
+  TextEditingController get _mentionsController =>
+      _mentionKey.currentState!.controller!;
+
+  List<Map<String, dynamic>> _suggestionList = [];
+  Map<String, dynamic>? _tempReplyUser;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
+    //_controller = TextEditingController();
     _focusNode = FocusNode();
     _parentId = null;
+    _loadCurrentUser();
+    _loadFriendSuggestions();
 
     // Tạo CommentBloc và CommentDetailsBloc từ DI
     _commentBloc = s1<CommentBloc>();
@@ -59,7 +74,10 @@ class _ModalCommentState extends State<ModalComment> {
     _commentDetailsBloc.add(LoadCommentDetailsEvent(widget.postId));
 
     // Listen text changes để emit typing
-    _controller.addListener(_onTextChanged);
+    //_controller.addListener(_onTextChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _mentionsController.addListener(_onTextChanged);
+    });
 
     if (widget.isPressComment!) {
       // Nếu mở modal từ việc nhấn vào biểu tượng bình luận, focus ngay
@@ -69,13 +87,67 @@ class _ModalCommentState extends State<ModalComment> {
     }
   }
 
+  Future<void> _loadCurrentUser() async {
+    final userData = await TokenStorage.getUserData();
+    if (mounted) {
+      setState(() {
+        _currentUserAvatar = userData?['avatarUrl'];
+      });
+    }
+  }
+
+  String markupToVisible(String markup) {
+    return markup.replaceAllMapped(
+      RegExp(r'@\[([^\]]+)\]\(([^)]+)\)'),
+      (m) => '@${m.group(1)}',
+    );
+  }
+
+  Future<void> _loadFriendSuggestions() async {
+    try {
+      // 1. Lấy UseCase từ DI
+      final getFriendsUseCase = s1<GetFriendsUseCase>();
+
+      // 2. Gọi API lấy danh sách
+      final dataState = await getFriendsUseCase();
+
+      // 3. Kiểm tra kết quả
+      if (dataState is DataStateSuccess && dataState.data != null) {
+        final friends = dataState.data!;
+
+        // 4. Map dữ liệu sang format yêu cầu: {id, display, full_name, photo}
+        final mappedFriends = friends.map((friend) {
+          return {
+            'id': friend.userId, // ID để gửi lên server
+            'display': friend.fullName ?? 'Unknown', // Tên hiển thị khi tag
+            'full_name': friend.fullName ?? 'Unknown', // Tên hiển thị dòng dưới
+            'photo': friend.avatarUrl ?? 'https://via.placeholder.com/150',
+          };
+        }).toList();
+
+        print("Đã load gợi ý bạn bè: $mappedFriends");
+
+        if (mounted) {
+          setState(() {
+            _suggestionList = mappedFriends;
+          });
+        }
+      } else {
+        // Xử lý lỗi nếu cần (DataFailed)
+        print("Lỗi lấy danh sách bạn bè: ${dataState.error}");
+      }
+    } catch (e) {
+      print("Exception khi load friend suggestions: $e");
+    }
+  }
+
   void _onTextChanged() {
-    if (_controller.text.isNotEmpty) {
-      // User is typing
+    final text = _mentionsController.text;
+
+    if (text.isNotEmpty) {
       _commentBloc.add(UserTypingEvent(postId: widget.postId, isTyping: true));
     } else {
       _parentId = null;
-      // User cleared text
       _commentBloc.add(UserTypingEvent(postId: widget.postId, isTyping: false));
     }
   }
@@ -113,22 +185,83 @@ class _ModalCommentState extends State<ModalComment> {
     );
   }
 
-  void _handleReply(String? parentId, String userDisplayName) {
-    _parentId = parentId;
-    // Thêm reply mention vào text field và focus
-    final currentText = _controller.text;
-    final replyText = '$userDisplayName ';
+  Future<void> _handleReply(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  ) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
 
-    // Nếu đã có text, thêm reply sau text hiện tại với space
-    final newText = currentText.isEmpty ? replyText : '$currentText $replyText';
+    // 1. Nếu trả lời chính mình: Chỉ set UI, KHÔNG mention
+    if (userId == currentUserId) {
+      setState(() {
+        _parentId = parentId;
+        _replyingToUserName = "ME";
+      });
+      _focusNode.requestFocus();
+      return;
+    }
 
-    _controller.text = newText;
-    _controller.selection = TextSelection.fromPosition(
-      TextPosition(offset: newText.length),
-    );
+    // 2. Nếu trả lời người khác
+    setState(() {
+      _parentId = parentId;
+      _replyingToUserName = userDisplayName;
 
-    // Focus vào text field
-    _focusNode.requestFocus();
+      _tempReplyUser = {
+        'id': userId,
+        'display': userDisplayName,
+        'full_name': userDisplayName,
+        'photo': userAvatar.isNotEmpty
+            ? userAvatar
+            : 'https://via.placeholder.com/150',
+      };
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentState = _mentionKey.currentState;
+      final controller = currentState?.controller;
+
+      if (currentState != null &&
+          controller != null &&
+          _tempReplyUser != null) {
+        final mentionConfig = Mention(
+          trigger: '@',
+          style: const TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+          data: [],
+          markupBuilder: (trigger, value, display) {
+            return '@[$display]($value)';
+          },
+        );
+
+        String currentText = controller.text;
+
+        if (currentText.isNotEmpty && !currentText.endsWith(' ')) {
+          currentText += ' ';
+        }
+        controller.text = currentText + '@';
+        controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: controller.text.length),
+        );
+        currentState.addMention(_tempReplyUser!, mentionConfig);
+      }
+      _focusNode.requestFocus();
+    });
+  }
+
+  //hủy reply
+  void _handleCancelReply() {
+    setState(() {
+      _parentId = null;
+      _replyingToUserName = null;
+      _tempReplyUser = null;
+    });
+    _mentionsController.clear();
+    FocusScope.of(context).unfocus();
   }
 
   Map<String, List<CommentEntity>> _groupCommentsByParent(
@@ -173,168 +306,183 @@ class _ModalCommentState extends State<ModalComment> {
     _commentBloc.close();
     _commentDetailsBloc.add(StopListeningCommentsEvent());
     _commentDetailsBloc.close();
-    _controller.dispose();
+    // _controller.dispose();
+    _mentionsController.removeListener(_onTextChanged);
     _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _commentBloc),
-        BlocProvider.value(value: _commentDetailsBloc),
-      ],
+    final effectiveSuggestionList = [
+      if (_tempReplyUser != null) _tempReplyUser!,
+      ..._suggestionList.where(
+        (u) => u['id'] != _tempReplyUser?['id'],
+      ), // Tránh trùng lặp
+    ];
+    return Portal(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: _commentBloc),
+          BlocProvider.value(value: _commentDetailsBloc),
+        ],
 
-      child: DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.95,
-        maxChildSize: 0.95,
-        minChildSize: 0.3,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-            ),
-            child: Column(
-              children: [
-                SizedBox(height: 10.h),
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.95,
+          maxChildSize: 0.95,
+          minChildSize: 0.3,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: 10.h),
 
-                Container(
-                  width: 40.w,
-                  height: 4.h,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(10.r),
+                  Container(
+                    width: 40.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
                   ),
-                ),
 
-                SizedBox(height: 10.h),
+                  SizedBox(height: 10.h),
 
-                CommentHeaderWidget(
-                  postId: widget.postId,
-                  onMention: _handleReply,
-                ),
+                  CommentHeaderWidget(
+                    postId: widget.postId,
+                    onMention: _handleReply,
+                  ),
 
-                SizedBox(height: 10.h),
-                Divider(height: 1.h, color: AppColors.divider),
+                  SizedBox(height: 10.h),
+                  Divider(height: 1.h, color: AppColors.divider),
 
-                Expanded(
-                  child: BlocBuilder<CommentDetailsBloc, CommentDetailsState>(
-                    builder: (context, state) {
-                      if (state is CommentDetailsLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
-                          ),
-                        );
-                      }
+                  Expanded(
+                    child: BlocBuilder<CommentDetailsBloc, CommentDetailsState>(
+                      builder: (context, state) {
+                        if (state is CommentDetailsLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        }
 
-                      if (state is CommentDetailsEmpty) {
-                        return EmptyCommentsWidget(
-                          onTapToComment: () {
-                            _focusNode.requestFocus();
-                          },
-                        );
-                      }
+                        if (state is CommentDetailsEmpty) {
+                          return EmptyCommentsWidget(
+                            onTapToComment: () {
+                              _focusNode.requestFocus();
+                            },
+                          );
+                        }
 
-                      if (state is CommentDetailsError) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.error_outline,
-                                size: 48.w,
-                                color: Colors.red[400],
-                              ),
-                              SizedBox(height: 16.h),
-                              Text(
-                                state.errorMessage ?? 'Có lỗi xảy ra',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.red[600],
+                        if (state is CommentDetailsError) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 48.w,
+                                  color: Colors.red[400],
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        );
-                      }
+                                SizedBox(height: 16.h),
+                                Text(
+                                  state.errorMessage ?? 'Có lỗi xảy ra',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.red[600],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
 
-                      if (state is CommentDetailsLoaded) {
-                        final comments = state.commentsData!.comments;
+                        if (state is CommentDetailsLoaded) {
+                          final comments = state.commentsData!.comments;
 
-                        final groupedComments = _groupCommentsByParent(
-                          comments,
-                        );
+                          final groupedComments = _groupCommentsByParent(
+                            comments,
+                          );
 
-                        final parentComments = comments
-                            .where((c) => c.parentId == null)
-                            .toList();
+                          final parentComments = comments
+                              .where((c) => c.parentId == null)
+                              .toList();
 
-                        return FutureBuilder<Map<String, dynamic>?>(
-                          future: TokenStorage.getUserData(),
-                          builder: (context, snapshot) {
-                            final currentUserId = snapshot.data?['id'];
+                          return FutureBuilder<Map<String, dynamic>?>(
+                            future: TokenStorage.getUserData(),
+                            builder: (context, snapshot) {
+                              final currentUserId = snapshot.data?['id'];
 
-                            return ListView.builder(
-                              controller: scrollController,
-                              itemCount: parentComments.length,
-                              itemBuilder: (context, index) {
-                                final parentComment = parentComments[index];
-                                final replies =
-                                    groupedComments[parentComment.id] ?? [];
+                              return ListView.builder(
+                                controller: scrollController,
+                                itemCount: parentComments.length,
+                                itemBuilder: (context, index) {
+                                  final parentComment = parentComments[index];
+                                  final replies =
+                                      groupedComments[parentComment.id] ?? [];
 
-                                return CommentItem(
-                                  comment: parentComment,
-                                  onReply: _handleReply,
-                                  replies: replies,
-                                  currentUserId: currentUserId,
-                                  onUpdateComment: _handleUpdateComment,
-                                  onDeleteComment: _handleDeleteComment,
-                                  onViewHistory: _handleViewHistory,
-                                );
-                              },
-                            );
-                          },
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
+                                  return CommentItem(
+                                    comment: parentComment,
+                                    onReply: _handleReply,
+                                    replies: replies,
+                                    currentUserId: currentUserId,
+                                    onUpdateComment: _handleUpdateComment,
+                                    onDeleteComment: _handleDeleteComment,
+                                    onViewHistory: _handleViewHistory,
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
-                ),
 
-                Divider(height: 1.h, color: Colors.grey[300]),
+                  Divider(height: 1.h, color: Colors.grey[300]),
 
-                const TypingIndicator(),
+                  const TypingIndicator(),
 
-                CommentInputField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  onSend: () async {
-                    if (_controller.text.isNotEmpty) {
-                      final text = _controller.text.trim();
+                  CommentInputField(
+                    mentionKey: _mentionKey,
+                    currentUserAvatar: _currentUserAvatar,
+                    suggestionList: effectiveSuggestionList,
 
-                      // Gửi event vào bloc
+                    // Truyền trạng thái reply vào
+                    replyingToUserName: _replyingToUserName,
+
+                    // Callback Hủy Reply
+                    onCancelReply: _handleCancelReply,
+
+                    onSendComment: (markupContent, taggedUserIds) {
                       context.read<CommentBloc>().add(
                         AddCommentEvent(
                           postId: widget.postId,
-                          content: text,
+                          content: markupContent,
                           parentId: _parentId,
+                          taggedUserIds: taggedUserIds,
                         ),
                       );
-                      // Clear the input field
-                      _controller.clear();
-                      _focusNode.unfocus();
-                    }
-                  },
-                ),
-              ],
-            ),
-          );
-        },
+
+                      setState(() {
+                        _parentId = null;
+                        _replyingToUserName = null;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

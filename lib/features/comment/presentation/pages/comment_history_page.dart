@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_parsed_text/flutter_parsed_text.dart'; // Import this
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment-log_entity.dart';
@@ -26,9 +27,37 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
   @override
   void initState() {
     super.initState();
-    // Load comment history khi page được khởi tạo
     context.read<CommentBloc>().add(
       LoadCommentHistoryEvent(commentId: widget.commentId),
+    );
+  }
+
+  // Helper method to build ParsedText for mentions
+  Widget _buildParsedText(String text, {Color? textColor}) {
+    return ParsedText(
+      text: text,
+      style: TextStyle(
+        fontSize: 14.sp,
+        color: textColor ?? AppColors.textPrimary,
+      ),
+      parse: [
+        MatchText(
+          // Regex: @[Name](ID)
+          pattern: r"@\[([^\]]+)\]\(([^)]+)\)",
+          style: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+          renderText: ({required String str, required String pattern}) {
+            final match = RegExp(pattern).firstMatch(str);
+            return {
+              'display': match?.group(2) ?? '',
+              'value': match?.group(1) ?? '',
+            };
+          },
+          onTap: (userId) {},
+        ),
+      ],
     );
   }
 
@@ -48,7 +77,6 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-
         title: Text(
           'Lịch sử chỉnh sửa',
           style: TextStyle(
@@ -59,7 +87,6 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
         ),
         centerTitle: true,
       ),
-
       body: BlocBuilder<CommentBloc, CommentState>(
         builder: (context, state) {
           if (state is CommentHistoryLoading) {
@@ -112,7 +139,6 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                       color: AppColors.primary.withOpacity(0.3),
                     ),
                   ),
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -135,13 +161,8 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                         ],
                       ),
                       SizedBox(height: 8.h),
-                      Text(
-                        widget.currentContent,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
+                      // --- USE PARSED TEXT HERE ---
+                      _buildParsedText(widget.currentContent),
                     ],
                   ),
                 ),
@@ -228,7 +249,6 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
           ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -255,9 +275,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                       )
                     : null,
               ),
-
               SizedBox(width: 12.w),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +300,6 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
               ),
             ],
           ),
-
           SizedBox(height: 16.h),
 
           // Old content
@@ -316,13 +333,8 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                   ],
                 ),
                 SizedBox(height: 6.h),
-                Text(
-                  historyItem.oldContent,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
+                // --- USE PARSED TEXT HERE ---
+                _buildParsedText(historyItem.oldContent),
               ],
             ),
           ),
@@ -360,13 +372,8 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                   ],
                 ),
                 SizedBox(height: 6.h),
-                Text(
-                  historyItem.newContent,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
+                // --- USE PARSED TEXT HERE ---
+                _buildParsedText(historyItem.newContent),
               ],
             ),
           ),

@@ -30,6 +30,10 @@ mixin _$CommentModel {
   ParentCommentModel? get parentId => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'reacts')
+  List<ReactCommentModel>? get reacts => throw _privateConstructorUsedError;
+  @JsonKey(name: 'taggedUserIds')
+  List<UserModel>? get taggedUsers => throw _privateConstructorUsedError;
 
   /// Serializes this CommentModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,6 +60,8 @@ abstract class $CommentModelCopyWith<$Res> {
     ParentCommentModel? parentId,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @JsonKey(name: 'reacts') List<ReactCommentModel>? reacts,
+    @JsonKey(name: 'taggedUserIds') List<UserModel>? taggedUsers,
   });
 
   $UserModelCopyWith<$Res> get user;
@@ -84,6 +90,8 @@ class _$CommentModelCopyWithImpl<$Res, $Val extends CommentModel>
     Object? parentId = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? reacts = freezed,
+    Object? taggedUsers = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -115,6 +123,14 @@ class _$CommentModelCopyWithImpl<$Res, $Val extends CommentModel>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            reacts: freezed == reacts
+                ? _value.reacts
+                : reacts // ignore: cast_nullable_to_non_nullable
+                      as List<ReactCommentModel>?,
+            taggedUsers: freezed == taggedUsers
+                ? _value.taggedUsers
+                : taggedUsers // ignore: cast_nullable_to_non_nullable
+                      as List<UserModel>?,
           )
           as $Val,
     );
@@ -162,6 +178,8 @@ abstract class _$$CommentModelImplCopyWith<$Res>
     ParentCommentModel? parentId,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @JsonKey(name: 'reacts') List<ReactCommentModel>? reacts,
+    @JsonKey(name: 'taggedUserIds') List<UserModel>? taggedUsers,
   });
 
   @override
@@ -191,6 +209,8 @@ class __$$CommentModelImplCopyWithImpl<$Res>
     Object? parentId = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? reacts = freezed,
+    Object? taggedUsers = freezed,
   }) {
     return _then(
       _$CommentModelImpl(
@@ -222,6 +242,14 @@ class __$$CommentModelImplCopyWithImpl<$Res>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        reacts: freezed == reacts
+            ? _value._reacts
+            : reacts // ignore: cast_nullable_to_non_nullable
+                  as List<ReactCommentModel>?,
+        taggedUsers: freezed == taggedUsers
+            ? _value._taggedUsers
+            : taggedUsers // ignore: cast_nullable_to_non_nullable
+                  as List<UserModel>?,
       ),
     );
   }
@@ -238,7 +266,10 @@ class _$CommentModelImpl implements _CommentModel {
     this.parentId,
     this.createdAt,
     this.updatedAt,
-  });
+    @JsonKey(name: 'reacts') final List<ReactCommentModel>? reacts,
+    @JsonKey(name: 'taggedUserIds') final List<UserModel>? taggedUsers,
+  }) : _reacts = reacts,
+       _taggedUsers = taggedUsers;
 
   factory _$CommentModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CommentModelImplFromJson(json);
@@ -259,6 +290,27 @@ class _$CommentModelImpl implements _CommentModel {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  final List<ReactCommentModel>? _reacts;
+  @override
+  @JsonKey(name: 'reacts')
+  List<ReactCommentModel>? get reacts {
+    final value = _reacts;
+    if (value == null) return null;
+    if (_reacts is EqualUnmodifiableListView) return _reacts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<UserModel>? _taggedUsers;
+  @override
+  @JsonKey(name: 'taggedUserIds')
+  List<UserModel>? get taggedUsers {
+    final value = _taggedUsers;
+    if (value == null) return null;
+    if (_taggedUsers is EqualUnmodifiableListView) return _taggedUsers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   bool operator ==(Object other) {
@@ -274,7 +326,12 @@ class _$CommentModelImpl implements _CommentModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._reacts, _reacts) &&
+            const DeepCollectionEquality().equals(
+              other._taggedUsers,
+              _taggedUsers,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -288,6 +345,8 @@ class _$CommentModelImpl implements _CommentModel {
     parentId,
     createdAt,
     updatedAt,
+    const DeepCollectionEquality().hash(_reacts),
+    const DeepCollectionEquality().hash(_taggedUsers),
   );
 
   /// Create a copy of CommentModel
@@ -313,6 +372,8 @@ abstract class _CommentModel implements CommentModel {
     final ParentCommentModel? parentId,
     final DateTime? createdAt,
     final DateTime? updatedAt,
+    @JsonKey(name: 'reacts') final List<ReactCommentModel>? reacts,
+    @JsonKey(name: 'taggedUserIds') final List<UserModel>? taggedUsers,
   }) = _$CommentModelImpl;
 
   factory _CommentModel.fromJson(Map<String, dynamic> json) =
@@ -334,6 +395,12 @@ abstract class _CommentModel implements CommentModel {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  @JsonKey(name: 'reacts')
+  List<ReactCommentModel>? get reacts;
+  @override
+  @JsonKey(name: 'taggedUserIds')
+  List<UserModel>? get taggedUsers;
 
   /// Create a copy of CommentModel
   /// with the given fields replaced by the non-null parameter values.

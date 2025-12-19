@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import 'package:social_app_fe/features/comment/data/models/parent_comment_model.dart';
+import 'package:social_app_fe/features/comment/data/models/react_comment_model.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 
 part 'comment_model.freezed.dart';
@@ -16,6 +17,8 @@ class CommentModel extends CommentEntity with _$CommentModel {
     ParentCommentModel? parentId,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @JsonKey(name: 'reacts') List<ReactCommentModel>? reacts,
+    @JsonKey(name: 'taggedUserIds') List<UserModel>? taggedUsers,
   }) = _CommentModel;
 
   factory CommentModel.fromJson(Map<String, dynamic> json) =>

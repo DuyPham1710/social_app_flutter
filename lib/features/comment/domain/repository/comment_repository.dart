@@ -1,6 +1,7 @@
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment-log_loaded_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
+import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
 import 'package:social_app_fe/features/comment/domain/entities/typing_entity.dart';
 import 'package:social_app_fe/features/comment/domain/params/add_comment_params.dart';
 import 'package:social_app_fe/features/comment/domain/params/delete_comment_params.dart';
@@ -40,6 +41,12 @@ abstract class CommentRepository {
   Future<DataState<CommentsLoadedEntity?>> getCommentsLoadedData(String postId);
 
   Future<void> clearCommentsCache(String postId);
+
+  /// React / unreact một comment
+  Future<DataState<ReactCommentEntity>> reactComment({
+    required String commentId,
+    required String emoji,
+  });
 
   void addComment(AddCommentParams params);
 

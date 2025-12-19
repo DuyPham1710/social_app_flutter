@@ -1,20 +1,64 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:flutter_parsed_text/flutter_parsed_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comment_entity.dart';
 import 'dart:ui';
 
+import 'package:social_app_fe/features/comment/presentation/widgets/mention_editable_field.dart';
+import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
+
 class CommentReactionMenu {
   static OverlayEntry? _overlayEntry;
+  //nhận danh sách bạn bè để gợi ý mention
+  static Future<List<Map<String, dynamic>>?> _loadFriendSuggestions() async {
+    try {
+      // 1. Lấy UseCase từ DI
+      final getFriendsUseCase = s1<GetFriendsUseCase>();
+
+      // 2. Gọi API lấy danh sách
+      final dataState = await getFriendsUseCase();
+
+      // 3. Kiểm tra kết quả
+      if (dataState is DataStateSuccess && dataState.data != null) {
+        final friends = dataState.data!;
+
+        // 4. Map dữ liệu sang format yêu cầu: {id, display, full_name, photo}
+        final mappedFriends = friends.map((friend) {
+          return {
+            'id': friend.userId, // ID để gửi lên server
+            'display': friend.fullName ?? 'Unknown', // Tên hiển thị khi tag
+            'full_name': friend.fullName ?? 'Unknown', // Tên hiển thị dòng dưới
+            'photo': friend.avatarUrl ?? 'https://via.placeholder.com/150',
+          };
+        }).toList();
+        return mappedFriends;
+      } else {
+        // Xử lý lỗi nếu cần (DataFailed)
+        print("Lỗi lấy danh sách bạn bè: ${dataState.error}");
+      }
+    } catch (e) {
+      print("Exception khi load friend suggestions: $e");
+    }
+  }
 
   static void show(
     BuildContext context,
     Offset position,
     CommentEntity comment, {
-    Function(String? parentId, String userDisplayName)? onReply,
+    Function(
+      String userId,
+      String userAvatar,
+      String? parentId,
+      String userDisplayName,
+    )?
+    onReply,
     Function(String commentId, EmojiType reaction)? onReactionChanged,
     String? currentUserId,
     Function(String commentId, String newContent)? onUpdateComment,
@@ -141,9 +185,25 @@ class CommentReactionMenu {
 
           SizedBox(height: 3.h),
 
-          Text(
-            comment.content,
+          ParsedText(
+            text: comment.content,
             style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+            parse: [
+              MatchText(
+                pattern: r'@\[([^\]]+)\]\(([^)]+)\)',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+                renderText: ({required String str, required String pattern}) {
+                  final match = RegExp(pattern).firstMatch(str);
+                  if (match == null) return {'display': str};
+
+                  return {'display': match.group(2)!, 'value': match.group(1)!};
+                },
+                onTap: (userId) {},
+              ),
+            ],
           ),
         ],
       ),
@@ -153,7 +213,13 @@ class CommentReactionMenu {
   static Widget _buildActionMenu(
     BuildContext context,
     CommentEntity comment,
-    Function(String? parentId, String userDisplayName)? onReply,
+    Function(
+      String userId,
+      String userAvatar,
+      String? parentId,
+      String userDisplayName,
+    )?
+    onReply,
     String? currentUserId,
     Function(String commentId, String newContent)? onUpdateComment,
     Function(String commentId, String postId)? onDeleteComment,
@@ -178,9 +244,19 @@ class CommentReactionMenu {
 
                 if (comment.parentId != null) {
                   // Nếu đã là reply thì trả về parentId gốc
-                  onReply(comment.parentId!.id, userName);
+                  onReply(
+                    comment.user.userId,
+                    comment.user.avatarUrl ?? '',
+                    comment.parentId!.id,
+                    userName,
+                  );
                 } else {
-                  onReply(comment.id, userName);
+                  onReply(
+                    comment.user.userId,
+                    comment.user.avatarUrl ?? '',
+                    null,
+                    userName,
+                  );
                 }
               }
             },
@@ -190,121 +266,93 @@ class CommentReactionMenu {
             _menuItem(
               Icons.edit,
               'Chỉnh sửa',
-              onTap: () {
-                hide();
+              onTap: () async {
+                hide(); // Ẩn menu reaction
 
-                final TextEditingController controller = TextEditingController(
-                  text: comment.content,
-                );
+                // 1. Load danh sách bạn bè
+                final suggestionList = await _loadFriendSuggestions() ?? [];
 
+                // 2. Tạo Key mới
+                final mentionKey = GlobalKey<FlutterMentionsState>();
+
+                // 3. Hiện Dialog
                 showDialog(
                   context: context,
                   builder: (context) {
-                    return AlertDialog(
-                      backgroundColor: AppColors.background,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      titlePadding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 10.h),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 10.h,
-                      ),
-                      actionsPadding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 10.h),
-
-                      title: Center(
-                        child: Text(
-                          'Chỉnh sửa',
+                    // 🔥 QUAN TRỌNG: Bọc Portal ở đây để sửa lỗi màn hình đỏ
+                    return Portal(
+                      child: AlertDialog(
+                        backgroundColor: AppColors.background,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        title: Text(
+                          'Chỉnh sửa bình luận',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
                             fontSize: 16.sp,
-                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
 
-                      content: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.2),
+                        content: Container(
+                          width: double.maxFinite,
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.2),
+                            ),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
-                        ),
-                        padding: EdgeInsets.all(8.w),
+                          padding: EdgeInsets.all(8.w),
 
-                        child: TextField(
-                          controller: controller,
-                          maxLines: null,
-                          autofocus: true,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.textPrimary,
-                          ),
-                          cursorColor: AppColors.primary,
-                          decoration: InputDecoration(
+                          // Gọi Widget Edit
+                          child: MentionEditableField(
+                            mentionKey: mentionKey,
+                            suggestionList: suggestionList,
+                            initialMarkup: comment.content,
                             hintText: 'Nhập nội dung mới...',
-                            hintStyle: TextStyle(
-                              color: AppColors.textSecondary.withOpacity(0.6),
-                            ),
-                            border: InputBorder.none,
                           ),
                         ),
+
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Hủy',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            onPressed: () {
+                              final controller =
+                                  mentionKey.currentState?.controller;
+                              if (controller == null) return;
+
+                              // Lấy markup text chuẩn
+                              final newMarkup = controller.markupText.trim();
+
+                              if (newMarkup.isNotEmpty &&
+                                  newMarkup != comment.content) {
+                                onUpdateComment?.call(comment.id, newMarkup);
+                              }
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'Cập nhật',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-
-                      actionsAlignment: MainAxisAlignment.end,
-                      actions: [
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.primary,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 14.w,
-                              vertical: 8.h,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Hủy',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 10.h,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            elevation: 0,
-                          ),
-                          onPressed: () {
-                            final newContent = controller.text.trim();
-                            if (newContent.isNotEmpty &&
-                                newContent != comment.content) {
-                              // Sử dụng callback thay vì context.read
-                              onUpdateComment?.call(comment.id, newContent);
-                            }
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Cập nhật',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
                     );
                   },
                 );
@@ -372,8 +420,25 @@ class CommentReactionMenu {
             Icons.copy,
             'Sao chép',
             onTap: () {
-              Clipboard.setData(ClipboardData(text: comment.content));
+              // 1. Dùng Regex để biến đổi @[Name](ID) thành @Name
+              final String cleanText = comment.content.replaceAllMapped(
+                RegExp(r'@\[([^\]]+)\]\(([^)]+)\)'),
+                (match) =>
+                    '${match.group(1)}', // Lấy dấu @ cộng với tên (group 1)
+              );
+
+              // 2. Sao chép text đã xử lý
+              Clipboard.setData(ClipboardData(text: cleanText));
+
               hide();
+
+              // (Tùy chọn) Hiển thị thông báo đã sao chép
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Đã sao chép nội dung'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
             },
           ),
         ],

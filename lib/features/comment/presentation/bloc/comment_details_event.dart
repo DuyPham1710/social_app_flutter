@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/domain/entities/comments_loaded_entity.dart';
 
 abstract class CommentDetailsEvent extends Equatable {
@@ -55,4 +56,21 @@ class ClearCommentCacheEvent extends CommentDetailsEvent {
 
   @override
   List<Object?> get props => [postId];
+}
+
+class ReactCommentEvent extends CommentDetailsEvent {
+  final String commentId;
+  final EmojiType emoji;
+  final String currentUserId; 
+  final String? currentUserAvatar;
+
+  const ReactCommentEvent({
+    required this.commentId,
+    required this.emoji,
+    required this.currentUserId,
+    this.currentUserAvatar,
+  });
+
+  @override
+  List<Object?> get props => [commentId, emoji, currentUserId];
 }

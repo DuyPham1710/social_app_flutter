@@ -11,7 +11,7 @@ import 'package:social_app_fe/features/post/presentation/pages/reaction_details_
 
 class CommentHeaderWidget extends StatelessWidget {
   final String postId;
-  final Function(String? parentId, String userDisplayName)? onMention;
+  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
 
   const CommentHeaderWidget({super.key, required this.postId, this.onMention});
 

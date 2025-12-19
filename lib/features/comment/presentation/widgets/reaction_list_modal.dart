@@ -1,0 +1,125 @@
+// reaction_list_modal.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
+
+class ReactionListModal extends StatelessWidget {
+  final List<ReactCommentEntity> reacts;
+  final String? currentUserId;
+  final Function(String) onUserTap;
+
+  const ReactionListModal({
+    super.key,
+    required this.reacts,
+    required this.currentUserId,
+    required this.onUserTap,
+  });
+
+  static void show(
+    BuildContext context,
+    List<ReactCommentEntity> reacts,
+    String? currentUserId,
+    Function(String) onUserTap,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) => ReactionListModal(
+        reacts: reacts,
+        currentUserId: currentUserId,
+        onUserTap: onUserTap,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        left: 16.w,
+        right: 16.w,
+        top: 16.h,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20.h,
+      ),
+      height: 400.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40.w,
+              height: 4.h,
+              margin: EdgeInsets.only(bottom: 16.h),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ),
+          Text(
+            'Biểu cảm về bình luận',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Expanded(
+            child: ListView.separated(
+              itemCount: reacts.length,
+              separatorBuilder: (context, index) =>
+                  Divider(color: Colors.grey[200], height: 1, thickness: 1),
+              itemBuilder: (context, index) {
+                final react = reacts[index];
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      radius: 20.r,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: NetworkImage(
+                        react.user.avatarUrl ?? 'https://via.placeholder.com/150',
+                      ),
+                    ),
+                    title: Text(
+                      react.user.userId == currentUserId
+                          ? 'Bạn'
+                          : react.user.fullName ?? 'Unknown',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    trailing: Container(
+                      padding: EdgeInsets.all(6.r),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        react.emoji.icon,
+                        style: TextStyle(fontSize: 18.sp),
+                      ),
+                    ),
+                    onTap: () => onUserTap(react.user.userId),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

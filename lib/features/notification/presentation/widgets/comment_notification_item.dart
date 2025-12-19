@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
 
 class CommentNotificationItem extends StatelessWidget {
@@ -16,6 +17,48 @@ class CommentNotificationItem extends StatelessWidget {
     required this.time,
     required this.isRead,
   });
+  List<InlineSpan> _parseContent(String text) {
+    final List<InlineSpan> spans = [];
+
+    final RegExp regex = RegExp(r"@\[([^\]]+)\]\(([^)]+)\)");
+    final Iterable<RegExpMatch> matches = regex.allMatches(text);
+
+    int lastIndex = 0;
+
+    for (final match in matches) {
+      if (match.start > lastIndex) {
+        spans.add(
+          TextSpan(
+            text: text.substring(lastIndex, match.start),
+            style: const TextStyle(color: Colors.black), // Style text thường
+          ),
+        );
+      }
+
+      spans.add(
+        TextSpan(
+          text: '@${match.group(1)}', // Lấy tên trong group 1
+          style: const TextStyle(
+            fontWeight: FontWeight.bold, // In đậm mention
+            color: AppColors.primary,
+          ),
+        ),
+      );
+
+      lastIndex = match.end;
+    }
+
+    if (lastIndex < text.length) {
+      spans.add(
+        TextSpan(
+          text: text.substring(lastIndex),
+          style: const TextStyle(color: Colors.black),
+        ),
+      );
+    }
+
+    return spans;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,20 +69,14 @@ class CommentNotificationItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-          ),
+          style: const TextStyle(fontSize: 16, color: Colors.black),
           children: [
             TextSpan(
               text: userName,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            TextSpan(
-              text: ' $content',
-            ),
+            TextSpan(text: ' '),
+            ..._parseContent(content),
           ],
         ),
       ),
@@ -48,11 +85,7 @@ class CommentNotificationItem extends StatelessWidget {
       iconOverlay: const CircleAvatar(
         radius: 12,
         backgroundColor: Colors.green,
-        child: Icon(
-          Icons.chat_bubble,
-          color: Colors.white,
-          size: 14,
-        ),
+        child: Icon(Icons.chat_bubble, color: Colors.white, size: 14),
       ),
     );
   }

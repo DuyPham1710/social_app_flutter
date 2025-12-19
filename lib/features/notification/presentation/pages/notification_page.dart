@@ -113,6 +113,14 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
         );
+      case NotificationType.MENTION:
+        return CommentNotificationItem(
+          avatarUrl: notification.sender?.avatarUrl ?? '',
+          userName: notification.sender?.fullName ?? '',
+          content: notification.message,
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+        );
       case NotificationType.UNKNOWN:
         throw UnimplementedError();
       case NotificationType.POST_REACTION:
