@@ -8,7 +8,13 @@ import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/r
 
 class ReactListWidget extends StatelessWidget {
   final List<ReactPostEntity> reacts;
-  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
+  final Function(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  )?
+  onMention;
   const ReactListWidget({super.key, required this.reacts, this.onMention});
 
   @override

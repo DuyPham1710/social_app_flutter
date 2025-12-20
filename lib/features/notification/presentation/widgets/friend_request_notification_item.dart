@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class FriendRequestNotificationItem extends StatelessWidget {
   final String avatarUrl;
   final String userName;
+  final String userId;
   final String time;
   final bool isRead;
   final String? mutualFriends;
+  final VoidCallback? onUserTap;
   final VoidCallback? onAccept;
   final VoidCallback? onRemove;
 
@@ -14,9 +17,11 @@ class FriendRequestNotificationItem extends StatelessWidget {
     super.key,
     required this.avatarUrl,
     required this.userName,
+    required this.userId,
     required this.time,
     required this.isRead,
     this.mutualFriends,
+    this.onUserTap,
     this.onAccept,
     this.onRemove,
   });
@@ -33,30 +38,33 @@ class FriendRequestNotificationItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Avatar + icon overlay
-          Stack(
-            children: [
-              ClipOval(
-                child: Image.network(
-                  avatarUrl,
-                  width: 58,
-                  height: 58,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: CircleAvatar(
-                  radius: 13,
-                  backgroundColor: Colors.blue,
-                  child: const Icon(
-                    Icons.person_add,
-                    size: 15,
-                    color: Colors.white,
+          GestureDetector(
+            onTap: onUserTap,
+            child: Stack(
+              children: [
+                ClipOval(
+                  child: Image.network(
+                    avatarUrl,
+                    width: 58,
+                    height: 58,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: CircleAvatar(
+                    radius: 13,
+                    backgroundColor: Colors.blue,
+                    child: const Icon(
+                      Icons.person_add,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(width: 12),
@@ -76,10 +84,16 @@ class FriendRequestNotificationItem extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
+                        recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
-                      const TextSpan(
+                      TextSpan(
                         text: " đã gửi cho bạn lời mời kết bạn.",
-                        style: TextStyle(color: Colors.black, fontSize: 16),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => print('Tapped on action text'),
                       ),
                     ],
                   ),

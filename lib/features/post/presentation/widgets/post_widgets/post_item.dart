@@ -30,13 +30,14 @@ class PostItem extends StatefulWidget {
 
 class _PostItemState extends State<PostItem> {
   late List<ReactPostEntity> _localReacts;
-  late EmojiType? _currentUserReaction;
+  EmojiType? _currentUserReaction;
 
   @override
   void initState() {
     super.initState();
     _localReacts = List.from(widget.post.reacts ?? []);
-    _currentUserReaction = widget.post.isReact;
+    _currentUserReaction = null;
+    _initCurrentUserReaction();
   }
 
   @override
@@ -46,7 +47,27 @@ class _PostItemState extends State<PostItem> {
     if (oldWidget.post != widget.post) {
       setState(() {
         _localReacts = List.from(widget.post.reacts ?? []);
-        _currentUserReaction = widget.post.isReact;
+      });
+      _initCurrentUserReaction();
+    }
+  }
+
+  Future<void> _initCurrentUserReaction() async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+
+    // Tìm reaction của user hiện tại từ reacts array
+    ReactPostEntity? userReaction;
+    for (final react in _localReacts) {
+      if (react.user.userId == currentUserId) {
+        userReaction = react;
+        break;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _currentUserReaction = userReaction?.emoji;
       });
     }
   }
@@ -163,7 +184,10 @@ class _PostItemState extends State<PostItem> {
                 isScrollControlled: true,
                 context: context,
                 builder: (BuildContext context) {
-                  return ModalComment(postId: widget.post.id);
+                  return ModalComment(
+                    postId: widget.post.id,
+                    reacts: _localReacts,
+                  );
                 },
               );
             },
@@ -176,6 +200,7 @@ class _PostItemState extends State<PostItem> {
             postId: widget.post.id,
             reactCount: _localReacts.length,
             isReact: _currentUserReaction,
+            reacts: _localReacts,
             commentCount: widget.commentCount,
             onReactionChanged: _onReactionChanged,
           ),

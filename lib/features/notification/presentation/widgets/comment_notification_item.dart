@@ -1,21 +1,29 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
+import 'package:flutter/gestures.dart';
 
 class CommentNotificationItem extends StatelessWidget {
   final String avatarUrl;
   final String userName;
+  final String userId;
   final String content;
   final String time;
   final bool isRead;
+  final VoidCallback? onUserTap;
+  final VoidCallback? onMessageTap;
 
   const CommentNotificationItem({
     super.key,
     required this.avatarUrl,
     required this.userName,
+    required this.userId,
     required this.content,
     required this.time,
     required this.isRead,
+    this.onUserTap,
+    this.onMessageTap,
   });
   List<InlineSpan> _parseContent(String text) {
     final List<InlineSpan> spans = [];
@@ -65,6 +73,8 @@ class CommentNotificationItem extends StatelessWidget {
     return NotificationBaseItem(
       isRead: isRead,
       avatarUrl: avatarUrl,
+      userId: userId,
+      onAvatarTap: onUserTap,
       title: RichText(
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
@@ -74,9 +84,19 @@ class CommentNotificationItem extends StatelessWidget {
             TextSpan(
               text: userName,
               style: const TextStyle(fontWeight: FontWeight.bold),
+              recognizer: TapGestureRecognizer()..onTap = onUserTap,
             ),
-            TextSpan(text: ' '),
-            ..._parseContent(content),
+            const TextSpan(text: ' '),
+            ...[ for (final span in _parseContent(content))
+              if (span is TextSpan)
+                TextSpan(
+                  text: span.text,
+                  style: span.style,
+                  recognizer: TapGestureRecognizer()..onTap = onMessageTap,
+                )
+              else
+                span,
+            ],
           ],
         ),
       ),

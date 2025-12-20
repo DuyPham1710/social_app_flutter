@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NotificationBaseItem extends StatelessWidget {
@@ -7,6 +8,8 @@ class NotificationBaseItem extends StatelessWidget {
   final String? preview;
   final String time;
   final bool isRead;
+  final String? userId;
+  final VoidCallback? onAvatarTap;
 
   const NotificationBaseItem({
     super.key,
@@ -16,6 +19,8 @@ class NotificationBaseItem extends StatelessWidget {
     this.preview,
     required this.time,
     required this.isRead,
+    this.userId,
+    this.onAvatarTap,
   });
 
   @override
@@ -28,18 +33,21 @@ class NotificationBaseItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Avatar + icon
-          Stack(
-            children: [
-              ClipOval(
-                child: Image.network(
-                  avatarUrl,
-                  width: 55,
-                  height: 55,
-                  fit: BoxFit.cover,
+          GestureDetector(
+            onTap: onAvatarTap,
+            child: Stack(
+              children: [
+                ClipOval(
+                  child: Image.network(
+                    avatarUrl,
+                    width: 55,
+                    height: 55,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              Positioned(bottom: 0, right: 0, child: iconOverlay),
-            ],
+                Positioned(bottom: 0, right: 0, child: iconOverlay),
+              ],
+            ),
           ),
 
           const SizedBox(width: 12),

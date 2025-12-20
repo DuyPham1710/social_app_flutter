@@ -1,7 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
 import '../bloc/notification_bloc.dart';
 import '../bloc/notification_event.dart';
 import '../bloc/notification_state.dart';
@@ -65,9 +73,30 @@ class _NotificationPageState extends State<NotificationPage> {
         return FriendRequestNotificationItem(
           avatarUrl: notification.sender?.avatarUrl ?? '',
           userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           mutualFriends: '',
+          onUserTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
           onAccept: () async {
             final targetId = notification.targetId;
             if (targetId == null) return;
@@ -109,17 +138,69 @@ class _NotificationPageState extends State<NotificationPage> {
         return CommentNotificationItem(
           avatarUrl: notification.sender?.avatarUrl ?? '',
           userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
           content: notification.message,
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
+          onUserTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+          onMessageTap: () => _navigateToCommentInPost(
+            postId: notification.content,
+            commentId: notification.targetId,
+            notificationId: notification.id,
+          ),
         );
       case NotificationType.MENTION:
         return CommentNotificationItem(
           avatarUrl: notification.sender?.avatarUrl ?? '',
           userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
           content: notification.message,
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
+          onUserTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+          onMessageTap: () => _navigateToCommentInPost(
+            postId: notification.content,
+            commentId: notification.targetId,
+            notificationId: notification.id,
+          ),
         );
       case NotificationType.UNKNOWN:
         throw UnimplementedError();
@@ -127,10 +208,89 @@ class _NotificationPageState extends State<NotificationPage> {
         return ReactPostNotificationItem(
           avatarUrl: notification.sender?.avatarUrl ?? '',
           userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
           message: notification.message,
-          content: notification.content ?? 'like',
+          content: notification.content ?? '',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
+          postId: notification.targetId,
+          onUserTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+          onMessageTap: () async {
+            final postId = notification.targetId;
+            if (postId != null && postId.isNotEmpty) {
+              // Navigate to loading page with smooth fade animation
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const _PostLoadingPage(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  transitionDuration: const Duration(milliseconds: 300),
+                ),
+              );
+
+              // Load post
+              GetPostDetailParams params = GetPostDetailParams(postId: postId);
+              final result = await s1<GetPostDetailUsecase>()(params: params);
+
+              if (context.mounted) {
+                if (result is DataStateSuccess && result.data != null) {
+                  // Replace loading page with post detail
+                  Navigator.of(context).pushReplacement(
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          PostDetailPage(post: result.data!),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                      transitionDuration: const Duration(milliseconds: 300),
+                    ),
+                  );
+                } else {
+                  // Post doesn't exist or error loading
+                  Navigator.of(context).pop(); // Close loading page
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Bài viết không tồn tại')),
+                  );
+
+                  // Delete the notification
+                  try {
+                    s1<DeleteNotificationUseCase>()(params: notification.id);
+                  } catch (_) {}
+                  context.read<NotificationBloc>().add(
+                    RemoveNotification(notification.id),
+                  );
+                }
+              }
+            }
+          },
         );
       default:
         throw UnimplementedError(
@@ -233,6 +393,74 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+  Future<void> _navigateToCommentInPost({
+    required String? postId,
+    required String? commentId,
+    required String? notificationId,
+  }) async {
+    print(
+      '[Notification] navigateToCommentInPost - postId: $postId, commentId: $commentId, notificationId: $notificationId',
+    );
+
+    if (postId == null || postId.isEmpty) {
+      print('[Notification] postId is null/empty, returning');
+      return;
+    }
+
+    // Navigate to loading page with smooth fade animation
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const _PostLoadingPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    );
+
+    // Load post
+    GetPostDetailParams params = GetPostDetailParams(postId: postId);
+    final result = await s1<GetPostDetailUsecase>()(params: params);
+    print('[Notification] Post loaded, result type: ${result.runtimeType}');
+
+    if (context.mounted) {
+      if (result is DataStateSuccess && result.data != null) {
+        print(
+          '[Notification] Post loaded successfully, passing commentId: $commentId to PostDetailPage',
+        );
+        // Replace loading page with post detail and scroll to comment
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                PostDetailPage(post: result.data!, initialCommentId: commentId),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+            transitionDuration: const Duration(milliseconds: 300),
+          ),
+        );
+      } else {
+        // Post doesn't exist or error loading
+        Navigator.of(context).pop(); // Close loading page
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Bài viết không tồn tại')));
+
+        // Delete the notification
+        try {
+          s1<DeleteNotificationUseCase>()(params: notificationId ?? '');
+        } catch (_) {}
+        context.read<NotificationBloc>().add(
+          RemoveNotification(notificationId ?? ''),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     if (_scrollListener != null) {
@@ -240,5 +468,112 @@ class _NotificationPageState extends State<NotificationPage> {
     }
     _scrollController.dispose();
     super.dispose();
+  }
+}
+
+class _PostLoadingPage extends StatelessWidget {
+  const _PostLoadingPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Top Bar giả (Khớp với nút back và tên tiêu đề)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: [
+                    // Giả lập nút Back
+                    _buildBox(width: 30, height: 30, radius: 8),
+                    const SizedBox(width: 60), // Khoảng cách tới title
+                    // Giả lập Title chính giữa/phía sau
+                    _buildBox(width: 150, height: 24, radius: 8),
+                  ],
+                ),
+              ),
+              const Divider(thickness: 1, color: Colors.white), // Đường kẻ mờ
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 2. Header: Avatar + Tên người đăng
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Colors.white,
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildBox(width: 160, height: 16, radius: 10),
+                            const SizedBox(height: 8),
+                            _buildBox(width: 100, height: 12, radius: 10),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 3. Text lines (Nội dung ngắn)
+                    _buildBox(width: double.infinity, height: 14, radius: 10),
+                    const SizedBox(height: 8),
+                    _buildBox(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      height: 14,
+                      radius: 10,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 4. Post Body (Khung ảnh)
+                    _buildBox(width: double.infinity, height: 250, radius: 15),
+                    const SizedBox(height: 20),
+
+                    // 5. Action Buttons (Like, Comment, Share)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildBox(width: 85, height: 35, radius: 20),
+                        _buildBox(width: 85, height: 35, radius: 20),
+                        _buildBox(width: 85, height: 35, radius: 20),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBox({
+    required double width,
+    required double height,
+    required double radius,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
   }
 }

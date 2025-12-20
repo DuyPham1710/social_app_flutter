@@ -11,33 +11,45 @@ import 'package:social_app_fe/features/post/presentation/pages/reaction_details_
 
 class CommentHeaderWidget extends StatelessWidget {
   final String postId;
-  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
+  final List<ReactPostEntity>? reacts;
+  final Function(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  )?
+  onMention;
 
-  const CommentHeaderWidget({super.key, required this.postId, this.onMention});
+  const CommentHeaderWidget({
+    super.key,
+    required this.postId,
+    this.reacts,
+    this.onMention,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
-        // Tìm post theo postId trong state
-        List<ReactPostEntity>? reacts;
+        // Nếu có reacts parameter thì dùng nó, ngược lại lấy từ HomeBloc
+        List<ReactPostEntity>? displayReacts = reacts;
 
-        if (state is HomeLoaded) {
+        if (displayReacts == null && state is HomeLoaded) {
           try {
             final post = state.posts?.firstWhere((p) => p.id == postId);
-            reacts = post?.reacts;
+            displayReacts = post?.reacts;
           } catch (e) {
             // Post không tìm thấy
-            reacts = null;
+            displayReacts = null;
           }
         }
 
         // Tính toán dữ liệu reacts
-        final reactCount = reacts?.length ?? 0;
+        final reactCount = displayReacts?.length ?? 0;
         final Map<EmojiType, int> emojiCounts = {};
 
-        if (reacts != null) {
-          for (var react in reacts) {
+        if (displayReacts != null) {
+          for (var react in displayReacts) {
             emojiCounts[react.emoji] = (emojiCounts[react.emoji] ?? 0) + 1;
           }
         }
@@ -55,12 +67,12 @@ class CommentHeaderWidget extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   // Chỉ điều hướng nếu có reacts
-                  if (reacts != null && reacts.isNotEmpty) {
+                  if (displayReacts != null && displayReacts.isNotEmpty) {
                     Navigator.push(
                       context,
                       CupertinoPageRoute(
                         builder: (_) => ReactionDetailsPage(
-                          reacts: reacts!,
+                          reacts: displayReacts!,
                           postId: postId,
                           onMention: onMention,
                         ),

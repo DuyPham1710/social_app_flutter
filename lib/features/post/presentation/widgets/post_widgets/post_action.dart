@@ -7,14 +7,15 @@ import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_picker.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
+import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 
 class PostAction extends StatefulWidget {
   final String postId;
   final int reactCount;
   final EmojiType? isReact;
   final int commentCount;
-  final void Function(EmojiType? newReaction)?
-  onReactionChanged; // Thêm parameter
+  final List<ReactPostEntity>? reacts;
+  final void Function(EmojiType? newReaction)? onReactionChanged;
 
   const PostAction({
     super.key,
@@ -22,6 +23,7 @@ class PostAction extends StatefulWidget {
     this.reactCount = 0,
     this.commentCount = 0,
     this.isReact,
+    this.reacts,
     this.onReactionChanged,
   });
 
@@ -147,7 +149,10 @@ class _PostActionState extends State<PostAction> {
                     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
-                      return ModalComment(postId: postId);
+                      return ModalComment(
+                        postId: postId,
+                        reacts: widget.reacts,
+                      );
                     },
                   );
                 },
@@ -160,7 +165,11 @@ class _PostActionState extends State<PostAction> {
                     isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
-                      return ModalComment(postId: postId, isPressComment: true);
+                      return ModalComment(
+                        postId: postId,
+                        reacts: widget.reacts,
+                        isPressComment: true,
+                      );
                     },
                   );
                 },
@@ -185,7 +194,11 @@ class _PostActionState extends State<PostAction> {
                 isScrollControlled: true,
                 context: context,
                 builder: (BuildContext context) {
-                  return ModalComment(postId: postId, isPressComment: true);
+                  return ModalComment(
+                    postId: postId,
+                    reacts: widget.reacts,
+                    isPressComment: true,
+                  );
                 },
               );
             },

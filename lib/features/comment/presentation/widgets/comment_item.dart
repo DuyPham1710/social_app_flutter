@@ -40,6 +40,8 @@ class CommentItem extends StatefulWidget {
   final Function(String commentId, String newContent)? onUpdateComment;
   final Function(String commentId, String postId)? onDeleteComment;
   final Function(String commentId, String currentContent)? onViewHistory;
+  final bool isHighlighted;
+  final String? targetCommentId; // ID của comment cần highlight
 
   const CommentItem({
     super.key,
@@ -54,6 +56,8 @@ class CommentItem extends StatefulWidget {
     this.onUpdateComment,
     this.onDeleteComment,
     this.onViewHistory,
+    this.isHighlighted = false,
+    this.targetCommentId,
   });
 
   @override
@@ -131,7 +135,9 @@ class _CommentItemState extends State<CommentItem> {
       padding: widget.isReply
           ? EdgeInsets.fromLTRB(0.w, 8.h, 4.w, 8.h)
           : EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
-
+      color: widget.isHighlighted 
+          ? Colors.yellow.withOpacity(0.2)
+          : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -310,6 +316,9 @@ class _CommentItemState extends State<CommentItem> {
                             onUpdateComment: widget.onUpdateComment,
                             onDeleteComment: widget.onDeleteComment,
                             onViewHistory: widget.onViewHistory,
+                            targetCommentId: widget.targetCommentId,
+                            isHighlighted:
+                                reply.id == widget.targetCommentId,
                           ),
                         );
                       }).toList(),
