@@ -87,7 +87,40 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       );
     });
 
-    on<MarkNotificationRead>((event, emit) => repository.markRead(event.id));
+    on<MarkNotificationRead>((event, emit) {
+      // Update the specific notification to be read in the list
+      final updatedNotifications = state.notifications
+          .map(
+            (n) => n.id == event.id
+                ? NotificationEntity(
+                    id: n.id,
+                    type: n.type,
+                    message: n.message,
+                    content: n.content,
+                    isRead: true,
+                    createdAt: n.createdAt,
+                    sender: n.sender,
+                    targetId: n.targetId,
+                  )
+                : n,
+          )
+          .toList();
+
+      // Recalculate unread count
+      final unreadCount = updatedNotifications.where((n) => !n.isRead).length;
+
+      emit(
+        NotificationState(
+          notifications: updatedNotifications,
+          unread: unreadCount,
+          hasMore: state.hasMore,
+          isLoadingMore: state.isLoadingMore,
+        ),
+      );
+
+      // Send to server
+      repository.markRead(event.id);
+    });
 
     on<MarkAllNotificationsRead>((event, emit) async {
       // Update all notifications to be read immediately

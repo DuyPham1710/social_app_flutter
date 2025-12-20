@@ -349,7 +349,9 @@ class _ModalCommentState extends State<ModalComment> {
           if (reply.id == widget.initialCommentId) {
             targetParentId = parentComments[i].id;
             targetIndex = i;
-            print('[Modal] Found as reply comment at parent index: $i, parent: $targetParentId');
+            print(
+              '[Modal] Found as reply comment at parent index: $i, parent: $targetParentId',
+            );
             break;
           }
         }
@@ -359,39 +361,41 @@ class _ModalCommentState extends State<ModalComment> {
 
     if (targetParentId != null && targetIndex != null) {
       print('[Modal] Scrolling to index: $targetIndex first, then highlight');
-      
+
       // Scroll to target comment first
       Future.delayed(const Duration(milliseconds: 200), () {
         if (mounted && _listScrollController.hasClients) {
           try {
             final itemHeight = 100.0; // Approximate height of each item
             final offset = targetIndex! * itemHeight;
-            
-            _listScrollController.animateTo(
-              offset,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-            ).then((_) {
-              // After scroll completed, set highlight
-              print('[Modal] Scroll completed, setting highlight');
-              if (mounted) {
-                setState(() {
-                  _targetCommentId = widget.initialCommentId;
-                  _targetParentId = targetParentId;
-                });
-                
-                // Remove highlight after 2 seconds
-                Future.delayed(const Duration(seconds: 2), () {
+
+            _listScrollController
+                .animateTo(
+                  offset,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                )
+                .then((_) {
+                  // After scroll completed, set highlight
+                  print('[Modal] Scroll completed, setting highlight');
                   if (mounted) {
-                    print('[Modal] Removing highlight after 2 seconds');
                     setState(() {
-                      _targetCommentId = null;
-                      _targetParentId = null;
+                      _targetCommentId = widget.initialCommentId;
+                      _targetParentId = targetParentId;
+                    });
+
+                    // Remove highlight after 2 seconds hoặc khi đóng modal
+                    Future.delayed(const Duration(seconds: 2), () {
+                      if (mounted) {
+                        print('[Modal] Removing highlight after 2 seconds');
+                        setState(() {
+                          _targetCommentId = null;
+                          _targetParentId = null;
+                        });
+                      }
                     });
                   }
                 });
-              }
-            });
           } catch (e) {
             print('[Modal] Scroll error: $e');
             // Fallback: just set highlight without scrolling

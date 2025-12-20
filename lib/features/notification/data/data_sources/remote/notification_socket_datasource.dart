@@ -83,8 +83,15 @@ class NotificationSocketDataSource {
 
         final List<NotificationModel> merged = [];
         // add/replace with incoming (preserve incoming order)
+        // but preserve local isRead state if already marked as read
         for (var it in items) {
-          merged.add(it);
+          final existing = existingById[it.id];
+          if (existing != null && existing.isRead && !it.isRead) {
+            // Keep local isRead=true if we marked it as read locally
+            merged.add(existing);
+          } else {
+            merged.add(it);
+          }
         }
         // append older existing items that weren't in incoming
         for (var e in _cache) {
@@ -131,10 +138,38 @@ class NotificationSocketDataSource {
   }
 
   void markRead(String id) {
+    // Update cache locally to mark as read immediately
+    final index = _cache.indexWhere((n) => n.id == id);
+    if (index != -1) {
+      final notification = _cache[index];
+      _cache[index] = notification.copyWith(isRead: true);
+      _listController.add(List.unmodifiable(_cache));
+
+      // Decrement unread count
+      _unreadCount = (_unreadCount - 1).clamp(0, double.infinity).toInt();
+      _unreadController.add(_unreadCount);
+    }
+
+    // Then emit to server
     socket.emit('markRead', {'notificationId': id});
   }
 
   void markAllRead() {
+    // Update all unread notifications to read locally
+    for (int i = 0; i < _cache.length; i++) {
+      if (!_cache[i].isRead) {
+        _cache[i] = _cache[i].copyWith(isRead: true);
+      }
+    }
+
+    // Reset unread count to 0
+    _unreadCount = 0;
+
+    // Emit updated cache and unread count
+    _listController.add(List.unmodifiable(_cache));
+    _unreadController.add(_unreadCount);
+
+    // Then emit to server
     socket.emit('markAllRead', {});
   }
 
