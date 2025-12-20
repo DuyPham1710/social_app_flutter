@@ -96,7 +96,8 @@ class OtherProfileHeader extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ImageViewerPage(
-                            imageUrl: user?.avatarUrl ?? 'https://picsum.photos/200',
+                            imageUrl:
+                                user?.avatarUrl ?? 'https://picsum.photos/200',
                             title: 'Ảnh đại diện',
                           ),
                         ),
