@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_editor_plus/image_editor_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/media_type.dart' as core_media;
@@ -40,6 +42,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   // Music state
   DeezerMusicModel? _selectedMusic;
   final AudioPlayer _audioPlayer = AudioPlayer();
+  
+  // Edited image file
+  File? _editedImageFile;
 
   @override
   void initState() {
@@ -167,6 +172,16 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         );
       }
     } else {
+      // Nếu có file đã chỉnh sửa, hiển thị nó
+      if (_editedImageFile != null) {
+        return Center(
+          child: Image.file(
+            _editedImageFile!,
+            fit: BoxFit.contain,
+          ),
+        );
+      }
+      
       return FutureBuilder<File?>(
         future: widget.asset.file,
         builder: (context, snapshot) {
@@ -198,38 +213,15 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         children: [
           _buildMenuButton(
             icon: Icons.sticky_note_2_outlined,
-            label: "Nhãn dán",
-            onTap: () {},
+            label: "Chỉnh sửa",
+            onTap: () => _openImageEditor(),
           ),
           SizedBox(height: 20.h),
-          _buildMenuButton(
-            icon: Icons.text_fields,
-            label: "Văn bản",
-            onTap: () {},
-          ),
           // Chỉ hiển thị option Nhạc nếu không phải video
           if (!isVideo) ...[
             SizedBox(height: 20.h),
             _buildMusicButton(),
           ],
-          SizedBox(height: 20.h),
-          _buildMenuButton(
-            icon: Icons.auto_awesome,
-            label: "Hiệu ứng",
-            onTap: () {},
-          ),
-          SizedBox(height: 20.h),
-          _buildMenuButton(
-            icon: Icons.brush,
-            label: "Vẽ",
-            onTap: () {},
-          ),
-          SizedBox(height: 20.h),
-          _buildMenuButton(
-            icon: Icons.alternate_email,
-            label: "Gắn thẻ\nngười khác",
-            onTap: () {},
-          ),
         ],
       ),
     );
@@ -403,9 +395,79 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     );
   }
 
+  Future<void> _openImageEditor() async {
+    // Chỉ cho phép chỉnh sửa ảnh, không phải video
+    if (widget.asset.type == AssetType.video) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chỉ có thể chỉnh sửa ảnh')),
+      );
+      return;
+    }
+
+    try {
+      // Lấy file gốc hoặc file đã chỉnh sửa
+      final originalFile = _editedImageFile ?? await widget.asset.file;
+      if (originalFile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không thể đọc file từ thiết bị')),
+        );
+        return;
+      }
+
+      // Đọc dữ liệu byte từ ảnh
+      final imageBytes = await originalFile.readAsBytes();
+
+      // Mở trình chỉnh sửa ảnh
+      final editedImage = await Navigator.push<Uint8List?>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ImageEditor(image: imageBytes),
+        ),
+      );
+
+      // Nếu người dùng đã chỉnh sửa xong và quay lại
+      if (editedImage != null && editedImage is Uint8List) {
+        // Tạo tên file mới với timestamp để tránh cache
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final directory = originalFile.parent;
+        final fileName = originalFile.path.split('/').last;
+        final nameWithoutExt = fileName.split('.').first;
+        final extension = fileName.split('.').last;
+        final newPath =
+            '${directory.path}/${nameWithoutExt}_edited_$timestamp.$extension';
+
+        final newFile = File(newPath);
+
+        // Ghi ảnh đã chỉnh sửa vào file mới
+        await newFile.writeAsBytes(editedImage);
+
+        // Clear image cache để force reload
+        imageCache.clear();
+        imageCache.clearLiveImages();
+
+        setState(() {
+          // Cập nhật với file mới
+          _editedImageFile = newFile;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi chỉnh sửa ảnh: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _onSharePressed() async {
-    // Lấy file ảnh/video từ AssetEntity
-    final file = await widget.asset.file;
+    // Sử dụng file đã chỉnh sửa nếu có, không thì lấy file gốc từ AssetEntity
+    File? file;
+    if (_editedImageFile != null) {
+      file = _editedImageFile;
+    } else {
+      file = await widget.asset.file;
+    }
+    
     if (file == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Không thể đọc file từ thiết bị')),

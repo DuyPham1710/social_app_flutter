@@ -212,32 +212,37 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
       );
     } else {
       // Image hoặc text
-      return Image.network(
-        widget.mediaUrl!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey[900],
-            child: const Center(
-              child: Icon(
-                Icons.error_outline,
-                color: Colors.white70,
-                size: 48,
-              ),
-            ),
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: Colors.grey[900],
-            child: const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          );
-        },
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: Image.network(
+            widget.mediaUrl!,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[900],
+                child: const Center(
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Colors.white70,
+                    size: 48,
+                  ),
+                ),
+              );
+            },
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                color: Colors.grey[900],
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       );
     }
   }
