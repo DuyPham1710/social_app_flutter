@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "D:/HK1_Nam_4/TLCN/social_app_fe/windows/flutter"
+    "cmake.sourceDirectory": "D:/HK1_Nam_4/TLCN/social_app_fe/windows/flutter",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

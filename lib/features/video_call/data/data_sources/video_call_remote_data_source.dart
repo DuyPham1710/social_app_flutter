@@ -35,7 +35,7 @@ class VideoCallRemoteDataSource {
 
   /// Connect to video-call namespace
   void connect(String userId, String username) {
-    _isConnected = false;
+    //   _isConnected = false;
     _connectionCompleter = Completer<void>();
 
     _socketClient.connect(
@@ -153,10 +153,7 @@ class VideoCallRemoteDataSource {
     try {
       await waitForConnection();
     } catch (e) {
-      developer.log(
-        'Connection not ready: $e',
-        name: 'VideoCallDataSource',
-      );
+      developer.log('Connection not ready: $e', name: 'VideoCallDataSource');
       throw Exception('Video call connection not ready: $e');
     }
 
@@ -248,7 +245,7 @@ class VideoCallRemoteDataSource {
     _socketClient.emit('call:accept', {'userId': userId, 'callId': callId});
 
     // Set timeout
-    Timer(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 14), () {
       if (!completer.isCompleted) {
         subscription.cancel();
         completer.completeError(TimeoutException('Accept call timeout'));

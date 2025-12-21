@@ -10,6 +10,7 @@ enum VideoCallStatus {
   callCreated,
   incomingCall,
   acceptingCall,
+  callAccepted,
   inCall,
   callEnded,
   callRejected,

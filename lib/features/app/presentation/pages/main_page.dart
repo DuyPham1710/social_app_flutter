@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/custom_bottom_navigation.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
@@ -10,10 +9,10 @@ import 'package:social_app_fe/features/notification/presentation/bloc/notificati
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_state.dart';
 import 'package:social_app_fe/features/notification/presentation/pages/notification_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/create_post_page.dart';
-import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final Map<String, dynamic>? userData;
+  const MainPage({super.key, this.userData});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -26,19 +25,14 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    _connectNotificationSocket();
+    _connectSocket();
   }
 
-  Future<void> _connectNotificationSocket() async {
-    final userData = await TokenStorage.getUserData();
-    if (userData == null) return;
+  Future<void> _connectSocket() async {
+    if (widget.userData == null) return;
+    final userId = widget.userData!['id'];
 
-    final userId = userData['id'];
-    final username = userData['username'];
-
-    context.read<VideoCallBloc>().add(
-      ConnectVideoCall(userId: userId, username: username),
-    );
+    // connect notification socket
     context.read<NotificationBloc>().add(ConnectNotificationSocket(userId));
   }
 

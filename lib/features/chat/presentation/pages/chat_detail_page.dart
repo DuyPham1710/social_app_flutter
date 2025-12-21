@@ -9,6 +9,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
@@ -26,7 +27,6 @@ import 'package:social_app_fe/features/chat/domain/usecases/get_message_edit_log
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/scroll_to_bottom_button.dart';
-import 'package:social_app_fe/features/video_call/domain/entities/video_call_entities.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/grid_image_item.dart';
@@ -34,7 +34,6 @@ import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dar
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
-import 'package:social_app_fe/features/video_call/presentation/pages/incoming_call_screen.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
@@ -185,12 +184,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     // Listen to focus changes để mở rộng input
     _focusNode.addListener(_onFocusChanged);
 
-    // Initialize and connect video call
-    // BLoC tự động setup listeners trong constructor
-    // _videoCallBloc = s1<VideoCallBloc>();
-    // _videoCallBloc.add(
-    //   ConnectVideoCall(userId: widget.userId, username: widget.username),
-    // );
+    // Save VideoCallBloc reference for dispose
+    // _videoCallBloc = context.read<VideoCallBloc>();
+
+    // Connect to video call socket once when page opens
+    context.read<VideoCallBloc>().add(
+      ConnectVideoCall(userId: widget.userId, username: widget.username),
+    );
 
     // Nếu có conversationId, thực hiện load messages
     if (widget.conversationId != null) {
@@ -266,28 +266,29 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     _photoPickerScrollController.dispose();
     _typingDebounceTimer?.cancel();
     _highlightTimer?.cancel();
+
     // _videoCallBloc.add(const DisconnectVideoCall());
-    // _videoCallBloc.close();
+
     super.dispose();
   }
 
-  void _handleIncomingCall(IncomingCallEntity incomingCallModel) {
-    if (!mounted) return;
+  // void _handleIncomingCall(IncomingCallEntity incomingCallModel) {
+  //   if (!mounted) return;
 
-    // Navigate to incoming call screen
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => IncomingCallScreen(
-          callData: incomingCallModel,
-          userId: widget.userId,
-        ),
-      ),
-    ).then((_) {
-      // Clear call state after returning
-      // _videoCallBloc.add(const ClearCallState());
-    });
-  }
+  //   // Navigate to incoming call screen
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => IncomingCallScreen(
+  //         callData: incomingCallModel,
+  //         userId: widget.userId,
+  //       ),
+  //     ),
+  //   ).then((_) {
+  //     // Clear call state after returning
+  //     // _videoCallBloc.add(const ClearCallState());
+  //   });
+  // }
 
   void _handleCallCreated(callResponse) {
     if (!mounted) return;
@@ -315,29 +316,24 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             receiverAvatar: widget.friendInfo?.avatarUrl,
           ),
         ),
-      ).then((_) {
-        // Clear call state after returning
-        // _videoCallBloc.add(const ClearCallState());
-      });
+      );
+      // Socket remains connected for future calls
     });
   }
 
   Future<void> _initiateCall(String callType) async {
     try {
       // Check permissions
-      final hasPermissions = await _checkCallPermissions(callType);
+      final hasPermissions = await PermissionHelper.checkCallPermissions(
+        callType,
+      );
       if (!hasPermissions) {
         if (mounted) {
-          _showError(
-            callType == 'video'
-                ? 'Cần quyền camera và microphone để gọi video'
-                : 'Cần quyền microphone để gọi thoại',
-          );
+          PermissionHelper.showPermissionDeniedError(context, callType);
         }
         return;
       }
 
-      // Create call via BLoC TRƯỚC
       context.read<VideoCallBloc>().add(
         CreateCall(
           userId: widget.userId,
@@ -347,7 +343,6 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         ),
       );
 
-      // KHÔNG show loading dialog vì nó sẽ block navigation
       // BlocListener sẽ tự động navigate khi state thay đổi
     } catch (e) {
       _showError('Không thể thực hiện cuộc gọi: $e');
@@ -359,17 +354,6 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
-    }
-  }
-
-  Future<bool> _checkCallPermissions(String callType) async {
-    if (callType == 'video') {
-      final cameraStatus = await Permission.camera.request();
-      final micStatus = await Permission.microphone.request();
-      return cameraStatus.isGranted && micStatus.isGranted;
-    } else {
-      final micStatus = await Permission.microphone.request();
-      return micStatus.isGranted;
     }
   }
 
@@ -920,13 +904,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   @override
   Widget build(BuildContext context) {
     return BlocListener<VideoCallBloc, VideoCallState>(
-      //  bloc: _videoCallBloc,
       listener: (context, state) {
-        // Listen to video call state changes (tương tự MessageBloc)
-        if (state.status == VideoCallStatus.incomingCall &&
-            state.incomingCall != null) {
-          _handleIncomingCall(state.incomingCall!);
-        } else if (state.status == VideoCallStatus.callCreated &&
+        // if (state.status == VideoCallStatus.incomingCall &&
+        //     state.incomingCall != null) {
+        //   _handleIncomingCall(state.incomingCall!);
+        // } else
+        if (state.status == VideoCallStatus.callCreated &&
             state.activeCall != null) {
           _handleCallCreated(state.activeCall!);
         } else if (state.status == VideoCallStatus.error) {

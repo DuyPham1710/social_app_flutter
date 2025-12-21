@@ -3,8 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/core/network/interceptors/auth_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/log_interceptor.dart';
 import 'package:social_app_fe/core/network/interceptors/response_interceptor.dart';
-import 'dart:io';
-import 'package:dio/io.dart';
 
 class DioClient {
   static Dio? _dio;
