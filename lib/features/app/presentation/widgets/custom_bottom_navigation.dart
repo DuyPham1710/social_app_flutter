@@ -44,51 +44,69 @@ class CustomBottomNavigation extends StatelessWidget {
 
   Widget _buildNavItem(IconData icon, int index) {
     final isActive = currentIndex == index;
-    return GestureDetector(
-      onTap: () => onTabSelected(index),
-      child: Icon(
-        icon,
-        size: 28,
-        color: isActive ? AppColors.primary : AppColors.unselectedIcon,
-      ),
-    );
-  }
-
-  Widget _buildNotificationNavItem(IconData icon, int index) {
-    final isActive = currentIndex == index;
-    return Stack(
-      children: [
-        GestureDetector(
-          onTap: () => onTabSelected(index),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onTabSelected(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: double.infinity,
+          alignment: Alignment.center,
           child: Icon(
             icon,
             size: 28,
             color: isActive ? AppColors.primary : AppColors.unselectedIcon,
           ),
         ),
-        if (unreadCount > 0)
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: EdgeInsets.all(2.r),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 220, 53, 69),
-                borderRadius: BorderRadius.circular(10.r),
+      ),
+    );
+  }
+
+  Widget _buildNotificationNavItem(IconData icon, int index) {
+    final isActive = currentIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onTabSelected(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: double.infinity,
+          alignment: Alignment.center,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Icon(
+                icon,
+                size: 28,
+                color: isActive ? AppColors.primary : AppColors.unselectedIcon,
               ),
-              constraints: BoxConstraints(minWidth: 18.r, minHeight: 18.r),
-              child: Text(
-                unreadCount > 99 ? '99+' : unreadCount.toString(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.bold,
+              if (unreadCount > 0)
+                Positioned(
+                  right: -8,
+                  top: -4,
+                  child: Container(
+                    padding: EdgeInsets.all(2.r),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 220, 53, 69),
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 18.r,
+                      minHeight: 18.r,
+                    ),
+                    child: Text(
+                      unreadCount > 99 ? '99+' : unreadCount.toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 }

@@ -60,6 +60,9 @@ class _ModalCommentState extends State<ModalComment> {
   List<Map<String, dynamic>> _suggestionList = [];
   Map<String, dynamic>? _tempReplyUser;
 
+  Timer? _scrollTimer;
+  Timer? _highlightTimer;
+
   @override
   void initState() {
     super.initState();
@@ -309,6 +312,10 @@ class _ModalCommentState extends State<ModalComment> {
   void _findAndHighlightComment(List<CommentEntity> comments) {
     print('[Modal] Finding comment: ${widget.initialCommentId}');
 
+    // Cancel previous timers
+    _scrollTimer?.cancel();
+    _highlightTimer?.cancel();
+
     // Tạo map parentId -> groupedComments
     Map<String?, List<CommentEntity>> groupedComments = {};
     List<CommentEntity> parentComments = [];
@@ -349,7 +356,9 @@ class _ModalCommentState extends State<ModalComment> {
           if (reply.id == widget.initialCommentId) {
             targetParentId = parentComments[i].id;
             targetIndex = i;
-            print('[Modal] Found as reply comment at parent index: $i, parent: $targetParentId');
+            print(
+              '[Modal] Found as reply comment at parent index: $i, parent: $targetParentId',
+            );
             break;
           }
         }
@@ -359,54 +368,58 @@ class _ModalCommentState extends State<ModalComment> {
 
     if (targetParentId != null && targetIndex != null) {
       print('[Modal] Scrolling to index: $targetIndex first, then highlight');
-      
-      // Scroll to target comment first
-      Future.delayed(const Duration(milliseconds: 200), () {
+
+      // Scroll to target comment first using Timer
+      _scrollTimer = Timer(const Duration(milliseconds: 200), () {
         if (mounted && _listScrollController.hasClients) {
           try {
             final itemHeight = 100.0; // Approximate height of each item
             final offset = targetIndex! * itemHeight;
-            
-            _listScrollController.animateTo(
-              offset,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-            ).then((_) {
-              // After scroll completed, set highlight
-              print('[Modal] Scroll completed, setting highlight');
-              if (mounted) {
-                setState(() {
-                  _targetCommentId = widget.initialCommentId;
-                  _targetParentId = targetParentId;
-                });
-                
-                // Remove highlight after 2 seconds
-                Future.delayed(const Duration(seconds: 2), () {
+
+            _listScrollController
+                .animateTo(
+                  offset,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                )
+                .then((_) {
+                  // After scroll completed, set highlight
+                  print('[Modal] Scroll completed, setting highlight');
                   if (mounted) {
-                    print('[Modal] Removing highlight after 2 seconds');
                     setState(() {
-                      _targetCommentId = null;
-                      _targetParentId = null;
+                      _targetCommentId = widget.initialCommentId;
+                      _targetParentId = targetParentId;
+                    });
+
+                    // Remove highlight after 2 seconds using Timer
+                    _highlightTimer = Timer(const Duration(seconds: 2), () {
+                      if (mounted) {
+                        print('[Modal] Removing highlight after 2 seconds');
+                        setState(() {
+                          _targetCommentId = null;
+                          _targetParentId = null;
+                        });
+                      }
                     });
                   }
                 });
-              }
-            });
           } catch (e) {
             print('[Modal] Scroll error: $e');
             // Fallback: just set highlight without scrolling
-            setState(() {
-              _targetCommentId = widget.initialCommentId;
-              _targetParentId = targetParentId;
-            });
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) {
-                setState(() {
-                  _targetCommentId = null;
-                  _targetParentId = null;
-                });
-              }
-            });
+            if (mounted) {
+              setState(() {
+                _targetCommentId = widget.initialCommentId;
+                _targetParentId = targetParentId;
+              });
+              _highlightTimer = Timer(const Duration(seconds: 2), () {
+                if (mounted) {
+                  setState(() {
+                    _targetCommentId = null;
+                    _targetParentId = null;
+                  });
+                }
+              });
+            }
           }
         }
       });
@@ -481,6 +494,10 @@ class _ModalCommentState extends State<ModalComment> {
 
   @override
   void dispose() {
+    // Cancel any pending timers trước khi dispose
+    _scrollTimer?.cancel();
+    _highlightTimer?.cancel();
+
     // Leave post khi đóng modal
     _commentBloc.add(LeavePostEvent(widget.postId));
     _commentBloc.close();

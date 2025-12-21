@@ -540,6 +540,8 @@ class _FriendsListPageState extends State<FriendForUserPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.background,
+        surfaceTintColor: Colors.transparent,
         title: const Text('Hủy kết bạn'),
         content: Text('Bạn có chắc chắn muốn hủy kết bạn với $name?'),
         actions: [

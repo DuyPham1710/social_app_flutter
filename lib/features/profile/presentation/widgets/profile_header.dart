@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/image_viewer_page.dart';
 
 class ProfileHeader extends StatelessWidget {
   final UserEntity? user;
@@ -54,16 +56,29 @@ class ProfileHeader extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             // Cover Image
-            Container(
-              height: 200.h,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.r),
-                image: DecorationImage(
-                  image: NetworkImage(
-                    user?.coverUrl ?? 'https://picsum.photos/200',
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => ImageViewerPage(
+                      imageUrl: user?.coverUrl ?? 'https://picsum.photos/200',
+                      title: 'Ảnh bìa',
+                    ),
                   ),
-                  fit: BoxFit.cover,
+                );
+              },
+              child: Container(
+                height: 200.h,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.r),
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      user?.coverUrl ?? 'https://picsum.photos/200',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -89,15 +104,30 @@ class ProfileHeader extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.bottomRight,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
-                    ),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: NetworkImage(
-                        user?.avatarUrl ?? 'https://picsum.photos/200',
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => ImageViewerPage(
+                            imageUrl:
+                                user?.avatarUrl ?? 'https://picsum.photos/200',
+                            title: 'Ảnh đại diện',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 4),
+                      ),
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundImage: NetworkImage(
+                          user?.avatarUrl ?? 'https://picsum.photos/200',
+                        ),
                       ),
                     ),
                   ),

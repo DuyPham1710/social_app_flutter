@@ -135,8 +135,8 @@ class _CommentItemState extends State<CommentItem> {
       padding: widget.isReply
           ? EdgeInsets.fromLTRB(0.w, 8.h, 4.w, 8.h)
           : EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
-      color: widget.isHighlighted 
-          ? Colors.yellow.withOpacity(0.2)
+      color: widget.isHighlighted
+          ? const Color.fromARGB(255, 113, 170, 255).withOpacity(0.15)
           : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,8 +317,7 @@ class _CommentItemState extends State<CommentItem> {
                             onDeleteComment: widget.onDeleteComment,
                             onViewHistory: widget.onViewHistory,
                             targetCommentId: widget.targetCommentId,
-                            isHighlighted:
-                                reply.id == widget.targetCommentId,
+                            isHighlighted: reply.id == widget.targetCommentId,
                           ),
                         );
                       }).toList(),

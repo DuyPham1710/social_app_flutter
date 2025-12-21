@@ -87,7 +87,40 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       );
     });
 
-    on<MarkNotificationRead>((event, emit) => repository.markRead(event.id));
+    on<MarkNotificationRead>((event, emit) {
+      // Update the specific notification to be read in the list
+      final updatedNotifications = state.notifications
+          .map(
+            (n) => n.id == event.id
+                ? NotificationEntity(
+                    id: n.id,
+                    type: n.type,
+                    message: n.message,
+                    content: n.content,
+                    isRead: true,
+                    createdAt: n.createdAt,
+                    sender: n.sender,
+                    targetId: n.targetId,
+                  )
+                : n,
+          )
+          .toList();
+
+      // Recalculate unread count
+      final unreadCount = updatedNotifications.where((n) => !n.isRead).length;
+
+      emit(
+        NotificationState(
+          notifications: updatedNotifications,
+          unread: unreadCount,
+          hasMore: state.hasMore,
+          isLoadingMore: state.isLoadingMore,
+        ),
+      );
+
+      // Send to server
+      repository.markRead(event.id);
+    });
 
     on<MarkAllNotificationsRead>((event, emit) async {
       // Update all notifications to be read immediately
@@ -119,11 +152,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     });
 
     on<RemoveNotification>((event, emit) {
+      print('[NotificationBloc] RemoveNotification event received for id: ${event.id}');
+      print('[NotificationBloc] Current notifications count: ${state.notifications.length}');
+      
       final updatedNotifications = state.notifications
           .where((n) => n.id != event.id)
           .toList();
       final unreadCount = updatedNotifications.where((n) => !n.isRead).length;
 
+      print('[NotificationBloc] After filtering, notifications count: ${updatedNotifications.length}');
+      
       // Emit updated list immediately
       emit(
         NotificationState(
@@ -133,11 +171,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           isLoadingMore: state.isLoadingMore,
         ),
       );
+      
+      print('[NotificationBloc] New state emitted with ${updatedNotifications.length} notifications');
 
-      // Also tell repository to mark it read/handled if supported
+      // Tell repository to delete from cache and server
       try {
-        repository.markRead(event.id);
-      } catch (_) {}
+        repository.deleteNotification(event.id);
+        print('[NotificationBloc] Repository deleteNotification called');
+      } catch (e) {
+        print('[NotificationBloc] Error calling deleteNotification: $e');
+      }
     });
   }
 

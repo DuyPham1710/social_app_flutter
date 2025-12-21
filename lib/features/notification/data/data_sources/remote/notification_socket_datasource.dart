@@ -61,8 +61,8 @@ class NotificationSocketDataSource {
         try {
           items.add(NotificationModel.fromJson(Map<String, dynamic>.from(e)));
         } catch (err) {
-          print('❌ Notification parse error: $err');
-          print('❌ Raw item: $e');
+          print('Notification parse error: $err');
+          print('Raw item: $e');
         }
       }
 
@@ -75,16 +75,19 @@ class NotificationSocketDataSource {
       final incomingIds = items.map((e) => e.id).toSet();
 
       if (page == 1) {
-        // For page 1, keep incoming items in front but preserve any existing items
-        // that are not present in this page (e.g., older pages already loaded).
         final Map<String, NotificationModel> existingById = {
           for (var e in _cache) e.id: e,
         };
 
         final List<NotificationModel> merged = [];
-        // add/replace with incoming (preserve incoming order)
         for (var it in items) {
-          merged.add(it);
+          final existing = existingById[it.id];
+          if (existing != null && existing.isRead && !it.isRead) {
+            // Keep local isRead=true if we marked it as read locally
+            merged.add(existing);
+          } else {
+            merged.add(it);
+          }
         }
         // append older existing items that weren't in incoming
         for (var e in _cache) {
@@ -113,41 +116,80 @@ class NotificationSocketDataSource {
       // Add to new stream
       _newController.add(model);
 
-      // Also insert into cache (at front) so later `notifications:list` merges will
-      // include this new item and UI won't lose it when server sends lists.
       final exists = _cache.any((c) => c.id == model.id);
       if (!exists) {
         _cache.insert(0, model);
       }
 
-      // update unread counter and emit updated list/unread
       _unreadCount = _unreadCount + 1;
       _listController.add(List.unmodifiable(_cache));
       _unreadController.add(_unreadCount);
     });
-
-    // Don't emit getNotifications on read/markAllRead events - it causes loops
-    // Server will handle updates internally; UI will refresh via explicit loadPage calls
   }
 
   void markRead(String id) {
+    final index = _cache.indexWhere((n) => n.id == id);
+    if (index != -1) {
+      final notification = _cache[index];
+      _cache[index] = notification.copyWith(isRead: true);
+      _listController.add(List.unmodifiable(_cache));
+
+      _unreadCount = (_unreadCount - 1).clamp(0, double.infinity).toInt();
+      _unreadController.add(_unreadCount);
+    }
+
     socket.emit('markRead', {'notificationId': id});
   }
 
   void markAllRead() {
+    for (int i = 0; i < _cache.length; i++) {
+      if (!_cache[i].isRead) {
+        _cache[i] = _cache[i].copyWith(isRead: true);
+      }
+    }
+
+    _unreadCount = 0;
+
+    _listController.add(List.unmodifiable(_cache));
+    _unreadController.add(_unreadCount);
+
     socket.emit('markAllRead', {});
   }
 
-  /// Request a specific page of notifications. Server should respond with
-  /// `notifications:list` including `page` so datasource can append/replace.
   void loadPage({int page = 1, int limit = 10}) {
     _lastRequestedPage = page;
     socket.emit('getNotifications', {'page': page, 'limit': limit});
   }
 
-  /// Request server to delete a notification from DB. Server should emit
-  /// updated list or an acknowledgement which will trigger a refresh.
   void deleteNotification(String id) {
+    print(
+      '[NotificationSocketDataSource] deleteNotification called for id: $id',
+    );
+    print(
+      '[NotificationSocketDataSource] Cache before deletion: ${_cache.length} items',
+    );
+
+    // Remove from local cache immediately
+    final removedCount = _cache.length;
+    _cache.removeWhere((n) => n.id == id);
+    print(
+      '[NotificationSocketDataSource] Cache after deletion: ${_cache.length} items (removed: ${removedCount - _cache.length})',
+    );
+
+    // Update streams
+    _listController.add(List.unmodifiable(_cache));
+
+    // Recalculate unread count
+    final unreadInCache = _cache.where((n) => !n.isRead).length;
+    if (unreadInCache < _unreadCount) {
+      _unreadCount = unreadInCache;
+      _unreadController.add(_unreadCount);
+    }
+
+    // Notify server
     socket.emit('deleteNotification', {'notificationId': id});
+    print(
+      '[NotificationSocketDataSource] Delete notification emitted to server',
+    );
   }
 }
