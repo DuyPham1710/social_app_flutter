@@ -21,6 +21,8 @@ class MessageItem extends StatelessWidget {
   final VoidCallback? onDoubleTap;
   final VoidCallback? onEditHistoryTap;
   final VoidCallback? onCallAgain;
+  final bool isFirstUnreadMessage;
+  final int? unreadCount;
 
   const MessageItem({
     super.key,
@@ -35,6 +37,8 @@ class MessageItem extends StatelessWidget {
     this.onDoubleTap,
     this.onEditHistoryTap,
     this.onCallAgain,
+    this.isFirstUnreadMessage = false,
+    this.unreadCount,
   });
 
   // Kiểm tra xem tin nhắn đã được xem bởi người khác chưa (không tính mình)
@@ -89,6 +93,10 @@ class MessageItem extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Show unread indicator if this is the first unread message
+        if (isFirstUnreadMessage && unreadCount != null && unreadCount! > 0)
+          _buildUnreadIndicator(),
+
         // Show "Đã chỉnh sửa" nếu tin nhắn đã được chỉnh sửa
         if (isEdited) _buildEditedText(),
 
@@ -189,6 +197,29 @@ class MessageItem extends StatelessWidget {
           fontStyle: FontStyle.italic,
           color: AppColors.textSecondary,
         ),
+      ),
+    );
+  }
+
+  Widget _buildUnreadIndicator() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 12.h),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: AppColors.divider, thickness: 1)),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            child: Text(
+              '$unreadCount tin nhắn chưa đọc',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(child: Divider(color: AppColors.divider, thickness: 1)),
+        ],
       ),
     );
   }

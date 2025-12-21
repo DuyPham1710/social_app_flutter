@@ -13,6 +13,7 @@ class ConversationModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int? unreadCount;
+  final int? firstUnreadMessageIndex;
 
   ConversationModel({
     required this.id,
@@ -25,6 +26,7 @@ class ConversationModel {
     required this.createdAt,
     required this.updatedAt,
     this.unreadCount,
+    this.firstUnreadMessageIndex,
   });
 
   factory ConversationModel.fromJson(Map<String, dynamic> json) =>
@@ -51,6 +53,7 @@ class ConversationModel {
             ? DateTime.parse(json['updatedAt'] as String)
             : DateTime.now(),
         unreadCount: json['unreadCount'] as int?,
+        firstUnreadMessageIndex: json['firstUnreadMessageIndex'] as int?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +67,7 @@ class ConversationModel {
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
     'unreadCount': unreadCount,
+    'firstUnreadMessageIndex': firstUnreadMessageIndex,
   };
 
   ConversationEntity toEntity() => ConversationEntity(
@@ -77,5 +81,6 @@ class ConversationModel {
     createdAt: createdAt,
     updatedAt: updatedAt,
     unreadCount: unreadCount,
+    firstUnreadMessageIndex: firstUnreadMessageIndex,
   );
 }

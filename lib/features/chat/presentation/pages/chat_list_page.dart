@@ -146,6 +146,7 @@ class _ChatListPageState extends State<ChatListPage> {
     String conversationId,
     UserEntity friendInfo,
     int unreadCount,
+    int? firstUnreadMessageIndex,
   ) async {
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -183,6 +184,8 @@ class _ChatListPageState extends State<ChatListPage> {
             username: username!,
             conversationId: conversationId,
             friendInfo: friendInfo,
+            unreadCount: unreadCount,
+            firstUnreadMessageIndex: firstUnreadMessageIndex,
           ),
         ),
       ),
@@ -211,7 +214,11 @@ class _ChatListPageState extends State<ChatListPage> {
           final hasThisFriend = participantIds.contains(friendId);
 
           if (hasCurrentUser && hasThisFriend) {
-            return {conversation.id: conversation.unreadCount ?? 0};
+            return {
+              conversation.id: conversation.unreadCount ?? 0,
+              "firstUnreadMessageIndex":
+                  conversation.firstUnreadMessageIndex ?? -1,
+            };
           }
         }
       }
@@ -261,6 +268,8 @@ class _ChatListPageState extends State<ChatListPage> {
       if (existingConversation != null) {
         final existingConversationId = existingConversation.keys.first;
         final unreadCount = existingConversation[existingConversationId] ?? 0;
+        final firstUnreadMessageIndex =
+            existingConversation["firstUnreadMessageIndex"] ?? -1;
         print(
           'Found existing conversation: $existingConversationId with friend: ${friend.userId}',
         );
@@ -268,6 +277,7 @@ class _ChatListPageState extends State<ChatListPage> {
           existingConversationId,
           friendInfo,
           unreadCount,
+          firstUnreadMessageIndex,
         );
       } else {
         print(
@@ -653,6 +663,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                         conversation.id,
                                         otherParticipant,
                                         conversation.unreadCount ?? 0,
+                                        conversation.firstUnreadMessageIndex,
                                       );
                                     },
                                   ),

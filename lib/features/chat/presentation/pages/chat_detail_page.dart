@@ -41,6 +41,8 @@ class ChatDetailPage extends StatefulWidget {
   final String? conversationId;
   final String? friendId;
   final UserEntity? friendInfo;
+  final int? unreadCount;
+  final int? firstUnreadMessageIndex;
 
   ChatDetailPage({
     super.key,
@@ -49,6 +51,8 @@ class ChatDetailPage extends StatefulWidget {
     this.conversationId,
     this.friendId,
     this.friendInfo,
+    this.unreadCount,
+    this.firstUnreadMessageIndex,
   });
 
   @override
@@ -98,6 +102,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   // Track conversationId khi tạo mới (nếu chỉ có friendId)
   String? _currentConversationId;
   bool _isCreatingConversation = false;
+
+  // Track unread count
+  int? _unreadCount;
 
   // Track input expansion state
   bool _isInputExpanded = false;
@@ -159,6 +166,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   @override
   void initState() {
     super.initState();
+
+    // Khởi tạo unread count từ parameter
+    _unreadCount = widget.unreadCount;
 
     // Khởi tạo AnimationController
     _highlightController = AnimationController(
@@ -1282,6 +1292,17 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                               ),
                                             );
 
+                                        bool isFirstUnreadMessage = false;
+                                        if (widget.firstUnreadMessageIndex !=
+                                            null) {
+                                          isFirstUnreadMessage =
+                                              widget.firstUnreadMessageIndex !=
+                                                  null &&
+                                              currentMessageIndex ==
+                                                  widget
+                                                      .firstUnreadMessageIndex;
+                                        }
+
                                         bool showAvatar = false;
                                         if (!fromMe) {
                                           MessageEntity? nextVisibleMessage;
@@ -1455,6 +1476,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                                 );
                                                               }
                                                             : null,
+                                                        isFirstUnreadMessage:
+                                                            isFirstUnreadMessage,
+                                                        unreadCount:
+                                                            _unreadCount,
                                                       ),
                                                     ),
                                                   ),

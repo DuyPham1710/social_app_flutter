@@ -13,6 +13,7 @@ class ConversationEntity extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int? unreadCount; // số lượng tin nhắn chưa đọc
+  final int? firstUnreadMessageIndex; // Index của tin nhắn chưa đọc đầu tiên
 
   const ConversationEntity({
     required this.id,
@@ -25,6 +26,7 @@ class ConversationEntity extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.unreadCount,
+    this.firstUnreadMessageIndex,
   });
 
   @override
@@ -39,6 +41,7 @@ class ConversationEntity extends Equatable {
     createdAt,
     updatedAt,
     unreadCount,
+    firstUnreadMessageIndex,
   ];
 }
 
