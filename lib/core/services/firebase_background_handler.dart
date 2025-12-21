@@ -9,7 +9,7 @@ import 'package:social_app_fe/core/services/callkit_service.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Initialize Firebase if not already initialized
   await Firebase.initializeApp();
-  
+
   debugPrint('[FCM Background] Message received: ${message.messageId}');
   debugPrint('[FCM Background] Data: ${message.data}');
   debugPrint('[FCM Background] Notification: ${message.notification?.title}');
@@ -17,7 +17,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Handle incoming call
   if (message.data['type'] == 'incoming_call') {
     await _handleBackgroundIncomingCall(message.data);
-  } 
+  }
   // Handle call ended
   else if (message.data['type'] == 'call_ended') {
     await _handleBackgroundCallEnded(message.data);
@@ -28,11 +28,11 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> _handleBackgroundIncomingCall(Map<String, dynamic> data) async {
   try {
     debugPrint('[FCM Background] Handling incoming call: ${data['callId']}');
-    
+
     // Show native call UI using CallKit
     final callKitService = CallKitService();
     await callKitService.showIncomingCall(data);
-    
+
     debugPrint('[FCM Background] Native call UI shown');
   } catch (e) {
     debugPrint('[FCM Background] Error handling incoming call: $e');
@@ -43,21 +43,19 @@ Future<void> _handleBackgroundIncomingCall(Map<String, dynamic> data) async {
 Future<void> _handleBackgroundCallEnded(Map<String, dynamic> data) async {
   try {
     debugPrint('[FCM Background] Handling call ended: ${data['callId']}');
-    
+
     // Dismiss native call UI
     final callKitService = CallKitService();
-    
+
     final callId = data['callId'] as String?;
-    if (callId != null) {
+    if (callId != null && callId.isNotEmpty) {
       await callKitService.endCall(callId);
+      debugPrint('[FCM Background] CallKit UI dismissed for call: $callId');
     } else {
       await callKitService.endAllCalls();
+      debugPrint('[FCM Background] All CallKit UIs dismissed');
     }
-    
-    debugPrint('[FCM Background] Call UI dismissed');
   } catch (e) {
     debugPrint('[FCM Background] Error handling call ended: $e');
   }
 }
-
-

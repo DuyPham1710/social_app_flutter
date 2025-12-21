@@ -25,6 +25,27 @@ class CallKitService {
         _handleCallKitEvent,
       );
 
+      final activeCalls = await getActiveCalls();
+
+      if (activeCalls.isNotEmpty) {
+        //   final callData = activeCalls.first;
+        // Nếu có nhiều cuộc gọi, lấy cuộc gọi cuối cùng
+        final callData = activeCalls.last;
+        if (callData['extra'] != null) {
+          final extra = Map<String, dynamic>.from(callData['extra']);
+
+          // Đợi một chút để main.dart kịp gán callback onCallAccepted
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            if (onCallAccepted != null) {
+              debugPrint('[CallKit] Khôi phục cuộc gọi chờ thành công');
+              onCallAccepted!(extra);
+            } else {
+              debugPrint('[CallKit] Callback vẫn chưa được gán sau 1.2s!');
+            }
+          });
+        }
+      }
+
       debugPrint('[CallKit] Service initialized successfully');
     } catch (e) {
       debugPrint('[CallKit] Error initializing: $e');

@@ -102,7 +102,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> _init() async {
     await _getUserInfo();
     await _initializeServices();
-    // await _checkPendingCall();
   }
 
   Future<void> _getUserInfo() async {
@@ -130,97 +129,6 @@ class _MyAppState extends State<MyApp> {
       debugPrint('[App] Error initializing services: $e');
     }
   }
-
-  // Future<void> _checkPendingCall() async {
-  //   try {
-  //     // Check if app was opened by accepting a call from killed state
-  //     final activeCalls = await CallKitService().getActiveCalls();
-
-  //     if (activeCalls.isEmpty) {
-  //       debugPrint('[App] No active calls found');
-  //       return;
-  //     }
-
-  //     debugPrint('[App] Active calls found: ${activeCalls.length}');
-
-  //     // Get the first active call - safely convert to Map<String, dynamic>
-  //     final activeCallRaw = activeCalls.first;
-  //     if (activeCallRaw is! Map) {
-  //       debugPrint('[App] Invalid active call format, skipping');
-  //       return;
-  //     }
-
-  //     final activeCall = Map<String, dynamic>.from(activeCallRaw);
-
-  //     // Check if app was opened from notification (not just normal app start)
-  //     final from = activeCall['from'] as String?;
-  //     debugPrint('[App] Call opened from: $from');
-
-  //     if (from != 'notification') {
-  //       debugPrint(
-  //         '[App] App opened normally, not from notification. Ignoring old call data.',
-  //       );
-  //       return;
-  //     }
-
-  //     // Extract call data - structure matches what we passed in showIncomingCall
-  //     final callId = activeCall['id'] as String?;
-  //     final extraRaw = activeCall['extra'];
-
-  //     if (callId == null || extraRaw == null || extraRaw is! Map) {
-  //       debugPrint('[App] Invalid call data format, skipping');
-  //       return;
-  //     }
-
-  //     // Convert to Map<String, dynamic> safely
-  //     final extra = Map<String, dynamic>.from(extraRaw);
-
-  //     final receiverId = extra['receiverId'] as String?;
-  //     final callType = extra['callType'] as String? ?? 'video';
-
-  //     if (receiverId == null || userData == null || userData!['id'] == null) {
-  //       debugPrint(
-  //         '[App] Skipping pending call - missing receiverId or user not logged in',
-  //       );
-  //       return;
-  //     }
-
-  //     debugPrint('[App] Processing pending call: $callId');
-
-  //     // Check permissions
-  //     final hasPermissions = await PermissionHelper.checkCallPermissions(
-  //       callType,
-  //     );
-
-  //     if (!hasPermissions) {
-  //       debugPrint('[App] Permissions denied for pending call');
-  //       await CallKitService().endCall(callId);
-  //       return;
-  //     }
-
-  //     // Wait a bit for app to fully initialize
-  //     await Future.delayed(const Duration(seconds: 1));
-
-  //     // Connect to socket and accept call
-  //     if (mounted) {
-  //       final videoCallBloc = context.read<VideoCallBloc>();
-
-  //       final currentUserId = userData!['id'];
-  //       final username = userData!['username'] ?? 'User';
-
-  //       videoCallBloc.add(
-  //         ConnectVideoCall(userId: currentUserId, username: username),
-  //       );
-
-  //       await Future.delayed(const Duration(seconds: 2));
-
-  //       videoCallBloc.add(AcceptCall(userId: receiverId, callId: callId));
-  //     }
-  //   } catch (e, stackTrace) {
-  //     debugPrint('[App] Error checking pending call: $e');
-  //     debugPrint('[App] Stack trace: $stackTrace');
-  //   }
-  // }
 
   void _handleCallAccepted(Map<String, dynamic> callData) async {
     debugPrint('[App] Call accepted from CallKit: $callData');

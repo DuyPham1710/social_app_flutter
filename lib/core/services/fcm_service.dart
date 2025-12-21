@@ -101,8 +101,17 @@ class FcmService {
 
       await _callKitService.showIncomingCall(callData);
     } else if (message.data['type'] == 'call_ended') {
-      // Dismiss call UI
-      await _callKitService.endAllCalls();
+      // Dismiss call UI when caller ends call
+      debugPrint('[FCM] Call ended in foreground, dismissing CallKit UI');
+
+      final callId = message.data['callId'] as String?;
+      if (callId != null && callId.isNotEmpty) {
+        await _callKitService.endCall(callId);
+        debugPrint('[FCM] CallKit UI dismissed for call: $callId');
+      } else {
+        await _callKitService.endAllCalls();
+        debugPrint('[FCM] All CallKit UIs dismissed');
+      }
     }
   }
 

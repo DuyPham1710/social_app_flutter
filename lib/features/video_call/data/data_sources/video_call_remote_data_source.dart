@@ -245,7 +245,7 @@ class VideoCallRemoteDataSource {
     _socketClient.emit('call:accept', {'userId': userId, 'callId': callId});
 
     // Set timeout
-    Timer(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 14), () {
       if (!completer.isCompleted) {
         subscription.cancel();
         completer.completeError(TimeoutException('Accept call timeout'));

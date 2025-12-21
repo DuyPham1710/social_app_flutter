@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/services/callkit_service.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/video_call/domain/entities/video_call_entities.dart';
 import 'package:social_app_fe/features/video_call/domain/usecases/video_call_usecases.dart';
@@ -301,6 +302,21 @@ class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
   }
 
   void _onCallEnded(CallEnded event, Emitter<VideoCallState> emit) {
+    try {
+      // Dismiss CallKit UI when receiving call:ended from socket
+      final callId = event.data['callId'] as String?;
+      if (callId != null && callId.isNotEmpty) {
+        debugPrint('[VideoCallBloc] Dismissing CallKit UI for call: $callId');
+        CallKitService().endCall(callId);
+      } else {
+        // If no callId, dismiss all calls
+        debugPrint('[VideoCallBloc] Dismissing all CallKit UIs');
+        CallKitService().endAllCalls();
+      }
+    } catch (e) {
+      debugPrint('[VideoCallBloc] Error dismissing CallKit UI: $e');
+    }
+
     emit(
       state.copyWith(
         status: VideoCallStatus.callEnded,
