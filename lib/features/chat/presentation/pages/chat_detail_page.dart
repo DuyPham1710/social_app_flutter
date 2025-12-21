@@ -105,6 +105,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   // Track unread count
   int? _unreadCount;
+  int? _firstUnreadMessageIndex;
 
   // Track input expansion state
   bool _isInputExpanded = false;
@@ -169,6 +170,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
     // Khởi tạo unread count từ parameter
     _unreadCount = widget.unreadCount;
+    _firstUnreadMessageIndex = widget.firstUnreadMessageIndex;
 
     // Khởi tạo AnimationController
     _highlightController = AnimationController(
@@ -862,6 +864,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   void _sendMessage() {
+    setState(() {
+      _firstUnreadMessageIndex = null;
+    });
     final text = _messageController.text.trim();
 
     if (text.isEmpty) return;
@@ -1293,14 +1298,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                             );
 
                                         bool isFirstUnreadMessage = false;
-                                        if (widget.firstUnreadMessageIndex !=
-                                            null) {
+                                        if (_firstUnreadMessageIndex != null) {
                                           isFirstUnreadMessage =
-                                              widget.firstUnreadMessageIndex !=
+                                              _firstUnreadMessageIndex !=
                                                   null &&
                                               currentMessageIndex ==
-                                                  widget
-                                                      .firstUnreadMessageIndex;
+                                                  _firstUnreadMessageIndex;
                                         }
 
                                         bool showAvatar = false;
