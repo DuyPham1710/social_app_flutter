@@ -103,40 +103,75 @@ class _NotificationPageState extends State<NotificationPage> {
             }
           },
           onAccept: () async {
+            print(
+              '[NotificationPage] onAccept called for notification: ${notification.id}',
+            );
             _markAsRead(notification.id);
             final targetId = notification.targetId;
             if (targetId == null) return;
+
             final result = await s1<AcceptFriendRequestUseCase>()(targetId);
             if (result is DataStateSuccess) {
-              // also request server to delete notification from DB
-              try {
-                s1<DeleteNotificationUseCase>()(params: notification.id);
-              } catch (_) {}
+              print(
+                '[NotificationPage] Friend request accepted, removing notification from UI',
+              );
+              // Update UI immediately by removing from local state
               context.read<NotificationBloc>().add(
                 RemoveNotification(notification.id),
               );
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Đã chấp nhận lời mời kết bạn')),
+              );
+
+              // Delete from server in background
+              try {
+                s1<DeleteNotificationUseCase>()(params: notification.id);
+                print('[NotificationPage] Notification deleted from server');
+              } catch (e) {
+                print('[NotificationPage] Failed to delete from server: $e');
+              }
             } else {
+              print('[NotificationPage] Friend request failed');
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Chấp nhận thất bại')),
               );
             }
           },
           onRemove: () async {
+            print(
+              '[NotificationPage] onRemove called for notification: ${notification.id}',
+            );
             _markAsRead(notification.id);
             final targetId = notification.targetId;
             if (targetId == null) return;
+
+            // Update UI immediately by removing from local state
+            print('[NotificationPage] Removing notification from UI');
+            context.read<NotificationBloc>().add(
+              RemoveNotification(notification.id),
+            );
+
+            // Then handle server operations
             final result = await s1<RejectFriendRequestUseCase>()(targetId);
             if (result is DataStateSuccess) {
-              try {
-                s1<DeleteNotificationUseCase>()(params: notification.id);
-              } catch (_) {}
-              context.read<NotificationBloc>().add(
-                RemoveNotification(notification.id),
+              print('[NotificationPage] Friend request rejected successfully');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Đã từ chối lời mời kết bạn')),
               );
             } else {
+              print('[NotificationPage] Friend request rejection failed');
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('Xóa thất bại')));
+            }
+
+            // Delete from server in background
+            try {
+              s1<DeleteNotificationUseCase>()(params: notification.id);
+              print('[NotificationPage] Notification deleted from server');
+            } catch (e) {
+              print('[NotificationPage] Failed to delete from server: $e');
             }
           },
         );
@@ -290,6 +325,10 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
+          print(
+            '[NotificationPage] BlocBuilder rebuilding with ${state.notifications.length} notifications',
+          );
+
           // Update scroll listener with current state flags
           if (_scrollListener != null) {
             _scrollController.removeListener(_scrollListener!);
@@ -299,6 +338,7 @@ class _NotificationPageState extends State<NotificationPage> {
           _scrollController.addListener(_scrollListener!);
 
           if (state.notifications.isEmpty) {
+            print('[NotificationPage] No notifications to display');
             return const Center(child: Text('Chưa có thông báo'));
           }
 
