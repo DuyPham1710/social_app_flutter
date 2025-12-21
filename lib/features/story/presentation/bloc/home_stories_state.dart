@@ -23,3 +23,26 @@ class HomeStoriesError extends HomeStoriesState {
   @override
   List<Object?> get props => [message];
 }
+
+class ReactStorySuccess extends HomeStoriesState {
+  final String storyId;
+  const ReactStorySuccess(this.storyId);
+  @override
+  List<Object?> get props => [storyId];
+}
+
+class StoryReactsLoaded extends HomeStoriesState {
+  final String storyId;
+  final List<dynamic> reacts;
+  const StoryReactsLoaded({required this.storyId, required this.reacts});
+  @override
+  List<Object?> get props => [storyId, reacts];
+}
+
+class UserReactStoryChecked extends HomeStoriesState {
+  final String storyId;
+  final Map<String, dynamic>? userReact;
+  const UserReactStoryChecked({required this.storyId, this.userReact});
+  @override
+  List<Object?> get props => [storyId, userReact];
+}

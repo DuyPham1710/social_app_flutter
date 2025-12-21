@@ -38,6 +38,10 @@ mixin _$StoryModel {
   DateTime get expireAt => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  List<ReactStoryModel> get reacts => throw _privateConstructorUsedError;
+  @EmojiConverter()
+  @JsonKey(name: 'isReact')
+  EmojiType? get isReact => throw _privateConstructorUsedError;
 
   /// Serializes this StoryModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -69,6 +73,8 @@ abstract class $StoryModelCopyWith<$Res> {
     DateTime expireAt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<ReactStoryModel> reacts,
+    @EmojiConverter() @JsonKey(name: 'isReact') EmojiType? isReact,
   });
 
   $UserModelCopyWith<$Res> get user;
@@ -102,6 +108,8 @@ class _$StoryModelCopyWithImpl<$Res, $Val extends StoryModel>
     Object? expireAt = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? reacts = null,
+    Object? isReact = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -153,6 +161,14 @@ class _$StoryModelCopyWithImpl<$Res, $Val extends StoryModel>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            reacts: null == reacts
+                ? _value.reacts
+                : reacts // ignore: cast_nullable_to_non_nullable
+                      as List<ReactStoryModel>,
+            isReact: freezed == isReact
+                ? _value.isReact
+                : isReact // ignore: cast_nullable_to_non_nullable
+                      as EmojiType?,
           )
           as $Val,
     );
@@ -205,6 +221,8 @@ abstract class _$$StoryModelImplCopyWith<$Res>
     DateTime expireAt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<ReactStoryModel> reacts,
+    @EmojiConverter() @JsonKey(name: 'isReact') EmojiType? isReact,
   });
 
   @override
@@ -239,6 +257,8 @@ class __$$StoryModelImplCopyWithImpl<$Res>
     Object? expireAt = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? reacts = null,
+    Object? isReact = freezed,
   }) {
     return _then(
       _$StoryModelImpl(
@@ -290,6 +310,14 @@ class __$$StoryModelImplCopyWithImpl<$Res>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        reacts: null == reacts
+            ? _value._reacts
+            : reacts // ignore: cast_nullable_to_non_nullable
+                  as List<ReactStoryModel>,
+        isReact: freezed == isReact
+            ? _value.isReact
+            : isReact // ignore: cast_nullable_to_non_nullable
+                  as EmojiType?,
       ),
     );
   }
@@ -313,8 +341,11 @@ class _$StoryModelImpl implements _StoryModel {
     required this.expireAt,
     this.createdAt,
     this.updatedAt,
+    final List<ReactStoryModel> reacts = const [],
+    @EmojiConverter() @JsonKey(name: 'isReact') this.isReact,
   }) : _friendsExcept = friendsExcept,
-       _friendsDetail = friendsDetail;
+       _friendsDetail = friendsDetail,
+       _reacts = reacts;
 
   factory _$StoryModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$StoryModelImplFromJson(json);
@@ -360,6 +391,19 @@ class _$StoryModelImpl implements _StoryModel {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  final List<ReactStoryModel> _reacts;
+  @override
+  @JsonKey()
+  List<ReactStoryModel> get reacts {
+    if (_reacts is EqualUnmodifiableListView) return _reacts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_reacts);
+  }
+
+  @override
+  @EmojiConverter()
+  @JsonKey(name: 'isReact')
+  final EmojiType? isReact;
 
   @override
   bool operator ==(Object other) {
@@ -389,7 +433,9 @@ class _$StoryModelImpl implements _StoryModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._reacts, _reacts) &&
+            (identical(other.isReact, isReact) || other.isReact == isReact));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -408,6 +454,8 @@ class _$StoryModelImpl implements _StoryModel {
     expireAt,
     createdAt,
     updatedAt,
+    const DeepCollectionEquality().hash(_reacts),
+    isReact,
   );
 
   /// Create a copy of StoryModel
@@ -438,6 +486,8 @@ abstract class _StoryModel implements StoryModel {
     required final DateTime expireAt,
     final DateTime? createdAt,
     final DateTime? updatedAt,
+    final List<ReactStoryModel> reacts,
+    @EmojiConverter() @JsonKey(name: 'isReact') final EmojiType? isReact,
   }) = _$StoryModelImpl;
 
   factory _StoryModel.fromJson(Map<String, dynamic> json) =
@@ -472,6 +522,12 @@ abstract class _StoryModel implements StoryModel {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  List<ReactStoryModel> get reacts;
+  @override
+  @EmojiConverter()
+  @JsonKey(name: 'isReact')
+  EmojiType? get isReact;
 
   /// Create a copy of StoryModel
   /// with the given fields replaced by the non-null parameter values.

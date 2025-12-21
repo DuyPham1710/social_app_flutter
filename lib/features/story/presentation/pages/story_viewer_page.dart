@@ -7,6 +7,8 @@ import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_
 import 'package:social_app_fe/features/story/presentation/widgets/story_background_widget.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_footer_widget.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_header_widget.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/story_react_count_widget.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/story_reacts_bottom_sheet.dart';
 
 class StoryViewerPage extends StatefulWidget {
   final List<GroupedUserStoryEntity> groups;
@@ -265,7 +267,20 @@ class _StoryViewerPageState extends State<StoryViewerPage>
 
   void _onTapDown(TapDownDetails details) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     final dx = details.globalPosition.dx;
+    final dy = details.globalPosition.dy;
+    
+
+    final isOwnStory = _currentStory.user.userId == _currentUserId;
+    final footerHeight = 80.0; // Chiều cao ước tính của footer area
+    final isInFooterArea = dy > (height - footerHeight);
+    
+    // Nếu tap vào footer area và không phải story của chính mình, không xử lý
+    if (!isOwnStory && isInFooterArea) {
+      return;
+    }
+    
     if (dx < width / 2) {
       _onPrev();
     } else {
@@ -418,8 +433,22 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                     currentUserId: _currentUserId,
                   ),
 
-                  // Bottom: comment input + reactions
-                  StoryFooterWidget(textController: _textController),
+                  // Bottom: comment input + reactions (chỉ hiển thị khi không phải story của chính mình)
+                  StoryFooterWidget(
+                    textController: _textController,
+                    story: _currentStory,
+                    currentUserId: _currentUserId,
+                    isOwnStory: _currentStory.user.userId == _currentUserId,
+                  ),
+
+                  // Hiển thị số lượng react ở góc trái dưới cho story của chính mình
+                  if (_currentStory.user.userId == _currentUserId)
+                    StoryReactCountWidget(
+                      story: _currentStory,
+                      onTap: () {
+                        StoryReactsBottomSheet.show(context, story: _currentStory);
+                      },
+                    ),
                 ],
               ),
             ),

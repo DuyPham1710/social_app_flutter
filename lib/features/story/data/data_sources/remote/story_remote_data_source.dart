@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/story/data/models/grouped_story_list_model.dart';
+import 'package:social_app_fe/features/story/data/models/react_story_model.dart';
 import 'package:retrofit/http.dart';
 
 part 'story_remote_data_source.g.dart';
@@ -38,6 +39,37 @@ abstract class StoryRemoteDataSource {
   /// Xóa story
   @DELETE('/story/{storyId}')
   Future<void> deleteStory(
+    @Path('storyId') String storyId,
+  );
+
+  /// Tạo hoặc cập nhật react cho story (trả về null nếu xóa react)
+  @POST('/react-story')
+  Future<ReactStoryModel?> createOrUpdateReactStory(
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// Lấy danh sách react của một story
+  @GET('/react-story/{storyId}')
+  Future<List<ReactStoryModel>> getStoryReacts(
+    @Path('storyId') String storyId,
+  );
+
+  /// Kiểm tra user hiện tại có react story không
+  @GET('/react-story/user/current/{storyId}')
+  Future<Map<String, dynamic>?> checkUserReactStory(
+    @Path('storyId') String storyId,
+  );
+
+  /// Cập nhật react của story
+  @PATCH('/react-story/{storyId}')
+  Future<ReactStoryModel> updateReactStory(
+    @Path('storyId') String storyId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// Xóa react của story
+  @DELETE('/react-story/{storyId}')
+  Future<void> deleteReactStory(
     @Path('storyId') String storyId,
   );
 }

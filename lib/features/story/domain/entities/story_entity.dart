@@ -1,7 +1,9 @@
 import 'package:social_app_fe/core/base/privacy_base.dart';
+import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/enums/media_type.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/story/domain/entities/deezer_music_entity.dart';
+import 'package:social_app_fe/features/story/domain/entities/react_story_entity.dart';
 
 class StoryEntity extends PrivacyBase {
   final String id;
@@ -13,6 +15,8 @@ class StoryEntity extends PrivacyBase {
   final DateTime expireAt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<ReactStoryEntity> reacts;
+  final EmojiType? isReact;
 
   const StoryEntity({
     required this.id,
@@ -24,6 +28,8 @@ class StoryEntity extends PrivacyBase {
     required this.expireAt,
     this.createdAt,
     this.updatedAt,
+    this.reacts = const [],
+    this.isReact,
     required super.privacyType,
     super.friendsExcept,
     super.friendsDetail,

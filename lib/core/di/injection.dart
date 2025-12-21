@@ -93,6 +93,7 @@ import 'package:social_app_fe/features/story/data/repository/story_repository_im
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
 import 'package:social_app_fe/features/story/domain/usecases/create_story_usecase.dart';
 import 'package:social_app_fe/features/story/domain/usecases/get_home_stories_usecase.dart';
+import 'package:social_app_fe/features/story/domain/usecases/react_story_usecase.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/story_create_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
@@ -474,6 +475,21 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<CreateStoryUsecase>(
     () => CreateStoryUsecase(s1()),
   );
+  s1.registerLazySingleton<CreateOrUpdateReactStoryUsecase>(
+    () => CreateOrUpdateReactStoryUsecase(s1()),
+  );
+  s1.registerLazySingleton<GetStoryReactsUsecase>(
+    () => GetStoryReactsUsecase(s1()),
+  );
+  s1.registerLazySingleton<CheckUserReactStoryUsecase>(
+    () => CheckUserReactStoryUsecase(s1()),
+  );
+  s1.registerLazySingleton<UpdateReactStoryUsecase>(
+    () => UpdateReactStoryUsecase(s1()),
+  );
+  s1.registerLazySingleton<DeleteReactStoryUsecase>(
+    () => DeleteReactStoryUsecase(s1()),
+  );
 
   // Privacy UseCases
   s1.registerLazySingleton<GetDefaultPrivacyUseCase>(
@@ -603,7 +619,14 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<HomeStoriesBloc>(
-    () => HomeStoriesBloc(getHomeStoriesUseCase: s1()),
+    () => HomeStoriesBloc(
+      getHomeStoriesUseCase: s1(),
+      createOrUpdateReactStoryUsecase: s1(),
+      getStoryReactsUsecase: s1(),
+      checkUserReactStoryUsecase: s1(),
+      updateReactStoryUsecase: s1(),
+      deleteReactStoryUsecase: s1(),
+    ),
   );
   s1.registerFactory<StoryCreateBloc>(
     () => StoryCreateBloc(s1()),

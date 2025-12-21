@@ -36,6 +36,15 @@ _$StoryModelImpl _$$StoryModelImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      reacts:
+          (json['reacts'] as List<dynamic>?)
+              ?.map((e) => ReactStoryModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      isReact: _$JsonConverterFromJson<Map<String, dynamic>, EmojiType>(
+        json['isReact'],
+        const EmojiConverter().fromJson,
+      ),
     );
 
 Map<String, dynamic> _$$StoryModelImplToJson(_$StoryModelImpl instance) =>
@@ -52,6 +61,11 @@ Map<String, dynamic> _$$StoryModelImplToJson(_$StoryModelImpl instance) =>
       'expireAt': instance.expireAt.toIso8601String(),
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'reacts': instance.reacts,
+      'isReact': _$JsonConverterToJson<Map<String, dynamic>, EmojiType>(
+        instance.isReact,
+        const EmojiConverter().toJson,
+      ),
     };
 
 const _$MediaTypeEnumMap = {
@@ -67,3 +81,13 @@ const _$PrivacyTypeEnumMap = {
   PrivacyType.friendsDetail: 'friends_detail',
   PrivacyType.private: 'private',
 };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);

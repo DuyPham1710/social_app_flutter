@@ -5,6 +5,7 @@ import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/story/data/data_sources/remote/story_remote_data_source.dart';
 import 'package:social_app_fe/features/story/data/models/grouped_story_list_model.dart';
+import 'package:social_app_fe/features/story/data/models/react_story_model.dart';
 import 'package:social_app_fe/features/story/domain/entities/create_story_entity.dart';
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
 
@@ -163,6 +164,78 @@ class StoryRepositoryImpl implements StoryRepository {
   }) async {
     try {
       await remoteDataSource.deleteStory(storyId);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<ReactStoryModel?>> createOrUpdateReactStory({
+    required String storyId,
+    required String emojiId,
+  }) async {
+    try {
+      final response = await remoteDataSource.createOrUpdateReactStory({
+        'storyId': storyId,
+        'emojiId': emojiId,
+      });
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 204 || 
+          (e.response?.statusCode == 200 && e.response?.data == null)) {
+        return DataStateSuccess(null);
+      }
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<List<ReactStoryModel>>> getStoryReacts({
+    required String storyId,
+  }) async {
+    try {
+      final response = await remoteDataSource.getStoryReacts(storyId);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<Map<String, dynamic>?>> checkUserReactStory({
+    required String storyId,
+  }) async {
+    try {
+      final response = await remoteDataSource.checkUserReactStory(storyId);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<ReactStoryModel>> updateReactStory({
+    required String storyId,
+    required String emojiId,
+  }) async {
+    try {
+      final response = await remoteDataSource.updateReactStory(
+        storyId,
+        {'emojiId': emojiId},
+      );
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> deleteReactStory({
+    required String storyId,
+  }) async {
+    try {
+      await remoteDataSource.deleteReactStory(storyId);
       return const DataStateSuccess(null);
     } on DioException catch (e) {
       return DataStateError(e);
