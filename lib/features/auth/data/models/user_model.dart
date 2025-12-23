@@ -7,7 +7,7 @@ part 'user_model.g.dart';
 @freezed
 class UserModel extends UserEntity with _$UserModel {
   const factory UserModel({
-    required String userId,
+    @JsonKey(name: '_id') required String userId,
     @JsonKey(includeIfNull: false) String? fullName,
     @JsonKey(includeIfNull: false) String? phoneNumber,
     @JsonKey(includeIfNull: false) String? bio,
