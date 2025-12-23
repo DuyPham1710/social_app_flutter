@@ -322,6 +322,17 @@ class _NotificationPageState extends State<NotificationPage> {
           'Thông báo',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              // Trigger reload
+              _currentPage = 1; // Reset page counter
+              context.read<NotificationBloc>().add(ReloadNotifications());
+            },
+            tooltip: 'Tải lại thông báo',
+          ),
+        ],
       ),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
@@ -339,7 +350,22 @@ class _NotificationPageState extends State<NotificationPage> {
 
           if (state.notifications.isEmpty) {
             print('[NotificationPage] No notifications to display');
-            return const Center(child: Text('Chưa có thông báo'));
+            return RefreshIndicator(
+              onRefresh: () async {
+                _currentPage = 1;
+                context.read<NotificationBloc>().add(ReloadNotifications());
+                await Future.delayed(const Duration(milliseconds: 800));
+              },
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const [
+                  SizedBox(
+                    height: 400,
+                    child: Center(child: Text('Chưa có thông báo')),
+                  ),
+                ],
+              ),
+            );
           }
 
           // Separate unread and read notifications
@@ -350,63 +376,71 @@ class _NotificationPageState extends State<NotificationPage> {
               .where((n) => n.isRead)
               .toList();
 
-          return ListView(
-            controller: _scrollController,
-            children: [
-              // "Mới" section (unread notifications)
-              if (unreadNotifications.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text(
-                    'Mới',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                ...unreadNotifications.map((n) => _buildNotificationItem(n)),
-              ],
-              // "Cũ hơn" section (read notifications)
-              // Only show title if there are both unread and read notifications
-              if (readNotifications.isNotEmpty &&
-                  unreadNotifications.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                  child: Text(
-                    'Cũ hơn',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-              // Show read notifications (with or without title)
-              if (readNotifications.isNotEmpty)
-                ...readNotifications.map((n) => _buildNotificationItem(n)),
-
-              // Loading indicator when loading more
-              if (state.isLoadingMore)
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-
-              // Show "end of data" message when no more pages
-              if (!state.hasMore && !state.isLoadingMore) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Center(
+          return RefreshIndicator(
+            onRefresh: () async {
+              _currentPage = 1;
+              context.read<NotificationBloc>().add(ReloadNotifications());
+              await Future.delayed(const Duration(milliseconds: 800));
+            },
+            child: ListView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                // "Mới" section (unread notifications)
+                if (unreadNotifications.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
-                      'Đã hiển thị hết thông báo',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
+                      'Mới',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
+                  ...unreadNotifications.map((n) => _buildNotificationItem(n)),
+                ],
+                // "Cũ hơn" section (read notifications)
+                // Only show title if there are both unread and read notifications
+                if (readNotifications.isNotEmpty &&
+                    unreadNotifications.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: Text(
+                      'Cũ hơn',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+                // Show read notifications (with or without title)
+                if (readNotifications.isNotEmpty)
+                  ...readNotifications.map((n) => _buildNotificationItem(n)),
+
+                // Loading indicator when loading more
+                if (state.isLoadingMore)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+
+                // Show "end of data" message when no more pages
+                if (!state.hasMore && !state.isLoadingMore) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        'Đã hiển thị hết thông báo',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           );
         },
       ),

@@ -8,6 +8,8 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_event.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -32,6 +34,14 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       homeBloc.add(const DisconnectChatEvent());
     } catch (e) {
       print('Error disconnecting chat during logout: $e');
+    }
+
+    // Clear notification cache before logout
+    try {
+      final notificationBloc = s1<NotificationBloc>();
+      notificationBloc.add(ClearNotificationCache());
+    } catch (e) {
+      print('Error clearing notification cache during logout: $e');
     }
 
     await TokenStorage.clear();

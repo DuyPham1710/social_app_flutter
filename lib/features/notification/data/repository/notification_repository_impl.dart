@@ -39,4 +39,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   void deleteNotification(String notificationId) =>
       datasource.deleteNotification(notificationId);
+
+  @override
+  void clearCache() => datasource.clearCache();
+
+  @override
+  void dispose() => datasource.dispose();
 }

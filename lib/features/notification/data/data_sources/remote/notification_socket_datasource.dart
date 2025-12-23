@@ -44,11 +44,15 @@ class NotificationSocketDataSource {
     socket.connect(namespace: 'notification', userId: userId);
 
     socket.on('register:ack').listen((_) {
+      print(
+        '[NotificationSocketDataSource] Socket registered, requesting first page',
+      );
       // request first page on register
       loadPage(page: 1, limit: 10);
     });
 
     socket.on('notifications:list').listen((data) {
+      print('[NotificationSocketDataSource] Received notifications:list event');
       final List<NotificationModel> items = [];
       // prefer explicit page from server; otherwise fall back to last requested
       final page = (data != null && data['page'] != null)
@@ -65,6 +69,10 @@ class NotificationSocketDataSource {
           print('Raw item: $e');
         }
       }
+
+      print(
+        '[NotificationSocketDataSource] Parsed ${items.length} notifications for page $page',
+      );
 
       // Determine if more pages available: items < limit means no more data
       final limit = data['limit'] ?? 10;
@@ -105,9 +113,13 @@ class NotificationSocketDataSource {
         }
       }
 
+      print(
+        '[NotificationSocketDataSource] Cache now has ${_cache.length} notifications',
+      );
       _listController.add(List.unmodifiable(_cache));
       _unreadCount = data['unread'] ?? _unreadCount;
       _unreadController.add(_unreadCount);
+      print('[NotificationSocketDataSource] Unread count: $_unreadCount');
     });
 
     socket.on('notification:new').listen((data) {
@@ -191,5 +203,28 @@ class NotificationSocketDataSource {
     print(
       '[NotificationSocketDataSource] Delete notification emitted to server',
     );
+  }
+
+  /// Clear all notification cache (used when logging out)
+  void clearCache() {
+    print('[NotificationSocketDataSource] Clearing cache');
+    _cache.clear();
+    _unreadCount = 0;
+    _lastRequestedPage = 1;
+    _hasMore = true;
+
+    // Reset streams to initial state
+    _listController.add(List.unmodifiable(_cache));
+    _unreadController.add(_unreadCount);
+    _hasMoreController.add(_hasMore);
+
+    print('[NotificationSocketDataSource] Cache cleared');
+  }
+
+  /// Disconnect socket and clear cache
+  void dispose() {
+    print('[NotificationSocketDataSource] Disposing');
+    clearCache();
+    socket.disconnect();
   }
 }

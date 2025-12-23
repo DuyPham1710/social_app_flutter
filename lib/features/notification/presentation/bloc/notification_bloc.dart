@@ -16,6 +16,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
   NotificationBloc(this.repository) : super(NotificationState.initial()) {
     on<LoadMoreNotificationsEvent>(_onLoadMoreNotifications);
+    on<ClearNotificationCache>(_onClearCache);
+    on<ReloadNotifications>(_onReloadNotifications);
     on<ConnectNotificationSocket>((event, emit) {
       repository.connect(event.userId);
 
@@ -152,16 +154,22 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     });
 
     on<RemoveNotification>((event, emit) {
-      print('[NotificationBloc] RemoveNotification event received for id: ${event.id}');
-      print('[NotificationBloc] Current notifications count: ${state.notifications.length}');
-      
+      print(
+        '[NotificationBloc] RemoveNotification event received for id: ${event.id}',
+      );
+      print(
+        '[NotificationBloc] Current notifications count: ${state.notifications.length}',
+      );
+
       final updatedNotifications = state.notifications
           .where((n) => n.id != event.id)
           .toList();
       final unreadCount = updatedNotifications.where((n) => !n.isRead).length;
 
-      print('[NotificationBloc] After filtering, notifications count: ${updatedNotifications.length}');
-      
+      print(
+        '[NotificationBloc] After filtering, notifications count: ${updatedNotifications.length}',
+      );
+
       // Emit updated list immediately
       emit(
         NotificationState(
@@ -171,8 +179,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           isLoadingMore: state.isLoadingMore,
         ),
       );
-      
-      print('[NotificationBloc] New state emitted with ${updatedNotifications.length} notifications');
+
+      print(
+        '[NotificationBloc] New state emitted with ${updatedNotifications.length} notifications',
+      );
 
       // Tell repository to delete from cache and server
       try {
@@ -226,5 +236,36 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     _unreadSub?.cancel();
     _hasMoreSub?.cancel();
     return super.close();
+  }
+
+  Future<void> _onClearCache(
+    ClearNotificationCache event,
+    Emitter<NotificationState> emit,
+  ) async {
+    // Clear cache and reset to initial state
+    repository.clearCache();
+    emit(NotificationState.initial());
+  }
+
+  Future<void> _onReloadNotifications(
+    ReloadNotifications event,
+    Emitter<NotificationState> emit,
+  ) async {
+    // Show loading state while keeping current data
+    emit(
+      NotificationState(
+        notifications: state.notifications,
+        unread: state.unread,
+        hasMore: true,
+        isLoadingMore: true,
+      ),
+    );
+
+    // Clear cache in data layer
+    repository.clearCache();
+
+    // Request first page - when data comes back via stream,
+    // NotificationsLoaded event will update the cache and UI
+    repository.loadPage(page: 1, limit: 10);
   }
 }

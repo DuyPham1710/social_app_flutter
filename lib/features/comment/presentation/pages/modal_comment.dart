@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
@@ -46,10 +48,12 @@ class _ModalCommentState extends State<ModalComment> {
   late CommentBloc _commentBloc;
   late CommentDetailsBloc _commentDetailsBloc;
   late String? _parentId;
-  late ScrollController _listScrollController;
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
   String? _replyingToUserName;
-  String? _targetCommentId; // ID của comment cần highlight
-  String? _targetParentId; // ID của parent comment (nếu target là reply)
+  String? _highlightedCommentId;
+  bool _hasScrolledToComment = false;
 
   String? _currentUserAvatar;
   final GlobalKey<FlutterMentionsState> _mentionKey =
@@ -60,15 +64,10 @@ class _ModalCommentState extends State<ModalComment> {
   List<Map<String, dynamic>> _suggestionList = [];
   Map<String, dynamic>? _tempReplyUser;
 
-  Timer? _scrollTimer;
-  Timer? _highlightTimer;
-
   @override
   void initState() {
     super.initState();
-    //_controller = TextEditingController();
     _focusNode = FocusNode();
-    _listScrollController = ScrollController();
     _parentId = null;
     _loadCurrentUser();
     _loadFriendSuggestions();
@@ -80,17 +79,13 @@ class _ModalCommentState extends State<ModalComment> {
     // Join post khi mở modal
     _commentBloc.add(JoinPostEvent(widget.postId));
 
-    // Load comment details - không clear cache mỗi lần
     _commentDetailsBloc.add(LoadCommentDetailsEvent(widget.postId));
 
-    // Listen text changes để emit typing
-    //_controller.addListener(_onTextChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _mentionsController.addListener(_onTextChanged);
     });
 
     if (widget.isPressComment!) {
-      // Nếu mở modal từ việc nhấn vào biểu tượng bình luận, focus ngay
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _focusNode.requestFocus();
       });
@@ -274,6 +269,69 @@ class _ModalCommentState extends State<ModalComment> {
     FocusScope.of(context).unfocus();
   }
 
+  void _scrollToAndHighlightComment(List<CommentEntity> comments) {
+    if (widget.initialCommentId == null || _hasScrolledToComment) {
+      return; // Đã scroll rồi hoặc không có comment cần highlight
+    }
+
+    // Đánh dấu đã scroll ngay từ đầu để không bao giờ scroll lại
+    _hasScrolledToComment = true;
+
+    final parentComments = comments.where((c) => c.parentId == null).toList();
+
+    // Tìm index của parent comment chứa target
+    int? targetIndex;
+
+    for (int i = 0; i < parentComments.length; i++) {
+      if (parentComments[i].id == widget.initialCommentId) {
+        // Target là parent comment
+        targetIndex = i;
+        break;
+      }
+
+      // Kiểm tra trong replies
+      final replies = comments
+          .where((c) => c.parentId?.id == parentComments[i].id)
+          .toList();
+
+      if (replies.any((r) => r.id == widget.initialCommentId)) {
+        targetIndex = i;
+        break;
+      }
+    }
+
+    if (targetIndex != null) {
+      // Set highlight ngay
+      setState(() {
+        _highlightedCommentId = widget.initialCommentId;
+      });
+
+      // Đợi frame hiện tại render xong rồi scroll (bất đồng bộ thay vì delay cố định)
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        // Double check để chắc chắn ScrollablePositionedList đã attached
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _itemScrollController.isAttached) {
+            _itemScrollController.scrollTo(
+              index: targetIndex!,
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.easeInOut,
+              alignment: 0.1, // Hiển thị gần đầu màn hình
+            );
+          }
+        });
+      });
+
+      // Tự động clear highlight sau 3s
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() {
+            _highlightedCommentId = null;
+          });
+        }
+      });
+    }
+  }
+
   Map<String, List<CommentEntity>> _groupCommentsByParent(
     List<CommentEntity> comments,
   ) {
@@ -309,204 +367,15 @@ class _ModalCommentState extends State<ModalComment> {
     return grouped;
   }
 
-  void _findAndHighlightComment(List<CommentEntity> comments) {
-    print('[Modal] Finding comment: ${widget.initialCommentId}');
-
-    // Cancel previous timers
-    _scrollTimer?.cancel();
-    _highlightTimer?.cancel();
-
-    // Tạo map parentId -> groupedComments
-    Map<String?, List<CommentEntity>> groupedComments = {};
-    List<CommentEntity> parentComments = [];
-
-    for (final comment in comments) {
-      if (comment.parentId == null) {
-        parentComments.add(comment);
-        groupedComments[comment.id] = [];
-      }
-    }
-
-    for (final comment in comments) {
-      if (comment.parentId != null) {
-        groupedComments[comment.parentId]?.add(comment);
-      }
-    }
-
-    // Tìm target comment - có thể là parent hoặc reply
-    String? targetParentId;
-    bool isParent = false;
-    int? targetIndex;
-
-    // Kiểm tra xem có phải parent comment không
-    for (int i = 0; i < parentComments.length; i++) {
-      if (parentComments[i].id == widget.initialCommentId) {
-        targetParentId = parentComments[i].id;
-        targetIndex = i;
-        isParent = true;
-        print('[Modal] Found as parent comment at index: $i');
-        break;
-      }
-    }
-
-    // Nếu không phải parent, tìm trong replies
-    if (!isParent) {
-      for (int i = 0; i < parentComments.length; i++) {
-        for (final reply in groupedComments[parentComments[i].id] ?? []) {
-          if (reply.id == widget.initialCommentId) {
-            targetParentId = parentComments[i].id;
-            targetIndex = i;
-            print(
-              '[Modal] Found as reply comment at parent index: $i, parent: $targetParentId',
-            );
-            break;
-          }
-        }
-        if (targetParentId != null) break;
-      }
-    }
-
-    if (targetParentId != null && targetIndex != null) {
-      print('[Modal] Scrolling to index: $targetIndex first, then highlight');
-
-      // Scroll to target comment first using Timer
-      _scrollTimer = Timer(const Duration(milliseconds: 200), () {
-        if (mounted && _listScrollController.hasClients) {
-          try {
-            final itemHeight = 100.0; // Approximate height of each item
-            final offset = targetIndex! * itemHeight;
-
-            _listScrollController
-                .animateTo(
-                  offset,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                )
-                .then((_) {
-                  // After scroll completed, set highlight
-                  print('[Modal] Scroll completed, setting highlight');
-                  if (mounted) {
-                    setState(() {
-                      _targetCommentId = widget.initialCommentId;
-                      _targetParentId = targetParentId;
-                    });
-
-                    // Remove highlight after 2 seconds using Timer
-                    _highlightTimer = Timer(const Duration(seconds: 2), () {
-                      if (mounted) {
-                        print('[Modal] Removing highlight after 2 seconds');
-                        setState(() {
-                          _targetCommentId = null;
-                          _targetParentId = null;
-                        });
-                      }
-                    });
-                  }
-                });
-          } catch (e) {
-            print('[Modal] Scroll error: $e');
-            // Fallback: just set highlight without scrolling
-            if (mounted) {
-              setState(() {
-                _targetCommentId = widget.initialCommentId;
-                _targetParentId = targetParentId;
-              });
-              _highlightTimer = Timer(const Duration(seconds: 2), () {
-                if (mounted) {
-                  setState(() {
-                    _targetCommentId = null;
-                    _targetParentId = null;
-                  });
-                }
-              });
-            }
-          }
-        }
-      });
-    } else {
-      print('[Modal] Comment not found: ${widget.initialCommentId}');
-    }
-  }
-
-  void _listenForCommentAndScroll() {
-    // Schedule scroll after comments are loaded
-    Future.delayed(const Duration(milliseconds: 500), () {
-      final state = _commentDetailsBloc.state;
-      if (state is CommentDetailsLoaded && mounted) {
-        final comments = state.commentsData!.comments;
-
-        // Tạo map parentId -> groupedComments
-        Map<String?, List<CommentEntity>> groupedComments = {};
-        List<CommentEntity> parentComments = [];
-
-        for (final comment in comments) {
-          if (comment.parentId == null) {
-            parentComments.add(comment);
-            groupedComments[comment.id] = [];
-          }
-        }
-
-        for (final comment in comments) {
-          if (comment.parentId != null) {
-            groupedComments[comment.parentId]?.add(comment);
-          }
-        }
-
-        // Tìm target comment - có thể là parent hoặc reply
-        String? targetParentId;
-        bool isParent = false;
-
-        // Kiểm tra xem có phải parent comment không
-        for (final parent in parentComments) {
-          if (parent.id == widget.initialCommentId) {
-            targetParentId = parent.id;
-            isParent = true;
-            break;
-          }
-        }
-
-        // Nếu không phải parent, tìm trong replies
-        if (!isParent) {
-          for (final entry in groupedComments.entries) {
-            for (final reply in entry.value) {
-              if (reply.id == widget.initialCommentId) {
-                targetParentId = entry.key;
-                break;
-              }
-            }
-            if (targetParentId != null) break;
-          }
-        }
-
-        if (targetParentId != null) {
-          print(
-            'Found target comment: ${widget.initialCommentId}, isParent: $isParent, parentId: $targetParentId',
-          );
-          // Set targetCommentId và targetParentId để highlight
-          setState(() {
-            _targetCommentId = widget.initialCommentId;
-            _targetParentId = targetParentId;
-          });
-        }
-      }
-    });
-  }
-
   @override
   void dispose() {
-    // Cancel any pending timers trước khi dispose
-    _scrollTimer?.cancel();
-    _highlightTimer?.cancel();
-
     // Leave post khi đóng modal
     _commentBloc.add(LeavePostEvent(widget.postId));
     _commentBloc.close();
     _commentDetailsBloc.add(StopListeningCommentsEvent());
     _commentDetailsBloc.close();
-    // _controller.dispose();
     _mentionsController.removeListener(_onTextChanged);
     _focusNode.dispose();
-    _listScrollController.dispose();
     super.dispose();
   }
 
@@ -561,111 +430,129 @@ class _ModalCommentState extends State<ModalComment> {
                   Divider(height: 1.h, color: AppColors.divider),
 
                   Expanded(
-                    child: BlocListener<CommentDetailsBloc, CommentDetailsState>(
-                      listener: (context, state) {
-                        // Khi comments đã load xong, highlight target comment
-                        if (state is CommentDetailsLoaded &&
-                            widget.initialCommentId != null &&
-                            _targetCommentId == null) {
-                          _findAndHighlightComment(
-                            state.commentsData!.comments,
-                          );
-                        }
-                      },
-                      child: BlocBuilder<CommentDetailsBloc, CommentDetailsState>(
-                        builder: (context, state) {
-                          if (state is CommentDetailsLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            );
-                          }
-
-                          if (state is CommentDetailsEmpty) {
-                            return EmptyCommentsWidget(
-                              onTapToComment: () {
-                                _focusNode.requestFocus();
-                              },
-                            );
-                          }
-
-                          if (state is CommentDetailsError) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    size: 48.w,
-                                    color: Colors.red[400],
-                                  ),
-                                  SizedBox(height: 16.h),
-                                  Text(
-                                    state.errorMessage ?? 'Có lỗi xảy ra',
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: Colors.red[600],
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-
-                          if (state is CommentDetailsLoaded) {
-                            final comments = state.commentsData!.comments;
-
-                            final groupedComments = _groupCommentsByParent(
-                              comments,
-                            );
-
-                            final parentComments = comments
-                                .where((c) => c.parentId == null)
-                                .toList();
-
-                            return FutureBuilder<Map<String, dynamic>?>(
-                              future: TokenStorage.getUserData(),
-                              builder: (context, snapshot) {
-                                final currentUserId = snapshot.data?['id'];
-
-                                return ListView.builder(
-                                  controller: _listScrollController,
-                                  itemCount: parentComments.length,
-                                  itemBuilder: (context, index) {
-                                    final parentComment = parentComments[index];
-                                    final replies =
-                                        groupedComments[parentComment.id] ?? [];
-
-                                    // Auto-expand parent nếu target comment là trong replies của nó
-                                    bool shouldShowReplies =
-                                        parentComment.id == _targetParentId &&
-                                        _targetCommentId != null &&
-                                        _targetCommentId != parentComment.id;
-
-                                    return CommentItem(
-                                      comment: parentComment,
-                                      onReply: _handleReply,
-                                      replies: replies,
-                                      showReplies: shouldShowReplies,
-                                      currentUserId: currentUserId,
-                                      onUpdateComment: _handleUpdateComment,
-                                      onDeleteComment: _handleDeleteComment,
-                                      onViewHistory: _handleViewHistory,
-                                      isHighlighted:
-                                          parentComment.id == _targetCommentId,
-                                      targetCommentId: _targetCommentId,
+                    child:
+                        BlocListener<CommentDetailsBloc, CommentDetailsState>(
+                          listener: (context, state) {
+                            // Khi comments đã load xong, scroll và highlight
+                            if (state is CommentDetailsLoaded &&
+                                widget.initialCommentId != null) {
+                              _scrollToAndHighlightComment(
+                                state.commentsData!.comments,
+                              );
+                            }
+                          },
+                          child:
+                              BlocBuilder<
+                                CommentDetailsBloc,
+                                CommentDetailsState
+                              >(
+                                builder: (context, state) {
+                                  if (state is CommentDetailsLoading) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primary,
+                                      ),
                                     );
-                                  },
-                                );
-                              },
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
+                                  }
+
+                                  if (state is CommentDetailsEmpty) {
+                                    return EmptyCommentsWidget(
+                                      onTapToComment: () {
+                                        _focusNode.requestFocus();
+                                      },
+                                    );
+                                  }
+
+                                  if (state is CommentDetailsError) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            size: 48.w,
+                                            color: Colors.red[400],
+                                          ),
+                                          SizedBox(height: 16.h),
+                                          Text(
+                                            state.errorMessage ??
+                                                'Có lỗi xảy ra',
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.red[600],
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  if (state is CommentDetailsLoaded) {
+                                    final comments =
+                                        state.commentsData!.comments;
+
+                                    final groupedComments =
+                                        _groupCommentsByParent(comments);
+
+                                    final parentComments = comments
+                                        .where((c) => c.parentId == null)
+                                        .toList();
+
+                                    return FutureBuilder<Map<String, dynamic>?>(
+                                      future: TokenStorage.getUserData(),
+                                      builder: (context, snapshot) {
+                                        final currentUserId =
+                                            snapshot.data?['id'];
+
+                                        return ScrollablePositionedList.builder(
+                                          itemScrollController:
+                                              _itemScrollController,
+                                          itemPositionsListener:
+                                              _itemPositionsListener,
+                                          itemCount: parentComments.length,
+                                          itemBuilder: (context, index) {
+                                            final parentComment =
+                                                parentComments[index];
+                                            final replies =
+                                                groupedComments[parentComment
+                                                    .id] ??
+                                                [];
+
+                                            // Auto-expand nếu target là reply
+                                            final hasTargetReply = replies.any(
+                                              (r) =>
+                                                  r.id ==
+                                                  widget.initialCommentId,
+                                            );
+
+                                            return CommentItem(
+                                              comment: parentComment,
+                                              onReply: _handleReply,
+                                              replies: replies,
+                                              showReplies: hasTargetReply,
+                                              currentUserId: currentUserId,
+                                              onUpdateComment:
+                                                  _handleUpdateComment,
+                                              onDeleteComment:
+                                                  _handleDeleteComment,
+                                              onViewHistory: _handleViewHistory,
+                                              isHighlighted:
+                                                  parentComment.id ==
+                                                  _highlightedCommentId,
+                                              targetCommentId:
+                                                  _highlightedCommentId,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                        ),
                   ),
 
                   Divider(height: 1.h, color: Colors.grey[300]),

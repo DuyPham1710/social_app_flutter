@@ -45,3 +45,7 @@ class HasMoreUpdated extends NotificationEvent {
   final bool hasMore;
   HasMoreUpdated(this.hasMore);
 }
+
+class ClearNotificationCache extends NotificationEvent {}
+
+class ReloadNotifications extends NotificationEvent {}
