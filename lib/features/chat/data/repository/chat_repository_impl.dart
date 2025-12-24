@@ -144,9 +144,13 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<DataState<void>> leaveConversation({
     required String conversationId,
+    required String userId,
   }) async {
     try {
-      await _remoteDataSource.leaveConversation(conversationId: conversationId);
+      await _remoteDataSource.leaveConversation(
+        conversationId: conversationId,
+        userId: userId,
+      );
       return const DataStateSuccess(null);
     } catch (e) {
       return DataStateError(

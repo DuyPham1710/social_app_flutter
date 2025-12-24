@@ -43,7 +43,10 @@ abstract class ChatRemoteDataSource {
   });
 
   // Leave conversation
-  Future<void> leaveConversation({required String conversationId});
+  Future<void> leaveConversation({
+    required String conversationId,
+    required String userId,
+  });
 
   // Typing events
   void emitTypingStart({

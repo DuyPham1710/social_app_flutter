@@ -130,10 +130,15 @@ class _ChatListPageState extends State<ChatListPage> {
       final conversations = chatState.conversations.data;
 
       // Leave tất cả conversations
-      for (final conversation in conversations) {
-        _conversationBloc.add(
-          LeaveConversationEvent(conversationId: conversation.id),
-        );
+      if (userId != null) {
+        for (final conversation in conversations) {
+          _conversationBloc.add(
+            LeaveConversationEvent(
+              conversationId: conversation.id,
+              userId: userId!,
+            ),
+          );
+        }
       }
 
       print(

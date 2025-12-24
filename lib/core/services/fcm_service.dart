@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
 import 'package:social_app_fe/core/network/dio_client.dart';
+import 'package:http/http.dart' as http;
 
 /// FCM Service to handle Firebase Cloud Messaging
 class FcmService {
@@ -21,9 +22,14 @@ class FcmService {
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
 
+  RemoteMessage? _pendingInitialMessage;
+
   /// Initialize FCM and request permissions
   Future<void> initialize() async {
     try {
+      // Initialize local notifications
+      await _initializeLocalNotifications();
+
       // Create notification channel for Android
       if (Platform.isAndroid) {
         await _createNotificationChannel();
@@ -70,14 +76,56 @@ class FcmService {
       FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
       // Check if app was opened from terminated state
-      final initialMessage = await _firebaseMessaging.getInitialMessage();
-      if (initialMessage != null) {
-        _handleNotificationTap(initialMessage);
+      // Save it to handle later after navigation callback is registered
+      _pendingInitialMessage = await _firebaseMessaging.getInitialMessage();
+      if (_pendingInitialMessage != null) {
+        debugPrint('[FCM] App opened from terminated state with notification');
+        debugPrint('[FCM] Will handle navigation after callback is registered');
       }
 
       debugPrint('[FCM] Service initialized successfully');
     } catch (e) {
       debugPrint('[FCM] Error initializing: $e');
+    }
+  }
+
+  /// Initialize local notifications plugin
+  Future<void> _initializeLocalNotifications() async {
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+    );
+
+    await _localNotifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _onLocalNotificationTap,
+    );
+  }
+
+  /// Handle local notification tap
+  void _onLocalNotificationTap(NotificationResponse response) {
+    debugPrint('[FCM] Local notification tapped: ${response.payload}');
+
+    if (response.payload != null && response.payload!.isNotEmpty) {
+      final parts = response.payload!.split('|');
+      if (parts.length >= 2 && parts[0] == 'new_message') {
+        final conversationId = parts[1];
+        final senderId = parts.length >= 3 ? parts[2] : null;
+        final senderName = parts.length >= 4 ? parts[3] : null;
+        final senderAvatar = parts.length >= 5 ? parts[4] : null;
+        final unreadCount = parts.length >= 6 ? int.tryParse(parts[5]) ?? 0 : 0;
+        final firstUnreadMessageIndex = parts.length >= 7 ? int.tryParse(parts[6]) ?? -1 : -1;
+        _navigateToConversation(
+          conversationId,
+          senderId,
+          senderName,
+          senderAvatar,
+          unreadCount: unreadCount,
+          firstUnreadMessageIndex: firstUnreadMessageIndex,
+        );
+      }
     }
   }
 
@@ -112,6 +160,9 @@ class FcmService {
         await _callKitService.endAllCalls();
         debugPrint('[FCM] All CallKit UIs dismissed');
       }
+    } else if (message.data['type'] == 'new_message') {
+      debugPrint('[FCM] New message in foreground');
+      await _showLocalNotification(message);
     }
   }
 
@@ -120,8 +171,30 @@ class FcmService {
     debugPrint('[FCM] Notification tapped: ${message.messageId}');
     debugPrint('[FCM] Data: ${message.data}');
 
-    // Navigate to appropriate screen based on data
-    // This will be handled by CallKitService
+    final messageType = message.data['type'];
+
+    if (messageType == 'new_message') {
+      // Navigate to chat conversation
+      final conversationId = message.data['conversationId'];
+      final senderId = message.data['senderId'];
+      final senderName = message.data['senderName'];
+      final senderAvatar = message.data['senderAvatar'];
+      final unreadCount = int.tryParse(message.data['unreadCount'] ?? '0') ?? 0;
+      final firstUnreadMessageIndex = int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
+
+      if (conversationId != null && conversationId.isNotEmpty) {
+        debugPrint('[FCM] Navigatingg to conversation: $conversationId');
+        await _navigateToConversation(
+          conversationId,
+          senderId,
+          senderName,
+          senderAvatar,
+          unreadCount: unreadCount,
+          firstUnreadMessageIndex: firstUnreadMessageIndex,
+        );
+      }
+    }
+    // For incoming_call, navigation is handled by CallKitService
   }
 
   /// Send FCM token to backend
@@ -194,7 +267,8 @@ class FcmService {
 
   /// Create notification channel for Android
   Future<void> _createNotificationChannel() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    // Channel for incoming calls
+    const AndroidNotificationChannel callChannel = AndroidNotificationChannel(
       'incoming_call', // id (must match AndroidManifest.xml)
       'Incoming Call', // name
       description: 'Notification channel for incoming calls',
@@ -204,12 +278,193 @@ class FcmService {
       showBadge: true,
     );
 
-    await _localNotifications
+    // Channel for chat messages
+    const AndroidNotificationChannel messageChannel =
+        AndroidNotificationChannel(
+          'chat_messages', // id
+          'Chat Messages', // name
+          description: 'Notification channel for chat messages',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+          showBadge: true,
+        );
+
+    final androidPlugin = _localNotifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(channel);
+        >();
 
-    debugPrint('[FCM] Notification channel created: ${channel.id}');
+    await androidPlugin?.createNotificationChannel(callChannel);
+    await androidPlugin?.createNotificationChannel(messageChannel);
+
+    debugPrint('[FCM] Notification channels created');
+  }
+
+  /// Show local notification for new message
+  Future<void> _showLocalNotification(RemoteMessage message) async {
+    try {
+      final senderName = message.data['senderName'] ?? 'Someone';
+      final messageText = message.data['messageText'] ?? 'New message';
+      final conversationId = message.data['conversationId'] ?? '';
+      final senderId = message.data['senderId'] ?? '';
+      final senderAvatar = message.data['senderAvatar'] ?? '';
+      final unreadCount = int.tryParse(message.data['unreadCount'] ?? '0') ?? 0;
+      final firstUnreadMessageIndex = int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
+
+      // Download avatar image for large icon
+      Uint8List? avatarBytes;
+
+      ByteArrayAndroidBitmap? largeBitmap;
+
+      ByteArrayAndroidIcon? personIcon;
+
+      if (senderAvatar.isNotEmpty) {
+        try {
+          // Download image from URL
+          final http.Response response = await http.get(
+            Uri.parse(senderAvatar),
+          );
+          if (response.statusCode == 200) {
+            // Convert to Android bitmap for large icon
+            avatarBytes = response.bodyBytes;
+
+            largeBitmap = ByteArrayAndroidBitmap(avatarBytes);
+            personIcon = ByteArrayAndroidIcon(avatarBytes);
+          }
+        } catch (e) {
+          debugPrint('[FCM] Error loading avatar: $e');
+        }
+      }
+
+      final AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+            'chat_messages',
+            'Chat Messages',
+            channelDescription: 'Notification channel for chat messages',
+            importance: Importance.high,
+            priority: Priority.high,
+            showWhen: true,
+            largeIcon: largeBitmap,
+            styleInformation: MessagingStyleInformation(
+              Person(name: 'Me', key: 'me'),
+              conversationTitle: senderName,
+              groupConversation: false,
+              messages: [
+                Message(
+                  messageText,
+                  DateTime.now(),
+                  Person(name: senderName, key: senderId, icon: personIcon),
+                ),
+              ],
+            ),
+          );
+
+      final NotificationDetails notificationDetails = NotificationDetails(
+        android: androidDetails,
+      );
+
+      final notificationId = conversationId.hashCode;
+
+      await _localNotifications.show(
+        notificationId,
+        senderName,
+        messageText,
+        notificationDetails,
+        payload:
+            'new_message|$conversationId|$senderId|$senderName|$senderAvatar|$unreadCount|$firstUnreadMessageIndex',
+      );
+
+      debugPrint('[FCM] Local notification shown for message with avatar');
+    } catch (e) {
+      debugPrint('[FCM] Error showing local notification: $e');
+    }
+  }
+
+  /// Handle pending initial message (called after navigation callback is registered)
+  Future<void> handlePendingNavigation() async {
+    if (_pendingInitialMessage != null) {
+      debugPrint('[FCM] Handling pending initial message');
+      await _handleNotificationTap(_pendingInitialMessage!);
+      _pendingInitialMessage = null;
+    }
+  }
+
+  /// Navigate to conversation screen (Chat_detail_page)
+  Future<void> _navigateToConversation(
+    String conversationId,
+    String? senderId,
+    String? senderName,
+    String? senderAvatar, {
+    int unreadCount = 0,
+    int firstUnreadMessageIndex = -1,
+  }) async {
+    try {
+      debugPrint('[FCM] Navigate to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)');
+
+      await NotificationNavigationHelper.navigateToConversation(
+        conversationId,
+        senderId,
+        senderName,
+        senderAvatar,
+        unreadCount: unreadCount,
+        firstUnreadMessageIndex: firstUnreadMessageIndex,
+      );
+    } catch (e) {
+      debugPrint('[FCM] Error navigating to conversation: $e');
+    }
+  }
+}
+
+/// Helper class for navigation from notifications
+class NotificationNavigationHelper {
+  static Function(
+    String conversationId,
+    String? senderId,
+    String? senderName,
+    String? senderAvatar, {
+    int unreadCount,
+    int firstUnreadMessageIndex,
+  })?
+  _navigateToConversationCallback;
+
+  /// Register navigation callback
+  static void registerNavigationCallback(
+    Function(
+      String conversationId,
+      String? senderId,
+      String? senderName,
+      String? senderAvatar, {
+      int unreadCount,
+      int firstUnreadMessageIndex,
+    })
+    callback,
+  ) {
+    _navigateToConversationCallback = callback;
+  }
+
+  /// Navigate to conversation
+  static Future<void> navigateToConversation(
+    String conversationId,
+    String? senderId,
+    String? senderName,
+    String? senderAvatar, {
+    int unreadCount = 0,
+    int firstUnreadMessageIndex = -1,
+  }) async {
+    if (_navigateToConversationCallback != null) {
+      _navigateToConversationCallback!(
+        conversationId,
+        senderId,
+        senderName,
+        senderAvatar,
+        unreadCount: unreadCount,
+        firstUnreadMessageIndex: firstUnreadMessageIndex,
+      );
+    } else {
+      debugPrint(
+        '[NotificationNavigationHelper] No navigation callback registered',
+      );
+    }
   }
 }

@@ -864,9 +864,6 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   void _sendMessage() {
-    setState(() {
-      _firstUnreadMessageIndex = null;
-    });
     final text = _messageController.text.trim();
 
     if (text.isEmpty) return;
@@ -990,6 +987,26 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                               // Listen để detect khi message được update và reload edit logs
                               if (state is MessagesLoaded) {
                                 final currentMessages = state.messages.data;
+
+                                // Check if new messages were added
+                                if (_previousMessages != null &&
+                                    currentMessages.length >
+                                        _previousMessages!.length &&
+                                    _firstUnreadMessageIndex != null) {
+                                  final newMessagesCount =
+                                      currentMessages.length -
+                                      _previousMessages!.length;
+
+                                  setState(() {
+                                    // Increase the index by the number of new messages
+                                    _firstUnreadMessageIndex =
+                                        _firstUnreadMessageIndex! +
+                                        newMessagesCount;
+                                  });
+                                  debugPrint(
+                                    '[ChatDetail] Adjusted unread marker index to $_firstUnreadMessageIndex due to $newMessagesCount new messages',
+                                  );
+                                }
 
                                 // Nếu có previous messages, so sánh để tìm message được update
                                 if (_previousMessages != null) {

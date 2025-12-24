@@ -65,11 +65,15 @@ class JoinConversationEvent extends ConversationEvent {
 
 class LeaveConversationEvent extends ConversationEvent {
   final String conversationId;
+  final String userId;
 
-  const LeaveConversationEvent({required this.conversationId});
+  const LeaveConversationEvent({
+    required this.conversationId,
+    required this.userId,
+  });
 
   @override
-  List<Object?> get props => [conversationId];
+  List<Object?> get props => [conversationId, userId];
 }
 
 class ConversationUpdatedEvent extends ConversationEvent {

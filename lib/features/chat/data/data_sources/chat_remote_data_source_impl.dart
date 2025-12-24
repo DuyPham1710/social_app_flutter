@@ -523,9 +523,12 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<void> leaveConversation({required String conversationId}) async {
+  Future<void> leaveConversation({
+    required String conversationId,
+    required String userId,
+  }) async {
     developer.log(
-      'Leaving conversation: $conversationId',
+      'Leaving conversation: $conversationId (userId: $userId)',
       name: 'ChatDataSource',
     );
 
@@ -543,6 +546,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     try {
       _socketClient.emit('conversation:leave', {
         'conversationId': conversationId,
+        'userId': userId,
       });
 
       developer.log(

@@ -51,18 +51,22 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   Timer? _callTimer;
   Timer? _callTimeoutTimer;
   int _callDuration = 0;
+  late bool _isSpeakerOn; // true = loa ngoài, false = loa trong
   // late VideoCallBloc _videoCallBloc;
   bool _isConnecting = true;
   bool _hasRemoteUserJoined = false; // Track if remote user has EVER joined
   final CallSoundService _soundService = CallSoundService();
 
-  static const int _callTimeoutSeconds = 30;
+  static const int _callTimeoutSeconds = 45;
 
   @override
   void initState() {
     super.initState();
 
     // _videoCallBloc = s1<VideoCallBloc>();
+
+    // Video call: loa ngoài, Audio call: loa trong (Khi bắt đầu)
+    _isSpeakerOn = widget.isVideo;
 
     _initAgora();
     _startCallTimer();
@@ -88,12 +92,18 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       // Register event handlers
       _engine.registerEventHandler(
         RtcEngineEventHandler(
-          onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+          onJoinChannelSuccess: (RtcConnection connection, int elapsed) async {
             if (mounted) {
               setState(() {
                 _localUserJoined = true;
                 _isConnecting = false;
               });
+              // Set speaker mode after successfully joining channel
+              try {
+                await _engine.setEnableSpeakerphone(_isSpeakerOn);
+              } catch (e) {
+                debugPrint('[VideoCall] Failed to set speaker mode: $e');
+              }
             }
           },
           onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
@@ -209,6 +219,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       _isFrontCamera = !_isFrontCamera;
     });
     await _engine.switchCamera();
+  }
+
+  void _toggleSpeaker() async {
+    // Toggle between speaker (loa ngoài) and earpiece (loa trong)
+    setState(() {
+      _isSpeakerOn = !_isSpeakerOn;
+    });
+
+    // Switch between speakerphone and earpiece in Agora
+    await _engine.setEnableSpeakerphone(_isSpeakerOn);
+
+    debugPrint(
+      '[VideoCall] Speaker mode: ${_isSpeakerOn ? "Loa ngoài" : "Loa trong (earpiece)"}',
+    );
   }
 
   Future<void> _endCall() async {
@@ -517,12 +541,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         backgroundColor: Colors.white24,
                       ),
 
-                    // Speaker button
-                    _buildControlButton(
-                      icon: CupertinoIcons.speaker_2,
-                      onPressed: () {},
-                      backgroundColor: Colors.white24,
-                    ),
+                    // Speaker button with volume indicator
+                    _buildSpeakerButton(),
                   ],
                 ),
               ),
@@ -549,6 +569,27 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: Colors.white, size: (size * 0.5).sp),
+      ),
+    );
+  }
+
+  Widget _buildSpeakerButton() {
+    // Icon: speaker_3_fill cho loa ngoài, speaker_1_fill cho loa trong
+    IconData speakerIcon = _isSpeakerOn
+        ? CupertinoIcons
+              .speaker_3_fill // Loa ngoài
+        : CupertinoIcons.speaker_1_fill; // Loa trong (earpiece)
+
+    return GestureDetector(
+      onTap: _toggleSpeaker,
+      child: Container(
+        width: 50.w,
+        height: 50.w,
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(speakerIcon, color: Colors.white, size: 25.sp),
       ),
     );
   }

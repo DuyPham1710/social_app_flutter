@@ -22,6 +22,10 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   else if (message.data['type'] == 'call_ended') {
     await _handleBackgroundCallEnded(message.data);
   }
+  // Handle new message
+  else if (message.data['type'] == 'new_message') {
+    await _handleBackgroundNewMessage(message.data);
+  }
 }
 
 /// Handle incoming call in background/terminated state
@@ -57,5 +61,18 @@ Future<void> _handleBackgroundCallEnded(Map<String, dynamic> data) async {
     }
   } catch (e) {
     debugPrint('[FCM Background] Error handling call ended: $e');
+  }
+}
+
+/// Handle new message in background/terminated state
+Future<void> _handleBackgroundNewMessage(Map<String, dynamic> data) async {
+  try {
+    debugPrint('[FCM Background] Handling new message: ${data['messageId']}');
+    debugPrint('[FCM Background] Conversation: ${data['conversationId']}');
+
+    // The notification will be automatically shown by FCM
+    // When user taps it, the app will open and handle navigation in FCM service
+  } catch (e) {
+    debugPrint('[FCM Background] Error handling new message: $e');
   }
 }
