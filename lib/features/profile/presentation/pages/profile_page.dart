@@ -58,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
         listener: (context, state) {
           if (state is ProfileError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Lỗi tải bài viết')),
+              SnackBar(content: Text('Lỗi tải bài viết')),
             );
           }
         },

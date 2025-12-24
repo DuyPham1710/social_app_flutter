@@ -57,13 +57,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
 
     if (!hasMore || isLoadingMore) return;
 
-    bloc.add(
-      LoadFriendSuggestions(
-        page: nextPage,
-        limit: 10,
-        append: true,
-      ),
-    );
+    bloc.add(LoadFriendSuggestions(page: nextPage, limit: 10, append: true));
   }
 
   @override
@@ -71,6 +65,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -88,7 +83,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {
+            onPressed: () {
               Navigator.pushNamed(context, '/search');
             },
             icon: const Icon(CupertinoIcons.search, color: Colors.black),
@@ -215,8 +210,8 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                itemCount: friendSuggestions.length +
-                    (_isLoadingMore(state) ? 1 : 0),
+                itemCount:
+                    friendSuggestions.length + (_isLoadingMore(state) ? 1 : 0),
                 separatorBuilder: (context, index) => SizedBox(height: 8.h),
                 itemBuilder: (context, index) {
                   if (_isLoadingMore(state) &&
@@ -335,7 +330,9 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         userId: suggestion.userId,
         name: suggestion.fullName ?? 'Người dùng',
         mutualFriends: suggestion.mutualFriends ?? 0,
-        avatarUrl: suggestion.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+        avatarUrl:
+            suggestion.avatarUrl ??
+            'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
         mutualFriendAvatars: suggestion.mutualFriendAvatars,
         isSent: isSent,
         onAddFriend: () {

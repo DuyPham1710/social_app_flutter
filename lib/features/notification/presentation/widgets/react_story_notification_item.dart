@@ -62,7 +62,7 @@ class ReactStoryNotificationItem extends StatelessWidget {
       time: time,
       iconOverlay: CircleAvatar(
         radius: 12,
-        backgroundColor: const Color.fromARGB(255, 205, 206, 205),
+        backgroundColor: const Color.fromARGB(255, 196, 250, 241),
         child: Text(emoji.icon, style: const TextStyle(fontSize: 14)),
       ),
     );

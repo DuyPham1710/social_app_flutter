@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 // Thay đổi đường dẫn theo dự án của bạn
-import 'package:social_app_fe/features/profile/domain/entities/update_user_entity.dart'; 
+import 'package:social_app_fe/features/profile/domain/entities/update_user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart'; // Cần để dùng BlocListener
@@ -14,7 +14,7 @@ import 'package:social_app_fe/features/profile/presentation/widgets/editable_ima
 import 'package:social_app_fe/features/profile/presentation/widgets/editable_text_row.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_detail_info_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/section_header.dart';
-
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class ProfileEditPage extends StatefulWidget {
   final UserEntity? user;
@@ -26,7 +26,6 @@ class ProfileEditPage extends StatefulWidget {
 }
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
-  
   // --- BottomSheet dùng chung cho Tên và Tiểu sử ---
   void _showEditBottomSheet({
     required BuildContext context,
@@ -36,8 +35,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     int maxLength = 100,
     int maxLines = 1,
   }) {
-    final TextEditingController controller = TextEditingController(text: initialValue);
-    
+    final TextEditingController controller = TextEditingController(
+      text: initialValue,
+    );
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -47,7 +48,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       builder: (BuildContext context) {
         return Padding(
           padding: EdgeInsets.only(
-            left: 16, right: 16, top: 16,
+            left: 16,
+            right: 16,
+            top: 16,
             bottom: MediaQuery.of(context).viewInsets.bottom + 16,
           ),
           child: Column(
@@ -56,7 +59,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -71,7 +80,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 maxLength: maxLength,
                 autofocus: true,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                   hintText: "Nhập $title...",
@@ -85,13 +96,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () {
                     onSave(controller.text.trim());
                     Navigator.pop(context);
                   },
-                  child: const Text("Lưu", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    "Lưu",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
@@ -106,12 +122,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => 
-        // Cần truyền ProfileBloc sang trang con để trang con có thể gọi event update
-        SingleImagePickerPage(
-          isAvatar: isAvatar,
-          profileBloc: context.read<ProfileBloc>(), 
-        ),
+        builder: (_) =>
+            // Cần truyền ProfileBloc sang trang con để trang con có thể gọi event update
+            SingleImagePickerPage(
+              isAvatar: isAvatar,
+              profileBloc: context.read<ProfileBloc>(),
+            ),
       ),
     );
   }
@@ -121,7 +137,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value( // Cung cấp lại Bloc cho trang con
+        builder: (_) => BlocProvider.value(
+          // Cung cấp lại Bloc cho trang con
           value: context.read<ProfileBloc>(),
           child: ProfileDetailEditPage(user: widget.user),
         ),
@@ -138,12 +155,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         if (state is ProfileLoaded) {
           if (state.updateSuccess) {
             // Sau khi cập nhật thành công, quay lại trang ProfilePage
-            Navigator.pop(context); 
+            Navigator.pop(context);
             // Trang ProfilePage cha sẽ tự động tải lại dữ liệu (như đã thiết lập ở file trước)
           } else if (state.updateError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.updateError!), backgroundColor: Colors.red),
-            );
+            showErrorSnackBar(context, 'Cập nhật thất bại');
           }
         }
       },
@@ -160,7 +175,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
             const SizedBox(height: 24),
-            
+
             // --- TÊN NGƯỜI DÙNG ---
             SectionHeader(
               title: "Tên người dùng",
@@ -172,7 +187,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 onSave: (newName) {
                   if (newName.isNotEmpty) {
                     context.read<ProfileBloc>().add(
-                      UpdateUserProfileEvent(UpdateUserEntity(fullName: newName))
+                      UpdateUserProfileEvent(
+                        UpdateUserEntity(fullName: newName),
+                      ),
                     );
                   }
                 },
@@ -189,7 +206,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             const SizedBox(height: 8),
             Center(
               child: EditableImage(
-                imageUrl: widget.user?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                imageUrl:
+                    widget.user?.avatarUrl ??
+                    "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                 isAvatarCircle: true,
                 onEditTap: () => _navigateToImagePicker(true),
               ),
@@ -200,11 +219,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             // --- ẢNH BÌA ---
             SectionHeader(
               title: "Ảnh bìa",
-              onEditTap: () => _navigateToImagePicker(false), // isAvatar = false
+              onEditTap: () =>
+                  _navigateToImagePicker(false), // isAvatar = false
             ),
             const SizedBox(height: 8),
             EditableImage(
-              imageUrl: widget.user?.coverUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg",
+              imageUrl:
+                  widget.user?.coverUrl ??
+                  "https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg",
               borderRadius: 12,
               onEditTap: () => _navigateToImagePicker(false),
             ),
@@ -219,10 +241,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 title: "Chỉnh sửa tiểu sử",
                 initialValue: widget.user?.bio,
                 maxLines: 3,
-                maxLength: 100, 
+                maxLength: 100,
                 onSave: (newBio) {
                   context.read<ProfileBloc>().add(
-                    UpdateUserProfileEvent(UpdateUserEntity(bio: newBio))
+                    UpdateUserProfileEvent(UpdateUserEntity(bio: newBio)),
                   );
                 },
               ),

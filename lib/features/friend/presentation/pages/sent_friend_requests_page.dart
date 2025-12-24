@@ -26,6 +26,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -43,7 +44,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {
+            onPressed: () {
               Navigator.pushNamed(context, '/search');
             },
             icon: const Icon(CupertinoIcons.search, color: Colors.black),

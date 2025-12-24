@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/post_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_story_notification_item.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
@@ -11,6 +10,8 @@ import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_e
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import '../bloc/notification_bloc.dart';
 import '../bloc/notification_event.dart';
 import '../bloc/notification_state.dart';
@@ -106,73 +107,10 @@ class _NotificationPageState extends State<NotificationPage> {
             }
           },
           onAccept: () async {
-            print(
-              '[NotificationPage] onAccept called for notification: ${notification.id}',
-            );
-            final targetId = notification.targetId;
-            if (targetId == null) return;
-
-            final result = await s1<AcceptFriendRequestUseCase>()(targetId);
-            if (result is DataStateSuccess) {
-              print(
-                '[NotificationPage] Friend request accepted, removing notification from UI',
-              );
-              // Update UI immediately by removing from local state
-              context.read<NotificationBloc>().add(
-                RemoveNotification(notification.id),
-              );
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã chấp nhận lời mời kết bạn')),
-              );
-
-              try {
-                s1<DeleteNotificationUseCase>()(params: notification.id);
-                print('[NotificationPage] Notification deleted from server');
-              } catch (e) {
-                print('[NotificationPage] Failed to delete from server: $e');
-              }
-            } else {
-              print('[NotificationPage] Friend request failed');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Chấp nhận thất bại')),
-              );
-            }
+            _handleAcceptFriendRequest(notification);
           },
           onRemove: () async {
-            print(
-              '[NotificationPage] onRemove called for notification: ${notification.id}',
-            );
-            final targetId = notification.targetId;
-            if (targetId == null) return;
-
-            // Update UI immediately by removing from local state
-            print('[NotificationPage] Removing notification from UI');
-            context.read<NotificationBloc>().add(
-              RemoveNotification(notification.id),
-            );
-
-            // Then handle server operations
-            final result = await s1<RejectFriendRequestUseCase>()(targetId);
-            if (result is DataStateSuccess) {
-              print('[NotificationPage] Friend request rejected successfully');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã từ chối lời mời kết bạn')),
-              );
-            } else {
-              print('[NotificationPage] Friend request rejection failed');
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Xóa thất bại')));
-            }
-
-            // Delete from server in background
-            try {
-              s1<DeleteNotificationUseCase>()(params: notification.id);
-              print('[NotificationPage] Notification deleted from server');
-            } catch (e) {
-              print('[NotificationPage] Failed to delete from server: $e');
-            }
+            _handleCancelFriendRequest(notification);
           },
         );
 
@@ -187,24 +125,30 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           onUserTap: () {
-            if (notification.sender?.userId != null) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => s1<OtherProfileBloc>()
-                      ..add(
-                        LoadOtherUserProfileEvent(
-                          userId: notification.sender!.userId,
-                        ),
-                      ),
-                    child: OtherProfilePage(
-                      userId: notification.sender!.userId,
-                    ),
-                  ),
-                ),
-              );
-            }
+            _handleViewerProfileTap(context, notification);
+          },
+          onMessageTap: () {
+            _navigateToCommentInPost(
+              postId: notification.content,
+              commentId: notification.targetId,
+              notificationId: notification.id,
+            );
+            // _markAsRead(notification.id);
+          },
+        );
+
+      case NotificationType.COMMENT_REACTION:
+        return CommentNotificationItem(
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+          userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
+          content: notification.message,
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+          onUserTap: () {
+            _handleViewerProfileTap(context, notification);
           },
           onMessageTap: () {
             _navigateToCommentInPost(
@@ -216,7 +160,7 @@ class _NotificationPageState extends State<NotificationPage> {
           },
         );
       case NotificationType.UNKNOWN:
-        throw UnimplementedError();
+        return const SizedBox.shrink();
       case NotificationType.POST_REACTION:
         return ReactPostNotificationItem(
           avatarUrl:
@@ -230,85 +174,14 @@ class _NotificationPageState extends State<NotificationPage> {
           isRead: notification.isRead,
           postId: notification.targetId,
           onUserTap: () {
-            if (notification.sender?.userId != null) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => s1<OtherProfileBloc>()
-                      ..add(
-                        LoadOtherUserProfileEvent(
-                          userId: notification.sender!.userId,
-                        ),
-                      ),
-                    child: OtherProfilePage(
-                      userId: notification.sender!.userId,
-                    ),
-                  ),
-                ),
-              );
-            }
+            _handleViewerProfileTap(context, notification);
           },
           onMessageTap: () async {
             // _markAsRead(notification.id);
-            final postId = notification.targetId;
-            if (postId != null && postId.isNotEmpty) {
-              // Navigate to loading page with smooth fade animation
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      const _PostLoadingPage(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                  transitionDuration: const Duration(milliseconds: 300),
-                ),
-              );
-
-              // Load post
-              GetPostDetailParams params = GetPostDetailParams(postId: postId);
-              final result = await s1<GetPostDetailUsecase>()(params: params);
-
-              if (context.mounted) {
-                if (result is DataStateSuccess && result.data != null) {
-                  // Replace loading page with post detail
-                  Navigator.of(context).pushReplacement(
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          PostDetailPage(post: result.data!),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
-                          },
-                      transitionDuration: const Duration(milliseconds: 300),
-                    ),
-                  );
-                } else {
-                  // Post doesn't exist or error loading
-                  Navigator.of(context).pop(); // Close loading page
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Bài viết không tồn tại')),
-                  );
-
-                  // Delete the notification
-                  try {
-                    s1<DeleteNotificationUseCase>()(params: notification.id);
-                  } catch (_) {}
-                  context.read<NotificationBloc>().add(
-                    RemoveNotification(notification.id),
-                  );
-                }
-              }
-            }
+            _handleJumpToPost(notification);
           },
         );
-      case NotificationType.STORY_REACT:
+      case NotificationType.STORY_REACTION:
         return ReactStoryNotificationItem(
           avatarUrl:
               notification.sender?.avatarUrl ??
@@ -321,24 +194,7 @@ class _NotificationPageState extends State<NotificationPage> {
           isRead: notification.isRead,
           storyId: notification.targetId,
           onUserTap: () {
-            if (notification.sender?.userId != null) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => s1<OtherProfileBloc>()
-                      ..add(
-                        LoadOtherUserProfileEvent(
-                          userId: notification.sender!.userId,
-                        ),
-                      ),
-                    child: OtherProfilePage(
-                      userId: notification.sender!.userId,
-                    ),
-                  ),
-                ),
-              );
-            }
+            _handleViewerProfileTap(context, notification.sender?.userId);
           },
           onMessageTap: () {
             // Currently no action defined for story react message tap
@@ -504,7 +360,7 @@ class _NotificationPageState extends State<NotificationPage> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const _PostLoadingPage(),
+            const PostLoadingPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -538,9 +394,7 @@ class _NotificationPageState extends State<NotificationPage> {
         // Post doesn't exist or error loading
         Navigator.of(context).pop(); // Close loading page
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Bài viết không tồn tại')));
+        showErrorSnackBar(context, 'Bài viết không tồn tại');
 
         // Delete the notification
         try {
@@ -561,111 +415,111 @@ class _NotificationPageState extends State<NotificationPage> {
     _scrollController.dispose();
     super.dispose();
   }
-}
 
-class _PostLoadingPage extends StatelessWidget {
-  const _PostLoadingPage();
+  Future<void> _handleAcceptFriendRequest(notification) async {
+    final targetId = notification.targetId;
+    if (targetId == null) return;
+    context.read<NotificationBloc>().add(RemoveNotification(notification.id));
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Top Bar giả (Khớp với nút back và tên tiêu đề)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 10,
-                ),
-                child: Row(
-                  children: [
-                    // Giả lập nút Back
-                    _buildBox(width: 30, height: 30, radius: 8),
-                    const SizedBox(width: 60), // Khoảng cách tới title
-                    // Giả lập Title chính giữa/phía sau
-                    _buildBox(width: 150, height: 24, radius: 8),
-                  ],
-                ),
-              ),
-              const Divider(thickness: 1, color: Colors.white), // Đường kẻ mờ
+    final result = await s1<AcceptFriendRequestUseCase>()(targetId);
+    if (result is DataStateSuccess) {
+      // Update UI immediately by removing from local state
+      showSuccessSnackBar(context, "Đã chấp nhận lời mời kết bạn");
+    } else {
+      showErrorSnackBar(context, "Lời mời kết bạn không tồn tại");
+    }
 
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 2. Header: Avatar + Tên người đăng
-                    Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white,
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildBox(width: 160, height: 16, radius: 10),
-                            const SizedBox(height: 8),
-                            _buildBox(width: 100, height: 12, radius: 10),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // 3. Text lines (Nội dung ngắn)
-                    _buildBox(width: double.infinity, height: 14, radius: 10),
-                    const SizedBox(height: 8),
-                    _buildBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: 14,
-                      radius: 10,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // 4. Post Body (Khung ảnh)
-                    _buildBox(width: double.infinity, height: 250, radius: 15),
-                    const SizedBox(height: 20),
-
-                    // 5. Action Buttons (Like, Comment, Share)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildBox(width: 85, height: 35, radius: 20),
-                        _buildBox(width: 85, height: 35, radius: 20),
-                        _buildBox(width: 85, height: 35, radius: 20),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    try {
+      s1<DeleteNotificationUseCase>()(params: notification.id);
+    } catch (e) {}
   }
 
-  Widget _buildBox({
-    required double width,
-    required double height,
-    required double radius,
-  }) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
+  Future<void> _handleCancelFriendRequest(notification) async {
+    final targetId = notification.targetId;
+    if (targetId == null) return;
+
+    context.read<NotificationBloc>().add(RemoveNotification(notification.id));
+
+    // Then handle server operations
+    final result = await s1<RejectFriendRequestUseCase>()(targetId);
+    if (result is DataStateSuccess) {
+      showSuccessSnackBar(context, "Đã từ chối lời mời kết bạn");
+    } else {
+      showErrorSnackBar(context, "Lời mời kết bạn không tồn tại");
+    }
+
+    // Delete from server in background
+    try {
+      s1<DeleteNotificationUseCase>()(params: notification.id);
+    } catch (e) {}
+  }
+
+  void _handleViewerProfileTap(BuildContext context, notification) {
+    if (notification.sender?.userId != null) {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => s1<OtherProfileBloc>()
+              ..add(
+                LoadOtherUserProfileEvent(userId: notification.sender!.userId),
+              ),
+            child: OtherProfilePage(userId: notification.sender!.userId),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleJumpToPost(notification) async {
+    final postId = notification.targetId;
+    if (postId != null && postId.isNotEmpty) {
+      // Navigate to loading page with smooth fade animation
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const PostLoadingPage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+      );
+
+      // Load post
+      GetPostDetailParams params = GetPostDetailParams(postId: postId);
+      final result = await s1<GetPostDetailUsecase>()(params: params);
+
+      if (context.mounted) {
+        if (result is DataStateSuccess && result.data != null) {
+          // Replace loading page with post detail
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  PostDetailPage(post: result.data!),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 300),
+            ),
+          );
+        } else {
+          // Post doesn't exist or error loading
+          Navigator.of(context).pop(); // Close loading page
+
+          showErrorSnackBar(context, 'Bài viết không tồn tại');
+
+          // Delete the notification
+          try {
+            s1<DeleteNotificationUseCase>()(params: notification.id);
+          } catch (_) {}
+          context.read<NotificationBloc>().add(
+            RemoveNotification(notification.id),
+          );
+        }
+      }
+    }
   }
 }
