@@ -12,12 +12,17 @@ class LeaveConversationUseCase
   Future<DataState<void>> call({LeaveConversationParams? params}) async {
     return await _chatRepository.leaveConversation(
       conversationId: params!.conversationId,
+      userId: params.userId,
     );
   }
 }
 
 class LeaveConversationParams {
   final String conversationId;
+  final String userId;
 
-  const LeaveConversationParams({required this.conversationId});
+  const LeaveConversationParams({
+    required this.conversationId,
+    required this.userId,
+  });
 }

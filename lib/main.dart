@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/config/theme/app_theme.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
@@ -23,7 +24,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/otp_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/personal_info_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/register_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/reset_password_page.dart';
-import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_bloc.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
@@ -37,6 +38,8 @@ import 'package:social_app_fe/features/search/presentation/pages/search_page.dar
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
 import 'package:social_app_fe/firebase_options.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -123,6 +126,15 @@ class _MyAppState extends State<MyApp> {
       CallKitService().onCallAccepted = _handleCallAccepted;
       CallKitService().onCallRejected = _handleCallRejected;
       CallKitService().onCallEnded = _handleCallEnded;
+
+      // Register navigation callback for chat notifications
+      NotificationNavigationHelper.registerNavigationCallback(
+        _handleNavigateToConversation,
+      );
+
+      // Handle pending notification if app was opened from terminated state
+      debugPrint('[App] Checking for pending notification navigation...');
+      await FcmService().handlePendingNavigation();
 
       debugPrint('[App] Services initialized successfully');
     } catch (e) {
@@ -214,6 +226,165 @@ class _MyAppState extends State<MyApp> {
     // The call already ended on the other side
   }
 
+  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+    if (settings.name == '/chat-detail') {
+      final args = settings.arguments as Map<String, dynamic>?;
+      if (args != null && args['conversationId'] != null) {
+        final conversationId = args['conversationId'] as String;
+        final senderId = args['senderId'] as String?;
+        final senderName = args['senderName'] as String?;
+        final senderAvatar = args['senderAvatar'] as String?;
+        final unreadCount = args['unreadCount'] as int? ?? 0;
+        final firstUnreadMessageIndex = args['firstUnreadMessageIndex'] as int? ?? -1;
+
+        debugPrint(
+          '[App] Navigating to ChatDetailPage for conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)',
+        );
+
+        // Create MessageBloc instance
+        final messageBloc = s1<MessageBloc>();
+
+        // Create friendInfo from notification data
+        UserEntity? friendInfo;
+        if (senderId != null && senderName != null) {
+          friendInfo = UserEntity(
+            userId: senderId,
+            fullName: senderName,
+            avatarUrl: senderAvatar,
+          );
+          debugPrint(
+            '[App] Created friendInfo from notification data: $senderName',
+          );
+        }
+
+        return MaterialPageRoute(
+          builder: (context) => FutureBuilder<Map<String, dynamic>?>(
+            future: userData != null
+                ? Future.value(userData)
+                : TokenStorage.getUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  ),
+                );
+              }
+
+              final currentUserData = snapshot.data;
+              final userId = currentUserData?['id'];
+              final username = currentUserData?['username'];
+
+              if (userId == null || username == null) {
+                return Scaffold(
+                  appBar: AppBar(title: const Text('Error')),
+                  body: const Center(child: Text('Unable to load user data')),
+                );
+              }
+
+              messageBloc.add(
+                MarkAsReadEvent(
+                  userId: userId!,
+                  conversationId: conversationId,
+                ),
+              );
+
+              return BlocProvider<MessageBloc>(
+                create: (_) => messageBloc,
+                child: ChatDetailPage(
+                  userId: userId,
+                  username: username,
+                  conversationId: conversationId,
+                  friendInfo: friendInfo,
+                  friendId: senderId,
+                  unreadCount: unreadCount,
+                  firstUnreadMessageIndex: firstUnreadMessageIndex != -1 ? firstUnreadMessageIndex : null,
+                ),
+              );
+            },
+          ),
+        );
+      }
+    }
+    return null;
+  }
+
+  void _handleNavigateToConversation(
+    String conversationId,
+    String? senderId,
+    String? senderName,
+    String? senderAvatar, {
+    int unreadCount = 0,
+    int firstUnreadMessageIndex = -1,
+  }) async {
+    debugPrint('[App] Navigating to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)');
+
+    try {
+      // Navigate to main first
+      // await _navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      //   '/main',
+      //   (route) => false,
+      // );
+
+      // Wait for main page to build
+      await Future.delayed(const Duration(milliseconds: 400));
+
+      // Get current context
+      final context = _navigatorKey.currentContext;
+      if (context == null || !context.mounted) {
+        debugPrint('[App] Context not available');
+        return;
+      }
+
+      try {
+        debugPrint('[App] joining conversation...');
+
+        // Join conversation before navigating to chat detail
+        final conversationBloc = context.read<ConversationBloc>();
+        conversationBloc.add(
+          JoinConversationEvent(
+            userId: userData?['id'] ?? '',
+            conversationId: conversationId,
+          ),
+        );
+
+        // Wait for join to complete
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        debugPrint('[App] Joined conversation, proceeding to chat detail page');
+      } catch (e) {
+        debugPrint('[App] Error ensuring chat socket: $e');
+        // Continue anyway, ChatDetailPage will handle the error
+      }
+
+      await Navigator.of(context)
+          .pushNamed(
+            '/chat-detail',
+            arguments: {
+              'conversationId': conversationId,
+              'senderId': senderId,
+              'senderName': senderName,
+              'senderAvatar': senderAvatar,
+              'unreadCount': unreadCount,
+              'firstUnreadMessageIndex': firstUnreadMessageIndex,
+            },
+          )
+          .then((_) {
+            final userId = userData?['id'];
+            if (userId != null) {
+              context.read<ConversationBloc>().add(
+                LeaveConversationEvent(
+                  conversationId: conversationId,
+                  userId: userId,
+                ),
+              );
+            }
+          });
+    } catch (e) {
+      debugPrint('[App] Error navigating to conversation: $e');
+    }
+  }
+
   bool _isNavigatingToCall = false;
 
   void _handleVideoCallStateChange(BuildContext context, VideoCallState state) {
@@ -284,6 +455,7 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             theme: theme(),
             initialRoute: '/splash',
+            onGenerateRoute: _onGenerateRoute,
             routes: <String, WidgetBuilder>{
               '/splash': (context) => const SplashPage(),
               '/main': (BuildContext context) => MainPage(userData: userData),

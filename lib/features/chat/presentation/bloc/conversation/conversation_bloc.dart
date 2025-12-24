@@ -229,7 +229,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   ) async {
     try {
       final result = await _leaveConversationUseCase(
-        params: LeaveConversationParams(conversationId: event.conversationId),
+        params: LeaveConversationParams(
+          conversationId: event.conversationId,
+          userId: event.userId,
+        ),
       );
 
       if (result is DataStateSuccess) {

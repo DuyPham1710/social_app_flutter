@@ -45,7 +45,10 @@ abstract class ChatRepository {
     required String conversationId,
   });
 
-  Future<DataState<void>> leaveConversation({required String conversationId});
+  Future<DataState<void>> leaveConversation({
+    required String conversationId,
+    required String userId,
+  });
 
   // Typing events
   void emitTypingStart({
