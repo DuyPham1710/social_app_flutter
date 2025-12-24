@@ -208,8 +208,8 @@ class _CommentItemState extends State<CommentItem> {
                           children: [
                             Text(
                               widget.comment.updatedAt != null
-                                  ? timeago.format(widget.comment.updatedAt!)
-                                  : "Unknown date",
+                                  ? _timeAgo(widget.comment.updatedAt!)
+                                  : "Không rõ thời gian",
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: AppColors.textSecondary,
@@ -232,18 +232,18 @@ class _CommentItemState extends State<CommentItem> {
                               onTap: () {
                                 final user = widget.comment.user;
                                 final userName =
-                                    user.fullName ?? user.username ?? 'Unknown';
+                                    user.fullName ?? user.username ?? 'Người dùng';
                                 if (widget.comment.parentId != null) {
                                   widget.onReply!(
                                     user.userId,
-                                    user.avatarUrl ?? '',
+                                    user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                                     widget.comment.parentId!.id,
                                     userName,
                                   );
                                 } else {
                                   widget.onReply!(
                                     user.userId,
-                                    user.avatarUrl ?? '',
+                                    user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                                     widget.comment.id,
                                     userName,
                                   );
@@ -440,5 +440,13 @@ class _CommentItemState extends State<CommentItem> {
         ),
       );
     }
+  }
+
+  String _timeAgo(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes == 0) return 'Vừa xong';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
+    return '${diff.inDays} ngày trước';
   }
 }

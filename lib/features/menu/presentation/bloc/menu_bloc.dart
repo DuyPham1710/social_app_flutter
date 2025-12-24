@@ -36,12 +36,12 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       print('Error disconnecting chat during logout: $e');
     }
 
-    // Clear notification cache before logout
+    // Disconnect notification socket and clear cache before logout
     try {
       final notificationBloc = s1<NotificationBloc>();
-      notificationBloc.add(ClearNotificationCache());
+      notificationBloc.add(DisconnectNotificationSocket());
     } catch (e) {
-      print('Error clearing notification cache during logout: $e');
+      print('Error disconnecting notification socket during logout: $e');
     }
 
     await TokenStorage.clear();

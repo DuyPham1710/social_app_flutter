@@ -35,7 +35,7 @@ class _FriendPageState extends State<FriendPage> {
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Friend',
+          'Bạn bè',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         actions: [

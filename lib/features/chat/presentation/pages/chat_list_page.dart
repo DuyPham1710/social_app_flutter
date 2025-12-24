@@ -757,8 +757,8 @@ class _ChatListPageState extends State<ChatListPage> {
               ),
               ...friends.map((friend) {
                 return FriendMessageSuggestionItem(
-                  avatar: friend.avatarUrl ?? "https://i.pravatar.cc/200",
-                  name: friend.fullName ?? friend.username ?? "Unknown",
+                  avatar: friend.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                  name: friend.fullName ?? friend.username ?? "Người dùng",
                   onTap: () {
                     // Check if conversation exists with this friend
                     _handleFriendTap(friend);

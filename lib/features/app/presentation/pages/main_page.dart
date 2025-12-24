@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/custom_bottom_navigation.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
@@ -29,8 +30,28 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _connectSocket() async {
-    if (widget.userData == null) return;
-    final userId = widget.userData!['id'];
+    // Load fresh userData from TokenStorage instead of using widget.userData
+    // This ensures we always connect with the correct current user
+    final userData = await TokenStorage.getUserData();
+
+    // Check mounted after async operation
+    if (!mounted) {
+      debugPrint('[MainPage] Widget disposed, skipping socket connection');
+      return;
+    }
+
+    if (userData == null) {
+      debugPrint('[MainPage] No user data found, skipping socket connection');
+      return;
+    }
+
+    final userId = userData['id'] as String?;
+    if (userId == null || userId.isEmpty) {
+      debugPrint('[MainPage] Invalid userId, skipping socket connection');
+      return;
+    }
+
+    debugPrint('[MainPage] Connecting notification socket for userId: $userId');
 
     // connect notification socket
     context.read<NotificationBloc>().add(ConnectNotificationSocket(userId));

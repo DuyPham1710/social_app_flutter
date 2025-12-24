@@ -112,7 +112,7 @@ class ReactItemWidget extends StatelessWidget {
               onMention: onMention,
               userDisplayName:
                   react.user.fullName ?? react.user.username ?? 'Unknown',
-              userAvatar: react.user.avatarUrl ?? '',
+              userAvatar: react.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
             ),
           ],
         ],

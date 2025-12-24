@@ -407,7 +407,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
 
   void _showMoreOptions(BuildContext context, dynamic friend) {
     final name = friend.fullName ?? 'Người dùng';
-    final avatarUrl = friend.avatarUrl ?? 'https://i.pravatar.cc/150?img=12';
+    final avatarUrl = friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg';
     final friendsSince = friend.friendsSince as DateTime?;
 
     showModalBottomSheet(

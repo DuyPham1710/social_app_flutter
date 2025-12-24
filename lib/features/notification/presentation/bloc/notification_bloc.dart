@@ -19,12 +19,14 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<ClearNotificationCache>(_onClearCache);
     on<ReloadNotifications>(_onReloadNotifications);
     on<ConnectNotificationSocket>((event, emit) {
-      repository.connect(event.userId);
-
+      // Cancel previous subscriptions
       _listSub?.cancel();
       _newSub?.cancel();
       _unreadSub?.cancel();
       _hasMoreSub?.cancel();
+
+      // Connect with new userId
+      repository.connect(event.userId);
 
       _listSub = repository.notifications.listen(
         (list) => add(NotificationsLoaded(list)),
@@ -40,6 +42,20 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
       // Listen to hasMore updates so UI can stop requesting pages
       _hasMoreSub = repository.hasMore.listen((b) => add(HasMoreUpdated(b)));
+    });
+
+    on<DisconnectNotificationSocket>((event, emit) {
+      // Cancel all subscriptions
+      _listSub?.cancel();
+      _newSub?.cancel();
+      _unreadSub?.cancel();
+      _hasMoreSub?.cancel();
+
+      // Disconnect from socket
+      repository.disconnect();
+
+      // Reset state
+      emit(NotificationState.initial());
     });
 
     on<NotificationsLoaded>((event, emit) {

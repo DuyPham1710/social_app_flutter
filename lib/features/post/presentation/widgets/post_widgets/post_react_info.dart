@@ -51,9 +51,9 @@ class PostReactInfo extends StatelessWidget {
 
         if (hasCurrentUserReacted) {
           if (otherReacts.isEmpty) {
-            displayText = "You reacted to this";
+            displayText = "Bạn";
           } else {
-            displayText = "You and ${otherReacts.length} others";
+            displayText = "Bạn và ${otherReacts.length} người khác";
           }
         } else {
           // Nếu current user chưa react
@@ -61,7 +61,7 @@ class PostReactInfo extends StatelessWidget {
               reacts!.first.user.fullName?.trim().split(" ").last ?? "Someone";
           final othersCount = reacts!.length - 1;
           if (othersCount > 0) {
-            displayText = "$firstUser and $othersCount others";
+            displayText = "$firstUser và $othersCount người khác";
           } else {
             displayText = firstUser;
           }

@@ -335,7 +335,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         userId: suggestion.userId,
         name: suggestion.fullName ?? 'Người dùng',
         mutualFriends: suggestion.mutualFriends ?? 0,
-        avatarUrl: suggestion.avatarUrl ?? 'https://i.pravatar.cc/150?img=30',
+        avatarUrl: suggestion.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
         mutualFriendAvatars: suggestion.mutualFriendAvatars,
         isSent: isSent,
         onAddFriend: () {

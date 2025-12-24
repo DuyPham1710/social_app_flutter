@@ -62,7 +62,9 @@ class ProfileHeader extends StatelessWidget {
                   context,
                   CupertinoPageRoute(
                     builder: (context) => ImageViewerPage(
-                      imageUrl: user?.coverUrl ?? 'https://picsum.photos/200',
+                      imageUrl:
+                          user?.coverUrl ??
+                          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
                       title: 'Ảnh bìa',
                     ),
                   ),
@@ -75,7 +77,8 @@ class ProfileHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                   image: DecorationImage(
                     image: NetworkImage(
-                      user?.coverUrl ?? 'https://picsum.photos/200',
+                      user?.coverUrl ??
+                          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -112,7 +115,8 @@ class ProfileHeader extends StatelessWidget {
                         CupertinoPageRoute(
                           builder: (context) => ImageViewerPage(
                             imageUrl:
-                                user?.avatarUrl ?? 'https://picsum.photos/200',
+                                user?.avatarUrl ??
+                                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                             title: 'Ảnh đại diện',
                           ),
                         ),
@@ -126,7 +130,8 @@ class ProfileHeader extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 60,
                         backgroundImage: NetworkImage(
-                          user?.avatarUrl ?? 'https://picsum.photos/200',
+                          user?.avatarUrl ??
+                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                         ),
                       ),
                     ),

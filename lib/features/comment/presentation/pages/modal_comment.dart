@@ -126,7 +126,7 @@ class _ModalCommentState extends State<ModalComment> {
             'id': friend.userId, // ID để gửi lên server
             'display': friend.fullName ?? 'Unknown', // Tên hiển thị khi tag
             'full_name': friend.fullName ?? 'Unknown', // Tên hiển thị dòng dưới
-            'photo': friend.avatarUrl ?? 'https://via.placeholder.com/150',
+            'photo': friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           };
         }).toList();
 
@@ -374,7 +374,14 @@ class _ModalCommentState extends State<ModalComment> {
     _commentBloc.close();
     _commentDetailsBloc.add(StopListeningCommentsEvent());
     _commentDetailsBloc.close();
-    _mentionsController.removeListener(_onTextChanged);
+
+    // Safely remove listener
+    final currentState = _mentionKey.currentState;
+    final controller = currentState?.controller;
+    if (controller != null) {
+      controller.removeListener(_onTextChanged);
+    }
+
     _focusNode.dispose();
     super.dispose();
   }

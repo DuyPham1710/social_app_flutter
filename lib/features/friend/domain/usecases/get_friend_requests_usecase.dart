@@ -40,7 +40,7 @@ class GetFriendRequestsUseCase {
         if (mutualResult is DataStateSuccess && mutualResult.data!.isNotEmpty) {
           // Lấy avatarUrl từ mutual friends
           final avatars = mutualResult.data!
-              .map((friend) => friend.avatarUrl ?? 'https://i.pravatar.cc/150?img=1')
+              .map((friend) => friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg')
               .take(3)
               .toList();
           

@@ -101,7 +101,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _scrollToCommentAndOpen(String commentId) {
-    print('[PostDetail] _scrollToCommentAndOpen called with commentId: $commentId');
+    print(
+      '[PostDetail] _scrollToCommentAndOpen called with commentId: $commentId',
+    );
     // Delay to ensure UI is fully built
     Future.delayed(const Duration(milliseconds: 800), () {
       print('[PostDetail] Opening modal after 800ms delay');
@@ -111,7 +113,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
           isScrollControlled: true,
           context: context,
           builder: (BuildContext context) {
-            print('[PostDetail] ModalComment builder called with initialCommentId: $commentId');
+            print(
+              '[PostDetail] ModalComment builder called with initialCommentId: $commentId',
+            );
             return ModalComment(
               postId: widget.post.id,
               reacts: _localReacts,

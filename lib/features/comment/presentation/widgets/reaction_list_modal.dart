@@ -88,7 +88,7 @@ class ReactionListModal extends StatelessWidget {
                       radius: 20.r,
                       backgroundColor: Colors.grey[200],
                       backgroundImage: NetworkImage(
-                        react.user.avatarUrl ?? 'https://via.placeholder.com/150',
+                        react.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                       ),
                     ),
                     title: Text(

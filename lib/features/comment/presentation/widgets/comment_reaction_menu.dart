@@ -32,10 +32,10 @@ class CommentReactionMenu {
         // 4. Map dữ liệu sang format yêu cầu: {id, display, full_name, photo}
         final mappedFriends = friends.map((friend) {
           return {
-            'id': friend.userId, // ID để gửi lên server
-            'display': friend.fullName ?? 'Unknown', // Tên hiển thị khi tag
-            'full_name': friend.fullName ?? 'Unknown', // Tên hiển thị dòng dưới
-            'photo': friend.avatarUrl ?? 'https://via.placeholder.com/150',
+            'id': friend.userId,
+            'display': friend.fullName ?? 'Unknown', 
+            'full_name': friend.fullName ?? 'Unknown', 
+            'photo': friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           };
         }).toList();
         return mappedFriends;
@@ -246,14 +246,14 @@ class CommentReactionMenu {
                   // Nếu đã là reply thì trả về parentId gốc
                   onReply(
                     comment.user.userId,
-                    comment.user.avatarUrl ?? '',
+                    comment.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                     comment.parentId!.id,
                     userName,
                   );
                 } else {
                   onReply(
                     comment.user.userId,
-                    comment.user.avatarUrl ?? '',
+                    comment.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                     null,
                     userName,
                   );

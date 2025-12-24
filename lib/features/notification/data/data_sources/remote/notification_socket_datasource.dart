@@ -221,6 +221,13 @@ class NotificationSocketDataSource {
     print('[NotificationSocketDataSource] Cache cleared');
   }
 
+  /// Disconnect socket (without disposing streams)
+  void disconnect() {
+    print('[NotificationSocketDataSource] Disconnecting socket');
+    socket.disconnect();
+    clearCache();
+  }
+
   /// Disconnect socket and clear cache
   void dispose() {
     print('[NotificationSocketDataSource] Disposing');

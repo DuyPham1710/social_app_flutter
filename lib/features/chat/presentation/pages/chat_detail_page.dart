@@ -1600,7 +1600,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           children: [
             CircleAvatar(
               backgroundImage: NetworkImage(
-                widget.friendInfo?.avatarUrl ?? "https://i.pravatar.cc/200",
+                widget.friendInfo?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
               ),
               radius: 18.r,
             ),
@@ -1698,7 +1698,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           CircleAvatar(
             radius: 50.r,
             backgroundImage: NetworkImage(
-              widget.friendInfo?.avatarUrl ?? "https://i.pravatar.cc/200",
+              widget.friendInfo?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
             ),
           ),
           SizedBox(height: 12.h),

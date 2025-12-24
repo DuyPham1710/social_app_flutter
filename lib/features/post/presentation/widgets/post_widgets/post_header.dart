@@ -26,6 +26,14 @@ class PostHeader extends StatelessWidget {
     this.onOptionsTap,
   });
 
+  String _timeAgo(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes == 0) return 'Vừa xong';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
+    return '${diff.inDays} ngày trước';
+  }
+
   Future<bool> _isCurrentUser() async {
     final userData = await TokenStorage.getUserData();
     final currentUserId = userData?['id'];
@@ -90,7 +98,7 @@ class PostHeader extends StatelessWidget {
                 GestureDetector(
                   onTap: () => _navigateToProfile(context),
                   child: Text(
-                    user.fullName ?? "Unknown",
+                    user.fullName ?? "Người dùng",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14.sp,
@@ -99,8 +107,8 @@ class PostHeader extends StatelessWidget {
                 ),
                 Text(
                   createdAt != null
-                      ? timeago.format(createdAt!)
-                      : "Unknown date",
+                      ? _timeAgo(createdAt!)
+                      : "Không rõ thời gian",
                   style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                 ),
               ],
@@ -110,7 +118,7 @@ class PostHeader extends StatelessWidget {
             future: _isCurrentUser(),
             builder: (context, snapshot) {
               final isOwner = snapshot.data ?? false;
-              
+
               if (isOwner) {
                 // Nếu là chủ sở hữu, hiển thị icon để mở options
                 return IconButton(
@@ -121,7 +129,7 @@ class PostHeader extends StatelessWidget {
                 // Nếu không phải chủ sở hữu, hiển thị menu report/share
                 return PopupMenuButton<String>(
                   icon: Icon(Icons.more_horiz, size: 20.sp),
-				  color: AppColors.background,
+                  color: AppColors.background,
                   onSelected: (value) {
                     if (value == 'report') {
                       onReportTap?.call();

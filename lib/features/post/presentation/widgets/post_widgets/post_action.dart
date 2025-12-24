@@ -206,8 +206,8 @@ class _PostActionState extends State<PostAction> {
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: Text(
                 commentCount > 0
-                    ? "View all $commentCount comment${commentCount > 1 ? 's' : ''}"
-                    : "No comments yet",
+                    ? "Xem tất cả $commentCount bình luận"
+                    : "Chưa có bình luận nào",
                 style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
               ),
             ),

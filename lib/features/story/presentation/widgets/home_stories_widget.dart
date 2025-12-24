@@ -140,9 +140,9 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
   Widget _buildAddStory() {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const StoryCreatePage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const StoryCreatePage()));
       },
       child: Column(
         children: [
@@ -171,7 +171,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
           ),
           SizedBox(height: 30.h),
           Text(
-            "Add Story",
+            "Thêm tin",
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
           ),
         ],
@@ -273,7 +273,10 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
                     radius: 16.r,
-                    backgroundImage: NetworkImage(story.user.avatarUrl ?? ""),
+                    backgroundImage: NetworkImage(
+                      story.user.avatarUrl ??
+                          "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                    ),
                   ),
                 ),
               ),

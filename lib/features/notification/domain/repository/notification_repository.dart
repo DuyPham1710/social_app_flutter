@@ -2,6 +2,7 @@ import 'package:social_app_fe/features/notification/domain/entities/notification
 
 abstract class NotificationRepository {
   void connect(String userId);
+  void disconnect();
 
   Stream<List<NotificationEntity>> get notifications;
   Stream<NotificationEntity> get newNotification;

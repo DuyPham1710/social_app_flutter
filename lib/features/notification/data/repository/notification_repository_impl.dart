@@ -13,6 +13,9 @@ class NotificationRepositoryImpl implements NotificationRepository {
   void connect(String userId) => datasource.connect(userId);
 
   @override
+  void disconnect() => datasource.disconnect();
+
+  @override
   Stream<List<NotificationEntity>> get notifications => datasource.notifications
       .map((list) => list.map((e) => e.toEntity()).toList());
 

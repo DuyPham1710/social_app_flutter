@@ -189,7 +189,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             const SizedBox(height: 8),
             Center(
               child: EditableImage(
-                imageUrl: widget.user?.avatarUrl ?? "https://picsum.photos/400",
+                imageUrl: widget.user?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                 isAvatarCircle: true,
                 onEditTap: () => _navigateToImagePicker(true),
               ),
@@ -204,7 +204,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ),
             const SizedBox(height: 8),
             EditableImage(
-              imageUrl: widget.user?.coverUrl ?? "https://picsum.photos/600",
+              imageUrl: widget.user?.coverUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg",
               borderRadius: 12,
               onEditTap: () => _navigateToImagePicker(false),
             ),

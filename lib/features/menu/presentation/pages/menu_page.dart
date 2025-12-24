@@ -95,7 +95,7 @@ class _MenuView extends StatelessWidget {
                 if (state is MenuLoadedState) {
                   return MenuHeader(
                     name: state.user.fullName ?? "User",
-                    avatarUrl: state.user.avatarUrl ?? "",
+                    avatarUrl: state.user.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                     userId: state.user.userId,
                   );
                 }

@@ -41,7 +41,7 @@ class ChatInfoPage extends StatelessWidget {
                       CircleAvatar(
                         radius: 50.r,
                         backgroundImage: NetworkImage(
-                          userInfo?.avatarUrl ?? "https://i.pravatar.cc/200",
+                          userInfo?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                         ),
                       ),
 

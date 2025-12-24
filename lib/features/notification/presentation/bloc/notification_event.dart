@@ -7,6 +7,8 @@ class ConnectNotificationSocket extends NotificationEvent {
   ConnectNotificationSocket(this.userId);
 }
 
+class DisconnectNotificationSocket extends NotificationEvent {}
+
 class NotificationsLoaded extends NotificationEvent {
   final List<NotificationEntity> notifications;
   NotificationsLoaded(this.notifications);

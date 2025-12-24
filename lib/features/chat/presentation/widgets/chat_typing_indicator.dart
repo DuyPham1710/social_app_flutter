@@ -35,7 +35,7 @@ class ChatTypingIndicator extends StatelessWidget {
                 CircleAvatar(
                   radius: 14.r,
                   backgroundImage: NetworkImage(
-                    friendAvatarUrl ?? "https://i.pravatar.cc/200",
+                    friendAvatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                   ),
                 ),
                 SizedBox(width: 8.w),

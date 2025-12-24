@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/react_story_notification_item.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
@@ -62,9 +63,10 @@ class _NotificationPageState extends State<NotificationPage> {
 
   String _timeAgo(DateTime time) {
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút';
-    if (diff.inHours < 24) return '${diff.inHours} giờ';
-    return '${diff.inDays} ngày';
+    if (diff.inMinutes == 0) return 'Vừa xong';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
+    return '${diff.inDays} ngày trước';
   }
 
   void _markAsRead(String notificationId) {
@@ -75,14 +77,15 @@ class _NotificationPageState extends State<NotificationPage> {
     switch (notification.type) {
       case NotificationType.FRIEND_REQUEST:
         return FriendRequestNotificationItem(
-          avatarUrl: notification.sender?.avatarUrl ?? '',
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           mutualFriends: '',
           onUserTap: () {
-            _markAsRead(notification.id);
             if (notification.sender?.userId != null) {
               Navigator.push(
                 context,
@@ -106,7 +109,6 @@ class _NotificationPageState extends State<NotificationPage> {
             print(
               '[NotificationPage] onAccept called for notification: ${notification.id}',
             );
-            _markAsRead(notification.id);
             final targetId = notification.targetId;
             if (targetId == null) return;
 
@@ -124,7 +126,6 @@ class _NotificationPageState extends State<NotificationPage> {
                 const SnackBar(content: Text('Đã chấp nhận lời mời kết bạn')),
               );
 
-              // Delete from server in background
               try {
                 s1<DeleteNotificationUseCase>()(params: notification.id);
                 print('[NotificationPage] Notification deleted from server');
@@ -142,7 +143,6 @@ class _NotificationPageState extends State<NotificationPage> {
             print(
               '[NotificationPage] onRemove called for notification: ${notification.id}',
             );
-            _markAsRead(notification.id);
             final targetId = notification.targetId;
             if (targetId == null) return;
 
@@ -178,14 +178,15 @@ class _NotificationPageState extends State<NotificationPage> {
 
       case NotificationType.POST_COMMENT:
         return CommentNotificationItem(
-          avatarUrl: notification.sender?.avatarUrl ?? '',
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           content: notification.message,
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           onUserTap: () {
-            _markAsRead(notification.id);
             if (notification.sender?.userId != null) {
               Navigator.push(
                 context,
@@ -206,19 +207,21 @@ class _NotificationPageState extends State<NotificationPage> {
             }
           },
           onMessageTap: () {
-            _markAsRead(notification.id);
             _navigateToCommentInPost(
               postId: notification.content,
               commentId: notification.targetId,
               notificationId: notification.id,
             );
+            // _markAsRead(notification.id);
           },
         );
       case NotificationType.UNKNOWN:
         throw UnimplementedError();
       case NotificationType.POST_REACTION:
         return ReactPostNotificationItem(
-          avatarUrl: notification.sender?.avatarUrl ?? '',
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           message: notification.message,
@@ -227,7 +230,6 @@ class _NotificationPageState extends State<NotificationPage> {
           isRead: notification.isRead,
           postId: notification.targetId,
           onUserTap: () {
-            _markAsRead(notification.id);
             if (notification.sender?.userId != null) {
               Navigator.push(
                 context,
@@ -248,7 +250,7 @@ class _NotificationPageState extends State<NotificationPage> {
             }
           },
           onMessageTap: () async {
-            _markAsRead(notification.id);
+            // _markAsRead(notification.id);
             final postId = notification.targetId;
             if (postId != null && postId.isNotEmpty) {
               // Navigate to loading page with smooth fade animation
@@ -304,6 +306,42 @@ class _NotificationPageState extends State<NotificationPage> {
                 }
               }
             }
+          },
+        );
+      case NotificationType.STORY_REACT:
+        return ReactStoryNotificationItem(
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+          userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
+          message: notification.message,
+          content: notification.content ?? '',
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+          storyId: notification.targetId,
+          onUserTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+          onMessageTap: () {
+            // Currently no action defined for story react message tap
           },
         );
       default:

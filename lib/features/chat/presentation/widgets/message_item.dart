@@ -117,7 +117,7 @@ class MessageItem extends StatelessWidget {
                   CircleAvatar(
                     radius: 14.r,
                     backgroundImage: NetworkImage(
-                      message.sender.avatarUrl ?? "https://i.pravatar.cc/200",
+                      message.sender.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                     ),
                   )
                 else
