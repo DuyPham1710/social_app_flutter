@@ -14,6 +14,8 @@ import 'package:social_app_fe/core/network/my_http_overrides.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/core/services/firebase_background_handler.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_event.dart';
+import 'package:social_app_fe/features/notification/presentation/services/notification_fcm_service.dart';
 import 'package:social_app_fe/features/app/presentation/pages/main_page.dart';
 import 'package:social_app_fe/features/app/presentation/pages/splash_page.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/restart_widget.dart';
@@ -132,9 +134,19 @@ class _MyAppState extends State<MyApp> {
         _handleNavigateToConversation,
       );
 
+      // Initialize Notification FCM Service
+      debugPrint('[App] Initializing Notification FCM service...');
+      await NotificationFcmService().initialize();
+
+      // Register navigation callback for app notifications
+      AppNotificationNavigationHelper.registerNavigationCallback(
+        _handleNavigateToAppNotification,
+      );
+
       // Handle pending notification if app was opened from terminated state
       debugPrint('[App] Checking for pending notification navigation...');
       await FcmService().handlePendingNavigation();
+      await NotificationFcmService().handlePendingNavigation();
 
       debugPrint('[App] Services initialized successfully');
     } catch (e) {
@@ -226,6 +238,36 @@ class _MyAppState extends State<MyApp> {
     // The call already ended on the other side
   }
 
+  void _handleNavigateToAppNotification(
+    String type, {
+    String? targetId,
+    String? senderId,
+    String? notificationId,
+  }) async {
+    debugPrint('[App] Navigating to notification page from FCM: type=$type');
+
+    try {
+      // Wait for app to be ready
+      await Future.delayed(const Duration(milliseconds: 400));
+
+      // Get current context
+      final context = _navigatorKey.currentContext;
+      if (context == null || !context.mounted) {
+        debugPrint('[App] Context not available');
+        return;
+      }
+
+      // Navigate to main page with notification tab (index 3)
+      await _navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        '/main',
+        (route) => false,
+        arguments: {'initialTab': 3}, // Open notification tab
+      );
+    } catch (e) {
+      debugPrint('[App] Error navigating to notification page: $e');
+    }
+  }
+
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
     if (settings.name == '/chat-detail') {
       final args = settings.arguments as Map<String, dynamic>?;
@@ -235,7 +277,8 @@ class _MyAppState extends State<MyApp> {
         final senderName = args['senderName'] as String?;
         final senderAvatar = args['senderAvatar'] as String?;
         final unreadCount = args['unreadCount'] as int? ?? 0;
-        final firstUnreadMessageIndex = args['firstUnreadMessageIndex'] as int? ?? -1;
+        final firstUnreadMessageIndex =
+            args['firstUnreadMessageIndex'] as int? ?? -1;
 
         debugPrint(
           '[App] Navigating to ChatDetailPage for conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)',
@@ -298,7 +341,9 @@ class _MyAppState extends State<MyApp> {
                   friendInfo: friendInfo,
                   friendId: senderId,
                   unreadCount: unreadCount,
-                  firstUnreadMessageIndex: firstUnreadMessageIndex != -1 ? firstUnreadMessageIndex : null,
+                  firstUnreadMessageIndex: firstUnreadMessageIndex != -1
+                      ? firstUnreadMessageIndex
+                      : null,
                 ),
               );
             },
@@ -317,7 +362,9 @@ class _MyAppState extends State<MyApp> {
     int unreadCount = 0,
     int firstUnreadMessageIndex = -1,
   }) async {
-    debugPrint('[App] Navigating to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)');
+    debugPrint(
+      '[App] Navigating to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)',
+    );
 
     try {
       // Navigate to main first
@@ -458,7 +505,15 @@ class _MyAppState extends State<MyApp> {
             onGenerateRoute: _onGenerateRoute,
             routes: <String, WidgetBuilder>{
               '/splash': (context) => const SplashPage(),
-              '/main': (BuildContext context) => MainPage(userData: userData),
+              '/main': (BuildContext context) {
+                final args =
+                    ModalRoute.of(context)?.settings.arguments
+                        as Map<String, dynamic>?;
+                return MainPage(
+                  userData: userData,
+                  initialTab: args?['initialTab'] as int?,
+                );
+              },
               '/login': (BuildContext context) => const LoginPage(),
               '/home': (BuildContext context) => const HomePage(),
               '/signup': (BuildContext context) => const RegisterPage(),

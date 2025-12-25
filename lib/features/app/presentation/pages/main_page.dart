@@ -13,20 +13,32 @@ import 'package:social_app_fe/features/post/presentation/pages/create_post_page.
 
 class MainPage extends StatefulWidget {
   final Map<String, dynamic>? userData;
-  const MainPage({super.key, this.userData});
+  final int? initialTab;
+  const MainPage({super.key, this.userData, this.initialTab});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
-  final PageController _pageController = PageController();
+  late int _currentIndex;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialTab ?? 0;
+    _pageController = PageController(initialPage: _currentIndex);
     _connectSocket();
+
+    // Reload notifications if opening notification tab
+    if (_currentIndex == 3) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<NotificationBloc>().add(ReloadNotifications());
+        }
+      });
+    }
   }
 
   Future<void> _connectSocket() async {

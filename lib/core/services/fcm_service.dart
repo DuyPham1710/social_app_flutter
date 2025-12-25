@@ -116,7 +116,9 @@ class FcmService {
         final senderName = parts.length >= 4 ? parts[3] : null;
         final senderAvatar = parts.length >= 5 ? parts[4] : null;
         final unreadCount = parts.length >= 6 ? int.tryParse(parts[5]) ?? 0 : 0;
-        final firstUnreadMessageIndex = parts.length >= 7 ? int.tryParse(parts[6]) ?? -1 : -1;
+        final firstUnreadMessageIndex = parts.length >= 7
+            ? int.tryParse(parts[6]) ?? -1
+            : -1;
         _navigateToConversation(
           conversationId,
           senderId,
@@ -180,7 +182,8 @@ class FcmService {
       final senderName = message.data['senderName'];
       final senderAvatar = message.data['senderAvatar'];
       final unreadCount = int.tryParse(message.data['unreadCount'] ?? '0') ?? 0;
-      final firstUnreadMessageIndex = int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
+      final firstUnreadMessageIndex =
+          int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
 
       if (conversationId != null && conversationId.isNotEmpty) {
         debugPrint('[FCM] Navigatingg to conversation: $conversationId');
@@ -310,7 +313,8 @@ class FcmService {
       final senderId = message.data['senderId'] ?? '';
       final senderAvatar = message.data['senderAvatar'] ?? '';
       final unreadCount = int.tryParse(message.data['unreadCount'] ?? '0') ?? 0;
-      final firstUnreadMessageIndex = int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
+      final firstUnreadMessageIndex =
+          int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
 
       // Download avatar image for large icon
       Uint8List? avatarBytes;
@@ -400,7 +404,9 @@ class FcmService {
     int firstUnreadMessageIndex = -1,
   }) async {
     try {
-      debugPrint('[FCM] Navigate to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)');
+      debugPrint(
+        '[FCM] Navigate to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)',
+      );
 
       await NotificationNavigationHelper.navigateToConversation(
         conversationId,
