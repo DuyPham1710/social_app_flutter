@@ -22,6 +22,8 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/notification/domain/usecases/delete_notification_usecase.dart';
 import '../widgets/comment_notification_item.dart';
 import '../widgets/friend_request_notification_item.dart';
+import '../widgets/post_report_detail_modal.dart';
+import '../widgets/post_report_notification_item.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -198,6 +200,20 @@ class _NotificationPageState extends State<NotificationPage> {
           },
           onMessageTap: () {
             // Currently no action defined for story react message tap
+          },
+        );
+      case NotificationType.POST_REPORT_REVIEWED:
+        return PostReportNotificationItem(
+          message: notification.message,
+          note: notification.content,
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+          postId: notification.targetId,
+          onTap: () {
+            // Hiển thị modal chi tiết lý do ẩn bài viết
+            if (notification.targetId != null) {
+              _showPostReportDetailModal(notification);
+            }
           },
         );
       default:
@@ -500,8 +516,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   PostDetailPage(post: result.data!),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                return FadeTransition(opacity: animation, child: child);
+              },
               transitionDuration: const Duration(milliseconds: 300),
             ),
           );
@@ -521,5 +537,44 @@ class _NotificationPageState extends State<NotificationPage> {
         }
       }
     }
+  }
+
+  void _showPostReportDetailModal(notification) {
+    final postId = notification.targetId ?? '';
+    final message = notification.message ?? '';
+    final note = notification.content;
+
+    // Parse status từ message
+    // Message format: "Báo cáo về "[caption]" đã được xác nhận" hoặc "đã bị từ chối"
+    String status = 'reviewed'; // default
+    if (message.contains('đã bị từ chối')) {
+      status = 'rejected';
+    } else if (message.contains('đã được xác nhận')) {
+      status = 'reviewed';
+    }
+
+    // Extract post title từ message
+    // Format: "Báo cáo về "[caption]" đã được xác nhận"
+    String postTitle = '';
+    final startIndex = message.indexOf('"');
+    final endIndex = message.lastIndexOf('"');
+    if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+      postTitle = message.substring(startIndex + 1, endIndex);
+    } else {
+      // Fallback: tìm "bài viết của bạn"
+      if (message.contains('bài viết của bạn')) {
+        postTitle = 'Bài viết của bạn';
+      } else {
+        postTitle = 'Bài viết';
+      }
+    }
+
+    PostReportDetailModal.show(
+      context,
+      postId: postId,
+      postTitle: postTitle,
+      status: status,
+      note: note,
+    );
   }
 }
