@@ -3,17 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 
 class ChatTypingIndicator extends StatelessWidget {
-  final String? friendAvatarUrl;
-  final String? friendName;
+  final bool isGroup;
+  final List<UserEntity>? participants;
+  final UserEntity? friendInfo;
   final String currentUserId;
 
   const ChatTypingIndicator({
     super.key,
-    this.friendAvatarUrl,
-    this.friendName,
+    this.isGroup = false,
+    this.participants,
+    this.friendInfo,
     required this.currentUserId,
   });
 
@@ -26,16 +29,34 @@ class ChatTypingIndicator extends StatelessWidget {
             state.isTyping &&
             state.typingUserId != null &&
             state.typingUserId != currentUserId) {
+          // Tìm user đang typing
+          String? typingUserAvatar;
+          //   String? typingUserName;
+
+          if (isGroup && participants != null) {
+            // Trong chat nhóm, tìm user từ participants list
+            final typingUser = participants!.firstWhere(
+              (user) => user.userId == state.typingUserId,
+            );
+            typingUserAvatar = typingUser.avatarUrl;
+            //     typingUserName = typingUser.fullName ?? typingUser.username;
+          } else {
+            // Trong chat 1-1, dùng friendInfo
+            typingUserAvatar = friendInfo?.avatarUrl;
+            //  typingUserName = friendInfo?.fullName ?? friendInfo?.username;
+          }
+
           return Container(
             padding: EdgeInsets.fromLTRB(0.w, 8.h, 12.w, 8.h),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Avatar của friend đang gõ
+                // Avatar của user đang gõ
                 CircleAvatar(
                   radius: 14.r,
                   backgroundImage: NetworkImage(
-                    friendAvatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                    typingUserAvatar ??
+                        "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                   ),
                 ),
                 SizedBox(width: 8.w),

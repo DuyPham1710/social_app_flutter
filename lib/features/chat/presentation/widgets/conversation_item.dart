@@ -1,31 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/group_avatar_widget.dart';
 
 class ConversationItem extends StatelessWidget {
-  final String avatarUrl;
+  final String? avatarUrl;
   final String name;
   final String preview;
   final bool isUnread;
+  final bool isGroup;
+  final List<UserEntity>? participants;
   final VoidCallback onTap;
 
   const ConversationItem({
     super.key,
-    required this.avatarUrl,
+    this.avatarUrl,
     required this.name,
     required this.preview,
     required this.isUnread,
+    required this.isGroup,
+    this.participants,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Build avatar widget
+    Widget avatarWidget;
+    if (isGroup && participants != null && participants!.length > 1) {
+      // Group chat với nhiều participants
+      final avatarUrls = participants!
+          .where((p) => p.avatarUrl != null && p.avatarUrl!.isNotEmpty)
+          .map((p) => p.avatarUrl!)
+          .toList();
+
+      avatarWidget = GroupAvatarWidget(
+        avatarUrls: avatarUrls.isNotEmpty
+            ? avatarUrls
+            : ['https://i.pravatar.cc/200'],
+        totalParticipants: participants!.length,
+        size: 52,
+      );
+    } else {
+      // Single avatar (1-1 chat or group with custom avatar)
+      avatarWidget = CircleAvatar(
+        radius: 26.r,
+        backgroundImage: NetworkImage(avatarUrl ?? 'https://i.pravatar.cc/200'),
+        backgroundColor: AppColors.textSecondary.withOpacity(0.1),
+      );
+    }
+
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
-      leading: CircleAvatar(
-        radius: 26.r,
-        backgroundImage: NetworkImage(avatarUrl),
-      ),
+      leading: avatarWidget,
       title: Text(
         name,
         style: TextStyle(

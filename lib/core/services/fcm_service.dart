@@ -116,7 +116,9 @@ class FcmService {
         final senderName = parts.length >= 4 ? parts[3] : null;
         final senderAvatar = parts.length >= 5 ? parts[4] : null;
         final unreadCount = parts.length >= 6 ? int.tryParse(parts[5]) ?? 0 : 0;
-        final firstUnreadMessageIndex = parts.length >= 7 ? int.tryParse(parts[6]) ?? -1 : -1;
+        final firstUnreadMessageIndex = parts.length >= 7
+            ? int.tryParse(parts[6]) ?? -1
+            : -1;
         _navigateToConversation(
           conversationId,
           senderId,
@@ -180,7 +182,8 @@ class FcmService {
       final senderName = message.data['senderName'];
       final senderAvatar = message.data['senderAvatar'];
       final unreadCount = int.tryParse(message.data['unreadCount'] ?? '0') ?? 0;
-      final firstUnreadMessageIndex = int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
+      final firstUnreadMessageIndex =
+          int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
 
       if (conversationId != null && conversationId.isNotEmpty) {
         debugPrint('[FCM] Navigatingg to conversation: $conversationId');
@@ -265,6 +268,28 @@ class FcmService {
     }
   }
 
+  /// Clear FCM token when logout (send empty token to backend)
+  Future<void> clearFcmToken() async {
+    try {
+      final accessToken = await TokenStorage.getAccessToken();
+
+      if (accessToken == null) {
+        debugPrint('[FCM] No access token, skipping clear token');
+        return;
+      }
+
+      // Send empty token to backend
+      await DioClient.instance.post('/user/fcm-token', data: {'fcmToken': ''});
+
+      debugPrint('[FCM] Token cleared on backend');
+
+      // Delete token from Firebase
+      await deleteToken();
+    } catch (e) {
+      debugPrint('[FCM] Error clearing FCM token: $e');
+    }
+  }
+
   /// Create notification channel for Android
   Future<void> _createNotificationChannel() async {
     // Channel for incoming calls
@@ -310,7 +335,8 @@ class FcmService {
       final senderId = message.data['senderId'] ?? '';
       final senderAvatar = message.data['senderAvatar'] ?? '';
       final unreadCount = int.tryParse(message.data['unreadCount'] ?? '0') ?? 0;
-      final firstUnreadMessageIndex = int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
+      final firstUnreadMessageIndex =
+          int.tryParse(message.data['firstUnreadMessageIndex'] ?? '-1') ?? -1;
 
       // Download avatar image for large icon
       Uint8List? avatarBytes;
@@ -400,7 +426,9 @@ class FcmService {
     int firstUnreadMessageIndex = -1,
   }) async {
     try {
-      debugPrint('[FCM] Navigate to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)');
+      debugPrint(
+        '[FCM] Navigate to conversation: $conversationId (unreadCount: $unreadCount, firstUnreadIndex: $firstUnreadMessageIndex)',
+      );
 
       await NotificationNavigationHelper.navigateToConversation(
         conversationId,

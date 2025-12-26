@@ -2,14 +2,15 @@ import 'package:intl/intl.dart';
 
 extension ChatTimeFormat on DateTime {
   String formatChatTime() {
+    final DateTime local = toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(Duration(days: 1));
-    final date = DateTime(year, month, day);
+    final date = DateTime(local.year, local.month, local.day);
 
     if (date == today) {
       // hôm nay -> hh:mm
-      return DateFormat('HH:mm').format(this);
+      return DateFormat('HH:mm').format(local);
     } else if (date == yesterday) {
       return 'Hôm qua';
     } else {
@@ -23,16 +24,20 @@ extension ChatTimeFormat on DateTime {
         DateTime.saturday: 'T7',
         DateTime.sunday: 'CN',
       };
-      return weekdayMap[weekday] ?? '';
+      return weekdayMap[local.weekday] ?? '';
     }
   }
 
   String formatTimeHeader() {
+    final DateTime localTime = toLocal();
     final now = DateTime.now();
-    final time = DateFormat('HH:mm').format(this);
+    final time = DateFormat('HH:mm').format(localTime);
 
     // Kiểm tra xem có phải là hôm nay không
-    final isToday = year == now.year && month == now.month && day == now.day;
+    final isToday =
+        localTime.year == now.year &&
+        localTime.month == now.month &&
+        localTime.day == now.day;
 
     // NẾU LÀ HÔM NAY: Chỉ trả về giờ
     if (isToday) {
@@ -41,7 +46,7 @@ extension ChatTimeFormat on DateTime {
 
     // NẾU LÀ NGÀY KHÁC: Trả về Thứ + LÚC + Giờ
     String weekday = '';
-    switch (this.weekday) {
+    switch (localTime.weekday) {
       case 1:
         weekday = 'T.2';
       case 2:
@@ -64,7 +69,7 @@ extension ChatTimeFormat on DateTime {
   // format 1 phút trước, 2 phút trước, 1 giờ trước
   String formatRelativeTime() {
     final now = DateTime.now();
-    final difference = now.difference(this);
+    final difference = now.difference(toLocal());
 
     if (difference.inSeconds < 60) {
       return '';
