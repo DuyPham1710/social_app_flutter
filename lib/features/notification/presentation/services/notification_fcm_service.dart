@@ -13,6 +13,14 @@ class NotificationFcmService {
   factory NotificationFcmService() => _instance;
   NotificationFcmService._internal();
 
+  // Track if user is currently on notification page
+  static bool _isOnNotificationPage = false;
+  
+  static void setOnNotificationPage(bool isOn) {
+    _isOnNotificationPage = isOn;
+    debugPrint('[NotificationFCM] User on notification page: $isOn');
+  }
+
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
@@ -23,6 +31,14 @@ class NotificationFcmService {
   Future<void> initialize() async {
     try {
       debugPrint('[NotificationFCM] Initializing...');
+
+      // Set foreground notification presentation options (iOS)
+      // This prevents automatic notification display, we handle it manually
+      await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+        alert: false, // Don't show alert
+        badge: false, // Don't update badge
+        sound: false, // Don't play sound
+      );
 
       // Initialize local notifications
       await _initializeLocalNotifications();
@@ -77,20 +93,25 @@ class NotificationFcmService {
     );
 
     if (response.payload != null && response.payload!.isNotEmpty) {
-      final parts = response.payload!.split('|');
-      if (parts.isNotEmpty) {
-        final type = parts[0];
-        final targetId = parts.length >= 2 ? parts[1] : null;
-        final senderId = parts.length >= 3 ? parts[2] : null;
-        final notificationId = parts.length >= 4 ? parts[3] : null;
+      handleNotificationTap(response.payload!);
+    }
+  }
 
-        _navigateBasedOnType(
-          type,
-          targetId: targetId,
-          senderId: senderId,
-          notificationId: notificationId,
-        );
-      }
+  /// Public method to handle notification tap (can be called from FcmService)
+  void handleNotificationTap(String payload) {
+    final parts = payload.split('|');
+    if (parts.isNotEmpty) {
+      final type = parts[0];
+      final targetId = parts.length >= 2 ? parts[1] : null;
+      final senderId = parts.length >= 3 ? parts[2] : null;
+      final notificationId = parts.length >= 4 ? parts[3] : null;
+
+      _navigateBasedOnType(
+        type,
+        targetId: targetId,
+        senderId: senderId,
+        notificationId: notificationId,
+      );
     }
   }
 
@@ -103,6 +124,14 @@ class NotificationFcmService {
 
     // Only handle app notification types (not chat or call)
     if (_isAppNotificationType(messageType)) {
+      // Don't show notification if user is already on notification page
+      if (_isOnNotificationPage) {
+        debugPrint(
+          '[NotificationFCM] User is on notification page, skipping notification',
+        );
+        return;
+      }
+      
       debugPrint(
         '[NotificationFCM] Showing local notification for: $messageType',
       );
@@ -275,8 +304,19 @@ class NotificationFcmService {
   /// Handle pending initial message
   Future<void> handlePendingNavigation() async {
     if (_pendingInitialMessage != null) {
-      debugPrint('[NotificationFCM] Handling pending initial message');
-      await _handleNotificationTap(_pendingInitialMessage!);
+      final messageType = _pendingInitialMessage!.data['type'];
+
+      // Only handle app notification types
+      if (_isAppNotificationType(messageType)) {
+        debugPrint(
+          '[NotificationFCM] Handling pending initial message: $messageType',
+        );
+        await _handleNotificationTap(_pendingInitialMessage!);
+      } else {
+        debugPrint(
+          '[NotificationFCM] Pending message is not app notification type: $messageType, skipping',
+        );
+      }
       _pendingInitialMessage = null;
     }
   }

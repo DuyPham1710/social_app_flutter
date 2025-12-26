@@ -151,52 +151,78 @@ class _CommentInputFieldState extends State<CommentInputField> {
                           return '@[$display]($value)';
                         },
                         suggestionBuilder: (data) {
-                          return Material(
+                          return Container(
                             color: Colors.white,
-                            child: InkWell(
-                              onTap: () {
-                                widget.mentionKey.currentState!.addMention(
-                                  data,
-                                );
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 10.h,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  // Add slight delay to ensure proper tap detection
+                                  Future.microtask(() {
+                                    widget.mentionKey.currentState?.addMention(
+                                      data,
+                                    );
+                                  });
+                                },
+                                splashColor: AppColors.primary.withOpacity(0.1),
+                                highlightColor: AppColors.primary.withOpacity(
+                                  0.05,
                                 ),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 18.r,
-                                      backgroundImage: NetworkImage(
-                                        data['photo'] ??
-                                            'https://via.placeholder.com/150',
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        width: 1,
                                       ),
                                     ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            data['display'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14.sp,
-                                            ),
-                                          ),
-                                          Text(
-                                            '@${data['full_name']}',
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 18.r,
+                                        backgroundImage: NetworkImage(
+                                          data['photo'] ??
+                                              'https://via.placeholder.com/150',
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(width: 12.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              data['display'],
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14.sp,
+                                                color: Colors.black87,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Text(
+                                              '@${data['full_name']}',
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                color: Colors.grey[600],
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

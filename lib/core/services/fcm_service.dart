@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
 import 'package:social_app_fe/core/network/dio_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:social_app_fe/features/notification/presentation/services/notification_fcm_service.dart';
 
 /// FCM Service to handle Firebase Cloud Messaging
 class FcmService {
@@ -127,6 +128,10 @@ class FcmService {
           unreadCount: unreadCount,
           firstUnreadMessageIndex: firstUnreadMessageIndex,
         );
+      } else {
+        // This is an app notification, delegate to NotificationFcmService
+        debugPrint('[FCM] Delegating to NotificationFcmService');
+        NotificationFcmService().handleNotificationTap(response.payload!);
       }
     }
   }
@@ -388,8 +393,19 @@ class FcmService {
   /// Handle pending initial message (called after navigation callback is registered)
   Future<void> handlePendingNavigation() async {
     if (_pendingInitialMessage != null) {
-      debugPrint('[FCM] Handling pending initial message');
-      await _handleNotificationTap(_pendingInitialMessage!);
+      final messageType = _pendingInitialMessage!.data['type'];
+
+      // Only handle chat/call messages
+      if (messageType == 'new_message' ||
+          messageType == 'incoming_call' ||
+          messageType == 'call_ended') {
+        debugPrint('[FCM] Handling pending initial message: $messageType');
+        await _handleNotificationTap(_pendingInitialMessage!);
+      } else {
+        debugPrint(
+          '[FCM] Pending message is not chat/call type: $messageType, skipping',
+        );
+      }
       _pendingInitialMessage = null;
     }
   }

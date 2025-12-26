@@ -83,28 +83,40 @@ class NotificationSocketDataSource {
       final incomingIds = items.map((e) => e.id).toSet();
 
       if (page == 1) {
-        final Map<String, NotificationModel> existingById = {
-          for (var e in _cache) e.id: e,
-        };
+        // If cache has more than one page worth of data, this is a reload
+        // Replace cache completely instead of merging
+        final isReload = _cache.length > limit;
 
-        final List<NotificationModel> merged = [];
-        for (var it in items) {
-          final existing = existingById[it.id];
-          if (existing != null && existing.isRead && !it.isRead) {
-            // Keep local isRead=true if we marked it as read locally
-            merged.add(existing);
-          } else {
-            merged.add(it);
+        if (isReload) {
+          // On reload: replace cache completely with fresh page 1 data
+          _cache
+            ..clear()
+            ..addAll(items);
+        } else {
+          // Initial load or first page: preserve local state (like isRead)
+          final Map<String, NotificationModel> existingById = {
+            for (var e in _cache) e.id: e,
+          };
+
+          final List<NotificationModel> merged = [];
+          for (var it in items) {
+            final existing = existingById[it.id];
+            if (existing != null && existing.isRead && !it.isRead) {
+              // Keep local isRead=true if we marked it as read locally
+              merged.add(existing);
+            } else {
+              merged.add(it);
+            }
           }
-        }
-        // append older existing items that weren't in incoming
-        for (var e in _cache) {
-          if (!incomingIds.contains(e.id)) merged.add(e);
-        }
+          // append older existing items that weren't in incoming
+          for (var e in _cache) {
+            if (!incomingIds.contains(e.id)) merged.add(e);
+          }
 
-        _cache
-          ..clear()
-          ..addAll(merged);
+          _cache
+            ..clear()
+            ..addAll(merged);
+        }
       } else {
         // For pages >1, append only new items (avoid duplicates)
         final existingIds = _cache.map((e) => e.id).toSet();

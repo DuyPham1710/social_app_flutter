@@ -4,7 +4,6 @@ import 'package:social_app_fe/features/notification/domain/entities/notification
 import 'package:social_app_fe/features/notification/domain/repository/notification_repository.dart';
 import 'notification_event.dart';
 import 'notification_state.dart';
-import 'package:social_app_fe/features/notification/presentation/services/notification_sound_service.dart';
 
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final NotificationRepository repository;
@@ -67,18 +66,21 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: unreadCount,
           hasMore: state.hasMore,
           isLoadingMore: false,
+          isInitialLoading: false, // Initial loading completed
+          isReloading: false, // Reload completed
         ),
       );
     });
 
     on<NewNotificationReceived>((event, emit) {
-      NotificationSoundService.play();
       emit(
         NotificationState(
           notifications: [event.notification, ...state.notifications],
           unread: state.unread + 1,
           hasMore: state.hasMore,
           isLoadingMore: state.isLoadingMore,
+          isInitialLoading: state.isInitialLoading,
+          isReloading: state.isReloading,
         ),
       );
     });
@@ -90,6 +92,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: event.unread,
           hasMore: state.hasMore,
           isLoadingMore: state.isLoadingMore,
+          isInitialLoading: state.isInitialLoading,
+          isReloading: state.isReloading,
         ),
       );
     });
@@ -101,6 +105,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: state.unread,
           hasMore: event.hasMore,
           isLoadingMore: false,
+          isInitialLoading: state.isInitialLoading,
+          isReloading: state.isReloading,
         ),
       );
     });
@@ -133,6 +139,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: unreadCount,
           hasMore: state.hasMore,
           isLoadingMore: state.isLoadingMore,
+          isInitialLoading: state.isInitialLoading,
+          isReloading: state.isReloading,
         ),
       );
 
@@ -162,6 +170,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: 0,
           hasMore: state.hasMore,
           isLoadingMore: state.isLoadingMore,
+          isInitialLoading: state.isInitialLoading,
+          isReloading: state.isReloading,
         ),
       );
 
@@ -193,6 +203,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: unreadCount,
           hasMore: state.hasMore,
           isLoadingMore: state.isLoadingMore,
+          isInitialLoading: state.isInitialLoading,
         ),
       );
 
@@ -226,6 +237,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         unread: state.unread,
         hasMore: state.hasMore,
         isLoadingMore: true,
+        isInitialLoading: state.isInitialLoading,
       ),
     );
 
@@ -240,6 +252,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           unread: state.unread,
           hasMore: state.hasMore,
           isLoadingMore: false,
+          isInitialLoading: state.isInitialLoading,
         ),
       );
     }
@@ -267,21 +280,18 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     ReloadNotifications event,
     Emitter<NotificationState> emit,
   ) async {
-    // Show loading state while keeping current data
+    // Show reload state while keeping current data
     emit(
       NotificationState(
         notifications: state.notifications,
         unread: state.unread,
         hasMore: true,
-        isLoadingMore: true,
+        isLoadingMore: false,
+        isInitialLoading: false,
+        isReloading: true, // Mark as reloading
       ),
     );
 
-    // Clear cache in data layer
-    repository.clearCache();
-
-    // Request first page - when data comes back via stream,
-    // NotificationsLoaded event will update the cache and UI
     repository.loadPage(page: 1, limit: 10);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/notification_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/post_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_story_notification_item.dart';
@@ -22,6 +23,7 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/notification/domain/usecases/delete_notification_usecase.dart';
 import '../widgets/comment_notification_item.dart';
 import '../widgets/friend_request_notification_item.dart';
+import '../services/notification_fcm_service.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -33,29 +35,46 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 1;
-  bool _isLoadingPage = false;
   final int _pageSize = 10;
-  VoidCallback? _scrollListener;
+  double _lastScrollPosition =
+      0; // Track last scroll position to detect scroll down
+
   @override
   void initState() {
     super.initState();
-    // scroll listener will be added in build context
+    // Add scroll listener once
+    _scrollController.addListener(_onScroll);
+    // Set flag that user is on notification page
+    NotificationFcmService.setOnNotificationPage(true);
   }
 
-  void _onScroll(bool hasMore, bool isLoadingMore, BuildContext context) {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !isLoadingMore) {
-      _loadNextPage(hasMore, context);
-    }
+  @override
+  void deactivate() {
+    // User is leaving notification page
+    NotificationFcmService.setOnNotificationPage(false);
+    super.deactivate();
   }
 
-  void _loadNextPage(bool hasMore, BuildContext context) {
-    if (!hasMore) {
-      // no more data, don't load
-      return;
+  void _onScroll() {
+    final currentPosition = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    // Only load more when:
+    // 1. Scrolling down (not just rebuilding at same position)
+    // 2. Near the bottom (within 100 pixels)
+    // 3. Not already loading
+    if (currentPosition > _lastScrollPosition && // Scrolling down
+        currentPosition >= maxScroll - 100) {
+      final state = context.read<NotificationBloc>().state;
+      if (state.hasMore && !state.isLoadingMore) {
+        _loadNextPage(context);
+      }
     }
 
+    _lastScrollPosition = currentPosition;
+  }
+
+  void _loadNextPage(BuildContext context) {
     _currentPage += 1;
     context.read<NotificationBloc>().add(
       LoadMoreNotificationsEvent(page: _currentPage, limit: _pageSize),
@@ -234,13 +253,15 @@ class _NotificationPageState extends State<NotificationPage> {
             '[NotificationPage] BlocBuilder rebuilding with ${state.notifications.length} notifications',
           );
 
-          // Update scroll listener with current state flags
-          if (_scrollListener != null) {
-            _scrollController.removeListener(_scrollListener!);
+          // Show loading page on initial load
+          if (state.isInitialLoading) {
+            return const NotificationLoadingPage();
           }
-          _scrollListener = () =>
-              _onScroll(state.hasMore, state.isLoadingMore, context);
-          _scrollController.addListener(_scrollListener!);
+
+          // Show loading page during reload (regardless of whether there's data)
+          if (state.isReloading) {
+            return const NotificationLoadingPage();
+          }
 
           if (state.notifications.isEmpty) {
             print('[NotificationPage] No notifications to display');
@@ -262,81 +283,82 @@ class _NotificationPageState extends State<NotificationPage> {
             );
           }
 
-          // Separate unread and read notifications
-          final unreadNotifications = state.notifications
-              .where((n) => !n.isRead)
-              .toList();
-          final readNotifications = state.notifications
-              .where((n) => n.isRead)
-              .toList();
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              _currentPage = 1;
-              context.read<NotificationBloc>().add(ReloadNotifications());
-              await Future.delayed(const Duration(milliseconds: 800));
-            },
-            child: ListView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                // "Mới" section (unread notifications)
-                if (unreadNotifications.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: Text(
-                      'Mới',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  ...unreadNotifications.map((n) => _buildNotificationItem(n)),
-                ],
-                // "Cũ hơn" section (read notifications)
-                // Only show title if there are both unread and read notifications
-                if (readNotifications.isNotEmpty &&
-                    unreadNotifications.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                    child: Text(
-                      'Cũ hơn',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-                // Show read notifications (with or without title)
-                if (readNotifications.isNotEmpty)
-                  ...readNotifications.map((n) => _buildNotificationItem(n)),
-
-                // Loading indicator when loading more
-                if (state.isLoadingMore)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-
-                // Show "end of data" message when no more pages
-                if (!state.hasMore && !state.isLoadingMore) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: Text(
-                        'Đã hiển thị hết thông báo',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          );
+          return _buildNotificationList(context, state);
         },
+      ),
+    );
+  }
+
+  Widget _buildNotificationList(BuildContext context, NotificationState state) {
+    // Separate unread and read notifications
+    final unreadNotifications = state.notifications
+        .where((n) => !n.isRead)
+        .toList();
+    final readNotifications = state.notifications
+        .where((n) => n.isRead)
+        .toList();
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        _currentPage = 1;
+        context.read<NotificationBloc>().add(ReloadNotifications());
+        await Future.delayed(const Duration(milliseconds: 800));
+      },
+      child: ListView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          // "Mới" section (unread notifications)
+          if (unreadNotifications.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                'Mới',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ...unreadNotifications.map((n) => _buildNotificationItem(n)),
+          ],
+          // "Cũ hơn" section (read notifications)
+          // Only show title if there are both unread and read notifications
+          if (readNotifications.isNotEmpty &&
+              unreadNotifications.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              child: Text(
+                'Cũ hơn',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+          // Show read notifications (with or without title)
+          if (readNotifications.isNotEmpty)
+            ...readNotifications.map((n) => _buildNotificationItem(n)),
+
+          // Loading indicator when loading more
+          if (state.isLoadingMore)
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+
+          // Show "end of data" message when no more pages
+          if (!state.hasMore && !state.isLoadingMore) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Text(
+                  'Đã hiển thị hết thông báo',
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -409,10 +431,10 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   void dispose() {
-    if (_scrollListener != null) {
-      _scrollController.removeListener(_scrollListener!);
-    }
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    // Ensure flag is reset when page is disposed
+    NotificationFcmService.setOnNotificationPage(false);
     super.dispose();
   }
 

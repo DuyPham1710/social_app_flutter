@@ -1,7 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
+import 'package:http/http.dart' as http;
+
+final FlutterLocalNotificationsPlugin _localNotifications =
+    FlutterLocalNotificationsPlugin();
 
 /// Top-level function for Firebase background message handler
 /// MUST be top-level function, not a class method
@@ -26,6 +31,30 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   else if (message.data['type'] == 'new_message') {
     await _handleBackgroundNewMessage(message.data);
   }
+  // Handle app notifications (POST_COMMENT, FRIEND_REQUEST, etc.)
+  else if (_isAppNotificationType(message.data['type'])) {
+    await _handleBackgroundAppNotification(message);
+  }
+}
+
+/// Check if message type is an app notification
+bool _isAppNotificationType(String? type) {
+  if (type == null) return false;
+  return type == 'FRIEND_REQUEST' ||
+      type == 'POST_COMMENT' ||
+      type == 'POST_REACTION' ||
+      type == 'MENTION' ||
+      type == 'STORY_REACTION' ||
+      type == 'COMMENT_REACTION';
+}
+
+/// Parse mention format @[Name](userId) to plain text @Name
+String _parseMentions(String text) {
+  final RegExp mentionRegex = RegExp(r'@\[([^\]]+)\]\(([^)]+)\)');
+  return text.replaceAllMapped(mentionRegex, (match) {
+    final name = match.group(1) ?? '';
+    return '@$name';
+  });
 }
 
 /// Handle incoming call in background/terminated state
@@ -74,5 +103,97 @@ Future<void> _handleBackgroundNewMessage(Map<String, dynamic> data) async {
     // When user taps it, the app will open and handle navigation in FCM service
   } catch (e) {
     debugPrint('[FCM Background] Error handling new message: $e');
+  }
+}
+
+/// Handle app notification in background/terminated state
+Future<void> _handleBackgroundAppNotification(RemoteMessage message) async {
+  try {
+    final type = message.data['type'] ?? '';
+    final senderName = message.data['senderName'] ?? 'Someone';
+    final rawMessage = message.data['message'] ?? 'New notification';
+    final notificationMessage = _parseMentions(rawMessage); // Parse mentions
+    final targetId = message.data['targetId'] ?? '';
+    final senderId = message.data['senderId'] ?? '';
+    final senderAvatar = message.data['senderAvatar'] ?? '';
+    final notificationId = message.data['notificationId'] ?? '';
+
+    debugPrint('[FCM Background] Handling app notification: $type');
+    debugPrint('[FCM Background] Original message: $rawMessage');
+    debugPrint('[FCM Background] Parsed message: $notificationMessage');
+
+    // Download avatar image for large icon
+    Uint8List? avatarBytes;
+    ByteArrayAndroidBitmap? largeBitmap;
+
+    if (senderAvatar.isNotEmpty) {
+      try {
+        final http.Response response = await http.get(Uri.parse(senderAvatar));
+        if (response.statusCode == 200) {
+          avatarBytes = response.bodyBytes;
+          largeBitmap = ByteArrayAndroidBitmap(avatarBytes);
+        }
+      } catch (e) {
+        debugPrint('[FCM Background] Error loading avatar: $e');
+      }
+    }
+
+    // Get appropriate icon and title based on type
+    final notificationInfo = _getNotificationInfo(type);
+
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'app_notifications',
+          'App Notifications',
+          channelDescription: 'Notification channel for app notifications',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+          largeIcon: largeBitmap,
+          icon: notificationInfo['icon'],
+          styleInformation: BigTextStyleInformation(
+            notificationMessage,
+            contentTitle: senderName,
+            summaryText: notificationInfo['title'],
+          ),
+        );
+
+    final NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
+
+    final localNotificationId = notificationId.hashCode;
+
+    await _localNotifications.show(
+      localNotificationId,
+      senderName,
+      notificationMessage,
+      notificationDetails,
+      payload: '$type|$targetId|$senderId|$notificationId',
+    );
+
+    debugPrint('[FCM Background] Local notification shown for type: $type');
+  } catch (e) {
+    debugPrint('[FCM Background] Error handling app notification: $e');
+  }
+}
+
+/// Get notification icon and title based on type
+Map<String, String> _getNotificationInfo(String type) {
+  switch (type) {
+    case 'FRIEND_REQUEST':
+      return {'icon': '@mipmap/ic_launcher', 'title': 'Friend Request'};
+    case 'POST_COMMENT':
+      return {'icon': '@mipmap/ic_launcher', 'title': 'New Comment'};
+    case 'POST_REACTION':
+      return {'icon': '@mipmap/ic_launcher', 'title': 'Post Reaction'};
+    case 'MENTION':
+      return {'icon': '@mipmap/ic_launcher', 'title': 'Mentioned You'};
+    case 'STORY_REACTION':
+      return {'icon': '@mipmap/ic_launcher', 'title': 'Story Reaction'};
+    case 'COMMENT_REACTION':
+      return {'icon': '@mipmap/ic_launcher', 'title': 'Comment Reaction'};
+    default:
+      return {'icon': '@mipmap/ic_launcher', 'title': 'Notification'};
   }
 }

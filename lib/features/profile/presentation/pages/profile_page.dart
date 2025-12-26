@@ -57,9 +57,9 @@ class _ProfilePageState extends State<ProfilePage> {
       body: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Lỗi tải bài viết')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Lỗi tải bài viết')));
           }
         },
         builder: (context, state) {
@@ -162,8 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     CreatePostWidget(
                       avatarUrl: user.avatarUrl,
-                      //onCreatePost: () =>
-                      //Navigator.pushNamed(context, '/create_post'),
+                      onCreatePost: () => _handleOpenCreatePost(),
                     ),
                     const Divider(),
 
@@ -243,6 +242,15 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         },
       ),
+    );
+  }
+
+  Future<void> _handleOpenCreatePost() async {
+    await Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/main',
+      (route) => false,
+      arguments: {'initialTab': 2},
     );
   }
 }

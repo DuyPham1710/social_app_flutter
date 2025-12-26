@@ -54,6 +54,12 @@ class _ModalCommentState extends State<ModalComment> {
   String? _replyingToUserName;
   String? _highlightedCommentId;
   bool _hasScrolledToComment = false;
+  
+  // Track for scrolling to newly sent comment
+  int _previousCommentCount = 0;
+  bool _shouldScrollToNewComment = false;
+  bool _isSendingReply = false; // Track if sending reply
+  String? _currentUserId;
 
   String? _currentUserAvatar;
   final GlobalKey<FlutterMentionsState> _mentionKey =
@@ -97,6 +103,7 @@ class _ModalCommentState extends State<ModalComment> {
     if (mounted) {
       setState(() {
         _currentUserAvatar = userData?['avatarUrl'];
+        _currentUserId = userData?['id'];
       });
     }
   }
@@ -447,6 +454,44 @@ class _ModalCommentState extends State<ModalComment> {
                                 state.commentsData!.comments,
                               );
                             }
+                            
+                            // Scroll to newly sent comment only if it's a new parent comment (not a reply)
+                            if (state is CommentDetailsLoaded && _shouldScrollToNewComment && !_isSendingReply) {
+                              final currentCount = state.commentsData!.comments.length;
+                              
+                              // Check if new comment was added
+                              if (currentCount > _previousCommentCount) {
+                                _shouldScrollToNewComment = false;
+                                _isSendingReply = false; // Reset flag
+                                
+                                // Scroll to bottom after a short delay
+                                Future.delayed(const Duration(milliseconds: 300), () {
+                                  if (mounted && _itemScrollController.isAttached) {
+                                    final parentComments = state.commentsData!.comments
+                                        .where((c) => c.parentId == null)
+                                        .toList();
+                                    
+                                    if (parentComments.isNotEmpty) {
+                                      _itemScrollController.scrollTo(
+                                        index: parentComments.length - 1,
+                                        duration: const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  }
+                                });
+                              }
+                              
+                              _previousCommentCount = currentCount;
+                            } else if (state is CommentDetailsLoaded) {
+                              // Just update count without scrolling
+                              _previousCommentCount = state.commentsData!.comments.length;
+                              // Reset flags if we're not scrolling
+                              if (_shouldScrollToNewComment && _isSendingReply) {
+                                _shouldScrollToNewComment = false;
+                                _isSendingReply = false;
+                              }
+                            }
                           },
                           child:
                               BlocBuilder<
@@ -578,6 +623,15 @@ class _ModalCommentState extends State<ModalComment> {
                     onCancelReply: _handleCancelReply,
 
                     onSendComment: (markupContent, taggedUserIds) {
+                      // Check if this is a reply or new parent comment
+                      final isReply = _parentId != null;
+                      
+                      // Set flag to scroll only if it's a new parent comment
+                      setState(() {
+                        _shouldScrollToNewComment = true;
+                        _isSendingReply = isReply;
+                      });
+                      
                       context.read<CommentBloc>().add(
                         AddCommentEvent(
                           postId: widget.postId,
