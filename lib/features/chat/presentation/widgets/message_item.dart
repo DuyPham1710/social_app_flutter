@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/attachment_type.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
+import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/reaction_detail_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/call_message_item.dart';
+import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
+import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class MessageItem extends StatelessWidget {
   final MessageEntity message;
@@ -75,6 +78,14 @@ class MessageItem extends StatelessWidget {
 
     // Nếu toàn bộ text là emoji và không quá 5 emoji
     return emojiLength == trimmedText.length && matches.length <= 5;
+  }
+
+  void _showVideoPlayer(BuildContext context, String videoUrl) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VideoPlayerScreen(videoData: videoUrl),
+      ),
+    );
   }
 
   @override
@@ -564,15 +575,20 @@ class MessageItem extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              // image viewer
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => FullScreenImageViewer(
-                    imageUrls: imageUrls,
-                    initialIndex: index,
+              // Check if video
+              if (VideoUtil.isVideo(attachment.url)) {
+                _showVideoPlayer(context, attachment.url);
+              } else {
+                // image viewer
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => FullScreenImageViewer(
+                      imageUrls: imageUrls,
+                      initialIndex: index,
+                    ),
                   ),
-                ),
-              );
+                );
+              }
             },
 
             child: Container(
@@ -584,38 +600,41 @@ class MessageItem extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  attachment.url,
-                  fit: BoxFit.cover,
+                child: VideoUtil.isVideo(attachment.url)
+                    ? buildVideoThumbnail()
+                    : Image.network(
+                        attachment.url,
+                        fit: BoxFit.cover,
 
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      color: AppColors.textSecondary.withOpacity(0.1),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                              : null,
-                          strokeWidth: 2,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    );
-                  },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: AppColors.textSecondary.withOpacity(0.1),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                                strokeWidth: 2,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          );
+                        },
 
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: AppColors.textSecondary.withOpacity(0.1),
-                      child: Icon(
-                        Icons.broken_image,
-                        color: AppColors.textSecondary,
-                        size: 24.sp,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: AppColors.textSecondary.withOpacity(0.1),
+                            child: Icon(
+                              Icons.broken_image,
+                              color: AppColors.textSecondary,
+                              size: 24.sp,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           );
