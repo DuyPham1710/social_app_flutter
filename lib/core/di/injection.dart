@@ -337,6 +337,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<LeaveConversationUseCase>(
     () => LeaveConversationUseCase(s1()),
   );
+  s1.registerLazySingleton<UpdateConversationUseCase>(
+    () => UpdateConversationUseCase(s1()),
+  );
   s1.registerLazySingleton<GetMessagesUseCase>(() => GetMessagesUseCase(s1()));
   s1.registerLazySingleton<GetMessagesAroundIdUseCase>(
     () => GetMessagesAroundIdUseCase(s1()),
@@ -472,9 +475,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),
   );
-  s1.registerLazySingleton<CreateStoryUsecase>(
-    () => CreateStoryUsecase(s1()),
-  );
+  s1.registerLazySingleton<CreateStoryUsecase>(() => CreateStoryUsecase(s1()));
   s1.registerLazySingleton<CreateOrUpdateReactStoryUsecase>(
     () => CreateOrUpdateReactStoryUsecase(s1()),
   );
@@ -628,9 +629,7 @@ Future<void> initializeDependencies() async {
       deleteReactStoryUsecase: s1(),
     ),
   );
-  s1.registerFactory<StoryCreateBloc>(
-    () => StoryCreateBloc(s1()),
-  );
+  s1.registerFactory<StoryCreateBloc>(() => StoryCreateBloc(s1()));
 
   s1.registerFactory<PrivacyBloc>(() => PrivacyBloc(s1(), s1()));
 
@@ -650,6 +649,7 @@ Future<void> initializeDependencies() async {
       joinConversationUseCase: s1(),
       leaveConversationUseCase: s1(),
       listenConversationUpdateUseCase: s1(),
+      updateConversationUseCase: s1(),
     ),
   );
 
@@ -682,9 +682,7 @@ Future<void> initializeDependencies() async {
   );
 
   // Chat Services
-  s1.registerLazySingleton<RecentSearchService>(
-    () => RecentSearchService(),
-  );
+  s1.registerLazySingleton<RecentSearchService>(() => RecentSearchService());
 }
 
 Future<void> resetDependencies() async {

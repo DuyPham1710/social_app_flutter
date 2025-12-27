@@ -28,7 +28,7 @@ Future<dynamic> showDialogSuccess(BuildContext parentContext, String message) {
               ),
               SizedBox(height: 10),
               Text(
-                '$message Successful!',
+                '$message!',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

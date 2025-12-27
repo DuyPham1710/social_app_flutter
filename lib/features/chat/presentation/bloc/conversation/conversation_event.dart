@@ -76,6 +76,34 @@ class LeaveConversationEvent extends ConversationEvent {
   List<Object?> get props => [conversationId, userId];
 }
 
+class UpdateConversationEvent extends ConversationEvent {
+  final String userId;
+  final String conversationId;
+  final String? name;
+  final String? avatar;
+  final String? createdBy;
+  final List<String>? participantIds;
+
+  const UpdateConversationEvent({
+    required this.userId,
+    required this.conversationId,
+    this.name,
+    this.avatar,
+    this.createdBy,
+    this.participantIds,
+  });
+
+  @override
+  List<Object?> get props => [
+    userId,
+    conversationId,
+    name,
+    avatar,
+    createdBy,
+    participantIds,
+  ];
+}
+
 class ConversationUpdatedEvent extends ConversationEvent {
   final ConversationEntity conversation;
 

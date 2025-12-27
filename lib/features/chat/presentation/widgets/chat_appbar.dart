@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
-import 'package:social_app_fe/features/chat/presentation/widgets/group_avatar_widget.dart';
 
-class ChatAppbar extends StatelessWidget {
+class ChatAppbar extends StatefulWidget {
   final bool isGroup;
   final String? groupName;
   final String? groupAvatar;
   final List<UserEntity>? participants;
   final UserEntity? friendInfo;
+  final String? conversationId;
+  final String userId;
   final Function(String callType)? onInitiateCall;
 
   const ChatAppbar({
@@ -21,52 +23,45 @@ class ChatAppbar extends StatelessWidget {
     this.groupAvatar,
     this.participants,
     this.friendInfo,
+    required this.conversationId,
+    required this.userId,
     this.onInitiateCall,
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Lấy tên và avatar hiển thị
-    String displayName;
-    String displayAvatar;
-    Widget avatarWidget;
+  State<ChatAppbar> createState() => _ChatAppbarState();
+}
 
-    if (isGroup) {
-      // Group chat
-      displayName = groupName ?? 'Group Chat';
-      displayAvatar = groupAvatar ?? 'https://i.pravatar.cc/200';
+class _ChatAppbarState extends State<ChatAppbar> {
+  late String _displayName;
 
-      // Nếu group có nhiều participants và không có avatar custom, dùng GroupAvatarWidget
-      if (participants != null && participants!.length > 1) {
-        final avatarUrls = participants!
-            .where((p) => p.avatarUrl != null && p.avatarUrl!.isNotEmpty)
-            .map((p) => p.avatarUrl!)
-            .toList();
+  @override
+  void initState() {
+    super.initState();
+    _updateDisplayName();
+  }
 
-        avatarWidget = GroupAvatarWidget(
-          avatarUrls: avatarUrls.isNotEmpty ? avatarUrls : [displayAvatar],
-          totalParticipants: participants!.length,
-          size: 36,
-        );
-      } else {
-        avatarWidget = CircleAvatar(
-          backgroundImage: NetworkImage(displayAvatar),
-          radius: 18.r,
-        );
-      }
+  void _updateDisplayName() {
+    if (widget.isGroup) {
+      _displayName = widget.groupName ?? 'Group Chat';
     } else {
-      // 1-1 chat
-      displayName =
-          friendInfo?.fullName ?? friendInfo?.username ?? "Unknown User";
-      displayAvatar =
-          friendInfo?.avatarUrl ??
-          "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg";
-
-      avatarWidget = CircleAvatar(
-        backgroundImage: NetworkImage(displayAvatar),
-        radius: 18.r,
-      );
+      _displayName =
+          widget.friendInfo?.fullName ??
+          widget.friendInfo?.username ??
+          "Unknown User";
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Lấy avatar hiển thị
+    Widget avatarWidget = ChatHelper.buildAvatarWidget(
+      isGroup: widget.isGroup,
+      groupAvatar: widget.groupAvatar,
+      participants: widget.participants,
+      firstParticipant: widget.friendInfo,
+      size: 36,
+    );
 
     return AppBar(
       elevation: 0,
@@ -88,9 +83,26 @@ class ChatAppbar extends StatelessWidget {
           Navigator.push(
             context,
             CupertinoPageRoute(
-              builder: (context) => ChatInfoPage(userInfo: friendInfo),
+              builder: (context) => ChatInfoPage(
+                isGroup: widget.isGroup,
+                displayName: _displayName,
+                groupAvatar: widget.groupAvatar,
+                participants: widget.participants,
+                userInfo: widget.friendInfo,
+                conversationId: widget.conversationId,
+                userId: widget.userId,
+              ),
             ),
-          );
+          ).then((newGroupName) {
+            if (widget.isGroup &&
+                newGroupName != null &&
+                newGroupName is String &&
+                newGroupName.isNotEmpty) {
+              setState(() {
+                _displayName = newGroupName;
+              });
+            }
+          });
         },
         child: Row(
           children: [
@@ -102,7 +114,7 @@ class ChatAppbar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    displayName,
+                    _displayName,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -111,9 +123,9 @@ class ChatAppbar extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (isGroup && participants != null)
+                  if (widget.isGroup && widget.participants != null)
                     Text(
-                      '${participants!.length} thành viên',
+                      '${widget.participants!.length} thành viên',
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w400,
@@ -142,7 +154,7 @@ class ChatAppbar extends StatelessWidget {
             color: AppColors.primary,
             size: 24.sp,
           ),
-          onPressed: () => onInitiateCall?.call('audio'),
+          onPressed: () => widget.onInitiateCall?.call('audio'),
         ),
         IconButton(
           icon: Icon(
@@ -150,7 +162,7 @@ class ChatAppbar extends StatelessWidget {
             color: AppColors.primary,
             size: 30.sp,
           ),
-          onPressed: () => onInitiateCall?.call('video'),
+          onPressed: () => widget.onInitiateCall?.call('video'),
         ),
         IconButton(
           icon: Icon(
@@ -162,9 +174,26 @@ class ChatAppbar extends StatelessWidget {
             Navigator.push(
               context,
               CupertinoPageRoute(
-                builder: (context) => ChatInfoPage(userInfo: friendInfo),
+                builder: (context) => ChatInfoPage(
+                  isGroup: widget.isGroup,
+                  displayName: _displayName,
+                  groupAvatar: widget.groupAvatar,
+                  participants: widget.participants,
+                  userInfo: widget.friendInfo,
+                  conversationId: widget.conversationId,
+                  userId: widget.userId,
+                ),
               ),
-            );
+            ).then((newGroupName) {
+              if (widget.isGroup &&
+                  newGroupName != null &&
+                  newGroupName is String &&
+                  newGroupName.isNotEmpty) {
+                setState(() {
+                  _displayName = newGroupName;
+                });
+              }
+            });
           },
         ),
       ],

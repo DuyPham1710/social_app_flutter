@@ -124,7 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Sign Up",
+                          "Đăng ký",
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -141,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         focusNode: emailFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return 'Vui lòng nhập email';
                           }
                           return null;
                         },
@@ -150,13 +150,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       SizedBox(height: 20.h),
 
                       TextformfieldCustom(
-                        label: 'Username',
+                        label: 'Tên người dùng',
                         isPassword: false,
                         controller: _usernameController,
                         focusNode: usernameFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your username';
+                            return 'Vui lòng nhập tên người dùng';
                           }
                           return null;
                         },
@@ -165,13 +165,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       SizedBox(height: 20.h),
 
                       TextformfieldCustom(
-                        label: 'Password',
+                        label: 'Mật khẩu',
                         isPassword: _isPasswordVisible,
                         controller: _passwordController,
                         focusNode: passwordFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return 'Vui lòng nhập mật khẩu';
                           }
                           return null;
                         },
@@ -194,13 +194,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       SizedBox(height: 20.h),
 
                       TextformfieldCustom(
-                        label: 'Confirm Password',
+                        label: 'Xác nhận mật khẩu',
                         isPassword: _isConfirmPasswordVisible,
                         controller: _confirmPasswordController,
                         focusNode: confirmPasswordFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return 'Vui lòng nhập xác nhận mật khẩu';
                           }
                           return null;
                         },
@@ -231,7 +231,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             )
                           : ButtonCustom(
                               onPressed: () => _onRegisterPressed(context),
-                              text: "Sign Up",
+                              text: "Đăng ký",
                             ),
 
                       SizedBox(height: 24.h),
@@ -240,7 +240,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Already have an Account? ",
+                            "Bạn đã có tài khoản? ",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 14.sp,
@@ -252,7 +252,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Navigator.pushNamed(context, '/login');
                             },
                             child: Text(
-                              "Sign in",
+                              "Đăng nhập",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14.sp,

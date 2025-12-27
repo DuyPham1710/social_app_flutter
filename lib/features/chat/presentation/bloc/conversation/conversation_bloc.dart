@@ -13,6 +13,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final JoinConversationUseCase _joinConversationUseCase;
   final LeaveConversationUseCase _leaveConversationUseCase;
   final ListenConversationUpdateUseCase _listenConversationUpdateUseCase;
+  final UpdateConversationUseCase _updateConversationUseCase;
   // bool _isConnected = false;
 
   StreamSubscription<ConversationEntity>? _conversationUpdateSubscription;
@@ -23,16 +24,19 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     required JoinConversationUseCase joinConversationUseCase,
     required LeaveConversationUseCase leaveConversationUseCase,
     required ListenConversationUpdateUseCase listenConversationUpdateUseCase,
+    required UpdateConversationUseCase updateConversationUseCase,
   }) : _getConversationsUseCase = getConversationsUseCase,
        _createConversationUseCase = createConversationUseCase,
        _joinConversationUseCase = joinConversationUseCase,
        _leaveConversationUseCase = leaveConversationUseCase,
        _listenConversationUpdateUseCase = listenConversationUpdateUseCase,
+       _updateConversationUseCase = updateConversationUseCase,
        super(const ConversationInitial()) {
     on<LoadConversationsEvent>(_onLoadConversations);
     on<CreateConversationEvent>(_onCreateConversation);
     on<JoinConversationEvent>(_onJoinConversation);
     on<LeaveConversationEvent>(_onLeaveConversation);
+    on<UpdateConversationEvent>(_onUpdateConversation);
     on<ConversationUpdatedEvent>(_onConversationUpdated);
 
     _setupConversationUpdateListener();
@@ -47,7 +51,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
     // Chỉ emit loading state khi load page đầu tiên
     if (isFirstPage) {
-    emit(const ConversationsLoading());
+      emit(const ConversationsLoading());
     }
 
     try {
@@ -127,18 +131,18 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       } else if (result is DataStateError) {
         // Chỉ emit error nếu là page đầu tiên
         if (isFirstPage) {
-        emit(
-          ConversationsError(
-            message: result.error?.message ?? 'Failed to load conversations',
-          ),
-        );
+          emit(
+            ConversationsError(
+              message: result.error?.message ?? 'Failed to load conversations',
+            ),
+          );
         }
         print('Error loading conversations: ${result.error}');
       }
     } catch (e) {
       // Chỉ emit error nếu là page đầu tiên
       if (isFirstPage) {
-      emit(ConversationsError(message: 'Failed to load conversations: $e'));
+        emit(ConversationsError(message: 'Failed to load conversations: $e'));
       }
       print('Exception loading conversations: $e');
     }
@@ -245,6 +249,25 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       }
     } catch (e) {
       print('Exception leaving conversation: $e');
+    }
+  }
+
+  Future<void> _onUpdateConversation(
+    UpdateConversationEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    try {
+      _updateConversationUseCase(
+        userId: event.userId,
+        conversationId: event.conversationId,
+        name: event.name,
+        avatar: event.avatar,
+        createdBy: event.createdBy,
+        participantIds: event.participantIds,
+      );
+      print('Update conversation ${event.conversationId} successfully');
+    } catch (e) {
+      print('Exception updating conversation: $e');
     }
   }
 

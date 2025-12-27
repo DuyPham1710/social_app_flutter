@@ -160,6 +160,25 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  void updateConversation({
+    required String userId,
+    required String conversationId,
+    String? name,
+    String? avatar,
+    String? createdBy,
+    List<String>? participantIds,
+  }) {
+    _remoteDataSource.updateConversation(
+      userId: userId,
+      conversationId: conversationId,
+      name: name,
+      avatar: avatar,
+      createdBy: createdBy,
+      participantIds: participantIds,
+    );
+  }
+
+  @override
   Stream<ConversationResponseEntity> get onConversationsLoaded {
     return _remoteDataSource.onConversationsLoaded.map((response) {
       return response.toEntity();

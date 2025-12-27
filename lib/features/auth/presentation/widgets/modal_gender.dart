@@ -9,7 +9,7 @@ class ModalGender extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoActionSheet(
       title: Text(
-        "Select Gender",
+        "Chọn giới tính",
         style: TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 14.sp,
@@ -23,7 +23,7 @@ class ModalGender extends StatelessWidget {
             Navigator.pop(context, "Male");
           },
           child: Text(
-            "Male",
+            "Nam",
             style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
           ),
         ),
@@ -32,7 +32,7 @@ class ModalGender extends StatelessWidget {
             Navigator.pop(context, "Female");
           },
           child: Text(
-            "Female",
+            "Nữ",
             style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
           ),
         ),
@@ -41,7 +41,7 @@ class ModalGender extends StatelessWidget {
             Navigator.pop(context, "Other");
           },
           child: Text(
-            "Other",
+            "Khác",
             style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
           ),
         ),
@@ -53,7 +53,7 @@ class ModalGender extends StatelessWidget {
         },
         isDefaultAction: true,
         child: Text(
-          "Cancel",
+          "Hủy",
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 14.sp,

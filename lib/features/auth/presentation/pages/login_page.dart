@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Sign In",
+                          "Đăng nhập",
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                         focusNode: emailFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return 'Vui lòng nhập email';
                           }
                           return null;
                         },
@@ -124,13 +124,13 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 20.h),
 
                       TextformfieldCustom(
-                        label: 'Password',
+                        label: 'Mật khẩu',
                         isPassword: _isPasswordVisible,
                         controller: _passwordController,
                         focusNode: passwordFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return 'Vui lòng nhập mật khẩu';
                           }
                           return null;
                         },
@@ -159,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.pushNamed(context, '/forgot-password');
                           },
                           child: Text(
-                            "Forgot Password?",
+                            "Quên mật khẩu?",
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: AppColors.primary,
@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 12.h),
                             child: Text(
-                              "or",
+                              "hoặc",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w600,
@@ -211,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             SizedBox(width: 12.w),
                             Text(
-                              "Sign in with Google",
+                              "Đăng nhập với Google",
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w500,
@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                           ? CircularProgressIndicator(color: AppColors.primary)
                           : ButtonCustom(
                               onPressed: () => _onLoginPressed(context),
-                              text: "Sign In",
+                              text: "Đăng nhập",
                             ),
 
                       SizedBox(height: 24.h),
@@ -237,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Do not have an Account? ",
+                            "Bạn chưa có tài khoản? ",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 14.sp,
@@ -249,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.pushNamed(context, '/signup');
                             },
                             child: Text(
-                              "Sign up",
+                              "Đăng ký",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14.sp,

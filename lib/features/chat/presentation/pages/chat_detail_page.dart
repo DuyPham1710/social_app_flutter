@@ -950,6 +950,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             groupAvatar: widget.groupAvatar,
             participants: widget.participants,
             friendInfo: widget.friendInfo,
+            conversationId: _currentConversationId ?? widget.conversationId,
+            userId: widget.userId,
             onInitiateCall: _initiateCall,
           ),
         ),

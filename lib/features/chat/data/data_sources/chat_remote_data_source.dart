@@ -48,6 +48,16 @@ abstract class ChatRemoteDataSource {
     required String userId,
   });
 
+  // Update conversation
+  void updateConversation({
+    required String userId,
+    required String conversationId,
+    String? name,
+    String? avatar,
+    String? createdBy,
+    List<String>? participantIds,
+  });
+
   // Typing events
   void emitTypingStart({
     required String userId,

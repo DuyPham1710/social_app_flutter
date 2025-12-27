@@ -3,13 +3,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/change_avatar_dialog.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/change_group_name_dialog.dart';
 
-class ChatInfoPage extends StatelessWidget {
+class ChatInfoPage extends StatefulWidget {
+  final bool isGroup;
+  final String? displayName;
+  final String? groupAvatar;
+  final List<UserEntity>? participants;
   final UserEntity? userInfo;
-  const ChatInfoPage({super.key, this.userInfo});
+  final String? conversationId;
+  final String? userId;
+
+  const ChatInfoPage({
+    super.key,
+    this.isGroup = false,
+    this.displayName,
+    this.groupAvatar,
+    this.participants,
+    this.userInfo,
+    this.conversationId,
+    this.userId,
+  });
+
+  @override
+  State<ChatInfoPage> createState() => _ChatInfoPageState();
+}
+
+class _ChatInfoPageState extends State<ChatInfoPage> {
+  late String _groupName;
+
+  @override
+  void initState() {
+    super.initState();
+    _groupName = widget.displayName ?? "";
+  }
 
   @override
   Widget build(BuildContext context) {
+    Widget avatarWidget = ChatHelper.buildAvatarWidget(
+      isGroup: widget.isGroup,
+      groupAvatar: widget.groupAvatar,
+      participants: widget.participants,
+      firstParticipant: widget.userInfo,
+      size: 80,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -18,12 +58,82 @@ class ChatInfoPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, _groupName),
         ),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-            onPressed: () {},
+            color: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            offset: Offset(0, 50),
+            itemBuilder: (BuildContext context) => [
+              if (widget.isGroup) ...[
+                PopupMenuItem<String>(
+                  value: 'change_avatar',
+                  child: Text(
+                    'Đổi ảnh nhóm',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'change_name',
+                  child: Text(
+                    'Đổi tên',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete_conversation',
+                  child: Text(
+                    'Xóa cuộc trò chuyện',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'leave_group',
+                  child: Text(
+                    'Rời nhóm',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+            onSelected: (String value) {
+              switch (value) {
+                case 'change_avatar':
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        const ChangeAvatarDialog(),
+                  );
+                case 'change_name':
+                  _showChangeGroupNameDialog(context);
+                case 'delete_conversation':
+                  // Xử lý xóa cuộc trò chuyện
+                  break;
+                case 'leave_group':
+                  // Xử lý rời nhóm
+                  break;
+              }
+            },
           ),
         ],
       ),
@@ -36,54 +146,70 @@ class ChatInfoPage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 50.r,
-                        backgroundImage: NetworkImage(
-                          userInfo?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
-                        ),
-                      ),
+                  GestureDetector(
+                    onTap: () {
+                      if (widget.isGroup) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              const ChangeAvatarDialog(),
+                        );
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        // Avatar
+                        avatarWidget,
 
-                      // Badge trạng thái hoạt động
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 4.w,
-                            vertical: 2.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade100,
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: AppColors.background,
-                              width: 2,
-                            ),
-                          ),
+                        // Badge trạng thái hoạt động
+                        // Positioned(
+                        //   bottom: 0,
+                        //   right: 0,
+                        //   child: Container(
+                        //     padding: EdgeInsets.symmetric(
+                        //       horizontal: 4.w,
+                        //       vertical: 2.h,
+                        //     ),
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.green.shade100,
+                        //       borderRadius: BorderRadius.circular(12.r),
+                        //       border: Border.all(
+                        //         color: AppColors.background,
+                        //         width: 2,
+                        //       ),
+                        //     ),
 
-                          child: Text(
-                            "26 phút",
-                            style: TextStyle(
-                              color: Colors.green.shade700,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                        //     child: Text(
+                        //       "26 phút",
+                        //       style: TextStyle(
+                        //         color: Colors.green.shade700,
+                        //         fontSize: 10.sp,
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
+                    ),
                   ),
 
                   SizedBox(height: 12.h),
 
-                  Text(
-                    userInfo?.fullName ?? userInfo?.username ?? "Unknown User",
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                  GestureDetector(
+                    onTap: () {
+                      if (widget.isGroup) {
+                        _showChangeGroupNameDialog(context);
+                      }
+                    },
+                    child: Text(
+                      _groupName.isNotEmpty
+                          ? _groupName
+                          : widget.userInfo?.fullName ?? "Tên người dùng",
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -105,11 +231,18 @@ class ChatInfoPage extends StatelessWidget {
                   icon: CupertinoIcons.videocam_fill,
                   label: "Gọi video",
                 ),
-                _buildActionBtn(
-                  icon: CupertinoIcons.person_fill,
-                  label: "Trang cá nhân",
-                  size: 22.sp,
-                ),
+
+                widget.isGroup
+                    ? _buildActionBtn(
+                        icon: Icons.person_add,
+                        label: "Thêm thành viên",
+                        size: 20.sp,
+                      )
+                    : _buildActionBtn(
+                        icon: CupertinoIcons.person_fill,
+                        label: "Trang cá nhân",
+                        size: 22.sp,
+                      ),
                 _buildActionBtn(
                   icon: CupertinoIcons.bell_fill,
                   label: "Tắt thông báo",
@@ -147,17 +280,24 @@ class ChatInfoPage extends StatelessWidget {
               endIndent: 16.w,
             ),
 
+            // SECTION: Thông tin về đoạn chat
+            widget.isGroup
+                ? _buildSectionInfoGroupChat(widget.participants!)
+                : SizedBox.shrink(),
+
             // SECTION: HÀNH ĐỘNG KHÁC
             _buildSectionTitle("Hành động khác"),
-            _buildListTile(
-              iconWidget: Icon(
-                CupertinoIcons.person_2_fill,
-                color: AppColors.textPrimary,
-                size: 24.sp,
-              ),
-              title: "Tạo nhóm chat",
-              onTap: () {},
-            ),
+            !widget.isGroup
+                ? _buildListTile(
+                    iconWidget: Icon(
+                      CupertinoIcons.person_2_fill,
+                      color: AppColors.textPrimary,
+                      size: 24.sp,
+                    ),
+                    title: "Tạo nhóm chat",
+                    onTap: () {},
+                  )
+                : SizedBox.shrink(),
             _buildListTile(
               iconWidget: Icon(
                 CupertinoIcons.photo,
@@ -253,10 +393,69 @@ class ChatInfoPage extends StatelessWidget {
               subtitle: "Góp ý và báo cáo cuộc trò chuyện",
               onTap: () {},
             ),
+
+            // SECTION: ACTIONS CHỈ CHO NHÓM
+            if (widget.isGroup) ...[
+              _buildListTile(
+                iconWidget: Icon(Icons.logout, color: Colors.red, size: 24.sp),
+                title: "Rời khỏi đoạn chat",
+                onTap: () {
+                  // Xử lý rời khỏi đoạn chat
+                },
+              ),
+              _buildListTile(
+                iconWidget: Icon(
+                  CupertinoIcons.delete,
+                  color: Colors.red,
+                  size: 24.sp,
+                ),
+                title: "Xóa đoạn chat",
+                onTap: () {
+                  // Xử lý xóa đoạn chat
+                },
+              ),
+            ],
+
             SizedBox(height: 40.h),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionInfoGroupChat(List<UserEntity> participants) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle("Thông tin về đoạn chat"),
+
+        _buildListTile(
+          iconWidget: Icon(
+            CupertinoIcons.person_2_fill,
+            color: AppColors.textPrimary,
+            size: 24.sp,
+          ),
+          title: "Xem thành viên trong nhóm",
+          subtitle: "${participants.length} thành viên",
+          onTap: () {},
+        ),
+        _buildListTile(
+          iconWidget: Icon(
+            CupertinoIcons.link,
+            color: AppColors.textPrimary,
+            size: 24.sp,
+          ),
+          title: "Liên kết nhóm",
+          onTap: () {},
+        ),
+        SizedBox(height: 10.h),
+        Divider(
+          height: 1,
+          color: AppColors.divider,
+          indent: 16.w,
+          endIndent: 16.w,
+        ),
+      ],
     );
   }
 
@@ -390,5 +589,22 @@ class ChatInfoPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showChangeGroupNameDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => ChangeGroupNameDialog(
+        currentName: _groupName.isNotEmpty ? _groupName : "Tên nhóm",
+        conversationId: widget.conversationId,
+        userId: widget.userId,
+      ),
+    ).then((newName) {
+      if (newName != null) {
+        setState(() {
+          _groupName = newName;
+        });
+      }
+    });
   }
 }

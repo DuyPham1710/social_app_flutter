@@ -97,10 +97,14 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             if (state is AuthLoaded &&
                 state.flowType == 'update_personal_info') {
               BlocProvider.of<AuthBloc>(context).add(AuthReset());
-              showDialogSuccess(context, "Registration");
+              showDialogSuccess(
+                context,
+                "Cập nhật thông tin cá nhân thành công",
+              );
             } else if (state is AuthError &&
                 state.flowType == 'update_personal_info') {
-              final message = state.errorMessage ?? 'Đăng ký thất bại';
+              final message =
+                  state.errorMessage ?? 'Cập nhật thông tin cá nhân thất bại';
               UIUtils.showErrorMessage(context, message);
             }
           },
@@ -129,7 +133,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Personal Information",
+                          "Thông tin cá nhân",
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -140,7 +144,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       SizedBox(height: 10.h),
 
                       Text(
-                        "Please fill the following information",
+                        "Vui lòng điền đầy đủ thông tin sau",
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Colors.grey[600],
@@ -150,26 +154,26 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       SizedBox(height: 40.h),
 
                       TextformfieldCustom(
-                        label: "Full Name",
+                        label: "Họ và tên",
                         isPassword: false,
                         controller: fullNameController,
                         focusNode: fullNameFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your Full Name';
+                            return 'Vui lòng nhập họ và tên';
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 20.h),
                       TextformfieldCustom(
-                        label: "Phone Number",
+                        label: "Số điện thoại",
                         isPassword: false,
                         controller: phoneNumberController,
                         focusNode: phoneNumberFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your Phone Number';
+                            return 'Vui lòng nhập số điện thoại';
                           }
                           return null;
                         },
@@ -180,7 +184,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                         children: [
                           TextformfieldCustom(
                             width: 150.w,
-                            label: "Date of Birth",
+                            label: "Ngày sinh",
                             isPassword: false,
                             controller: dateOfBirthController,
                             focusNode: dateOfBirthFocusNode,
@@ -205,7 +209,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your Date of Birth';
+                                return 'Vui lòng nhập ngày sinh';
                               }
                               return null;
                             },
@@ -213,7 +217,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
                           TextformfieldCustom(
                             width: 150.w,
-                            label: "Gender",
+                            label: "Giới tính",
                             isPassword: false,
                             controller: genderController,
                             focusNode: genderFocusNode,
@@ -247,7 +251,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your Gender';
+                                return 'Vui lòng nhập giới tính';
                               }
                               return null;
                             },
@@ -258,7 +262,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       SizedBox(height: 20.h),
 
                       TextformfieldCustom(
-                        label: "Bio",
+                        label: "Tiểu sử",
                         isPassword: false,
                         controller: bioController,
                         focusNode: bioFocusNode,
@@ -275,7 +279,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                           : ButtonCustom(
                               onPressed: () =>
                                   _onInfoSubmitted(context, userId),
-                              text: "Continue",
+                              text: "Tiếp tục",
                             ),
 
                       SizedBox(height: 24.h),
@@ -284,7 +288,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Already have an Account? ",
+                            "Bạn đã có tài khoản? ",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 14.sp,
@@ -296,7 +300,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                               Navigator.pushNamed(context, '/login');
                             },
                             child: Text(
-                              "Sign in",
+                              "Đăng nhập",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14.sp,
