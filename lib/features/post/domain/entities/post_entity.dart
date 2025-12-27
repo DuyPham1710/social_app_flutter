@@ -6,7 +6,7 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 
 class PostEntity extends PrivacyBase {
   final String id;
-  final String caption;
+  final String? caption;
   final UserEntity user;
   final List<PostUrlEntity> urls;
   final String layout;
@@ -17,7 +17,7 @@ class PostEntity extends PrivacyBase {
 
   const PostEntity({
     required this.id,
-    required this.caption,
+    this.caption,
     required this.user,
     required this.urls,
     required this.layout,

@@ -91,6 +91,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
                 userInfo: widget.friendInfo,
                 conversationId: widget.conversationId,
                 userId: widget.userId,
+                onInitiateCall: widget.onInitiateCall,
               ),
             ),
           ).then((newGroupName) {
@@ -182,6 +183,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
                   userInfo: widget.friendInfo,
                   conversationId: widget.conversationId,
                   userId: widget.userId,
+                  onInitiateCall: widget.onInitiateCall,
                 ),
               ),
             ).then((newGroupName) {

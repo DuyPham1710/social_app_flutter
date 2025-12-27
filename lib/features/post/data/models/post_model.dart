@@ -13,7 +13,7 @@ part 'post_model.g.dart';
 class PostModel extends PostEntity with _$PostModel {
   const factory PostModel({
     @JsonKey(name: '_id') required String id,
-    required String caption,
+    String? caption,
     @JsonKey(name: 'userId') required UserModel user,
     required List<PostUrlModel> urls,
     required String layout,

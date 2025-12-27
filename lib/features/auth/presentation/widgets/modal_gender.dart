@@ -20,7 +20,7 @@ class ModalGender extends StatelessWidget {
       actions: [
         CupertinoActionSheetAction(
           onPressed: () {
-            Navigator.pop(context, "Male");
+            Navigator.pop(context, "Nam");
           },
           child: Text(
             "Nam",
@@ -29,7 +29,7 @@ class ModalGender extends StatelessWidget {
         ),
         CupertinoActionSheetAction(
           onPressed: () {
-            Navigator.pop(context, "Female");
+            Navigator.pop(context, "Nữ");
           },
           child: Text(
             "Nữ",
@@ -38,7 +38,7 @@ class ModalGender extends StatelessWidget {
         ),
         CupertinoActionSheetAction(
           onPressed: () {
-            Navigator.pop(context, "Other");
+            Navigator.pop(context, "Khác");
           },
           child: Text(
             "Khác",

@@ -3,15 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_item.dart';
 
 class FriendForUserPage extends StatefulWidget {
   final String userId;
+  final String username;
   final String fullName;
   const FriendForUserPage({
     super.key,
     required this.userId,
+    required this.username,
     required this.fullName,
   });
 
@@ -28,9 +34,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
   void initState() {
     super.initState();
     // Load danh sách bạn bè khi khởi tạo
-    context.read<FriendForUserBloc>().add(
-      LoadFriendsByUserId(widget.userId ?? ''),
-    );
+    context.read<FriendForUserBloc>().add(LoadFriendsByUserId(widget.userId));
   }
 
   @override
@@ -224,11 +228,31 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                                 mutualFriends: friend.mutualFriendsCount ?? 0,
                                 avatarUrl: friend.avatarUrl,
                                 mutualFriendAvatars: friend.mutualFriendAvatars,
+                                onMyFriend: false,
                                 onMessage: () {
-                                  _showMessage(
-                                    context,
-                                    'Nhắn tin cho ${friend.fullName}',
-                                  );
+                                  // final messageBloc = s1<MessageBloc>();
+
+                                  // UserEntity friendInfo = UserEntity(
+                                  //   userId: friend.userId,
+                                  //   username: friend.username,
+                                  //   fullName: friend.fullName,
+                                  //   avatarUrl: friend.avatarUrl,
+                                  // );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   CupertinoPageRoute(
+                                  //     builder: (_) => BlocProvider(
+                                  //       create: (_) => messageBloc,
+                                  //       child: ChatDetailPage(
+                                  //         // Pass friendId to create new conversation
+                                  //         userId: widget.userId,
+                                  //         username: widget.username,
+                                  //         friendId: friend.userId,
+                                  //         friendInfo: friendInfo,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // );
                                 },
                                 onMoreOptions: () {
                                   _showMoreOptions(context, friend);
@@ -407,7 +431,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
 
   void _showMoreOptions(BuildContext context, dynamic friend) {
     final name = friend.fullName ?? 'Người dùng';
-    final avatarUrl = friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg';
+    final avatarUrl =
+        friend.avatarUrl ??
+        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg';
     final friendsSince = friend.friendsSince as DateTime?;
 
     showModalBottomSheet(

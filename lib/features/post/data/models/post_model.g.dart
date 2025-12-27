@@ -9,7 +9,7 @@ part of 'post_model.dart';
 _$PostModelImpl _$$PostModelImplFromJson(Map<String, dynamic> json) =>
     _$PostModelImpl(
       id: json['_id'] as String,
-      caption: json['caption'] as String,
+      caption: json['caption'] as String?,
       user: UserModel.fromJson(json['userId'] as Map<String, dynamic>),
       urls: (json['urls'] as List<dynamic>)
           .map((e) => PostUrlModel.fromJson(e as Map<String, dynamic>))

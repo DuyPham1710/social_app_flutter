@@ -271,13 +271,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     SizedBox(height: 10.h),
 
                     // Caption
-                    if (post.caption.isNotEmpty)
+                    if (post.caption != null && post.caption!.isNotEmpty)
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12.w),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            post.caption,
+                            post.caption!,
                             style: TextStyle(fontSize: 14.sp, height: 1.4),
                           ),
                         ),

@@ -147,10 +147,7 @@ class _PostItemState extends State<PostItem> {
             user: user,
             createdAt: widget.post.createdAt,
             onOptionsTap: () {
-              PostOptionsBottomSheet.show(
-                context,
-                post: widget.post,
-              );
+              PostOptionsBottomSheet.show(context, post: widget.post);
             },
             onReportTap: () {
               ReportPostBottomSheet.show(
@@ -162,10 +159,14 @@ class _PostItemState extends State<PostItem> {
           ),
 
           // Caption
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: Text(widget.post.caption, style: TextStyle(fontSize: 13.sp)),
-          ),
+          if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              child: Text(
+                widget.post.caption!,
+                style: TextStyle(fontSize: 13.sp),
+              ),
+            ),
 
           SizedBox(height: 8.h),
 

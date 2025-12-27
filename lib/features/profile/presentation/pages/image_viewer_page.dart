@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 
 class ImageViewerPage extends StatefulWidget {
   final String imageUrl;
   final String? title;
 
-  const ImageViewerPage({
-    super.key,
-    required this.imageUrl,
-    this.title,
-  });
+  const ImageViewerPage({super.key, required this.imageUrl, this.title});
 
   @override
   State<ImageViewerPage> createState() => _ImageViewerPageState();
@@ -50,7 +45,9 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         initialScale: PhotoViewComputedScale.contained,
         loadingBuilder: (context, event) => Center(
           child: CircularProgressIndicator(
-            value: event == null ? null : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+            value: event == null
+                ? null
+                : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
           ),
         ),
       ),

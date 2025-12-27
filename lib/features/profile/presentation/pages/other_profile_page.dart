@@ -168,6 +168,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                           MaterialPageRoute(
                             builder: (context) => FriendForUserPage(
                               userId: user.userId,
+                              username: user.username ?? "user",
                               fullName: user.fullName ?? "Người dùng",
                             ),
                           ),

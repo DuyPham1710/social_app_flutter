@@ -20,6 +20,7 @@ class FriendItem extends StatelessWidget {
   final List<String>? mutualFriendAvatars;
   final bool? isOnline;
   final DateTime? lastSeen;
+  final bool onMyFriend;
   final VoidCallback? onMessage;
   final VoidCallback? onMoreOptions;
 
@@ -32,6 +33,7 @@ class FriendItem extends StatelessWidget {
     this.mutualFriendAvatars,
     this.isOnline,
     this.lastSeen,
+    required this.onMyFriend,
     this.onMessage,
     this.onMoreOptions,
   });
@@ -170,45 +172,47 @@ class FriendItem extends StatelessWidget {
             ),
           ),
           // Action buttons
-          Row(
-            children: [
-              // Message button
-              GestureDetector(
-                onTap: onMessage,
-                child: Container(
-                  width: 36.r,
-                  height: 36.r,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    CupertinoIcons.chat_bubble_fill,
-                    size: 18.r,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              // More options button
-              GestureDetector(
-                onTap: onMoreOptions,
-                child: Container(
-                  width: 36.r,
-                  height: 36.r,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.more_horiz,
-                    size: 20.r,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          onMyFriend
+              ? Row(
+                  children: [
+                    // Message button
+                    GestureDetector(
+                      onTap: onMessage,
+                      child: Container(
+                        width: 36.r,
+                        height: 36.r,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          CupertinoIcons.chat_bubble_fill,
+                          size: 18.r,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    // More options button
+                    GestureDetector(
+                      onTap: onMoreOptions,
+                      child: Container(
+                        width: 36.r,
+                        height: 36.r,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.more_horiz,
+                          size: 20.r,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox.shrink(),
         ],
       ),
     );

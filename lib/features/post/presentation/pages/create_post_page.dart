@@ -28,6 +28,7 @@ import 'package:social_app_fe/features/post/presentation/pages/edit_selected_ima
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CreatePostPage extends StatefulWidget {
@@ -64,8 +65,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
     // ẩn bàn phím
     FocusScope.of(context).unfocus();
 
+    // Kiểm tra nếu cả caption và ảnh đều trống
+    if (_captionController.text.trim().isEmpty && _selectedAssets.isEmpty) {
+      showErrorSnackBar(
+        context,
+        'Vui lòng nhập nội dung hoặc chọn ảnh để đăng',
+      );
+      return;
+    }
+
     // Validation: Nếu chọn friends_except hoặc friends_detail, phải có danh sách bạn bè
-    if (_selectedPrivacy == PrivacyType.friendsExcept && _friendsExceptIds.isEmpty) {
+    if (_selectedPrivacy == PrivacyType.friendsExcept &&
+        _friendsExceptIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng chọn bạn bè cần ẩn bài viết'),
@@ -75,7 +86,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       return;
     }
 
-    if (_selectedPrivacy == PrivacyType.friendsDetail && _friendsDetailIds.isEmpty) {
+    if (_selectedPrivacy == PrivacyType.friendsDetail &&
+        _friendsDetailIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng chọn bạn bè được phép xem bài viết'),
@@ -102,11 +114,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
       // Chỉ gửi friendsExcept/friendsDetail nếu privacy type tương ứng
       List<String>? friendsExcept;
       List<String>? friendsDetail;
-      
-      if (_selectedPrivacy == PrivacyType.friendsExcept && _friendsExceptIds.isNotEmpty) {
+
+      if (_selectedPrivacy == PrivacyType.friendsExcept &&
+          _friendsExceptIds.isNotEmpty) {
         friendsExcept = _friendsExceptIds;
       }
-      if (_selectedPrivacy == PrivacyType.friendsDetail && _friendsDetailIds.isNotEmpty) {
+      if (_selectedPrivacy == PrivacyType.friendsDetail &&
+          _friendsDetailIds.isNotEmpty) {
         friendsDetail = _friendsDetailIds;
       }
 
@@ -232,11 +246,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Future<void> _handleCameraResult(Map<String, dynamic> result) async {
     final String filePath = result['path'];
     final String fileType = result['type'];
-    
+
     // Chỉ xử lý ảnh, bỏ qua video
     if (fileType == 'photo') {
       final File imageFile = File(filePath);
-      
+
       // Navigate đến EditSelectedImagePage để chỉnh sửa ảnh
       final editedFiles = await Navigator.push<List<File>>(
         context,
@@ -249,7 +263,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
           ),
         ),
       );
-      
+
       // Nếu có file được edit, convert thành AssetEntity
       if (editedFiles != null && editedFiles.isNotEmpty) {
         for (final file in editedFiles) {
@@ -285,11 +299,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Future<AssetEntity?> _createAssetFromFile(File file) async {
     try {
       // Lưu file vào gallery
-      final AssetEntity? asset = await PhotoManager.editor.saveImageWithPath(
+      final AssetEntity asset = await PhotoManager.editor.saveImageWithPath(
         file.path,
         title: "camera_${DateTime.now().millisecondsSinceEpoch}",
       );
-      
+
       return asset;
     } catch (e) {
       print('Error creating AssetEntity: $e');
@@ -595,18 +609,40 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                       setState(() {
                                                         // result có thể là String (cũ) hoặc Map (mới)
                                                         if (result is Map) {
-                                                          _selectedPrivacyLabel = result['label'] as String;
-                                                          _friendsExceptIds = (result['friendsExcept'] as List<dynamic>?)
-                                                              ?.map((e) => e.toString())
-                                                              .toList() ?? [];
-                                                          _friendsDetailIds = (result['friendsDetail'] as List<dynamic>?)
-                                                              ?.map((e) => e.toString())
-                                                              .toList() ?? [];
-                                                        } else if (result is String) {
+                                                          _selectedPrivacyLabel =
+                                                              result['label']
+                                                                  as String;
+                                                          _friendsExceptIds =
+                                                              (result['friendsExcept']
+                                                                      as List<
+                                                                        dynamic
+                                                                      >?)
+                                                                  ?.map(
+                                                                    (e) => e
+                                                                        .toString(),
+                                                                  )
+                                                                  .toList() ??
+                                                              [];
+                                                          _friendsDetailIds =
+                                                              (result['friendsDetail']
+                                                                      as List<
+                                                                        dynamic
+                                                                      >?)
+                                                                  ?.map(
+                                                                    (e) => e
+                                                                        .toString(),
+                                                                  )
+                                                                  .toList() ??
+                                                              [];
+                                                        } else if (result
+                                                            is String) {
                                                           // Backward compatibility
-                                                          _selectedPrivacyLabel = result;
-                                                          _friendsExceptIds = [];
-                                                          _friendsDetailIds = [];
+                                                          _selectedPrivacyLabel =
+                                                              result;
+                                                          _friendsExceptIds =
+                                                              [];
+                                                          _friendsDetailIds =
+                                                              [];
                                                         }
 
                                                         _selectedPrivacy =

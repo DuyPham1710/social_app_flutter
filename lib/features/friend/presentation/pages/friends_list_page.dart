@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_online_service.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_item.dart';
@@ -22,12 +26,14 @@ class _FriendsListPageState extends State<FriendsListPage> {
   String _sortBy = 'name'; // 'name', 'recent', 'online'
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  
+
   FriendOnlineService? _onlineService;
-  StreamSubscription<Map<String, FriendOnlineStatus>>? _friendsStatusSubscription;
+  StreamSubscription<Map<String, FriendOnlineStatus>>?
+  _friendsStatusSubscription;
   Map<String, FriendOnlineStatus> _friendsStatus = {};
   bool _hasInitializedFriendsStatus = false;
-
+  late String userId;
+  late String username;
   @override
   void initState() {
     super.initState();
@@ -42,19 +48,21 @@ class _FriendsListPageState extends State<FriendsListPage> {
       final userData = await TokenStorage.getUserData();
       if (userData == null || !mounted) return;
 
-      final userId = userData['id']?.toString() ?? '';
-      final username = userData['username']?.toString() ?? 
-                      userData['fullName']?.toString() ?? 'User';
+      userId = userData['id']?.toString() ?? '';
+      username =
+          userData['username']?.toString() ??
+          userData['fullName']?.toString() ??
+          'User';
 
       if (userId.isEmpty) return;
 
       // Khởi tạo service
       final socketClient = SocketClient();
       _onlineService = FriendOnlineService(socketClient);
-      
+
       // Kết nối và lắng nghe
       _onlineService!.connect(userId, username);
-      
+
       // Lắng nghe stream trạng thái bạn bè
       _friendsStatusSubscription = _onlineService!.friendsStatusStream.listen(
         (statusMap) {
@@ -90,10 +98,10 @@ class _FriendsListPageState extends State<FriendsListPage> {
         } else if (state is FriendActionError) {
           _showMessage(context, state.message);
         }
-        
+
         // Khởi tạo trạng thái bạn bè khi có danh sách mới
-        if (state is FriendLoaded && 
-            _onlineService != null && 
+        if (state is FriendLoaded &&
+            _onlineService != null &&
             !_hasInitializedFriendsStatus &&
             state.friends.isNotEmpty) {
           final friendIds = state.friends.map((f) => f.userId).toList();
@@ -104,243 +112,270 @@ class _FriendsListPageState extends State<FriendsListPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Bạn bè',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(CupertinoIcons.back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(CupertinoIcons.search, color: Colors.black),
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
+          title: Text(
+            'Bạn bè',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
           ),
-        ],
-      ),
-      body: BlocBuilder<FriendBloc, FriendState>(
-        builder: (context, state) {
-          if (state is FriendLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is FriendLoaded) {
-            final friends = state.friends;
-            
-            final filteredFriends = friends.where((f) {
-              if (_searchQuery.isEmpty) return true;
-              final q = _searchQuery.toLowerCase();
-              final name = (f.fullName ?? '').toLowerCase();
-              final username = (f.username ?? '').toLowerCase();
-              return name.contains(q) || username.contains(q);
-            }).toList();
-            
-            // Đếm số lượng bạn bè online từ status
-            final onlineFriendsCount = _friendsStatus.values
-                .where((status) => status.isOnline)
-                .length;
+          actions: [
+            IconButton(
+              icon: const Icon(CupertinoIcons.search, color: Colors.black),
+              onPressed: () {
+                Navigator.pushNamed(context, '/search');
+              },
+            ),
+          ],
+        ),
+        body: BlocBuilder<FriendBloc, FriendState>(
+          builder: (context, state) {
+            if (state is FriendLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is FriendLoaded) {
+              final friends = state.friends;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Search bar
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm bạn bè',
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(CupertinoIcons.xmark_circle_fill),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                            )
-                          : null,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+              final filteredFriends = friends.where((f) {
+                if (_searchQuery.isEmpty) return true;
+                final q = _searchQuery.toLowerCase();
+                final name = (f.fullName ?? '').toLowerCase();
+                final username = (f.username ?? '').toLowerCase();
+                return name.contains(q) || username.contains(q);
+              }).toList();
+
+              // Đếm số lượng bạn bè online từ status
+              final onlineFriendsCount = _friendsStatus.values
+                  .where((status) => status.isOnline)
+                  .length;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Search bar
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Tìm kiếm bạn bè',
+                        prefixIcon: const Icon(CupertinoIcons.search),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(
+                                  CupertinoIcons.xmark_circle_fill,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 10.h,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        fillColor: Colors.white,
+                        filled: true,
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(color: AppColors.primary),
-                      ),
-                      fillColor: Colors.white,
-                      filled: true,
                     ),
                   ),
-                ),
-                // Header section
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade200,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${filteredFriends.length} bạn bè',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: _showSortOptions,
-                            child: Text(
-                              'Sắp xếp',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        '$onlineFriendsCount người đang hoạt động',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w400,
+                  // Header section
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade200,
+                          width: 1,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-
-                // Friends list
-                Expanded(
-                  child: filteredFriends.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                CupertinoIcons.person_2,
-                                size: 64.r,
-                                color: Colors.grey[400],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${filteredFriends.length} bạn bè',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
                               ),
-                              SizedBox(height: 16.h),
-                              Text(
-                                'Chưa có bạn bè nào',
+                            ),
+                            GestureDetector(
+                              onTap: _showSortOptions,
+                              child: Text(
+                                'Sắp xếp',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
                                 ),
                               ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: filteredFriends.length,
-                          itemBuilder: (context, index) {
-                            final friend = filteredFriends[index];
-                            // Lấy trạng thái online từ WebSocket
-                            final friendStatus = _friendsStatus[friend.userId];
-                            
-                            return FriendItem(
-                              friendId: friend.userId,
-                              name: friend.fullName ?? 'Người dùng',
-                              mutualFriends: friend.mutualFriendsCount ?? 0,
-                              avatarUrl: friend.avatarUrl,
-                              mutualFriendAvatars: friend.mutualFriendAvatars,
-                              isOnline: friendStatus?.isOnline,
-                              lastSeen: friendStatus?.lastSeen,
-                              onMessage: () {
-                                _showMessage(context, 'Nhắn tin cho ${friend.fullName}');
-                              },
-                              onMoreOptions: () {
-                                _showMoreOptions(context, friend);
-                              },
-                            );
-                          },
+                            ),
+                          ],
                         ),
-                ),
-              ],
-            );
-            } else if (state is FriendError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64.r,
-                    color: Colors.red[300],
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Lỗi tải dữ liệu',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w600,
+                        SizedBox(height: 8.h),
+                        Text(
+                          '$onlineFriendsCount người đang hoạt động',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    state.message,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.grey[600],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 16.h),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<FriendBloc>().add(const LoadFriends());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                    child: const Text('Thử lại'),
+
+                  // Friends list
+                  Expanded(
+                    child: filteredFriends.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.person_2,
+                                  size: 64.r,
+                                  color: Colors.grey[400],
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  'Chưa có bạn bè nào',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredFriends.length,
+                            itemBuilder: (context, index) {
+                              final friend = filteredFriends[index];
+                              // Lấy trạng thái online từ WebSocket
+                              final friendStatus =
+                                  _friendsStatus[friend.userId];
+
+                              return FriendItem(
+                                friendId: friend.userId,
+                                name: friend.fullName ?? 'Người dùng',
+                                mutualFriends: friend.mutualFriendsCount ?? 0,
+                                avatarUrl: friend.avatarUrl,
+                                mutualFriendAvatars: friend.mutualFriendAvatars,
+                                isOnline: friendStatus?.isOnline,
+                                lastSeen: friendStatus?.lastSeen,
+                                onMyFriend: true,
+                                onMessage: () {
+                                  // final messageBloc = s1<MessageBloc>();
+
+                                  // UserEntity friendInfo = UserEntity(
+                                  //   userId: friend.userId,
+                                  //   username: friend.username,
+                                  //   fullName: friend.fullName,
+                                  //   avatarUrl: friend.avatarUrl,
+                                  // );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   CupertinoPageRoute(
+                                  //     builder: (_) => BlocProvider(
+                                  //       create: (_) => messageBloc,
+                                  //       child: ChatDetailPage(
+                                  //         // Pass friendId to create new conversation
+                                  //         userId: userId,
+                                  //         username: username,
+                                  //         friendId: friend.userId,
+                                  //         friendInfo: friendInfo,
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // );
+                                },
+                                onMoreOptions: () {
+                                  _showMoreOptions(context, friend);
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
-              ),
-            );
-          }
+              );
+            } else if (state is FriendError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64.r,
+                      color: Colors.red[300],
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'Lỗi tải dữ liệu',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      state.message,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16.h),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<FriendBloc>().add(const LoadFriends());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              );
+            }
 
             return const SizedBox.shrink();
           },
@@ -416,11 +451,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
               ),
             ),
             if (isSelected)
-              Icon(
-                Icons.check,
-                color: AppColors.primary,
-                size: 24.r,
-              ),
+              Icon(Icons.check, color: AppColors.primary, size: 24.r),
           ],
         ),
       ),
@@ -429,29 +460,38 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
   }
 
   String _formatFriendsSince(DateTime? friendsSince) {
     if (friendsSince == null) return 'Là bạn bè từ lâu';
-    
+
     final months = [
-      'tháng 1', 'tháng 2', 'tháng 3', 'tháng 4', 'tháng 5', 'tháng 6',
-      'tháng 7', 'tháng 8', 'tháng 9', 'tháng 10', 'tháng 11', 'tháng 12'
+      'tháng 1',
+      'tháng 2',
+      'tháng 3',
+      'tháng 4',
+      'tháng 5',
+      'tháng 6',
+      'tháng 7',
+      'tháng 8',
+      'tháng 9',
+      'tháng 10',
+      'tháng 11',
+      'tháng 12',
     ];
-    
+
     return 'Là bạn bè từ ${months[friendsSince.month - 1]} năm ${friendsSince.year}';
   }
 
   void _showMoreOptions(BuildContext context, dynamic friend) {
     final name = friend.fullName ?? 'Người dùng';
-    final avatarUrl = friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg';
+    final avatarUrl =
+        friend.avatarUrl ??
+        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg';
     final friendsSince = friend.friendsSince as DateTime?;
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -556,7 +596,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
           children: [
             Icon(
               icon,
-              color: iconColor ?? (isDestructive ? Colors.red : Colors.grey[700]),
+              color:
+                  iconColor ?? (isDestructive ? Colors.red : Colors.grey[700]),
               size: 24.r,
             ),
             SizedBox(width: 16.w),
@@ -577,7 +618,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
   void _showUnfriendDialog(dynamic friend) {
     final name = friend.fullName ?? 'Người dùng';
     final friendId = friend.userId;
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -594,9 +635,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
               // Gọi RemoveFriend event với friendId
               context.read<FriendBloc>().add(RemoveFriend(friendId: friendId));
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Xác nhận'),
           ),
         ],

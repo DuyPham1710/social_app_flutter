@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 // Thay đổi đường dẫn theo dự án của bạn
@@ -34,16 +33,24 @@ class _SingleImagePickerPageState extends State<SingleImagePickerPage> {
   }
 
   Future<void> _fetchAssets() async {
-    // 1. Xin quyền truy cập ảnh
+    // Xin quyền truy cập ảnh
     final PermissionState ps = await PhotoManager.requestPermissionExtend();
     if (ps.isAuth) {
-      // 2. Lấy album Recent (Gần đây)
+      // Lấy album Recent (Gần đây) với sắp xếp từ mới nhất tới cũ nhất
       final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
         type: RequestType.image,
         hasAll: true,
+        filterOption: FilterOptionGroup(
+          orders: [
+            const OrderOption(
+              type: OrderOptionType.createDate,
+              asc: false, // false = giảm dần (mới nhất trước)
+            ),
+          ],
+        ),
       );
       if (paths.isNotEmpty) {
-        // 3. Lấy danh sách ảnh trong album đầu tiên
+        // Lấy danh sách ảnh trong album đầu tiên
         // Lấy 100 ảnh demo, thực tế nên dùng phân trang (load more)
         final List<AssetEntity> entities = await paths[0].getAssetListPaged(
           page: 0,

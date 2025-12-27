@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/change_avatar_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/change_group_name_dialog.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/core/di/injection.dart' as di;
 
 class ChatInfoPage extends StatefulWidget {
   final bool isGroup;
@@ -15,6 +20,7 @@ class ChatInfoPage extends StatefulWidget {
   final UserEntity? userInfo;
   final String? conversationId;
   final String? userId;
+  final Function(String callType)? onInitiateCall;
 
   const ChatInfoPage({
     super.key,
@@ -25,6 +31,7 @@ class ChatInfoPage extends StatefulWidget {
     this.userInfo,
     this.conversationId,
     this.userId,
+    this.onInitiateCall,
   });
 
   @override
@@ -224,26 +231,48 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildActionBtn(
+                  onTap: () => widget.onInitiateCall?.call('audio'),
                   icon: CupertinoIcons.phone_fill,
                   label: "Gọi thoại",
                 ),
                 _buildActionBtn(
+                  onTap: () => widget.onInitiateCall?.call('video'),
                   icon: CupertinoIcons.videocam_fill,
                   label: "Gọi video",
                 ),
 
                 widget.isGroup
                     ? _buildActionBtn(
+                        onTap: () {},
                         icon: Icons.person_add,
                         label: "Thêm thành viên",
                         size: 20.sp,
                       )
                     : _buildActionBtn(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BlocProvider(
+                                create: (_) => di.s1<OtherProfileBloc>()
+                                  ..add(
+                                    LoadOtherUserProfileEvent(
+                                      userId: widget.userInfo!.userId,
+                                    ),
+                                  ),
+                                child: OtherProfilePage(
+                                  userId: widget.userInfo!.userId,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                         icon: CupertinoIcons.person_fill,
                         label: "Trang cá nhân",
                         size: 22.sp,
                       ),
                 _buildActionBtn(
+                  onTap: () {},
                   icon: CupertinoIcons.bell_fill,
                   label: "Tắt thông báo",
                   size: 20.sp,
@@ -477,35 +506,39 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
   }
 
   Widget _buildActionBtn({
+    required VoidCallback onTap,
     required IconData icon,
     required String label,
     double size = 24,
   }) {
-    return Column(
-      children: [
-        Container(
-          width: 44.w,
-          height: 44.w,
-          decoration: BoxDecoration(
-            color: AppColors.textSecondary.withOpacity(0.1),
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 44.w,
+            height: 44.w,
+            decoration: BoxDecoration(
+              color: AppColors.textSecondary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.textPrimary, size: size.sp),
           ),
-          child: Icon(icon, color: AppColors.textPrimary, size: size.sp),
-        ),
-        SizedBox(height: 6.h),
-        SizedBox(
-          width: 70.w, // Giới hạn chiều rộng để text tự xuống dòng nếu dài
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: AppColors.textPrimary,
-              height: 1.2,
+          SizedBox(height: 6.h),
+          SizedBox(
+            width: 70.w, // Giới hạn chiều rộng để text tự xuống dòng nếu dài
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: AppColors.textPrimary,
+                height: 1.2,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

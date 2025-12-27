@@ -14,7 +14,6 @@ import 'package:social_app_fe/core/network/my_http_overrides.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/core/services/firebase_background_handler.dart';
-import 'package:social_app_fe/features/notification/presentation/bloc/notification_event.dart';
 import 'package:social_app_fe/features/notification/presentation/services/notification_fcm_service.dart';
 import 'package:social_app_fe/features/app/presentation/pages/main_page.dart';
 import 'package:social_app_fe/features/app/presentation/pages/splash_page.dart';
@@ -248,7 +247,7 @@ class _MyAppState extends State<MyApp> {
 
     try {
       // Wait for app to be ready
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future.delayed(const Duration(milliseconds: 600));
 
       // Get current context
       final context = _navigatorKey.currentContext;

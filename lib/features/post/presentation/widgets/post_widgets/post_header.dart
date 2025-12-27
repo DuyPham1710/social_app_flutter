@@ -11,7 +11,6 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class PostHeader extends StatelessWidget {
   final UserEntity user;

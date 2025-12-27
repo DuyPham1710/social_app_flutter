@@ -101,12 +101,12 @@ class FcmService {
 
     await _localNotifications.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: _onLocalNotificationTap,
+      onDidReceiveNotificationResponse: onLocalNotificationTap,
     );
   }
 
   /// Handle local notification tap
-  void _onLocalNotificationTap(NotificationResponse response) {
+  void onLocalNotificationTap(NotificationResponse response) {
     debugPrint('[FCM] Local notification tapped: ${response.payload}');
 
     if (response.payload != null && response.payload!.isNotEmpty) {

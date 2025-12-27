@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/post_loading_page.dart';
@@ -282,6 +283,8 @@ class _NotificationPageState extends State<NotificationPage> {
           if (state.notifications.isEmpty) {
             print('[NotificationPage] No notifications to display');
             return RefreshIndicator(
+              color: AppColors.primary,
+              backgroundColor: AppColors.background,
               onRefresh: () async {
                 _currentPage = 1;
                 context.read<NotificationBloc>().add(ReloadNotifications());
@@ -538,8 +541,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   PostDetailPage(post: result.data!),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
+                    return FadeTransition(opacity: animation, child: child);
+                  },
               transitionDuration: const Duration(milliseconds: 300),
             ),
           );

@@ -40,6 +40,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
 
     showModalBottomSheet(
+      backgroundColor: AppColors.background,
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -164,6 +165,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),

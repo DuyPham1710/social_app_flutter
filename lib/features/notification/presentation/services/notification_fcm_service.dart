@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:social_app_fe/core/enums/notification_type.dart';
 import 'package:http/http.dart' as http;
+import 'package:social_app_fe/core/services/fcm_service.dart';
 
 /// Service to handle Firebase Cloud Messaging for app notifications
 /// (not chat messages - those are handled by FcmService)
@@ -15,7 +15,7 @@ class NotificationFcmService {
 
   // Track if user is currently on notification page
   static bool _isOnNotificationPage = false;
-  
+
   static void setOnNotificationPage(bool isOn) {
     _isOnNotificationPage = isOn;
     debugPrint('[NotificationFCM] User on notification page: $isOn');
@@ -93,7 +93,14 @@ class NotificationFcmService {
     );
 
     if (response.payload != null && response.payload!.isNotEmpty) {
-      handleNotificationTap(response.payload!);
+      // Check if this is a chat message notification
+      final parts = response.payload!.split('|');
+      if (parts.isNotEmpty && parts[0] == 'new_message') {
+        FcmService().onLocalNotificationTap(response);
+      } else {
+        // Handle app notifications
+        handleNotificationTap(response.payload!);
+      }
     }
   }
 
@@ -106,12 +113,14 @@ class NotificationFcmService {
       final senderId = parts.length >= 3 ? parts[2] : null;
       final notificationId = parts.length >= 4 ? parts[3] : null;
 
-      _navigateBasedOnType(
-        type,
-        targetId: targetId,
-        senderId: senderId,
-        notificationId: notificationId,
-      );
+      if (_isAppNotificationType(type)) {
+        _navigateBasedOnType(
+          type,
+          targetId: targetId,
+          senderId: senderId,
+          notificationId: notificationId,
+        );
+      }
     }
   }
 
@@ -131,7 +140,7 @@ class NotificationFcmService {
         );
         return;
       }
-      
+
       debugPrint(
         '[NotificationFCM] Showing local notification for: $messageType',
       );

@@ -1,16 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
-import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
-import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
-import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -19,7 +17,6 @@ import 'package:social_app_fe/features/profile/presentation/pages/other_profile_
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/features/search/domain/entities/search_history_entity.dart';
-import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 
 class SearchHistoryItem extends StatelessWidget {
@@ -35,10 +32,12 @@ class SearchHistoryItem extends StatelessWidget {
   void _showBottomSheet(BuildContext context) {
     final hasViewedUser = history.viewedUser != null;
     final displayName = hasViewedUser
-        ? (history.viewedUser!.fullName ?? history.viewedUser!.username ?? 'Người dùng')
+        ? (history.viewedUser!.fullName ??
+              history.viewedUser!.username ??
+              'Người dùng')
         : history.query!;
     final avatarUrl = hasViewedUser ? history.viewedUser!.avatarUrl : null;
-    
+
     // Lưu SearchBloc từ context cha trước khi show bottom sheet
     final searchBloc = context.read<SearchBloc>();
 
@@ -47,7 +46,7 @@ class SearchHistoryItem extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (bottomSheetContext) => Container(
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: AppColors.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20.r),
             topRight: Radius.circular(20.r),
@@ -62,7 +61,7 @@ class SearchHistoryItem extends StatelessWidget {
               width: 40.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.grey[700],
+                color: AppColors.textSecondary,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -74,7 +73,8 @@ class SearchHistoryItem extends StatelessWidget {
                   hasViewedUser
                       ? CircleAvatar(
                           radius: 24.r,
-                          backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                          backgroundImage:
+                              avatarUrl != null && avatarUrl.isNotEmpty
                               ? NetworkImage(avatarUrl)
                               : null,
                           child: avatarUrl == null || avatarUrl.isEmpty
@@ -105,7 +105,7 @@ class SearchHistoryItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -115,18 +115,12 @@ class SearchHistoryItem extends StatelessWidget {
               ),
             ),
             // Đường phân cách
-            Divider(
-              color: Colors.grey[800],
-              height: 1,
-              thickness: 1,
-            ),
+            Divider(color: AppColors.divider, height: 1, thickness: 1),
             // Action: Xóa
             InkWell(
               onTap: () {
                 Navigator.pop(bottomSheetContext);
-                searchBloc.add(
-                  DeleteSearchHistory(historyId: history.id),
-                );
+                searchBloc.add(DeleteSearchHistory(historyId: history.id));
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -135,7 +129,7 @@ class SearchHistoryItem extends StatelessWidget {
                     Icon(
                       CupertinoIcons.delete,
                       size: 22.r,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                     SizedBox(width: 16.w),
                     Expanded(
@@ -147,7 +141,7 @@ class SearchHistoryItem extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 2.h),
@@ -155,7 +149,7 @@ class SearchHistoryItem extends StatelessWidget {
                             'Gỡ khỏi lịch sử tìm kiếm của bạn.',
                             style: TextStyle(
                               fontSize: 13.sp,
-                              color: Colors.grey[400],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -178,7 +172,7 @@ class SearchHistoryItem extends StatelessWidget {
                     Icon(
                       CupertinoIcons.pin,
                       size: 22.r,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                     SizedBox(width: 16.w),
                     Expanded(
@@ -190,7 +184,7 @@ class SearchHistoryItem extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 2.h),
@@ -198,7 +192,7 @@ class SearchHistoryItem extends StatelessWidget {
                             'Bạn chỉ có thể ghim 3 nội dung tìm kiếm cùng lúc.',
                             style: TextStyle(
                               fontSize: 13.sp,
-                              color: Colors.grey[400],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -230,12 +224,12 @@ class SearchHistoryItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            builder: (_) => BlocProvider(
+              create: (_) =>
+                  di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+              child: const ProfilePage(),
+            ),
           ),
-        ),
         );
       } else {
         Navigator.push(
@@ -245,8 +239,8 @@ class SearchHistoryItem extends StatelessWidget {
               create: (_) => OtherProfileBloc(
                 getOtherUserProfileUseCase: di.s1<GetOtherUserProfileUseCase>(),
                 getUserPostsUseCase: di.s1<GetUserPostsUseCase>(),
-                getFriendRelationshipUseCase:
-                    di.s1<GetFriendRelationshipUseCase>(),
+                getFriendRelationshipUseCase: di
+                    .s1<GetFriendRelationshipUseCase>(),
                 listenCommentCountUseCase: di.s1<ListenCommentCountUseCase>(),
                 loadCommentsUseCase: di.s1<LoadCommentsUseCase>(),
               )..add(LoadOtherUserProfileEvent(userId: user.userId)),
@@ -273,11 +267,15 @@ class SearchHistoryItem extends StatelessWidget {
     }
 
     final displayName = hasViewedUser
-        ? (history.viewedUser!.fullName ?? history.viewedUser!.username ?? 'Người dùng')
+        ? (history.viewedUser!.fullName ??
+              history.viewedUser!.username ??
+              'Người dùng')
         : history.query!;
     final avatarUrl = hasViewedUser ? history.viewedUser!.avatarUrl : null;
     final subtitle = hasViewedUser
-        ? (history.viewedUser!.username != null ? '@${history.viewedUser!.username}' : null)
+        ? (history.viewedUser!.username != null
+              ? '@${history.viewedUser!.username}'
+              : null)
         : null;
 
     return InkWell(
@@ -295,11 +293,7 @@ class SearchHistoryItem extends StatelessWidget {
                     ? NetworkImage(avatarUrl)
                     : null,
                 child: avatarUrl == null || avatarUrl.isEmpty
-                    ? Icon(
-                        Icons.person,
-                        size: 24.r,
-                        color: Colors.grey[400],
-                      )
+                    ? Icon(Icons.person, size: 24.r, color: Colors.grey[400])
                     : null,
               )
             else
@@ -359,8 +353,8 @@ class SearchHistoryItem extends StatelessWidget {
                     constraints: const BoxConstraints(),
                     onPressed: () {
                       context.read<SearchBloc>().add(
-                            DeleteSearchHistory(historyId: history.id),
-                          );
+                        DeleteSearchHistory(historyId: history.id),
+                      );
                     },
                   )
                 : IconButton(

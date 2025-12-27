@@ -23,7 +23,7 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) {
 mixin _$PostModel {
   @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
-  String get caption => throw _privateConstructorUsedError;
+  String? get caption => throw _privateConstructorUsedError;
   @JsonKey(name: 'userId')
   UserModel get user => throw _privateConstructorUsedError;
   List<PostUrlModel> get urls => throw _privateConstructorUsedError;
@@ -58,7 +58,7 @@ abstract class $PostModelCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    String caption,
+    String? caption,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
@@ -179,7 +179,7 @@ abstract class _$$PostModelImplCopyWith<$Res>
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    String caption,
+    String? caption,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
@@ -283,7 +283,7 @@ class __$$PostModelImplCopyWithImpl<$Res>
 class _$PostModelImpl implements _PostModel {
   const _$PostModelImpl({
     @JsonKey(name: '_id') required this.id,
-    required this.caption,
+    this.caption,
     @JsonKey(name: 'userId') required this.user,
     required final List<PostUrlModel> urls,
     required this.layout,
@@ -308,7 +308,7 @@ class _$PostModelImpl implements _PostModel {
   @JsonKey(name: '_id')
   final String id;
   @override
-  final String caption;
+  final String? caption;
   @override
   @JsonKey(name: 'userId')
   final UserModel user;
@@ -424,7 +424,7 @@ class _$PostModelImpl implements _PostModel {
 abstract class _PostModel implements PostModel {
   const factory _PostModel({
     @JsonKey(name: '_id') required final String id,
-    required final String caption,
+    final String? caption,
     @JsonKey(name: 'userId') required final UserModel user,
     required final List<PostUrlModel> urls,
     required final String layout,
@@ -444,7 +444,7 @@ abstract class _PostModel implements PostModel {
   @JsonKey(name: '_id')
   String get id;
   @override
-  String get caption;
+  String? get caption;
   @override
   @JsonKey(name: 'userId')
   UserModel get user;

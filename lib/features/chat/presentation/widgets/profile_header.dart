@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/group_avatar_widget.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/core/di/injection.dart' as di;
 
 class ProfileHeader extends StatelessWidget {
   final bool isGroup;
@@ -194,15 +199,15 @@ class ProfileHeader extends StatelessWidget {
             style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
           ),
           SizedBox(height: 4.h),
-          Text(
-            "1 bạn chung: Hùng Nguyễn",
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
 
+          // Text(
+          //   "1 bạn chung: Hùng Nguyễn",
+          //   style: TextStyle(
+          //     color: AppColors.textSecondary,
+          //     fontSize: 12.sp,
+          //     fontWeight: FontWeight.w500,
+          //   ),
+          // ),
           SizedBox(height: 16.h),
 
           // Nút Xem trang cá nhân
@@ -214,7 +219,20 @@ class ProfileHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(18.r),
             ),
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider(
+                      create: (_) => di.s1<OtherProfileBloc>()
+                        ..add(
+                          LoadOtherUserProfileEvent(userId: friendInfo!.userId),
+                        ),
+                      child: OtherProfilePage(userId: friendInfo!.userId),
+                    ),
+                  ),
+                );
+              },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
                 minimumSize: Size.zero,

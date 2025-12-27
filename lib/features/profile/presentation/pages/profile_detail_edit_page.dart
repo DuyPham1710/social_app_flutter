@@ -166,6 +166,7 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
+            dropdownColor: AppColors.background,
             value: _selectedRelationshipStatus,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.favorite, color: Colors.red),

@@ -26,6 +26,7 @@ class OtherProfileActions extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.background,
         title: const Text('Xác nhận hủy kết bạn'),
         content: const Text(
           'Bạn có chắc chắn muốn hủy kết bạn với người này không?',
@@ -33,7 +34,10 @@ class OtherProfileActions extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Hủy'),
+            child: const Text(
+              'Hủy',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
@@ -110,7 +114,6 @@ class OtherProfileActions extends StatelessWidget {
             size: const Size(totalWidth, buttonHeight),
           ),
         ];
-        break;
 
       case 'request_sent':
         buttons = [
@@ -122,7 +125,6 @@ class OtherProfileActions extends StatelessWidget {
             size: const Size(totalWidth, buttonHeight),
           ),
         ];
-        break;
 
       case 'request_received':
         buttons = [
@@ -141,7 +143,6 @@ class OtherProfileActions extends StatelessWidget {
             size: const Size(totalWidth / 2 - 8, buttonHeight),
           ),
         ];
-        break;
 
       case 'friends':
         buttons = [
@@ -160,7 +161,6 @@ class OtherProfileActions extends StatelessWidget {
             size: const Size(totalWidth / 2 - 8, buttonHeight),
           ),
         ];
-        break;
     }
 
     return Padding(

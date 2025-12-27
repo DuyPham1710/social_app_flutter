@@ -123,7 +123,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
             ],
           ),
           Text(
-            friends.length.toString() + " người bạn" ?? "0 người bạn",
+            "${friends.length} người bạn" ?? "0 người bạn",
             style: TextStyle(
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w400,
@@ -162,7 +162,9 @@ class _FriendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = friend.fullName ?? friend.username ?? "Không tên";
-    final avatarUrl = friend.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg";
+    final avatarUrl =
+        friend.avatarUrl ??
+        "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg";
 
     return Container(
       decoration: BoxDecoration(
