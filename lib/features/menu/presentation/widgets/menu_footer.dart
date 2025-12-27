@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/restart_widget.dart';
 import '../bloc/menu_bloc.dart';
 import '../bloc/menu_event.dart';
@@ -52,8 +53,11 @@ class MenuFooter extends StatelessWidget {
                     ),
 
                     TextButton(
-                      onPressed: () {
-                        Navigator.pop(context); // đóng dialog
+                      onPressed: () async {
+                        //Navigator.pop(context); // đóng dialog
+
+                        // Clear FCM token trước khi đăng xuất
+                        await FcmService().clearFcmToken();
 
                         // Dispatch event logout
                         context.read<MenuBloc>().add(LogoutEvent());

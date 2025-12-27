@@ -8,8 +8,10 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_event.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_state.dart';
+import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_search_page.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/create_group_chat_page.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/conversation_item.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/conversations_loading_widget.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/list_friend_loading.dart';
@@ -151,8 +153,12 @@ class _ChatListPageState extends State<ChatListPage> {
     String conversationId,
     UserEntity friendInfo,
     int unreadCount,
-    int? firstUnreadMessageIndex,
-  ) async {
+    int? firstUnreadMessageIndex, {
+    bool isGroup = false,
+    String? groupName,
+    String? groupAvatar,
+    List<UserEntity>? participants,
+  }) async {
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -191,6 +197,10 @@ class _ChatListPageState extends State<ChatListPage> {
             friendInfo: friendInfo,
             unreadCount: unreadCount,
             firstUnreadMessageIndex: firstUnreadMessageIndex,
+            isGroup: isGroup,
+            groupName: groupName,
+            groupAvatar: groupAvatar,
+            participants: participants,
           ),
         ),
       ),
@@ -417,6 +427,30 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
                 actions: [
                   IconButton(
+                    onPressed: () {
+                      final friendState = context.read<FriendBloc>().state;
+                      List<FriendEntity> friendsList = [];
+
+                      if (friendState is FriendLoaded) {
+                        friendsList = friendState.friends;
+                      }
+
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (_) =>
+                              CreateGroupChatPage(friends: friendsList),
+                        ),
+                      );
+                    },
+                    icon: Icon(
+                      CupertinoIcons.plus_app,
+                      color: AppColors.textPrimary,
+                      size: 24.sp,
+                    ),
+                  ),
+
+                  IconButton(
                     onPressed: () {},
                     icon: const Icon(
                       Icons.settings,
@@ -615,67 +649,128 @@ class _ChatListPageState extends State<ChatListPage> {
                             ) {
                               final conversation = conversations[index];
 
-                              if (conversation.lastMessage != null) {
-                                // Tìm participant khác với user hiện tại
-                                final otherParticipant =
-                                    conversation.participants
-                                        .where(
-                                          (participant) =>
-                                              participant.userId != userId,
-                                        )
-                                        .firstOrNull ??
-                                    conversation.participants.firstOrNull;
+                              // Lấy danh sách participants khác với user hiện tại
+                              final otherParticipants = conversation
+                                  .participants
+                                  .where(
+                                    (participant) =>
+                                        participant.userId != userId,
+                                  )
+                                  .toList();
 
+                              // Participant đầu tiên để dùng cho navigation
+                              final firstParticipant =
+                                  otherParticipants.isNotEmpty
+                                  ? otherParticipants.first
+                                  : conversation.participants.firstOrNull;
+
+                              // Xử lý tên hiển thị cho group
+                              String displayName =
+                                  ChatHelper.formatConversationName(
+                                    conversation,
+                                    otherParticipants,
+                                    firstParticipant,
+                                  );
+
+                              // Xử lý preview text
+                              final String previewText;
+
+                              if (conversation.lastMessage != null) {
                                 final bool fromMe =
-                                    conversation.lastMessage?.sender.userId ==
+                                    conversation.lastMessage!.sender.userId ==
                                     userId;
 
-                                final String lastName = otherParticipant!
-                                    .fullName!
-                                    .trim()
-                                    .split(' ')
-                                    .last;
-                                final String previewText;
+                                // Lấy tên người gửi
+                                String senderName;
+                                if (fromMe) {
+                                  senderName = "Bạn";
+                                } else if (conversation.isGroup) {
+                                  // Trong group, hiển thị tên người gửi
+                                  final sender = conversation.participants
+                                      .firstWhere(
+                                        (p) =>
+                                            p.userId ==
+                                            conversation
+                                                .lastMessage!
+                                                .sender
+                                                .userId,
+                                      );
+                                  senderName =
+                                      sender.fullName?.trim().split(' ').last ??
+                                      sender.username ??
+                                      'User';
+                                } else {
+                                  senderName = "";
+                                }
 
                                 if (conversation
                                     .lastMessage!
                                     .attachments
                                     .isNotEmpty) {
                                   previewText =
-                                      "${fromMe ? "Bạn" : " $lastName"} đã gửi ${conversation.lastMessage?.attachments.first.type}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";
+                                      "$senderName${senderName.isNotEmpty ? ' ' : ''}đã gửi ${conversation.lastMessage!.attachments.first.type}   •   ${conversation.lastMessage!.createdAt.formatChatTime()}";
                                 } else {
                                   previewText =
-                                      "${fromMe ? "Bạn: " : ""}${conversation.lastMessage?.text}   •   ${conversation.lastMessage?.createdAt.formatChatTime() ?? ''}";
+                                      "$senderName${senderName.isNotEmpty && !fromMe
+                                          ? ': '
+                                          : fromMe
+                                          ? ': '
+                                          : ''}${conversation.lastMessage!.text}   •   ${conversation.lastMessage!.createdAt.formatChatTime()}";
                                 }
-                                return Padding(
-                                  padding: EdgeInsets.only(bottom: 6.h),
-                                  child: ConversationItem(
-                                    avatarUrl: conversation.isGroup
-                                        ? conversation.avatar ??
-                                              "https://i.pravatar.cc/200"
-                                        : otherParticipant.avatarUrl ??
-                                              "https://i.pravatar.cc/200",
-                                    name: conversation.isGroup
-                                        ? conversation.name ?? "Group Chat"
-                                        : otherParticipant.fullName ??
-                                              otherParticipant.username ??
-                                              "Unknown",
-                                    preview: previewText,
-                                    isUnread:
-                                        (conversation.unreadCount ?? 0) > 0,
-                                    onTap: () {
-                                      _joinConversationAndNavigate(
-                                        conversation.id,
-                                        otherParticipant,
-                                        conversation.unreadCount ?? 0,
-                                        conversation.firstUnreadMessageIndex,
-                                      );
-                                    },
-                                  ),
-                                );
                               } else {
-                                return const SizedBox.shrink();
+                                // Không có lastMessage
+                                if (conversation.isGroup) {
+                                  // Group mới tạo - hiển thị người tạo
+                                  final creator = conversation.createdBy!;
+                                  final creatorName = creator.userId == userId
+                                      ? "Bạn"
+                                      : creator.fullName
+                                                ?.trim()
+                                                .split(' ')
+                                                .last ??
+                                            creator.username ??
+                                            'Ai đó';
+                                  previewText = "$creatorName vừa tạo nhóm";
+                                } else {
+                                  // 1-1 chat chưa có tin nhắn
+                                  previewText = "Đã kết nối";
+                                }
                               }
+
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 6.h),
+                                child: ConversationItem(
+                                  avatarUrl:
+                                      conversation.isGroup &&
+                                          conversation.avatar != null
+                                      ? conversation.avatar
+                                      : firstParticipant!.avatarUrl ??
+                                            'https://i.pravatar.cc/200',
+                                  name: displayName,
+                                  preview: previewText,
+                                  isUnread: (conversation.unreadCount ?? 0) > 0,
+                                  isGroup: conversation.isGroup,
+                                  participants: conversation.isGroup
+                                      ? otherParticipants
+                                      : (firstParticipant != null
+                                            ? [firstParticipant]
+                                            : null),
+                                  onTap: () {
+                                    _joinConversationAndNavigate(
+                                      conversation.id,
+                                      firstParticipant!,
+                                      conversation.unreadCount ?? 0,
+                                      conversation.firstUnreadMessageIndex,
+                                      isGroup: conversation.isGroup,
+                                      groupName: displayName,
+                                      groupAvatar: conversation.avatar,
+                                      participants: conversation.isGroup
+                                          ? otherParticipants
+                                          : null,
+                                    );
+                                  },
+                                ),
+                              );
                             }, childCount: conversations.length),
                           );
                         }
@@ -762,7 +857,9 @@ class _ChatListPageState extends State<ChatListPage> {
               ),
               ...friends.map((friend) {
                 return FriendMessageSuggestionItem(
-                  avatar: friend.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                  avatar:
+                      friend.avatarUrl ??
+                      "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                   name: friend.fullName ?? friend.username ?? "Người dùng",
                   onTap: () {
                     // Check if conversation exists with this friend

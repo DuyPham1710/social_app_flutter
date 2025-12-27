@@ -273,6 +273,28 @@ class FcmService {
     }
   }
 
+  /// Clear FCM token when logout (send empty token to backend)
+  Future<void> clearFcmToken() async {
+    try {
+      final accessToken = await TokenStorage.getAccessToken();
+
+      if (accessToken == null) {
+        debugPrint('[FCM] No access token, skipping clear token');
+        return;
+      }
+
+      // Send empty token to backend
+      await DioClient.instance.post('/user/fcm-token', data: {'fcmToken': ''});
+
+      debugPrint('[FCM] Token cleared on backend');
+
+      // Delete token from Firebase
+      await deleteToken();
+    } catch (e) {
+      debugPrint('[FCM] Error clearing FCM token: $e');
+    }
+  }
+
   /// Create notification channel for Android
   Future<void> _createNotificationChannel() async {
     // Channel for incoming calls

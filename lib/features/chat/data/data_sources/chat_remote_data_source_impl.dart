@@ -564,6 +564,58 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     }
   }
 
+  /// Update conversation
+  @override
+  void updateConversation({
+    required String userId,
+    required String conversationId,
+    String? name,
+    String? avatar,
+    String? createdBy,
+    List<String>? participantIds,
+  }) {
+    developer.log(
+      'Updating conversation: $conversationId',
+      name: 'ChatDataSource',
+    );
+
+    if (!_isConnected) {
+      developer.log(
+        'Connection not ready for updating conversation',
+        name: 'ChatDataSource',
+      );
+      throw Exception('Connection not ready');
+    }
+
+    final updateData = <String, dynamic>{
+      'userId': userId,
+      'conversationId': conversationId,
+    };
+
+    if (name != null) {
+      updateData['name'] = name;
+    }
+
+    if (avatar != null) {
+      updateData['avatar'] = avatar;
+    }
+
+    if (createdBy != null) {
+      updateData['createdBy'] = createdBy;
+    }
+
+    if (participantIds != null && participantIds.isNotEmpty) {
+      updateData['participantIds'] = participantIds;
+    }
+
+    _socketClient.emit('conversation:update', updateData);
+
+    developer.log(
+      'Update conversation request sent successfully',
+      name: 'ChatDataSource',
+    );
+  }
+
   /// Get cached conversations data
   ConversationsResponseModel? getCachedConversations({
     int page = 1,
@@ -801,20 +853,14 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
           formData.files.add(
             MapEntry(
               'files',
-              await MultipartFile.fromFile(
-                filePath,
-                filename: fileName,
-              ),
+              await MultipartFile.fromFile(filePath, filename: fileName),
             ),
           );
         }
       }
 
       // Send POST request
-      final response = await _dio.post(
-        '/chat/send-message',
-        data: formData,
-      );
+      final response = await _dio.post('/chat/send-message', data: formData);
 
       developer.log(
         'Files uploaded successfully: ${response.data}',
@@ -828,10 +874,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
       return attachments;
     } catch (e) {
-      developer.log(
-        'Error uploading files: $e',
-        name: 'ChatDataSource',
-      );
+      developer.log('Error uploading files: $e', name: 'ChatDataSource');
       throw Exception('Failed to upload files: $e');
     }
   }

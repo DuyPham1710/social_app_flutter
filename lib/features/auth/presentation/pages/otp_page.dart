@@ -72,7 +72,7 @@ class _OtpPageState extends State<OtpPage> {
       ).add(VerifyOtpEvent(email: _email!, otp: otpCode));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid 6-digit OTP')),
+        const SnackBar(content: Text('Vui lòng nhập mã OTP hợp lệ')),
       );
     }
   }
@@ -160,7 +160,7 @@ class _OtpPageState extends State<OtpPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Otp sent",
+                        "Xác thực OTP",
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
@@ -171,7 +171,7 @@ class _OtpPageState extends State<OtpPage> {
                     SizedBox(height: 10.h),
 
                     Text(
-                      "Enter the OTP sent to ${_email ?? ''}",
+                      "Nhập mã OTP đã gửi đến ${_email ?? ''}",
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: Colors.grey[600],
@@ -202,7 +202,7 @@ class _OtpPageState extends State<OtpPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "Didn't receive the code? ",
+                          "Bạn chưa nhận được mã? ",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14.sp,
@@ -216,10 +216,10 @@ class _OtpPageState extends State<OtpPage> {
                               : () => _resendOtp(context),
                           child: Text(
                             state is OtpResendLoading
-                                ? 'Resending...'
+                                ? 'Đang gửi lại...'
                                 : _secondsRemaining > 0
-                                ? "Resend in $_secondsRemaining s"
-                                : "Resend Code",
+                                ? "Gửi lại trong $_secondsRemaining giây"
+                                : "Gửi lại mã",
                             style: TextStyle(
                               color: _secondsRemaining > 0
                                   ? AppColors.primary
@@ -242,7 +242,7 @@ class _OtpPageState extends State<OtpPage> {
                           )
                         : ButtonCustom(
                             onPressed: () => _verifyOtp(context),
-                            text: "Verify",
+                            text: "Xác thực",
                           ),
 
                     SizedBox(height: 24.h),
@@ -251,7 +251,7 @@ class _OtpPageState extends State<OtpPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Already have an Account? ",
+                          "Bạn đã có tài khoản? ",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14.sp,
@@ -263,7 +263,7 @@ class _OtpPageState extends State<OtpPage> {
                             Navigator.pushNamed(context, '/login');
                           },
                           child: Text(
-                            "Sign in",
+                            "Đăng nhập",
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14.sp,

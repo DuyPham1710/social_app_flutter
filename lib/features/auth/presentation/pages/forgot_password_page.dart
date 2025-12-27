@@ -85,7 +85,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Forgot Password",
+                          "Quên mật khẩu",
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       SizedBox(height: 10.h),
 
                       Text(
-                        "Let's help recovery your account",
+                        "Nhập email của bạn để khôi phục tài khoản.",
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Colors.grey[600],
@@ -111,7 +111,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         focusNode: emailFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return 'Vui lòng nhập email';
                           }
                           return null;
                         },
@@ -128,7 +128,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           : ButtonCustom(
                               onPressed: () =>
                                   _onForgotPasswordPressed(context),
-                              text: "Next",
+                              text: "Tiếp tục",
                             ),
 
                       SizedBox(height: 24.h),
@@ -137,7 +137,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Do not have an Account? ",
+                            "Bạn chưa có tài khoản? ",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 14.sp,
@@ -149,7 +149,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               Navigator.pushNamed(context, '/signup');
                             },
                             child: Text(
-                              "Sign up",
+                              "Đăng ký",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14.sp,

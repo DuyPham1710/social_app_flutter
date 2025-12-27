@@ -50,6 +50,15 @@ abstract class ChatRepository {
     required String userId,
   });
 
+  void updateConversation({
+    required String userId,
+    required String conversationId,
+    String? name,
+    String? avatar,
+    String? createdBy,
+    List<String>? participantIds,
+  });
+
   // Typing events
   void emitTypingStart({
     required String userId,

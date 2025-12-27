@@ -16,16 +16,17 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
-import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_item.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/chat_typing_indicator.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_action_sheet.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_more_options_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/message_edit_history_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/delete_message_bottom_sheet.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/chat_appbar.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/get_message_edit_logs_usecase.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/profile_header.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/scroll_to_bottom_button.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -43,6 +44,10 @@ class ChatDetailPage extends StatefulWidget {
   final UserEntity? friendInfo;
   final int? unreadCount;
   final int? firstUnreadMessageIndex;
+  final bool isGroup;
+  final String? groupName;
+  final String? groupAvatar;
+  final List<UserEntity>? participants;
 
   ChatDetailPage({
     super.key,
@@ -53,6 +58,10 @@ class ChatDetailPage extends StatefulWidget {
     this.friendInfo,
     this.unreadCount,
     this.firstUnreadMessageIndex,
+    this.isGroup = false,
+    this.groupName,
+    this.groupAvatar,
+    this.participants,
   });
 
   @override
@@ -933,7 +942,19 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         resizeToAvoidBottomInset:
             true, // Đảm bảo UI resize khi bàn phím hiện lên
 
-        appBar: _buildAppBar(context),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: ChatAppbar(
+            isGroup: widget.isGroup,
+            groupName: widget.groupName,
+            groupAvatar: widget.groupAvatar,
+            participants: widget.participants,
+            friendInfo: widget.friendInfo,
+            conversationId: _currentConversationId ?? widget.conversationId,
+            userId: widget.userId,
+            onInitiateCall: _initiateCall,
+          ),
+        ),
 
         body: SafeArea(
           child: GestureDetector(
@@ -1206,7 +1227,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                     return SingleChildScrollView(
                                       child: Column(
                                         children: [
-                                          _buildProfileInfo(),
+                                          ProfileHeader(
+                                            isGroup: widget.isGroup,
+                                            groupName: widget.groupName,
+                                            groupAvatar: widget.groupAvatar,
+                                            participants: widget.participants,
+                                            friendInfo: widget.friendInfo,
+                                          ),
                                           Center(
                                             child: Text(
                                               'không có tin nhắn nào. Bắt đầu cuộc trò chuyện ngay!',
@@ -1246,17 +1273,21 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                       // Chỉ hiện khi không còn tin nhắn để load
                                       if (actualIndex == 0 &&
                                           !pagination.hasNextPage) {
-                                        return _buildProfileInfo();
+                                        return ProfileHeader(
+                                          isGroup: widget.isGroup,
+                                          groupName: widget.groupName,
+                                          groupAvatar: widget.groupAvatar,
+                                          participants: widget.participants,
+                                          friendInfo: widget.friendInfo,
+                                        );
                                       }
 
                                       // Typing indicator ở actualIndex = itemCount - 1 (index 0 - hiển thị ở dưới cùng khi reverse)
                                       if (actualIndex == itemCount - 1) {
                                         return ChatTypingIndicator(
-                                          friendAvatarUrl:
-                                              widget.friendInfo?.avatarUrl,
-                                          friendName:
-                                              widget.friendInfo?.fullName ??
-                                              widget.friendInfo?.username,
+                                          isGroup: widget.isGroup,
+                                          participants: widget.participants,
+                                          friendInfo: widget.friendInfo,
                                           currentUserId: widget.userId,
                                         );
                                       }
@@ -1348,13 +1379,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                           if (nextVisibleMessage == null) {
                                             showAvatar = true;
                                           } else {
-                                            // Kiểm tra message tiếp theo có phải từ tôi không
-                                            final nextFromMe =
-                                                nextVisibleMessage
+                                            // Kiểm tra message tiếp theo có phải khác sender không
+                                            if (nextVisibleMessage
                                                     .sender
-                                                    .userId ==
-                                                widget.userId;
-                                            if (nextFromMe) {
+                                                    .userId !=
+                                                message.sender.userId) {
                                               showAvatar = true;
                                             }
                                           }
@@ -1517,7 +1546,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                 } else if (state is MessagesError) {
                                   return Column(
                                     children: [
-                                      _buildProfileInfo(),
+                                      ProfileHeader(
+                                        isGroup: widget.isGroup,
+                                        groupName: widget.groupName,
+                                        groupAvatar: widget.groupAvatar,
+                                        participants: widget.participants,
+                                        friendInfo: widget.friendInfo,
+                                      ),
                                       Expanded(
                                         child: Center(
                                           child: Column(
@@ -1561,7 +1596,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                 }
 
                                 // Default state - show profile info only
-                                return _buildProfileInfo();
+                                return ProfileHeader(
+                                  isGroup: widget.isGroup,
+                                  groupName: widget.groupName,
+                                  groupAvatar: widget.groupAvatar,
+                                  participants: widget.participants,
+                                  friendInfo: widget.friendInfo,
+                                );
                               },
                             ),
                           ),
@@ -1588,108 +1629,6 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: AppColors.background,
-      surfaceTintColor: Colors.transparent,
-      shape: Border(
-        bottom: BorderSide(
-          color: AppColors.textSecondary.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      leadingWidth: 40,
-      leading: IconButton(
-        icon: Icon(CupertinoIcons.back, color: AppColors.primary),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => ChatInfoPage(userInfo: widget.friendInfo),
-            ),
-          );
-        },
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                widget.friendInfo?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
-              ),
-              radius: 18.r,
-            ),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.friendInfo?.fullName ??
-                        widget.friendInfo?.username ??
-                        "Unknown User",
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.sp,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  Text(
-                    "Đang hoạt động",
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 10.sp,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(
-            CupertinoIcons.phone_fill,
-            color: AppColors.primary,
-            size: 24.sp,
-          ),
-          onPressed: () => _initiateCall('audio'),
-        ),
-        IconButton(
-          icon: Icon(
-            CupertinoIcons.videocam_fill,
-            color: AppColors.primary,
-            size: 30.sp,
-          ),
-          onPressed: () => _initiateCall('video'),
-        ),
-        IconButton(
-          icon: Icon(
-            CupertinoIcons.info_circle_fill,
-            color: AppColors.primary,
-            size: 24.sp,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => ChatInfoPage(userInfo: widget.friendInfo),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
   Padding _showTimeHeader(MessageEntity message) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -1702,100 +1641,6 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             fontWeight: FontWeight.w500,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildProfileInfo() {
-    return Container(
-      padding: EdgeInsets.only(top: 20.h, bottom: 30.h),
-      width: double.infinity,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 50.r,
-            backgroundImage: NetworkImage(
-              widget.friendInfo?.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
-            ),
-          ),
-          SizedBox(height: 12.h),
-
-          // Tên hiển thị
-          Text(
-            widget.friendInfo?.fullName ??
-                widget.friendInfo?.username ??
-                "Unknown User",
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 22.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          // Username nhỏ
-          Text(
-            widget.friendInfo?.username != null
-                ? "@${widget.friendInfo!.username}"
-                : "@unknown",
-            style: TextStyle(
-              color: AppColors.textSecondary, // Màu xám nhạt
-              fontSize: 12.sp,
-            ),
-          ),
-
-          SizedBox(height: 12.h),
-
-          // Dòng thông tin context (Bạn bè chung, v.v.)
-          Text(
-            "Các bạn là bạn bè trên Facebook",
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            "1 bạn chung: Hùng Nguyễn",
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-
-          SizedBox(height: 16.h),
-
-          // Nút Xem trang cá nhân
-          Container(
-            height: 36.h,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            decoration: BoxDecoration(
-              color: AppColors.textSecondary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(18.r),
-            ),
-            child: TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                "Xem trang cá nhân",
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(height: 16.h),
-
-          // Status footer
-          Text(
-            "Bạn và ${widget.friendInfo?.fullName?.split(' ').last ?? 'bạn này'} hiện đã là bạn bè.",
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
-          ),
-        ],
       ),
     );
   }

@@ -117,7 +117,8 @@ class MessageItem extends StatelessWidget {
                   CircleAvatar(
                     radius: 14.r,
                     backgroundImage: NetworkImage(
-                      message.sender.avatarUrl ?? "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                      message.sender.avatarUrl ??
+                          "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                     ),
                   )
                 else
@@ -172,6 +173,8 @@ class MessageItem extends StatelessWidget {
 
         // Hiển thị trạng thái tin nhắn
         _buildMessageStatus(),
+
+        if (showAvatar) SizedBox(height: 16.h),
       ],
     );
   }
@@ -307,10 +310,22 @@ class MessageItem extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (isSeenByOthers)
-            ...
-            // Hiển thị avatar của người đã xem
-            seenByUsers.take(3).map((user) {
+          if (isSeenByOthers) ...[
+            // Hiển thị +n nếu có nhiều hơn 10 người
+            if (seenByUsers.length > 10)
+              Padding(
+                padding: EdgeInsets.only(left: 4.w),
+                child: Text(
+                  '+${seenByUsers.length - 10}',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            // Hiển thị tối đa 10 avatars
+            ...seenByUsers.take(10).map((user) {
               return Padding(
                 padding: EdgeInsets.only(left: 2.w),
                 child: CircleAvatar(
@@ -320,8 +335,8 @@ class MessageItem extends StatelessWidget {
                       : const NetworkImage("https://i.pravatar.cc/200"),
                 ),
               );
-            })
-          else
+            }),
+          ] else
             // Hiển thị text "Đã gửi"
             Text(
               'Đã gửi ${message.createdAt.formatRelativeTime()}',

@@ -70,10 +70,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           listener: (context, state) {
             // Chỉ xử lý state từ reset_password flow
             if (state is AuthLoaded && state.flowType == 'reset_password') {
-              showDialogSuccess(context, "Reset Password");
+              showDialogSuccess(context, "Đặt lại mật khẩu thành công");
               //   BlocProvider.of<AuthBloc>(context).add(AuthReset());
-            } else if (state is AuthError && state.flowType == 'reset_password') {
-              final message = state.errorMessage ?? 'Reset password thất bại';
+            } else if (state is AuthError &&
+                state.flowType == 'reset_password') {
+              final message = state.errorMessage ?? 'Đặt lại mật khẩu thất bại';
               UIUtils.showErrorMessage(context, message);
             }
           },
@@ -102,7 +103,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Pick a new password",
+                          "Đặt lại mật khẩu",
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -113,7 +114,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       SizedBox(height: 10.h),
 
                       Text(
-                        "Help us keep your account secure by choosing a strong password.",
+                        "Giúp chúng tôi bảo vệ tài khoản của bạn bằng cách chọn mật khẩu mạnh.",
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Colors.grey[600],
@@ -123,13 +124,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       SizedBox(height: 40.h),
 
                       TextformfieldCustom(
-                        label: "New Password",
+                        label: "Mật khẩu mới",
                         isPassword: _isPasswordVisible,
                         controller: newPasswordController,
                         focusNode: newPasswordFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your New Password';
+                            return 'Vui lòng nhập mật khẩu mới';
                           }
                           return null;
                         },
@@ -152,13 +153,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       SizedBox(height: 20.h),
 
                       TextformfieldCustom(
-                        label: "Confirm New Password",
+                        label: "Xác nhận mật khẩu mới",
                         isPassword: _isConfirmPasswordVisible,
                         controller: confirmPasswordController,
                         focusNode: confirmPasswordFocusNode,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your Confirm New Password';
+                            return 'Vui lòng nhập xác nhận mật khẩu mới';
                           }
                           return null;
                         },
@@ -190,7 +191,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           : ButtonCustom(
                               onPressed: () =>
                                   _onSaveSubmitted(context, email, otp),
-                              text: "Save",
+                              text: "Lưu",
                             ),
 
                       SizedBox(height: 24.h),
@@ -199,7 +200,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Already have an Account? ",
+                            "Bạn đã có tài khoản? ",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 14.sp,
@@ -211,7 +212,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               Navigator.pushNamed(context, '/login');
                             },
                             child: Text(
-                              "Sign in",
+                              "Đăng nhập",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14.sp,

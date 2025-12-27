@@ -20,3 +20,4 @@ export 'get_message_edit_logs_usecase.dart';
 export 'leave_conversation_usecase.dart';
 export 'listen_conversation_update_usecase.dart';
 export 'mark_as_read_usecase.dart';
+export 'update_conversation_usecase.dart';
