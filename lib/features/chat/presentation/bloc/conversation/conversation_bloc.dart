@@ -294,7 +294,21 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
       if (index != -1) {
         final updatedList = List<ConversationEntity>.from(currentList);
-        updatedList[index] = event.conversation;
+        final oldConversation = updatedList[index];
+
+        // Kiểm tra xem lastMessage có thay đổi không
+        final hasNewMessage =
+            oldConversation.lastMessage?.id !=
+            event.conversation.lastMessage?.id;
+
+        if (hasNewMessage) {
+          // Xóa conversation cũ và đưa lên đầu
+          updatedList.remove(updatedList[index]);
+          updatedList.insert(0, event.conversation);
+        } else {
+          // Chỉ có unreadCount thay đổi thì Cập nhật tại chỗ
+          updatedList[index] = event.conversation;
+        }
 
         final updatedResponse = currentState.conversations.copyWith(
           data: updatedList,
