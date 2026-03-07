@@ -30,4 +30,7 @@ abstract class AuthService {
 
   @PATCH('/auth/reset-password')
   Future<UserModel> resetPassword(@Body() ResetPasswordRequest request);
+
+  @POST('/auth/refresh')
+  Future<AuthResponse> refreshToken();
 }

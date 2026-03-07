@@ -120,4 +120,28 @@ class AuthRepositoryImpl implements AuthRepository {
       ));
     }
   }
+
+  @override
+  Future<DataState<UserEntity>> refreshToken() async {
+    try {
+      final response = await authService.refreshToken();
+
+      // Save new tokens to local storage
+      await TokenStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        userData: {
+          'id': response.user.userId,
+          'fullName': response.user.fullName,
+          'email': response.user.email,
+          'username': response.user.username,
+          'avatarUrl': response.user.avatarUrl,
+        },
+      );
+
+      return DataStateSuccess(response.user);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }
