@@ -20,14 +20,12 @@ import 'package:social_app_fe/features/story/presentation/pages/story_music_pick
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:video_player/video_player.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class StoryEditorPage extends StatefulWidget {
   final AssetEntity asset;
 
-  const StoryEditorPage({
-    super.key,
-    required this.asset,
-  });
+  const StoryEditorPage({super.key, required this.asset});
 
   @override
   State<StoryEditorPage> createState() => _StoryEditorPageState();
@@ -38,11 +36,11 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   bool _isVideoInitialized = false;
   bool _isVideoPlaying = false;
   bool _isPrivacyOff = false;
-  
+
   // Music state
   DeezerMusicModel? _selectedMusic;
   final AudioPlayer _audioPlayer = AudioPlayer();
-  
+
   // Edited image file
   File? _editedImageFile;
 
@@ -101,17 +99,13 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
               showSuccessSnackBar(context, "Tạo tin thành công");
               Navigator.of(context).maybePop();
             } else if (state is StoryCreateError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              showErrorSnackBar(context, state.message);
             }
           },
           child: Stack(
             children: [
               // Main content - Image/Video
-              Center(
-                child: _buildMediaContent(isVideo),
-              ),
+              Center(child: _buildMediaContent(isVideo)),
               // Top bar - Close button
               Positioned(
                 top: 0,
@@ -125,12 +119,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                 ),
               ),
               // Right side menu - Editing tools
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                child: _buildRightMenu(),
-              ),
+              Positioned(right: 0, top: 0, bottom: 0, child: _buildRightMenu()),
               // Bottom bar
               Positioned(
                 bottom: 0,
@@ -175,23 +164,17 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       // Nếu có file đã chỉnh sửa, hiển thị nó
       if (_editedImageFile != null) {
         return Center(
-          child: Image.file(
-            _editedImageFile!,
-            fit: BoxFit.contain,
-          ),
+          child: Image.file(_editedImageFile!, fit: BoxFit.contain),
         );
       }
-      
+
       return FutureBuilder<File?>(
         future: widget.asset.file,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.data != null) {
             return Center(
-              child: Image.file(
-                snapshot.data!,
-                fit: BoxFit.contain,
-              ),
+              child: Image.file(snapshot.data!, fit: BoxFit.contain),
             );
           }
           return const Center(
@@ -204,7 +187,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
 
   Widget _buildRightMenu() {
     final isVideo = widget.asset.type == AssetType.video;
-    
+
     return Container(
       width: 80.w,
       padding: EdgeInsets.symmetric(vertical: 20.h),
@@ -218,10 +201,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
           ),
           SizedBox(height: 20.h),
           // Chỉ hiển thị option Nhạc nếu không phải video
-          if (!isVideo) ...[
-            SizedBox(height: 20.h),
-            _buildMusicButton(),
-          ],
+          if (!isVideo) ...[SizedBox(height: 20.h), _buildMusicButton()],
         ],
       ),
     );
@@ -230,17 +210,16 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   Widget _buildMusicButton() {
     return GestureDetector(
       onTap: () async {
-        final selectedMusic = await Navigator.of(context).push<DeezerMusicModel>(
-          MaterialPageRoute(
-            builder: (_) => const StoryMusicPickerPage(),
-          ),
-        );
+        final selectedMusic = await Navigator.of(context)
+            .push<DeezerMusicModel>(
+              MaterialPageRoute(builder: (_) => const StoryMusicPickerPage()),
+            );
 
         if (selectedMusic != null) {
           setState(() {
             _selectedMusic = selectedMusic;
           });
-          
+
           // Phát nhạc theo vòng lặp
           if (selectedMusic.preview.isNotEmpty) {
             await _audioPlayer.setReleaseMode(ReleaseMode.loop);
@@ -269,11 +248,19 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                       height: 50.w,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.music_note, color: Colors.white, size: 24.sp);
+                        return Icon(
+                          Icons.music_note,
+                          color: Colors.white,
+                          size: 24.sp,
+                        );
                       },
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
-                        return Icon(Icons.music_note, color: Colors.white, size: 24.sp);
+                        return Icon(
+                          Icons.music_note,
+                          color: Colors.white,
+                          size: 24.sp,
+                        );
                       },
                     ),
                   )
@@ -331,9 +318,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   Widget _buildBottomBar() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-      ),
+      decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -362,7 +347,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       padding: EdgeInsets.symmetric(
-                          horizontal: 24.w, vertical: 12.h),
+                        horizontal: 24.w,
+                        vertical: 12.h,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
@@ -373,8 +360,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                             height: 20.w,
                             child: const CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Text(
@@ -398,9 +386,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   Future<void> _openImageEditor() async {
     // Chỉ cho phép chỉnh sửa ảnh, không phải video
     if (widget.asset.type == AssetType.video) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chỉ có thể chỉnh sửa ảnh')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Chỉ có thể chỉnh sửa ảnh')));
       return;
     }
 
@@ -420,13 +408,11 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       // Mở trình chỉnh sửa ảnh
       final editedImage = await Navigator.push<Uint8List?>(
         context,
-        MaterialPageRoute(
-          builder: (context) => ImageEditor(image: imageBytes),
-        ),
+        MaterialPageRoute(builder: (context) => ImageEditor(image: imageBytes)),
       );
 
       // Nếu người dùng đã chỉnh sửa xong và quay lại
-      if (editedImage != null && editedImage is Uint8List) {
+      if (editedImage != null) {
         // Tạo tên file mới với timestamp để tránh cache
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final directory = originalFile.parent;
@@ -452,9 +438,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi khi chỉnh sửa ảnh: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi khi chỉnh sửa ảnh: $e')));
       }
     }
   }
@@ -467,7 +453,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     } else {
       file = await widget.asset.file;
     }
-    
+
     if (file == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Không thể đọc file từ thiết bị')),
@@ -477,8 +463,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
 
     // Xác định loại media
     final isVideo = widget.asset.type == AssetType.video;
-    final mediaType =
-        isVideo ? core_media.MediaType.video : core_media.MediaType.image;
+    final mediaType = isVideo
+        ? core_media.MediaType.video
+        : core_media.MediaType.image;
 
     // Lấy cài đặt quyền riêng tư đã lưu
     final privacyLabel = await StoryPrivacyStorage.getPrivacy();
@@ -493,12 +480,11 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     switch (privacyLabel) {
       case "Công khai":
         privacyType = core_privacy.PrivacyType.public;
-        break;
       case "Tùy chỉnh":
         privacyType = core_privacy.PrivacyType.friendsDetail;
-        friendsDetail =
-            allowedFriendIds.isNotEmpty ? List.of(allowedFriendIds) : null;
-        break;
+        friendsDetail = allowedFriendIds.isNotEmpty
+            ? List.of(allowedFriendIds)
+            : null;
       case "Bạn bè":
       default:
         if (hiddenFriendIds.isNotEmpty) {
@@ -507,7 +493,6 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         } else {
           privacyType = core_privacy.PrivacyType.friends;
         }
-        break;
     }
 
     final storyEntity = CreateStoryEntity(
@@ -521,8 +506,8 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       file: file,
     );
 
-    context
-        .read<StoryCreateBloc>()
-        .add(CreateStoryRequested(story: storyEntity));
+    context.read<StoryCreateBloc>().add(
+      CreateStoryRequested(story: storyEntity),
+    );
   }
 }

@@ -22,7 +22,7 @@ void showErrorSnackBar(BuildContext context, String message) {
           ),
         ],
       ),
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
     ),
   );
 }
