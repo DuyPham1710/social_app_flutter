@@ -4,6 +4,7 @@ import 'package:social_app_fe/features/post/domain/entities/create_post_entity.d
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_list_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_translation_entity.dart';
 
 abstract class PostRepository {
   Future<DataState<PostListEntity>> getHomePosts({
@@ -47,5 +48,11 @@ abstract class PostRepository {
   /// Xóa post
   Future<DataState<void>> deletePost({
     required String postId,
+  });
+
+  /// Dịch caption của post
+  Future<DataState<PostTranslationEntity>> translateCaption({
+    required String postId,
+    String targetLang = 'vi',
   });
 }

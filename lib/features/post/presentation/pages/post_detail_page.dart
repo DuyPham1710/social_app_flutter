@@ -23,6 +23,7 @@ import 'package:social_app_fe/features/post/presentation/pages/video_player_scre
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_translatable_caption.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
@@ -270,15 +271,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
                     SizedBox(height: 10.h),
 
-                    // Caption
+                    // Caption + dịch
                     if (post.caption != null && post.caption!.isNotEmpty)
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12.w),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            post.caption!,
-                            style: TextStyle(fontSize: 14.sp, height: 1.4),
+                          child: PostTranslatableCaption(
+                            postId: post.id,
+                            caption: post.caption!,
+                            textStyle:
+                                TextStyle(fontSize: 14.sp, height: 1.4),
                           ),
                         ),
                       ),

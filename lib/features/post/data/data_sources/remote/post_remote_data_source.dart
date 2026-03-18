@@ -4,6 +4,7 @@ import 'package:social_app_fe/features/post/data/models/create_post_response.dar
 import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
+import 'package:social_app_fe/features/post/data/models/post_translation_model.dart';
 
 part 'post_remote_data_source.g.dart';
 
@@ -66,5 +67,12 @@ abstract class PostRemoteDataSource {
   @DELETE('/post/{postId}')
   Future<void> deletePost(
     @Path('postId') String postId,
+  );
+
+  /// Dịch caption của post
+  @POST('/post/{postId}/translate-caption')
+  Future<PostTranslationModel> translateCaption(
+    @Path('postId') String postId,
+    @Query('targetLang') String targetLang,
   );
 }
