@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/post/data/models/create_post_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
+import 'package:social_app_fe/features/post/data/models/post_translation_model.dart';
 import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 
@@ -213,6 +214,20 @@ class PostRepositoryImpl implements PostRepository {
     try {
       await remoteDataSource.deletePost(postId);
       return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<PostTranslationModel>> translateCaption({
+    required String postId,
+    String targetLang = 'vi',
+  }) async {
+    try {
+      final response =
+          await remoteDataSource.translateCaption(postId, targetLang);
+      return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);
     }

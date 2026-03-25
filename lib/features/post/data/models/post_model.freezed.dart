@@ -90,7 +90,7 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
   @override
   $Res call({
     Object? id = null,
-    Object? caption = null,
+    Object? caption = freezed,
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
@@ -108,10 +108,10 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as String,
-            caption: null == caption
+            caption: freezed == caption
                 ? _value.caption
                 : caption // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             user: null == user
                 ? _value.user
                 : user // ignore: cast_nullable_to_non_nullable
@@ -211,7 +211,7 @@ class __$$PostModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? caption = null,
+    Object? caption = freezed,
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
@@ -229,10 +229,10 @@ class __$$PostModelImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as String,
-        caption: null == caption
+        caption: freezed == caption
             ? _value.caption
             : caption // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         user: null == user
             ? _value.user
             : user // ignore: cast_nullable_to_non_nullable

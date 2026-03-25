@@ -23,14 +23,12 @@ class StoryCreateBloc extends Bloc<StoryCreateEvent, StoryCreateState> {
       if (dataState is DataStateSuccess<void>) {
         emit(StoryCreated());
       } else if (dataState is DataStateError) {
-        emit(
-          StoryCreateError(
-            message:
-                dataState.error?.message ?? 'Có lỗi xảy ra khi tạo story',
-          ),
-        );
+        // Lấy message từ response body của BE (ví dụ: BadRequestException)
+        final errorMessage = dataState.error?.response?.data?['message']
+            ?? dataState.error?.message
+            ?? 'Có lỗi xảy ra khi tạo story';
+        emit(StoryCreateError(message: errorMessage is List ? errorMessage.join(', ') : errorMessage.toString()));
       } else {
-        // Phòng trường hợp không rơi vào 2 case trên
         emit(const StoryCreateError(message: 'Có lỗi không xác định xảy ra'));
       }
     } catch (e) {

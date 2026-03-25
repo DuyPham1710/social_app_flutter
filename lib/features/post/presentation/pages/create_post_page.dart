@@ -29,7 +29,6 @@ import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.da
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
-import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CreatePostPage extends StatefulWidget {
   final VoidCallback? onPostCreated;
@@ -427,20 +426,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
         }
 
         if (state is PostCreated) {
-          showSuccessSnackBar(context, state.message);
-
-          // Clear form and go back
+          // Clear form (SnackBar hiển thị ở main_page)
           _captionController.clear();
           setState(() {
             _selectedAssets.clear();
           });
-
-          //  widget.onPostCreated?.call();
-          // Navigator.of(context).pop();
-        } else if (state is PostCreateError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
         }
       },
 

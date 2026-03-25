@@ -16,6 +16,7 @@ import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_options_bottom_sheet.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_translatable_caption.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
 
 class PostItem extends StatefulWidget {
@@ -158,13 +159,14 @@ class _PostItemState extends State<PostItem> {
             },
           ),
 
-          // Caption
+          // Caption + dịch
           if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
-              child: Text(
-                widget.post.caption!,
-                style: TextStyle(fontSize: 13.sp),
+              child: PostTranslatableCaption(
+                postId: widget.post.id,
+                caption: widget.post.caption!,
+                textStyle: TextStyle(fontSize: 13.sp),
               ),
             ),
 

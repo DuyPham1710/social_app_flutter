@@ -23,12 +23,11 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       if (dataState is DataStateSuccess<String>) {
         emit(PostCreated(message: dataState.data!));
       } else if (dataState is DataStateError) {
-        emit(
-          PostCreateError(
-            message:
-                dataState.error?.message ?? 'Có lỗi xảy ra khi tạo bài viết',
-          ),
-        );
+        // Lấy message từ response body của BE (ví dụ: BadRequestException)
+        final errorMessage = dataState.error?.response?.data?['message']
+            ?? dataState.error?.message
+            ?? 'Có lỗi xảy ra khi tạo bài viết';
+        emit(PostCreateError(message: errorMessage is List ? errorMessage.join(', ') : errorMessage.toString()));
       }
     } catch (e) {
       emit(PostCreateError(message: 'Có lỗi xảy ra: ${e.toString()}'));

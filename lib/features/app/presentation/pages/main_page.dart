@@ -10,6 +10,10 @@ import 'package:social_app_fe/features/notification/presentation/bloc/notificati
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_state.dart';
 import 'package:social_app_fe/features/notification/presentation/pages/notification_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/create_post_page.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
+import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class MainPage extends StatefulWidget {
   final Map<String, dynamic>? userData;
@@ -79,41 +83,52 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          // Mark all notifications as read when leaving notification page
-          if (_currentIndex == 3 && index != 3) {
-            final unread = context.read<NotificationBloc>().state.unread;
-            if (unread > 0) {
-              context.read<NotificationBloc>().add(MarkAllNotificationsRead());
+    return BlocListener<PostBloc, PostState>(
+      listener: (context, state) {
+        if (state is PostCreated) {
+          showSuccessSnackBar(context, state.message);
+        } else if (state is PostCreateError) {
+          showErrorSnackBar(context, state.message);
+        }
+      },
+      child: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            // Mark all notifications as read when leaving notification page
+            if (_currentIndex == 3 && index != 3) {
+              final unread = context.read<NotificationBloc>().state.unread;
+              if (unread > 0) {
+                context.read<NotificationBloc>().add(
+                  MarkAllNotificationsRead(),
+                );
+              }
             }
-          }
-          setState(() => _currentIndex = index);
-        },
-        //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-        children: [
-          HomePage(),
-          FriendPage(),
-          CreatePostPage(
-            onPostCreated: () {
-              _pageController.jumpToPage(0);
-              setState(() => _currentIndex = 0);
-            },
-          ),
-          NotificationPage(),
-          MenuPage(),
-        ],
-      ),
-      bottomNavigationBar: BlocBuilder<NotificationBloc, NotificationState>(
-        builder: (context, notificationState) {
-          return CustomBottomNavigation(
-            currentIndex: _currentIndex,
-            onTabSelected: _onTabSelected,
-            unreadCount: notificationState.unread,
-          );
-        },
+            setState(() => _currentIndex = index);
+          },
+          //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
+          children: [
+            HomePage(),
+            FriendPage(),
+            CreatePostPage(
+              onPostCreated: () {
+                _pageController.jumpToPage(0);
+                setState(() => _currentIndex = 0);
+              },
+            ),
+            NotificationPage(),
+            MenuPage(),
+          ],
+        ),
+        bottomNavigationBar: BlocBuilder<NotificationBloc, NotificationState>(
+          builder: (context, notificationState) {
+            return CustomBottomNavigation(
+              currentIndex: _currentIndex,
+              onTabSelected: _onTabSelected,
+              unreadCount: notificationState.unread,
+            );
+          },
+        ),
       ),
     );
   }

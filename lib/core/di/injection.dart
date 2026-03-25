@@ -78,6 +78,7 @@ import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_useca
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/create_post_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/translate_caption_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/profile/data/repository/user_repository_impl.dart';
@@ -212,6 +213,9 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<CreatePostUsecase>(() => CreatePostUsecase(s1()));
   s1.registerLazySingleton<ReportPostUseCase>(() => ReportPostUseCase(s1()));
+  s1.registerLazySingleton<TranslateCaptionUsecase>(
+    () => TranslateCaptionUsecase(s1()),
+  );
 
   s1.registerLazySingleton<GetProfilePostsUseCase>(
     () => GetProfilePostsUseCase(s1()),
