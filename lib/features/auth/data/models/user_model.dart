@@ -4,10 +4,15 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
+Object? _readUserId(Map<dynamic, dynamic> json, String key) {
+  return json['_id'] ?? json['userId'] ?? json['id'];
+}
+
 @freezed
 class UserModel extends UserEntity with _$UserModel {
   const factory UserModel({
-    @JsonKey(name: '_id') required String userId,
+    @JsonKey(name: '_id', readValue: _readUserId) required String userId,
+    //@JsonKey(name: '_id') required String userId,
     @JsonKey(includeIfNull: false) String? fullName,
     @JsonKey(includeIfNull: false) String? phoneNumber,
     @JsonKey(includeIfNull: false) String? bio,

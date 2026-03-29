@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_edit_page.dart';
+import 'package:social_app_fe/features/save/presentation/pages/saved_items_page.dart';
 import 'package:social_app_fe/features/search/presentation/pages/search_page.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_actions.dart';
@@ -96,6 +97,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   actions: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.bookmark_border,
+                        color: AppColors.iconPrimary,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SavedItemsPage(),
+                          ),
+                        );
+                      },
+                    ),
                     const Icon(
                       Icons.settings_outlined,
                       color: AppColors.textPrimary,

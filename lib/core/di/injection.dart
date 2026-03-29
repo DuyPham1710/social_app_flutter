@@ -75,6 +75,7 @@ import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_useca
 import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
+import 'package:social_app_fe/features/save/domain/usecases/get_saved_items_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/create_post_usecase.dart';
@@ -107,6 +108,7 @@ import 'package:social_app_fe/features/privacy/data/repository/privacy_repositor
 import 'package:social_app_fe/features/privacy/domain/repository/privacy_repository.dart';
 import 'package:social_app_fe/features/privacy/domain/usecases/get_default_privacy_usecase.dart';
 import 'package:social_app_fe/features/privacy/domain/usecases/set_default_privacy_usecase.dart';
+import 'package:social_app_fe/features/save/presentation/bloc/saved_items_bloc.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
 import 'package:social_app_fe/features/search/data/data_sources/search_remote_data_source.dart';
 import 'package:social_app_fe/features/search/data/repository/search_repository_impl.dart';
@@ -116,6 +118,10 @@ import 'package:social_app_fe/features/search/domain/usecases/delete_search_hist
 import 'package:social_app_fe/features/search/domain/usecases/get_search_history_usecase.dart';
 import 'package:social_app_fe/features/search/domain/usecases/search_users_usecase.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
+
+import 'package:social_app_fe/features/save/data/data_sources/remote/save_remote_data_source.dart';
+import 'package:social_app_fe/features/save/data/repository/save_repository_impl.dart';
+import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 
 final s1 = GetIt.instance;
 
@@ -163,6 +169,10 @@ Future<void> initializeDependencies() async {
     () => SearchRemoteDataSource(s1()),
   );
 
+  s1.registerLazySingleton<SaveRemoteDataSource>(
+    () => SaveRemoteDataSource(s1()),
+  );
+
   s1.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(s1(instanceName: 'chatSocket'), s1()),
   );
@@ -183,6 +193,7 @@ Future<void> initializeDependencies() async {
     () => PrivacyRepositoryImpl(s1()),
   );
   s1.registerLazySingleton<SearchRepository>(() => SearchRepositoryImpl(s1()));
+  s1.registerLazySingleton<SaveRepository>(() => SaveRepositoryImpl(s1()));
   s1.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(remoteDataSource: s1()),
   );
@@ -192,6 +203,8 @@ Future<void> initializeDependencies() async {
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
+  //s1.registerLazySingleton<CheckSavedUsecase>(() => CheckSavedUsecase(s1()));
+  s1.registerLazySingleton<GetSavedItemsUsecase>(() => GetSavedItemsUsecase(s1()));
   s1.registerLazySingleton<RegisterUsecase>(() => RegisterUsecase(s1()));
   s1.registerLazySingleton<VerifyOtpUsecase>(() => VerifyOtpUsecase(s1()));
   s1.registerLazySingleton<ResendOtpUsecase>(() => ResendOtpUsecase(s1()));
@@ -219,6 +232,10 @@ Future<void> initializeDependencies() async {
 
   s1.registerLazySingleton<GetProfilePostsUseCase>(
     () => GetProfilePostsUseCase(s1()),
+  );
+  
+  s1.registerFactory<SavedItemsBloc>(
+    () => SavedItemsBloc(s1()),
   );
 
   // Comment UseCases

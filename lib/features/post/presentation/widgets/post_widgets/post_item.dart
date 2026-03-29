@@ -18,12 +18,17 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_options_bottom_sheet.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_translatable_caption.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/save_post_bottom_sheet.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 
 class PostItem extends StatefulWidget {
   final PostEntity post;
   final int commentCount;
+  final bool isSaved;
 
-  const PostItem({super.key, required this.post, this.commentCount = 0});
+  const PostItem({super.key, required this.post, this.commentCount = 0, this.isSaved = false});
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -32,13 +37,72 @@ class PostItem extends StatefulWidget {
 class _PostItemState extends State<PostItem> {
   late List<ReactPostEntity> _localReacts;
   EmojiType? _currentUserReaction;
+  bool _isSaved = false;
+  String? _savedId;
+  final SaveRepository _saveRepository = s1<SaveRepository>();
 
   @override
   void initState() {
     super.initState();
     _localReacts = List.from(widget.post.reacts ?? []);
     _currentUserReaction = null;
+    _isSaved = widget.isSaved;
     _initCurrentUserReaction();
+    _checkSavedStatus();
+  }
+
+  Future<void> _checkSavedStatus() async {
+    final result = await _saveRepository.checkSaved(targetId: widget.post.id, type: 'post');
+    if (result is DataStateSuccess && result.data == true) {
+      if (mounted) {
+        setState(() {
+          _isSaved = true;
+          // Note: we don't have _savedId yet unless we query full list, but unsave requires _savedId
+          // This will require getting the saved document. For now, checkSaved API only returns true/false.
+          // Since unsave API needs savedId, we'll fetch the list to find it if it exists.
+        });
+        _fetchSavedId();
+      }
+    }
+  }
+
+  Future<void> _fetchSavedId() async {
+     final listResult = await _saveRepository.getSavedByUser(type: 'post', limit: 50);
+     if (listResult is DataStateSuccess && listResult.data != null) {
+       for (var item in listResult.data!.data) {
+         if (item.targetId == widget.post.id) {
+           if (mounted) {
+             setState(() {
+               _savedId = item.id;
+             });
+           }
+           break;
+         }
+       }
+     }
+  }
+
+  Future<void> _handleUnsave() async {
+    if (_savedId == null) {
+      await _fetchSavedId();
+      if (_savedId == null) return;
+    }
+
+    final result = await _saveRepository.unsavePost(savedId: _savedId!);
+    if (result is DataStateSuccess) {
+      if (mounted) {
+        setState(() {
+          _isSaved = false;
+          _savedId = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Đã bỏ lưu bài viết'),
+            backgroundColor: Colors.green[800],
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -150,12 +214,29 @@ class _PostItemState extends State<PostItem> {
             onOptionsTap: () {
               PostOptionsBottomSheet.show(context, post: widget.post);
             },
+            isSaved: _isSaved,
             onReportTap: () {
               ReportPostBottomSheet.show(
                 context,
                 postId: widget.post.id,
                 ownerUserId: user.userId,
               );
+            },
+            onSaveTap: () {
+              if (_isSaved) {
+                _handleUnsave();
+              } else {
+                SavePostBottomSheet.show(
+                  context,
+                  post: widget.post,
+                  onSaved: (savedId) {
+                    setState(() {
+                      _isSaved = true;
+                      _savedId = savedId;
+                    });
+                  },
+                );
+              }
             },
           ),
 

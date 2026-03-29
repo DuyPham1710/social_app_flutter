@@ -21,8 +21,8 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserModel {
-  @JsonKey(name: '_id')
-  String get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: '_id', readValue: _readUserId)
+  String get userId => throw _privateConstructorUsedError; //@JsonKey(name: '_id') required String userId,
   @JsonKey(includeIfNull: false)
   String? get fullName => throw _privateConstructorUsedError;
   @JsonKey(includeIfNull: false)
@@ -72,7 +72,7 @@ abstract class $UserModelCopyWith<$Res> {
       _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
   $Res call({
-    @JsonKey(name: '_id') String userId,
+    @JsonKey(name: '_id', readValue: _readUserId) String userId,
     @JsonKey(includeIfNull: false) String? fullName,
     @JsonKey(includeIfNull: false) String? phoneNumber,
     @JsonKey(includeIfNull: false) String? bio,
@@ -211,7 +211,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: '_id') String userId,
+    @JsonKey(name: '_id', readValue: _readUserId) String userId,
     @JsonKey(includeIfNull: false) String? fullName,
     @JsonKey(includeIfNull: false) String? phoneNumber,
     @JsonKey(includeIfNull: false) String? bio,
@@ -342,7 +342,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserModelImpl implements _UserModel {
   const _$UserModelImpl({
-    @JsonKey(name: '_id') required this.userId,
+    @JsonKey(name: '_id', readValue: _readUserId) required this.userId,
     @JsonKey(includeIfNull: false) this.fullName,
     @JsonKey(includeIfNull: false) this.phoneNumber,
     @JsonKey(includeIfNull: false) this.bio,
@@ -365,8 +365,9 @@ class _$UserModelImpl implements _UserModel {
       _$$UserModelImplFromJson(json);
 
   @override
-  @JsonKey(name: '_id')
+  @JsonKey(name: '_id', readValue: _readUserId)
   final String userId;
+  //@JsonKey(name: '_id') required String userId,
   @override
   @JsonKey(includeIfNull: false)
   final String? fullName;
@@ -496,7 +497,7 @@ class _$UserModelImpl implements _UserModel {
 
 abstract class _UserModel implements UserModel {
   const factory _UserModel({
-    @JsonKey(name: '_id') required final String userId,
+    @JsonKey(name: '_id', readValue: _readUserId) required final String userId,
     @JsonKey(includeIfNull: false) final String? fullName,
     @JsonKey(includeIfNull: false) final String? phoneNumber,
     @JsonKey(includeIfNull: false) final String? bio,
@@ -519,8 +520,8 @@ abstract class _UserModel implements UserModel {
       _$UserModelImpl.fromJson;
 
   @override
-  @JsonKey(name: '_id')
-  String get userId;
+  @JsonKey(name: '_id', readValue: _readUserId)
+  String get userId; //@JsonKey(name: '_id') required String userId,
   @override
   @JsonKey(includeIfNull: false)
   String? get fullName;

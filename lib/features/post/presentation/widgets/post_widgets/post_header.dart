@@ -17,12 +17,17 @@ class PostHeader extends StatelessWidget {
   final DateTime? createdAt;
   final VoidCallback? onReportTap;
   final VoidCallback? onOptionsTap;
+  final VoidCallback? onSaveTap;
+  final bool? isSaved;
   const PostHeader({
     super.key,
     required this.user,
     this.createdAt,
     this.onReportTap,
     this.onOptionsTap,
+    this.onSaveTap,
+    this.isSaved,
+
   });
 
   String _timeAgo(DateTime time) {
@@ -135,6 +140,9 @@ class PostHeader extends StatelessWidget {
                     } else if (value == 'share') {
                       // TODO: Thêm logic chia sẻ bài viết nếu cần
                     }
+                    else if (value == 'save') {
+                      onSaveTap?.call();
+                    }
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(
@@ -158,6 +166,32 @@ class PostHeader extends StatelessWidget {
                           ),
                           SizedBox(width: 8.w),
                           const Text('Báo cáo bài viết'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'save',
+                      child: Row(
+                        children: [
+                          // Nếu đã lưu, hiển thị icon save gạch chéo và text "Bỏ lưu bài viết"
+                          isSaved == true
+                              ? const Icon(
+                                // icon save gạch chéo
+                                  Icons.bookmark_remove_outlined,
+                                  size: 18,
+                                  color: AppColors.textSecondary,
+                                )
+                              :
+                          const Icon(
+                            Icons.bookmark_border,
+                            size: 18,
+                            color: AppColors.textSecondary,
+                          ),
+                          SizedBox(width: 8.w),
+                          isSaved == true
+                              ? const Text('Bỏ lưu bài viết')
+                              :
+                          const Text('Lưu bài viết'),
                         ],
                       ),
                     ),
