@@ -199,7 +199,6 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
             ),
             SizedBox(height: 16.h),
             
-            // Header: "Đã lưu" (chỉ là giao diện hiển thị theo requirements)
             InkWell(
               onTap: () {
                 Navigator.pop(context);

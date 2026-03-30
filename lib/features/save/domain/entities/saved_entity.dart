@@ -1,3 +1,5 @@
+import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+
 class SavedEntity {
   final String id;
   final String userId;
@@ -8,7 +10,6 @@ class SavedEntity {
   final String note;
   final DateTime? createdAt;
   
-  // Dynamic fields populated by backend
   final String? authorId;
   final String? authorName;
   final String? authorAvatar;

@@ -22,7 +22,8 @@ SavedModel _$SavedModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$SavedModel {
   @JsonKey(name: '_id')
-  String get id => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError; // required String userId,
+  @JsonKey(name: 'userId')
   String get userId => throw _privateConstructorUsedError;
   String get targetId => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
@@ -53,7 +54,7 @@ abstract class $SavedModelCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    String userId,
+    @JsonKey(name: 'userId') String userId,
     String targetId,
     String type,
     String content,
@@ -156,7 +157,7 @@ abstract class _$$SavedModelImplCopyWith<$Res>
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    String userId,
+    @JsonKey(name: 'userId') String userId,
     String targetId,
     String type,
     String content,
@@ -251,7 +252,7 @@ class __$$SavedModelImplCopyWithImpl<$Res>
 class _$SavedModelImpl implements _SavedModel {
   const _$SavedModelImpl({
     @JsonKey(name: '_id') required this.id,
-    required this.userId,
+    @JsonKey(name: 'userId') required this.userId,
     required this.targetId,
     required this.type,
     this.content = '',
@@ -269,7 +270,9 @@ class _$SavedModelImpl implements _SavedModel {
   @override
   @JsonKey(name: '_id')
   final String id;
+  // required String userId,
   @override
+  @JsonKey(name: 'userId')
   final String userId;
   @override
   final String targetId;
@@ -356,7 +359,7 @@ class _$SavedModelImpl implements _SavedModel {
 abstract class _SavedModel implements SavedModel {
   const factory _SavedModel({
     @JsonKey(name: '_id') required final String id,
-    required final String userId,
+    @JsonKey(name: 'userId') required final String userId,
     required final String targetId,
     required final String type,
     final String content,
@@ -373,8 +376,9 @@ abstract class _SavedModel implements SavedModel {
 
   @override
   @JsonKey(name: '_id')
-  String get id;
+  String get id; // required String userId,
   @override
+  @JsonKey(name: 'userId')
   String get userId;
   @override
   String get targetId;
