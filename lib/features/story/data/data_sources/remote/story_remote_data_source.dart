@@ -15,7 +15,18 @@ abstract class StoryRemoteDataSource {
     @Query('page') int page,
     @Query('limit') int limit,
   );
+  
+  @GET('/story/me/archive')
+  Future<GroupedStoryListModel> getMyArchivedStories(
+    @Query('page') int page,
+    @Query('limit') int limit,
+  );
 
+  @GET('/story/me/active')
+  Future<GroupedStoryListModel> getMyActiveStories(
+    @Query('page') int page,
+    @Query('limit') int limit,
+  );
   /// Tạo story: gửi file và metadata (mediaType, music, privacy,...) trong một request
   @POST('/story')
   @MultiPart()

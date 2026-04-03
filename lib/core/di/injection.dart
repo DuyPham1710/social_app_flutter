@@ -19,6 +19,7 @@ import 'package:social_app_fe/features/chat/domain/repository/chat_repository.da
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/send_message_with_files_usecase.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
+import 'package:social_app_fe/features/story/domain/usecases/get_my_archived_stories_usecase.dart';
 import 'package:social_app_fe/features/video_call/data/data_sources/video_call_remote_data_source.dart';
 import 'package:social_app_fe/features/video_call/data/repository/video_call_repository_impl.dart';
 import 'package:social_app_fe/features/video_call/domain/repository/video_call_repository.dart';
@@ -495,6 +496,9 @@ Future<void> initializeDependencies() async {
   // Story Usecases
   s1.registerLazySingleton<GetHomeStoriesUsecase>(
     () => GetHomeStoriesUsecase(s1()),
+  );
+  s1.registerLazySingleton<GetMyArchivedStoriesUsecase>(
+    () => GetMyArchivedStoriesUsecase(s1()),
   );
   s1.registerLazySingleton<CreateStoryUsecase>(() => CreateStoryUsecase(s1()));
   s1.registerLazySingleton<CreateOrUpdateReactStoryUsecase>(

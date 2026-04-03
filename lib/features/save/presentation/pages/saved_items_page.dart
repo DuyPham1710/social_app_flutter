@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/save/presentation/bloc/saved_items_bloc.d
 import 'package:social_app_fe/features/save/presentation/bloc/saved_items_event.dart';
 import 'package:social_app_fe/features/save/presentation/bloc/saved_items_state.dart';
 import 'package:social_app_fe/features/save/presentation/pages/widgets/saved_item_card.dart';
+import 'package:social_app_fe/features/save/presentation/pages/saved_archived_stories_page.dart';
 
 class SavedItemsPage extends StatefulWidget {
   const SavedItemsPage({Key? key}) : super(key: key);
@@ -60,6 +61,26 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         ),
         body: Column(
           children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              child: ListTile(
+                tileColor: AppColors.background,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                leading: const Icon(Icons.history),
+                title: const Text('Tin lưu trữ'),
+                subtitle: const Text('Xem lại các story đã đăng'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SavedArchivedStoriesPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
             _buildCategoryTabs(),
             Expanded(
               child: BlocConsumer<SavedItemsBloc, SavedItemsState>(

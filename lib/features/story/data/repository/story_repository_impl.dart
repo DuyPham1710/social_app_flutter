@@ -28,6 +28,19 @@ class StoryRepositoryImpl implements StoryRepository {
   }
 
   @override
+  Future<DataState<GroupedStoryListModel>> getMyArchivedStories({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await remoteDataSource.getMyArchivedStories(page, limit);
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+  
+  @override
   Future<DataState<void>> createStory({
     required CreateStoryEntity story,
   }) async {

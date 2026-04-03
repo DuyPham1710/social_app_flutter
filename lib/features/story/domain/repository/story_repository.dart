@@ -10,6 +10,10 @@ abstract class StoryRepository {
     int limit = 10,
   });
 
+  Future<DataState<GroupedStoryListEntity>> getMyArchivedStories({
+    int page = 1,
+    int limit = 20,
+  });
   /// Tạo story, không cần trả về dữ liệu chi tiết, chỉ cần biết thành công/thất bại.
   Future<DataState<void>> createStory({
     required CreateStoryEntity story,
