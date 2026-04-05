@@ -4,6 +4,7 @@ import 'package:social_app_fe/features/post/data/models/create_post_response.dar
 import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
+import 'package:social_app_fe/features/post/data/models/caption_translation_eligibility_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_translation_model.dart';
 
 part 'post_remote_data_source.g.dart';
@@ -67,6 +68,13 @@ abstract class PostRemoteDataSource {
   @DELETE('/post/{postId}')
   Future<void> deletePost(
     @Path('postId') String postId,
+  );
+
+  /// Kiểm tra caption có cần dịch (ngôn ngữ nguồn khác ngôn ngữ máy không)
+  @GET('/post/{postId}/caption-translation-eligibility')
+  Future<CaptionTranslationEligibilityModel> getCaptionTranslationEligibility(
+    @Path('postId') String postId,
+    @Query('targetLang') String targetLang,
   );
 
   /// Dịch caption của post

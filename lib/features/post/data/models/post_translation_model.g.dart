@@ -13,6 +13,7 @@ _$PostTranslationModelImpl _$$PostTranslationModelImplFromJson(
   translatedCaption: json['translatedCaption'] as String,
   sourceLang: json['sourceLang'] as String,
   targetLang: json['targetLang'] as String,
+  translationNotNeeded: json['translationNotNeeded'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$$PostTranslationModelImplToJson(
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$PostTranslationModelImplToJson(
   'translatedCaption': instance.translatedCaption,
   'sourceLang': instance.sourceLang,
   'targetLang': instance.targetLang,
+  'translationNotNeeded': instance.translationNotNeeded,
 };

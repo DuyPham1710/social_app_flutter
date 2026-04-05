@@ -4,6 +4,7 @@ import 'package:social_app_fe/features/post/domain/entities/create_post_entity.d
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_list_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/features/post/domain/entities/caption_translation_eligibility_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_translation_entity.dart';
 
 abstract class PostRepository {
@@ -50,9 +51,16 @@ abstract class PostRepository {
     required String postId,
   });
 
+  /// Kiểm tra có cần dịch caption theo ngôn ngữ đích (thường là ngôn ngữ máy).
+  Future<DataState<CaptionTranslationEligibilityEntity>>
+      getCaptionTranslationEligibility({
+    required String postId,
+    String targetLang = 'en',
+  });
+
   /// Dịch caption của post
   Future<DataState<PostTranslationEntity>> translateCaption({
     required String postId,
-    String targetLang = 'vi',
+    String targetLang = 'en',
   });
 }

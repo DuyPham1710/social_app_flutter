@@ -25,6 +25,7 @@ mixin _$PostTranslationModel {
   String get translatedCaption => throw _privateConstructorUsedError;
   String get sourceLang => throw _privateConstructorUsedError;
   String get targetLang => throw _privateConstructorUsedError;
+  bool get translationNotNeeded => throw _privateConstructorUsedError;
 
   /// Serializes this PostTranslationModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,6 +49,7 @@ abstract class $PostTranslationModelCopyWith<$Res> {
     String translatedCaption,
     String sourceLang,
     String targetLang,
+    bool translationNotNeeded,
   });
 }
 
@@ -73,6 +75,7 @@ class _$PostTranslationModelCopyWithImpl<
     Object? translatedCaption = null,
     Object? sourceLang = null,
     Object? targetLang = null,
+    Object? translationNotNeeded = null,
   }) {
     return _then(
       _value.copyWith(
@@ -92,6 +95,10 @@ class _$PostTranslationModelCopyWithImpl<
                 ? _value.targetLang
                 : targetLang // ignore: cast_nullable_to_non_nullable
                       as String,
+            translationNotNeeded: null == translationNotNeeded
+                ? _value.translationNotNeeded
+                : translationNotNeeded // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -112,6 +119,7 @@ abstract class _$$PostTranslationModelImplCopyWith<$Res>
     String translatedCaption,
     String sourceLang,
     String targetLang,
+    bool translationNotNeeded,
   });
 }
 
@@ -133,6 +141,7 @@ class __$$PostTranslationModelImplCopyWithImpl<$Res>
     Object? translatedCaption = null,
     Object? sourceLang = null,
     Object? targetLang = null,
+    Object? translationNotNeeded = null,
   }) {
     return _then(
       _$PostTranslationModelImpl(
@@ -152,6 +161,10 @@ class __$$PostTranslationModelImplCopyWithImpl<$Res>
             ? _value.targetLang
             : targetLang // ignore: cast_nullable_to_non_nullable
                   as String,
+        translationNotNeeded: null == translationNotNeeded
+            ? _value.translationNotNeeded
+            : translationNotNeeded // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -165,6 +178,7 @@ class _$PostTranslationModelImpl implements _PostTranslationModel {
     required this.translatedCaption,
     required this.sourceLang,
     required this.targetLang,
+    this.translationNotNeeded = false,
   });
 
   factory _$PostTranslationModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -178,10 +192,13 @@ class _$PostTranslationModelImpl implements _PostTranslationModel {
   final String sourceLang;
   @override
   final String targetLang;
+  @override
+  @JsonKey()
+  final bool translationNotNeeded;
 
   @override
   String toString() {
-    return 'PostTranslationModel(originalCaption: $originalCaption, translatedCaption: $translatedCaption, sourceLang: $sourceLang, targetLang: $targetLang)';
+    return 'PostTranslationModel(originalCaption: $originalCaption, translatedCaption: $translatedCaption, sourceLang: $sourceLang, targetLang: $targetLang, translationNotNeeded: $translationNotNeeded)';
   }
 
   @override
@@ -196,7 +213,9 @@ class _$PostTranslationModelImpl implements _PostTranslationModel {
             (identical(other.sourceLang, sourceLang) ||
                 other.sourceLang == sourceLang) &&
             (identical(other.targetLang, targetLang) ||
-                other.targetLang == targetLang));
+                other.targetLang == targetLang) &&
+            (identical(other.translationNotNeeded, translationNotNeeded) ||
+                other.translationNotNeeded == translationNotNeeded));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -207,6 +226,7 @@ class _$PostTranslationModelImpl implements _PostTranslationModel {
     translatedCaption,
     sourceLang,
     targetLang,
+    translationNotNeeded,
   );
 
   /// Create a copy of PostTranslationModel
@@ -233,6 +253,7 @@ abstract class _PostTranslationModel implements PostTranslationModel {
     required final String translatedCaption,
     required final String sourceLang,
     required final String targetLang,
+    final bool translationNotNeeded,
   }) = _$PostTranslationModelImpl;
 
   factory _PostTranslationModel.fromJson(Map<String, dynamic> json) =
@@ -246,6 +267,8 @@ abstract class _PostTranslationModel implements PostTranslationModel {
   String get sourceLang;
   @override
   String get targetLang;
+  @override
+  bool get translationNotNeeded;
 
   /// Create a copy of PostTranslationModel
   /// with the given fields replaced by the non-null parameter values.

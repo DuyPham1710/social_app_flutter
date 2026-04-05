@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/helpers/device_translation_locale.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/post/domain/entities/caption_translation_eligibility_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_translation_entity.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_caption_translation_eligibility_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/translate_caption_usecase.dart';
 
 class PostTranslatableCaption extends StatefulWidget {
@@ -29,10 +32,55 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
   PostTranslationEntity? _translation;
   String? _error;
 
+  /// null: đang kiểm tra; true: ẩn nút dịch; false: hiện nút.
+  bool? _hideTranslateAction;
+  bool _eligibilityChecked = false;
+
+  String get _deviceTargetLang => deviceTranslationTargetLang();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkEligibility());
+  }
+
+  Future<void> _checkEligibility() async {
+    if (widget.caption.trim().isEmpty) {
+      if (mounted) {
+        setState(() {
+          _hideTranslateAction = true;
+          _eligibilityChecked = true;
+        });
+      }
+      return;
+    }
+
+    final usecase = s1<GetCaptionTranslationEligibilityUsecase>();
+    final result = await usecase(
+      params: GetCaptionTranslationEligibilityParams(
+        postId: widget.postId,
+        targetLang: _deviceTargetLang,
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (result is DataStateSuccess<CaptionTranslationEligibilityEntity>) {
+      setState(() {
+        _hideTranslateAction = result.data!.translationNotNeeded;
+        _eligibilityChecked = true;
+      });
+    } else {
+      setState(() {
+        _hideTranslateAction = false;
+        _eligibilityChecked = true;
+      });
+    }
+  }
+
   Future<void> _toggleTranslation() async {
     if (_isLoading) return;
 
-    // Nếu đã có bản dịch thì chỉ toggle hiển thị
     if (_translation != null) {
       setState(() {
         _showTranslated = !_showTranslated;
@@ -48,14 +96,26 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
     try {
       final usecase = s1<TranslateCaptionUsecase>();
       final result = await usecase(
-        params: TranslateCaptionParams(postId: widget.postId),
+        params: TranslateCaptionParams(
+          postId: widget.postId,
+          targetLang: _deviceTargetLang,
+        ),
       );
 
       if (result is DataStateSuccess<PostTranslationEntity>) {
-        setState(() {
-          _translation = result.data;
-          _showTranslated = true;
-        });
+        final data = result.data!;
+        if (data.translationNotNeeded) {
+          setState(() {
+            _translation = null;
+            _showTranslated = false;
+            _hideTranslateAction = true;
+          });
+        } else {
+          setState(() {
+            _translation = data;
+            _showTranslated = true;
+          });
+        }
       } else if (result is DataStateError) {
         setState(() {
           _error = result.error?.message ?? 'Không thể dịch caption';
@@ -82,6 +142,9 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
 
     final style = widget.textStyle ?? TextStyle(fontSize: 13.sp);
 
+    final showTranslateRow = _eligibilityChecked &&
+        _hideTranslateAction == false;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -89,35 +152,37 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
           captionToShow,
           style: style,
         ),
-        SizedBox(height: 4.h),
-        Row(
-          children: [
-            if (_isLoading)
-              SizedBox(
-                width: 14.w,
-                height: 14.w,
-                child: const CircularProgressIndicator(strokeWidth: 1.5),
-              ),
-            if (_isLoading) SizedBox(width: 6.w),
-            TextButton(
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size(0, 0),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              onPressed: _isLoading ? null : _toggleTranslation,
-              child: Text(
-                _translation == null
-                    ? 'Xem bản dịch'
-                    : (_showTranslated ? 'Xem bản gốc' : 'Xem bản dịch'),
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: AppColors.primary,
+        if (showTranslateRow) ...[
+          SizedBox(height: 4.h),
+          Row(
+            children: [
+              if (_isLoading)
+                SizedBox(
+                  width: 14.w,
+                  height: 14.w,
+                  child: const CircularProgressIndicator(strokeWidth: 1.5),
+                ),
+              if (_isLoading) SizedBox(width: 6.w),
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                onPressed: _isLoading ? null : _toggleTranslation,
+                child: Text(
+                  _translation == null
+                      ? 'Xem bản dịch'
+                      : (_showTranslated ? 'Xem bản gốc' : 'Xem bản dịch'),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
         if (_error != null)
           Padding(
             padding: EdgeInsets.only(top: 2.h),
@@ -133,4 +198,3 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
     );
   }
 }
-

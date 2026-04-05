@@ -12,6 +12,7 @@ class PostTranslationModel extends PostTranslationEntity
     required String translatedCaption,
     required String sourceLang,
     required String targetLang,
+    @Default(false) bool translationNotNeeded,
   }) = _PostTranslationModel;
 
   factory PostTranslationModel.fromJson(Map<String, dynamic> json) =>

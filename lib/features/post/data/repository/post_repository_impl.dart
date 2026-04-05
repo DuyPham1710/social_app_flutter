@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/post/data/models/post_list_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_translation_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/caption_translation_eligibility_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 
@@ -220,9 +221,26 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
+  Future<DataState<CaptionTranslationEligibilityEntity>>
+      getCaptionTranslationEligibility({
+    required String postId,
+    String targetLang = 'en',
+  }) async {
+    try {
+      final response = await remoteDataSource.getCaptionTranslationEligibility(
+        postId,
+        targetLang,
+      );
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
   Future<DataState<PostTranslationModel>> translateCaption({
     required String postId,
-    String targetLang = 'vi',
+    String targetLang = 'en',
   }) async {
     try {
       final response =

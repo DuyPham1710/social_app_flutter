@@ -28,7 +28,7 @@ class TranslateCaptionParams {
 
   const TranslateCaptionParams({
     required this.postId,
-    this.targetLang = 'vi',
+    this.targetLang = 'en',
   });
 }
 
