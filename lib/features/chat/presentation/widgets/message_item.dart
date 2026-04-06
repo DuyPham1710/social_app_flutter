@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/reaction_detail_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/call_message_item.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/audio_message_bubble.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
@@ -170,9 +171,9 @@ class MessageItem extends StatelessWidget {
                             message.text != null && _isOnlyEmoji(message.text!)
                           ? _buildEmojiMessage()
                           : isAudioAttachment
-                          ? _buildAudioMessage(
-                              context,
-                              message.attachments.first,
+                          ? AudioMessageBubble(
+                              fromMe: fromMe,
+                              attachment: message.attachments.first,
                             )
                           : isAttachment
                           ? _buildAttachmentsGrid(context, message.attachments)
@@ -433,7 +434,8 @@ class MessageItem extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  message.replyTo!.attachments.isNotEmpty
+                  message.replyTo!.attachments.isNotEmpty &&
+                          message.replyTo!.attachments.first.type != 'audio'
                       ? Image.network(
                           message.replyTo!.attachments.first.url,
                           width: 40.w,
@@ -506,77 +508,6 @@ class MessageItem extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAudioMessage(BuildContext context, AttachmentEntity attachment) {
-    return Container(
-      constraints: BoxConstraints(maxWidth: 0.7.sw),
-      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: fromMe
-            ? AppColors.primary
-            : AppColors.textSecondary.withOpacity(0.1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          topRight: Radius.circular(16.r),
-          bottomLeft: Radius.circular(fromMe ? 16.r : 0),
-          bottomRight: Radius.circular(fromMe ? 0 : 16.r),
-        ),
-      ),
-      
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.play_arrow_rounded,
-            color: fromMe ? Colors.white : AppColors.textPrimary,
-            size: 32.sp,
-          ),
-          SizedBox(width: 8.w),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(15, (index) {
-              final heights = [
-                8.0,
-                14.0,
-                20.0,
-                10.0,
-                24.0,
-                12.0,
-                18.0,
-                8.0,
-                22.0,
-                14.0,
-                10.0,
-                16.0,
-                8.0,
-                18.0,
-                12.0,
-              ];
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 1.5.w),
-                width: 3.w,
-                height: heights[index].h,
-                decoration: BoxDecoration(
-                  color: fromMe ? Colors.white : AppColors.primary,
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
-              );
-            }),
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            "0:02",
-            style: TextStyle(
-              color: fromMe ? Colors.white : AppColors.textPrimary,
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
         ],
       ),
     );

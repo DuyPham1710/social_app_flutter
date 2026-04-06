@@ -6,11 +6,18 @@ import 'dart:math';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class VoiceRecordingWidget extends StatefulWidget {
-  final Function(String) onSend;
+  final Function(
+    String filePath, {
+    required int duration,
+    required List<double> waveform,
+  })
+  onSend;
+
   final VoidCallback onCancel;
 
   const VoiceRecordingWidget({
@@ -248,7 +255,15 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
     }
 
     if (_filePath != null) {
-      widget.onSend(_filePath!);
+      final waveform40Bars = ChatHelper.compressWaveformTo40Bars(
+        _allAmplitudes,
+      );
+
+      widget.onSend(
+        _filePath!,
+        duration: _recordDuration,
+        waveform: waveform40Bars,
+      );
     } else {
       widget.onCancel();
     }
@@ -418,7 +433,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
                   child: Row(
                     children: [
                       Icon(
-                        CupertinoIcons.wand_rays,
+                        Icons.auto_awesome,
                         color: AppColors.textPrimary,
                         size: 18.sp,
                       ),

@@ -79,4 +79,35 @@ class ChatHelper {
     }
     return avatarWidget;
   }
+
+  // Tạo waveform từ audio blob
+  static List<double> compressWaveformTo40Bars(List<double> allAmplitudes) {
+    if (allAmplitudes.isEmpty) return [];
+
+    const int targetBars = 40;
+    List<double> compressed = [];
+
+    double step = allAmplitudes.length / targetBars;
+
+    for (int i = 0; i < targetBars; i++) {
+      int start = (i * step).floor();
+      int end = ((i + 1) * step).floor();
+      if (end > allAmplitudes.length) end = allAmplitudes.length;
+      if (start >= end) start = end - 1;
+      if (start < 0) start = 0;
+
+      // Lấy giá trị MAX của segment (giống logic hiện tại)
+      double maxValue = 4.0;
+      for (int j = start; j < end; j++) {
+        if (allAmplitudes[j] > maxValue) {
+          maxValue = allAmplitudes[j];
+        }
+      }
+
+      // Normalize về 0-1 range để backend dễ xử lý
+      compressed.add((maxValue - 4.0) / 24.0); // 4.0 là min, 28.0 là max (4+24)
+    }
+
+    return compressed;
+  }
 }

@@ -939,7 +939,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     });
   }
 
-  void _stopAndSendRecording(String filePath) {
+  void _stopAndSendRecording(
+    String filePath, {
+    required int duration,
+    required List<double> waveform,
+  }) {
     setState(() => _isRecording = false);
 
     final conversationId = _currentConversationId ?? widget.conversationId;
@@ -951,6 +955,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           conversationId: conversationId,
           filePaths: [filePath],
           replyTo: _replyingMessage?.id,
+          audioDuration: duration,
+          audioWaveform: waveform,
         ),
       );
       _clearReplyMessage();
@@ -1872,7 +1878,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   Widget _buildReplyPreview() {
-    final replyText = _replyingMessage!.text ?? '[Ảnh]';
+    final replyText = _replyingMessage!.text?.isNotEmpty == true
+        ? _replyingMessage!.text!
+        : (_replyingMessage!.attachments.isNotEmpty
+              ? '[${_replyingMessage!.attachments.first.type == 'audio' ? 'Tin nhắn thoại' : 'Ảnh'}]'
+              : '[Tin nhắn]');
+
     final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
 
     String name;
@@ -1933,8 +1944,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ),
           ),
 
-          // how to fix
-          _replyingMessage!.attachments.isNotEmpty
+          _replyingMessage!.attachments.isNotEmpty &&
+                  _replyingMessage!.attachments.first.type != 'audio'
               ? Image(
                   image: NetworkImage(_replyingMessage!.attachments.first.url),
                   width: 30.w,
