@@ -258,6 +258,24 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<String>> applyVoiceEffect({
+    required String filePath,
+    required String voicePreset,
+  }) async {
+    try {
+      final newPath = await _remoteDataSource.applyVoiceEffect(
+        filePath: filePath,
+        voicePreset: voicePreset,
+      );
+      return DataStateSuccess(newPath);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   void markAsRead({
     required String userId,
     required String conversationId,

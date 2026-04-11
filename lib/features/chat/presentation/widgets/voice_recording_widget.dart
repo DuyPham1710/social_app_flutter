@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/voice_effect_bottom_sheet.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -37,6 +38,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
   int _recordDuration = 0;
   Timer? _timer;
   String? _filePath;
+  String? _originalFilePath;
 
   // Waveform
   final List<double> _waveformHeights = List.generate(100, (index) => 4.0);
@@ -114,6 +116,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
             _isRecording = true;
             _recordDuration = 0;
             _filePath = filePath;
+            _originalFilePath = filePath;
             _allAmplitudes.clear();
           });
 
@@ -194,6 +197,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
     if (path != null && mounted) {
       setState(() {
         _filePath = path;
+        _originalFilePath ??= path;
         _hasRecorded = true;
       });
     } else {
@@ -243,6 +247,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
         final path = await _audioRecorder.stop();
         if (path != null) {
           _filePath = path;
+          _originalFilePath ??= path;
         }
       } catch (e) {
         print('Error stopping recorder on send: $e');
@@ -413,13 +418,27 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
               ),
 
               GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tính năng đang phát triển'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
+                onTap: () async {
+                  await _finishRecording();
+
+                  if (mounted && _filePath != null) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => VoiceEffectBottomSheet(
+                        filePath: _originalFilePath ?? _filePath!,
+                        onVoiceChanged: (newFilePath) {
+                          setState(() {
+                            _filePath = newFilePath;
+                            // Reset player để phát file mới
+                            _isPlaying = false;
+                            _playbackPosition = Duration.zero;
+                          });
+                        },
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(
