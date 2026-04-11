@@ -8,21 +8,45 @@ class AttachmentModel {
   final String url;
   final String type; // image, video, file, audio
   final int size;
+  final int? duration; // For audio/video
+  final List<double>? waveform; // For audio messages
 
-  AttachmentModel({required this.url, required this.type, required this.size});
+  AttachmentModel({
+    required this.url,
+    required this.type,
+    required this.size,
+    this.duration,
+    this.waveform,
+  });
 
   factory AttachmentModel.fromJson(Map<String, dynamic> json) {
     return AttachmentModel(
       url: json['url'] as String,
       type: json['type'] as String,
       size: json['size'] as int,
+      duration: json['duration'] as int?,
+      waveform: (json['waveform'] as List<dynamic>?)
+          ?.whereType<num>()
+          .map((v) => v.toDouble())
+          .toList(),
     );
   }
 
-  Map<String, dynamic> toJson() => {'url': url, 'type': type, 'size': size};
+  Map<String, dynamic> toJson() => {
+    'url': url,
+    'type': type,
+    'size': size,
+    'duration': duration,
+    'waveform': waveform,
+  };
 
-  AttachmentEntity toEntity() =>
-      AttachmentEntity(url: url, type: type, size: size);
+  AttachmentEntity toEntity() => AttachmentEntity(
+    url: url,
+    type: type,
+    size: size,
+    duration: duration,
+    waveform: waveform,
+  );
 }
 
 class ReactionModel {

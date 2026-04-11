@@ -84,6 +84,12 @@ abstract class ChatRepository {
     String? replyTo,
   });
 
+  // Apply voice effect to audio file and return converted file path
+  Future<DataState<String>> applyVoiceEffect({
+    required String filePath,
+    required String voicePreset,
+  });
+
   // Mark messages as read
   void markAsRead({
     required String userId,

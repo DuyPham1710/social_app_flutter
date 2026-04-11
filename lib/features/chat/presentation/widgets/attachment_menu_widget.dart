@@ -1,0 +1,134 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+
+class AttachmentMenuWidget extends StatelessWidget {
+  final VoidCallback onClose;
+
+  const AttachmentMenuWidget({super.key, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.h),
+      width: 200.w,
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 8.h),
+          _buildAttachmentMenuItem(
+            context: context,
+            title: 'Chia sẻ file',
+            icon: CupertinoIcons.doc_fill,
+            color: AppColors.primary,
+            onTap: () {
+              onClose();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tính năng chia sẻ file đang phát triển'),
+                ),
+              );
+            },
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.h),
+            child: Divider(color: AppColors.divider, height: 1, thickness: 1),
+          ),
+
+          _buildAttachmentMenuItem(
+            context: context,
+            title: 'Vị trí',
+            icon: CupertinoIcons.location_solid,
+            color: AppColors.primary,
+            onTap: () {
+              onClose();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tính năng vị trí đang phát triển'),
+                ),
+              );
+            },
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.h),
+            child: Divider(color: AppColors.divider, height: 1, thickness: 1),
+          ),
+
+          // _buildAttachmentMenuItem(
+          //   context: context,
+          //   title: 'Chơi game',
+          //   icon: CupertinoIcons.gamecontroller_fill,
+          //   color: Colors.blueAccent,
+          //   onTap: () {
+          //     onClose();
+          //     ScaffoldMessenger.of(context).showSnackBar(
+          //       const SnackBar(
+          //         content: Text('Tính năng chơi game đang phát triển'),
+          //       ),
+          //     );
+          //   },
+          // ),
+          _buildAttachmentMenuItem(
+            context: context,
+            title: 'Hình ảnh AI',
+            icon: CupertinoIcons.sparkles,
+            color: AppColors.primary,
+            onTap: () {
+              onClose();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Tính năng Hình ảnh AI đang phát triển'),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 8.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAttachmentMenuItem({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Icon(icon, color: color, size: 22.sp),
+          ],
+        ),
+      ),
+    );
+  }
+}

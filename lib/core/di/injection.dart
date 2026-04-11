@@ -18,6 +18,8 @@ import 'package:social_app_fe/features/chat/data/repository/chat_repository_impl
 import 'package:social_app_fe/features/chat/domain/repository/chat_repository.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/chat_usecases.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/send_message_with_files_usecase.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/apply_voice_effect_usecase.dart';
+import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice_effect_bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/story/domain/usecases/get_my_archived_stories_usecase.dart';
 import 'package:social_app_fe/features/video_call/data/data_sources/video_call_remote_data_source.dart';
@@ -405,6 +407,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<ListenConversationUpdateUseCase>(
     () => ListenConversationUpdateUseCase(s1()),
   );
+  s1.registerLazySingleton<ApplyVoiceEffectUseCase>(() => ApplyVoiceEffectUseCase(s1()));
 
   // Video Call UseCases
   s1.registerLazySingleton<ConnectVideoCallUseCase>(
@@ -708,6 +711,10 @@ Future<void> initializeDependencies() async {
       sendFriendRequestUseCase: s1(),
       cancelFriendRequestUseCase: s1(),
     ),
+  );
+
+  s1.registerFactory<VoiceEffectBloc>(
+    () => VoiceEffectBloc(s1()),
   );
 
   // Chat Services

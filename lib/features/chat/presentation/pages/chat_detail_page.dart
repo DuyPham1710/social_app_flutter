@@ -30,6 +30,8 @@ import 'package:social_app_fe/features/chat/presentation/widgets/profile_header.
 import 'package:social_app_fe/features/chat/presentation/widgets/scroll_to_bottom_button.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/attachment_menu_widget.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/voice_recording_widget.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/grid_image_item.dart';
 import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
@@ -118,6 +120,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   // Track input expansion state
   bool _isInputExpanded = false;
+
+  bool _isRecording = false;
+
+  // Track attachment menu state
+  bool _showAttachmentMenu = false;
 
   // Track photo picker state
   bool _showPhotoPicker = false;
@@ -248,6 +255,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } else {
       setState(() {
         _showPhotoPicker = false;
+        _showAttachmentMenu = false;
       });
     }
   }
@@ -922,6 +930,44 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     _clearReplyMessage();
   }
 
+  void _startRecording() {
+    setState(() {
+      _isRecording = true;
+      _showAttachmentMenu = false;
+      _showPhotoPicker = false;
+      _focusNode.unfocus();
+    });
+  }
+
+  void _stopAndSendRecording(
+    String filePath, {
+    required int duration,
+    required List<double> waveform,
+  }) {
+    setState(() => _isRecording = false);
+
+    final conversationId = _currentConversationId ?? widget.conversationId;
+
+    if (conversationId != null) {
+      context.read<MessageBloc>().add(
+        SendMessageWithFilesEvent(
+          userId: widget.userId,
+          conversationId: conversationId,
+          filePaths: [filePath],
+          replyTo: _replyingMessage?.id,
+          audioDuration: duration,
+          audioWaveform: waveform,
+        ),
+      );
+      _clearReplyMessage();
+      _scrollToBottom();
+    }
+  }
+
+  void _cancelRecording() {
+    setState(() => _isRecording = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<VideoCallBloc, VideoCallState>(
@@ -1448,20 +1494,27 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                     child: SwipeTo(
                                                       key: messageKey,
 
-                                                      onRightSwipe: !fromMe
-                                                          ? (details) {
-                                                              _setReplyMessage(
-                                                                message,
-                                                              );
-                                                            }
-                                                          : null, // null nghĩa là disable hướng này
-
-                                                      onLeftSwipe: fromMe
-                                                          ? (details) {
-                                                              _setReplyMessage(
-                                                                message,
-                                                              );
-                                                            }
+                                                      onRightSwipe:
+                                                          !message
+                                                              .deletedForEveryone
+                                                          ? !fromMe
+                                                                ? (details) {
+                                                                    _setReplyMessage(
+                                                                      message,
+                                                                    );
+                                                                  }
+                                                                : null // null nghĩa là disable hướng này
+                                                          : null,
+                                                      onLeftSwipe:
+                                                          !message
+                                                              .deletedForEveryone
+                                                          ? fromMe
+                                                                ? (details) {
+                                                                    _setReplyMessage(
+                                                                      message,
+                                                                    );
+                                                                  }
+                                                                : null
                                                           : null,
 
                                                       iconOnRightSwipe:
@@ -1487,16 +1540,24 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                             widget.userId,
                                                         otherParticipants:
                                                             otherParticipants,
-                                                        onLongPress: () =>
+                                                        onLongPress: () {
+                                                          if (!message
+                                                              .deletedForEveryone) {
                                                             _handleMessageLongPress(
                                                               message,
                                                               fromMe,
-                                                            ),
-                                                        onDoubleTap: () =>
+                                                            );
+                                                          }
+                                                        },
+                                                        onDoubleTap: () {
+                                                          if (!message
+                                                              .deletedForEveryone) {
                                                             _handleReactionSelected(
                                                               message,
                                                               EmojiType.love,
-                                                            ),
+                                                            );
+                                                          }
+                                                        },
                                                         onEditHistoryTap:
                                                             message.isEdited
                                                             ? () =>
@@ -1617,6 +1678,19 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                           onPressed: _scrollToBottom,
                         ),
                       ),
+
+                      if (_showAttachmentMenu)
+                        Positioned(
+                          bottom: 0,
+                          left: 10.w,
+                          child: AttachmentMenuWidget(
+                            onClose: () {
+                              setState(() {
+                                _showAttachmentMenu = false;
+                              });
+                            },
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -1646,6 +1720,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   Widget _buildInputArea() {
+    if (_isRecording) {
+      return VoiceRecordingWidget(
+        onSend: _stopAndSendRecording,
+        onCancel: _cancelRecording,
+      );
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1678,11 +1759,21 @@ class _ChatDetailPageState extends State<ChatDetailPage>
               if (!_isInputExpanded) ...[
                 IconButton(
                   icon: Icon(
-                    CupertinoIcons.plus_circle_fill,
+                    _showAttachmentMenu
+                        ? CupertinoIcons.xmark_circle_fill
+                        : CupertinoIcons.plus_circle_fill,
                     color: AppColors.primary,
                     size: 24.sp,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      _showAttachmentMenu = !_showAttachmentMenu;
+                      if (_showAttachmentMenu) {
+                        _focusNode.unfocus();
+                        _showPhotoPicker = false;
+                      }
+                    });
+                  },
                 ),
                 IconButton(
                   icon: Icon(
@@ -1709,6 +1800,15 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                       });
                     }
                   },
+                ),
+
+                IconButton(
+                  icon: Icon(
+                    CupertinoIcons.mic_fill,
+                    color: AppColors.primary,
+                    size: 24.sp,
+                  ),
+                  onPressed: _startRecording,
                 ),
               ],
 
@@ -1778,7 +1878,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   Widget _buildReplyPreview() {
-    final replyText = _replyingMessage!.text ?? '[Ảnh]';
+    final replyText = _replyingMessage!.text?.isNotEmpty == true
+        ? _replyingMessage!.text!
+        : (_replyingMessage!.attachments.isNotEmpty
+              ? '[${_replyingMessage!.attachments.first.type == 'audio' ? 'Tin nhắn thoại' : 'Ảnh'}]'
+              : '[Tin nhắn]');
+
     final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
 
     String name;
@@ -1839,8 +1944,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ),
           ),
 
-          // how to fix
-          _replyingMessage!.attachments.isNotEmpty
+          _replyingMessage!.attachments.isNotEmpty &&
+                  _replyingMessage!.attachments.first.type != 'audio'
               ? Image(
                   image: NetworkImage(_replyingMessage!.attachments.first.url),
                   width: 30.w,

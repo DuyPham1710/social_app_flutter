@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/reaction_detail_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/call_message_item.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/audio_message_bubble.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
@@ -96,6 +97,9 @@ class MessageItem extends StatelessWidget {
     final isDeleteforEveryone = message.deletedForEveryone;
     final lastName = message.sender.fullName!.trim().split(' ').last;
     final isAttachment = message.attachments.isNotEmpty;
+    final isAudioAttachment =
+        isAttachment &&
+        message.attachments.first.type == AttachmentType.audio.name;
     final isHasMetaData =
         message.metadata != null &&
         (message.metadata!.type == 'video_call' ||
@@ -166,6 +170,11 @@ class MessageItem extends StatelessWidget {
                             // Kiểm tra xem có phải là emoji không
                             message.text != null && _isOnlyEmoji(message.text!)
                           ? _buildEmojiMessage()
+                          : isAudioAttachment
+                          ? AudioMessageBubble(
+                              fromMe: fromMe,
+                              attachment: message.attachments.first,
+                            )
                           : isAttachment
                           ? _buildAttachmentsGrid(context, message.attachments)
                           : _buildNormalMessage(),
@@ -425,7 +434,8 @@ class MessageItem extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  message.replyTo!.attachments.isNotEmpty
+                  message.replyTo!.attachments.isNotEmpty &&
+                          message.replyTo!.attachments.first.type != 'audio'
                       ? Image.network(
                           message.replyTo!.attachments.first.url,
                           width: 40.w,

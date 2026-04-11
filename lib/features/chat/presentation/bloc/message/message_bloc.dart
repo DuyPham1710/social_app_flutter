@@ -571,12 +571,32 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
 
       // Sau khi có attachments URLs, gửi message qua WebSocket
       if (attachments.isNotEmpty) {
+        // Nếu có duration và waveform (voice message), thêm vào attachment đầu tiên
+        List<Map<String, dynamic>> finalAttachments = attachments;
+        
+        if (event.audioDuration != null && event.audioWaveform != null) {
+          print('Adding voice metadata: duration=${event.audioDuration}s, waveform=${event.audioWaveform!.length} bars');
+          
+          // Clone attachment đầu tiên và thêm duration + waveform
+          finalAttachments = attachments.map((attachment) {
+            // Chỉ thêm vào attachment đầu tiên (voice message)
+            if (attachment == attachments.first && attachment['type'] == 'audio') {
+              return {
+                ...attachment,
+                'duration': event.audioDuration,
+                'waveform': event.audioWaveform,
+              };
+            }
+            return attachment;
+          }).toList();
+        }
+        
         add(
           SendMessageEvent(
             userId: event.userId,
             conversationId: event.conversationId,
             text: event.text,
-            attachments: attachments,
+            attachments: finalAttachments,
             replyTo: event.replyTo,
           ),
         );

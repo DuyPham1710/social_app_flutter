@@ -136,6 +136,8 @@ class SendMessageWithFilesEvent extends MessageEvent {
   final String? text;
   final List<String> filePaths; // File paths for MultipartFile
   final String? replyTo;
+  final int? audioDuration; // Duration in seconds for audio messages
+  final List<double>? audioWaveform; // Waveform data for audio messages
 
   const SendMessageWithFilesEvent({
     required this.userId,
@@ -143,10 +145,20 @@ class SendMessageWithFilesEvent extends MessageEvent {
     this.text,
     required this.filePaths,
     this.replyTo,
+    this.audioDuration,
+    this.audioWaveform,
   });
 
   @override
-  List<Object?> get props => [userId, conversationId, text, filePaths, replyTo];
+  List<Object?> get props => [
+    userId,
+    conversationId,
+    text,
+    filePaths,
+    replyTo,
+    audioDuration,
+    audioWaveform,
+  ];
 }
 
 class MarkAsReadEvent extends MessageEvent {

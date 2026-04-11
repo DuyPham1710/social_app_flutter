@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
 import 'package:social_app_fe/features/chat/data/models/message-edit-log_model.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
@@ -876,6 +878,56 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     } catch (e) {
       developer.log('Error uploading files: $e', name: 'ChatDataSource');
       throw Exception('Failed to upload files: $e');
+    }
+  }
+
+  @override
+  Future<String> applyVoiceEffect({
+    required String filePath,
+    required String voicePreset,
+  }) async {
+    developer.log(
+      'Applying voice effect from API for file: $filePath',
+      name: 'ChatDataSource',
+    );
+
+    try {
+      final formData = FormData.fromMap({
+        'audio': await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+        'voicePreset': voicePreset,
+      });
+
+      final response = await _dio.post(
+        '/chat/voice-effect',
+        data: formData,
+        options: Options(
+          responseType: ResponseType.bytes,
+          receiveTimeout: const Duration(minutes: 2),
+          sendTimeout: const Duration(minutes: 2),
+        ),
+      );
+
+      final tempDir = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final newFilePath = '${tempDir.path}/voice_effect_$timestamp.wav';
+      final file = File(newFilePath);
+      await file.writeAsBytes(response.data);
+
+      return newFilePath;
+    } on DioException catch (e) {
+      developer.log('Voice effect dio error: ${e.message}', name: 'ChatDataSource');
+      if (e.response?.statusCode == 400) {
+        throw Exception('Preset giọng không hợp lệ.');
+      } else if (e.response?.statusCode == 503) {
+        throw Exception('Dịch vụ AI chưa sẵn sàng. Vui lòng thử lại sau.');
+      }
+      throw Exception('Không thể chuyển giọng. Vui lòng thử lại.');
+    } catch (e) {
+      developer.log('Error applying voice effect: $e', name: 'ChatDataSource');
+      throw Exception('Lỗi hệ thống khi chuyển giọng: $e');
     }
   }
 
