@@ -196,12 +196,29 @@ class _PostItemState extends State<PostItem> {
     final urls = widget.post.urls;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(vertical: 8.h),
       decoration: BoxDecoration(
         color: AppColors.background,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: AppColors.divider.withValues(alpha: 0.85),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: Offset(0, 3.h),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 4,
+            offset: Offset(0, 1.h),
+            spreadRadius: 0,
+          ),
+        ],
       ),
 
       child: Column(

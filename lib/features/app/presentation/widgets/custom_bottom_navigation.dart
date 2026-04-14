@@ -17,93 +17,198 @@ class CustomBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 66.h,
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.unselectedIcon.withOpacity(0.1),
-            offset: const Offset(0, -1),
-            blurRadius: 4.r,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(CupertinoIcons.house_fill, 0),
-          _buildNavItem(CupertinoIcons.person_2, 1),
-          _buildNavItem(CupertinoIcons.plus_app, 2),
-          _buildNotificationNavItem(CupertinoIcons.bell, 3),
-          _buildNavItem(CupertinoIcons.line_horizontal_3, 4),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, int index) {
-    final isActive = currentIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => onTabSelected(index),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: double.infinity,
-          alignment: Alignment.center,
-          child: Icon(
-            icon,
-            size: 28,
-            color: isActive ? AppColors.primary : AppColors.unselectedIcon,
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(left: 14.w, right: 14.w, bottom: 10.h),
+        child: SizedBox(
+          height: 76.h,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              _buildBarBackground(
+                child: Row(
+                  children: [
+                    _buildTabItem(
+                      index: 0,
+                      icon: CupertinoIcons.house_fill,
+                      label: 'Trang chủ',
+                    ),
+                    _buildTabItem(
+                      index: 1,
+                      icon: CupertinoIcons.person_2,
+                      label: 'Bạn bè',
+                    ),
+                    SizedBox(width: 70.w),
+                    _buildNotificationTabItem(
+                      index: 3,
+                      icon: CupertinoIcons.bell,
+                      label: 'Thông báo',
+                    ),
+                    _buildTabItem(
+                      index: 4,
+                      icon: CupertinoIcons.line_horizontal_3,
+                      label: 'Menu',
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 14.h,
+                child: _buildCenterActionButton(),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNotificationNavItem(IconData icon, int index) {
+  Widget _buildBarBackground({required Widget child}) {
+    return Container(
+      height: 62.h,
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 18.r,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18.r),
+        child: Material(
+          color: Colors.transparent,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabItem({
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
     final isActive = currentIndex == index;
+    final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
+
     return Expanded(
-      child: GestureDetector(
+      child: InkWell(
         onTap: () => onTabSelected(index),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: double.infinity,
-          alignment: Alignment.center,
-          child: Stack(
-            clipBehavior: Clip.none,
+        child: Padding(
+          padding: EdgeInsets.only(top: 10.h),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                size: 28,
-                color: isActive ? AppColors.primary : AppColors.unselectedIcon,
-              ),
-              if (unreadCount > 0)
-                Positioned(
-                  right: -8,
-                  top: -4,
-                  child: Container(
-                    padding: EdgeInsets.all(2.r),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 220, 53, 69),
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 18.r,
-                      minHeight: 18.r,
-                    ),
-                    child: Text(
-                      unreadCount > 99 ? '99+' : unreadCount.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+              Icon(icon, size: 26.sp, color: color),
+              SizedBox(height: 4.h),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                  color: color,
                 ),
+              ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationTabItem({
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
+    final isActive = currentIndex == index;
+    final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => onTabSelected(index),
+        child: Padding(
+          padding: EdgeInsets.only(top: 10.h),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, size: 26.sp, color: color),
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: -10.w,
+                      top: -6.h,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 220, 53, 69),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        constraints: BoxConstraints(minWidth: 18.w),
+                        child: Text(
+                          unreadCount > 99 ? '99+' : unreadCount.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterActionButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18.r),
+        onTap: () => onTabSelected(2),
+        child: Ink(
+          width: 56.w,
+          height: 56.w,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(18.r),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.35),
+                blurRadius: 16.r,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Icon(
+            CupertinoIcons.plus,
+            color: Colors.white,
+            size: 30.sp,
           ),
         ),
       ),
