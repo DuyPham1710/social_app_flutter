@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/utils/react_post_util.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'dart:async';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
@@ -22,6 +23,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/sa
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/post/domain/usecases/view_post_usecase.dart';
 
 class PostItem extends StatefulWidget {
   final PostEntity post;
@@ -40,6 +42,23 @@ class _PostItemState extends State<PostItem> {
   bool _isSaved = false;
   String? _savedId;
   final SaveRepository _saveRepository = s1<SaveRepository>();
+
+  void _openPostDetail({int initialImageIndex = 0}) {
+    unawaited(
+      s1<ViewPostUsecase>()(
+        params: ViewPostParams(postId: widget.post.id),
+      ),
+    );
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => PostDetailPage(
+          post: widget.post,
+          initialImageIndex: initialImageIndex,
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -157,15 +176,7 @@ class _PostItemState extends State<PostItem> {
     late final Widget layout;
 
     void onImageTap(int initialIndex) {
-      Navigator.push(
-        context,
-        CupertinoPageRoute(
-          builder: (_) => PostDetailPage(
-            post: widget.post,
-            initialImageIndex: initialIndex,
-          ),
-        ),
-      );
+      _openPostDetail(initialImageIndex: initialIndex);
     }
 
     switch (widget.post.layout.toLowerCase()) {
@@ -181,10 +192,7 @@ class _PostItemState extends State<PostItem> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(builder: (_) => PostDetailPage(post: widget.post)),
-        );
+        _openPostDetail();
       },
       child: layout,
     );
@@ -259,12 +267,15 @@ class _PostItemState extends State<PostItem> {
 
           // Caption + dịch
           if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
-              child: PostTranslatableCaption(
-                postId: widget.post.id,
-                caption: widget.post.caption!,
-                textStyle: TextStyle(fontSize: 13.sp),
+            GestureDetector(
+              onTap: widget.post.urls.isEmpty ? _openPostDetail : null,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: PostTranslatableCaption(
+                  postId: widget.post.id,
+                  caption: widget.post.caption!,
+                  textStyle: TextStyle(fontSize: 13.sp),
+                ),
               ),
             ),
 
@@ -274,7 +285,11 @@ class _PostItemState extends State<PostItem> {
           if (urls.isNotEmpty)
             _buildMediaLayout(context, urls)
           else
-            SizedBox.shrink(),
+            GestureDetector(
+              onTap: _openPostDetail,
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(height: 8.h),
+            ),
 
           SizedBox(height: 8.h),
 

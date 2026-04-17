@@ -61,6 +61,16 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
+  Future<DataState<void>> viewPost({required String postId}) async {
+    try {
+      await remoteDataSource.viewPost(postId);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
   Future<DataState<PostListModel>> getProfilePosts({
     int page = 1,
     int limit = 10,
