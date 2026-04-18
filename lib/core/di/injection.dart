@@ -127,6 +127,30 @@ import 'package:social_app_fe/features/save/data/data_sources/remote/save_remote
 import 'package:social_app_fe/features/save/data/repository/save_repository_impl.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 
+// Community imports
+import 'package:social_app_fe/features/community/data/data_sources/remote/community_remote_data_source.dart';
+import 'package:social_app_fe/features/community/data/repository/community_repository_impl.dart';
+import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_all_communities_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_my_communities_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_my_invites_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_community_detail_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_member_status_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/join_community_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/cancel_join_request_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/leave_community_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_community_posts_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_pending_requests_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/respond_to_join_request_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/create_community_usecase.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_create_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_create_event.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_create_state.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
+
 final s1 = GetIt.instance;
 
 Future<void> initializeDependencies() async {
@@ -208,7 +232,9 @@ Future<void> initializeDependencies() async {
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
   //s1.registerLazySingleton<CheckSavedUsecase>(() => CheckSavedUsecase(s1()));
-  s1.registerLazySingleton<GetSavedItemsUsecase>(() => GetSavedItemsUsecase(s1()));
+  s1.registerLazySingleton<GetSavedItemsUsecase>(
+    () => GetSavedItemsUsecase(s1()),
+  );
   s1.registerLazySingleton<RegisterUsecase>(() => RegisterUsecase(s1()));
   s1.registerLazySingleton<VerifyOtpUsecase>(() => VerifyOtpUsecase(s1()));
   s1.registerLazySingleton<ResendOtpUsecase>(() => ResendOtpUsecase(s1()));
@@ -240,10 +266,8 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetProfilePostsUseCase>(
     () => GetProfilePostsUseCase(s1()),
   );
-  
-  s1.registerFactory<SavedItemsBloc>(
-    () => SavedItemsBloc(s1()),
-  );
+
+  s1.registerFactory<SavedItemsBloc>(() => SavedItemsBloc(s1()));
 
   // Comment UseCases
   s1.registerLazySingleton<ConnectCommentSocketUseCase>(
@@ -407,7 +431,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<ListenConversationUpdateUseCase>(
     () => ListenConversationUpdateUseCase(s1()),
   );
-  s1.registerLazySingleton<ApplyVoiceEffectUseCase>(() => ApplyVoiceEffectUseCase(s1()));
+  s1.registerLazySingleton<ApplyVoiceEffectUseCase>(
+    () => ApplyVoiceEffectUseCase(s1()),
+  );
 
   // Video Call UseCases
   s1.registerLazySingleton<ConnectVideoCallUseCase>(
@@ -713,9 +739,96 @@ Future<void> initializeDependencies() async {
     ),
   );
 
-  s1.registerFactory<VoiceEffectBloc>(
-    () => VoiceEffectBloc(s1()),
+  s1.registerFactory<VoiceEffectBloc>(() => VoiceEffectBloc(s1()));
+
+  // ==================== COMMUNITY FEATURE ====================
+
+  // Community Data Source
+  s1.registerLazySingleton<CommunityRemoteDataSource>(
+    () => CommunityRemoteDataSource(s1()),
   );
+
+  // Community Repository
+  s1.registerLazySingleton<CommunityRepository>(
+    () => CommunityRepositoryImpl(s1()),
+  );
+
+  // Community Use Cases
+  s1.registerLazySingleton<GetAllCommunitiesUseCase>(
+    () => GetAllCommunitiesUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMyCommunitiesUseCase>(
+    () => GetMyCommunitiesUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMyInvitesUseCase>(
+    () => GetMyInvitesUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetCommunityDetailUseCase>(
+    () => GetCommunityDetailUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetMemberStatusUseCase>(
+    () => GetMemberStatusUseCase(s1()),
+  );
+  s1.registerLazySingleton<JoinCommunityUseCase>(
+    () => JoinCommunityUseCase(s1()),
+  );
+  s1.registerLazySingleton<CancelJoinRequestUseCase>(
+    () => CancelJoinRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<LeaveCommunityUseCase>(
+    () => LeaveCommunityUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetCommunityPostsUseCase>(
+    () => GetCommunityPostsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetPendingRequestsUseCase>(
+    () => GetPendingRequestsUseCase(s1()),
+  );
+  s1.registerLazySingleton<RespondToJoinRequestUseCase>(
+    () => RespondToJoinRequestUseCase(s1()),
+  );
+  s1.registerLazySingleton<RespondToInviteUseCase>(
+    () => RespondToInviteUseCase(s1()),
+  );
+  s1.registerLazySingleton<CreateCommunityUseCase>(
+    () => CreateCommunityUseCase(s1()),
+  );
+
+  // Community BLoCs
+  // Community BLoCs
+  s1.registerFactory<CommunityListBloc>(
+    () => CommunityListBloc(
+      s1<GetAllCommunitiesUseCase>(),
+      s1<GetMyCommunitiesUseCase>(),
+      s1<GetMyInvitesUseCase>(),
+    ),
+  );
+
+  s1.registerFactory<CommunityDetailBloc>(
+    () => CommunityDetailBloc(
+      s1<GetCommunityDetailUseCase>(),
+      s1<GetMemberStatusUseCase>(),
+      s1<JoinCommunityUseCase>(),
+      s1<CancelJoinRequestUseCase>(),
+      s1<LeaveCommunityUseCase>(),
+      s1<GetCommunityPostsUseCase>(),
+      s1<RespondToInviteUseCase>(),
+    ),
+  );
+
+  s1.registerFactory<CommunityAdminBloc>(
+    () => CommunityAdminBloc(
+      s1<GetPendingRequestsUseCase>(),
+      s1<RespondToJoinRequestUseCase>(),
+      s1<CommunityRepository>(),
+    ),
+  );
+
+  s1.registerFactory<CommunityCreateBloc>(
+    () => CommunityCreateBloc(s1<CreateCommunityUseCase>()),
+  );
+
+  // ==================== END COMMUNITY FEATURE ====================
 
   // Chat Services
   s1.registerLazySingleton<RecentSearchService>(() => RecentSearchService());

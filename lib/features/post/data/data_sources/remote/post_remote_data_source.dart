@@ -41,6 +41,7 @@ abstract class PostRemoteDataSource {
     @Part(name: 'titles') String? titles,
     @Part(name: 'friends_except') String? friendsExcept,
     @Part(name: 'friends_detail') String? friendsDetail,
+    @Part(name: 'communityId') String? communityId,
     @Part(name: 'files') List<MultipartFile>? files,
   );
 
@@ -66,9 +67,7 @@ abstract class PostRemoteDataSource {
 
   /// Xóa post
   @DELETE('/post/{postId}')
-  Future<void> deletePost(
-    @Path('postId') String postId,
-  );
+  Future<void> deletePost(@Path('postId') String postId);
 
   /// Kiểm tra caption có cần dịch (ngôn ngữ nguồn khác ngôn ngữ máy không)
   @GET('/post/{postId}/caption-translation-eligibility')

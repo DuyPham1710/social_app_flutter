@@ -18,6 +18,7 @@ class CreatePostModel with _$CreatePostModel {
     PrivacyType? privacyType,
     List<String>? friendsExcept,
     List<String>? friendsDetail,
+    String? communityId,
   }) = _CreatePostModel;
 
   factory CreatePostModel.fromJson(Map<String, dynamic> json) =>
@@ -34,6 +35,7 @@ class CreatePostModel with _$CreatePostModel {
       privacyType: entity.privacyType,
       friendsExcept: entity.friendsExcept,
       friendsDetail: entity.friendsDetail,
+      communityId: entity.communityId,
     );
   }
 }

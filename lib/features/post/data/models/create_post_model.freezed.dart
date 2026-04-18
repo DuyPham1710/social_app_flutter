@@ -30,6 +30,7 @@ mixin _$CreatePostModel {
   PrivacyType? get privacyType => throw _privateConstructorUsedError;
   List<String>? get friendsExcept => throw _privateConstructorUsedError;
   List<String>? get friendsDetail => throw _privateConstructorUsedError;
+  String? get communityId => throw _privateConstructorUsedError;
 
   /// Serializes this CreatePostModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,6 +58,7 @@ abstract class $CreatePostModelCopyWith<$Res> {
     PrivacyType? privacyType,
     List<String>? friendsExcept,
     List<String>? friendsDetail,
+    String? communityId,
   });
 }
 
@@ -83,6 +85,7 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
     Object? privacyType = freezed,
     Object? friendsExcept = freezed,
     Object? friendsDetail = freezed,
+    Object? communityId = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -118,6 +121,10 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
                 ? _value.friendsDetail
                 : friendsDetail // ignore: cast_nullable_to_non_nullable
                       as List<String>?,
+            communityId: freezed == communityId
+                ? _value.communityId
+                : communityId // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -142,6 +149,7 @@ abstract class _$$CreatePostModelImplCopyWith<$Res>
     PrivacyType? privacyType,
     List<String>? friendsExcept,
     List<String>? friendsDetail,
+    String? communityId,
   });
 }
 
@@ -167,6 +175,7 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
     Object? privacyType = freezed,
     Object? friendsExcept = freezed,
     Object? friendsDetail = freezed,
+    Object? communityId = freezed,
   }) {
     return _then(
       _$CreatePostModelImpl(
@@ -202,6 +211,10 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
             ? _value._friendsDetail
             : friendsDetail // ignore: cast_nullable_to_non_nullable
                   as List<String>?,
+        communityId: freezed == communityId
+            ? _value.communityId
+            : communityId // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -219,6 +232,7 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     this.privacyType,
     final List<String>? friendsExcept,
     final List<String>? friendsDetail,
+    this.communityId,
   }) : _files = files,
        _titles = titles,
        _orders = orders,
@@ -286,8 +300,11 @@ class _$CreatePostModelImpl implements _CreatePostModel {
   }
 
   @override
+  final String? communityId;
+
+  @override
   String toString() {
-    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail)';
+    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail, communityId: $communityId)';
   }
 
   @override
@@ -309,7 +326,9 @@ class _$CreatePostModelImpl implements _CreatePostModel {
             const DeepCollectionEquality().equals(
               other._friendsDetail,
               _friendsDetail,
-            ));
+            ) &&
+            (identical(other.communityId, communityId) ||
+                other.communityId == communityId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -324,6 +343,7 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     privacyType,
     const DeepCollectionEquality().hash(_friendsExcept),
     const DeepCollectionEquality().hash(_friendsDetail),
+    communityId,
   );
 
   /// Create a copy of CreatePostModel
@@ -353,6 +373,7 @@ abstract class _CreatePostModel implements CreatePostModel {
     final PrivacyType? privacyType,
     final List<String>? friendsExcept,
     final List<String>? friendsDetail,
+    final String? communityId,
   }) = _$CreatePostModelImpl;
 
   factory _CreatePostModel.fromJson(Map<String, dynamic> json) =
@@ -375,6 +396,8 @@ abstract class _CreatePostModel implements CreatePostModel {
   List<String>? get friendsExcept;
   @override
   List<String>? get friendsDetail;
+  @override
+  String? get communityId;
 
   /// Create a copy of CreatePostModel
   /// with the given fields replaced by the non-null parameter values.

@@ -32,7 +32,9 @@ import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class CreatePostPage extends StatefulWidget {
   final VoidCallback? onPostCreated;
-  const CreatePostPage({super.key, this.onPostCreated});
+  final String? communityId;
+
+  const CreatePostPage({super.key, this.onPostCreated, this.communityId});
 
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
@@ -138,6 +140,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         titles: null, // Can be added if needed
         friendsExcept: friendsExcept,
         friendsDetail: friendsDetail,
+        communityId: widget.communityId,
       );
 
       // Trigger BLoC event

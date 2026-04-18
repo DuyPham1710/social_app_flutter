@@ -135,6 +135,7 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
     String? titles,
     String? friendsExcept,
     String? friendsDetail,
+    String? communityId,
     List<MultipartFile>? files,
   ) async {
     final _extra = <String, dynamic>{};
@@ -162,6 +163,9 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
     }
     if (friendsDetail != null) {
       _data.fields.add(MapEntry('friends_detail', friendsDetail));
+    }
+    if (communityId != null) {
+      _data.fields.add(MapEntry('communityId', communityId));
     }
     if (files != null) {
       _data.files.addAll(files.map((i) => MapEntry('files', i)));

@@ -105,7 +105,9 @@ class PostRepositoryImpl implements PostRepository {
       }
 
       String? layoutString = post.layout!.name;
-      String? privacyString = PrivacyUtil.privacyTypeToApiString(post.privacyType!);
+      String? privacyString = PrivacyUtil.privacyTypeToApiString(
+        post.privacyType!,
+      );
 
       // Convert lists to JSON strings
       final ordersString = post.orders != null ? jsonEncode(post.orders) : null;
@@ -125,6 +127,7 @@ class PostRepositoryImpl implements PostRepository {
         titlesString,
         friendsExceptString,
         friendsDetailString,
+        post.communityId,
         multipartFiles,
       );
 
@@ -181,12 +184,12 @@ class PostRepositoryImpl implements PostRepository {
       }
 
       // Build request body - luôn gửi cả hai field để backend có thể clear đúng
-      final Map<String, dynamic> body = {
-        'privacy_type': privacyTypeString,
-      };
+      final Map<String, dynamic> body = {'privacy_type': privacyTypeString};
 
       // Gửi friends_except nếu privacy_type là friendsExcept và có dữ liệu
-      if (privacyType == PrivacyType.friendsExcept && friendsExcept != null && friendsExcept.isNotEmpty) {
+      if (privacyType == PrivacyType.friendsExcept &&
+          friendsExcept != null &&
+          friendsExcept.isNotEmpty) {
         body['friends_except'] = friendsExcept;
       } else {
         // Gửi null để backend clear field này
@@ -194,7 +197,9 @@ class PostRepositoryImpl implements PostRepository {
       }
 
       // Gửi friends_detail nếu privacy_type là friendsDetail và có dữ liệu
-      if (privacyType == PrivacyType.friendsDetail && friendsDetail != null && friendsDetail.isNotEmpty) {
+      if (privacyType == PrivacyType.friendsDetail &&
+          friendsDetail != null &&
+          friendsDetail.isNotEmpty) {
         body['friends_detail'] = friendsDetail;
       } else {
         // Gửi null để backend clear field này
@@ -209,9 +214,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<DataState<void>> deletePost({
-    required String postId,
-  }) async {
+  Future<DataState<void>> deletePost({required String postId}) async {
     try {
       await remoteDataSource.deletePost(postId);
       return const DataStateSuccess(null);
@@ -222,7 +225,7 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<DataState<CaptionTranslationEligibilityEntity>>
-      getCaptionTranslationEligibility({
+  getCaptionTranslationEligibility({
     required String postId,
     String targetLang = 'en',
   }) async {
@@ -243,8 +246,10 @@ class PostRepositoryImpl implements PostRepository {
     String targetLang = 'en',
   }) async {
     try {
-      final response =
-          await remoteDataSource.translateCaption(postId, targetLang);
+      final response = await remoteDataSource.translateCaption(
+        postId,
+        targetLang,
+      );
       return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);

@@ -1,0 +1,136 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/widgets/community_item_card.dart';
+
+class MyCommunitiesWidget extends StatefulWidget {
+  const MyCommunitiesWidget({super.key});
+
+  @override
+  State<MyCommunitiesWidget> createState() => _MyCommunitiesWidgetState();
+}
+
+class _MyCommunitiesWidgetState extends State<MyCommunitiesWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<CommunityListBloc>().add(const MyCommunitiesFetched());
+      },
+      child: BlocBuilder<CommunityListBloc, CommunityListState>(
+        builder: (context, state) {
+          if (state is CommunityListLoading) {
+            return const _MyCommunitiesSkeleton();
+          }
+
+          if (state is MyCommunitiesLoaded) {
+            if (state.communities.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.group_off_rounded,
+                        size: 54,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Bạn chưa tham gia cộng đồng nào',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              itemCount: state.communities.length,
+              itemBuilder: (context, index) {
+                final community = state.communities[index];
+                return _AnimatedIn(
+                  index: index,
+                  child: CommunityItem(community: community),
+                );
+              },
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+            );
+          }
+
+          if (state is CommunityListError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Text(
+                  state.message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFFB42318)),
+                ),
+              ),
+            );
+          }
+
+          return const Center(child: Text(''));
+        },
+      ),
+    );
+  }
+}
+
+class _MyCommunitiesSkeleton extends StatelessWidget {
+  const _MyCommunitiesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return _AnimatedIn(
+          index: index,
+          child: Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+    );
+  }
+}
+
+class _AnimatedIn extends StatelessWidget {
+  final int index;
+  final Widget child;
+
+  const _AnimatedIn({required this.index, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final delayMs = (index * 45).clamp(0, 500);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 280 + delayMs),
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, (1 - value) * 30),
+          child: child,
+        ),
+      ),
+      child: child,
+    );
+  }
+}
