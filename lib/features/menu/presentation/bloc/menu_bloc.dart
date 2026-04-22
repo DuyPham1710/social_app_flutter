@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_event.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -42,6 +43,28 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       notificationBloc.add(DisconnectNotificationSocket());
     } catch (e) {
       print('Error disconnecting notification socket during logout: $e');
+    }
+
+    // Disconnect remaining sockets to force presence offline immediately
+    try {
+      s1<SocketClient>(instanceName: 'chatSocket').disconnect();
+    } catch (e) {
+      print('Error disconnecting chatSocket during logout: $e');
+    }
+    try {
+      s1<SocketClient>(instanceName: 'commentSocket').disconnect();
+    } catch (e) {
+      print('Error disconnecting commentSocket during logout: $e');
+    }
+    try {
+      s1<SocketClient>(instanceName: 'videoCallSocket').disconnect();
+    } catch (e) {
+      print('Error disconnecting videoCallSocket during logout: $e');
+    }
+    try {
+      s1<SocketClient>(instanceName: 'notificationSocket').disconnect();
+    } catch (e) {
+      print('Error disconnecting notificationSocket during logout: $e');
     }
 
     await TokenStorage.clear();

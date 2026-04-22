@@ -145,6 +145,11 @@ Future<void> initializeDependencies() async {
     SocketClient(),
     instanceName: 'chatSocket',
   );
+  // Friend namespace (factory để tránh nhiều widget dùng chung 1 socket và duplicate listeners)
+  s1.registerFactory<SocketClient>(
+    () => SocketClient(),
+    instanceName: 'friendSocket',
+  );
   // Video call namespace
   s1.registerSingleton<SocketClient>(
     SocketClient(),

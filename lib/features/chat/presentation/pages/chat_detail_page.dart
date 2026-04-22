@@ -998,6 +998,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             friendInfo: widget.friendInfo,
             conversationId: _currentConversationId ?? widget.conversationId,
             userId: widget.userId,
+            username: widget.username,
             onInitiateCall: _initiateCall,
           ),
         ),

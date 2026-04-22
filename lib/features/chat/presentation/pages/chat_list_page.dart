@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +28,8 @@ import 'package:social_app_fe/features/chat/presentation/bloc/message/message_ev
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
+import 'package:social_app_fe/features/chat/data/services/chat_presence_service.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -42,6 +46,24 @@ class _ChatListPageState extends State<ChatListPage> {
   late final ConversationBloc _conversationBloc;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
+
+  SocketClient? _presenceSocketClient;
+  ChatPresenceService? _chatPresenceService;
+  StreamSubscription<Map<String, ChatPresenceStatus>>? _presenceSub;
+  Map<String, ChatPresenceStatus> _presenceByUserId = {};
+  final Set<String> _presenceRequestedUserIds = {};
+
+  String _formatPresenceText(ChatPresenceStatus status) {
+    if (status.isOnline) return 'Online';
+    final lastSeenAt = status.lastSeenAt?.toLocal();
+    if (lastSeenAt == null) return 'Offline';
+
+    final diff = DateTime.now().difference(lastSeenAt);
+    if (diff.inMinutes < 1) return 'Vừa hoạt động';
+    if (diff.inMinutes < 60) return 'Hoạt động ${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return 'Hoạt động ${diff.inHours} giờ trước';
+    return 'Hoạt động ${diff.inDays} ngày trước';
+  }
 
   @override
   void didChangeDependencies() {
@@ -62,6 +84,8 @@ class _ChatListPageState extends State<ChatListPage> {
   void dispose() {
     _scrollController.dispose();
     _leaveAllConversations();
+    _presenceSub?.cancel();
+    _chatPresenceService?.dispose();
     super.dispose();
   }
 
@@ -103,9 +127,25 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _loadData() async {
     await _loadUserInfo();
     if (userId != null) {
+      _initPresence();
       _loadFriends();
       await _loadConversations();
     }
+  }
+
+  void _initPresence() {
+    if (userId == null || username == null) return;
+    _presenceSocketClient ??= s1<SocketClient>(instanceName: 'chatSocket');
+    _chatPresenceService ??= ChatPresenceService(_presenceSocketClient!);
+    _chatPresenceService!.connect(userId: userId!, username: username!);
+
+    _presenceSub?.cancel();
+    _presenceSub = _chatPresenceService!.presenceStream.listen((map) {
+      if (!mounted) return;
+      setState(() {
+        _presenceByUserId = map;
+      });
+    });
   }
 
   Future<void> _loadUserInfo() async {
@@ -737,6 +777,21 @@ class _ChatListPageState extends State<ChatListPage> {
                                 }
                               }
 
+                              bool? isOnline;
+                              if (!conversation.isGroup && firstParticipant != null) {
+                                final otherUserId = firstParticipant.userId;
+                                final status = _presenceByUserId[otherUserId];
+                                if (status != null) {
+                                  isOnline = status.isOnline;
+                                }
+
+                                if (_chatPresenceService != null &&
+                                    !_presenceRequestedUserIds.contains(otherUserId)) {
+                                  _presenceRequestedUserIds.add(otherUserId);
+                                  _chatPresenceService!.requestPresence([otherUserId]);
+                                }
+                              }
+
                               return Padding(
                                 padding: EdgeInsets.only(bottom: 6.h),
                                 child: ConversationItem(
@@ -755,6 +810,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                       : (firstParticipant != null
                                             ? [firstParticipant]
                                             : null),
+                                  isOnline: isOnline,
                                   onTap: () {
                                     _joinConversationAndNavigate(
                                       conversation.id,

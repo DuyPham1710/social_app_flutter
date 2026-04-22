@@ -264,8 +264,7 @@ class FriendOnlineService {
   /// Ngắt kết nối
   void disconnect() {
     _isConnected = false;
-    // Note: Không disconnect socketClient vì có thể đang được dùng bởi service khác
-    // Chỉ reset trạng thái của service này
+    _socketClient.disconnect();
   }
 
   /// Khởi tạo trạng thái bạn bè từ danh sách bạn bè

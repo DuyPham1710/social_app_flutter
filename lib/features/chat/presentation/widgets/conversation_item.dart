@@ -11,6 +11,7 @@ class ConversationItem extends StatelessWidget {
   final bool isUnread;
   final bool isGroup;
   final List<UserEntity>? participants;
+  final bool? isOnline;
   final VoidCallback onTap;
 
   const ConversationItem({
@@ -21,6 +22,7 @@ class ConversationItem extends StatelessWidget {
     required this.isUnread,
     required this.isGroup,
     this.participants,
+    this.isOnline,
     required this.onTap,
   });
 
@@ -51,9 +53,30 @@ class ConversationItem extends StatelessWidget {
       );
     }
 
+    final avatarWithStatus = (!isGroup && isOnline == true)
+        ? Stack(
+            children: [
+              avatarWidget,
+              Positioned(
+                right: 2,
+                bottom: 2,
+                child: Container(
+                  width: 14.r,
+                  height: 14.r,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2CD45C),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                ),
+              ),
+            ],
+          )
+        : avatarWidget;
+
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
-      leading: avatarWidget,
+      leading: avatarWithStatus,
       title: Text(
         name,
         style: TextStyle(
@@ -63,6 +86,8 @@ class ConversationItem extends StatelessWidget {
       ),
       subtitle: Text(
         preview.contains('null') ? 'Đã kết nối' : preview,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: isUnread ? AppColors.textPrimary : AppColors.textSecondary,
           fontWeight: isUnread ? FontWeight.w600 : FontWeight.w400,
