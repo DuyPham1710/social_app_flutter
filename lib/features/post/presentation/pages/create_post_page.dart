@@ -76,23 +76,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
     // Validation: Nếu chọn friends_except hoặc friends_detail, phải có danh sách bạn bè
     if (_selectedPrivacy == PrivacyType.friendsExcept &&
         _friendsExceptIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn bạn bè cần ẩn bài viết'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorSnackBar(context, 'Vui lòng chọn bạn bè cần ẩn bài viết');
+
       return;
     }
 
     if (_selectedPrivacy == PrivacyType.friendsDetail &&
         _friendsDetailIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn bạn bè được phép xem bài viết'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorSnackBar(context, 'Vui lòng chọn bạn bè được phép xem bài viết');
+
       return;
     }
 
@@ -755,6 +747,20 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         setState(() {
                           _selectedAssets.removeAt(index);
                         });
+                      },
+                      onImageEdited: (index, newFile) async {
+                        try {
+                          final AssetEntity? asset = await _createAssetFromFile(
+                            newFile,
+                          );
+                          if (asset != null && mounted) {
+                            setState(() {
+                              _selectedAssets[index] = asset;
+                            });
+                          }
+                        } catch (e) {
+                          print('Error updating edited asset: $e');
+                        }
                       },
                     ),
                   ],
