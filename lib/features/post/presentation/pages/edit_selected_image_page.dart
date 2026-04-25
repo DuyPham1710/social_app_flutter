@@ -15,12 +15,15 @@ class EditSelectedImagePage extends StatefulWidget {
   final int initialIndex;
   final VoidCallback? onAdd;
   final Function(int index)? onRemoveAtIndex;
+  final Function(int index, File newFile)? onImageEdited;
+
   const EditSelectedImagePage({
     super.key,
     required this.imageFiles,
     required this.initialIndex,
     this.onAdd,
     this.onRemoveAtIndex,
+    this.onImageEdited,
   });
 
   @override
@@ -251,6 +254,10 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                                         // Cập nhật với file mới
                                         widget.imageFiles[index] = newFile;
                                       });
+                                      widget.onImageEdited?.call(
+                                        index,
+                                        newFile,
+                                      );
                                     }
                                   } catch (e) {
                                     print("Lỗi khi chỉnh sửa ảnh: $e");
