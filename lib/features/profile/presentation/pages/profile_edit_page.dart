@@ -209,8 +209,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             Center(
               child: EditableImage(
                 imageUrl:
-                    widget.user?.avatarUrl ??
-                    "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                    (widget.user?.avatarUrl != null &&
+                        widget.user!.avatarUrl!.isNotEmpty)
+                    ? widget.user!.avatarUrl!
+                    : "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
                 isAvatarCircle: true,
                 onEditTap: () => _navigateToImagePicker(true),
               ),
@@ -227,8 +229,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             const SizedBox(height: 8),
             EditableImage(
               imageUrl:
-                  widget.user?.coverUrl ??
-                  "https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg",
+                  (widget.user?.coverUrl != null &&
+                      widget.user!.coverUrl!.isNotEmpty)
+                  ? widget.user!.coverUrl!
+                  : "https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg",
               borderRadius: 12,
               onEditTap: () => _navigateToImagePicker(false),
             ),

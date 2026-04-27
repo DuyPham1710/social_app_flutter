@@ -27,6 +27,7 @@ import '../widgets/friend_request_notification_item.dart';
 import '../services/notification_fcm_service.dart';
 import '../widgets/post_report_detail_modal.dart';
 import '../widgets/post_report_notification_item.dart';
+import '../widgets/face_detected_notification_item.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -236,6 +237,24 @@ class _NotificationPageState extends State<NotificationPage> {
             }
           },
         );
+      case NotificationType.FACE_DETECTED:
+        return FaceDetectedNotificationItem(
+          isRead: notification.isRead,
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+          userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
+          message: notification.message,
+          time: _timeAgo(notification.createdAt),
+          postId: notification.targetId,
+          onUserTap: () {
+            _handleViewerProfileTap(context, notification);
+          },
+          onMessageTap: () async {
+            _handleJumpToPost(notification);
+          },
+        );
       default:
         throw UnimplementedError(
           'Unknown notification type: ${notification.type}',
@@ -318,6 +337,8 @@ class _NotificationPageState extends State<NotificationPage> {
         .toList();
 
     return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: AppColors.background,
       onRefresh: () async {
         _currentPage = 1;
         context.read<NotificationBloc>().add(ReloadNotifications());
