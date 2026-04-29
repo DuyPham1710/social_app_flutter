@@ -45,6 +45,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
   ChatPresenceService? _presenceService;
   StreamSubscription<Map<String, ChatPresenceStatus>>? _presenceSub;
   ChatPresenceStatus? _friendPresence;
+  Timer? _relativeTimeTimer;
 
   @override
   void initState() {
@@ -69,9 +70,30 @@ class _ChatAppbarState extends State<ChatAppbar> {
       setState(() {
         _friendPresence = status;
       });
+      _syncRelativeTimer();
     });
 
     _presenceService!.requestPresence([friendId]);
+  }
+
+  void _syncRelativeTimer() {
+    final status = _friendPresence;
+    final shouldTick =
+        status != null && status.isOnline == false && status.lastSeenAt != null;
+
+    if (!shouldTick) {
+      _relativeTimeTimer?.cancel();
+      _relativeTimeTimer = null;
+      return;
+    }
+
+    if (_relativeTimeTimer != null) return;
+
+    // Tick để text "Hoạt động X phút trước" tự tăng
+    _relativeTimeTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted) return;
+      setState(() {});
+    });
   }
 
   String _formatPresenceText(ChatPresenceStatus status) {
@@ -101,6 +123,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
   void dispose() {
     _presenceSub?.cancel();
     _presenceService?.dispose();
+    _relativeTimeTimer?.cancel();
     super.dispose();
   }
 
