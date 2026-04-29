@@ -37,6 +37,14 @@ _$PostModelImpl _$$PostModelImplFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      taggedUsers: (json['taggedUsers'] as List<dynamic>?)
+          ?.map((e) => UserModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      visibleOnProfileUserIds:
+          (json['visibleOnProfileUserIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -60,6 +68,8 @@ Map<String, dynamic> _$$PostModelImplToJson(_$PostModelImpl instance) =>
       'privacy_type': _$PrivacyTypeEnumMap[instance.privacyType]!,
       'friends_except': instance.friendsExcept,
       'friends_detail': instance.friendsDetail,
+      'taggedUsers': instance.taggedUsers,
+      'visibleOnProfileUserIds': instance.visibleOnProfileUserIds,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };

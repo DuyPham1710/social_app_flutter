@@ -44,6 +44,7 @@ abstract class PostRemoteDataSource {
     @Part(name: 'titles') String? titles,
     @Part(name: 'friends_except') String? friendsExcept,
     @Part(name: 'friends_detail') String? friendsDetail,
+    @Part(name: 'taggedUserIds') String? taggedUserIds,
     @Part(name: 'files') List<MultipartFile>? files,
   );
 
@@ -69,9 +70,7 @@ abstract class PostRemoteDataSource {
 
   /// Xóa post
   @DELETE('/post/{postId}')
-  Future<void> deletePost(
-    @Path('postId') String postId,
-  );
+  Future<void> deletePost(@Path('postId') String postId);
 
   /// Kiểm tra caption có cần dịch (ngôn ngữ nguồn khác ngôn ngữ máy không)
   @GET('/post/{postId}/caption-translation-eligibility')
@@ -86,4 +85,15 @@ abstract class PostRemoteDataSource {
     @Path('postId') String postId,
     @Query('targetLang') String targetLang,
   );
+
+  /// Cập nhật trạng thái hiển thị của thẻ trên profile
+  @PATCH('/post/{postId}/tag-visibility')
+  Future<void> updateTagVisibility(
+    @Path('postId') String postId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// Gỡ gắn thẻ
+  @DELETE('/post/{postId}/tag')
+  Future<void> removeTag(@Path('postId') String postId);
 }

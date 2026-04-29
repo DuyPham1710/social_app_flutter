@@ -38,6 +38,9 @@ mixin _$PostModel {
   List<String> get friendsExcept => throw _privateConstructorUsedError;
   @JsonKey(name: 'friends_detail')
   List<String> get friendsDetail => throw _privateConstructorUsedError;
+  List<UserModel>? get taggedUsers => throw _privateConstructorUsedError;
+  List<String> get visibleOnProfileUserIds =>
+      throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
@@ -67,6 +70,8 @@ abstract class $PostModelCopyWith<$Res> {
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'friends_except') List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
+    List<UserModel>? taggedUsers,
+    List<String> visibleOnProfileUserIds,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
@@ -99,6 +104,8 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
     Object? privacyType = null,
     Object? friendsExcept = null,
     Object? friendsDetail = null,
+    Object? taggedUsers = freezed,
+    Object? visibleOnProfileUserIds = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -144,6 +151,14 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
                 ? _value.friendsDetail
                 : friendsDetail // ignore: cast_nullable_to_non_nullable
                       as List<String>,
+            taggedUsers: freezed == taggedUsers
+                ? _value.taggedUsers
+                : taggedUsers // ignore: cast_nullable_to_non_nullable
+                      as List<UserModel>?,
+            visibleOnProfileUserIds: null == visibleOnProfileUserIds
+                ? _value.visibleOnProfileUserIds
+                : visibleOnProfileUserIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -188,6 +203,8 @@ abstract class _$$PostModelImplCopyWith<$Res>
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'friends_except') List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
+    List<UserModel>? taggedUsers,
+    List<String> visibleOnProfileUserIds,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
@@ -220,6 +237,8 @@ class __$$PostModelImplCopyWithImpl<$Res>
     Object? privacyType = null,
     Object? friendsExcept = null,
     Object? friendsDetail = null,
+    Object? taggedUsers = freezed,
+    Object? visibleOnProfileUserIds = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -265,6 +284,14 @@ class __$$PostModelImplCopyWithImpl<$Res>
             ? _value._friendsDetail
             : friendsDetail // ignore: cast_nullable_to_non_nullable
                   as List<String>,
+        taggedUsers: freezed == taggedUsers
+            ? _value._taggedUsers
+            : taggedUsers // ignore: cast_nullable_to_non_nullable
+                  as List<UserModel>?,
+        visibleOnProfileUserIds: null == visibleOnProfileUserIds
+            ? _value._visibleOnProfileUserIds
+            : visibleOnProfileUserIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -294,12 +321,16 @@ class _$PostModelImpl implements _PostModel {
     final List<String> friendsExcept = const [],
     @JsonKey(name: 'friends_detail')
     final List<String> friendsDetail = const [],
+    final List<UserModel>? taggedUsers,
+    final List<String> visibleOnProfileUserIds = const [],
     this.createdAt,
     this.updatedAt,
   }) : _urls = urls,
        _reacts = reacts,
        _friendsExcept = friendsExcept,
-       _friendsDetail = friendsDetail;
+       _friendsDetail = friendsDetail,
+       _taggedUsers = taggedUsers,
+       _visibleOnProfileUserIds = visibleOnProfileUserIds;
 
   factory _$PostModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PostModelImplFromJson(json);
@@ -356,6 +387,26 @@ class _$PostModelImpl implements _PostModel {
     return EqualUnmodifiableListView(_friendsDetail);
   }
 
+  final List<UserModel>? _taggedUsers;
+  @override
+  List<UserModel>? get taggedUsers {
+    final value = _taggedUsers;
+    if (value == null) return null;
+    if (_taggedUsers is EqualUnmodifiableListView) return _taggedUsers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<String> _visibleOnProfileUserIds;
+  @override
+  @JsonKey()
+  List<String> get visibleOnProfileUserIds {
+    if (_visibleOnProfileUserIds is EqualUnmodifiableListView)
+      return _visibleOnProfileUserIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_visibleOnProfileUserIds);
+  }
+
   @override
   final DateTime? createdAt;
   @override
@@ -383,6 +434,14 @@ class _$PostModelImpl implements _PostModel {
               other._friendsDetail,
               _friendsDetail,
             ) &&
+            const DeepCollectionEquality().equals(
+              other._taggedUsers,
+              _taggedUsers,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._visibleOnProfileUserIds,
+              _visibleOnProfileUserIds,
+            ) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -403,6 +462,8 @@ class _$PostModelImpl implements _PostModel {
     privacyType,
     const DeepCollectionEquality().hash(_friendsExcept),
     const DeepCollectionEquality().hash(_friendsDetail),
+    const DeepCollectionEquality().hash(_taggedUsers),
+    const DeepCollectionEquality().hash(_visibleOnProfileUserIds),
     createdAt,
     updatedAt,
   );
@@ -433,6 +494,8 @@ abstract class _PostModel implements PostModel {
     @JsonKey(name: 'privacy_type') final PrivacyType privacyType,
     @JsonKey(name: 'friends_except') final List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') final List<String> friendsDetail,
+    final List<UserModel>? taggedUsers,
+    final List<String> visibleOnProfileUserIds,
     final DateTime? createdAt,
     final DateTime? updatedAt,
   }) = _$PostModelImpl;
@@ -467,6 +530,10 @@ abstract class _PostModel implements PostModel {
   @override
   @JsonKey(name: 'friends_detail')
   List<String> get friendsDetail;
+  @override
+  List<UserModel>? get taggedUsers;
+  @override
+  List<String> get visibleOnProfileUserIds;
   @override
   DateTime? get createdAt;
   @override

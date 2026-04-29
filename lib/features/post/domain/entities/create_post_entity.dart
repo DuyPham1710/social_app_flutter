@@ -11,6 +11,7 @@ class CreatePostEntity {
   final PrivacyType? privacyType;
   final List<String>? friendsExcept;
   final List<String>? friendsDetail;
+  final List<String>? taggedUserIds;
 
   const CreatePostEntity({
     this.caption,
@@ -21,5 +22,6 @@ class CreatePostEntity {
     this.privacyType,
     this.friendsExcept,
     this.friendsDetail,
+    this.taggedUserIds,
   });
 }

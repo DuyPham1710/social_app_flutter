@@ -12,13 +12,13 @@ import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
-import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.dart';
+import 'package:social_app_fe/features/post/presentation/helpers/tag_action_helper.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
@@ -48,12 +48,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
   late PostDetailBloc _postDetailBloc;
   late List<ReactPostEntity> _localReacts;
   EmojiType? _currentUserReaction;
+  String? _currentUserId;
+  List<String> _visibleOnProfileUserIds = [];
+  bool _isRemoved = false;
 
   @override
   void initState() {
     super.initState();
     _localReacts = List.from(widget.post.reacts ?? []);
     _currentUserReaction = null;
+    _visibleOnProfileUserIds = List.from(
+      widget.post.visibleOnProfileUserIds ?? [],
+    );
     _initCurrentUserReaction();
 
     // Khởi tạo các Blocs
@@ -96,6 +102,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     if (mounted) {
       setState(() {
+        _currentUserId = currentUserId;
         _currentUserReaction = userReaction?.emoji;
       });
     }
@@ -166,6 +173,41 @@ class _PostDetailPageState extends State<PostDetailPage> {
       index: newIndex + 1, // vì index 0 là header
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
+    );
+  }
+
+  Future<void> _handleTagVisibility(bool isVisible) async {
+    await TagActionHelper.handleTagVisibility(
+      context: context,
+      postId: widget.post.id,
+      isVisible: isVisible,
+      onSuccess: () async {
+        final userData = await TokenStorage.getUserData();
+        final currentUserId = userData?['id'];
+        if (currentUserId != null) {
+          setState(() {
+            if (isVisible) {
+              if (!_visibleOnProfileUserIds.contains(currentUserId)) {
+                _visibleOnProfileUserIds.add(currentUserId);
+              }
+            } else {
+              _visibleOnProfileUserIds.remove(currentUserId);
+            }
+          });
+        }
+      },
+    );
+  }
+
+  Future<void> _handleRemoveTag() async {
+    await TagActionHelper.handleRemoveTag(
+      context: context,
+      postId: widget.post.id,
+      onSuccess: () {
+        setState(() {
+          _isRemoved = true;
+        });
+      },
     );
   }
 
@@ -264,6 +306,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     PostHeader(
                       user: post.user,
                       createdAt: post.createdAt,
+                      taggedUsers: _isRemoved
+                          ? post.taggedUsers
+                                ?.where((u) => u.userId != _currentUserId)
+                                .toList()
+                          : post.taggedUsers,
+                      visibleOnProfileUserIds: _visibleOnProfileUserIds,
+                      onTagVisibilityTap: _handleTagVisibility,
+                      onRemoveTagTap: _handleRemoveTag,
                       onReportTap: () {
                         // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
                       },
@@ -280,8 +330,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           child: PostTranslatableCaption(
                             postId: post.id,
                             caption: post.caption!,
-                            textStyle:
-                                TextStyle(fontSize: 14.sp, height: 1.4),
+                            textStyle: TextStyle(fontSize: 14.sp, height: 1.4),
                           ),
                         ),
                       ),

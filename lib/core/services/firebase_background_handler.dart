@@ -45,7 +45,9 @@ bool _isAppNotificationType(String? type) {
       type == 'POST_REACTION' ||
       type == 'MENTION' ||
       type == 'STORY_REACTION' ||
-      type == 'COMMENT_REACTION';
+      type == 'COMMENT_REACTION' ||
+      type == 'TAG_POST' ||
+      type == 'FACE_DETECTED';
 }
 
 /// Parse mention format @[Name](userId) to plain text @Name

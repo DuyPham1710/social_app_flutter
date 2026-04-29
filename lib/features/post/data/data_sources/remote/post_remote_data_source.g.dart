@@ -116,7 +116,6 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     await _dio.fetch<void>(_options);
-    return;
   }
 
   @override
@@ -155,6 +154,7 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
     String? titles,
     String? friendsExcept,
     String? friendsDetail,
+    String? taggedUserIds,
     List<MultipartFile>? files,
   ) async {
     final _extra = <String, dynamic>{};
@@ -182,6 +182,9 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
     }
     if (friendsDetail != null) {
       _data.fields.add(MapEntry('friends_detail', friendsDetail));
+    }
+    if (taggedUserIds != null) {
+      _data.fields.add(MapEntry('taggedUserIds', taggedUserIds));
     }
     if (files != null) {
       _data.files.addAll(files.map((i) => MapEntry('files', i)));
@@ -359,6 +362,48 @@ class _PostRemoteDataSource implements PostRemoteDataSource {
       rethrow;
     }
     return _value;
+  }
+
+  @override
+  Future<void> updateTagVisibility(
+    String postId,
+    Map<String, dynamic> body,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
+    final _options = _setStreamType<void>(
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/post/${postId}/tag-visibility',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<void> removeTag(String postId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/post/${postId}/tag',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

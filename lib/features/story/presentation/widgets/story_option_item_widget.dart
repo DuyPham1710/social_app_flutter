@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class StoryOptionItemWidget extends StatelessWidget {
   final IconData icon;
@@ -23,7 +24,7 @@ class StoryOptionItemWidget extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white, size: 24.sp),
+            Icon(icon, color: AppColors.textSecondary, size: 24.sp),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
@@ -32,7 +33,7 @@ class StoryOptionItemWidget extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textSecondary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w400,
                     ),
@@ -42,7 +43,7 @@ class StoryOptionItemWidget extends StatelessWidget {
                     Text(
                       subtitle!,
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: AppColors.textSecondary,
                         fontSize: 13.sp,
                       ),
                     ),
@@ -56,4 +57,3 @@ class StoryOptionItemWidget extends StatelessWidget {
     );
   }
 }
-

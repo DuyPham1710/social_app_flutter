@@ -22,6 +22,9 @@ _$CreatePostModelImpl _$$CreatePostModelImplFromJson(
   friendsDetail: (json['friendsDetail'] as List<dynamic>?)
       ?.map((e) => e as String)
       .toList(),
+  taggedUserIds: (json['taggedUserIds'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
 );
 
 Map<String, dynamic> _$$CreatePostModelImplToJson(
@@ -34,6 +37,7 @@ Map<String, dynamic> _$$CreatePostModelImplToJson(
   'privacyType': _$PrivacyTypeEnumMap[instance.privacyType],
   'friendsExcept': instance.friendsExcept,
   'friendsDetail': instance.friendsDetail,
+  'taggedUserIds': instance.taggedUserIds,
 };
 
 const _$LayoutTypeEnumMap = {

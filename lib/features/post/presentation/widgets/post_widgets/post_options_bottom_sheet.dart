@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
@@ -11,29 +12,23 @@ import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.da
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_event.dart';
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_option_item_widget.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class PostOptionsBottomSheet extends StatefulWidget {
   final PostEntity post;
 
-  const PostOptionsBottomSheet({
-    super.key,
-    required this.post,
-  });
+  const PostOptionsBottomSheet({super.key, required this.post});
 
   @override
   State<PostOptionsBottomSheet> createState() => _PostOptionsBottomSheetState();
 
-  static void show(
-    BuildContext context, {
-    required PostEntity post,
-  }) {
+  static void show(BuildContext context, {required PostEntity post}) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return PostOptionsBottomSheet(
-          post: post,
-        );
+        return PostOptionsBottomSheet(post: post);
       },
     );
   }
@@ -45,7 +40,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
 
   Future<void> _deletePost(BuildContext context) async {
     final postId = widget.post.id;
-    
+
     // Hiển thị dialog xác nhận
     final confirmed = await showDialog<bool>(
       context: context,
@@ -63,17 +58,11 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text(
-                'Hủy',
-                style: TextStyle(color: Colors.white70),
-              ),
+              child: const Text('Hủy', style: TextStyle(color: Colors.white70)),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text(
-                'Xóa',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -91,33 +80,21 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
 
       if (mounted) {
         Navigator.pop(context); // Đóng bottom sheet
-        
+
         if (result is DataStateSuccess) {
           // Hiển thị thông báo thành công
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Đã xóa bài viết'),
-              backgroundColor: Colors.green[800],
-            ),
-          );
+          showSuccessSnackBar(context, 'Đã xóa bài viết');
         } else if (result is DataStateError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${result.error?.message ?? "Không thể xóa bài viết"}'),
-              backgroundColor: Colors.red[800],
-            ),
+          showErrorSnackBar(
+            context,
+            'Lỗi: ${result.error?.message ?? "Không thể xóa bài viết"}',
           );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red[800],
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi: $e');
       }
     } finally {
       if (mounted) {
@@ -132,7 +109,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2E),
+        color: AppColors.background,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20.r),
           topRight: Radius.circular(20.r),
@@ -147,7 +124,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
               width: 40.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: AppColors.textSecondary,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -157,12 +134,14 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
               title: "Chỉnh sửa quyền riêng tư của bài viết",
               onTap: () {
                 Navigator.pop(context);
-                final privacyLabel = PrivacyUtil.privacyTypeToLabel(widget.post.privacyType);
+                final privacyLabel = PrivacyUtil.privacyTypeToLabel(
+                  widget.post.privacyType,
+                );
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => BlocProvider(
-                      create: (_) => s1<PrivacyBloc>()
-                        ..add( GetDefaultPrivacyRequested()),
+                      create: (_) =>
+                          s1<PrivacyBloc>()..add(GetDefaultPrivacyRequested()),
                       child: PrivacyPage(
                         selectedOption: privacyLabel,
                         postId: widget.post.id,
@@ -176,6 +155,11 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
               },
             ),
             StoryOptionItemWidget(
+              icon: Icons.lock_outline,
+              title: "Gắn thẻ bạn bè",
+              onTap: () {},
+            ),
+            StoryOptionItemWidget(
               icon: Icons.delete_outline,
               title: "Xóa bài viết",
               onTap: _isDeleting ? null : () => _deletePost(context),
@@ -187,4 +171,3 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
     );
   }
 }
-

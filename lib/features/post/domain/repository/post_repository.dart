@@ -66,4 +66,15 @@ abstract class PostRepository {
     required String postId,
     String targetLang = 'en',
   });
+
+  /// Cập nhật trạng thái hiển thị của thẻ trên profile
+  Future<DataState<void>> updateTagVisibility({
+    required String postId,
+    required bool isVisible,
+  });
+
+  /// Gỡ gắn thẻ
+  Future<DataState<void>> removeTag({
+    required String postId,
+  });
 }

@@ -26,6 +26,7 @@ import 'package:social_app_fe/features/chat/presentation/bloc/message/message_ev
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -160,13 +161,8 @@ class _ChatListPageState extends State<ChatListPage> {
     List<UserEntity>? participants,
   }) async {
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('User not found. Please login again.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      showErrorSnackBar(context, 'User not found. Please login again.');
+
       return;
     }
 
@@ -246,13 +242,8 @@ class _ChatListPageState extends State<ChatListPage> {
   /// Check if conversation exists, if yes join it, if no create new one
   Future<void> _handleFriendTap(FriendEntity friend) async {
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('User not found. Please login again.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      showErrorSnackBar(context, 'User not found. Please login again.');
+
       return;
     }
 
@@ -320,13 +311,7 @@ class _ChatListPageState extends State<ChatListPage> {
       // Hide loading indicator if error
       Navigator.of(context).pop();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error finding conversation: $e'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
-      );
+      showErrorSnackBar(context, 'Error finding conversation: $e');
     }
   }
 
@@ -351,27 +336,16 @@ class _ChatListPageState extends State<ChatListPage> {
     return BlocListener<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Conversation error: ${state.message}'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
-          );
+          showErrorSnackBar(context, 'Conversation error: ${state.message}');
         } else if (state is CreateConversationSuccess) {
           // Khi tạo conversation thành công, reload conversations để hiển thị conversation mới
           if (userId != null) {
             _loadConversations();
           }
         } else if (state is ConversationsError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Conversations Error: ${state.message ?? "Unknown error"}',
-              ),
-              backgroundColor: Colors.orange,
-              duration: const Duration(seconds: 3),
-            ),
+          showErrorSnackBar(
+            context,
+            'Conversations Error: ${state.message ?? "Unknown error"}',
           );
           // Reset loading flag khi có lỗi
           if (_isLoadingMore) {

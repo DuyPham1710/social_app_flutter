@@ -9,14 +9,13 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_friend_selection_page.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class StoryPrivacySettingsPage extends StatefulWidget {
   final String? storyId;
 
-  const StoryPrivacySettingsPage({
-    super.key,
-    this.storyId,
-  });
+  const StoryPrivacySettingsPage({super.key, this.storyId});
 
   @override
   State<StoryPrivacySettingsPage> createState() =>
@@ -41,7 +40,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
     final savedPrivacy = await StoryPrivacyStorage.getPrivacy();
     final savedHiddenIds = await StoryPrivacyStorage.getHiddenFriendIds();
     final savedAllowedIds = await StoryPrivacyStorage.getAllowedFriendIds();
-    
+
     if (mounted) {
       setState(() {
         if (savedPrivacy != null) {
@@ -56,7 +55,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
 
   Future<void> _savePrivacy(String privacy) async {
     await StoryPrivacyStorage.savePrivacy(privacy);
-    
+
     // Nếu có storyId, gọi API để cập nhật privacy
     if (widget.storyId != null) {
       await _updateStoryPrivacy(privacy);
@@ -65,7 +64,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
 
   Future<void> _saveHiddenFriendIds(List<String> friendIds) async {
     await StoryPrivacyStorage.saveHiddenFriendIds(friendIds);
-    
+
     // Nếu có storyId và đang chọn "Ẩn tin với", gọi API
     if (widget.storyId != null && _selectedPrivacy == "Ẩn tin với") {
       await _updateStoryPrivacy(_selectedPrivacy);
@@ -74,7 +73,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
 
   Future<void> _saveAllowedFriendIds(List<String> friendIds) async {
     await StoryPrivacyStorage.saveAllowedFriendIds(friendIds);
-    
+
     // Nếu có storyId và đang chọn "Tùy chỉnh", gọi API
     if (widget.storyId != null && _selectedPrivacy == "Tùy chỉnh") {
       await _updateStoryPrivacy(_selectedPrivacy);
@@ -97,18 +96,16 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
       switch (privacy) {
         case "Công khai":
           privacyType = PrivacyType.public;
-          break;
         case "Bạn bè":
           privacyType = PrivacyType.friends;
-          break;
         case "Ẩn tin với":
           privacyType = PrivacyType.friendsExcept;
           friendsExcept = _hiddenFriendIds.isNotEmpty ? _hiddenFriendIds : null;
-          break;
         case "Tùy chỉnh":
           privacyType = PrivacyType.friendsDetail;
-          friendsDetail = _allowedFriendIds.isNotEmpty ? _allowedFriendIds : null;
-          break;
+          friendsDetail = _allowedFriendIds.isNotEmpty
+              ? _allowedFriendIds
+              : null;
         default:
           privacyType = PrivacyType.friends;
       }
@@ -122,31 +119,19 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
 
       if (result is DataStateSuccess) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Đã cập nhật quyền riêng tư'),
-              backgroundColor: Colors.green[800],
-            ),
-          );
+          showSuccessSnackBar(context, 'Đã cập nhật quyền riêng tư');
         }
       } else if (result is DataStateError) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}'),
-              backgroundColor: Colors.red[800],
-            ),
+          showErrorSnackBar(
+            context,
+            'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}',
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red[800],
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi: $e');
       }
     } finally {
       if (mounted) {
@@ -221,10 +206,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
         SizedBox(height: 8.h),
         Text(
           "Tin của bạn sẽ hiển thị trong 24 giờ.",
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 14.sp,
-          ),
+          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
         ),
         SizedBox(height: 20.h),
         _buildPrivacyOption(
@@ -295,10 +277,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   SizedBox(height: 4.h),
                   Text(
                     description,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13.sp,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 13.sp),
                   ),
                 ],
               ),
@@ -341,13 +320,14 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           final selectedFriends = state.friends
               .where((f) => _hiddenFriendIds.contains(f.userId))
               .toList();
-          
+
           if (selectedFriends.isEmpty) {
             displayText = "Chưa chọn ai";
           } else if (selectedFriends.length == 1) {
-            displayText = selectedFriends.first.fullName ?? 
-                         selectedFriends.first.username ?? 
-                         "1 người";
+            displayText =
+                selectedFriends.first.fullName ??
+                selectedFriends.first.username ??
+                "1 người";
           } else if (selectedFriends.length <= 3) {
             final names = selectedFriends
                 .map((f) => f.fullName ?? f.username ?? "Người dùng")
@@ -372,7 +352,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               _selectedPrivacy = "Ẩn tin với";
             });
             await _savePrivacy("Ẩn tin với");
-            
+
             final selectedIds = await Navigator.of(context).push<List<String>>(
               MaterialPageRoute(
                 builder: (_) => StoryFriendSelectionPage(
@@ -389,46 +369,42 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
             }
           },
           child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
-        decoration: BoxDecoration(
-          color: Colors.grey[900]!.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Ẩn tin với",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    displayText,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13.sp,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+            decoration: BoxDecoration(
+              color: Colors.grey[900]!.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.white70,
-              size: 24.sp,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Ẩn tin với",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        displayText,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13.sp,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: Colors.white70, size: 24.sp),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
         );
       },
     );
@@ -443,13 +419,14 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           final selectedFriends = state.friends
               .where((f) => _allowedFriendIds.contains(f.userId))
               .toList();
-          
+
           if (selectedFriends.isEmpty) {
             displayText = "Chưa chọn ai";
           } else if (selectedFriends.length == 1) {
-            displayText = selectedFriends.first.fullName ?? 
-                         selectedFriends.first.username ?? 
-                         "1 người";
+            displayText =
+                selectedFriends.first.fullName ??
+                selectedFriends.first.username ??
+                "1 người";
           } else if (selectedFriends.length <= 3) {
             final names = selectedFriends
                 .map((f) => f.fullName ?? f.username ?? "Người dùng")
@@ -468,7 +445,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
         }
 
         final isSelected = _selectedPrivacy == "Tùy chỉnh";
-        
+
         return GestureDetector(
           onTap: () async {
             // First select "Tùy chỉnh" option
@@ -476,7 +453,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               _selectedPrivacy = "Tùy chỉnh";
             });
             await _savePrivacy("Tùy chỉnh");
-            
+
             // Then navigate to friend selection page
             final selectedIds = await Navigator.of(context).push<List<String>>(
               MaterialPageRoute(
@@ -510,7 +487,11 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                     color: Colors.grey[800]!.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.person_outline, color: Colors.white, size: 20.sp),
+                  child: Icon(
+                    Icons.person_outline,
+                    color: Colors.white,
+                    size: 20.sp,
+                  ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(

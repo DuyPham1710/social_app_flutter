@@ -126,6 +126,9 @@ class PostRepositoryImpl implements PostRepository {
       final friendsDetailString = post.friendsDetail != null
           ? jsonEncode(post.friendsDetail)
           : null;
+      final taggedUserIdsString = post.taggedUserIds != null
+          ? jsonEncode(post.taggedUserIds)
+          : null;
 
       final response = await remoteDataSource.createPost(
         post.caption,
@@ -135,6 +138,7 @@ class PostRepositoryImpl implements PostRepository {
         titlesString,
         friendsExceptString,
         friendsDetailString,
+        taggedUserIdsString,
         multipartFiles,
       );
 
@@ -256,6 +260,31 @@ class PostRepositoryImpl implements PostRepository {
       final response =
           await remoteDataSource.translateCaption(postId, targetLang);
       return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> updateTagVisibility({
+    required String postId,
+    required bool isVisible,
+  }) async {
+    try {
+      await remoteDataSource.updateTagVisibility(postId, {
+        'isVisible': isVisible,
+      });
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> removeTag({required String postId}) async {
+    try {
+      await remoteDataSource.removeTag(postId);
+      return const DataStateSuccess(null);
     } on DioException catch (e) {
       return DataStateError(e);
     }

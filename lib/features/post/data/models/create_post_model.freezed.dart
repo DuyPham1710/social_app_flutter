@@ -30,6 +30,7 @@ mixin _$CreatePostModel {
   PrivacyType? get privacyType => throw _privateConstructorUsedError;
   List<String>? get friendsExcept => throw _privateConstructorUsedError;
   List<String>? get friendsDetail => throw _privateConstructorUsedError;
+  List<String>? get taggedUserIds => throw _privateConstructorUsedError;
 
   /// Serializes this CreatePostModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,6 +58,7 @@ abstract class $CreatePostModelCopyWith<$Res> {
     PrivacyType? privacyType,
     List<String>? friendsExcept,
     List<String>? friendsDetail,
+    List<String>? taggedUserIds,
   });
 }
 
@@ -83,6 +85,7 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
     Object? privacyType = freezed,
     Object? friendsExcept = freezed,
     Object? friendsDetail = freezed,
+    Object? taggedUserIds = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -118,6 +121,10 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
                 ? _value.friendsDetail
                 : friendsDetail // ignore: cast_nullable_to_non_nullable
                       as List<String>?,
+            taggedUserIds: freezed == taggedUserIds
+                ? _value.taggedUserIds
+                : taggedUserIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
           )
           as $Val,
     );
@@ -142,6 +149,7 @@ abstract class _$$CreatePostModelImplCopyWith<$Res>
     PrivacyType? privacyType,
     List<String>? friendsExcept,
     List<String>? friendsDetail,
+    List<String>? taggedUserIds,
   });
 }
 
@@ -167,6 +175,7 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
     Object? privacyType = freezed,
     Object? friendsExcept = freezed,
     Object? friendsDetail = freezed,
+    Object? taggedUserIds = freezed,
   }) {
     return _then(
       _$CreatePostModelImpl(
@@ -202,6 +211,10 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
             ? _value._friendsDetail
             : friendsDetail // ignore: cast_nullable_to_non_nullable
                   as List<String>?,
+        taggedUserIds: freezed == taggedUserIds
+            ? _value._taggedUserIds
+            : taggedUserIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
       ),
     );
   }
@@ -219,11 +232,13 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     this.privacyType,
     final List<String>? friendsExcept,
     final List<String>? friendsDetail,
+    final List<String>? taggedUserIds,
   }) : _files = files,
        _titles = titles,
        _orders = orders,
        _friendsExcept = friendsExcept,
-       _friendsDetail = friendsDetail;
+       _friendsDetail = friendsDetail,
+       _taggedUserIds = taggedUserIds;
 
   factory _$CreatePostModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreatePostModelImplFromJson(json);
@@ -285,9 +300,19 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<String>? _taggedUserIds;
+  @override
+  List<String>? get taggedUserIds {
+    final value = _taggedUserIds;
+    if (value == null) return null;
+    if (_taggedUserIds is EqualUnmodifiableListView) return _taggedUserIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail)';
+    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail, taggedUserIds: $taggedUserIds)';
   }
 
   @override
@@ -309,6 +334,10 @@ class _$CreatePostModelImpl implements _CreatePostModel {
             const DeepCollectionEquality().equals(
               other._friendsDetail,
               _friendsDetail,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._taggedUserIds,
+              _taggedUserIds,
             ));
   }
 
@@ -324,6 +353,7 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     privacyType,
     const DeepCollectionEquality().hash(_friendsExcept),
     const DeepCollectionEquality().hash(_friendsDetail),
+    const DeepCollectionEquality().hash(_taggedUserIds),
   );
 
   /// Create a copy of CreatePostModel
@@ -353,6 +383,7 @@ abstract class _CreatePostModel implements CreatePostModel {
     final PrivacyType? privacyType,
     final List<String>? friendsExcept,
     final List<String>? friendsDetail,
+    final List<String>? taggedUserIds,
   }) = _$CreatePostModelImpl;
 
   factory _CreatePostModel.fromJson(Map<String, dynamic> json) =
@@ -375,6 +406,8 @@ abstract class _CreatePostModel implements CreatePostModel {
   List<String>? get friendsExcept;
   @override
   List<String>? get friendsDetail;
+  @override
+  List<String>? get taggedUserIds;
 
   /// Create a copy of CreatePostModel
   /// with the given fields replaced by the non-null parameter values.
