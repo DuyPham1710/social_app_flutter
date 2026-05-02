@@ -22,6 +22,7 @@ import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/community_post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_translatable_caption.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
@@ -261,13 +262,29 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     ),
 
                     // Content header
-                    PostHeader(
-                      user: post.user,
-                      createdAt: post.createdAt,
-                      onReportTap: () {
-                        // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
-                      },
-                    ),
+                    if (post.communityStatus != null)
+                      // Post trong community: dùng CommunityPostHeader
+                      CommunityPostHeader(
+                        community: post.community,
+                        user: post.user,
+                        createdAt: post.createdAt,
+                        showCommunityInfo: true,
+                        onOptionsTap: () {
+                          // TODO: Có thể tái sử dụng bottom sheet tùy chọn giống PostItem nếu muốn
+                        },
+                        onReportTap: () {
+                          // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
+                        },
+                      )
+                    else
+                      // Post bình thường: dùng PostHeader
+                      PostHeader(
+                        user: post.user,
+                        createdAt: post.createdAt,
+                        onReportTap: () {
+                          // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
+                        },
+                      ),
 
                     SizedBox(height: 10.h),
 
@@ -280,49 +297,51 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           child: PostTranslatableCaption(
                             postId: post.id,
                             caption: post.caption!,
-                            textStyle:
-                                TextStyle(fontSize: 14.sp, height: 1.4),
+                            textStyle: TextStyle(fontSize: 14.sp, height: 1.4),
                           ),
                         ),
                       ),
 
                     SizedBox(height: 20.h),
 
-                    // Likes info
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return ModalComment(
-                              postId: widget.post.id,
-                              reacts: _localReacts,
-                            );
-                          },
-                        );
-                      },
-                      child: PostReactInfo(reacts: _localReacts),
-                    ),
+                    // Likes info - ẩn nếu bài viết đang chờ duyệt
+                    if (post.communityStatus != 'pending')
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ModalComment(
+                                postId: widget.post.id,
+                                reacts: _localReacts,
+                              );
+                            },
+                          );
+                        },
+                        child: PostReactInfo(reacts: _localReacts),
+                      ),
 
-                    // Reaction Buttons
-                    SizedBox(height: 20.h),
-                    BlocBuilder<PostDetailBloc, PostDetailState>(
-                      builder: (context, state) {
-                        final commentCount = state is PostDetailLoaded
-                            ? state.commentCount
-                            : 0;
-                        return PostAction(
-                          postId: post.id,
-                          reactCount: _localReacts
-                              .length, // ← Sử dụng _localReacts thay vì post.reacts
-                          isReact: _currentUserReaction,
-                          reacts: _localReacts,
-                          commentCount: commentCount,
-                          onReactionChanged: _onReactionChanged,
-                        );
-                      },
-                    ),
+                    // Reaction Buttons - ẩn nếu bài viết đang chờ duyệt
+                    if (post.communityStatus != 'pending') ...[
+                      SizedBox(height: 20.h),
+                      BlocBuilder<PostDetailBloc, PostDetailState>(
+                        builder: (context, state) {
+                          final commentCount = state is PostDetailLoaded
+                              ? state.commentCount
+                              : 0;
+                          return PostAction(
+                            postId: post.id,
+                            reactCount: _localReacts
+                                .length, // ← Sử dụng _localReacts thay vì post.reacts
+                            isReact: _currentUserReaction,
+                            reacts: _localReacts,
+                            commentCount: commentCount,
+                            onReactionChanged: _onReactionChanged,
+                          );
+                        },
+                      ),
+                    ],
                   ],
                 );
               }

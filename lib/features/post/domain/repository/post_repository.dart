@@ -30,6 +30,18 @@ abstract class PostRepository {
     int limit = 10,
   });
 
+  Future<DataState<PostListEntity>> getCommunityPosts({
+    required String communityId,
+    int page = 1,
+    int limit = 10,
+  });
+
+  Future<DataState<PostListEntity>> getUserCommunityPosts({
+    int page = 1,
+    int limit = 10,
+    String status = 'all',
+  });
+
   Future<DataState<String>> createPost({required CreatePostEntity post});
 
   Future<DataState<void>> reportPost({
@@ -47,13 +59,11 @@ abstract class PostRepository {
   });
 
   /// Xóa post
-  Future<DataState<void>> deletePost({
-    required String postId,
-  });
+  Future<DataState<void>> deletePost({required String postId});
 
   /// Kiểm tra có cần dịch caption theo ngôn ngữ đích (thường là ngôn ngữ máy).
   Future<DataState<CaptionTranslationEligibilityEntity>>
-      getCaptionTranslationEligibility({
+  getCaptionTranslationEligibility({
     required String postId,
     String targetLang = 'en',
   });

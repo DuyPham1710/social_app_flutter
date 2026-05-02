@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_all_communities_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_my_communities_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_my_invites_usecase.dart';
@@ -23,6 +23,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     on<CommunityListSearched>(_onCommunityListSearched);
     on<MyCommunitiesFetched>(_onMyCommunitiesFetched);
     on<MyInvitesFetched>(_onMyInvitesFetched);
+    on<PendingCommunitiesFetched>(_onPendingCommunitiesFetched);
   }
 
   Future<void> _onCommunityListFetched(
@@ -128,7 +129,42 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
       final dataState = await _getMyInvitesUseCase(params: null);
 
       if (dataState is DataStateSuccess) {
-        emit(MyInvitesLoaded(dataState.data!));
+        // dataState.data is already List<CommunityInviteModel> from Retrofit deserialization
+        final invites = (dataState.data ?? []) as List<CommunityInviteModel>;
+        emit(MyInvitesLoaded(invites));
+      } else if (dataState is DataStateError) {
+        final errorMessage =
+            '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
+        emit(CommunityListError(errorMessage));
+      }
+    } catch (e) {
+      emit(CommunityListError('Đã xảy ra lỗi: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onPendingCommunitiesFetched(
+    PendingCommunitiesFetched event,
+    Emitter<CommunityListState> emit,
+  ) async {
+    emit(const CommunityListLoading());
+
+    try {
+      // Get all communities and filter for pending join requests
+      final dataState = await _getAllCommunitiesUseCase(
+        params: GetAllCommunitiesParams(
+          page: 1,
+          limit: 100, // Get more to find pending ones
+          search: null,
+        ),
+      );
+
+      if (dataState is DataStateSuccess) {
+        // Filter communities where memberStatus == 'pending'
+        final pendingCommunities = dataState.data!.data
+            .where((community) => community.memberStatus == 'pending')
+            .toList();
+
+        emit(PendingCommunitiesLoaded(pendingCommunities));
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';

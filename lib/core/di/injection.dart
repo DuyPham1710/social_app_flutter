@@ -75,6 +75,8 @@ import 'package:social_app_fe/features/post/data/data_sources/remote/post_remote
 import 'package:social_app_fe/features/post/data/repository/post_repository_impl.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_home_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_community_posts_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_user_community_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
@@ -139,17 +141,19 @@ import 'package:social_app_fe/features/community/domain/usecases/get_member_stat
 import 'package:social_app_fe/features/community/domain/usecases/join_community_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/cancel_join_request_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/leave_community_usecase.dart';
-import 'package:social_app_fe/features/community/domain/usecases/get_community_posts_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_pending_requests_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_join_request_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/create_community_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_available_friends_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/invite_friend_usecase.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_bloc.dart';
-import 'package:social_app_fe/features/community/presentation/bloc/community_create_event.dart';
-import 'package:social_app_fe/features/community/presentation/bloc/community_create_state.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_posts_tab_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/invite_friends_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -248,6 +252,20 @@ Future<void> initializeDependencies() async {
   // post usecase
   s1.registerLazySingleton<GetHomePostsUseCase>(
     () => GetHomePostsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetCommunityPostsUseCase>(
+    () => GetCommunityPostsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetUserCommunityPostsUseCase>(
+    () => GetUserCommunityPostsUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<GetAvailableFriendsUseCase>(
+    () => GetAvailableFriendsUseCase(s1()),
+  );
+
+  s1.registerLazySingleton<InviteFriendUseCase>(
+    () => InviteFriendUseCase(s1()),
   );
 
   s1.registerLazySingleton<ReactPostUsecase>(() => ReactPostUsecase(s1()));
@@ -778,9 +796,6 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<LeaveCommunityUseCase>(
     () => LeaveCommunityUseCase(s1()),
   );
-  s1.registerLazySingleton<GetCommunityPostsUseCase>(
-    () => GetCommunityPostsUseCase(s1()),
-  );
   s1.registerLazySingleton<GetPendingRequestsUseCase>(
     () => GetPendingRequestsUseCase(s1()),
   );
@@ -805,13 +820,12 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<CommunityDetailBloc>(
-    () => CommunityDetailBloc(
+    () => CommunityDetailBloc.withDeps(
       s1<GetCommunityDetailUseCase>(),
       s1<GetMemberStatusUseCase>(),
       s1<JoinCommunityUseCase>(),
       s1<CancelJoinRequestUseCase>(),
       s1<LeaveCommunityUseCase>(),
-      s1<GetCommunityPostsUseCase>(),
       s1<RespondToInviteUseCase>(),
     ),
   );
@@ -826,6 +840,27 @@ Future<void> initializeDependencies() async {
 
   s1.registerFactory<CommunityCreateBloc>(
     () => CommunityCreateBloc(s1<CreateCommunityUseCase>()),
+  );
+
+  s1.registerFactory<CommunityPostsTabBloc>(
+    () => CommunityPostsTabBloc.withDeps(
+      s1<GetUserCommunityPostsUseCase>(),
+      s1<CommentRepository>(),
+    ),
+  );
+
+  s1.registerFactory<InviteFriendsBloc>(
+    () => InviteFriendsBloc(
+      getAvailableFriendsUseCase: s1<GetAvailableFriendsUseCase>(),
+      inviteFriendUseCase: s1<InviteFriendUseCase>(),
+    ),
+  );
+
+  s1.registerFactory<CommunityInvitesBloc>(
+    () => CommunityInvitesBloc(
+      getMyInvitesUseCase: s1<GetMyInvitesUseCase>(),
+      respondToInviteUseCase: s1<RespondToInviteUseCase>(),
+    ),
   );
 
   // ==================== END COMMUNITY FEATURE ====================

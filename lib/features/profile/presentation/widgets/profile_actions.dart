@@ -12,44 +12,51 @@ class ProfileActions extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) {
-                    return StoryCreatePage();
-                  },
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              );
-            },
-            icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-            label: const Text(
-              'Thêm vào tin',
-              style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) {
+                      return StoryCreatePage();
+                    },
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+              label: const Text(
+                'Thêm vào tin',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
           const SizedBox(width: 10),
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.grey),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          Expanded(
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.grey),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-            onPressed: onTapEdit,
-            icon: const Icon(Icons.edit_outlined, color: Colors.black),
-            label: const Text(
-              'Chỉnh sửa thông tin',
-              style: TextStyle(color: Colors.black),
+              onPressed: onTapEdit,
+              icon: const Icon(Icons.edit_outlined, color: Colors.black),
+              label: const Text(
+                'Chỉnh sửa thông tin',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ),
         ],

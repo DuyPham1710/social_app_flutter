@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
-import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
-import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/widgets/my_invites_item.dart';
 
 class MyInvitesWidget extends StatefulWidget {
   const MyInvitesWidget({super.key});
@@ -80,113 +79,6 @@ class _MyInvitesWidgetState extends State<MyInvitesWidget> {
 
           return const Center(child: Text(''));
         },
-      ),
-    );
-  }
-}
-
-class MyInvitesItem extends StatelessWidget {
-  final dynamic invite;
-
-  const MyInvitesItem({super.key, required this.invite});
-
-  @override
-  Widget build(BuildContext context) {
-    final avatarUrl = invite.user.avatarUrl as String?;
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5EAF0)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D101828),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
-                ? NetworkImage(avatarUrl)
-                : null,
-            child: (avatarUrl == null || avatarUrl.isEmpty)
-                ? const Icon(Icons.person)
-                : null,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  invite.user.fullName ?? 'Unknown',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Mời bạn tham gia cộng đồng',
-                  style: TextStyle(color: Color(0xFF667085), fontSize: 12),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.read<CommunityDetailBloc>().add(
-                            RespondToInviteRequested(
-                              communityId: invite.communityId ?? '',
-                              requestId: invite.id,
-                              action: 'approve',
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          backgroundColor: const Color(0xFF12B76A),
-                        ),
-                        child: const Text(
-                          'Chấp nhận',
-                          style: TextStyle(fontSize: 12, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          context.read<CommunityDetailBloc>().add(
-                            RespondToInviteRequested(
-                              communityId: invite.communityId ?? '',
-                              requestId: invite.id,
-                              action: 'reject',
-                            ),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          side: const BorderSide(color: Color(0xFFD0D5DD)),
-                        ),
-                        child: const Text(
-                          'Từ chối',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

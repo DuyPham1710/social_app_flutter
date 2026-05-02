@@ -135,12 +135,12 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
   }
 
   @override
-  Future<List<CommunityRequestModel>> getMyInvites() async {
+  Future<List<CommunityInviteModel>> getMyInvites() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<CommunityRequestModel>>(
+    final _options = _setStreamType<List<CommunityInviteModel>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -151,12 +151,12 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<CommunityRequestModel> _value;
+    late List<CommunityInviteModel> _value;
     try {
       _value = _result.data!
           .map(
             (dynamic i) =>
-                CommunityRequestModel.fromJson(i as Map<String, dynamic>),
+                CommunityInviteModel.fromJson(i as Map<String, dynamic>),
           )
           .toList();
     } on Object catch (e, s) {
@@ -278,7 +278,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
   }
 
   @override
-  Future<List<MemberModel>> getMembers({
+  Future<MemberListModel> getMembers({
     required String communityId,
     required int page,
     required int limit,
@@ -287,7 +287,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
     final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<MemberModel>>(
+    final _options = _setStreamType<MemberListModel>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -297,16 +297,35 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<MemberModel> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late MemberListModel _value;
     try {
-      _value = _result.data!
-          .map((dynamic i) => MemberModel.fromJson(i as Map<String, dynamic>))
-          .toList();
+      _value = MemberListModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
+    return _value;
+  }
+
+  @override
+  Future<dynamic> getAvailableFriends({required String communityId}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<dynamic>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/community/${communityId}/available-friends',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
     return _value;
   }
 
@@ -400,6 +419,29 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
   }
 
   @override
+  Future<void> inviteFriend({
+    required String communityId,
+    required Map<String, dynamic> body,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/community/${communityId}/invite-friend',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
   Future<List<CommunityRequestModel>> getPendingRequests(
     String communityId,
   ) async {
@@ -482,7 +524,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
   }
 
   @override
-  Future<List<CommunityPostModel>> getCommunityPosts({
+  Future<CommunityPostListModel> getCommunityPosts({
     required String communityId,
     required int page,
     required int limit,
@@ -491,7 +533,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
     final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<CommunityPostModel>>(
+    final _options = _setStreamType<CommunityPostListModel>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -501,15 +543,10 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<CommunityPostModel> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late CommunityPostListModel _value;
     try {
-      _value = _result.data!
-          .map(
-            (dynamic i) =>
-                CommunityPostModel.fromJson(i as Map<String, dynamic>),
-          )
-          .toList();
+      _value = CommunityPostListModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -518,7 +555,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
   }
 
   @override
-  Future<List<CommunityPostModel>> getPendingPosts({
+  Future<CommunityPostListModel> getPendingPosts({
     required String communityId,
     required int page,
     required int limit,
@@ -527,7 +564,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
     final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<CommunityPostModel>>(
+    final _options = _setStreamType<CommunityPostListModel>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -537,15 +574,10 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<CommunityPostModel> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late CommunityPostListModel _value;
     try {
-      _value = _result.data!
-          .map(
-            (dynamic i) =>
-                CommunityPostModel.fromJson(i as Map<String, dynamic>),
-          )
-          .toList();
+      _value = CommunityPostListModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

@@ -176,7 +176,21 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       showDragHandle: true,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
-        child: BlocBuilder<CommunityAdminBloc, CommunityAdminState>(
+        child: BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
+          listener: (context, state) {
+            if (state is CommunityAdminActionSuccess) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            } else if (state is CommunityAdminError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
           builder: (context, state) {
             if (state is PendingPostsLoaded) {
               if (state.posts.isEmpty) {
@@ -236,9 +250,59 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   },
                 ),
               );
+            } else if (state is CommunityAdminLoading) {
+              return const SafeArea(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            } else if (state is CommunityAdminActionSuccess) {
+              // Show loading while refreshing after action
+              return const SafeArea(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            } else if (state is CommunityAdminError) {
+              return SafeArea(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.red[300],
+                        size: 48,
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Text(
+                          state.message,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          context.read<CommunityAdminBloc>().add(
+                            GetPendingPostsRequested(
+                              communityId: widget.communityId,
+                              page: 1,
+                              limit: 10,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Thử lại'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
-            return const Center(child: CircularProgressIndicator());
+            // Initial state
+            return const SafeArea(
+              child: Center(child: CircularProgressIndicator()),
+            );
           },
         ),
       ),

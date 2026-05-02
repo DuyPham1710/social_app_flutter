@@ -45,15 +45,3 @@ class RespondToInviteRequested extends CommunityDetailEvent {
     required this.action,
   });
 }
-
-class GetCommunityPostsRequested extends CommunityDetailEvent {
-  final String communityId;
-  final int page;
-  final int limit;
-
-  const GetCommunityPostsRequested({
-    required this.communityId,
-    required this.page,
-    required this.limit,
-  });
-}

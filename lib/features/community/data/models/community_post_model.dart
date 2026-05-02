@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import 'package:social_app_fe/features/post/data/models/post_url_model.dart';
 import 'package:social_app_fe/features/post/data/models/react_post_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_ref_model.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
 
@@ -23,7 +24,7 @@ class CommunityPostModel with _$CommunityPostModel {
     PrivacyType privacyType,
     @JsonKey(name: 'communityStatus')
     String? communityStatus, // 'pending', 'approved', 'rejected'
-    @JsonKey(name: 'communityId') required String communityId,
+    @JsonKey(name: 'communityId') required CommunityRefModel community,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _CommunityPostModel;

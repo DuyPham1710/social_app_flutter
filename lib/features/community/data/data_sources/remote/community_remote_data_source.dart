@@ -3,9 +3,12 @@ import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
+import 'package:social_app_fe/features/community/data/models/member_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_status_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_post_list_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
 
 part 'community_remote_data_source.g.dart';
 
@@ -35,7 +38,7 @@ abstract class CommunityRemoteDataSource {
   Future<List<CommunityModel>> getMyCommunities();
 
   @GET('/community/invites')
-  Future<List<CommunityRequestModel>> getMyInvites();
+  Future<List<CommunityInviteModel>> getMyInvites();
 
   @GET('/community/{communityId}')
   Future<CommunityModel> getCommunityDetail(
@@ -57,10 +60,15 @@ abstract class CommunityRemoteDataSource {
   );
 
   @GET('/community/{communityId}/members')
-  Future<List<MemberModel>> getMembers({
+  Future<MemberListModel> getMembers({
     @Path('communityId') required String communityId,
     @Query('page') required int page,
     @Query('limit') required int limit,
+  });
+
+  @GET('/community/{communityId}/available-friends')
+  Future<dynamic> getAvailableFriends({
+    @Path('communityId') required String communityId,
   });
 
   @DELETE('/community/{communityId}/members/{memberId}')
@@ -87,6 +95,12 @@ abstract class CommunityRemoteDataSource {
     @Body() required Map<String, dynamic> body,
   });
 
+  @POST('/community/{communityId}/invite-friend')
+  Future<void> inviteFriend({
+    @Path('communityId') required String communityId,
+    @Body() required Map<String, dynamic> body,
+  });
+
   @GET('/community/{communityId}/requests')
   Future<List<CommunityRequestModel>> getPendingRequests(
     @Path('communityId') String communityId,
@@ -107,14 +121,14 @@ abstract class CommunityRemoteDataSource {
   });
 
   @GET('/community/{communityId}/posts')
-  Future<List<CommunityPostModel>> getCommunityPosts({
+  Future<CommunityPostListModel> getCommunityPosts({
     @Path('communityId') required String communityId,
     @Query('page') required int page,
     @Query('limit') required int limit,
   });
 
   @GET('/community/{communityId}/posts/pending')
-  Future<List<CommunityPostModel>> getPendingPosts({
+  Future<CommunityPostListModel> getPendingPosts({
     @Path('communityId') required String communityId,
     @Query('page') required int page,
     @Query('limit') required int limit,

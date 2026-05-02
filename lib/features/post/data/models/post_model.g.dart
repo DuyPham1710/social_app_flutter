@@ -43,6 +43,8 @@ _$PostModelImpl _$$PostModelImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      community: _parseCommunity(json['communityId']),
+      communityStatus: json['communityStatus'] as String?,
     );
 
 Map<String, dynamic> _$$PostModelImplToJson(_$PostModelImpl instance) =>
@@ -62,6 +64,8 @@ Map<String, dynamic> _$$PostModelImplToJson(_$PostModelImpl instance) =>
       'friends_detail': instance.friendsDetail,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'communityId': _serializeCommunity(instance.community),
+      'communityStatus': instance.communityStatus,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(

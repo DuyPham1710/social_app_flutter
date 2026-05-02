@@ -9,7 +9,6 @@ class CommunityDetailHeader extends StatelessWidget {
   final VoidCallback? onJoin;
   final VoidCallback? onLeave;
   final VoidCallback? onCancelRequest;
-  final VoidCallback? onCreatePost;
   final VoidCallback? onManage;
 
   const CommunityDetailHeader({
@@ -20,7 +19,6 @@ class CommunityDetailHeader extends StatelessWidget {
     this.onJoin,
     this.onLeave,
     this.onCancelRequest,
-    this.onCreatePost,
     this.onManage,
   });
 
@@ -30,20 +28,21 @@ class CommunityDetailHeader extends StatelessWidget {
     final roleColor = userRole == 'admin'
         ? const Color(0xFFB54708)
         : const Color(0xFF0F766E);
+    final isPrivate = (community.status ?? '').toLowerCase() == 'private';
+    final privacyLabel = isPrivate ? 'Nhóm riêng tư' : 'Nhóm công khai';
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFE4E7EC)),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x140F172A),
-              blurRadius: 16,
-              offset: Offset(0, 8),
+              color: Color(0x14000000),
+              blurRadius: 10,
+              offset: Offset(0, 3),
             ),
           ],
         ),
@@ -53,38 +52,53 @@ class CommunityDetailHeader extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  radius: 34,
-                  backgroundColor: const Color(0xFFEEF2FF),
+                  radius: 30,
+                  backgroundColor: const Color(0xFFE4E6EB),
                   backgroundImage: community.avatar != null
                       ? NetworkImage(community.avatar!)
                       : null,
                   child: community.avatar == null
-                      ? const Icon(Icons.groups, size: 32)
+                      ? const Icon(
+                          Icons.groups,
+                          size: 30,
+                          color: Color(0xFF65676B),
+                        )
                       : null,
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         community.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          height: 1.2,
+                          color: Color(0xFF1C1E21),
+                          height: 1.1,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 7),
+                      Text(
+                        '$privacyLabel · ${community.memberCount ?? 0} thành viên',
+                        style: const TextStyle(
+                          color: Color(0xFF65676B),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
                         runSpacing: 6,
                         children: [
                           _InfoChip(
-                            icon: Icons.group_outlined,
-                            label: '${community.memberCount} thành viên',
+                            icon: isPrivate
+                                ? Icons.lock_rounded
+                                : Icons.public_rounded,
+                            label: privacyLabel,
                           ),
                           if (userRole != null)
                             _InfoChip(
@@ -92,7 +106,9 @@ class CommunityDetailHeader extends StatelessWidget {
                                   ? Icons.workspace_premium_rounded
                                   : Icons.verified_user_outlined,
                               label: roleLabel,
-                              backgroundColor: roleColor.withValues(alpha: 0.14),
+                              backgroundColor: roleColor.withValues(
+                                alpha: 0.14,
+                              ),
                               textColor: roleColor,
                             ),
                         ],
@@ -104,130 +120,129 @@ class CommunityDetailHeader extends StatelessWidget {
             ),
             const SizedBox(height: 14),
 
-            if (community.description != null && community.description!.isNotEmpty)
+            if (community.description != null &&
+                community.description!.isNotEmpty)
               Text(
                 community.description!,
                 style: TextStyle(
-                  color: Colors.grey[800],
+                  color: const Color(0xFF1C1E21),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                   height: 1.35,
                 ),
               )
             else
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  color: const Color(0xFFF0F2F5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   'Cộng đồng này chưa có mô tả.',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(color: Colors.grey[700]),
                 ),
               ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
+            const Divider(height: 1, color: Color(0xFFE4E6EB)),
+            const SizedBox(height: 14),
 
             if (memberStatus == 'none')
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: onJoin,
-                  icon: const Icon(Icons.group_add_rounded, color: Colors.white),
+                  icon: const Icon(
+                    Icons.group_add_rounded,
+                    color: Colors.white,
+                  ),
                   label: const Text(
                     'Tham gia cộng đồng',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: const Color(0xFF1877F2),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
               )
             else if (memberStatus == 'pending')
               Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onCancelRequest,
-                        icon: const Icon(Icons.cancel_outlined),
-                        label: const Text('Hủy yêu cầu'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          side: const BorderSide(color: Color(0xFF98A2B3)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onCancelRequest,
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: const Text('Hủy yêu cầu'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: const BorderSide(color: Color(0xFFCCD0D5)),
+                        foregroundColor: const Color(0xFF1C1E21),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF8E1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFFDE68A)),
-                        ),
-                        child: const Text(
-                          'Đang chờ duyệt',
-                          style: TextStyle(
-                            color: Color(0xFFB45309),
-                            fontWeight: FontWeight.w700,
-                          ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF8E1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
+                      ),
+                      child: const Text(
+                        'Đang chờ duyệt',
+                        style: TextStyle(
+                          color: Color(0xFFB45309),
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
-                  ],
-                
+                  ),
+                ],
               )
             else if (memberStatus == 'member' || userRole == 'admin')
               Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: onCreatePost,
-                      icon: const Icon(Icons.edit_square, color: Colors.white),
-                      label: const Text(
-                        'Đăng bài',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
                       onPressed: userRole == 'admin' ? onManage : onLeave,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            userRole == 'admin' ? const Color(0xFF1D4ED8) : Colors.red,
-                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        backgroundColor: userRole == 'admin'
+                            ? const Color(0xFFE7F3FF)
+                            : const Color(0xFFFFE4E6),
+                        elevation: 0,
+                        foregroundColor: userRole == 'admin'
+                            ? const Color(0xFF1877F2)
+                            : const Color(0xFFB91C1C),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       icon: Icon(
-                        userRole == 'admin' ? Icons.tune_rounded : Icons.logout_rounded,
-                        color: Colors.white,
+                        userRole == 'admin'
+                            ? Icons.tune_rounded
+                            : Icons.logout_rounded,
                       ),
                       label: Text(
                         userRole == 'admin' ? 'Quản lý' : 'Rời nhóm',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -236,7 +251,10 @@ class CommunityDetailHeader extends StatelessWidget {
             else if (memberStatus == 'invited')
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEEF2FF),
                   borderRadius: BorderRadius.circular(12),
@@ -277,7 +295,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: backgroundColor ?? const Color(0xFFF2F4F7),
+        color: backgroundColor ?? const Color(0xFFF0F2F5),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

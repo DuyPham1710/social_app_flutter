@@ -30,6 +30,8 @@ mixin _$NotificationModel {
   @JsonKey(fromJson: _dateTimeFromJson)
   DateTime? get createdAt => throw _privateConstructorUsedError;
   UserModel? get sender => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+  CommunityRefModel? get community => throw _privateConstructorUsedError;
   String? get targetId => throw _privateConstructorUsedError;
 
   /// Serializes this NotificationModel to a JSON map.
@@ -57,10 +59,13 @@ abstract class $NotificationModelCopyWith<$Res> {
     bool isRead,
     @JsonKey(fromJson: _dateTimeFromJson) DateTime? createdAt,
     UserModel? sender,
+    @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+    CommunityRefModel? community,
     String? targetId,
   });
 
   $UserModelCopyWith<$Res>? get sender;
+  $CommunityRefModelCopyWith<$Res>? get community;
 }
 
 /// @nodoc
@@ -85,6 +90,7 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
     Object? isRead = null,
     Object? createdAt = freezed,
     Object? sender = freezed,
+    Object? community = freezed,
     Object? targetId = freezed,
   }) {
     return _then(
@@ -117,6 +123,10 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
                 ? _value.sender
                 : sender // ignore: cast_nullable_to_non_nullable
                       as UserModel?,
+            community: freezed == community
+                ? _value.community
+                : community // ignore: cast_nullable_to_non_nullable
+                      as CommunityRefModel?,
             targetId: freezed == targetId
                 ? _value.targetId
                 : targetId // ignore: cast_nullable_to_non_nullable
@@ -139,6 +149,20 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
       return _then(_value.copyWith(sender: value) as $Val);
     });
   }
+
+  /// Create a copy of NotificationModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CommunityRefModelCopyWith<$Res>? get community {
+    if (_value.community == null) {
+      return null;
+    }
+
+    return $CommunityRefModelCopyWith<$Res>(_value.community!, (value) {
+      return _then(_value.copyWith(community: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -158,11 +182,15 @@ abstract class _$$NotificationModelImplCopyWith<$Res>
     bool isRead,
     @JsonKey(fromJson: _dateTimeFromJson) DateTime? createdAt,
     UserModel? sender,
+    @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+    CommunityRefModel? community,
     String? targetId,
   });
 
   @override
   $UserModelCopyWith<$Res>? get sender;
+  @override
+  $CommunityRefModelCopyWith<$Res>? get community;
 }
 
 /// @nodoc
@@ -186,6 +214,7 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
     Object? isRead = null,
     Object? createdAt = freezed,
     Object? sender = freezed,
+    Object? community = freezed,
     Object? targetId = freezed,
   }) {
     return _then(
@@ -218,6 +247,10 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
             ? _value.sender
             : sender // ignore: cast_nullable_to_non_nullable
                   as UserModel?,
+        community: freezed == community
+            ? _value.community
+            : community // ignore: cast_nullable_to_non_nullable
+                  as CommunityRefModel?,
         targetId: freezed == targetId
             ? _value.targetId
             : targetId // ignore: cast_nullable_to_non_nullable
@@ -238,6 +271,8 @@ class _$NotificationModelImpl implements _NotificationModel {
     required this.isRead,
     @JsonKey(fromJson: _dateTimeFromJson) this.createdAt,
     this.sender,
+    @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+    this.community,
     this.targetId,
   });
 
@@ -261,11 +296,14 @@ class _$NotificationModelImpl implements _NotificationModel {
   @override
   final UserModel? sender;
   @override
+  @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+  final CommunityRefModel? community;
+  @override
   final String? targetId;
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, type: $type, message: $message, content: $content, isRead: $isRead, createdAt: $createdAt, sender: $sender, targetId: $targetId)';
+    return 'NotificationModel(id: $id, type: $type, message: $message, content: $content, isRead: $isRead, createdAt: $createdAt, sender: $sender, community: $community, targetId: $targetId)';
   }
 
   @override
@@ -281,6 +319,8 @@ class _$NotificationModelImpl implements _NotificationModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.sender, sender) || other.sender == sender) &&
+            (identical(other.community, community) ||
+                other.community == community) &&
             (identical(other.targetId, targetId) ||
                 other.targetId == targetId));
   }
@@ -296,6 +336,7 @@ class _$NotificationModelImpl implements _NotificationModel {
     isRead,
     createdAt,
     sender,
+    community,
     targetId,
   );
 
@@ -325,6 +366,8 @@ abstract class _NotificationModel implements NotificationModel {
     required final bool isRead,
     @JsonKey(fromJson: _dateTimeFromJson) final DateTime? createdAt,
     final UserModel? sender,
+    @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+    final CommunityRefModel? community,
     final String? targetId,
   }) = _$NotificationModelImpl;
 
@@ -347,6 +390,9 @@ abstract class _NotificationModel implements NotificationModel {
   DateTime? get createdAt;
   @override
   UserModel? get sender;
+  @override
+  @JsonKey(fromJson: _communityFromJson, toJson: _communityToJson)
+  CommunityRefModel? get community;
   @override
   String? get targetId;
 

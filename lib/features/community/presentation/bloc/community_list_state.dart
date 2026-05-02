@@ -37,9 +37,15 @@ class MyCommunitiesLoaded extends CommunityListState {
 }
 
 class MyInvitesLoaded extends CommunityListState {
-  final List<CommunityRequestModel> invites;
+  final List<CommunityInviteModel> invites;
 
   const MyInvitesLoaded(this.invites);
+}
+
+class PendingCommunitiesLoaded extends CommunityListState {
+  final List<CommunityModel> communities;
+
+  const PendingCommunitiesLoaded(this.communities);
 }
 
 class CommunityListError extends CommunityListState {

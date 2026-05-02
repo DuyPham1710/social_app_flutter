@@ -18,6 +18,7 @@ _$NotificationModelImpl _$$NotificationModelImplFromJson(
   sender: json['sender'] == null
       ? null
       : UserModel.fromJson(json['sender'] as Map<String, dynamic>),
+  community: _communityFromJson(json['community']),
   targetId: json['targetId'] as String?,
 );
 
@@ -31,5 +32,6 @@ Map<String, dynamic> _$$NotificationModelImplToJson(
   'isRead': instance.isRead,
   'createdAt': instance.createdAt?.toIso8601String(),
   'sender': instance.sender,
+  'community': _communityToJson(instance.community),
   'targetId': instance.targetId,
 };

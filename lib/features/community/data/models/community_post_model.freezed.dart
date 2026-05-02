@@ -37,7 +37,7 @@ mixin _$CommunityPostModel {
   @JsonKey(name: 'communityStatus')
   String? get communityStatus => throw _privateConstructorUsedError; // 'pending', 'approved', 'rejected'
   @JsonKey(name: 'communityId')
-  String get communityId => throw _privateConstructorUsedError;
+  CommunityRefModel get community => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
@@ -68,12 +68,13 @@ abstract class $CommunityPostModelCopyWith<$Res> {
     @EmojiConverter() @JsonKey(name: 'isReact') EmojiType? isReact,
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'communityStatus') String? communityStatus,
-    @JsonKey(name: 'communityId') String communityId,
+    @JsonKey(name: 'communityId') CommunityRefModel community,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
 
   $UserModelCopyWith<$Res> get user;
+  $CommunityRefModelCopyWith<$Res> get community;
 }
 
 /// @nodoc
@@ -100,7 +101,7 @@ class _$CommunityPostModelCopyWithImpl<$Res, $Val extends CommunityPostModel>
     Object? isReact = freezed,
     Object? privacyType = null,
     Object? communityStatus = freezed,
-    Object? communityId = null,
+    Object? community = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -142,10 +143,10 @@ class _$CommunityPostModelCopyWithImpl<$Res, $Val extends CommunityPostModel>
                 ? _value.communityStatus
                 : communityStatus // ignore: cast_nullable_to_non_nullable
                       as String?,
-            communityId: null == communityId
-                ? _value.communityId
-                : communityId // ignore: cast_nullable_to_non_nullable
-                      as String,
+            community: null == community
+                ? _value.community
+                : community // ignore: cast_nullable_to_non_nullable
+                      as CommunityRefModel,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -166,6 +167,16 @@ class _$CommunityPostModelCopyWithImpl<$Res, $Val extends CommunityPostModel>
   $UserModelCopyWith<$Res> get user {
     return $UserModelCopyWith<$Res>(_value.user, (value) {
       return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
+
+  /// Create a copy of CommunityPostModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CommunityRefModelCopyWith<$Res> get community {
+    return $CommunityRefModelCopyWith<$Res>(_value.community, (value) {
+      return _then(_value.copyWith(community: value) as $Val);
     });
   }
 }
@@ -189,13 +200,15 @@ abstract class _$$CommunityPostModelImplCopyWith<$Res>
     @EmojiConverter() @JsonKey(name: 'isReact') EmojiType? isReact,
     @JsonKey(name: 'privacy_type') PrivacyType privacyType,
     @JsonKey(name: 'communityStatus') String? communityStatus,
-    @JsonKey(name: 'communityId') String communityId,
+    @JsonKey(name: 'communityId') CommunityRefModel community,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
 
   @override
   $UserModelCopyWith<$Res> get user;
+  @override
+  $CommunityRefModelCopyWith<$Res> get community;
 }
 
 /// @nodoc
@@ -221,7 +234,7 @@ class __$$CommunityPostModelImplCopyWithImpl<$Res>
     Object? isReact = freezed,
     Object? privacyType = null,
     Object? communityStatus = freezed,
-    Object? communityId = null,
+    Object? community = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -263,10 +276,10 @@ class __$$CommunityPostModelImplCopyWithImpl<$Res>
             ? _value.communityStatus
             : communityStatus // ignore: cast_nullable_to_non_nullable
                   as String?,
-        communityId: null == communityId
-            ? _value.communityId
-            : communityId // ignore: cast_nullable_to_non_nullable
-                  as String,
+        community: null == community
+            ? _value.community
+            : community // ignore: cast_nullable_to_non_nullable
+                  as CommunityRefModel,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -293,7 +306,7 @@ class _$CommunityPostModelImpl implements _CommunityPostModel {
     @EmojiConverter() @JsonKey(name: 'isReact') this.isReact,
     @JsonKey(name: 'privacy_type') this.privacyType = PrivacyType.public,
     @JsonKey(name: 'communityStatus') this.communityStatus,
-    @JsonKey(name: 'communityId') required this.communityId,
+    @JsonKey(name: 'communityId') required this.community,
     this.createdAt,
     this.updatedAt,
   }) : _urls = urls,
@@ -342,7 +355,7 @@ class _$CommunityPostModelImpl implements _CommunityPostModel {
   // 'pending', 'approved', 'rejected'
   @override
   @JsonKey(name: 'communityId')
-  final String communityId;
+  final CommunityRefModel community;
   @override
   final DateTime? createdAt;
   @override
@@ -350,7 +363,7 @@ class _$CommunityPostModelImpl implements _CommunityPostModel {
 
   @override
   String toString() {
-    return 'CommunityPostModel(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, reacts: $reacts, isReact: $isReact, privacyType: $privacyType, communityStatus: $communityStatus, communityId: $communityId, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityPostModel(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, reacts: $reacts, isReact: $isReact, privacyType: $privacyType, communityStatus: $communityStatus, community: $community, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -369,8 +382,8 @@ class _$CommunityPostModelImpl implements _CommunityPostModel {
                 other.privacyType == privacyType) &&
             (identical(other.communityStatus, communityStatus) ||
                 other.communityStatus == communityStatus) &&
-            (identical(other.communityId, communityId) ||
-                other.communityId == communityId) &&
+            (identical(other.community, community) ||
+                other.community == community) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -390,7 +403,7 @@ class _$CommunityPostModelImpl implements _CommunityPostModel {
     isReact,
     privacyType,
     communityStatus,
-    communityId,
+    community,
     createdAt,
     updatedAt,
   );
@@ -423,7 +436,7 @@ abstract class _CommunityPostModel implements CommunityPostModel {
     @EmojiConverter() @JsonKey(name: 'isReact') final EmojiType? isReact,
     @JsonKey(name: 'privacy_type') final PrivacyType privacyType,
     @JsonKey(name: 'communityStatus') final String? communityStatus,
-    @JsonKey(name: 'communityId') required final String communityId,
+    @JsonKey(name: 'communityId') required final CommunityRefModel community,
     final DateTime? createdAt,
     final DateTime? updatedAt,
   }) = _$CommunityPostModelImpl;
@@ -457,7 +470,7 @@ abstract class _CommunityPostModel implements CommunityPostModel {
   String? get communityStatus; // 'pending', 'approved', 'rejected'
   @override
   @JsonKey(name: 'communityId')
-  String get communityId;
+  CommunityRefModel get community;
   @override
   DateTime? get createdAt;
   @override

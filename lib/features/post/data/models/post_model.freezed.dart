@@ -40,6 +40,14 @@ mixin _$PostModel {
   List<String> get friendsDetail => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(
+    name: 'communityId',
+    fromJson: _parseCommunity,
+    toJson: _serializeCommunity,
+  )
+  CommunityEntity? get community => throw _privateConstructorUsedError;
+  @JsonKey(name: 'communityStatus')
+  String? get communityStatus => throw _privateConstructorUsedError;
 
   /// Serializes this PostModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -69,6 +77,13 @@ abstract class $PostModelCopyWith<$Res> {
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @JsonKey(
+      name: 'communityId',
+      fromJson: _parseCommunity,
+      toJson: _serializeCommunity,
+    )
+    CommunityEntity? community,
+    @JsonKey(name: 'communityStatus') String? communityStatus,
   });
 
   $UserModelCopyWith<$Res> get user;
@@ -101,6 +116,8 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
     Object? friendsDetail = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? community = freezed,
+    Object? communityStatus = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -152,6 +169,14 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            community: freezed == community
+                ? _value.community
+                : community // ignore: cast_nullable_to_non_nullable
+                      as CommunityEntity?,
+            communityStatus: freezed == communityStatus
+                ? _value.communityStatus
+                : communityStatus // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -190,6 +215,13 @@ abstract class _$$PostModelImplCopyWith<$Res>
     @JsonKey(name: 'friends_detail') List<String> friendsDetail,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @JsonKey(
+      name: 'communityId',
+      fromJson: _parseCommunity,
+      toJson: _serializeCommunity,
+    )
+    CommunityEntity? community,
+    @JsonKey(name: 'communityStatus') String? communityStatus,
   });
 
   @override
@@ -222,6 +254,8 @@ class __$$PostModelImplCopyWithImpl<$Res>
     Object? friendsDetail = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? community = freezed,
+    Object? communityStatus = freezed,
   }) {
     return _then(
       _$PostModelImpl(
@@ -273,6 +307,14 @@ class __$$PostModelImplCopyWithImpl<$Res>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        community: freezed == community
+            ? _value.community
+            : community // ignore: cast_nullable_to_non_nullable
+                  as CommunityEntity?,
+        communityStatus: freezed == communityStatus
+            ? _value.communityStatus
+            : communityStatus // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -296,6 +338,13 @@ class _$PostModelImpl implements _PostModel {
     final List<String> friendsDetail = const [],
     this.createdAt,
     this.updatedAt,
+    @JsonKey(
+      name: 'communityId',
+      fromJson: _parseCommunity,
+      toJson: _serializeCommunity,
+    )
+    this.community,
+    @JsonKey(name: 'communityStatus') this.communityStatus,
   }) : _urls = urls,
        _reacts = reacts,
        _friendsExcept = friendsExcept,
@@ -360,6 +409,16 @@ class _$PostModelImpl implements _PostModel {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  @override
+  @JsonKey(
+    name: 'communityId',
+    fromJson: _parseCommunity,
+    toJson: _serializeCommunity,
+  )
+  final CommunityEntity? community;
+  @override
+  @JsonKey(name: 'communityStatus')
+  final String? communityStatus;
 
   @override
   bool operator ==(Object other) {
@@ -386,7 +445,11 @@ class _$PostModelImpl implements _PostModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.community, community) ||
+                other.community == community) &&
+            (identical(other.communityStatus, communityStatus) ||
+                other.communityStatus == communityStatus));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -405,6 +468,8 @@ class _$PostModelImpl implements _PostModel {
     const DeepCollectionEquality().hash(_friendsDetail),
     createdAt,
     updatedAt,
+    community,
+    communityStatus,
   );
 
   /// Create a copy of PostModel
@@ -435,6 +500,13 @@ abstract class _PostModel implements PostModel {
     @JsonKey(name: 'friends_detail') final List<String> friendsDetail,
     final DateTime? createdAt,
     final DateTime? updatedAt,
+    @JsonKey(
+      name: 'communityId',
+      fromJson: _parseCommunity,
+      toJson: _serializeCommunity,
+    )
+    final CommunityEntity? community,
+    @JsonKey(name: 'communityStatus') final String? communityStatus,
   }) = _$PostModelImpl;
 
   factory _PostModel.fromJson(Map<String, dynamic> json) =
@@ -471,6 +543,16 @@ abstract class _PostModel implements PostModel {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  @JsonKey(
+    name: 'communityId',
+    fromJson: _parseCommunity,
+    toJson: _serializeCommunity,
+  )
+  CommunityEntity? get community;
+  @override
+  @JsonKey(name: 'communityStatus')
+  String? get communityStatus;
 
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.

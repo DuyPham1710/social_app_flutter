@@ -29,7 +29,9 @@ _$CommunityPostModelImpl _$$CommunityPostModelImplFromJson(
       $enumDecodeNullable(_$PrivacyTypeEnumMap, json['privacy_type']) ??
       PrivacyType.public,
   communityStatus: json['communityStatus'] as String?,
-  communityId: json['communityId'] as String,
+  community: CommunityRefModel.fromJson(
+    json['communityId'] as Map<String, dynamic>,
+  ),
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -53,7 +55,7 @@ Map<String, dynamic> _$$CommunityPostModelImplToJson(
   ),
   'privacy_type': _$PrivacyTypeEnumMap[instance.privacyType]!,
   'communityStatus': instance.communityStatus,
-  'communityId': instance.communityId,
+  'communityId': instance.community,
   'createdAt': instance.createdAt?.toIso8601String(),
   'updatedAt': instance.updatedAt?.toIso8601String(),
 };

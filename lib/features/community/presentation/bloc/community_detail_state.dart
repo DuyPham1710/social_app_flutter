@@ -24,22 +24,11 @@ class CommunityDetailLoaded extends CommunityDetailState {
   });
 }
 
-class CommunityPostsLoaded extends CommunityDetailState {
-  final List<CommunityPostModel> posts;
-  final int page;
-  final int limit;
-
-  const CommunityPostsLoaded({
-    required this.posts,
-    required this.page,
-    required this.limit,
-  });
-}
-
 class CommunityActionSuccess extends CommunityDetailState {
   final String message;
+  final String? requestId; // For tracking which invite was responded to
 
-  const CommunityActionSuccess(this.message);
+  const CommunityActionSuccess(this.message, {this.requestId});
 }
 
 class CommunityDetailError extends CommunityDetailState {

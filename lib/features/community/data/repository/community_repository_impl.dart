@@ -1,12 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/data_sources/remote/community_remote_data_source.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
+import 'package:social_app_fe/features/community/data/models/member_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_status_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_post_list_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
 import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
+import 'package:social_app_fe/shared/models/api_response.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 
@@ -83,7 +88,7 @@ class CommunityRepositoryImpl implements CommunityRepository {
   }
 
   @override
-  Future<DataState<List<CommunityRequestModel>>> getMyInvites() async {
+  Future<DataState<List<dynamic>>> getMyInvites() async {
     try {
       final response = await _remoteDataSource.getMyInvites();
       return DataStateSuccess(response);
@@ -158,7 +163,7 @@ class CommunityRepositoryImpl implements CommunityRepository {
         page: page,
         limit: limit,
       );
-      return DataStateSuccess(response);
+      return DataStateSuccess(response.data);
     } on DioException catch (e) {
       return DataStateError(e);
     }
@@ -229,6 +234,38 @@ class CommunityRepositoryImpl implements CommunityRepository {
   }
 
   @override
+  Future<DataState<List<dynamic>>> getAvailableFriends({
+    required String communityId,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getAvailableFriends(
+        communityId: communityId,
+      );
+      // Convert dynamic response to List<dynamic>
+      List<dynamic> friendsList = response is List ? response : [];
+      return DataStateSuccess(friendsList);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> inviteFriend({
+    required String communityId,
+    required String userId,
+  }) async {
+    try {
+      await _remoteDataSource.inviteFriend(
+        communityId: communityId,
+        body: {'userId': userId},
+      );
+      return DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
   Future<DataState<List<CommunityRequestModel>>> getPendingRequests(
     String communityId,
   ) async {
@@ -288,7 +325,7 @@ class CommunityRepositoryImpl implements CommunityRepository {
         page: page,
         limit: limit,
       );
-      return DataStateSuccess(response);
+      return DataStateSuccess(response.data);
     } on DioException catch (e) {
       return DataStateError(e);
     }
@@ -306,9 +343,20 @@ class CommunityRepositoryImpl implements CommunityRepository {
         page: page,
         limit: limit,
       );
-      return DataStateSuccess(response);
+      // Extract posts from CommunityPostListModel
+      return DataStateSuccess(response.data);
     } on DioException catch (e) {
+      debugPrint('[getPendingPosts] DioException: ${e.message}');
       return DataStateError(e);
+    } catch (e, stackTrace) {
+      debugPrint('[getPendingPosts] Exception: $e');
+      debugPrint('[getPendingPosts] StackTrace: $stackTrace');
+      return DataStateError(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          error: e.toString(),
+        ),
+      );
     }
   }
 

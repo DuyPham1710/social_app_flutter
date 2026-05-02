@@ -186,19 +186,25 @@ class _FriendCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
-              child: Image.network(
-                avatarUrl,
-                width: double.infinity,
-                height: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: Colors.grey.shade100,
-                  height: 100,
-                  child: const Icon(Icons.person, size: 40, color: Colors.grey),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: Image.network(
+                  avatarUrl,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: Colors.grey.shade100,
+                    height: double.infinity,
+                    child: const Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
               ),
             ),

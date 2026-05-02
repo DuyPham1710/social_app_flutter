@@ -5,10 +5,13 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_posts_tab_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_list_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/my_communities_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/my_invites_widget.dart';
+import 'package:social_app_fe/features/community/presentation/widgets/pending_communities_widget.dart';
 import 'package:social_app_fe/features/community/presentation/pages/create_community_page.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -48,10 +51,15 @@ class _CommunityPageState extends State<CommunityPage>
         providerContext.read<CommunityListBloc>().add(const MyInvitesFetched());
         break;
       case 3:
-        // Pending approvals - to be implemented
+        providerContext.read<CommunityListBloc>().add(
+          const PendingCommunitiesFetched(),
+        );
         break;
       case 4:
-        // Community posts - to be implemented
+        // Community posts tab
+        providerContext.read<CommunityPostsTabBloc>().add(
+          const CommunityPostsTabFetched(status: 'all'),
+        );
         break;
     }
   }
@@ -118,6 +126,9 @@ class _CommunityPageState extends State<CommunityPage>
         ),
         BlocProvider<CommunityAdminBloc>(
           create: (context) => s1<CommunityAdminBloc>(),
+        ),
+        BlocProvider<CommunityPostsTabBloc>(
+          create: (context) => s1<CommunityPostsTabBloc>(),
         ),
       ],
       child: Builder(
@@ -391,41 +402,116 @@ class _CommunityPageState extends State<CommunityPage>
   }
 }
 
-// Tab: Chờ duyệt - Communities pending approval
-class PendingCommunitiesWidget extends StatelessWidget {
-  const PendingCommunitiesWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.hourglass_empty_rounded,
-            size: 54,
-            color: Color(0xFFD1D5DB),
-          ),
-          SizedBox(height: 12),
-          Text(
-            'Chưa có cộng đồng nào đang chờ duyệt',
-            style: TextStyle(
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // Tab: Các bài viết - Community posts
-class CommunityPostsWidget extends StatelessWidget {
+class CommunityPostsWidget extends StatefulWidget {
   const CommunityPostsWidget({super.key});
 
   @override
+  State<CommunityPostsWidget> createState() => _CommunityPostsWidgetState();
+}
+
+class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
+  @override
   Widget build(BuildContext context) {
+    return BlocBuilder<CommunityPostsTabBloc, CommunityPostsTabState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            // Filter buttons
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  _buildFilterButton('all', 'Tất cả', state),
+                  const SizedBox(width: 8),
+                  _buildFilterButton('pending', 'Chờ duyệt', state),
+                  const SizedBox(width: 8),
+                  _buildFilterButton('approved', 'Đã duyệt', state),
+                ],
+              ),
+            ),
+            // Posts list
+            Expanded(child: _buildPostsList(state)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildFilterButton(
+    String status,
+    String label,
+    CommunityPostsTabState state,
+  ) {
+    final isSelected =
+        state is CommunityPostsTabLoaded && state.status == status;
+    return GestureDetector(
+      onTap: () {
+        context.read<CommunityPostsTabBloc>().add(
+          CommunityPostsTabStatusChanged(status: status),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.grey[200],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[600],
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostsList(CommunityPostsTabState state) {
+    if (state is CommunityPostsTabLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is CommunityPostsTabError) {
+      return Center(child: Text('Lỗi: ${state.message}'));
+    }
+
+    if (state is CommunityPostsTabLoaded) {
+      if (state.posts.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.article_outlined, size: 54, color: Colors.grey[400]),
+              const SizedBox(height: 12),
+              Text(
+                'Chưa có bài viết nào',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return ListView.builder(
+        itemCount: state.posts.length,
+        itemBuilder: (context, index) {
+          final post = state.posts[index];
+          final commentCount = state.commentCounts[post.id] ?? 0;
+          return PostItem(
+            post: post,
+            commentCount: commentCount,
+            isInCommunityDetail: false,
+          );
+        },
+      );
+    }
+
     return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

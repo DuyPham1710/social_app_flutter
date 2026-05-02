@@ -29,3 +29,7 @@ class MyCommunitiesFetched extends CommunityListEvent {
 class MyInvitesFetched extends CommunityListEvent {
   const MyInvitesFetched();
 }
+
+class PendingCommunitiesFetched extends CommunityListEvent {
+  const PendingCommunitiesFetched();
+}

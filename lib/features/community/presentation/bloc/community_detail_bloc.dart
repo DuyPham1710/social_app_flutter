@@ -1,13 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_community_detail_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_member_status_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/join_community_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/cancel_join_request_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/leave_community_usecase.dart';
-import 'package:social_app_fe/features/community/domain/usecases/get_community_posts_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
 
 part 'community_detail_event.dart';
@@ -20,16 +19,25 @@ class CommunityDetailBloc
   final JoinCommunityUseCase _joinCommunityUseCase;
   final CancelJoinRequestUseCase _cancelJoinRequestUseCase;
   final LeaveCommunityUseCase _leaveCommunityUseCase;
-  final GetCommunityPostsUseCase _getCommunityPostsUseCase;
   final RespondToInviteUseCase _respondToInviteUseCase;
 
-  CommunityDetailBloc(
+  factory CommunityDetailBloc() {
+    return CommunityDetailBloc.withDeps(
+      s1<GetCommunityDetailUseCase>(),
+      s1<GetMemberStatusUseCase>(),
+      s1<JoinCommunityUseCase>(),
+      s1<CancelJoinRequestUseCase>(),
+      s1<LeaveCommunityUseCase>(),
+      s1<RespondToInviteUseCase>(),
+    );
+  }
+
+  CommunityDetailBloc.withDeps(
     this._getCommunityDetailUseCase,
     this._getMemberStatusUseCase,
     this._joinCommunityUseCase,
     this._cancelJoinRequestUseCase,
     this._leaveCommunityUseCase,
-    this._getCommunityPostsUseCase,
     this._respondToInviteUseCase,
   ) : super(const CommunityDetailInitial()) {
     on<CommunityDetailFetched>(_onCommunityDetailFetched);
@@ -38,7 +46,6 @@ class CommunityDetailBloc
     on<LeaveCommunityRequested>(_onLeaveCommunityRequested);
     on<MemberStatusFetched>(_onMemberStatusFetched);
     on<RespondToInviteRequested>(_onRespondToInviteRequested);
-    on<GetCommunityPostsRequested>(_onGetCommunityPostsRequested);
   }
 
   Future<void> _onCommunityDetailFetched(
@@ -197,41 +204,11 @@ class CommunityDetailBloc
             event.action == 'approve'
                 ? 'Đã chấp nhận lời mời'
                 : 'Đã từ chối lời mời',
+            requestId: event.requestId,
           ),
         );
         // Refresh
         add(CommunityDetailFetched(event.communityId));
-      } else if (dataState is DataStateError) {
-        final errorMessage =
-            '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
-        emit(CommunityDetailError(errorMessage));
-      }
-    } catch (e) {
-      emit(CommunityDetailError('Đã xảy ra lỗi: ${e.toString()}'));
-    }
-  }
-
-  Future<void> _onGetCommunityPostsRequested(
-    GetCommunityPostsRequested event,
-    Emitter<CommunityDetailState> emit,
-  ) async {
-    try {
-      final dataState = await _getCommunityPostsUseCase(
-        params: GetCommunityPostsParams(
-          communityId: event.communityId,
-          page: event.page,
-          limit: event.limit,
-        ),
-      );
-
-      if (dataState is DataStateSuccess) {
-        emit(
-          CommunityPostsLoaded(
-            posts: dataState.data!,
-            page: event.page,
-            limit: event.limit,
-          ),
-        );
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';

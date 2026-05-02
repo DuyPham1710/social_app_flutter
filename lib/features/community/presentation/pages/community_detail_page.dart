@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/widgets/community_create_post_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_admin_panel.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_detail_header.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_members_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_posts_widget.dart';
-import 'package:social_app_fe/features/post/presentation/pages/create_post_page.dart';
+import 'package:social_app_fe/features/community/presentation/widgets/invite_friends_bottom_sheet.dart';
+import 'package:social_app_fe/features/community/presentation/pages/community_create_post_page.dart';
 
 class CommunityDetailPage extends StatefulWidget {
   final String communityId;
@@ -21,6 +23,8 @@ class CommunityDetailPage extends StatefulWidget {
 class _CommunityDetailPageState extends State<CommunityDetailPage> {
   int _refreshSeed = 0;
 
+  static const Color _pageBackground = Color(0xFFF0F2F5);
+
   void _refreshContent(BuildContext context) {
     setState(() {
       _refreshSeed++;
@@ -30,11 +34,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     );
   }
 
-  void _openCreatePost(BuildContext context) {
+  void _openCreatePost(BuildContext context, String? userRole) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => CreatePostPage(
+        builder: (_) => CommunityCreatePostPage(
           communityId: widget.communityId,
+          userRole: userRole,
           onPostCreated: () => _refreshContent(context),
         ),
       ),
@@ -79,57 +84,73 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     );
   }
 
+  void _showInviteFriendsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      builder: (context) =>
+          InviteFriendsBottomSheet(communityId: widget.communityId),
+    );
+  }
+
   Widget _buildMembersButton(BuildContext context, int membersCount) {
-    return GestureDetector(
-      onTap: () => _showMembersBottomSheet(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE4E7EC)),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x120F172A),
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.people_alt_outlined,
-                color: Color(0xFF0F766E),
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Thành viên',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1F2937),
-                      ),
-                    ),
-                    Text(
-                      '$membersCount thành viên',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
-                      ),
-                    ),
-                  ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () => _showMembersBottomSheet(context),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE7F3FF),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.group_rounded,
+                    color: Color(0xFF1877F2),
+                    size: 22,
+                  ),
                 ),
-              ),
-              const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Thành viên',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1C1E21),
+                        ),
+                      ),
+                      Text(
+                        '$membersCount thành viên',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF65676B),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.keyboard_arrow_right_rounded,
+                  color: Color(0xFF65676B),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -150,7 +171,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: const Color(0xFFF4F7FB),
+        backgroundColor: _pageBackground,
         body: BlocConsumer<CommunityDetailBloc, CommunityDetailState>(
           listener: (context, state) {
             if (state is CommunityActionSuccess) {
@@ -207,15 +228,34 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
                     SliverAppBar(
+                      titleSpacing: 0,
                       title: Text(
                         state.community.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF1C1E21),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      centerTitle: false,
-                      expandedHeight: 220,
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back_rounded),
+                        color: const Color(0xFF1C1E21),
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                      actions: [
+                        IconButton(
+                          icon: const Icon(Icons.more_horiz_rounded),
+                          color: const Color(0xFF1C1E21),
+                          onPressed: () {},
+                        ),
+                      ],
+                      expandedHeight: 240,
                       pinned: true,
-                      backgroundColor: const Color(0xFFF4F7FB),
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF1C1E21),
+                      surfaceTintColor: Colors.transparent,
+                      scrolledUnderElevation: 0,
                       flexibleSpace: FlexibleSpaceBar(
                         background:
                             (state.community.coverImage?.isNotEmpty ?? false)
@@ -224,9 +264,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(
-                                      Icons.image_not_supported,
+                                    color: const Color(0xFFBCC0C4),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        color: Color(0xFF65676B),
+                                        size: 36,
+                                      ),
                                     ),
                                   );
                                 },
@@ -234,18 +278,20 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                             : Container(
                                 decoration: const BoxDecoration(
                                   gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
                                     colors: [
-                                      Color(0xFF0EA5E9),
-                                      Color(0xFF1D4ED8),
+                                      Color(0xFF3A3B3C),
+                                      Color(0xFF242526),
                                     ],
                                   ),
                                 ),
-                                child: const Icon(
-                                  Icons.groups,
-                                  size: 48,
-                                  color: Colors.white,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.groups_rounded,
+                                    size: 52,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                       ),
@@ -254,6 +300,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 8),
                           CommunityDetailHeader(
                             community: state.community,
                             memberStatus: state.memberStatus,
@@ -272,9 +319,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                 context.read<CommunityDetailBloc>().add(
                                   LeaveCommunityRequested(widget.communityId),
                                 ),
-                            onCreatePost: isMember
-                                ? () => _openCreatePost(context)
-                                : null,
                             onManage: state.userRole == 'admin'
                                 ? () {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -287,26 +331,100 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                   }
                                 : null,
                           ),
-                          if (state.userRole == 'admin')
-                            CommunityAdminPanel(
-                              communityId: widget.communityId,
-                            ),
-                          const SizedBox(height: 16),
+
                           _buildMembersButton(
                             context,
                             state.community.memberCount ?? 0,
                           ),
-                          const SizedBox(height: 16),
+                          if (isMember)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              child: Material(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(14),
+                                  onTap: () =>
+                                      _showInviteFriendsBottomSheet(context),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 42,
+                                          height: 42,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFE7F3FF),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.person_add_rounded,
+                                            color: Color(0xFF1877F2),
+                                            size: 22,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        const Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Mời bạn bè',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF1C1E21),
+                                                ),
+                                              ),
+                                              Text(
+                                                'Mời bạn bè tham gia',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Color(0xFF65676B),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Icon(
+                                          Icons.keyboard_arrow_right_rounded,
+                                          color: Color(0xFF65676B),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (state.userRole == 'admin')
+                            CommunityAdminPanel(
+                              communityId: widget.communityId,
+                            ),
+                          const SizedBox(height: 8),
+                          if (isMember)
+                            CommunityCreatePostWidget(
+                              avatarUrl: state.community.avatar,
+                              onCreatePost: () =>
+                                  _openCreatePost(context, state.userRole),
+                            ),
+                          const SizedBox(height: 8),
                           CommunityPostsWidget(
                             communityId: widget.communityId,
                             refreshSeed: _refreshSeed,
-                            canCreatePost: isMember,
                             canViewPosts: isMember,
-                            onCreatePost: isMember
-                                ? () => _openCreatePost(context)
-                                : null,
+                            userRole: state.userRole,
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 22),
                         ],
                       ),
                     ),
@@ -318,33 +436,6 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             return const Center(child: Text(''));
           },
         ),
-        floatingActionButton:
-            BlocBuilder<CommunityDetailBloc, CommunityDetailState>(
-              builder: (context, state) {
-                final canCreatePost =
-                    state is CommunityDetailLoaded &&
-                    (state.memberStatus == 'member' ||
-                        state.userRole == 'admin');
-
-                if (!canCreatePost) return const SizedBox.shrink();
-
-                return FloatingActionButton.extended(
-                  onPressed: () => _openCreatePost(context),
-                  backgroundColor: const Color(0xFF0F766E),
-                  icon: const Icon(
-                    Icons.edit_note_rounded,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Đăng bài',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                );
-              },
-            ),
       ),
     );
   }

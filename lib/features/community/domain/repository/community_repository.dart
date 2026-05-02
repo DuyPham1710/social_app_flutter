@@ -24,7 +24,7 @@ abstract class CommunityRepository {
 
   Future<DataState<List<CommunityModel>>> getMyCommunities();
 
-  Future<DataState<List<CommunityRequestModel>>> getMyInvites();
+  Future<DataState<List<dynamic>>> getMyInvites();
 
   Future<DataState<CommunityModel>> getCommunityDetail(String communityId);
 
@@ -76,6 +76,15 @@ abstract class CommunityRepository {
   });
 
   Future<DataState<void>> inviteMember({
+    required String communityId,
+    required String userId,
+  });
+
+  Future<DataState<List<dynamic>>> getAvailableFriends({
+    required String communityId,
+  });
+
+  Future<DataState<void>> inviteFriend({
     required String communityId,
     required String userId,
   });

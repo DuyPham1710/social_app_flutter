@@ -3,6 +3,7 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_url_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/features/community/domain/entities/community_entity.dart';
 
 class PostEntity extends PrivacyBase {
   final String id;
@@ -14,6 +15,8 @@ class PostEntity extends PrivacyBase {
   final EmojiType? isReact;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final CommunityEntity? community;
+  final String? communityStatus;
 
   const PostEntity({
     required this.id,
@@ -28,10 +31,12 @@ class PostEntity extends PrivacyBase {
     super.friendsDetail,
     this.createdAt,
     this.updatedAt,
+    this.community,
+    this.communityStatus,
   });
 
   @override
   String toString() {
-    return 'PostEntity(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, privacyType: $privacyType)';
+    return 'PostEntity(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, privacyType: $privacyType, community: $community)';
   }
 }

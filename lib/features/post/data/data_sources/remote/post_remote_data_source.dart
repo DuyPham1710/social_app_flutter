@@ -52,6 +52,20 @@ abstract class PostRemoteDataSource {
     @Query('limit') int limit,
   );
 
+  @GET('/community/{communityId}/posts')
+  Future<PostListModel> getCommunityPosts(
+    @Path('communityId') String communityId,
+    @Query('page') int page,
+    @Query('limit') int limit,
+  );
+
+  @GET('/post/community-posts/user')
+  Future<PostListModel> getUserCommunityPosts(
+    @Query('page') int page,
+    @Query('limit') int limit,
+    @Query('status') String status,
+  );
+
   @POST('/post/{postId}/report')
   Future<void> reportPost(
     @Path('postId') String postId,

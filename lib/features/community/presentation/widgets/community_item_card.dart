@@ -40,182 +40,196 @@ class _CommunityItemState extends State<CommunityItem> {
     final isPrivate =
         ((widget.community.status ?? 'public').toString() == 'private');
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
-        boxShadow: [
-          const BoxShadow(
-            color: Color(0x0F0F172A),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-              // Avatar with type badge
-              Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      backgroundImage: avatarUrl != null
-                          ? NetworkImage(avatarUrl)
-                          : null,
-                      child: avatarUrl == null
-                          ? const Icon(
-                              Icons.groups_rounded,
-                              color: AppColors.primary,
-                              size: 30,
-                            )
-                          : null,
-                    ),
-                  ),
-                  Positioned(
-                    top: -4,
-                    left: -4,
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFFDDE3EA),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 4,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        isPrivate ? Icons.lock_rounded : Icons.public_rounded,
-                        size: 12,
-                        color: isPrivate
-                            ? const Color(0xFF6B7280)
-                            : const Color(0xFF0F766E),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 12),
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Text(
-                          widget.community.name,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1F2937),
-                          ),
-                        ),
-                        if (_myRole == 'admin')
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFDEF7EC),
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: const Color(0xFF86EFAC),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: const Text(
-                              'Quản trị viên',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF15803D),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.people_outline_rounded,
-                                    size: 13,
-                                    color: Color(0xFF6B7280),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${widget.community.memberCount} thành viên',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFF6B7280),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (description.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    description,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF9CA3AF),
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        _buildActionButton(context),
-                      ],
-                    ),
-                  ],
-                ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  CommunityDetailPage(communityId: widget.community.id),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
+            boxShadow: [
+              const BoxShadow(
+                color: Color(0x0F0F172A),
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
             ],
           ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Avatar with type badge
+                Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.white,
+                        backgroundImage: avatarUrl != null
+                            ? NetworkImage(avatarUrl)
+                            : null,
+                        child: avatarUrl == null
+                            ? const Icon(
+                                Icons.groups_rounded,
+                                color: AppColors.primary,
+                                size: 30,
+                              )
+                            : null,
+                      ),
+                    ),
+                    Positioned(
+                      top: -4,
+                      left: -4,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFDDE3EA),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          isPrivate ? Icons.lock_rounded : Icons.public_rounded,
+                          size: 12,
+                          color: isPrivate
+                              ? const Color(0xFF6B7280)
+                              : const Color(0xFF0F766E),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 12),
+                // Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Text(
+                            widget.community.name,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          if (_myRole == 'admin')
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDEF7EC),
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: const Color(0xFF86EFAC),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: const Text(
+                                'Quản trị viên',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF15803D),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.people_outline_rounded,
+                                      size: 13,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${widget.community.memberCount} thành viên',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF6B7280),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (description.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF9CA3AF),
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          _buildActionButton(context),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildActionButton(BuildContext context) {
@@ -269,9 +283,6 @@ class _CommunityItemState extends State<CommunityItem> {
       return OutlinedButton(
         style: outlineStyle,
         onPressed: () {
-          setState(() {
-            _memberStatus = null; // Optimistic update: show "Tham gia" again
-          });
           context.read<CommunityDetailBloc>().add(
             CancelJoinRequestRequested(widget.community.id),
           );
@@ -281,17 +292,27 @@ class _CommunityItemState extends State<CommunityItem> {
     }
 
     // Chưa tham gia (memberStatus == null hoặc không tồn tại)
-    return FilledButton(
-      style: buttonStyle,
-      onPressed: () {
-        setState(() {
-          _memberStatus = 'pending'; // Optimistic update: show "Hủy yêu cầu"
-        });
-        context.read<CommunityDetailBloc>().add(
-          JoinCommunityRequested(widget.community.id),
-        );
+    return BlocListener<CommunityDetailBloc, CommunityDetailState>(
+      listener: (context, state) {
+        // Cập nhật memberStatus khi CommunityDetailLoaded được emit
+        if (state is CommunityDetailLoaded &&
+            widget.community.id == state.community.id) {
+          setState(() {
+            _memberStatus = state.memberStatus;
+            _myRole = state.userRole;
+          });
+        }
       },
-      child: const Text('Tham gia'),
+      child: FilledButton(
+        style: buttonStyle,
+        onPressed: () {
+          // Gửi request join mà không dùng optimistic update
+          context.read<CommunityDetailBloc>().add(
+            JoinCommunityRequested(widget.community.id),
+          );
+        },
+        child: const Text('Tham gia'),
+      ),
     );
   }
 

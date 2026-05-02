@@ -10,6 +10,8 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/community_post_header.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/community_post_header_base.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
@@ -27,8 +29,16 @@ class PostItem extends StatefulWidget {
   final PostEntity post;
   final int commentCount;
   final bool isSaved;
+  final bool
+  isInCommunityDetail; // Nếu true, dùng CommunityPostHeaderBase cho posts có community
 
-  const PostItem({super.key, required this.post, this.commentCount = 0, this.isSaved = false});
+  const PostItem({
+    super.key,
+    required this.post,
+    this.commentCount = 0,
+    this.isSaved = false,
+    this.isInCommunityDetail = false,
+  });
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -52,7 +62,10 @@ class _PostItemState extends State<PostItem> {
   }
 
   Future<void> _checkSavedStatus() async {
-    final result = await _saveRepository.checkSaved(targetId: widget.post.id, type: 'post');
+    final result = await _saveRepository.checkSaved(
+      targetId: widget.post.id,
+      type: 'post',
+    );
     if (result is DataStateSuccess && result.data == true) {
       if (mounted) {
         setState(() {
@@ -67,19 +80,22 @@ class _PostItemState extends State<PostItem> {
   }
 
   Future<void> _fetchSavedId() async {
-     final listResult = await _saveRepository.getSavedByUser(type: 'post', limit: 50);
-     if (listResult is DataStateSuccess && listResult.data != null) {
-       for (var item in listResult.data!.data) {
-         if (item.targetId == widget.post.id) {
-           if (mounted) {
-             setState(() {
-               _savedId = item.id;
-             });
-           }
-           break;
-         }
-       }
-     }
+    final listResult = await _saveRepository.getSavedByUser(
+      type: 'post',
+      limit: 50,
+    );
+    if (listResult is DataStateSuccess && listResult.data != null) {
+      for (var item in listResult.data!.data) {
+        if (item.targetId == widget.post.id) {
+          if (mounted) {
+            setState(() {
+              _savedId = item.id;
+            });
+          }
+          break;
+        }
+      }
+    }
   }
 
   Future<void> _handleUnsave() async {
@@ -224,38 +240,77 @@ class _PostItemState extends State<PostItem> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          PostHeader(
-            user: user,
-            createdAt: widget.post.createdAt,
-            onOptionsTap: () {
-              PostOptionsBottomSheet.show(context, post: widget.post);
-            },
-            isSaved: _isSaved,
-            onReportTap: () {
-              ReportPostBottomSheet.show(
-                context,
-                postId: widget.post.id,
-                ownerUserId: user.userId,
-              );
-            },
-            onSaveTap: () {
-              if (_isSaved) {
-                _handleUnsave();
-              } else {
-                SavePostBottomSheet.show(
+          // Header - chọn header dựa trên loại post (kiểm tra communityStatus)
+          if (widget.post.communityStatus != null) ...[
+            // Post trong community
+            if (widget.isInCommunityDetail)
+              // Trong community detail: dùng CommunityPostHeaderBase (header đơn giản)
+              CommunityPostHeaderBase(
+                user: user,
+                createdAt: widget.post.createdAt,
+                onOptionsTap: () {
+                  PostOptionsBottomSheet.show(context, post: widget.post);
+                },
+                onReportTap: () {
+                  ReportPostBottomSheet.show(
+                    context,
+                    postId: widget.post.id,
+                    ownerUserId: user.userId,
+                  );
+                },
+              )
+            else
+              // Ngoài community: dùng CommunityPostHeader (header full với community info)
+              CommunityPostHeader(
+                community: widget.post.community,
+                user: user,
+                createdAt: widget.post.createdAt,
+                showCommunityInfo: true,
+                onOptionsTap: () {
+                  PostOptionsBottomSheet.show(context, post: widget.post);
+                },
+                onReportTap: () {
+                  ReportPostBottomSheet.show(
+                    context,
+                    postId: widget.post.id,
+                    ownerUserId: user.userId,
+                  );
+                },
+              ),
+          ] else ...[
+            // Post bình thường: dùng PostHeader
+            PostHeader(
+              user: user,
+              createdAt: widget.post.createdAt,
+              onOptionsTap: () {
+                PostOptionsBottomSheet.show(context, post: widget.post);
+              },
+              isSaved: _isSaved,
+              onReportTap: () {
+                ReportPostBottomSheet.show(
                   context,
-                  post: widget.post,
-                  onSaved: (savedId) {
-                    setState(() {
-                      _isSaved = true;
-                      _savedId = savedId;
-                    });
-                  },
+                  postId: widget.post.id,
+                  ownerUserId: user.userId,
                 );
-              }
-            },
-          ),
+              },
+              onSaveTap: () {
+                if (_isSaved) {
+                  _handleUnsave();
+                } else {
+                  SavePostBottomSheet.show(
+                    context,
+                    post: widget.post,
+                    onSaved: (savedId) {
+                      setState(() {
+                        _savedId = savedId;
+                        _isSaved = true;
+                      });
+                    },
+                  );
+                }
+              },
+            ),
+          ],
 
           // Caption + dịch
           if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
@@ -278,33 +333,36 @@ class _PostItemState extends State<PostItem> {
 
           SizedBox(height: 8.h),
 
-          // Likes info
-          GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return ModalComment(
-                    postId: widget.post.id,
-                    reacts: _localReacts,
-                  );
-                },
-              );
-            },
-            child: PostReactInfo(reacts: _localReacts),
-          ),
+          // Likes info - ẩn nếu bài viết đang chờ duyệt
+          if (widget.post.communityStatus != 'pending')
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalComment(
+                      postId: widget.post.id,
+                      reacts: _localReacts,
+                    );
+                  },
+                );
+              },
+              child: PostReactInfo(reacts: _localReacts),
+            ),
 
           SizedBox(height: 20.h),
 
-          PostAction(
-            postId: widget.post.id,
-            reactCount: _localReacts.length,
-            isReact: _currentUserReaction,
-            reacts: _localReacts,
-            commentCount: widget.commentCount,
-            onReactionChanged: _onReactionChanged,
-          ),
+          // Post actions (like, comment, share) - ẩn nếu bài viết đang chờ duyệt
+          if (widget.post.communityStatus != 'pending')
+            PostAction(
+              postId: widget.post.id,
+              reactCount: _localReacts.length,
+              isReact: _currentUserReaction,
+              reacts: _localReacts,
+              commentCount: widget.commentCount,
+              onReactionChanged: _onReactionChanged,
+            ),
         ],
       ),
     );

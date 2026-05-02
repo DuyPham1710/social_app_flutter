@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
@@ -133,6 +134,14 @@ class CommunityAdminBloc
             event.action == 'approve'
                 ? 'Đã duyệt bài viết'
                 : 'Đã từ chối bài viết',
+          ),
+        );
+        // Refresh pending posts list
+        add(
+          GetPendingPostsRequested(
+            communityId: event.communityId,
+            page: 1,
+            limit: 10,
           ),
         );
       } else if (dataState is DataStateError) {
