@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
 
 class PostReportNotificationItem extends StatelessWidget {
@@ -25,7 +24,8 @@ class PostReportNotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotificationBaseItem(
       isRead: isRead,
-      avatarUrl: 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg', // System/Admin avatar
+      avatarUrl:
+          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg', // System/Admin avatar
       userId: null,
       onAvatarTap: null, // Không có action cho avatar
       title: RichText(
@@ -45,20 +45,13 @@ class PostReportNotificationItem extends StatelessWidget {
           ],
         ),
       ),
-      preview: note != null && note!.isNotEmpty 
-          ? note 
-          : null,
+      preview: note != null && note!.isNotEmpty ? note : null,
       time: time,
       iconOverlay: const CircleAvatar(
         radius: 12,
         backgroundColor: Colors.red,
-        child: Icon(
-          Icons.warning_amber_rounded,
-          color: Colors.white,
-          size: 16,
-        ),
+        child: Icon(Icons.warning_amber_rounded, color: Colors.white, size: 16),
       ),
     );
   }
 }
-

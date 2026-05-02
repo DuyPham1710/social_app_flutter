@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_online_service.dart';
@@ -48,7 +49,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
       if (userId.isEmpty) return;
 
       // Khởi tạo service
-      final socketClient = SocketClient();
+      final socketClient = s1<SocketClient>(instanceName: 'friendSocket');
       _onlineService = FriendOnlineService(socketClient);
       
       // Kết nối và lắng nghe

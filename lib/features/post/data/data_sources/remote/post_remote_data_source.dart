@@ -25,6 +25,9 @@ abstract class PostRemoteDataSource {
   @GET('/post/{postId}')
   Future<PostModel> getPostDetail(@Path('postId') String postId);
 
+  @POST('/post/{postId}/view')
+  Future<void> viewPost(@Path('postId') String postId);
+
   @GET('/post')
   Future<PostListModel> getProfilePosts(
     @Query('page') int page,

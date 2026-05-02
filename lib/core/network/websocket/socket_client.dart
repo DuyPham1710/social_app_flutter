@@ -58,7 +58,7 @@ class SocketClient {
       developer.log('Connected to $namespace', name: 'SocketClient');
 
       // Emit register event sau khi connect
-      _socket!.emit('register', {'userId': userId, 'username': username});
+      _socket?.emit('register', {'userId': userId, 'username': username});
     });
 
     _socket!.onDisconnect((_) {

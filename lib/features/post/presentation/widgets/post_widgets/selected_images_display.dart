@@ -16,6 +16,7 @@ class SelectedImagesDisplay extends StatefulWidget {
   final Function(List<AssetEntity>)? onRemove;
   final Function(int index)? onRemoveAtIndex;
   final Function(LayoutType layout)? onChangedLayout;
+  final Function(int index, File newFile)? onImageEdited;
 
   const SelectedImagesDisplay({
     super.key,
@@ -24,6 +25,7 @@ class SelectedImagesDisplay extends StatefulWidget {
     this.onRemove,
     this.onRemoveAtIndex,
     this.onChangedLayout,
+    this.onImageEdited,
   });
 
   @override
@@ -205,6 +207,16 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           onAdd: widget.onEdit,
           onRemoveAtIndex: (removeIndex) {
             widget.onRemoveAtIndex?.call(removeIndex);
+          },
+          onImageEdited: (editedIndex, newFile) {
+            widget.onImageEdited?.call(editedIndex, newFile);
+
+            // Also update the local list immediately to reflect the new image
+            if (mounted && editedIndex < _imageFiles.length) {
+              setState(() {
+                _imageFiles[editedIndex] = newFile;
+              });
+            }
           },
         ),
       ),

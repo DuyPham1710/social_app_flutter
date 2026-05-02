@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/data/services/chat_presence_service.dart';
 import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
 
@@ -14,6 +19,7 @@ class ChatAppbar extends StatefulWidget {
   final UserEntity? friendInfo;
   final String? conversationId;
   final String userId;
+  final String username;
   final Function(String callType)? onInitiateCall;
 
   const ChatAppbar({
@@ -25,6 +31,7 @@ class ChatAppbar extends StatefulWidget {
     this.friendInfo,
     required this.conversationId,
     required this.userId,
+    required this.username,
     this.onInitiateCall,
   });
 
@@ -34,11 +41,71 @@ class ChatAppbar extends StatefulWidget {
 
 class _ChatAppbarState extends State<ChatAppbar> {
   late String _displayName;
+  SocketClient? _presenceSocketClient;
+  ChatPresenceService? _presenceService;
+  StreamSubscription<Map<String, ChatPresenceStatus>>? _presenceSub;
+  ChatPresenceStatus? _friendPresence;
+  Timer? _relativeTimeTimer;
 
   @override
   void initState() {
     super.initState();
     _updateDisplayName();
+    _initPresence();
+  }
+
+  void _initPresence() {
+    if (widget.isGroup) return;
+    final friendId = widget.friendInfo?.userId;
+    if (friendId == null || friendId.isEmpty) return;
+
+    _presenceSocketClient ??= s1<SocketClient>(instanceName: 'chatSocket');
+    _presenceService ??= ChatPresenceService(_presenceSocketClient!);
+    _presenceService!.connect(userId: widget.userId, username: widget.username);
+
+    _presenceSub?.cancel();
+    _presenceSub = _presenceService!.presenceStream.listen((map) {
+      final status = map[friendId];
+      if (!mounted) return;
+      setState(() {
+        _friendPresence = status;
+      });
+      _syncRelativeTimer();
+    });
+
+    _presenceService!.requestPresence([friendId]);
+  }
+
+  void _syncRelativeTimer() {
+    final status = _friendPresence;
+    final shouldTick =
+        status != null && status.isOnline == false && status.lastSeenAt != null;
+
+    if (!shouldTick) {
+      _relativeTimeTimer?.cancel();
+      _relativeTimeTimer = null;
+      return;
+    }
+
+    if (_relativeTimeTimer != null) return;
+
+    // Tick để text "Hoạt động X phút trước" tự tăng
+    _relativeTimeTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted) return;
+      setState(() {});
+    });
+  }
+
+  String _formatPresenceText(ChatPresenceStatus status) {
+    if (status.isOnline) return 'Online';
+    final lastSeenAt = status.lastSeenAt?.toLocal();
+    if (lastSeenAt == null) return 'Offline';
+
+    final diff = DateTime.now().difference(lastSeenAt);
+    if (diff.inMinutes < 1) return 'Vừa hoạt động';
+    if (diff.inMinutes < 60) return 'Hoạt động ${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return 'Hoạt động ${diff.inHours} giờ trước';
+    return 'Hoạt động ${diff.inDays} ngày trước';
   }
 
   void _updateDisplayName() {
@@ -50,6 +117,14 @@ class _ChatAppbarState extends State<ChatAppbar> {
           widget.friendInfo?.username ??
           "Unknown User";
     }
+  }
+
+  @override
+  void dispose() {
+    _presenceSub?.cancel();
+    _presenceService?.dispose();
+    _relativeTimeTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -135,7 +210,9 @@ class _ChatAppbarState extends State<ChatAppbar> {
                     )
                   else
                     Text(
-                      "Đang hoạt động",
+                      _friendPresence == null
+                          ? "Đang hoạt động"
+                          : _formatPresenceText(_friendPresence!),
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w400,

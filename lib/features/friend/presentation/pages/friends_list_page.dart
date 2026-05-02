@@ -57,7 +57,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
       if (userId.isEmpty) return;
 
       // Khởi tạo service
-      final socketClient = SocketClient();
+      final socketClient = s1<SocketClient>(instanceName: 'friendSocket');
       _onlineService = FriendOnlineService(socketClient);
 
       // Kết nối và lắng nghe
