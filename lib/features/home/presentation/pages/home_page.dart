@@ -18,10 +18,10 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -70,6 +70,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void scrollToTopOrRefresh() {
+    if (_scrollController.hasClients) {
+      if (_scrollController.offset > 0) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } else {
+        _onRefresh();
+      }
+    } else {
+      _onRefresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -79,91 +95,113 @@ class _HomePageState extends State<HomePage> {
             onRefresh: _onRefresh,
             color: AppColors.primary,
             backgroundColor: AppColors.background,
-            child: ListView(
+            child: CustomScrollView(
               controller: _scrollController,
               physics: const ClampingScrollPhysics(),
-              children: [
-                HomeHeaderWidget(),
-                HomeStoriesWidget(page: 1, limit: 5),
-
-                BlocBuilder<PostBloc, PostState>(
-                  builder: (context, postState) {
-                    if (postState is PostCreating) {
-                      return const PostCreatingProgress();
-                    }
-                    return const SizedBox.shrink(); // Không hiển thị nếu không tạo post
-                  },
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  elevation: 0,
+                  backgroundColor: AppColors.background,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 72.h,
+                  titleSpacing: 0,
+                  title: const HomeHeaderWidget(),
                 ),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      HomeStoriesWidget(page: 1, limit: 5),
 
-                if (state is HomeInitializing)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(color: AppColors.primary),
-                          SizedBox(height: 8),
-                          Text(
-                            "Đang kết nối...",
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
+                      BlocBuilder<PostBloc, PostState>(
+                        builder: (context, postState) {
+                          if (postState is PostCreating) {
+                            return const PostCreatingProgress();
+                          }
+                          return const SizedBox.shrink(); // Không hiển thị nếu không tạo post
+                        },
+                      ),
+
+                      if (state is HomeInitializing)
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  "Đang kết nối...",
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+
+                      if (state is HomeLoading) const PostsLoadingWidget(),
+
+                      if (state is HomeError)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Text(
+                              state.errorMessage ?? "Không thể tải bài viết",
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
+                ),
 
-                if (state is HomeLoading) const PostsLoadingWidget(),
-
-                if (state is HomeError)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Center(
-                      child: Text(
-                        state.errorMessage ?? "Không thể tải bài viết",
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ),
-
-                if (state is HomeLoaded) ...[
-                  ListView.builder(
-                    physics:
-                        NeverScrollableScrollPhysics(), // tránh scroll lồng nhau
-                    shrinkWrap: true, // giúp list con chiếm chiều cao vừa đủ
-                    itemCount: state.posts?.length,
-                    itemBuilder: (context, index) {
+                if (state is HomeLoaded)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
                       final post = state.posts![index];
                       final commentCount = state.commentCounts?[post.id] ?? 0;
                       return PostItem(post: post, commentCount: commentCount);
-                    },
+                    }, childCount: state.posts?.length ?? 0),
                   ),
 
-                  // Loading indicator khi đang load more
-                  if (state.isLoadingMore)
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
+                if (state is HomeLoaded)
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        // Loading indicator khi đang load more
+                        if (state.isLoadingMore)
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
 
-                  // Hiển thị thông báo khi hết data
-                  if (state.hasNext == false && !state.isLoadingMore)
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      child: Center(
-                        child: Text(
-                          "Đã hiển thị hết bài viết",
-                          style: TextStyle(color: Colors.grey, fontSize: 14.sp),
-                        ),
-                      ),
+                        // Hiển thị thông báo khi hết data
+                        if (state.hasNext == false && !state.isLoadingMore)
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
+                            child: Center(
+                              child: Text(
+                                "Đã hiển thị hết bài viết",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                ],
+                  ),
               ],
             ),
           );

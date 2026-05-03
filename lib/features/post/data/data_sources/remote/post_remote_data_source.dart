@@ -96,4 +96,8 @@ abstract class PostRemoteDataSource {
   /// Gỡ gắn thẻ
   @DELETE('/post/{postId}/tag')
   Future<void> removeTag(@Path('postId') String postId);
+
+  /// Cập nhật danh sách gắn thẻ của bài viết
+  @PATCH('/post')
+  Future<void> updatePostTags(@Body() Map<String, dynamic> body);
 }

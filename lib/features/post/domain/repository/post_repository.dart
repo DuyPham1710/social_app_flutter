@@ -77,4 +77,10 @@ abstract class PostRepository {
   Future<DataState<void>> removeTag({
     required String postId,
   });
+
+  /// Cập nhật danh sách gắn thẻ của bài viết
+  Future<DataState<void>> updatePostTags({
+    required String postId,
+    required List<String> taggedUserIds,
+  });
 }

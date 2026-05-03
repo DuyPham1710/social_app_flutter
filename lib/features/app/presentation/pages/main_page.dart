@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/custom_bottom_navigation.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_page.dart';
@@ -27,6 +29,8 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late int _currentIndex;
   late PageController _pageController;
+  bool _isBottomNavVisible = true;
+  final GlobalKey<HomePageState> _homePageKey = GlobalKey<HomePageState>();
 
   @override
   void initState() {
@@ -74,11 +78,44 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _onTabSelected(int index) {
+    if (_currentIndex == 0 && index == 0) {
+      // Nếu đang ở trang chủ và bấm lại trang chủ -> cuộn lên/reload
+      _homePageKey.currentState?.scrollToTopOrRefresh();
+      return;
+    }
+
     // Update _currentIndex AFTER jumpToPage to ensure onPageChanged works correctly
     _pageController.jumpToPage(index);
     Future.delayed(const Duration(milliseconds: 100), () {
-      setState(() => _currentIndex = index);
+      if (mounted) {
+        setState(() {
+          _currentIndex = index;
+          _isBottomNavVisible = true; // reset visibility when changing tabs
+        });
+      }
     });
+  }
+
+  bool _handleScrollNotification(ScrollNotification notification) {
+    // Chỉ xử lý ẩn/hiện bottom nav bar ở trang Home (index == 0)
+    if (_currentIndex != 0) return false;
+
+    if (notification is UserScrollNotification) {
+      if (notification.metrics.axis == Axis.vertical) {
+        if (notification.direction == ScrollDirection.reverse) {
+          // Vuốt lên (cuộn xuống dưới) -> Ẩn bottom nav
+          if (_isBottomNavVisible) {
+            setState(() => _isBottomNavVisible = false);
+          }
+        } else if (notification.direction == ScrollDirection.forward) {
+          // Vuốt xuống (cuộn lên trên) -> Hiện bottom nav
+          if (!_isBottomNavVisible) {
+            setState(() => _isBottomNavVisible = true);
+          }
+        }
+      }
+    }
+    return false;
   }
 
   @override
@@ -92,42 +129,58 @@ class _MainPageState extends State<MainPage> {
         }
       },
       child: Scaffold(
-        body: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            // Mark all notifications as read when leaving notification page
-            if (_currentIndex == 3 && index != 3) {
-              final unread = context.read<NotificationBloc>().state.unread;
-              if (unread > 0) {
-                context.read<NotificationBloc>().add(
-                  MarkAllNotificationsRead(),
-                );
+        body: NotificationListener<ScrollNotification>(
+          onNotification: _handleScrollNotification,
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              // Mark all notifications as read when leaving notification page
+              if (_currentIndex == 3 && index != 3) {
+                final unread = context.read<NotificationBloc>().state.unread;
+                if (unread > 0) {
+                  context.read<NotificationBloc>().add(
+                    MarkAllNotificationsRead(),
+                  );
+                }
               }
-            }
-            setState(() => _currentIndex = index);
-          },
-          //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-          children: [
-            HomePage(),
-            FriendPage(),
-            CreatePostPage(
-              onPostCreated: () {
-                _pageController.jumpToPage(0);
-                setState(() => _currentIndex = 0);
+              setState(() {
+                _currentIndex = index;
+                _isBottomNavVisible = true; // reset visibility
+              });
+            },
+            //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
+            children: [
+              HomePage(key: _homePageKey),
+              FriendPage(),
+              CreatePostPage(
+                onPostCreated: () {
+                  _pageController.jumpToPage(0);
+                  setState(() => _currentIndex = 0);
+                },
+              ),
+              NotificationPage(),
+              MenuPage(),
+            ],
+          ),
+        ),
+        bottomNavigationBar: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: _isBottomNavVisible
+              ? (86.h + MediaQuery.of(context).padding.bottom)
+              : 0,
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: BlocBuilder<NotificationBloc, NotificationState>(
+              builder: (context, notificationState) {
+                return CustomBottomNavigation(
+                  currentIndex: _currentIndex,
+                  onTabSelected: _onTabSelected,
+                  unreadCount: notificationState.unread,
+                );
               },
             ),
-            NotificationPage(),
-            MenuPage(),
-          ],
-        ),
-        bottomNavigationBar: BlocBuilder<NotificationBloc, NotificationState>(
-          builder: (context, notificationState) {
-            return CustomBottomNavigation(
-              currentIndex: _currentIndex,
-              onTabSelected: _onTabSelected,
-              unreadCount: notificationState.unread,
-            );
-          },
+          ),
         ),
       ),
     );

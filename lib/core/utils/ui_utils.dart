@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class UIUtils {
   static void showErrorMessage(BuildContext context, String message) {
@@ -17,13 +18,7 @@ class UIUtils {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      showErrorSnackBar(context, message);
     }
   }
 

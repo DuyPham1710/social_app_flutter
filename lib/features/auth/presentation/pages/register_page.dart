@@ -77,198 +77,193 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            // Chỉ xử lý state từ register flow
-            if (state is AuthLoaded && state.flowType == 'register') {
-              Navigator.pushNamed(
-                context,
-                '/otp',
-                arguments: {
-                  'email': state.user!.email!.trim(),
-                  'id': state.user!.userId,
-                },
-              );
-            } else if (state is AuthError && state.flowType == 'register') {
-              final message = state.errorMessage ?? 'Đăng ký thất bại';
-              UIUtils.showErrorMessage(context, message);
-            }
-          },
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          // Chỉ xử lý state từ register flow
+          if (state is AuthLoaded && state.flowType == 'register') {
+            Navigator.pushNamed(
+              context,
+              '/otp',
+              arguments: {
+                'email': state.user!.email!.trim(),
+                'id': state.user!.userId,
+              },
+            );
+          } else if (state is AuthError && state.flowType == 'register') {
+            final message = state.errorMessage ?? 'Đăng ký thất bại';
+            UIUtils.showErrorMessage(context, message);
+          }
+        },
 
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.h),
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.h),
 
-                      GestureDetector(
-                        onTap: () => Navigator.popUntil(
-                          context,
-                          ModalRoute.withName('/login'),
+                    GestureDetector(
+                      onTap: () => Navigator.popUntil(
+                        context,
+                        ModalRoute.withName('/login'),
+                      ),
+                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                    ),
+
+                    SizedBox(height: 50.h),
+
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Đăng ký",
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                    ),
+
+                    SizedBox(height: 50.h),
+
+                    TextformfieldCustom(
+                      label: 'Email',
+                      isPassword: false,
+                      controller: _emailController,
+                      focusNode: emailFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập email';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    SizedBox(height: 20.h),
+
+                    TextformfieldCustom(
+                      label: 'Tên người dùng',
+                      isPassword: false,
+                      controller: _usernameController,
+                      focusNode: usernameFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập tên người dùng';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    SizedBox(height: 20.h),
+
+                    TextformfieldCustom(
+                      label: 'Mật khẩu',
+                      isPassword: _isPasswordVisible,
+                      controller: _passwordController,
+                      focusNode: passwordFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập mật khẩu';
+                        }
+                        return null;
+                      },
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
                         child: Icon(
-                          CupertinoIcons.back,
+                          _isPasswordVisible
+                              ? CupertinoIcons.eye_slash_fill
+                              : CupertinoIcons.eye_fill,
+                          size: 22.sp,
                           color: Colors.grey[600],
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 50.h),
+                    SizedBox(height: 20.h),
 
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Đăng ký",
+                    TextformfieldCustom(
+                      label: 'Xác nhận mật khẩu',
+                      isPassword: _isConfirmPasswordVisible,
+                      controller: _confirmPasswordController,
+                      focusNode: confirmPasswordFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập xác nhận mật khẩu';
+                        }
+                        return null;
+                      },
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
+                        child: Icon(
+                          _isConfirmPasswordVisible
+                              ? CupertinoIcons.eye_slash_fill
+                              : CupertinoIcons.eye_fill,
+                          size: 22.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 100.h),
+
+                    state is AuthLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          )
+                        : ButtonCustom(
+                            onPressed: () => _onRegisterPressed(context),
+                            text: "Đăng ký",
+                          ),
+
+                    SizedBox(height: 24.h),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Bạn đã có tài khoản? ",
                           style: TextStyle(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ),
-
-                      SizedBox(height: 50.h),
-
-                      TextformfieldCustom(
-                        label: 'Email',
-                        isPassword: false,
-                        controller: _emailController,
-                        focusNode: emailFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập email';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 20.h),
-
-                      TextformfieldCustom(
-                        label: 'Tên người dùng',
-                        isPassword: false,
-                        controller: _usernameController,
-                        focusNode: usernameFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập tên người dùng';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 20.h),
-
-                      TextformfieldCustom(
-                        label: 'Mật khẩu',
-                        isPassword: _isPasswordVisible,
-                        controller: _passwordController,
-                        focusNode: passwordFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập mật khẩu';
-                          }
-                          return null;
-                        },
-                        suffixIcon: GestureDetector(
+                        GestureDetector(
                           onTap: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
+                            Navigator.pushNamed(context, '/login');
                           },
-                          child: Icon(
-                            _isPasswordVisible
-                                ? CupertinoIcons.eye_slash_fill
-                                : CupertinoIcons.eye_fill,
-                            size: 22.sp,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 20.h),
-
-                      TextformfieldCustom(
-                        label: 'Xác nhận mật khẩu',
-                        isPassword: _isConfirmPasswordVisible,
-                        controller: _confirmPasswordController,
-                        focusNode: confirmPasswordFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập xác nhận mật khẩu';
-                          }
-                          return null;
-                        },
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isConfirmPasswordVisible =
-                                  !_isConfirmPasswordVisible;
-                            });
-                          },
-                          child: Icon(
-                            _isConfirmPasswordVisible
-                                ? CupertinoIcons.eye_slash_fill
-                                : CupertinoIcons.eye_fill,
-                            size: 22.sp,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 100.h),
-
-                      state is AuthLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            )
-                          : ButtonCustom(
-                              onPressed: () => _onRegisterPressed(context),
-                              text: "Đăng ký",
-                            ),
-
-                      SizedBox(height: 24.h),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Bạn đã có tài khoản? ",
+                          child: Text(
+                            "Đăng nhập",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.primary,
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/login');
-                            },
-                            child: Text(
-                              "Đăng nhập",
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

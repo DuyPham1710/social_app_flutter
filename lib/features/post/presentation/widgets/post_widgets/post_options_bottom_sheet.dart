@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,8 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
+import 'package:social_app_fe/features/post/domain/usecases/update_post_tags_usecase.dart';
+import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_event.dart';
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
@@ -105,6 +108,44 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
     }
   }
 
+  Future<void> _updatePostTags(BuildContext context) async {
+    final parentContext = Navigator.of(context).context;
+    Navigator.pop(context); // Đóng bottom sheet trước
+
+    final currentTaggedIds =
+        widget.post.taggedUsers?.map((u) => u.userId).toList() ?? [];
+
+    final result = await Navigator.push(
+      parentContext,
+      CupertinoPageRoute(
+        builder: (_) =>
+            TagFriendsPage(initialSelectedFriends: currentTaggedIds),
+      ),
+    );
+
+    if (result != null && result is List<Map<String, String>>) {
+      final newTaggedIds = result.map((e) => e['id']!).toList();
+
+      final updateResult = await s1<UpdatePostTagsUsecase>()(
+        params: UpdatePostTagsParams(
+          postId: widget.post.id,
+          taggedUserIds: newTaggedIds,
+        ),
+      );
+
+      if (parentContext.mounted) {
+        if (updateResult is DataStateSuccess) {
+          showSuccessSnackBar(parentContext, 'Đã cập nhật gắn thẻ');
+        } else {
+          showErrorSnackBar(
+            parentContext,
+            'Có lỗi xảy ra khi cập nhật gắn thẻ',
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -155,9 +196,9 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
               },
             ),
             StoryOptionItemWidget(
-              icon: Icons.lock_outline,
+              icon: Icons.person_add_alt_1_outlined,
               title: "Gắn thẻ bạn bè",
-              onTap: () {},
+              onTap: () => _updatePostTags(context),
             ),
             StoryOptionItemWidget(
               icon: Icons.delete_outline,

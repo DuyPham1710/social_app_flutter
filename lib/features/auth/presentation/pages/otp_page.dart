@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
@@ -103,182 +104,177 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            // Chỉ xử lý state từ verify_otp flow
-            if (state is AuthLoaded && state.flowType == 'verify_otp') {
-              context.read<AuthBloc>().add(AuthReset());
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          // Chỉ xử lý state từ verify_otp flow
+          if (state is AuthLoaded && state.flowType == 'verify_otp') {
+            context.read<AuthBloc>().add(AuthReset());
 
-              if (_isForgotPassword ?? false) {
-                Navigator.pushNamed(
-                  context,
-                  '/reset-password',
-                  arguments: {'email': _email, 'otp': otpCode},
-                );
-              } else {
-                final args =
-                    ModalRoute.of(context)!.settings.arguments
-                        as Map<String, dynamic>;
-                Navigator.pushReplacementNamed(
-                  context,
-                  '/personal-info',
-                  arguments: {'id': args['id']},
-                );
-              }
-            } else if (state is OtpResendSuccess &&
-                state.flowType == 'resend_otp') {
-              // Chỉ hiện message khi user thực sự resend OTP từ OTP page
-              UIUtils.showSuccessMessage(context, state.message);
-              _startCountdown();
-            } else if (state is AuthError && state.flowType == 'verify_otp') {
-              final message = state.errorMessage ?? 'xác thực thất bại';
-              UIUtils.showErrorMessage(context, message);
-              BlocProvider.of<AuthBloc>(
+            if (_isForgotPassword ?? false) {
+              Navigator.pushNamed(
                 context,
-              ).add(AuthReset()); // reset sau khi show lỗi
+                '/reset-password',
+                arguments: {'email': _email, 'otp': otpCode},
+              );
+            } else {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              Navigator.pushReplacementNamed(
+                context,
+                '/personal-info',
+                arguments: {'id': args['id']},
+              );
             }
-          },
+          } else if (state is OtpResendSuccess &&
+              state.flowType == 'resend_otp') {
+            // Chỉ hiện message khi user thực sự resend OTP từ OTP page
+            showSuccessSnackBar(context, state.message);
+            _startCountdown();
+          } else if (state is AuthError && state.flowType == 'verify_otp') {
+            final message = state.errorMessage ?? 'xác thực thất bại';
+            UIUtils.showErrorMessage(context, message);
+            BlocProvider.of<AuthBloc>(
+              context,
+            ).add(AuthReset()); // reset sau khi show lỗi
+          }
+        },
 
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20.h),
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20.h),
 
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
-                    ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                  ),
 
-                    SizedBox(height: 50.h),
+                  SizedBox(height: 50.h),
 
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Xác thực OTP",
-                        style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: 10.h),
-
-                    Text(
-                      "Nhập mã OTP đã gửi đến ${_email ?? ''}",
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Xác thực OTP",
                       style: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.grey[600],
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ),
 
-                    SizedBox(height: 40.h),
+                  SizedBox(height: 10.h),
 
-                    Pinput(
-                      length: 6,
-                      defaultPinTheme: defaultPinTheme,
-                      focusedPinTheme: defaultPinTheme.copyWith(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: Colors.black, width: 2.w),
+                  Text(
+                    "Nhập mã OTP đã gửi đến ${_email ?? ''}",
+                    style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
+                  ),
+
+                  SizedBox(height: 40.h),
+
+                  Pinput(
+                    length: 6,
+                    defaultPinTheme: defaultPinTheme,
+                    focusedPinTheme: defaultPinTheme.copyWith(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: Colors.black, width: 2.w),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        otpCode = value;
+                      });
+                    },
+                  ),
+
+                  SizedBox(height: 30.h),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Bạn chưa nhận được mã? ",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          otpCode = value;
-                        });
-                      },
-                    ),
 
-                    SizedBox(height: 30.h),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Bạn chưa nhận được mã? ",
+                      GestureDetector(
+                        onTap: _secondsRemaining > 0
+                            ? null
+                            : () => _resendOtp(context),
+                        child: Text(
+                          state is OtpResendLoading
+                              ? 'Đang gửi lại...'
+                              : _secondsRemaining > 0
+                              ? "Gửi lại trong $_secondsRemaining giây"
+                              : "Gửi lại mã",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: _secondsRemaining > 0
+                                ? AppColors.primary
+                                : Colors.red,
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ),
+                    ],
+                  ),
 
-                        GestureDetector(
-                          onTap: _secondsRemaining > 0
-                              ? null
-                              : () => _resendOtp(context),
-                          child: Text(
-                            state is OtpResendLoading
-                                ? 'Đang gửi lại...'
-                                : _secondsRemaining > 0
-                                ? "Gửi lại trong $_secondsRemaining giây"
-                                : "Gửi lại mã",
-                            style: TextStyle(
-                              color: _secondsRemaining > 0
-                                  ? AppColors.primary
-                                  : Colors.red,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  SizedBox(height: 280.h),
+
+                  state is AuthLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
                           ),
+                        )
+                      : ButtonCustom(
+                          onPressed: () => _verifyOtp(context),
+                          text: "Xác thực",
                         ),
-                      ],
-                    ),
 
-                    SizedBox(height: 280.h),
+                  SizedBox(height: 24.h),
 
-                    state is AuthLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          )
-                        : ButtonCustom(
-                            onPressed: () => _verifyOtp(context),
-                            text: "Xác thực",
-                          ),
-
-                    SizedBox(height: 24.h),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Bạn đã có tài khoản? ",
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Bạn đã có tài khoản? ",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                        child: Text(
+                          "Đăng nhập",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.primary,
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/login');
-                          },
-                          child: Text(
-                            "Đăng nhập",
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

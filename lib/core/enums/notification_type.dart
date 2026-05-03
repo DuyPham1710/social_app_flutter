@@ -8,5 +8,6 @@ enum NotificationType {
   POST_REPORT_REVIEWED, // Admin đã xử lý báo cáo
   FACE_DETECTED,        // Phát hiện khuôn mặt
   TAG_POST,             // Được gắn thẻ
+  FACE_TAG_SUGGEST,     // Gợi ý gắn thẻ từ AI
   UNKNOWN,              // Fallback
 }

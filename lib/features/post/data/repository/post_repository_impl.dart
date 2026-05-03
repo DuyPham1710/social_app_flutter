@@ -289,4 +289,20 @@ class PostRepositoryImpl implements PostRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> updatePostTags({
+    required String postId,
+    required List<String> taggedUserIds,
+  }) async {
+    try {
+      await remoteDataSource.updatePostTags({
+        'postId': postId,
+        'taggedUserIds': taggedUserIds,
+      });
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

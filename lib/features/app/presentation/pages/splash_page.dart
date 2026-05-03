@@ -23,7 +23,11 @@ class _SplashPageState extends State<SplashPage> {
     final user = await TokenStorage.getUserData();
     final token = await TokenStorage.getAccessToken();
 
-    await Future.delayed(const Duration(milliseconds: 300)); // cho mượt
+    await Future.delayed(
+      const Duration(seconds: 2),
+    ); // Chờ 2 giây để hiển thị logo
+
+    if (!mounted) return;
 
     if (user != null && token != null) {
       // Load user hiện tại vào MenuBloc
@@ -39,8 +43,19 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset(
+            'assets/icons/logo.jpg',
+            width: 120,
+            height: 120,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
     );
   }
 }

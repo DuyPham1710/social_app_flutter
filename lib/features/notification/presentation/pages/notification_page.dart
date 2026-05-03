@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/face_tag_suggest_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/post_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/react_post_notification_item.dart';
@@ -272,6 +275,29 @@ class _NotificationPageState extends State<NotificationPage> {
           },
           onMessageTap: () async {
             _handleJumpToPost(notification);
+          },
+        );
+      case NotificationType.FACE_TAG_SUGGEST:
+        return FaceTagSuggestNotificationItem(
+          message: notification.message,
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+          onTap: () {
+            List<String> suggestedIds = [];
+            if (notification.content != null &&
+                notification.content!.isNotEmpty) {
+              try {
+                suggestedIds = List<String>.from(
+                  jsonDecode(notification.content!),
+                );
+              } catch (e) {
+                // Ignore parse error
+              }
+            }
+            _handleJumpToPost(
+              notification,
+              initialAutoTagUserIds: suggestedIds,
+            );
           },
         );
       default:
@@ -552,7 +578,10 @@ class _NotificationPageState extends State<NotificationPage> {
     }
   }
 
-  Future<void> _handleJumpToPost(notification) async {
+  Future<void> _handleJumpToPost(
+    notification, {
+    List<String>? initialAutoTagUserIds,
+  }) async {
     final postId = notification.targetId;
     if (postId != null && postId.isNotEmpty) {
       // Navigate to loading page with smooth fade animation
@@ -578,7 +607,10 @@ class _NotificationPageState extends State<NotificationPage> {
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  PostDetailPage(post: result.data!),
+                  PostDetailPage(
+                    post: result.data!,
+                    initialAutoTagUserIds: initialAutoTagUserIds,
+                  ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);

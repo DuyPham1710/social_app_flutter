@@ -90,233 +90,221 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final userId = args['id'];
 
-    return SafeArea(
-      child: Scaffold(
-        body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthLoaded &&
-                state.flowType == 'update_personal_info') {
-              BlocProvider.of<AuthBloc>(context).add(AuthReset());
-              showDialogSuccess(
-                context,
-                "Cập nhật thông tin cá nhân thành công",
-              );
-            } else if (state is AuthError &&
-                state.flowType == 'update_personal_info') {
-              final message =
-                  state.errorMessage ?? 'Cập nhật thông tin cá nhân thất bại';
-              UIUtils.showErrorMessage(context, message);
-            }
-          },
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthLoaded && state.flowType == 'update_personal_info') {
+            BlocProvider.of<AuthBloc>(context).add(AuthReset());
+            showDialogSuccess(context, "Cập nhật thông tin cá nhân thành công");
+          } else if (state is AuthError &&
+              state.flowType == 'update_personal_info') {
+            final message =
+                state.errorMessage ?? 'Cập nhật thông tin cá nhân thất bại';
+            UIUtils.showErrorMessage(context, message);
+          }
+        },
 
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.h),
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.h),
 
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                    ),
 
-                      SizedBox(height: 50.h),
+                    SizedBox(height: 50.h),
 
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Thông tin cá nhân",
-                          style: TextStyle(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 10.h),
-
-                      Text(
-                        "Vui lòng điền đầy đủ thông tin sau",
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Thông tin cá nhân",
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.grey[600],
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 40.h),
+                    SizedBox(height: 10.h),
 
-                      TextformfieldCustom(
-                        label: "Họ và tên",
-                        isPassword: false,
-                        controller: fullNameController,
-                        focusNode: fullNameFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập họ và tên';
-                          }
-                          return null;
-                        },
+                    Text(
+                      "Vui lòng điền đầy đủ thông tin sau",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.grey[600],
                       ),
-                      SizedBox(height: 20.h),
-                      TextformfieldCustom(
-                        label: "Số điện thoại",
-                        isPassword: false,
-                        controller: phoneNumberController,
-                        focusNode: phoneNumberFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập số điện thoại';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextformfieldCustom(
-                            width: 150.w,
-                            label: "Ngày sinh",
-                            isPassword: false,
-                            controller: dateOfBirthController,
-                            focusNode: dateOfBirthFocusNode,
-                            suffixIcon: Icon(
-                              CupertinoIcons.calendar,
-                              size: 20.sp,
-                              color: dateOfBirthFocusNode.hasFocus
-                                  ? AppColors.primary
-                                  : Colors.grey,
+                    ),
+
+                    SizedBox(height: 40.h),
+
+                    TextformfieldCustom(
+                      label: "Họ và tên",
+                      isPassword: false,
+                      controller: fullNameController,
+                      focusNode: fullNameFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập họ và tên';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20.h),
+                    TextformfieldCustom(
+                      label: "Số điện thoại",
+                      isPassword: false,
+                      controller: phoneNumberController,
+                      focusNode: phoneNumberFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập số điện thoại';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextformfieldCustom(
+                          width: 150.w,
+                          label: "Ngày sinh",
+                          isPassword: false,
+                          controller: dateOfBirthController,
+                          focusNode: dateOfBirthFocusNode,
+                          suffixIcon: Icon(
+                            CupertinoIcons.calendar,
+                            size: 20.sp,
+                            color: dateOfBirthFocusNode.hasFocus
+                                ? AppColors.primary
+                                : Colors.grey,
+                          ),
+                          onTap: () async {
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(FocusNode()); // tắt bàn phím
+                            final picked = await DatePickerWidget.show(context);
+                            if (picked != null) {
+                              dateOfBirthController.text =
+                                  "${picked.day}/${picked.month}/${picked.year}";
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Vui lòng nhập ngày sinh';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        TextformfieldCustom(
+                          width: 150.w,
+                          label: "Giới tính",
+                          isPassword: false,
+                          controller: genderController,
+                          focusNode: genderFocusNode,
+                          suffixIcon: Icon(
+                            Icons.arrow_drop_down,
+                            size: 20.sp,
+                            color: genderFocusNode.hasFocus
+                                ? AppColors.primary
+                                : Colors.grey,
+                          ),
+                          onTap: () async {
+                            FocusScope.of(
+                              context,
+                            ).requestFocus(FocusNode()); // tắt bàn phím
+                            final gender =
+                                await showCupertinoModalPopup<String>(
+                                  context: context,
+                                  builder: (context) {
+                                    return ModalGender();
+                                  },
+                                );
+                            // final gender = await showModalBottomSheet<String>(
+                            //   context: context,
+                            //   builder: (context) {
+                            //     return ModalGender();
+                            //   },
+                            // );
+                            if (gender != null) {
+                              genderController.text = gender;
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Vui lòng nhập giới tính';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 20.h),
+
+                    TextformfieldCustom(
+                      label: "Tiểu sử",
+                      isPassword: false,
+                      controller: bioController,
+                      focusNode: bioFocusNode,
+                    ),
+
+                    SizedBox(height: 70.h),
+
+                    state is AuthLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
                             ),
-                            onTap: () async {
-                              FocusScope.of(
-                                context,
-                              ).requestFocus(FocusNode()); // tắt bàn phím
-                              final picked = await DatePickerWidget.show(
-                                context,
-                              );
-                              if (picked != null) {
-                                dateOfBirthController.text =
-                                    "${picked.day}/${picked.month}/${picked.year}";
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Vui lòng nhập ngày sinh';
-                              }
-                              return null;
-                            },
+                          )
+                        : ButtonCustom(
+                            onPressed: () => _onInfoSubmitted(context, userId),
+                            text: "Tiếp tục",
                           ),
 
-                          TextformfieldCustom(
-                            width: 150.w,
-                            label: "Giới tính",
-                            isPassword: false,
-                            controller: genderController,
-                            focusNode: genderFocusNode,
-                            suffixIcon: Icon(
-                              Icons.arrow_drop_down,
-                              size: 20.sp,
-                              color: genderFocusNode.hasFocus
-                                  ? AppColors.primary
-                                  : Colors.grey,
-                            ),
-                            onTap: () async {
-                              FocusScope.of(
-                                context,
-                              ).requestFocus(FocusNode()); // tắt bàn phím
-                              final gender =
-                                  await showCupertinoModalPopup<String>(
-                                    context: context,
-                                    builder: (context) {
-                                      return ModalGender();
-                                    },
-                                  );
-                              // final gender = await showModalBottomSheet<String>(
-                              //   context: context,
-                              //   builder: (context) {
-                              //     return ModalGender();
-                              //   },
-                              // );
-                              if (gender != null) {
-                                genderController.text = gender;
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Vui lòng nhập giới tính';
-                              }
-                              return null;
-                            },
+                    SizedBox(height: 24.h),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Bạn đã có tài khoản? ",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
-                      ),
-
-                      SizedBox(height: 20.h),
-
-                      TextformfieldCustom(
-                        label: "Tiểu sử",
-                        isPassword: false,
-                        controller: bioController,
-                        focusNode: bioFocusNode,
-                      ),
-
-                      SizedBox(height: 70.h),
-
-                      state is AuthLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            )
-                          : ButtonCustom(
-                              onPressed: () =>
-                                  _onInfoSubmitted(context, userId),
-                              text: "Tiếp tục",
-                            ),
-
-                      SizedBox(height: 24.h),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Bạn đã có tài khoản? ",
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/login');
+                          },
+                          child: Text(
+                            "Đăng nhập",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.primary,
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/login');
-                            },
-                            child: Text(
-                              "Đăng nhập",
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
