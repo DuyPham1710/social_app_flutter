@@ -29,34 +29,21 @@ class CustomBottomNavigation extends StatelessWidget {
               _buildBarBackground(
                 child: Row(
                   children: [
-                    _buildTabItem(
-                      index: 0,
-                      icon: CupertinoIcons.house_fill,
-                      label: 'Trang chủ',
-                    ),
-                    _buildTabItem(
-                      index: 1,
-                      icon: CupertinoIcons.person_2,
-                      label: 'Bạn bè',
-                    ),
+                    _buildTabItem(index: 0, icon: CupertinoIcons.house_fill),
+                    _buildTabItem(index: 1, icon: CupertinoIcons.person_2),
                     SizedBox(width: 70.w),
                     _buildNotificationTabItem(
                       index: 3,
                       icon: CupertinoIcons.bell,
-                      label: 'Thông báo',
                     ),
                     _buildTabItem(
                       index: 4,
                       icon: CupertinoIcons.line_horizontal_3,
-                      label: 'Menu',
                     ),
                   ],
                 ),
               ),
-              Positioned(
-                bottom: 14.h,
-                child: _buildCenterActionButton(),
-              ),
+              Positioned(bottom: 14.h, child: _buildCenterActionButton()),
             ],
           ),
         ),
@@ -80,19 +67,12 @@ class CustomBottomNavigation extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18.r),
-        child: Material(
-          color: Colors.transparent,
-          child: child,
-        ),
+        child: Material(color: Colors.transparent, child: child),
       ),
     );
   }
 
-  Widget _buildTabItem({
-    required int index,
-    required IconData icon,
-    required String label,
-  }) {
+  Widget _buildTabItem({required int index, required IconData icon}) {
     final isActive = currentIndex == index;
     final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
 
@@ -100,24 +80,8 @@ class CustomBottomNavigation extends StatelessWidget {
       child: InkWell(
         onTap: () => onTabSelected(index),
         child: Padding(
-          padding: EdgeInsets.only(top: 10.h),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(icon, size: 26.sp, color: color),
-              SizedBox(height: 4.h),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
+          child: Icon(icon, size: 26.sp, color: color),
         ),
       ),
     );
@@ -126,7 +90,6 @@ class CustomBottomNavigation extends StatelessWidget {
   Widget _buildNotificationTabItem({
     required int index,
     required IconData icon,
-    required String label,
   }) {
     final isActive = currentIndex == index;
     final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
@@ -135,9 +98,9 @@ class CustomBottomNavigation extends StatelessWidget {
       child: InkWell(
         onTap: () => onTabSelected(index),
         child: Padding(
-          padding: EdgeInsets.only(top: 10.h),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Stack(
                 clipBehavior: Clip.none,
@@ -148,7 +111,10 @@ class CustomBottomNavigation extends StatelessWidget {
                       right: -10.w,
                       top: -6.h,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 5.w,
+                          vertical: 2.h,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 220, 53, 69),
                           borderRadius: BorderRadius.circular(10.r),
@@ -166,17 +132,6 @@ class CustomBottomNavigation extends StatelessWidget {
                       ),
                     ),
                 ],
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: color,
-                ),
               ),
             ],
           ),
@@ -197,19 +152,8 @@ class CustomBottomNavigation extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(18.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.35),
-                blurRadius: 16.r,
-                offset: const Offset(0, 8),
-              ),
-            ],
           ),
-          child: Icon(
-            CupertinoIcons.plus,
-            color: Colors.white,
-            size: 30.sp,
-          ),
+          child: Icon(CupertinoIcons.plus, color: Colors.white, size: 30.sp),
         ),
       ),
     );

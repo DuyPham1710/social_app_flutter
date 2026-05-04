@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/utils/react_post_util.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/features/post/presentation/helpers/tag_action_helper.dart';
 import 'dart:async';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
@@ -26,6 +27,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/view_post_usecase.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class PostItem extends StatefulWidget {
   final PostEntity post;
@@ -52,12 +54,12 @@ class _PostItemState extends State<PostItem> {
   bool _isSaved = false;
   String? _savedId;
   final SaveRepository _saveRepository = s1<SaveRepository>();
+  List<String> _visibleOnProfileUserIds = [];
+  bool _isRemoved = false; // To hide item if tag removed
 
   void _openPostDetail({int initialImageIndex = 0}) {
     unawaited(
-      s1<ViewPostUsecase>()(
-        params: ViewPostParams(postId: widget.post.id),
-      ),
+      s1<ViewPostUsecase>()(params: ViewPostParams(postId: widget.post.id)),
     );
     Navigator.push(
       context,
@@ -76,8 +78,47 @@ class _PostItemState extends State<PostItem> {
     _localReacts = List.from(widget.post.reacts ?? []);
     _currentUserReaction = null;
     _isSaved = widget.isSaved;
+    _visibleOnProfileUserIds = List.from(
+      widget.post.visibleOnProfileUserIds ?? [],
+    );
     _initCurrentUserReaction();
     _checkSavedStatus();
+  }
+
+  Future<void> _handleTagVisibility(bool isVisible) async {
+    await TagActionHelper.handleTagVisibility(
+      context: context,
+      postId: widget.post.id,
+      isVisible: isVisible,
+      onSuccess: () async {
+        final userData = await TokenStorage.getUserData();
+        final currentUserId = userData?['id'];
+        if (currentUserId != null) {
+          setState(() {
+            if (isVisible) {
+              if (!_visibleOnProfileUserIds.contains(currentUserId)) {
+                _visibleOnProfileUserIds.add(currentUserId);
+              }
+            } else {
+              _visibleOnProfileUserIds.remove(currentUserId);
+              _isRemoved = true;
+            }
+          });
+        }
+      },
+    );
+  }
+
+  Future<void> _handleRemoveTag() async {
+    await TagActionHelper.handleRemoveTag(
+      context: context,
+      postId: widget.post.id,
+      onSuccess: () {
+        setState(() {
+          _isRemoved = true;
+        });
+      },
+    );
   }
 
   Future<void> _checkSavedStatus() async {
@@ -130,12 +171,7 @@ class _PostItemState extends State<PostItem> {
           _isSaved = false;
           _savedId = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Đã bỏ lưu bài viết'),
-            backgroundColor: Colors.green[800],
-          ),
-        );
+        showSuccessSnackBar(context, 'Đã bỏ lưu bài viết');
       }
     }
   }
@@ -216,6 +252,8 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isRemoved) return const SizedBox.shrink();
+
     final user = widget.post.user;
     final urls = widget.post.urls;
 
@@ -286,10 +324,14 @@ class _PostItemState extends State<PostItem> {
                 },
               ),
           ] else ...[
-            // Post bình thường: dùng PostHeader
+            // Header
             PostHeader(
               user: user,
               createdAt: widget.post.createdAt,
+              taggedUsers: widget.post.taggedUsers,
+              visibleOnProfileUserIds: _visibleOnProfileUserIds,
+              onTagVisibilityTap: _handleTagVisibility,
+              onRemoveTagTap: _handleRemoveTag,
               onOptionsTap: () {
                 PostOptionsBottomSheet.show(context, post: widget.post);
               },

@@ -24,9 +24,9 @@ class PrivacyPage extends StatefulWidget {
   final PrivacyType? initialPrivacyType;
   final List<String>? initialFriendsExcept;
   final List<String>? initialFriendsDetail;
-  
+
   const PrivacyPage({
-    super.key, 
+    super.key,
     required this.selectedOption,
     this.postId,
     this.initialPrivacyType,
@@ -51,12 +51,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
   void initState() {
     super.initState();
     selected = widget.selectedOption;
-    
+
     // Initialize PostRepository nếu có postId
     if (widget.postId != null) {
       _postRepository = s1<PostRepository>();
     }
-    
+
     // Load initial friends từ widget parameters nếu có (cho post đã tồn tại)
     if (widget.initialFriendsExcept != null) {
       _friendsExceptIds = List.from(widget.initialFriendsExcept!);
@@ -64,7 +64,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     if (widget.initialFriendsDetail != null) {
       _friendsDetailIds = List.from(widget.initialFriendsDetail!);
     }
-    
+
     // Nếu có initialPrivacyType, convert sang label
     if (widget.initialPrivacyType != null) {
       selected = _privacyTypeToLabel(widget.initialPrivacyType!);
@@ -78,7 +78,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
     {'label': 'Bạn bè cụ thể', 'desc': 'Chỉ hiển thị với một vài bạn'},
     {'label': 'Chỉ mình tôi', 'desc': 'Chỉ mình tôi'},
   ];
-
 
   String _privacyTypeToLabel(PrivacyType privacyType) {
     switch (privacyType) {
@@ -101,11 +100,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
       try {
         final currentState = context.read<PrivacyBloc>().state;
         if (currentState is PrivacyLoaded) {
-          _friendsExceptIds = currentState.privacyEntity.friendsExcept
+          _friendsExceptIds =
+              currentState.privacyEntity.friendsExcept
                   ?.map((e) => e.userId)
                   .toList() ??
               [];
-          _friendsDetailIds = currentState.privacyEntity.friendsDetail
+          _friendsDetailIds =
+              currentState.privacyEntity.friendsDetail
                   ?.map((e) => e.userId)
                   .toList() ??
               [];
@@ -171,7 +172,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
               await _updatePostPrivacy();
               return;
             }
-            
+
             // Nếu cần update default privacy, gọi API trước khi close
             if (shouldUpdateDefault) {
               _updateDefaultPrivacy();
@@ -230,12 +231,15 @@ class _PrivacyPageState extends State<PrivacyPage> {
                   child: BlocBuilder<PrivacyBloc, PrivacyState>(
                     builder: (context, state) {
                       // Load initial friends on first build (chỉ khi không có postId)
-                      if (widget.postId == null && state is PrivacyLoaded && _friendsExceptIds.isEmpty && _friendsDetailIds.isEmpty) {
+                      if (widget.postId == null &&
+                          state is PrivacyLoaded &&
+                          _friendsExceptIds.isEmpty &&
+                          _friendsDetailIds.isEmpty) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           _loadInitialFriends();
                         });
                       }
-                      
+
                       return _buildContent(state);
                     },
                   ),
@@ -255,7 +259,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     String description = widget.postId != null
         ? 'Bạn có thể thay đổi ai có thể xem bài viết này.'
         : 'Bài viết của bạn sẽ hiển thị trên Bảng feed, trang cá nhân và trong kết quả tìm kiếm.\n\n'
-            'Tùy đối tượng mặc định là $defaultPrivacy, nhưng bạn có thể thay đổi đối tượng của riêng bài viết này.';
+              'Tùy đối tượng mặc định là $defaultPrivacy, nhưng bạn có thể thay đổi đối tượng của riêng bài viết này.';
 
     return Text(
       description,
@@ -350,13 +354,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
           final selectedFriends = state.friends
               .where((f) => _friendsExceptIds.contains(f.userId))
               .toList();
-          
+
           if (selectedFriends.isEmpty) {
             displayText = "Chưa chọn ai";
           } else if (selectedFriends.length == 1) {
-            displayText = selectedFriends.first.fullName ?? 
-                         selectedFriends.first.username ?? 
-                         "1 người";
+            displayText =
+                selectedFriends.first.fullName ??
+                selectedFriends.first.username ??
+                "1 người";
           } else if (selectedFriends.length <= 3) {
             final names = selectedFriends
                 .map((f) => f.fullName ?? f.username ?? "Người dùng")
@@ -452,13 +457,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
           final selectedFriends = state.friends
               .where((f) => _friendsDetailIds.contains(f.userId))
               .toList();
-          
+
           if (selectedFriends.isEmpty) {
             displayText = "Chưa chọn ai";
           } else if (selectedFriends.length == 1) {
-            displayText = selectedFriends.first.fullName ?? 
-                         selectedFriends.first.username ?? 
-                         "1 người";
+            displayText =
+                selectedFriends.first.fullName ??
+                selectedFriends.first.username ??
+                "1 người";
           } else if (selectedFriends.length <= 3) {
             final names = selectedFriends
                 .map((f) => f.fullName ?? f.username ?? "Người dùng")
@@ -476,10 +482,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 4),
-          leading: Icon(
-            getIcon('Bạn bè cụ thể'),
-            color: AppColors.textPrimary,
-          ),
+          leading: Icon(getIcon('Bạn bè cụ thể'), color: AppColors.textPrimary),
           title: Text(
             'Bạn bè cụ thể',
             style: const TextStyle(
@@ -602,7 +605,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
   }
 
   Future<void> _updatePostPrivacy() async {
-    if (widget.postId == null || _postRepository == null || _isUpdatingPost) return;
+    if (widget.postId == null || _postRepository == null || _isUpdatingPost)
+      return;
 
     setState(() {
       _isUpdatingPost = true;
@@ -619,27 +623,26 @@ class _PrivacyPageState extends State<PrivacyPage> {
           privacyType = PrivacyType.public;
           friendsExcept = null;
           friendsDetail = null;
-          break;
         case "Bạn bè":
           privacyType = PrivacyType.friends;
           friendsExcept = null;
           friendsDetail = null;
-          break;
         case "Bạn bè ngoại trừ...":
           privacyType = PrivacyType.friendsExcept;
-          friendsExcept = _friendsExceptIds.isNotEmpty ? _friendsExceptIds : null;
+          friendsExcept = _friendsExceptIds.isNotEmpty
+              ? _friendsExceptIds
+              : null;
           friendsDetail = null; // Đảm bảo friendsDetail luôn null
-          break;
         case "Bạn bè cụ thể":
           privacyType = PrivacyType.friendsDetail;
           friendsExcept = null; // Đảm bảo friendsExcept luôn null
-          friendsDetail = _friendsDetailIds.isNotEmpty ? _friendsDetailIds : null;
-          break;
+          friendsDetail = _friendsDetailIds.isNotEmpty
+              ? _friendsDetailIds
+              : null;
         case "Chỉ mình tôi":
           privacyType = PrivacyType.private;
           friendsExcept = null;
           friendsDetail = null;
-          break;
         default:
           privacyType = PrivacyType.friends;
           friendsExcept = null;
@@ -655,12 +658,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
       if (mounted) {
         if (result is DataStateSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Đã cập nhật quyền riêng tư'),
-              backgroundColor: Colors.green[800],
-            ),
-          );
+          showSuccessSnackBar(context, 'Đã cập nhật quyền riêng tư');
+
           Navigator.pop(context, {
             'label': selected,
             'friendsExcept': _friendsExceptIds,
@@ -669,7 +668,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
         } else if (result is DataStateError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}'),
+              content: Text(
+                'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}',
+              ),
               backgroundColor: Colors.red[800],
             ),
           );
@@ -678,10 +679,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red[800],
-          ),
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red[800]),
         );
       }
     } finally {
@@ -703,7 +701,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
         // Convert IDs to UserEntity list - chỉ một trong hai list có dữ liệu
         List<UserEntity>? friendsExcept;
         List<UserEntity>? friendsDetail;
-        
+
         if (selected == 'Bạn bè ngoại trừ...') {
           friendsExcept = _friendsExceptIds.isNotEmpty
               ? _convertIdsToUserEntities(_friendsExceptIds)

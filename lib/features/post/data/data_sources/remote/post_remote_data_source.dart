@@ -44,6 +44,7 @@ abstract class PostRemoteDataSource {
     @Part(name: 'titles') String? titles,
     @Part(name: 'friends_except') String? friendsExcept,
     @Part(name: 'friends_detail') String? friendsDetail,
+    @Part(name: 'taggedUserIds') String? taggedUserIds,
     @Part(name: 'communityId') String? communityId,
     @Part(name: 'files') List<MultipartFile>? files,
   );
@@ -99,4 +100,19 @@ abstract class PostRemoteDataSource {
     @Path('postId') String postId,
     @Query('targetLang') String targetLang,
   );
+
+  /// Cập nhật trạng thái hiển thị của thẻ trên profile
+  @PATCH('/post/{postId}/tag-visibility')
+  Future<void> updateTagVisibility(
+    @Path('postId') String postId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// Gỡ gắn thẻ
+  @DELETE('/post/{postId}/tag')
+  Future<void> removeTag(@Path('postId') String postId);
+
+  /// Cập nhật danh sách gắn thẻ của bài viết
+  @PATCH('/post')
+  Future<void> updatePostTags(@Body() Map<String, dynamic> body);
 }

@@ -39,133 +39,127 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is OtpResendSuccess && state.flowType == 'resend_otp') {
-              // Reset state trước khi navigate để tránh state cũ trigger ở OTP page
-              BlocProvider.of<AuthBloc>(context).add(AuthReset());
-              Navigator.pushNamed(
-                context,
-                '/otp',
-                arguments: {
-                  'email': _emailController.text.trim(),
-                  'isForgotPassword': true,
-                },
-              );
-            } else if (state is AuthError && state.flowType == 'resend_otp') {
-              final message = state.errorMessage ?? 'Gửi OTP thất bại';
-              UIUtils.showErrorMessage(context, message);
-              BlocProvider.of<AuthBloc>(context).add(AuthReset());
-            }
-          },
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is OtpResendSuccess && state.flowType == 'resend_otp') {
+            // Reset state trước khi navigate để tránh state cũ trigger ở OTP page
+            BlocProvider.of<AuthBloc>(context).add(AuthReset());
+            Navigator.pushNamed(
+              context,
+              '/otp',
+              arguments: {
+                'email': _emailController.text.trim(),
+                'isForgotPassword': true,
+              },
+            );
+          } else if (state is AuthError && state.flowType == 'resend_otp') {
+            final message = state.errorMessage ?? 'Gửi OTP thất bại';
+            UIUtils.showErrorMessage(context, message);
+            BlocProvider.of<AuthBloc>(context).add(AuthReset());
+          }
+        },
 
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.h),
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.h),
 
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                    ),
 
-                      SizedBox(height: 50.h),
+                    SizedBox(height: 50.h),
 
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Quên mật khẩu",
-                          style: TextStyle(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10.h),
-
-                      Text(
-                        "Nhập email của bạn để khôi phục tài khoản.",
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Quên mật khẩu",
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.grey[600],
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                    ),
+                    SizedBox(height: 10.h),
 
-                      SizedBox(height: 50.h),
-
-                      TextformfieldCustom(
-                        label: 'Email',
-                        isPassword: false,
-                        controller: _emailController,
-                        focusNode: emailFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập email';
-                          }
-                          return null;
-                        },
+                    Text(
+                      "Nhập email của bạn để khôi phục tài khoản.",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.grey[600],
                       ),
+                    ),
 
-                      SizedBox(height: 320.h),
+                    SizedBox(height: 50.h),
 
-                      state is OtpResendLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            )
-                          : ButtonCustom(
-                              onPressed: () =>
-                                  _onForgotPasswordPressed(context),
-                              text: "Tiếp tục",
+                    TextformfieldCustom(
+                      label: 'Email',
+                      isPassword: false,
+                      controller: _emailController,
+                      focusNode: emailFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập email';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    SizedBox(height: 320.h),
+
+                    state is OtpResendLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
                             ),
+                          )
+                        : ButtonCustom(
+                            onPressed: () => _onForgotPasswordPressed(context),
+                            text: "Tiếp tục",
+                          ),
 
-                      SizedBox(height: 24.h),
+                    SizedBox(height: 24.h),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Bạn chưa có tài khoản? ",
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Bạn chưa có tài khoản? ",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/signup');
+                          },
+                          child: Text(
+                            "Đăng ký",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.primary,
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/signup');
-                            },
-                            child: Text(
-                              "Đăng ký",
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

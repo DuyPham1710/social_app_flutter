@@ -10,6 +10,7 @@ class NotificationBaseItem extends StatelessWidget {
   final bool isRead;
   final String? userId;
   final VoidCallback? onAvatarTap;
+  final bool? isImageAsset;
 
   const NotificationBaseItem({
     super.key,
@@ -21,6 +22,7 @@ class NotificationBaseItem extends StatelessWidget {
     required this.isRead,
     this.userId,
     this.onAvatarTap,
+    this.isImageAsset = false,
   });
 
   @override
@@ -38,12 +40,19 @@ class NotificationBaseItem extends StatelessWidget {
             child: Stack(
               children: [
                 ClipOval(
-                  child: Image.network(
-                    avatarUrl,
-                    width: 55,
-                    height: 55,
-                    fit: BoxFit.cover,
-                  ),
+                  child: isImageAsset == true
+                      ? Image.asset(
+                          avatarUrl,
+                          width: 55,
+                          height: 55,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          avatarUrl,
+                          width: 55,
+                          height: 55,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 Positioned(bottom: 0, right: 0, child: iconOverlay),
               ],

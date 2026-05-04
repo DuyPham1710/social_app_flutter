@@ -64,171 +64,165 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     final email = args['email'] as String;
     final otp = args['otp'] as String;
 
-    return SafeArea(
-      child: Scaffold(
-        body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            // Chỉ xử lý state từ reset_password flow
-            if (state is AuthLoaded && state.flowType == 'reset_password') {
-              showDialogSuccess(context, "Đặt lại mật khẩu thành công");
-              //   BlocProvider.of<AuthBloc>(context).add(AuthReset());
-            } else if (state is AuthError &&
-                state.flowType == 'reset_password') {
-              final message = state.errorMessage ?? 'Đặt lại mật khẩu thất bại';
-              UIUtils.showErrorMessage(context, message);
-            }
-          },
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          // Chỉ xử lý state từ reset_password flow
+          if (state is AuthLoaded && state.flowType == 'reset_password') {
+            showDialogSuccess(context, "Đặt lại mật khẩu thành công");
+            //   BlocProvider.of<AuthBloc>(context).add(AuthReset());
+          } else if (state is AuthError && state.flowType == 'reset_password') {
+            final message = state.errorMessage ?? 'Đặt lại mật khẩu thất bại';
+            UIUtils.showErrorMessage(context, message);
+          }
+        },
 
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.h),
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.h),
 
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                    ),
 
-                      SizedBox(height: 50.h),
+                    SizedBox(height: 50.h),
 
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Đặt lại mật khẩu",
-                          style: TextStyle(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 10.h),
-
-                      Text(
-                        "Giúp chúng tôi bảo vệ tài khoản của bạn bằng cách chọn mật khẩu mạnh.",
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Đặt lại mật khẩu",
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 10.h),
+
+                    Text(
+                      "Giúp chúng tôi bảo vệ tài khoản của bạn bằng cách chọn mật khẩu mạnh.",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+
+                    SizedBox(height: 40.h),
+
+                    TextformfieldCustom(
+                      label: "Mật khẩu mới",
+                      isPassword: _isPasswordVisible,
+                      controller: newPasswordController,
+                      focusNode: newPasswordFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập mật khẩu mới';
+                        }
+                        return null;
+                      },
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        child: Icon(
+                          _isPasswordVisible
+                              ? CupertinoIcons.eye_slash_fill
+                              : CupertinoIcons.eye_fill,
+                          size: 22.sp,
                           color: Colors.grey[600],
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 40.h),
+                    SizedBox(height: 20.h),
 
-                      TextformfieldCustom(
-                        label: "Mật khẩu mới",
-                        isPassword: _isPasswordVisible,
-                        controller: newPasswordController,
-                        focusNode: newPasswordFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập mật khẩu mới';
-                          }
-                          return null;
+                    TextformfieldCustom(
+                      label: "Xác nhận mật khẩu mới",
+                      isPassword: _isConfirmPasswordVisible,
+                      controller: confirmPasswordController,
+                      focusNode: confirmPasswordFocusNode,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập xác nhận mật khẩu mới';
+                        }
+                        return null;
+                      },
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
                         },
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                          child: Icon(
-                            _isPasswordVisible
-                                ? CupertinoIcons.eye_slash_fill
-                                : CupertinoIcons.eye_fill,
-                            size: 22.sp,
-                            color: Colors.grey[600],
-                          ),
+                        child: Icon(
+                          _isConfirmPasswordVisible
+                              ? CupertinoIcons.eye_slash_fill
+                              : CupertinoIcons.eye_fill,
+                          size: 22.sp,
+                          color: Colors.grey[600],
                         ),
                       ),
+                    ),
 
-                      SizedBox(height: 20.h),
+                    SizedBox(height: 200.h),
 
-                      TextformfieldCustom(
-                        label: "Xác nhận mật khẩu mới",
-                        isPassword: _isConfirmPasswordVisible,
-                        controller: confirmPasswordController,
-                        focusNode: confirmPasswordFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập xác nhận mật khẩu mới';
-                          }
-                          return null;
-                        },
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isConfirmPasswordVisible =
-                                  !_isConfirmPasswordVisible;
-                            });
-                          },
-                          child: Icon(
-                            _isConfirmPasswordVisible
-                                ? CupertinoIcons.eye_slash_fill
-                                : CupertinoIcons.eye_fill,
-                            size: 22.sp,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 200.h),
-
-                      state is AuthLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            )
-                          : ButtonCustom(
-                              onPressed: () =>
-                                  _onSaveSubmitted(context, email, otp),
-                              text: "Lưu",
+                    state is AuthLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
                             ),
+                          )
+                        : ButtonCustom(
+                            onPressed: () =>
+                                _onSaveSubmitted(context, email, otp),
+                            text: "Lưu",
+                          ),
 
-                      SizedBox(height: 24.h),
+                    SizedBox(height: 24.h),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Bạn đã có tài khoản? ",
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Bạn đã có tài khoản? ",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/login');
+                          },
+                          child: Text(
+                            "Đăng nhập",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.primary,
                               fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/login');
-                            },
-                            child: Text(
-                              "Đăng nhập",
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

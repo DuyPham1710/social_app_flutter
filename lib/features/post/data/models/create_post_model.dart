@@ -18,6 +18,7 @@ class CreatePostModel with _$CreatePostModel {
     PrivacyType? privacyType,
     List<String>? friendsExcept,
     List<String>? friendsDetail,
+    List<String>? taggedUserIds,
     String? communityId,
   }) = _CreatePostModel;
 
@@ -35,6 +36,7 @@ class CreatePostModel with _$CreatePostModel {
       privacyType: entity.privacyType,
       friendsExcept: entity.friendsExcept,
       friendsDetail: entity.friendsDetail,
+      taggedUserIds: entity.taggedUserIds,
       communityId: entity.communityId,
     );
   }

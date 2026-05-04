@@ -177,7 +177,10 @@ class NotificationFcmService {
         type == 'POST_REACTION' ||
         type == 'MENTION' ||
         type == 'STORY_REACTION' ||
-        type == 'COMMENT_REACTION';
+        type == 'COMMENT_REACTION' ||
+        type == 'TAG_POST' ||
+        type == 'FACE_DETECTED' ||
+        type == 'FACE_TAG_SUGGEST';
   }
 
   /// Parse mention format @[Name](userId) to plain text @Name
@@ -305,6 +308,12 @@ class NotificationFcmService {
         return {'icon': '@mipmap/ic_launcher', 'title': 'Story Reaction'};
       case 'COMMENT_REACTION':
         return {'icon': '@mipmap/ic_launcher', 'title': 'Comment Reaction'};
+      case 'TAG_POST':
+        return {'icon': '@mipmap/ic_launcher', 'title': 'Tagged You'};
+      case 'FACE_DETECTED':
+        return {'icon': '@mipmap/ic_launcher', 'title': 'Face Detected'};
+      case 'FACE_TAG_SUGGEST':
+        return {'icon': '@mipmap/ic_launcher', 'title': 'Tag Suggestion'};
       default:
         return {'icon': '@mipmap/ic_launcher', 'title': 'Notification'};
     }

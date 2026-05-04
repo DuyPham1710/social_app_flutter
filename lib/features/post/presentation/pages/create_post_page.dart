@@ -18,6 +18,7 @@ import 'package:social_app_fe/features/post/domain/entities/create_post_entity.d
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
+import 'package:social_app_fe/features/post/presentation/helpers/tag_helper.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_event.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_state.dart';
@@ -26,6 +27,7 @@ import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dar
 import 'package:social_app_fe/features/post/presentation/pages/gallery_picker_screen.dart';
 import 'package:social_app_fe/features/post/presentation/pages/edit_selected_image_page.dart';
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
+import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -48,6 +50,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   String _selectedPrivacyLabel = '';
   List<String> _friendsExceptIds = [];
   List<String> _friendsDetailIds = [];
+  List<Map<String, String>> _taggedUsers = [];
   bool _isCreatingPost = false;
 
   @override
@@ -132,6 +135,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
         titles: null, // Can be added if needed
         friendsExcept: friendsExcept,
         friendsDetail: friendsDetail,
+        taggedUserIds: _taggedUsers.isNotEmpty
+            ? _taggedUsers.map((e) => e['id']!).toList()
+            : null,
         communityId: widget.communityId,
       );
 
@@ -193,6 +199,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
         const SnackBar(content: Text('Cần quyền truy cập ảnh để tiếp tục')),
       );
     }
+  }
+
+  Future<void> _openTagFriends() async {
+    final result = await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => TagFriendsPage(
+          initialSelectedFriends: _taggedUsers.map((e) => e['id']!).toList(),
+        ),
+      ),
+    );
+    if (result != null && result is List<Map<String, String>>) {
+      setState(() {
+        _taggedUsers = result;
+      });
+    }
+  }
+
+  Widget _buildTaggedText() {
+    final taggedNames = _taggedUsers.map((e) => e['name']!).toList();
+    return TagHelper.buildTagsOnly(taggedNames: taggedNames);
   }
 
   Future<void> _openCamera() async {
@@ -540,13 +567,34 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            state.user.fullName ?? 'unknown',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13.sp,
-                                              color: AppColors.textPrimary,
-                                            ),
+                                          Wrap(
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.center,
+                                            children: [
+                                              Text(
+                                                state.user.fullName ??
+                                                    'unknown',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.sp,
+                                                  color: AppColors.textPrimary,
+                                                ),
+                                              ),
+                                              if (_taggedUsers.isNotEmpty) ...[
+                                                Text(
+                                                  ' cùng với ',
+                                                  style: TextStyle(
+                                                    fontSize: 14.sp,
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: _openTagFriends,
+                                                  child: _buildTaggedText(),
+                                                ),
+                                              ],
+                                            ],
                                           ),
 
                                           SizedBox(height: 8.h),
@@ -783,26 +831,30 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                 SizedBox(height: 10.h),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _bottomIcon(
-                      Icons.image,
-                      color: Colors.green,
-                      onTap: () => _onSelectImage(context),
-                    ),
-                    _bottomIcon(
-                      Icons.person_add_alt_1,
-                      color: Colors.blueAccent,
-                    ),
-                    _bottomIcon(Icons.emoji_emotions, color: Colors.amber),
-                    _bottomIcon(Icons.location_on, color: Colors.redAccent),
-                    _bottomIcon(
-                      CupertinoIcons.ellipsis_circle,
-                      color: Colors.grey,
-                      onTap: () => _showMoreOptions(context),
-                    ),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: [
+                      _bottomIcon(
+                        Icons.image_outlined,
+                        "Thư viện",
+                        onTap: () => _onSelectImage(context),
+                      ),
+                      _bottomIcon(
+                        Icons.person_add_alt_1,
+                        "Gắn thẻ",
+                        onTap: _openTagFriends,
+                      ),
+                      _bottomIcon(Icons.emoji_emotions_outlined, "Cảm xúc"),
+                      _bottomIcon(Icons.location_on_outlined, "Vị trí"),
+                      _bottomIcon(
+                        CupertinoIcons.ellipsis,
+                        "Thêm",
+                        onTap: () => _showMoreOptions(context),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -812,10 +864,33 @@ class _CreatePostPageState extends State<CreatePostPage> {
     );
   }
 
-  Widget _bottomIcon(IconData icon, {Color? color, VoidCallback? onTap}) {
+  Widget _bottomIcon(IconData icon, String text, {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Icon(icon, color: color, size: 28.sp),
+      child: Container(
+        constraints: BoxConstraints(minWidth: 90.w),
+        margin: EdgeInsets.only(right: 8.w),
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: AppColors.textSecondary.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.textPrimary, size: 24.sp),
+            SizedBox(height: 4.h),
+            Text(
+              text,
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

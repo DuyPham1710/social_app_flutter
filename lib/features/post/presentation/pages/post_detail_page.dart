@@ -12,31 +12,43 @@ import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
-import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_state.dart';
+import 'package:social_app_fe/features/post/presentation/helpers/tag_action_helper.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
+import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
+import 'package:social_app_fe/features/post/domain/usecases/update_post_tags_usecase.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_options_bottom_sheet.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/save_post_bottom_sheet.dart';
+import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/community_post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_react_info.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_translatable_caption.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostEntity post;
   final int initialImageIndex;
   final String? initialCommentId;
+  final List<String>? initialAutoTagUserIds;
+
   const PostDetailPage({
     super.key,
     required this.post,
     this.initialImageIndex = 0,
     this.initialCommentId,
+    this.initialAutoTagUserIds,
   });
 
   @override
@@ -49,12 +61,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
   late PostDetailBloc _postDetailBloc;
   late List<ReactPostEntity> _localReacts;
   EmojiType? _currentUserReaction;
+  String? _currentUserId;
+  List<String> _visibleOnProfileUserIds = [];
+  bool _isRemoved = false;
+  bool _isSaved = false;
+  String? _savedId;
+  final SaveRepository _saveRepository = s1<SaveRepository>();
 
   @override
   void initState() {
     super.initState();
     _localReacts = List.from(widget.post.reacts ?? []);
     _currentUserReaction = null;
+    _visibleOnProfileUserIds = List.from(
+      widget.post.visibleOnProfileUserIds ?? [],
+    );
     _initCurrentUserReaction();
 
     // Khởi tạo các Blocs
@@ -70,6 +91,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
         _scrollToCommentAndOpen(widget.initialCommentId!);
       });
     }
+
+    if (widget.initialAutoTagUserIds != null &&
+        widget.initialAutoTagUserIds!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openAutoTagSuggest();
+      });
+    }
+
+    _checkSavedStatus();
   }
 
   @override
@@ -97,6 +127,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     if (mounted) {
       setState(() {
+        _currentUserId = currentUserId;
         _currentUserReaction = userReaction?.emoji;
       });
     }
@@ -127,6 +158,42 @@ class _PostDetailPageState extends State<PostDetailPage> {
         );
       }
     });
+  }
+
+  Future<void> _openAutoTagSuggest() async {
+    final selectedFriends = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TagFriendsPage(
+          initialSelectedFriends: widget.initialAutoTagUserIds!,
+        ),
+      ),
+    );
+
+    if (selectedFriends != null &&
+        selectedFriends is List<Map<String, String>>) {
+      final selectedIds = selectedFriends.map((f) => f['id']!).toList();
+      final updatePostTags = s1<UpdatePostTagsUsecase>();
+      final result = await updatePostTags(
+        params: UpdatePostTagsParams(
+          postId: widget.post.id,
+          taggedUserIds: selectedIds,
+        ),
+      );
+
+      if (mounted) {
+        if (result is DataStateSuccess) {
+          showSuccessSnackBar(context, 'Đã cập nhật thẻ thành công');
+
+          setState(() {});
+        } else {
+          showErrorSnackBar(
+            context,
+            'Cập nhật thẻ thất bại: ${result.error?.message}',
+          );
+        }
+      }
+    }
   }
 
   void _onReactionChanged(EmojiType? newReaction) async {
@@ -168,6 +235,93 @@ class _PostDetailPageState extends State<PostDetailPage> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> _handleTagVisibility(bool isVisible) async {
+    await TagActionHelper.handleTagVisibility(
+      context: context,
+      postId: widget.post.id,
+      isVisible: isVisible,
+      onSuccess: () async {
+        final userData = await TokenStorage.getUserData();
+        final currentUserId = userData?['id'];
+        if (currentUserId != null) {
+          setState(() {
+            if (isVisible) {
+              if (!_visibleOnProfileUserIds.contains(currentUserId)) {
+                _visibleOnProfileUserIds.add(currentUserId);
+              }
+            } else {
+              _visibleOnProfileUserIds.remove(currentUserId);
+            }
+          });
+        }
+      },
+    );
+  }
+
+  Future<void> _handleRemoveTag() async {
+    await TagActionHelper.handleRemoveTag(
+      context: context,
+      postId: widget.post.id,
+      onSuccess: () {
+        setState(() {
+          _isRemoved = true;
+        });
+      },
+    );
+  }
+
+  Future<void> _checkSavedStatus() async {
+    final result = await _saveRepository.checkSaved(
+      targetId: widget.post.id,
+      type: 'post',
+    );
+    if (result is DataStateSuccess && result.data == true) {
+      if (mounted) {
+        setState(() {
+          _isSaved = true;
+        });
+        _fetchSavedId();
+      }
+    }
+  }
+
+  Future<void> _fetchSavedId() async {
+    final listResult = await _saveRepository.getSavedByUser(
+      type: 'post',
+      limit: 50,
+    );
+    if (listResult is DataStateSuccess && listResult.data != null) {
+      for (var item in listResult.data!.data) {
+        if (item.targetId == widget.post.id) {
+          if (mounted) {
+            setState(() {
+              _savedId = item.id;
+            });
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  Future<void> _handleUnsave() async {
+    if (_savedId == null) {
+      await _fetchSavedId();
+      if (_savedId == null) return;
+    }
+
+    final result = await _saveRepository.unsavePost(savedId: _savedId!);
+    if (result is DataStateSuccess) {
+      if (mounted) {
+        setState(() {
+          _isSaved = false;
+          _savedId = null;
+        });
+        showSuccessSnackBar(context, 'Đã bỏ lưu bài viết');
+      }
+    }
   }
 
   void _showFullScreenImage(BuildContext context, int initialIndex) async {
@@ -277,15 +431,48 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         },
                       )
                     else
-                      // Post bình thường: dùng PostHeader
                       PostHeader(
                         user: post.user,
                         createdAt: post.createdAt,
+                        taggedUsers: _isRemoved
+                            ? post.taggedUsers
+                                  ?.where((u) => u.userId != _currentUserId)
+                                  .toList()
+                            : post.taggedUsers,
+                        visibleOnProfileUserIds: _visibleOnProfileUserIds,
+                        onTagVisibilityTap: _handleTagVisibility,
+                        onRemoveTagTap: _handleRemoveTag,
+                        onOptionsTap: () {
+                          PostOptionsBottomSheet.show(
+                            context,
+                            post: widget.post,
+                          );
+                        },
+                        isSaved: _isSaved,
                         onReportTap: () {
-                          // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
+                          ReportPostBottomSheet.show(
+                            context,
+                            postId: widget.post.id,
+                            ownerUserId: post.user.userId,
+                          );
+                        },
+                        onSaveTap: () {
+                          if (_isSaved) {
+                            _handleUnsave();
+                          } else {
+                            SavePostBottomSheet.show(
+                              context,
+                              post: widget.post,
+                              onSaved: (savedId) {
+                                setState(() {
+                                  _isSaved = true;
+                                  _savedId = savedId;
+                                });
+                              },
+                            );
+                          }
                         },
                       ),
-
                     SizedBox(height: 10.h),
 
                     // Caption + dịch

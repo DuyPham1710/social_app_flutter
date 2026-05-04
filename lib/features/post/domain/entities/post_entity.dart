@@ -13,6 +13,8 @@ class PostEntity extends PrivacyBase {
   final String layout;
   final List<ReactPostEntity>? reacts;
   final EmojiType? isReact;
+  final List<UserEntity>? taggedUsers;
+  final List<String>? visibleOnProfileUserIds;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final CommunityEntity? community;
@@ -26,6 +28,8 @@ class PostEntity extends PrivacyBase {
     required this.layout,
     this.reacts,
     this.isReact,
+    this.taggedUsers,
+    this.visibleOnProfileUserIds,
     required super.privacyType,
     super.friendsExcept,
     super.friendsDetail,
@@ -37,6 +41,6 @@ class PostEntity extends PrivacyBase {
 
   @override
   String toString() {
-    return 'PostEntity(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, privacyType: $privacyType, community: $community)';
+    return 'PostEntity(id: $id, caption: $caption, user: $user, urls: $urls, layout: $layout, privacyType: $privacyType, taggedUsers: $taggedUsers, visibleOnProfileUserIds: $visibleOnProfileUserIds, community: $community)';
   }
 }

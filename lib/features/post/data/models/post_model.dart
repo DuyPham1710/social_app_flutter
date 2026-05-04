@@ -72,6 +72,8 @@ class PostModel extends PostEntity with _$PostModel {
     PrivacyType privacyType,
     @JsonKey(name: 'friends_except') @Default([]) List<String> friendsExcept,
     @JsonKey(name: 'friends_detail') @Default([]) List<String> friendsDetail,
+    List<UserModel>? taggedUsers,
+    @Default([]) List<String> visibleOnProfileUserIds,
     DateTime? createdAt,
     DateTime? updatedAt,
     @JsonKey(
