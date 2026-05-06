@@ -37,6 +37,7 @@ import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dar
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
@@ -930,6 +931,80 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     _clearReplyMessage();
   }
 
+  Future<void> _shareCurrentLocation() async {
+    try {
+      final messenger = ScaffoldMessenger.of(context);
+
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('GPS đang tắt. Đang mở Cài đặt định vị...'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Bạn chưa cấp quyền truy cập vị trí.')),
+        );
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Quyền vị trí bị từ chối vĩnh viễn. Đang mở Cài đặt ứng dụng...'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        await Geolocator.openAppSettings();
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final conversationId = _currentConversationId ?? widget.conversationId;
+      if (conversationId == null) return;
+
+      // NOTE: Phần gửi metadata sẽ được nối vào pipeline ở TODO tiếp theo.
+      final lat = position.latitude;
+      final lng = position.longitude;
+      final mapUrl =
+          'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+
+      context.read<MessageBloc>().add(
+        SendMessageEvent(
+          userId: widget.userId,
+          conversationId: conversationId,
+          metadata: {
+            'type': 'location',
+            'latitude': lat,
+            'longitude': lng,
+            'mapUrl': mapUrl,
+            'label': 'Vị trí hiện tại',
+          },
+          replyTo: _replyingMessage?.id,
+        ),
+      );
+
+      _clearReplyMessage();
+      _scrollToBottom();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể lấy vị trí: $e')),
+      );
+    }
+  }
+
   void _startRecording() {
     setState(() {
       _isRecording = true;
@@ -1690,6 +1765,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                 _showAttachmentMenu = false;
                               });
                             },
+                            onShareLocation: _shareCurrentLocation,
                           ),
                         ),
                     ],

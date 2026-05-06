@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/chat/presentation/widgets/audio_message_b
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MessageItem extends StatelessWidget {
   final MessageEntity message;
@@ -104,6 +105,7 @@ class MessageItem extends StatelessWidget {
         message.metadata != null &&
         (message.metadata!.type == 'video_call' ||
             message.metadata!.type == 'audio_call');
+    final isLocationMessage = message.metadata?.type == 'location';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -154,6 +156,8 @@ class MessageItem extends StatelessWidget {
                           ? _buildDeletedMessage(lastName, fromMe)
                           : isReplying
                           ? _buildReplyMessage(context)
+                          : isLocationMessage
+                          ? _buildLocationMessage(context)
                           : isHasMetaData
                           ? VideoCallMessageItem(
                               fromMe: fromMe,
@@ -534,6 +538,93 @@ class MessageItem extends StatelessWidget {
         style: TextStyle(
           color: fromMe ? Colors.white : AppColors.textPrimary,
           fontSize: 14.sp,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationMessage(BuildContext context) {
+    final label = message.metadata?.label ?? 'Vị trí';
+    final lat = message.metadata?.latitude;
+    final lng = message.metadata?.longitude;
+    final mapUrl = message.metadata?.mapUrl;
+
+    final subText = (lat != null && lng != null)
+        ? '${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}'
+        : (mapUrl ?? '');
+
+    return InkWell(
+      onTap: mapUrl == null
+          ? null
+          : () async {
+              final uri = Uri.tryParse(mapUrl);
+              if (uri == null) return;
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            },
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(14.r),
+        topRight: Radius.circular(14.r),
+        bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+        bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+      ),
+      child: Container(
+        constraints: BoxConstraints(maxWidth: 0.7.sw),
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: fromMe ? AppColors.primary : AppColors.textSecondary.withOpacity(0.1),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(14.r),
+            topRight: Radius.circular(14.r),
+            bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+            bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.location_on,
+              color: fromMe ? Colors.white : AppColors.primary,
+              size: 20.sp,
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: fromMe ? Colors.white : AppColors.textPrimary,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (subText.isNotEmpty) ...[
+                    SizedBox(height: 2.h),
+                    Text(
+                      subText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: fromMe
+                            ? Colors.white.withOpacity(0.9)
+                            : AppColors.textSecondary,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            SizedBox(width: 10.w),
+            Icon(
+              Icons.open_in_new,
+              color: fromMe ? Colors.white.withOpacity(0.9) : AppColors.textSecondary,
+              size: 18.sp,
+            ),
+          ],
         ),
       ),
     );

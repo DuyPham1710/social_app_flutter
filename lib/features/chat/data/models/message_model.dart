@@ -127,16 +127,24 @@ class SeenByModel {
 }
 
 class MessageMetadataModel {
-  final String? type; // 'video_call' or 'audio_call'
+  final String? type; // 'video_call' | 'audio_call' | 'location'
   final String? callStatus; // 'completed', 'missed', 'rejected'
   final int? duration; // in seconds
   final String? callId;
+  final double? latitude;
+  final double? longitude;
+  final String? mapUrl;
+  final String? label;
 
   MessageMetadataModel({
     this.type,
     this.callStatus,
     this.duration,
     this.callId,
+    this.latitude,
+    this.longitude,
+    this.mapUrl,
+    this.label,
   });
 
   factory MessageMetadataModel.fromJson(Map<String, dynamic> json) {
@@ -145,6 +153,10 @@ class MessageMetadataModel {
       callStatus: json['callStatus'] as String?,
       duration: json['duration'] as int?,
       callId: json['callId'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      mapUrl: json['mapUrl'] as String?,
+      label: json['label'] as String?,
     );
   }
 
@@ -153,6 +165,10 @@ class MessageMetadataModel {
     'callStatus': callStatus,
     'duration': duration,
     'callId': callId,
+    'latitude': latitude,
+    'longitude': longitude,
+    'mapUrl': mapUrl,
+    'label': label,
   };
 
   MessageMetadataEntity toEntity() => MessageMetadataEntity(
@@ -160,6 +176,10 @@ class MessageMetadataModel {
     callStatus: callStatus,
     duration: duration,
     callId: callId,
+    latitude: latitude,
+    longitude: longitude,
+    mapUrl: mapUrl,
+    label: label,
   );
 }
 

@@ -5,8 +5,13 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class AttachmentMenuWidget extends StatelessWidget {
   final VoidCallback onClose;
+  final Future<void> Function()? onShareLocation;
 
-  const AttachmentMenuWidget({super.key, required this.onClose});
+  const AttachmentMenuWidget({
+    super.key,
+    required this.onClose,
+    this.onShareLocation,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +61,7 @@ class AttachmentMenuWidget extends StatelessWidget {
             color: AppColors.primary,
             onTap: () {
               onClose();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tính năng vị trí đang phát triển'),
-                ),
-              );
+              onShareLocation?.call();
             },
           ),
 

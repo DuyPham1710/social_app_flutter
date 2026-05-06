@@ -11,6 +11,7 @@ class SendMessageUseCase {
     String? text,
     List<Map<String, dynamic>>? attachments,
     String? replyTo,
+    Map<String, dynamic>? metadata,
   }) {
     _chatRepository.sendMessage(
       userId: userId,
@@ -18,6 +19,7 @@ class SendMessageUseCase {
       text: text,
       attachments: attachments,
       replyTo: replyTo,
+      metadata: metadata,
     );
   }
 }
