@@ -985,6 +985,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         SendMessageEvent(
           userId: widget.userId,
           conversationId: conversationId,
+          text: 'Gửi vị trí',
           metadata: {
             'type': 'location',
             'latitude': lat,
