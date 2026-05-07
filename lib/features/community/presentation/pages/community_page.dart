@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/community/presentation/widgets/my_invites
 import 'package:social_app_fe/features/community/presentation/widgets/pending_communities_widget.dart';
 import 'package:social_app_fe/features/community/presentation/pages/create_community_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -100,12 +101,7 @@ class _CommunityPageState extends State<CommunityPage>
 
     _tabController.animateTo(1);
     providerContext.read<CommunityListBloc>().add(const MyCommunitiesFetched());
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Đã tạo cộng đồng mới'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    showSuccessSnackBar(context, 'Đã tạo cộng đồng mới');
   }
 
   @override

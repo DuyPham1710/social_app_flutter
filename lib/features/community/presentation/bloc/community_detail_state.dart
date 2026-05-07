@@ -27,12 +27,18 @@ class CommunityDetailLoaded extends CommunityDetailState {
 class CommunityActionSuccess extends CommunityDetailState {
   final String message;
   final String? requestId; // For tracking which invite was responded to
+  final String? communityId; // For filtering in item card listeners
 
-  const CommunityActionSuccess(this.message, {this.requestId});
+  const CommunityActionSuccess(
+    this.message, {
+    this.requestId,
+    this.communityId,
+  });
 }
 
 class CommunityDetailError extends CommunityDetailState {
   final String message;
+  final String? communityId; // For filtering in item card listeners
 
-  const CommunityDetailError(this.message);
+  const CommunityDetailError(this.message, {this.communityId});
 }

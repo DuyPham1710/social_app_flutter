@@ -34,6 +34,8 @@ import 'package:social_app_fe/features/friend/domain/usecases/accept_friend_requ
 import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_request_usecase.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/notification/domain/usecases/delete_notification_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/respond_to_join_request_usecase.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import '../widgets/comment_notification_item.dart';
 import '../widgets/friend_request_notification_item.dart';
 import '../services/notification_fcm_service.dart';
@@ -346,14 +348,14 @@ class _NotificationPageState extends State<NotificationPage> {
           },
           onAccept: () async {
             _markAsRead(notification.id);
-            // TODO: Implement accept join request
+            await _handleAcceptJoinRequest(notification);
           },
           onReject: () async {
             _markAsRead(notification.id);
-            // TODO: Implement reject join request
+            await _handleRejectJoinRequest(notification);
           },
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
@@ -374,10 +376,7 @@ class _NotificationPageState extends State<NotificationPage> {
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
-          communityName:
-              notification.community?.name ??
-              notification.content ??
-              'Community',
+          communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
@@ -410,7 +409,7 @@ class _NotificationPageState extends State<NotificationPage> {
             // TODO: Implement reject invite
           },
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.targetId;
             if (id != null) {
               Navigator.push(
                 context,
@@ -427,40 +426,13 @@ class _NotificationPageState extends State<NotificationPage> {
         return CommunityJoinApprovedNotificationItem(
           avatarUrl:
               notification.community?.avatar ??
-              notification.sender?.avatarUrl ??
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-          userName: notification.sender?.fullName ?? '',
-          userId: notification.sender?.userId ?? '',
-          communityName:
-              notification.community?.name ??
-              notification.content ??
-              'Community',
+          communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
-          onUserTap: () {
-            if (notification.sender?.userId != null) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => s1<OtherProfileBloc>()
-                      ..add(
-                        LoadOtherUserProfileEvent(
-                          userId: notification.sender!.userId,
-                        ),
-                      ),
-                    child: OtherProfilePage(
-                      userId: notification.sender!.userId,
-                    ),
-                  ),
-                ),
-              );
-            }
-            _markAsRead(notification.id);
-          },
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.targetId;
             if (id != null) {
               Navigator.push(
                 context,
@@ -477,40 +449,16 @@ class _NotificationPageState extends State<NotificationPage> {
         return CommunityJoinRejectedNotificationItem(
           avatarUrl:
               notification.community?.avatar ??
-              notification.sender?.avatarUrl ??
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-          userName: notification.sender?.fullName ?? '',
-          userId: notification.sender?.userId ?? '',
-          communityName:
-              notification.community?.name ??
-              notification.content ??
-              'Community',
+          userName: 'Admin',
+          userId: '',
+          communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
-          onUserTap: () {
-            if (notification.sender?.userId != null) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => s1<OtherProfileBloc>()
-                      ..add(
-                        LoadOtherUserProfileEvent(
-                          userId: notification.sender!.userId,
-                        ),
-                      ),
-                    child: OtherProfilePage(
-                      userId: notification.sender!.userId,
-                    ),
-                  ),
-                ),
-              );
-            }
-            _markAsRead(notification.id);
-          },
+          onUserTap: () {},
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.targetId;
             if (id != null) {
               Navigator.push(
                 context,
@@ -531,10 +479,7 @@ class _NotificationPageState extends State<NotificationPage> {
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
-          communityName:
-              notification.community?.name ??
-              notification.content ??
-              'Community',
+          communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
@@ -566,8 +511,7 @@ class _NotificationPageState extends State<NotificationPage> {
             _markAsRead(notification.id);
 
             if (isAdminReview) {
-              final communityId =
-                  notification.community?._id ?? notification.content;
+              final communityId = notification.community?.id;
               final postId = notification.targetId;
               if (communityId != null && postId != null) {
                 Navigator.push(
@@ -581,8 +525,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       senderAvatar:
                           notification.sender?.avatarUrl ??
                           'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                      communityName:
-                          notification.community?.name ?? 'Community',
+                      communityName: notification.content ?? 'Community',
                       createdAt: notification.createdAt,
                     ),
                   ),
@@ -594,7 +537,7 @@ class _NotificationPageState extends State<NotificationPage> {
             _handleJumpToPost(notification);
           },
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
@@ -615,10 +558,7 @@ class _NotificationPageState extends State<NotificationPage> {
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
-          communityName:
-              notification.community?.name ??
-              notification.content ??
-              'Community',
+          communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
@@ -644,8 +584,7 @@ class _NotificationPageState extends State<NotificationPage> {
           },
           onViewPost: () async {
             _markAsRead(notification.id);
-            final communityId =
-                notification.community?._id ?? notification.content;
+            final communityId = notification.community?.id;
             final postId = notification.targetId;
             if (communityId != null && postId != null) {
               Navigator.push(
@@ -659,7 +598,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     senderAvatar:
                         notification.sender?.avatarUrl ??
                         'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                    communityName: notification.community?.name ?? 'Community',
+                    communityName: notification.content ?? 'Community',
                     createdAt: notification.createdAt,
                   ),
                 ),
@@ -670,7 +609,7 @@ class _NotificationPageState extends State<NotificationPage> {
             _handleJumpToPost(notification);
           },
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
@@ -683,8 +622,7 @@ class _NotificationPageState extends State<NotificationPage> {
           },
           onReviewTap: () {
             _markAsRead(notification.id);
-            final communityId =
-                notification.community?._id ?? notification.content;
+            final communityId = notification.community?.id;
             final postId = notification.targetId;
             if (communityId != null && postId != null) {
               Navigator.push(
@@ -698,7 +636,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     senderAvatar:
                         notification.sender?.avatarUrl ??
                         'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                    communityName: notification.community?.name ?? 'Community',
+                    communityName: notification.content ?? 'Community',
                     createdAt: notification.createdAt,
                   ),
                 ),
@@ -715,10 +653,7 @@ class _NotificationPageState extends State<NotificationPage> {
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
-          communityName:
-              notification.community?.name ??
-              notification.content ??
-              'Community',
+          communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           rejectionReason: notification.message,
@@ -747,7 +682,7 @@ class _NotificationPageState extends State<NotificationPage> {
             // TODO: Implement view rejection details
           },
           onCommunityTap: () {
-            final id = notification.community?._id ?? notification.content;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
@@ -1012,6 +947,85 @@ class _NotificationPageState extends State<NotificationPage> {
       showSuccessSnackBar(context, "Đã từ chối lời mời kết bạn");
     } else {
       showErrorSnackBar(context, "Lời mời kết bạn không tồn tại");
+    }
+
+    // Delete from server in background
+    try {
+      s1<DeleteNotificationUseCase>()(params: notification.id);
+    } catch (e) {}
+  }
+
+  Future<void> _handleAcceptJoinRequest(notification) async {
+    final requestId = notification.targetId;
+    final communityId = notification.community?.id;
+
+    if (requestId == null ||
+        requestId.isEmpty ||
+        communityId == null ||
+        communityId.isEmpty) {
+      showErrorSnackBar(context, "Không thể xử lý yêu cầu tham gia");
+      // Delete from server in background
+      try {
+        s1<DeleteNotificationUseCase>()(params: notification.id);
+      } catch (e) {}
+      return;
+    }
+
+    // Remove from UI immediately
+    context.read<NotificationBloc>().add(RemoveNotification(notification.id));
+
+    // Call the API
+    final result = await s1<RespondToJoinRequestUseCase>()(
+      params: RespondToJoinRequestParams(
+        communityId: communityId,
+        requestId: requestId,
+        action: 'approve',
+      ),
+    );
+
+    if (result is DataStateSuccess) {
+      showSuccessSnackBar(context, "Đã chấp nhận yêu cầu tham gia");
+    } else {
+      showErrorSnackBar(context, "Lỗi khi xử lý yêu cầu tham gia");
+    }
+
+    // Delete from server in background
+    try {
+      s1<DeleteNotificationUseCase>()(params: notification.id);
+    } catch (e) {}
+  }
+
+  Future<void> _handleRejectJoinRequest(notification) async {
+    final requestId = notification.targetId;
+    final communityId = notification.community?.id;
+
+    if (requestId == null ||
+        requestId.isEmpty ||
+        communityId == null ||
+        communityId.isEmpty) {
+      showErrorSnackBar(context, "Không thể xử lý yêu cầu tham gia");
+      try {
+        s1<DeleteNotificationUseCase>()(params: notification.id);
+      } catch (e) {}
+      return;
+    }
+
+    // Remove from UI immediately
+    context.read<NotificationBloc>().add(RemoveNotification(notification.id));
+
+    // Call the API
+    final result = await s1<RespondToJoinRequestUseCase>()(
+      params: RespondToJoinRequestParams(
+        communityId: communityId,
+        requestId: requestId,
+        action: 'reject',
+      ),
+    );
+
+    if (result is DataStateSuccess) {
+      showSuccessSnackBar(context, "Đã từ chối yêu cầu tham gia");
+    } else {
+      showErrorSnackBar(context, "Lỗi khi xử lý yêu cầu tham gia");
     }
 
     // Delete from server in background

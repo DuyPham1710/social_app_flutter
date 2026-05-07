@@ -7,6 +7,8 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_event.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_state.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CreateCommunityPage extends StatefulWidget {
   const CreateCommunityPage({super.key});
@@ -50,9 +52,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Lỗi chọn ảnh: ${e.toString()}')));
+      showErrorSnackBar(context, 'Lỗi chọn ảnh: ${e.toString()}');
     }
   }
 
@@ -93,24 +93,14 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
       child: BlocListener<CommunityCreateBloc, CommunityCreateState>(
         listener: (context, state) {
           if (state is CommunityCreateSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-              ),
-            );
+            showSuccessSnackBar(context, state.message);
             Future.delayed(const Duration(seconds: 1), () {
               if (mounted) {
                 Navigator.of(context).pop(state.community);
               }
             });
           } else if (state is CommunityCreateError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showErrorSnackBar(context, state.message);
           }
         },
         child: Scaffold(
@@ -373,12 +363,9 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                             ? null
                             : () {
                                 if (_nameController.text.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Vui lòng nhập tên cộng đồng',
-                                      ),
-                                    ),
+                                  showErrorSnackBar(
+                                    context,
+                                    'Vui lòng nhập tên cộng đồng',
                                   );
                                   return;
                                 }

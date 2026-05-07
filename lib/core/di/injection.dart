@@ -295,20 +295,15 @@ Future<void> initializeDependencies() async {
     () => GetProfilePostsUseCase(s1()),
   );
 
-
   s1.registerLazySingleton<UpdateTagVisibilityUsecase>(
     () => UpdateTagVisibilityUsecase(s1()),
   );
-  s1.registerLazySingleton<RemoveTagUsecase>(
-    () => RemoveTagUsecase(s1()),
-  );
+  s1.registerLazySingleton<RemoveTagUsecase>(() => RemoveTagUsecase(s1()));
   s1.registerLazySingleton<UpdatePostTagsUsecase>(
     () => UpdatePostTagsUsecase(s1()),
   );
-  
-  s1.registerFactory<SavedItemsBloc>(
-    () => SavedItemsBloc(s1()),
-  );
+
+  s1.registerFactory<SavedItemsBloc>(() => SavedItemsBloc(s1()));
 
   // Comment UseCases
   s1.registerLazySingleton<ConnectCommentSocketUseCase>(
@@ -839,6 +834,7 @@ Future<void> initializeDependencies() async {
       s1<GetAllCommunitiesUseCase>(),
       s1<GetMyCommunitiesUseCase>(),
       s1<GetMyInvitesUseCase>(),
+      s1<CancelJoinRequestUseCase>(),
     ),
   );
 

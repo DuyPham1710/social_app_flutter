@@ -33,3 +33,9 @@ class MyInvitesFetched extends CommunityListEvent {
 class PendingCommunitiesFetched extends CommunityListEvent {
   const PendingCommunitiesFetched();
 }
+
+class CancelPendingCommunityRequested extends CommunityListEvent {
+  final String communityId;
+
+  const CancelPendingCommunityRequested(this.communityId);
+}

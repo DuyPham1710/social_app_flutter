@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
+import 'package:social_app_fe/features/community/domain/usecases/cancel_join_request_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_all_communities_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_my_communities_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_my_invites_usecase.dart';
@@ -13,17 +14,20 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
   final GetAllCommunitiesUseCase _getAllCommunitiesUseCase;
   final GetMyCommunitiesUseCase _getMyCommunitiesUseCase;
   final GetMyInvitesUseCase _getMyInvitesUseCase;
+  final CancelJoinRequestUseCase _cancelJoinRequestUseCase;
 
   CommunityListBloc(
     this._getAllCommunitiesUseCase,
     this._getMyCommunitiesUseCase,
     this._getMyInvitesUseCase,
+    this._cancelJoinRequestUseCase,
   ) : super(const CommunityListInitial()) {
     on<CommunityListFetched>(_onCommunityListFetched);
     on<CommunityListSearched>(_onCommunityListSearched);
     on<MyCommunitiesFetched>(_onMyCommunitiesFetched);
     on<MyInvitesFetched>(_onMyInvitesFetched);
     on<PendingCommunitiesFetched>(_onPendingCommunitiesFetched);
+    on<CancelPendingCommunityRequested>(_onCancelPendingCommunityRequested);
   }
 
   Future<void> _onCommunityListFetched(
@@ -168,6 +172,40 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
+        emit(CommunityListError(errorMessage));
+      }
+    } catch (e) {
+      emit(CommunityListError('Đã xảy ra lỗi: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onCancelPendingCommunityRequested(
+    CancelPendingCommunityRequested event,
+    Emitter<CommunityListState> emit,
+  ) async {
+    try {
+      final dataState = await _cancelJoinRequestUseCase(
+        params: event.communityId,
+      );
+
+      if (dataState is DataStateSuccess) {
+        final currentState = state;
+        if (currentState is PendingCommunitiesLoaded) {
+          final updatedCommunities = currentState.communities
+              .where(
+                (community) => community.id.toString() != event.communityId,
+              )
+              .toList();
+
+          emit(const CommunityListActionSuccess('Đã hủy yêu cầu tham gia'));
+          emit(PendingCommunitiesLoaded(updatedCommunities));
+        } else {
+          emit(const CommunityListActionSuccess('Đã hủy yêu cầu tham gia'));
+          add(const PendingCommunitiesFetched());
+        }
+      } else if (dataState is DataStateError) {
+        final errorMessage =
+            '${dataState.error?.response?.data?["message"] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
         emit(CommunityListError(errorMessage));
       }
     } catch (e) {

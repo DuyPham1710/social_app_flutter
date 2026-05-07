@@ -87,10 +87,17 @@ class CommunityDetailBloc
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
-        emit(CommunityDetailError(errorMessage));
+        emit(
+          CommunityDetailError(errorMessage, communityId: event.communityId),
+        );
       }
     } catch (e) {
-      emit(CommunityDetailError('Đã xảy ra lỗi: ${e.toString()}'));
+      emit(
+        CommunityDetailError(
+          'Đã xảy ra lỗi: ${e.toString()}',
+          communityId: event.communityId,
+        ),
+      );
     }
   }
 
@@ -102,16 +109,28 @@ class CommunityDetailBloc
       final dataState = await _joinCommunityUseCase(params: event.communityId);
 
       if (dataState is DataStateSuccess) {
-        emit(const CommunityActionSuccess('Đã gửi yêu cầu tham gia cộng đồng'));
+        emit(
+          CommunityActionSuccess(
+            'Đã gửi yêu cầu tham gia cộng đồng',
+            communityId: event.communityId,
+          ),
+        );
         // Refresh detail
         add(CommunityDetailFetched(event.communityId));
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
-        emit(CommunityDetailError(errorMessage));
+        emit(
+          CommunityDetailError(errorMessage, communityId: event.communityId),
+        );
       }
     } catch (e) {
-      emit(CommunityDetailError('Đã xảy ra lỗi: ${e.toString()}'));
+      emit(
+        CommunityDetailError(
+          'Đã xảy ra lỗi: ${e.toString()}',
+          communityId: event.communityId,
+        ),
+      );
     }
   }
 
@@ -123,14 +142,26 @@ class CommunityDetailBloc
       final dataState = await _leaveCommunityUseCase(params: event.communityId);
 
       if (dataState is DataStateSuccess) {
-        emit(const CommunityActionSuccess('Đã rời khỏi cộng đồng'));
+        emit(
+          CommunityActionSuccess(
+            'Đã rời khỏi cộng đồng',
+            communityId: event.communityId,
+          ),
+        );
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
-        emit(CommunityDetailError(errorMessage));
+        emit(
+          CommunityDetailError(errorMessage, communityId: event.communityId),
+        );
       }
     } catch (e) {
-      emit(CommunityDetailError('Đã xảy ra lỗi: ${e.toString()}'));
+      emit(
+        CommunityDetailError(
+          'Đã xảy ra lỗi: ${e.toString()}',
+          communityId: event.communityId,
+        ),
+      );
     }
   }
 
@@ -144,15 +175,27 @@ class CommunityDetailBloc
       );
 
       if (dataState is DataStateSuccess) {
-        emit(const CommunityActionSuccess('Đã hủy yêu cầu tham gia'));
+        emit(
+          CommunityActionSuccess(
+            'Đã hủy yêu cầu tham gia',
+            communityId: event.communityId,
+          ),
+        );
         add(CommunityDetailFetched(event.communityId));
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
-        emit(CommunityDetailError(errorMessage));
+        emit(
+          CommunityDetailError(errorMessage, communityId: event.communityId),
+        );
       }
     } catch (e) {
-      emit(CommunityDetailError('Đã xảy ra lỗi: ${e.toString()}'));
+      emit(
+        CommunityDetailError(
+          'Đã xảy ra lỗi: ${e.toString()}',
+          communityId: event.communityId,
+        ),
+      );
     }
   }
 
@@ -205,6 +248,7 @@ class CommunityDetailBloc
                 ? 'Đã chấp nhận lời mời'
                 : 'Đã từ chối lời mời',
             requestId: event.requestId,
+            communityId: event.communityId,
           ),
         );
         // Refresh
@@ -212,10 +256,17 @@ class CommunityDetailBloc
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
-        emit(CommunityDetailError(errorMessage));
+        emit(
+          CommunityDetailError(errorMessage, communityId: event.communityId),
+        );
       }
     } catch (e) {
-      emit(CommunityDetailError('Đã xảy ra lỗi: ${e.toString()}'));
+      emit(
+        CommunityDetailError(
+          'Đã xảy ra lỗi: ${e.toString()}',
+          communityId: event.communityId,
+        ),
+      );
     }
   }
 }

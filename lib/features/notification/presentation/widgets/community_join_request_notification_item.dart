@@ -35,6 +35,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
     return Container(
       color: isRead ? const Color(0xFFFFFFFF) : const Color(0xFFEAF3FF),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      margin: const EdgeInsets.only(bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -64,9 +65,9 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                   bottom: 0,
                   child: CircleAvatar(
                     radius: 13,
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: const Color.fromARGB(255, 247, 177, 112),
                     child: const Icon(
-                      Icons.person_add,
+                      Icons.hourglass_top,
                       size: 15,
                       color: Colors.white,
                     ),
@@ -227,7 +228,6 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
           const Icon(Icons.more_horiz),
         ],
       ),
-      margin: const EdgeInsets.only(bottom: 4),
     );
   }
 }

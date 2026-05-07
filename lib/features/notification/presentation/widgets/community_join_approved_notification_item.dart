@@ -3,25 +3,19 @@ import 'package:flutter/gestures.dart';
 
 class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   final String avatarUrl;
-  final String userName;
-  final String userId;
   final String communityName;
   final String time;
   final bool isRead;
-  final VoidCallback? onUserTap;
   final VoidCallback? onCommunityTap;
   final String? message;
 
   const CommunityJoinApprovedNotificationItem({
     super.key,
     required this.avatarUrl,
-    required this.userName,
-    required this.userId,
     required this.communityName,
     this.message,
     required this.time,
     required this.isRead,
-    this.onUserTap,
     this.onCommunityTap,
   });
 
@@ -35,41 +29,38 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Avatar with icon overlay
-          GestureDetector(
-            onTap: onUserTap,
-            child: Stack(
-              children: [
-                ClipOval(
-                  child: Image.network(
-                    avatarUrl,
-                    width: 58,
-                    height: 58,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return CircleAvatar(
-                        radius: 29,
-                        backgroundColor: Colors.grey[300],
-                        child: const Icon(Icons.person),
-                      );
-                    },
+          Stack(
+            children: [
+              ClipOval(
+                child: Image.network(
+                  avatarUrl,
+                  width: 58,
+                  height: 58,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return CircleAvatar(
+                      radius: 29,
+                      backgroundColor: Colors.grey[300],
+                      child: const Icon(Icons.group),
+                    );
+                  },
+                ),
+              ),
+              // Icon overlay for approved
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: CircleAvatar(
+                  radius: 13,
+                  backgroundColor: Colors.green,
+                  child: const Icon(
+                    Icons.diversity_1,
+                    size: 15,
+                    color: Colors.white,
                   ),
                 ),
-                // Icon overlay for approved
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: CircleAvatar(
-                    radius: 13,
-                    backgroundColor: Colors.green,
-                    child: const Icon(
-                      Icons.check_circle,
-                      size: 15,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
 
           const SizedBox(width: 12),
@@ -81,88 +72,33 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final msg = message ?? 'đã phê duyệt yêu cầu';
-                    final quotedCommunity = '"$communityName"';
-
-                    int idx = -1;
-                    int communityLength = 0;
-                    if (msg.contains(quotedCommunity)) {
-                      idx = msg.indexOf(quotedCommunity);
-                      communityLength = quotedCommunity.length;
-                    } else if (msg.contains(communityName)) {
-                      idx = msg.indexOf(communityName);
-                      communityLength = communityName.length;
-                    }
-
-                    final hasCommunityInline = idx != -1;
-
-                    final List<TextSpan> spans = [];
-                    spans.add(
-                      TextSpan(
-                        text: userName,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        recognizer: TapGestureRecognizer()..onTap = onUserTap,
-                      ),
-                    );
-
-                    if (hasCommunityInline) {
-                      final before = msg.substring(0, idx);
-                      final after = msg.substring(idx + communityLength);
-
-                      spans.add(
-                        TextSpan(
-                          text: ' ${before.trimLeft()}',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      );
-
-                      spans.add(
-                        TextSpan(
-                          text: communityName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = onCommunityTap,
-                        ),
-                      );
-
-                      if (after.trim().isNotEmpty) {
-                        spans.add(
+                    final msg =
+                        message ??
+                        'Yêu cầu tham gia cộng đồng của bạn đã được phê duyệt';
+                    return RichText(
+                      text: TextSpan(
+                        children: [
                           TextSpan(
-                            text: ' ${after.trim()}',
+                            text: msg,
                             style: const TextStyle(
                               color: Colors.black,
-                              fontSize: 14,
+                              fontSize: 15,
                               fontWeight: FontWeight.normal,
                             ),
                           ),
-                        );
-                      }
-                    } else {
-                      spans.add(
-                        TextSpan(
-                          text: ' $msg',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
+                          TextSpan(
+                            text: ' $communityName',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = onCommunityTap,
                           ),
-                        ),
-                      );
-                    }
-
-                    return RichText(text: TextSpan(children: spans));
+                        ],
+                      ),
+                    );
                   },
                 ),
 
@@ -172,38 +108,12 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                   time == "0 phút" ? "Vừa xong" : time,
                   style: TextStyle(color: Colors.grey.shade700),
                 ),
-
-                const SizedBox(height: 8),
-
-                // Status message
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    border: Border.all(color: Colors.green.shade200),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'Bạn đã trở thành thành viên của cộng đồng',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.green.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
-
-          const SizedBox(width: 5),
           const Icon(Icons.more_horiz),
         ],
       ),
-      margin: const EdgeInsets.only(bottom: 4),
     );
   }
 }

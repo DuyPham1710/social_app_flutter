@@ -48,6 +48,12 @@ class PendingCommunitiesLoaded extends CommunityListState {
   const PendingCommunitiesLoaded(this.communities);
 }
 
+class CommunityListActionSuccess extends CommunityListState {
+  final String message;
+
+  const CommunityListActionSuccess(this.message);
+}
+
 class CommunityListError extends CommunityListState {
   final String message;
 

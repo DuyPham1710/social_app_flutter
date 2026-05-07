@@ -24,6 +24,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/se
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityCreatePostPage extends StatefulWidget {
   final String communityId;
@@ -110,9 +111,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         _isCreatingPost = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra: ${e.toString()}')));
+      showErrorSnackBar(context, 'Có lỗi xảy ra: ${e.toString()}');
     }
   }
 
@@ -153,9 +152,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cần quyền truy cập ảnh để tiếp tục')),
-      );
+      showErrorSnackBar(context, 'Cần quyền truy cập ảnh để tiếp tục');
     }
   }
 
@@ -225,12 +222,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
             }
           } catch (e) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Không thể thêm ảnh: $e'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              showErrorSnackBar(context, 'Không thể thêm ảnh: $e');
             }
           }
         }
@@ -367,11 +359,9 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
 
           // Nếu user không phải admin, thông báo bài viết chờ duyệt
           if (widget.userRole != 'admin') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Bài viết của bạn đang chờ admin duyệt'),
-                duration: Duration(seconds: 3),
-              ),
+            showSuccessSnackBar(
+              context,
+              'Bài viết của bạn đang chờ admin duyệt',
             );
           }
         }

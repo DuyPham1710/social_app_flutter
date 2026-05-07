@@ -217,57 +217,50 @@ class CommunityDetailHeader extends StatelessWidget {
                 ],
               )
             else if (memberStatus == 'member' || userRole == 'admin')
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: userRole == 'admin' ? onManage : onLeave,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: userRole == 'admin'
-                            ? const Color(0xFFE7F3FF)
-                            : const Color(0xFFFFE4E6),
-                        elevation: 0,
-                        foregroundColor: userRole == 'admin'
-                            ? const Color(0xFF1877F2)
-                            : const Color(0xFFB91C1C),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+              if (userRole != 'admin')
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: onLeave,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFE4E6),
+                          elevation: 0,
+                          foregroundColor: const Color(0xFFB91C1C),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        icon: const Icon(Icons.logout_rounded),
+                        label: const Text(
+                          'Rời nhóm',
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
-                      icon: Icon(
-                        userRole == 'admin'
-                            ? Icons.tune_rounded
-                            : Icons.logout_rounded,
-                      ),
-                      label: Text(
-                        userRole == 'admin' ? 'Quản lý' : 'Rời nhóm',
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
+                    ),
+                  ],
+                )
+              else if (memberStatus == 'invited')
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEEF2FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFC7D2FE)),
+                  ),
+                  child: const Text(
+                    'Bạn đang có lời mời tham gia. Hãy phản hồi trong tab Lời mời.',
+                    style: TextStyle(
+                      color: Color(0xFF3730A3),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ],
-              )
-            else if (memberStatus == 'invited')
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFC7D2FE)),
-                ),
-                child: const Text(
-                  'Bạn đang có lời mời tham gia. Hãy phản hồi trong tab Lời mời.',
-                  style: TextStyle(
-                    color: Color(0xFF3730A3),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
           ],
         ),
       ),

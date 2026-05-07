@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
-import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class PendingCommunitiesWidget extends StatefulWidget {
   const PendingCommunitiesWidget({super.key});
@@ -21,7 +22,14 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
           const PendingCommunitiesFetched(),
         );
       },
-      child: BlocBuilder<CommunityListBloc, CommunityListState>(
+      child: BlocConsumer<CommunityListBloc, CommunityListState>(
+        listener: (context, state) {
+          if (state is CommunityListActionSuccess) {
+            showSuccessSnackBar(context, state.message);
+          } else if (state is CommunityListError) {
+            showErrorSnackBar(context, state.message);
+          }
+        },
         builder: (context, state) {
           if (state is CommunityListLoading) {
             return const _PendingCommunitiesSkeleton();
@@ -302,34 +310,25 @@ class PendingCommunityItem extends StatelessWidget {
     );
   }
 
-  void _showCancelConfirmDialog(BuildContext context, String communityId) {
+  void _showCancelConfirmDialog(BuildContext outerContext, String communityId) {
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: outerContext,
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Hủy yêu cầu'),
         content: const Text(
           'Bạn có chắc muốn hủy yêu cầu tham gia cộng đồng này?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Không'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              // Cancel the join request
-              context.read<CommunityDetailBloc>().add(
-                CancelJoinRequestRequested(communityId),
+              Navigator.pop(dialogContext);
+              outerContext.read<CommunityListBloc>().add(
+                CancelPendingCommunityRequested(communityId),
               );
-              // Refresh the pending communities list
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (context.mounted) {
-                  context.read<CommunityListBloc>().add(
-                    const PendingCommunitiesFetched(),
-                  );
-                }
-              });
             },
             child: const Text('Hủy', style: TextStyle(color: Colors.red)),
           ),
