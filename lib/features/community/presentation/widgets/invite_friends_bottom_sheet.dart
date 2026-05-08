@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/invite_friends_bloc.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 // Helper function để lấy giá trị từ dynamic data (Map hoặc Object)
 String _getStringValue(dynamic value, [String defaultValue = '']) {
@@ -61,9 +63,7 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
 
   void _inviteFriend(String userId) {
     if (userId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lỗi: Không thể xác định bạn bè')),
-      );
+      showErrorSnackBar(context, 'Lỗi: Không thể xác định bạn bè');
       return;
     }
 
@@ -83,13 +83,9 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
       child: BlocListener<InviteFriendsBloc, InviteFriendsState>(
         listener: (context, state) {
           if (state is InviteFriendsSuccess) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            showSuccessSnackBar(context, state.message);
           } else if (state is InviteFriendsError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            showErrorSnackBar(context, state.message);
           }
         },
         child: DraggableScrollableSheet(

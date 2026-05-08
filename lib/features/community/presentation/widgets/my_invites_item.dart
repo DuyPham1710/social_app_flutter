@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
-import 'package:social_app_fe/shared/helpers/show_success_snackbar.dart';
-import 'package:social_app_fe/shared/helpers/show_error_snackbar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 enum _InviteResponseStatus { pending, approved, rejected }
 

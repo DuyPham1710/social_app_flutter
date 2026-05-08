@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityInvitesTabWidget extends StatefulWidget {
   const CommunityInvitesTabWidget({Key? key}) : super(key: key);
@@ -29,19 +31,9 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
       child: BlocListener<CommunityInvitesBloc, CommunityInvitesState>(
         listener: (context, state) {
           if (state is CommunityInvitesError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showErrorSnackBar(context, state.message);
           } else if (state is CommunityInvitesSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-              ),
-            );
+            showSuccessSnackBar(context, state.message);
           }
         },
         child: BlocBuilder<CommunityInvitesBloc, CommunityInvitesState>(

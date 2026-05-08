@@ -9,7 +9,7 @@ void showErrorSnackBar(BuildContext context, String message) {
       backgroundColor: const Color.fromARGB(255, 247, 37, 72),
       content: Row(
         children: [
-          const Icon(Icons.check_circle, color: Colors.white),
+          const Icon(Icons.error_rounded, color: Colors.white),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

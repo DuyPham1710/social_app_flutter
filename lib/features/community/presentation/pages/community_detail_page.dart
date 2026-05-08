@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_create_post_widget.dart';
-import 'package:social_app_fe/features/community/presentation/widgets/community_admin_panel.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_detail_header.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_members_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_posts_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/invite_friends_bottom_sheet.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_create_post_page.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityDetailPage extends StatefulWidget {
   final String communityId;
@@ -95,66 +99,618 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     );
   }
 
-  Widget _buildMembersButton(BuildContext context, int membersCount) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Material(
+  List<PopupMenuEntry<String>> _buildMenuItems(
+    BuildContext context,
+    CommunityDetailLoaded state,
+  ) {
+    final isMember =
+        state.memberStatus == 'member' || state.userRole == 'admin';
+    final items = <PopupMenuEntry<String>>[];
+
+    // View members
+    items.add(
+      const PopupMenuItem<String>(
+        value: 'view_members',
+        child: Text('Thành viên'),
+      ),
+    );
+
+    // Invite friends (only for members)
+    if (isMember) {
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'invite_friends',
+          child: Text('Mời bạn bè'),
+        ),
+      );
+    }
+
+    // Review members (admin only)
+    if (state.userRole == 'admin') {
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'review_members',
+          child: Text('Duyệt thành viên'),
+        ),
+      );
+
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'review_posts',
+          child: Text('Duyệt bài viết'),
+        ),
+      );
+    }
+
+    // Leave community (for members)
+    if (isMember && state.userRole != 'admin') {
+      items.add(const PopupMenuDivider(height: 8));
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'leave_community',
+          child: Text('Rời nhóm'),
+        ),
+      );
+    }
+
+    return items;
+  }
+
+  void _handleMenuAction(
+    BuildContext context,
+    String value,
+    CommunityDetailLoaded state,
+  ) {
+    switch (value) {
+      case 'view_members':
+        _showMembersBottomSheet(context);
+        break;
+      case 'invite_friends':
+        _showInviteFriendsBottomSheet(context);
+        break;
+      case 'review_members':
+        context.read<CommunityAdminBloc>().add(
+          GetPendingRequestsRequested(widget.communityId),
+        );
+        _showPendingMembersReview(context);
+        break;
+      case 'review_posts':
+        context.read<CommunityAdminBloc>().add(
+          GetPendingPostsRequested(
+            communityId: widget.communityId,
+            page: 1,
+            limit: 10,
+          ),
+        );
+        _showPendingPostsReview(context);
+        break;
+      case 'leave_community':
+        _showLeaveConfirmation(context);
+        break;
+    }
+  }
+
+  void _showPendingMembersReview(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: const Color(0xFFF8FAFF),
+      builder: (_) => BlocProvider.value(
+        value: context.read<CommunityAdminBloc>(),
+        child: _buildMembersReviewSheet(context),
+      ),
+    );
+  }
+
+  void _showPendingPostsReview(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: const Color(0xFFF8FAFF),
+      builder: (_) => BlocProvider.value(
+        value: context.read<CommunityAdminBloc>(),
+        child: _buildPostsReviewSheet(context),
+      ),
+    );
+  }
+
+  Widget _buildMembersReviewSheet(BuildContext context) {
+    return BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
+      listener: (context, state) {
+        if (state is CommunityAdminActionSuccess) {
+          showSuccessSnackBar(context, state.message);
+        } else if (state is CommunityAdminError) {
+          showErrorSnackBar(context, state.message);
+        }
+      },
+      builder: (context, state) {
+        Widget content;
+
+        if (state is PendingRequestsLoaded) {
+          if (state.requests.isEmpty) {
+            content = const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.group_add_rounded,
+                    size: 46,
+                    color: Color(0xFF94A3B8),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Không có yêu cầu tham gia đang chờ duyệt',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            content = ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+              itemCount: state.requests.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final request = state.requests[index];
+                return _buildReviewMemberCard(context, request);
+              },
+            );
+          }
+        } else if (state is CommunityAdminLoading) {
+          content = const Center(child: CircularProgressIndicator());
+        } else {
+          content = const Center(child: CircularProgressIndicator());
+        }
+
+        return SafeArea(
+          child: Column(
+            children: [
+              _buildReviewSheetHeader(
+                icon: Icons.how_to_reg_rounded,
+                title: 'Duyệt thành viên',
+                subtitle: 'Xác nhận yêu cầu tham gia cộng đồng',
+              ),
+              Expanded(child: content),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPostsReviewSheet(BuildContext context) {
+    return BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
+      listener: (context, state) {
+        if (state is CommunityAdminActionSuccess) {
+          showSuccessSnackBar(context, state.message);
+        } else if (state is CommunityAdminError) {
+          showErrorSnackBar(context, state.message);
+        }
+      },
+      builder: (context, state) {
+        Widget content;
+
+        if (state is PendingPostsLoaded) {
+          if (state.posts.isEmpty) {
+            content = const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.fact_check_outlined,
+                    size: 46,
+                    color: Color(0xFF94A3B8),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Không có bài viết nào đang chờ duyệt',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            content = ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+              itemCount: state.posts.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final post = state.posts[index];
+                return _buildReviewPostCard(context, post);
+              },
+            );
+          }
+        } else if (state is CommunityAdminLoading) {
+          content = const Center(child: CircularProgressIndicator());
+        } else {
+          content = const Center(child: CircularProgressIndicator());
+        }
+
+        return SafeArea(
+          child: Column(
+            children: [
+              _buildReviewSheetHeader(
+                icon: Icons.fact_check_rounded,
+                title: 'Duyệt bài viết',
+                subtitle: 'Kiểm tra nội dung trước khi bài được công khai',
+              ),
+              Expanded(child: content),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildReviewSheetHeader({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () => _showMembersBottomSheet(context),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
+        border: Border(
+          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE7F0FF),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: const Color(0xFF1D4ED8)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE7F3FF),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.group_rounded,
-                    color: Color(0xFF1877F2),
-                    size: 22,
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF111827),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Thành viên',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1C1E21),
-                        ),
-                      ),
-                      Text(
-                        '$membersCount thành viên',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF65676B),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF6B7280),
                   ),
-                ),
-                const Icon(
-                  Icons.keyboard_arrow_right_rounded,
-                  color: Color(0xFF65676B),
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
+  }
+
+  Widget _buildReviewMemberCard(
+    BuildContext context,
+    CommunityRequestModel request,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundImage: request.user.avatarUrl != null
+                    ? NetworkImage(request.user.avatarUrl!)
+                    : null,
+                child: request.user.avatarUrl == null
+                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      request.user.fullName ?? 'Người dùng',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _formatTimeAgo(request.createdAt),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    context.read<CommunityAdminBloc>().add(
+                      RespondToJoinRequestRequested(
+                        communityId: widget.communityId,
+                        requestId: request.id,
+                        action: 'reject',
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.close_rounded),
+                  label: const Text('Từ chối'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFB91C1C),
+                    side: const BorderSide(color: Color(0xFFFCA5A5)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    context.read<CommunityAdminBloc>().add(
+                      RespondToJoinRequestRequested(
+                        communityId: widget.communityId,
+                        requestId: request.id,
+                        action: 'approve',
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.check_rounded),
+                  label: const Text('Chấp nhận'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF16A34A),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewPostCard(BuildContext context, CommunityPostModel post) {
+    final caption = (post.caption ?? '').trim();
+    final hasImage = post.urls.isNotEmpty && post.urls.first.url.isNotEmpty;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundImage: post.user.avatarUrl != null
+                    ? NetworkImage(post.user.avatarUrl!)
+                    : null,
+                child: post.user.avatarUrl == null
+                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.user.fullName ?? 'Người dùng',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _formatTimeAgo(post.createdAt),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            caption.isNotEmpty
+                ? caption
+                : 'Bài viết không có nội dung văn bản.',
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.35,
+              color: caption.isNotEmpty
+                  ? const Color(0xFF111827)
+                  : const Color(0xFF6B7280),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (hasImage) ...[
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Image.network(
+                  post.urls.first.url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: const Color(0xFFF3F4F6),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.broken_image_rounded,
+                      color: Color(0xFF9CA3AF),
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    context.read<CommunityAdminBloc>().add(
+                      ApproveCommunityPostRequested(
+                        communityId: widget.communityId,
+                        postId: post.id,
+                        action: 'reject',
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.close_rounded),
+                  label: const Text('Từ chối'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFB91C1C),
+                    side: const BorderSide(color: Color(0xFFFCA5A5)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    context.read<CommunityAdminBloc>().add(
+                      ApproveCommunityPostRequested(
+                        communityId: widget.communityId,
+                        postId: post.id,
+                        action: 'approve',
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.check_rounded),
+                  label: const Text('Duyệt bài'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF16A34A),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLeaveConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rời nhóm'),
+        content: const Text(
+          'Bạn có chắc chắn muốn rời khỏi cộng đồng này? Bạn có thể tham gia lại sau nếu muốn.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Hủy'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<CommunityDetailBloc>().add(
+                LeaveCommunityRequested(widget.communityId),
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFB91C1C),
+            ),
+            child: const Text('Rời nhóm'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatTimeAgo(DateTime? value) {
+    if (value == null) return 'Không rõ thời gian';
+
+    final now = DateTime.now();
+    final date = value.toLocal();
+    final diff = now.difference(date);
+
+    if (diff.inSeconds < 60) return 'Vừa xong';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
+    if (diff.inDays < 7) return '${diff.inDays} ngày trước';
+
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+    return '$day/$month/$year';
   }
 
   @override
@@ -175,14 +731,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         body: BlocConsumer<CommunityDetailBloc, CommunityDetailState>(
           listener: (context, state) {
             if (state is CommunityActionSuccess) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.message)));
+              showSuccessSnackBar(context, state.message);
               _refreshContent(context);
             } else if (state is CommunityDetailError) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.message)));
+              showErrorSnackBar(context, state.message);
             }
           },
           builder: (context, state) {
@@ -244,10 +796,16 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                         onPressed: () => Navigator.of(context).maybePop(),
                       ),
                       actions: [
-                        IconButton(
+                        PopupMenuButton<String>(
                           icon: const Icon(Icons.more_horiz_rounded),
-                          color: const Color(0xFF1C1E21),
-                          onPressed: () {},
+                          iconSize: 24,
+                          color: AppColors.background,
+                          onSelected: (value) {
+                            _handleMenuAction(context, value, state);
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return _buildMenuItems(context, state);
+                          },
                         ),
                       ],
                       expandedHeight: 240,
@@ -319,97 +877,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                 context.read<CommunityDetailBloc>().add(
                                   LeaveCommunityRequested(widget.communityId),
                                 ),
-                            onManage: state.userRole == 'admin'
-                                ? () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Dùng phần quản lý bên dưới để duyệt thành viên và bài viết',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                : null,
+                            onManage: null,
                           ),
-
-                          _buildMembersButton(
-                            context,
-                            state.community.memberCount ?? 0,
-                          ),
-                          if (isMember)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              child: Material(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(14),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(14),
-                                  onTap: () =>
-                                      _showInviteFriendsBottomSheet(context),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 12,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 42,
-                                          height: 42,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFE7F3FF),
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          child: const Icon(
-                                            Icons.person_add_rounded,
-                                            color: Color(0xFF1877F2),
-                                            size: 22,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        const Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Mời bạn bè',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFF1C1E21),
-                                                ),
-                                              ),
-                                              Text(
-                                                'Mời bạn bè tham gia',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF65676B),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const Icon(
-                                          Icons.keyboard_arrow_right_rounded,
-                                          color: Color(0xFF65676B),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (state.userRole == 'admin')
-                            CommunityAdminPanel(
-                              communityId: widget.communityId,
-                            ),
                           const SizedBox(height: 8),
                           if (isMember)
                             CommunityCreatePostWidget(
