@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -20,9 +21,9 @@ class CustomBottomNavigation extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: EdgeInsets.only(left: 14.w, right: 14.w, bottom: 10.h),
+        padding: EdgeInsets.only(left: 24.w, right: 24.w, bottom: 20.h),
         child: SizedBox(
-          height: 76.h,
+          height: 80.h,
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [
@@ -31,7 +32,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   children: [
                     _buildTabItem(index: 0, icon: CupertinoIcons.house_fill),
                     _buildTabItem(index: 1, icon: CupertinoIcons.person_2),
-                    SizedBox(width: 70.w),
+                    Expanded(child: SizedBox()),
                     _buildNotificationTabItem(
                       index: 3,
                       icon: CupertinoIcons.bell,
@@ -43,7 +44,7 @@ class CustomBottomNavigation extends StatelessWidget {
                   ],
                 ),
               ),
-              Positioned(bottom: 14.h, child: _buildCenterActionButton()),
+              Positioned(bottom: 16.h, child: _buildCenterActionButton()),
             ],
           ),
         ),
@@ -53,20 +54,22 @@ class CustomBottomNavigation extends StatelessWidget {
 
   Widget _buildBarBackground({required Widget child}) {
     return Container(
-      height: 62.h,
+      height: 64.h,
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(32.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 18.r,
-            offset: const Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 24.r,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18.r),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(32.r),
+        ),
         child: Material(color: Colors.transparent, child: child),
       ),
     );
@@ -77,7 +80,8 @@ class CustomBottomNavigation extends StatelessWidget {
     final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
 
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () => onTabSelected(index),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -95,7 +99,8 @@ class CustomBottomNavigation extends StatelessWidget {
     final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
 
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () => onTabSelected(index),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -144,14 +149,14 @@ class CustomBottomNavigation extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(20.r),
         onTap: () => onTabSelected(2),
         child: Ink(
           width: 56.w,
           height: 56.w,
           decoration: BoxDecoration(
             color: AppColors.primary,
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(20.r),
           ),
           child: Icon(CupertinoIcons.plus, color: Colors.white, size: 30.sp),
         ),

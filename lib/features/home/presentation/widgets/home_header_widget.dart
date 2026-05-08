@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,49 +14,91 @@ class HomeHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      padding: EdgeInsets.all(16.0.sp),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'CommonsHub',
-            style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+    return Padding(
+      padding: EdgeInsets.only(left: 12.w, right: 12.w, bottom: 8.h),
+      child: Container(
+        height: 56.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(12.r)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 16.r,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(12.r)),
           ),
-
-          Row(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: const Icon(
-                  CupertinoIcons.search,
-                  color: AppColors.primary,
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/search');
-                },
+              Text(
+                'CommonsHub',
+                style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
               ),
-              SizedBox(width: 8.w),
-              BlocProvider<MenuBloc>(
-                create: (_) => s1<MenuBloc>()..add(LoadCurrentUserEvent()),
-                child: IconButton(
-                  icon: const Icon(
-                    CupertinoIcons.chat_bubble_2,
-                    color: AppColors.primary,
+              Row(
+                children: [
+                  _buildGlassIconButton(
+                    icon: CupertinoIcons.search,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/search');
+                    },
                   ),
-
-                  // bọc trong blocProvider để sử dụng   create: (_) => s1<MenuBloc>()..add(LoadCurrentUserEvent()),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(builder: (_) => const ChatListPage()),
-                    );
-                  },
-                ),
+                  SizedBox(width: 8.w),
+                  BlocProvider<MenuBloc>(
+                    create: (_) => s1<MenuBloc>()..add(LoadCurrentUserEvent()),
+                    child: _buildGlassIconButton(
+                      icon: CupertinoIcons.chat_bubble_2,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) => const ChatListPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassIconButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      behavior: HitTestBehavior.opaque,
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+          child: Container(
+            width: 40.w,
+            height: 40.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black.withValues(alpha: 0.05),
+              border: Border.all(
+                color: Colors.black.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
+            child: Center(
+              child: Icon(icon, color: AppColors.primary, size: 22.sp),
+            ),
+          ),
+        ),
       ),
     );
   }

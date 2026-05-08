@@ -16,7 +16,11 @@ class FriendPage extends StatefulWidget {
   State<FriendPage> createState() => _FriendPageState();
 }
 
-class _FriendPageState extends State<FriendPage> {
+class _FriendPageState extends State<FriendPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,7 @@ class _FriendPageState extends State<FriendPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
@@ -49,6 +54,8 @@ class _FriendPageState extends State<FriendPage> {
       ),
       body: SafeArea(
         child: RefreshIndicator(
+          backgroundColor: AppColors.background,
+          color: AppColors.primary,
           onRefresh: () async {
             _loadData();
             // Đợi một chút để animation hoàn thành
@@ -166,7 +173,9 @@ class _FriendPageState extends State<FriendPage> {
                   ),
                 ],
               ),
-              child: const Center(child: CircularProgressIndicator()),
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
             );
           } else if (state is FriendRequestsLoaded ||
               state is FriendPageLoaded) {
@@ -353,7 +362,9 @@ class _FriendPageState extends State<FriendPage> {
         builder: (context, state) {
           if (state is FriendSuggestionsLoading ||
               (state is FriendPageLoaded && state.isLoadingSuggestions)) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           } else if (state is FriendSuggestionsLoaded ||
               state is FriendPageLoaded) {
             final friendSuggestions = state is FriendSuggestionsLoaded
