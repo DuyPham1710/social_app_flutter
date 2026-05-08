@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
-class CommunityJoinRejectedNotificationItem extends StatelessWidget {
+class CommunityPublicJoinNotificationItem extends StatelessWidget {
   final String avatarUrl;
   final String userName;
   final String userId;
   final String communityName;
   final String time;
   final bool isRead;
+  final String? message;
   final VoidCallback? onUserTap;
   final VoidCallback? onCommunityTap;
-  final String? message;
 
-  const CommunityJoinRejectedNotificationItem({
+  const CommunityPublicJoinNotificationItem({
     super.key,
     required this.avatarUrl,
     required this.userName,
@@ -54,15 +55,15 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
                     },
                   ),
                 ),
-                // Icon overlay for rejected
+                // Icon overlay for join request
                 Positioned(
                   right: 0,
                   bottom: 0,
                   child: CircleAvatar(
                     radius: 13,
-                    backgroundColor: const Color.fromARGB(255, 247, 127, 58),
+                    backgroundColor: const Color.fromARGB(255, 154, 208, 245),
                     child: const Icon(
-                      Icons.cancel,
+                      Icons.diversity_1,
                       size: 15,
                       color: Colors.white,
                     ),
@@ -79,47 +80,50 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Builder(
-                  builder: (context) {
-                    final msg =
-                        message ??
-                        'Yêu cầu tham gia cộng đồng của bạn đã được phê duyệt';
-                    return RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: msg,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' $communityName',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = onCommunityTap,
-                          ),
-                        ],
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: userName,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
-                    );
-                  },
+                      TextSpan(
+                        text: ' ${message ?? "đã tham gia"} ',
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      TextSpan(
+                        text: communityName,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = onCommunityTap,
+                      ),
+                    ],
+                  ),
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
 
                 Text(
                   time == "0 phút" ? "Vừa xong" : time,
-                  style: TextStyle(color: Colors.grey.shade700),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 5),
           const Icon(Icons.more_horiz),
         ],
       ),

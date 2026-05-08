@@ -84,25 +84,9 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Builder(
-                  builder: (context) {
-                    final msg = message ?? 'đã gửi yêu cầu tham gia';
-                    final quotedCommunity = '"$communityName"';
-
-                    int idx = -1;
-                    int communityLength = 0;
-                    if (msg.contains(quotedCommunity)) {
-                      idx = msg.indexOf(quotedCommunity);
-                      communityLength = quotedCommunity.length;
-                    } else if (msg.contains(communityName)) {
-                      idx = msg.indexOf(communityName);
-                      communityLength = communityName.length;
-                    }
-
-                    final hasCommunityInline = idx != -1;
-
-                    final List<TextSpan> spans = [];
-                    spans.add(
+                RichText(
+                  text: TextSpan(
+                    children: [
                       TextSpan(
                         text: userName,
                         style: const TextStyle(
@@ -112,63 +96,26 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                         ),
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
-                    );
-
-                    if (hasCommunityInline) {
-                      final before = msg.substring(0, idx);
-                      final after = msg.substring(idx + communityLength);
-
-                      spans.add(
-                        TextSpan(
-                          text: ' ${before.trimLeft()}',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
+                      TextSpan(
+                        text: ' ${message ?? "đã gửi yêu cầu tham gia"} ',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
                         ),
-                      );
-
-                      spans.add(
-                        TextSpan(
-                          text: communityName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = onCommunityTap,
+                      ),
+                      TextSpan(
+                        text: communityName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-
-                      if (after.trim().isNotEmpty) {
-                        spans.add(
-                          TextSpan(
-                            text: ' ${after.trim()}',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        );
-                      }
-                    } else {
-                      spans.add(
-                        TextSpan(
-                          text: ' $msg',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      );
-                    }
-
-                    return RichText(text: TextSpan(children: spans));
-                  },
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = onCommunityTap,
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 6),

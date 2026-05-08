@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class CommunityPostPendingNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -85,86 +86,50 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                 children: [
                   Builder(
                     builder: (context) {
-                      final msg =
-                          message ?? ' gửi yêu cầu đăng bài vào cộng đồng';
-                      final quotedMatch = RegExp(r'"([^\"]+)"').firstMatch(msg);
-
+                      final msg = message ?? ' gửi yêu cầu đăng bài vào cộng đồng';
                       final List<TextSpan> spans = [];
-
-                      // User name (bold + tappable)
                       spans.add(
                         TextSpan(
                           text: userName,
                           style: const TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                           recognizer: TapGestureRecognizer()..onTap = onUserTap,
                         ),
                       );
-
-                      if (quotedMatch != null) {
-                        final before = msg.substring(0, quotedMatch.start);
-                        final quotedText = quotedMatch.group(1) ?? '';
-                        final after = msg.substring(quotedMatch.end);
-
-                        if (before.trim().isNotEmpty) {
-                          spans.add(
-                            TextSpan(
-                              text: ' ${before.trimLeft()}',
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          );
-                        }
-
-                        spans.add(
-                          TextSpan(
-                            text: quotedText,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = onCommunityTap,
+                      spans.add(
+                        TextSpan(
+                          text: msg,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
                           ),
-                        );
-
-                        if (after.trim().isNotEmpty) {
-                          spans.add(
-                            TextSpan(
-                              text: ' ${after.trim()}',
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          );
-                        }
-                      } else {
-                        spans.add(
-                          TextSpan(
-                            text: ' $msg',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.normal,
-                            ),
+                        ),
+                      );
+                      spans.add(
+                        TextSpan(
+                          text: communityName,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      }
-
-                      return RichText(text: TextSpan(children: spans));
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = onCommunityTap,
+                        ),
+                      );
+                      //text căn 2 bên
+                      return RichText(
+                        text: TextSpan(children: spans),
+                        textAlign: TextAlign.justify,
+                      );
                     },
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
 
                   Row(
                     children: [
@@ -172,12 +137,13 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                         time == "0 phút" ? "Vừa xong" : time,
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
-                      const Spacer(),
                     ],
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 5),
+          const Icon(Icons.more_horiz),
           ],
         ),
       ),

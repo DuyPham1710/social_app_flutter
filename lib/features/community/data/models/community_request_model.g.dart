@@ -13,6 +13,9 @@ _$CommunityRequestModelImpl _$$CommunityRequestModelImplFromJson(
   user: UserModel.fromJson(json['userId'] as Map<String, dynamic>),
   type: json['type'] as String,
   status: json['status'] as String,
+  sender: json['senderId'] == null
+      ? null
+      : UserModel.fromJson(json['senderId'] as Map<String, dynamic>),
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -25,5 +28,6 @@ Map<String, dynamic> _$$CommunityRequestModelImplToJson(
   'userId': instance.user,
   'type': instance.type,
   'status': instance.status,
+  'senderId': instance.sender,
   'createdAt': instance.createdAt?.toIso8601String(),
 };

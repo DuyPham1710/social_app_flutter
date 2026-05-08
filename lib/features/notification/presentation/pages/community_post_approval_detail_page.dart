@@ -16,6 +16,8 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/co
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 
@@ -119,17 +121,10 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                 );
               } catch (_) {}
 
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.message)));
+              showSuccessSnackBar(context, state.message);
               Navigator.of(context).pop(true);
             } else if (state is CommunityAdminError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              showErrorSnackBar(context, state.message);
             }
           },
           builder: (context, state) {

@@ -5,6 +5,7 @@ class CommunityRequestEntity {
   final UserModel user;
   final String type; // 'join', 'invite'
   final String status; // 'pending', 'approved', 'rejected'
+  final UserModel? sender;
   final DateTime? createdAt;
 
   CommunityRequestEntity({
@@ -12,6 +13,7 @@ class CommunityRequestEntity {
     required this.user,
     required this.type,
     required this.status,
+    this.sender,
     this.createdAt,
   });
 }

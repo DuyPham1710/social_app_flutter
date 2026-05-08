@@ -30,6 +30,8 @@ mixin _$CommunityRequestModel {
   String get type => throw _privateConstructorUsedError; // 'join', 'invite'
   String get status =>
       throw _privateConstructorUsedError; // 'pending', 'approved', 'rejected'
+  @JsonKey(name: 'senderId')
+  UserModel? get sender => throw _privateConstructorUsedError;
   @JsonKey(name: 'createdAt')
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -55,10 +57,12 @@ abstract class $CommunityRequestModelCopyWith<$Res> {
     @JsonKey(name: 'userId') UserModel user,
     String type,
     String status,
+    @JsonKey(name: 'senderId') UserModel? sender,
     @JsonKey(name: 'createdAt') DateTime? createdAt,
   });
 
   $UserModelCopyWith<$Res> get user;
+  $UserModelCopyWith<$Res>? get sender;
 }
 
 /// @nodoc
@@ -83,6 +87,7 @@ class _$CommunityRequestModelCopyWithImpl<
     Object? user = null,
     Object? type = null,
     Object? status = null,
+    Object? sender = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -103,6 +108,10 @@ class _$CommunityRequestModelCopyWithImpl<
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as String,
+            sender: freezed == sender
+                ? _value.sender
+                : sender // ignore: cast_nullable_to_non_nullable
+                      as UserModel?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -121,6 +130,20 @@ class _$CommunityRequestModelCopyWithImpl<
       return _then(_value.copyWith(user: value) as $Val);
     });
   }
+
+  /// Create a copy of CommunityRequestModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserModelCopyWith<$Res>? get sender {
+    if (_value.sender == null) {
+      return null;
+    }
+
+    return $UserModelCopyWith<$Res>(_value.sender!, (value) {
+      return _then(_value.copyWith(sender: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -137,11 +160,14 @@ abstract class _$$CommunityRequestModelImplCopyWith<$Res>
     @JsonKey(name: 'userId') UserModel user,
     String type,
     String status,
+    @JsonKey(name: 'senderId') UserModel? sender,
     @JsonKey(name: 'createdAt') DateTime? createdAt,
   });
 
   @override
   $UserModelCopyWith<$Res> get user;
+  @override
+  $UserModelCopyWith<$Res>? get sender;
 }
 
 /// @nodoc
@@ -163,6 +189,7 @@ class __$$CommunityRequestModelImplCopyWithImpl<$Res>
     Object? user = null,
     Object? type = null,
     Object? status = null,
+    Object? sender = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -183,6 +210,10 @@ class __$$CommunityRequestModelImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as String,
+        sender: freezed == sender
+            ? _value.sender
+            : sender // ignore: cast_nullable_to_non_nullable
+                  as UserModel?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -200,6 +231,7 @@ class _$CommunityRequestModelImpl implements _CommunityRequestModel {
     @JsonKey(name: 'userId') required this.user,
     required this.type,
     required this.status,
+    @JsonKey(name: 'senderId') this.sender,
     @JsonKey(name: 'createdAt') this.createdAt,
   });
 
@@ -219,12 +251,15 @@ class _$CommunityRequestModelImpl implements _CommunityRequestModel {
   final String status;
   // 'pending', 'approved', 'rejected'
   @override
+  @JsonKey(name: 'senderId')
+  final UserModel? sender;
+  @override
   @JsonKey(name: 'createdAt')
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'CommunityRequestModel(id: $id, user: $user, type: $type, status: $status, createdAt: $createdAt)';
+    return 'CommunityRequestModel(id: $id, user: $user, type: $type, status: $status, sender: $sender, createdAt: $createdAt)';
   }
 
   @override
@@ -236,6 +271,7 @@ class _$CommunityRequestModelImpl implements _CommunityRequestModel {
             (identical(other.user, user) || other.user == user) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.sender, sender) || other.sender == sender) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -243,7 +279,7 @@ class _$CommunityRequestModelImpl implements _CommunityRequestModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, user, type, status, createdAt);
+      Object.hash(runtimeType, id, user, type, status, sender, createdAt);
 
   /// Create a copy of CommunityRequestModel
   /// with the given fields replaced by the non-null parameter values.
@@ -269,6 +305,7 @@ abstract class _CommunityRequestModel implements CommunityRequestModel {
     @JsonKey(name: 'userId') required final UserModel user,
     required final String type,
     required final String status,
+    @JsonKey(name: 'senderId') final UserModel? sender,
     @JsonKey(name: 'createdAt') final DateTime? createdAt,
   }) = _$CommunityRequestModelImpl;
 
@@ -285,6 +322,9 @@ abstract class _CommunityRequestModel implements CommunityRequestModel {
   String get type; // 'join', 'invite'
   @override
   String get status; // 'pending', 'approved', 'rejected'
+  @override
+  @JsonKey(name: 'senderId')
+  UserModel? get sender;
   @override
   @JsonKey(name: 'createdAt')
   DateTime? get createdAt;

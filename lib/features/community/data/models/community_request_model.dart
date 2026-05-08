@@ -11,6 +11,7 @@ class CommunityRequestModel with _$CommunityRequestModel {
     @JsonKey(name: 'userId') required UserModel user,
     required String type, // 'join', 'invite'
     required String status, // 'pending', 'approved', 'rejected'
+    @JsonKey(name: 'senderId') UserModel? sender,
     @JsonKey(name: 'createdAt') DateTime? createdAt,
   }) = _CommunityRequestModel;
 

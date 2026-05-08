@@ -12,6 +12,7 @@ enum NotificationType {
   TAG_POST, // Được gắn thẻ
   FACE_TAG_SUGGEST, // Gợi ý gắn thẻ từ AI
 
+  COMMUNITY_PUBLIC_JOIN,
   COMMUNITY_JOIN_REQUEST,
   COMMUNITY_INVITE,
   COMMUNITY_JOIN_APPROVED,

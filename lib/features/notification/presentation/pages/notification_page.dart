@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/notification/presentation/widgets/communi
 import 'package:social_app_fe/features/notification/presentation/widgets/community_post_approved_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/community_post_pending_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/community_post_rejected_notification_item.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/community_public_join_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/face_tag_suggest_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_loading_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/post_loading_page.dart';
@@ -311,6 +312,52 @@ class _NotificationPageState extends State<NotificationPage> {
             );
           },
         );
+
+      case NotificationType.COMMUNITY_PUBLIC_JOIN:
+        return CommunityPublicJoinNotificationItem(
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+          userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
+          communityName: notification.content ?? 'Community',
+          time: _timeAgo(notification.createdAt),
+          isRead: notification.isRead,
+          message: notification.message,
+          onUserTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+          onCommunityTap: () {
+            final id = notification.community?.id;
+            if (id != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CommunityDetailPage(communityId: id),
+                ),
+              );
+              _markAsRead(notification.id);
+            }
+          },
+        );
+
       case NotificationType.COMMUNITY_JOIN_REQUEST:
         return CommunityJoinRequestNotificationItem(
           avatarUrl:
@@ -553,7 +600,6 @@ class _NotificationPageState extends State<NotificationPage> {
       case NotificationType.COMMUNITY_POST_PENDING:
         return CommunityPostPendingNotificationItem(
           avatarUrl:
-              notification.community?.avatar ??
               notification.sender?.avatarUrl ??
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
