@@ -8,16 +8,33 @@ class MessageMetadataEntity extends Equatable {
   final String? callStatus;
   final int? duration;
   final String? callId;
+  final double? latitude;
+  final double? longitude;
+  final String? mapUrl;
+  final String? label;
 
   const MessageMetadataEntity({
     this.type,
     this.callStatus,
     this.duration,
     this.callId,
+    this.latitude,
+    this.longitude,
+    this.mapUrl,
+    this.label,
   });
 
   @override
-  List<Object?> get props => [type, callStatus, duration, callId];
+  List<Object?> get props => [
+    type,
+    callStatus,
+    duration,
+    callId,
+    latitude,
+    longitude,
+    mapUrl,
+    label,
+  ];
 }
 
 class MessageEntity extends Equatable {

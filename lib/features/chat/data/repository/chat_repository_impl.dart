@@ -232,6 +232,7 @@ class ChatRepositoryImpl implements ChatRepository {
     String? text,
     List<Map<String, dynamic>>? attachments,
     String? replyTo,
+    Map<String, dynamic>? metadata,
   }) {
     _remoteDataSource.sendMessage(
       userId: userId,
@@ -239,6 +240,7 @@ class ChatRepositoryImpl implements ChatRepository {
       text: text,
       attachments: attachments,
       replyTo: replyTo,
+      metadata: metadata,
     );
   }
 

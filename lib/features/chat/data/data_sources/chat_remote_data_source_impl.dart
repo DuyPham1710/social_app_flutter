@@ -784,6 +784,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     String? text,
     List<Map<String, dynamic>>? attachments,
     String? replyTo,
+    Map<String, dynamic>? metadata,
   }) {
     developer.log(
       'Sending message to conversation: $conversationId',
@@ -813,6 +814,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
     if (replyTo != null && replyTo.isNotEmpty) {
       messageData['replyTo'] = replyTo;
+    }
+
+    if (metadata != null && metadata.isNotEmpty) {
+      messageData['metadata'] = metadata;
     }
 
     _socketClient.emit('message:send', messageData);

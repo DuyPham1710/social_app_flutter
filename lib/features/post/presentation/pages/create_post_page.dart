@@ -821,7 +821,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
           ),
 
           bottomNavigationBar: Container(
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+            padding: EdgeInsets.only(
+              top: 10.h,
+              bottom: 90.h,
+              left: 8.w,
+              right: 8.w,
+            ),
             color: AppColors.background,
 
             child: Column(

@@ -97,8 +97,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   bool _handleScrollNotification(ScrollNotification notification) {
-    // Chỉ xử lý ẩn/hiện bottom nav bar ở trang Home (index == 0)
-    if (_currentIndex != 0) return false;
+    // Xử lý ẩn/hiện bottom nav bar ở trang Home (0), Friend (1), Notification (3)
+    if (_currentIndex != 0 && _currentIndex != 1 && _currentIndex != 3)
+      return false;
 
     if (notification is UserScrollNotification) {
       if (notification.metrics.axis == Axis.vertical) {
@@ -129,58 +130,70 @@ class _MainPageState extends State<MainPage> {
         }
       },
       child: Scaffold(
-        body: NotificationListener<ScrollNotification>(
-          onNotification: _handleScrollNotification,
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              // Mark all notifications as read when leaving notification page
-              if (_currentIndex == 3 && index != 3) {
-                final unread = context.read<NotificationBloc>().state.unread;
-                if (unread > 0) {
-                  context.read<NotificationBloc>().add(
-                    MarkAllNotificationsRead(),
-                  );
-                }
-              }
-              setState(() {
-                _currentIndex = index;
-                _isBottomNavVisible = true; // reset visibility
-              });
-            },
-            //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-            children: [
-              HomePage(key: _homePageKey),
-              FriendPage(),
-              CreatePostPage(
-                onPostCreated: () {
-                  _pageController.jumpToPage(0);
-                  setState(() => _currentIndex = 0);
+        body: Stack(
+          children: [
+            NotificationListener<ScrollNotification>(
+              onNotification: _handleScrollNotification,
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  // Mark all notifications as read when leaving notification page
+                  if (_currentIndex == 3 && index != 3) {
+                    final unread = context
+                        .read<NotificationBloc>()
+                        .state
+                        .unread;
+                    if (unread > 0) {
+                      context.read<NotificationBloc>().add(
+                        MarkAllNotificationsRead(),
+                      );
+                    }
+                  }
+                  setState(() {
+                    _currentIndex = index;
+                    _isBottomNavVisible = true; // reset visibility
+                  });
                 },
+                //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
+                children: [
+                  HomePage(key: _homePageKey),
+                  FriendPage(),
+                  CreatePostPage(
+                    onPostCreated: () {
+                      _pageController.jumpToPage(0);
+                      setState(() => _currentIndex = 0);
+                    },
+                  ),
+                  NotificationPage(),
+                  MenuPage(),
+                ],
               ),
-              NotificationPage(),
-              MenuPage(),
-            ],
-          ),
-        ),
-        bottomNavigationBar: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          height: _isBottomNavVisible
-              ? (86.h + MediaQuery.of(context).padding.bottom)
-              : 0,
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: BlocBuilder<NotificationBloc, NotificationState>(
-              builder: (context, notificationState) {
-                return CustomBottomNavigation(
-                  currentIndex: _currentIndex,
-                  onTabSelected: _onTabSelected,
-                  unreadCount: notificationState.unread,
-                );
-              },
             ),
-          ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                height: _isBottomNavVisible
+                    ? (86.h + MediaQuery.of(context).padding.bottom)
+                    : 0,
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: BlocBuilder<NotificationBloc, NotificationState>(
+                    builder: (context, notificationState) {
+                      return CustomBottomNavigation(
+                        currentIndex: _currentIndex,
+                        onTabSelected: _onTabSelected,
+                        unreadCount: notificationState.unread,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

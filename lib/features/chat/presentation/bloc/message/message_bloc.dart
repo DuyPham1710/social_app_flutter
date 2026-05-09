@@ -532,9 +532,10 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<MessageState> emit) {
-    // Validate message - phải có text hoặc attachments
+    // Validate message - phải có text hoặc attachments hoặc metadata
     if ((event.text == null || event.text!.isEmpty) &&
-        (event.attachments == null || event.attachments!.isEmpty)) {
+        (event.attachments == null || event.attachments!.isEmpty) &&
+        (event.metadata == null || event.metadata!.isEmpty)) {
       print('Cannot send empty message');
       return;
     }
@@ -546,6 +547,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       text: event.text,
       attachments: event.attachments,
       replyTo: event.replyTo,
+      metadata: event.metadata,
     );
 
     print('Message sent to conversation: ${event.conversationId}');
