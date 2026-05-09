@@ -35,6 +35,7 @@ class CommunityInviteNotificationItem extends StatelessWidget {
     return Container(
       color: isRead ? const Color(0xFFFFFFFF) : const Color(0xFFEAF3FF),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      margin: const EdgeInsets.only(bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -86,19 +87,6 @@ class CommunityInviteNotificationItem extends StatelessWidget {
                 Builder(
                   builder: (context) {
                     final msg = message ?? 'đã mời bạn tham gia';
-                    final quotedCommunity = '"$communityName"';
-
-                    int idx = -1;
-                    int communityLength = 0;
-                    if (msg.contains(quotedCommunity)) {
-                      idx = msg.indexOf(quotedCommunity);
-                      communityLength = quotedCommunity.length;
-                    } else if (msg.contains(communityName)) {
-                      idx = msg.indexOf(communityName);
-                      communityLength = communityName.length;
-                    }
-
-                    final hasCommunityInline = idx != -1;
 
                     final List<TextSpan> spans = [];
                     spans.add(
@@ -112,60 +100,24 @@ class CommunityInviteNotificationItem extends StatelessWidget {
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
                     );
-
-                    if (hasCommunityInline) {
-                      final before = msg.substring(0, idx);
-                      final after = msg.substring(idx + communityLength);
-
-                      spans.add(
-                        TextSpan(
-                          text: ' ${before.trimLeft()}',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
+                    spans.add(
+                      TextSpan(
+                        text: ' $msg ',
+                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                      ),
+                    );
+                    spans.add(
+                      TextSpan(
+                        text: communityName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-
-                      spans.add(
-                        TextSpan(
-                          text: communityName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = onCommunityTap,
-                        ),
-                      );
-
-                      if (after.trim().isNotEmpty) {
-                        spans.add(
-                          TextSpan(
-                            text: ' ${after.trim()}',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        );
-                      }
-                    } else {
-                      spans.add(
-                        TextSpan(
-                          text: ' $msg',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      );
-                    }
-
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = onCommunityTap,
+                      ),
+                    );
                     return RichText(text: TextSpan(children: spans));
                   },
                 ),
@@ -227,7 +179,6 @@ class CommunityInviteNotificationItem extends StatelessWidget {
           const Icon(Icons.more_horiz),
         ],
       ),
-      margin: const EdgeInsets.only(bottom: 4),
     );
   }
 }

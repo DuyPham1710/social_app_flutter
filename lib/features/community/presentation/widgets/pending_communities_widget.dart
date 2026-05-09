@@ -134,9 +134,7 @@ class PendingCommunityItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => CommunityDetailPage(communityId: community.id),
-            ),
+            CommunityDetailPage.route(communityId: community.id),
           );
         },
         child: Container(

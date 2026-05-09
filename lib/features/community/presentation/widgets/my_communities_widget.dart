@@ -97,16 +97,123 @@ class _MyCommunitiesSkeleton extends StatelessWidget {
       itemBuilder: (context, index) {
         return _AnimatedIn(
           index: index,
-          child: Container(
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
+          child: const _CommunityItemSkeleton(),
         );
       },
       separatorBuilder: (_, __) => const SizedBox(height: 12),
+    );
+  }
+}
+
+class _CommunityItemSkeleton extends StatelessWidget {
+  const _CommunityItemSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F0F172A),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const _SkeletonBox(width: 60, height: 60, radius: 30),
+                Positioned(
+                  top: -4,
+                  left: -4,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9EEF5),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFFDDE3EA),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: _SkeletonBox(height: 16, radius: 8),
+                      ),
+                      SizedBox(width: 42),
+                    ],
+                  ),
+                  const SizedBox(height: 9),
+                  const Row(
+                    children: [
+                      _SkeletonBox(width: 14, height: 14, radius: 7),
+                      SizedBox(width: 6),
+                      _SkeletonBox(width: 108, height: 12, radius: 6),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const _SkeletonBox(
+                    width: double.infinity,
+                    height: 11,
+                    radius: 6,
+                  ),
+                  const SizedBox(height: 6),
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: _SkeletonBox(height: 11, radius: 6),
+                      ),
+                      SizedBox(width: 12),
+                      _SkeletonBox(width: 72, height: 30, radius: 18),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonBox extends StatelessWidget {
+  final double? width;
+  final double height;
+  final double radius;
+
+  const _SkeletonBox({this.width, required this.height, required this.radius});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9EEF5),
+        borderRadius: BorderRadius.circular(radius),
+      ),
     );
   }
 }

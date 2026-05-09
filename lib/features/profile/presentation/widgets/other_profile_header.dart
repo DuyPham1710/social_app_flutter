@@ -14,33 +14,63 @@ class OtherProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: 20.h),
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Column(
-            children: [
-              // Background cover shimmer
-              Container(
-                height: 200.h,
-                width: double.infinity,
+      return Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              alignment: Alignment.bottomLeft,
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  height: 200.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                Positioned(
+                  bottom: -60,
+                  left: 16,
+                  child: Container(
+                    width: 128.r,
+                    height: 128.r,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 65.h),
+            Center(
+              child: Container(
+                height: 22.h,
+                width: 150.w,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              SizedBox(height: 50.h),
-              // Avatar shimmer
-              CircleAvatar(radius: 60.r, backgroundColor: Colors.white),
-              SizedBox(height: 16.h),
-              // Name shimmer
-              Container(height: 20.h, width: 140.w, color: Colors.white),
-              SizedBox(height: 8.h),
-              // Bio shimmer
-              Container(height: 14.h, width: 200.w, color: Colors.white),
-            ],
-          ),
+            ),
+            SizedBox(height: 8.h),
+            Center(
+              child: Container(
+                height: 14.h,
+                width: 210.w,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+            SizedBox(height: 10.h),
+          ],
         ),
       );
     }

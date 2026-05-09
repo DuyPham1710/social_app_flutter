@@ -407,25 +407,15 @@ class CommunityPostsWidget extends StatefulWidget {
 }
 
 class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
+  String _selectedStatus = 'all';
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CommunityPostsTabBloc, CommunityPostsTabState>(
       builder: (context, state) {
         return Column(
           children: [
-            // Filter buttons
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  _buildFilterButton('all', 'Tất cả', state),
-                  const SizedBox(width: 8),
-                  _buildFilterButton('pending', 'Chờ duyệt', state),
-                  const SizedBox(width: 8),
-                  _buildFilterButton('approved', 'Đã duyệt', state),
-                ],
-              ),
-            ),
+            _buildFilterHeader(state),
             // Posts list
             Expanded(child: _buildPostsList(state)),
           ],
@@ -434,95 +424,465 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
     );
   }
 
-  Widget _buildFilterButton(
-    String status,
-    String label,
-    CommunityPostsTabState state,
-  ) {
-    final isSelected =
-        state is CommunityPostsTabLoaded && state.status == status;
-    return GestureDetector(
-      onTap: () {
-        context.read<CommunityPostsTabBloc>().add(
-          CommunityPostsTabStatusChanged(status: status),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[600],
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
+  Widget _buildFilterHeader(CommunityPostsTabState state) {
+    final currentStatus = state is CommunityPostsTabLoaded
+        ? state.status
+        : _selectedStatus;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5EAF0)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F0F172A),
+            blurRadius: 10,
+            offset: Offset(0, 3),
           ),
-        ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              _statusIcon(currentStatus),
+              color: AppColors.primary,
+              size: 19,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Bài viết',
+                  style: TextStyle(
+                    color: Color(0xFF111827),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  child: Text(
+                    _statusLabel(currentStatus),
+                    key: ValueKey(currentStatus),
+                    style: const TextStyle(
+                      color: Color(0xFF667085),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          PopupMenuButton<String>(
+            tooltip: 'Lọc bài viết',
+            initialValue: currentStatus,
+            color: Colors.white,
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            onSelected: (status) {
+              setState(() => _selectedStatus = status);
+              context.read<CommunityPostsTabBloc>().add(
+                CommunityPostsTabStatusChanged(status: status),
+              );
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'all',
+                child: _PostFilterOption(
+                  icon: Icons.dynamic_feed_rounded,
+                  label: 'Tất cả',
+                ),
+              ),
+              PopupMenuItem(
+                value: 'pending',
+                child: _PostFilterOption(
+                  icon: Icons.schedule_rounded,
+                  label: 'Chờ duyệt',
+                ),
+              ),
+              PopupMenuItem(
+                value: 'approved',
+                child: _PostFilterOption(
+                  icon: Icons.verified_rounded,
+                  label: 'Đã duyệt',
+                ),
+              ),
+            ],
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFE5EAF0)),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.tune_rounded,
+                    color: Color(0xFF475467),
+                    size: 17,
+                  ),
+                  SizedBox(width: 5),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Color(0xFF667085),
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildPostsList(CommunityPostsTabState state) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 260),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      child: _buildPostsListContent(state),
+    );
+  }
+
+  Widget _buildPostsListContent(CommunityPostsTabState state) {
     if (state is CommunityPostsTabLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const _PostsTabSkeleton(key: ValueKey('loading'));
     }
 
     if (state is CommunityPostsTabError) {
-      return Center(child: Text('Lỗi: ${state.message}'));
-    }
-
-    if (state is CommunityPostsTabLoaded) {
-      if (state.posts.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.article_outlined, size: 54, color: Colors.grey[400]),
-              const SizedBox(height: 12),
-              Text(
-                'Chưa có bài viết nào',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        itemCount: state.posts.length,
-        itemBuilder: (context, index) {
-          final post = state.posts[index];
-          final commentCount = state.commentCounts[post.id] ?? 0;
-          return PostItem(
-            post: post,
-            commentCount: commentCount,
-            isInCommunityDetail: false,
+      return _PostsErrorState(
+        key: const ValueKey('error'),
+        message: state.message,
+        onRetry: () {
+          context.read<CommunityPostsTabBloc>().add(
+            CommunityPostsTabFetched(status: _selectedStatus),
           );
         },
       );
     }
 
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.article_outlined, size: 54, color: Color(0xFFD1D5DB)),
-          SizedBox(height: 12),
-          Text(
-            'Chưa có bài viết nào',
-            style: TextStyle(
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w600,
+    if (state is CommunityPostsTabLoaded) {
+      if (state.posts.isEmpty) {
+        return _PostsEmptyState(
+          key: ValueKey('empty-${state.status}'),
+          status: state.status,
+        );
+      }
+
+      return ListView.builder(
+        key: ValueKey('loaded-${state.status}-${state.posts.length}'),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+        itemCount: state.posts.length,
+        itemBuilder: (context, index) {
+          final post = state.posts[index];
+          final commentCount = state.commentCounts[post.id] ?? 0;
+          return _AnimatedIn(
+            index: index,
+            child: PostItem(
+              post: post,
+              commentCount: commentCount,
+              isInCommunityDetail: false,
+            ),
+          );
+        },
+      );
+    }
+
+    return _PostsEmptyState(
+      key: const ValueKey('initial'),
+      status: _selectedStatus,
+    );
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'pending':
+        return 'Chờ duyệt';
+      case 'approved':
+        return 'Đã duyệt';
+      default:
+        return 'Tất cả';
+    }
+  }
+
+  IconData _statusIcon(String status) {
+    switch (status) {
+      case 'pending':
+        return Icons.schedule_rounded;
+      case 'approved':
+        return Icons.verified_rounded;
+      default:
+        return Icons.dynamic_feed_rounded;
+    }
+  }
+}
+
+class _PostFilterOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _PostFilterOption({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.primary),
+        const SizedBox(width: 10),
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF111827),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PostsTabSkeleton extends StatelessWidget {
+  const _PostsTabSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return _AnimatedIn(
+          index: index,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE4E7EC)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0F0F172A),
+                  blurRadius: 10,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    _SkeletonBox(width: 42, height: 42, radius: 21),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SkeletonBox(width: 160, height: 14, radius: 7),
+                          SizedBox(height: 8),
+                          _SkeletonBox(width: 94, height: 12, radius: 6),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const _SkeletonBox(
+                  width: double.infinity,
+                  height: 13,
+                  radius: 7,
+                ),
+                const SizedBox(height: 8),
+                const _SkeletonBox(width: 230, height: 13, radius: 7),
+                if (index == 0) ...[
+                  const SizedBox(height: 12),
+                  AspectRatio(
+                    aspectRatio: 16 / 8.5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE9EEF5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-        ],
+        );
+      },
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+    );
+  }
+}
+
+class _PostsEmptyState extends StatelessWidget {
+  final String status;
+
+  const _PostsEmptyState({super.key, required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final message = _messageForStatus(status);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.article_outlined, size: 54, color: Colors.grey[400]),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  String _messageForStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return 'Chưa có bài viết chờ duyệt';
+      case 'approved':
+        return 'Chưa có bài viết đã duyệt';
+      default:
+        return 'Chưa có bài viết nào';
+    }
+  }
+}
+
+class _PostsErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _PostsErrorState({
+    super.key,
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF1F2),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFFECACA)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.error_outline_rounded,
+                color: Color(0xFFE11D48),
+                size: 30,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Không tải được bài viết',
+                style: const TextStyle(
+                  color: Color(0xFF111827),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFF667085)),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Thử lại'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonBox extends StatelessWidget {
+  final double? width;
+  final double height;
+  final double radius;
+
+  const _SkeletonBox({this.width, required this.height, required this.radius});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9EEF5),
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+}
+
+class _AnimatedIn extends StatelessWidget {
+  final int index;
+  final Widget child;
+
+  const _AnimatedIn({required this.index, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final delayMs = (index * 35).clamp(0, 240);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 220 + delayMs),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 14),
+            child: child,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

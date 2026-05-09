@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/notification_type.dart';
+import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
 import 'package:social_app_fe/features/notification/presentation/pages/community_post_approval_detail_page.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/community_invite_notification_item.dart';
@@ -349,9 +350,7 @@ class _NotificationPageState extends State<NotificationPage> {
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -406,9 +405,7 @@ class _NotificationPageState extends State<NotificationPage> {
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -418,12 +415,11 @@ class _NotificationPageState extends State<NotificationPage> {
       case NotificationType.COMMUNITY_INVITE:
         return CommunityInviteNotificationItem(
           avatarUrl:
-              notification.community?.avatar ??
               notification.sender?.avatarUrl ??
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
-          communityName: notification.content ?? 'Community',
+          communityName: notification.community?.name ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
@@ -449,20 +445,18 @@ class _NotificationPageState extends State<NotificationPage> {
           },
           onAccept: () async {
             _markAsRead(notification.id);
-            // TODO: Implement accept invite
+            await _handleAcceptInviteRequest(notification);
           },
           onReject: () async {
             _markAsRead(notification.id);
-            // TODO: Implement reject invite
+            await _handleRejectInviteRequest(notification);
           },
           onCommunityTap: () {
             final id = notification.targetId;
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -483,9 +477,7 @@ class _NotificationPageState extends State<NotificationPage> {
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -509,9 +501,7 @@ class _NotificationPageState extends State<NotificationPage> {
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -557,30 +547,6 @@ class _NotificationPageState extends State<NotificationPage> {
 
             _markAsRead(notification.id);
 
-            if (isAdminReview) {
-              final communityId = notification.community?.id;
-              final postId = notification.targetId;
-              if (communityId != null && postId != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CommunityPostApprovalDetailPage(
-                      notificationId: notification.id,
-                      communityId: communityId,
-                      postId: postId,
-                      senderName: notification.sender?.fullName ?? '',
-                      senderAvatar:
-                          notification.sender?.avatarUrl ??
-                          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                      communityName: notification.content ?? 'Community',
-                      createdAt: notification.createdAt,
-                    ),
-                  ),
-                );
-                return;
-              }
-            }
-
             _handleJumpToPost(notification);
           },
           onCommunityTap: () {
@@ -588,9 +554,7 @@ class _NotificationPageState extends State<NotificationPage> {
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -651,17 +615,13 @@ class _NotificationPageState extends State<NotificationPage> {
               );
               return;
             }
-
-            _handleJumpToPost(notification);
           },
           onCommunityTap: () {
             final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -702,7 +662,7 @@ class _NotificationPageState extends State<NotificationPage> {
           communityName: notification.content ?? 'Community',
           time: _timeAgo(notification.createdAt),
           isRead: notification.isRead,
-          rejectionReason: notification.message,
+          message: notification.message,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -732,9 +692,7 @@ class _NotificationPageState extends State<NotificationPage> {
             if (id != null) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => CommunityDetailPage(communityId: id),
-                ),
+                CommunityDetailPage.route(communityId: id),
               );
               _markAsRead(notification.id);
             }
@@ -1072,6 +1030,85 @@ class _NotificationPageState extends State<NotificationPage> {
       showSuccessSnackBar(context, "Đã từ chối yêu cầu tham gia");
     } else {
       showErrorSnackBar(context, "Lỗi khi xử lý yêu cầu tham gia");
+    }
+
+    // Delete from server in background
+    try {
+      s1<DeleteNotificationUseCase>()(params: notification.id);
+    } catch (e) {}
+  }
+
+  Future<void> _handleAcceptInviteRequest(notification) async {
+    final requestId = notification.targetId;
+    final communityId = notification.community?.id;
+
+    if (requestId == null ||
+        requestId.isEmpty ||
+        communityId == null ||
+        communityId.isEmpty) {
+      showErrorSnackBar(context, "Không thể xử lý lời mời tham gia");
+      // Delete from server in background
+      try {
+        s1<DeleteNotificationUseCase>()(params: notification.id);
+      } catch (e) {}
+      return;
+    }
+
+    // Remove from UI immediately
+    context.read<NotificationBloc>().add(RemoveNotification(notification.id));
+
+    // Call the API
+    final result = await s1<RespondToInviteUseCase>()(
+      params: RespondToInviteParams(
+        communityId: communityId,
+        requestId: requestId,
+        action: 'approve',
+      ),
+    );
+
+    if (result is DataStateSuccess) {
+      showSuccessSnackBar(context, "Đã chấp nhận lời mời tham gia");
+    } else {
+      showErrorSnackBar(context, "Lỗi khi xử lý lời mời tham gia");
+    }
+
+    // Delete from server in background
+    try {
+      s1<DeleteNotificationUseCase>()(params: notification.id);
+    } catch (e) {}
+  }
+
+  Future<void> _handleRejectInviteRequest(notification) async {
+    final requestId = notification.targetId;
+    final communityId = notification.community?.id;
+
+    if (requestId == null ||
+        requestId.isEmpty ||
+        communityId == null ||
+        communityId.isEmpty) {
+      showErrorSnackBar(context, "Không thể xử lý lời mời tham gia");
+      try {
+        s1<DeleteNotificationUseCase>()(params: notification.id);
+      } catch (e) {}
+      return;
+    }
+
+    // Remove from UI immediately
+    context.read<NotificationBloc>().add(RemoveNotification(notification.id));
+
+    // Call the API
+    final result = await s1<RespondToInviteUseCase>()(
+      params: RespondToInviteParams(
+        communityId: communityId,
+        requestId: requestId,
+        action: 'reject',
+      ),
+    );
+
+    if (result is DataStateSuccess) {
+      showSuccessSnackBar(context, "Đã từ chối lời mời tham gia");
+    } else {
+      showErrorSnackBar(context, "Lỗi khi xử lý lời mời tham gia");
     }
 
     // Delete from server in background

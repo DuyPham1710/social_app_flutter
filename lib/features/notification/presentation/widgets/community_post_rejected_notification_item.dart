@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class CommunityPostRejectedNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -8,7 +9,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
   final String communityName;
   final String time;
   final bool isRead;
-  final String? rejectionReason;
+  final String? message;
   final VoidCallback? onUserTap;
   final VoidCallback? onViewDetails;
   final VoidCallback? onCommunityTap;
@@ -21,7 +22,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
     required this.communityName,
     required this.time,
     required this.isRead,
-    this.rejectionReason,
+    this.message,
     this.onUserTap,
     this.onViewDetails,
     this.onCommunityTap,
@@ -78,94 +79,44 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
 
             const SizedBox(width: 12),
 
-            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Bài viết bị từ chối',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Builder(
+                    builder: (context) {
+                      final msg = message ?? 'đã gửi yêu cầu đăng bài vào cộng đồng';
 
-                  const SizedBox(height: 4),
+                      final List<TextSpan> spans = [];
 
-                  RichText(
-                    text: TextSpan(
-                      children: [
+                      //message bấm vào là xem bài viết
+                      spans.add(
+                        TextSpan(
+                          text: '$msg ',
+                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                        ),
+                      );
+                      spans.add(
                         TextSpan(
                           text: communityName,
                           style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = onCommunityTap,
                         ),
-                      ],
-                    ),
+                      );
+                      return RichText(text: TextSpan(children: spans));
+                    },
                   ),
 
                   const SizedBox(height: 6),
 
                   Text(
                     time == "0 phút" ? "Vừa xong" : time,
-                    style: TextStyle(color: Colors.grey.shade700),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Status message with reason
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      border: Border.all(color: Colors.orange.shade200),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Bài viết không được phê duyệt',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.orange.shade700,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 12,
-                              color: Colors.orange.shade700,
-                            ),
-                          ],
-                        ),
-                        if (rejectionReason != null &&
-                            rejectionReason!.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            'Lý do: $rejectionReason',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.orange.shade600,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                   ),
                 ],
               ),

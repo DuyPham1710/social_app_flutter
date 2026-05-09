@@ -43,7 +43,13 @@ class ProfileInitial extends ProfileState {
   const ProfileInitial() : super(user: null);
 }
 
-class ProfileLoading extends ProfileState {}
+class ProfileLoading extends ProfileState {
+  const ProfileLoading({
+    super.posts,
+    super.commentCounts,
+    super.user,
+  });
+}
 
 class ProfileLoaded extends ProfileState {
   final bool isUpdating;

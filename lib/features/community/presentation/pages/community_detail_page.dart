@@ -17,8 +17,29 @@ import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityDetailPage extends StatefulWidget {
   final String communityId;
+  static const Duration fadeTransitionDuration = Duration(milliseconds: 280);
 
   const CommunityDetailPage({super.key, required this.communityId});
+
+  static Route<void> route({required String communityId}) {
+    return PageRouteBuilder<void>(
+      transitionDuration: fadeTransitionDuration,
+      reverseTransitionDuration: fadeTransitionDuration,
+      pageBuilder: (_, __, ___) => CommunityDetailPage(
+        communityId: communityId,
+      ),
+      transitionsBuilder: (_, animation, __, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+          child: child,
+        );
+      },
+    );
+  }
 
   @override
   State<CommunityDetailPage> createState() => _CommunityDetailPageState();
@@ -28,6 +49,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   int _refreshSeed = 0;
 
   static const Color _pageBackground = Color(0xFFF0F2F5);
+  static const Duration _pageFadeDuration =
+      CommunityDetailPage.fadeTransitionDuration;
 
   void _refreshContent(BuildContext context) {
     setState(() {
@@ -713,6 +736,148 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return '$day/$month/$year';
   }
 
+  Widget _fadePage(String key, Widget child) {
+    return AnimatedSwitcher(
+      duration: _pageFadeDuration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey(key),
+        child: child,
+      ),
+    );
+  }
+
+  Widget _buildLoadingPage() {
+    return CustomScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      slivers: [
+        SliverAppBar(
+          titleSpacing: 0,
+          title: Container(
+            width: 150,
+            height: 16,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE4E7EC),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            color: const Color(0xFF1C1E21),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          expandedHeight: 240,
+          pinned: true,
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFF1C1E21),
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFE8EEF5),
+                    Color(0xFFD8E1EA),
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLoadingCard(height: 118),
+                const SizedBox(height: 12),
+                _buildLoadingCard(height: 92, compact: true),
+                const SizedBox(height: 12),
+                _buildLoadingCard(height: 210),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingCard({required double height, bool compact = false}) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE4E7EC)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F0F172A),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildLoadingLine(width: 170),
+            const SizedBox(height: 10),
+            _buildLoadingLine(width: double.infinity),
+            if (!compact) ...[
+              const SizedBox(height: 8),
+              _buildLoadingLine(width: 230),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingLine({required double width}) {
+    return FractionallySizedBox(
+      widthFactor: width == double.infinity ? 1 : null,
+      child: Container(
+        width: width == double.infinity ? null : width,
+        height: 14,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE9EEF5),
+          borderRadius: BorderRadius.circular(999),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -740,32 +905,36 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           builder: (context, state) {
             if (state is CommunityDetailLoading ||
                 state is CommunityDetailInitial) {
-              return const Center(child: CircularProgressIndicator());
+              return _fadePage('loading', _buildLoadingPage());
             }
 
             if (state is CommunityDetailError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.wifi_tethering_error_rounded,
-                      color: Colors.red[300],
-                      size: 42,
-                    ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(state.message, textAlign: TextAlign.center),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => context.read<CommunityDetailBloc>().add(
-                        CommunityDetailFetched(widget.communityId),
+              return _fadePage(
+                'error',
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.wifi_tethering_error_rounded,
+                        color: Colors.red[300],
+                        size: 42,
                       ),
-                      child: const Text('Thử lại'),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Text(state.message, textAlign: TextAlign.center),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () =>
+                            context.read<CommunityDetailBloc>().add(
+                              CommunityDetailFetched(widget.communityId),
+                            ),
+                        child: const Text('Thử lại'),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -774,135 +943,138 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               final isMember =
                   state.memberStatus == 'member' || state.userRole == 'admin';
 
-              return RefreshIndicator(
-                onRefresh: () async => _refreshContent(context),
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    SliverAppBar(
-                      titleSpacing: 0,
-                      title: Text(
-                        state.community.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF1C1E21),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded),
-                        color: const Color(0xFF1C1E21),
-                        onPressed: () => Navigator.of(context).maybePop(),
-                      ),
-                      actions: [
-                        PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_horiz_rounded),
-                          iconSize: 24,
-                          color: AppColors.background,
-                          onSelected: (value) {
-                            _handleMenuAction(context, value, state);
-                          },
-                          itemBuilder: (BuildContext context) {
-                            return _buildMenuItems(context, state);
-                          },
-                        ),
-                      ],
-                      expandedHeight: 240,
-                      pinned: true,
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF1C1E21),
-                      surfaceTintColor: Colors.transparent,
-                      scrolledUnderElevation: 0,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background:
-                            (state.community.coverImage?.isNotEmpty ?? false)
-                            ? Image.network(
-                                state.community.coverImage!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: const Color(0xFFBCC0C4),
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        color: Color(0xFF65676B),
-                                        size: 36,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )
-                            : Container(
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Color(0xFF3A3B3C),
-                                      Color(0xFF242526),
-                                    ],
-                                  ),
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.groups_rounded,
-                                    size: 52,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
-                          CommunityDetailHeader(
-                            community: state.community,
-                            memberStatus: state.memberStatus,
-                            userRole: state.userRole,
-                            onJoin: () =>
-                                context.read<CommunityDetailBloc>().add(
-                                  JoinCommunityRequested(widget.communityId),
-                                ),
-                            onCancelRequest: () =>
-                                context.read<CommunityDetailBloc>().add(
-                                  CancelJoinRequestRequested(
-                                    widget.communityId,
-                                  ),
-                                ),
-                            onLeave: () =>
-                                context.read<CommunityDetailBloc>().add(
-                                  LeaveCommunityRequested(widget.communityId),
-                                ),
-                            onManage: null,
+              return _fadePage(
+                'loaded-${state.community.id}',
+                RefreshIndicator(
+                  onRefresh: () async => _refreshContent(context),
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverAppBar(
+                        titleSpacing: 0,
+                        title: Text(
+                          state.community.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF1C1E21),
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(height: 8),
-                          if (isMember)
-                            CommunityCreatePostWidget(
-                              avatarUrl: state.community.avatar,
-                              onCreatePost: () =>
-                                  _openCreatePost(context, state.userRole),
-                            ),
-                          const SizedBox(height: 8),
-                          CommunityPostsWidget(
-                            communityId: widget.communityId,
-                            refreshSeed: _refreshSeed,
-                            canViewPosts: isMember,
-                            userRole: state.userRole,
+                        ),
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded),
+                          color: const Color(0xFF1C1E21),
+                          onPressed: () => Navigator.of(context).maybePop(),
+                        ),
+                        actions: [
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_horiz_rounded),
+                            iconSize: 24,
+                            color: AppColors.background,
+                            onSelected: (value) {
+                              _handleMenuAction(context, value, state);
+                            },
+                            itemBuilder: (BuildContext context) {
+                              return _buildMenuItems(context, state);
+                            },
                           ),
-                          const SizedBox(height: 22),
                         ],
+                        expandedHeight: 240,
+                        pinned: true,
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1C1E21),
+                        surfaceTintColor: Colors.transparent,
+                        scrolledUnderElevation: 0,
+                        flexibleSpace: FlexibleSpaceBar(
+                          background:
+                              (state.community.coverImage?.isNotEmpty ?? false)
+                              ? Image.network(
+                                  state.community.coverImage!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: const Color(0xFFBCC0C4),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.image_not_supported,
+                                          color: Color(0xFF65676B),
+                                          size: 36,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  decoration: const BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Color(0xFF3A3B3C),
+                                        Color(0xFF242526),
+                                      ],
+                                    ),
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.groups_rounded,
+                                      size: 52,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                        ),
                       ),
-                    ),
-                  ],
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8),
+                            CommunityDetailHeader(
+                              community: state.community,
+                              memberStatus: state.memberStatus,
+                              userRole: state.userRole,
+                              onJoin: () =>
+                                  context.read<CommunityDetailBloc>().add(
+                                    JoinCommunityRequested(widget.communityId),
+                                  ),
+                              onCancelRequest: () =>
+                                  context.read<CommunityDetailBloc>().add(
+                                    CancelJoinRequestRequested(
+                                      widget.communityId,
+                                    ),
+                                  ),
+                              onLeave: () =>
+                                  context.read<CommunityDetailBloc>().add(
+                                    LeaveCommunityRequested(widget.communityId),
+                                  ),
+                              onManage: null,
+                            ),
+                            const SizedBox(height: 8),
+                            if (isMember)
+                              CommunityCreatePostWidget(
+                                avatarUrl: state.community.avatar,
+                                onCreatePost: () =>
+                                    _openCreatePost(context, state.userRole),
+                              ),
+                            const SizedBox(height: 8),
+                            CommunityPostsWidget(
+                              communityId: widget.communityId,
+                              refreshSeed: _refreshSeed,
+                              canViewPosts: isMember,
+                              userRole: state.userRole,
+                            ),
+                            const SizedBox(height: 22),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
 
-            return const Center(child: Text(''));
+            return _fadePage('empty', const Center(child: Text('')));
           },
         ),
       ),

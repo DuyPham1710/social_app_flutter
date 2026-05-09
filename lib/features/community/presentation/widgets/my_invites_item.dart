@@ -93,148 +93,233 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFE5EAF0)),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE5EAF0), width: 1),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x0D101828),
-              blurRadius: 10,
-              offset: Offset(0, 4),
+              color: const Color(0x0D101828),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+              spreadRadius: 0,
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundImage: avatarUrl.isNotEmpty
-                  ? NetworkImage(avatarUrl)
-                  : null,
-              child: avatarUrl.isEmpty ? const Icon(Icons.group) : null,
+            Row(
+              children: [
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: const Color(0xFFF3F4F6),
+                      backgroundImage: avatarUrl.isNotEmpty
+                          ? NetworkImage(avatarUrl)
+                          : null,
+                      child: avatarUrl.isEmpty
+                          ? const Icon(Icons.group, size: 28, color: Color(0xFF9CA3AF))
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.mail_outline,
+                          color: Colors.white,
+                          size: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        communityName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          color: Color(0xFF101828),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _getStatusMessage(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _getStatusColor(),
+                          fontSize: 13,
+                          fontWeight: _status != _InviteResponseStatus.pending
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 12),
+            if (_status == _InviteResponseStatus.pending)
+              Row(
                 children: [
-                  Text(
-                    communityName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () => _onApprovePressed(communityId),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle_outline,
+                                    size: 16, color: Colors.white),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Chấp nhận',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _getStatusMessage(),
-                    style: TextStyle(
-                      color: _getStatusColor(),
-                      fontSize: 12,
-                      fontWeight: _status != _InviteResponseStatus.pending
-                          ? FontWeight.w600
-                          : FontWeight.w400,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () => _onRejectPressed(communityId),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        side: const BorderSide(
+                            color: Color(0xFFD0D5DD), width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF667085),
+                                ),
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.close, size: 16, color: Color(0xFF667085)),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Từ chối',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF667085),
+                                  ),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  if (_status == _InviteResponseStatus.pending)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () => _onApprovePressed(communityId),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              backgroundColor: AppColors.primary,
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const Text(
-                                    'Chấp nhận',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () => _onRejectPressed(communityId),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              side: const BorderSide(color: Color(0xFFD0D5DD)),
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Color(0xFF667085),
-                                      ),
-                                    ),
-                                  )
-                                : const Text(
-                                    'Từ chối',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                          ),
-                        ),
-                      ],
-                    )
-                  else
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _status == _InviteResponseStatus.approved
-                            ? const Color(0xFFECFDF5)
-                            : const Color(0xFFFEECEB),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _status == _InviteResponseStatus.approved
-                              ? const Color(0xFFA6F4C5)
-                              : const Color(0xFFFECDCA),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          _status == _InviteResponseStatus.approved
-                              ? '✓ Đã chấp nhận'
-                              : '✕ Đã từ chối',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: _status == _InviteResponseStatus.approved
-                                ? const Color(0xFF059669)
-                                : const Color(0xFFDC2626),
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
+              )
+            else
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                decoration: BoxDecoration(
+                  color: _status == _InviteResponseStatus.approved
+                      ? const Color(0xFFECFDF5)
+                      : const Color(0xFFFEECEB),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _status == _InviteResponseStatus.approved
+                        ? const Color(0xFFA6F4C5)
+                        : const Color(0xFFFECDCA),
+                    width: 1.5,
+                  ),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _status == _InviteResponseStatus.approved
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                        size: 16,
+                        color: _status == _InviteResponseStatus.approved
+                            ? const Color(0xFF059669)
+                            : const Color(0xFFDC2626),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _status == _InviteResponseStatus.approved
+                            ? 'Đã chấp nhận'
+                            : 'Đã từ chối',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _status == _InviteResponseStatus.approved
+                              ? const Color(0xFF059669)
+                              : const Color(0xFFDC2626),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
           ],
         ),
       ),

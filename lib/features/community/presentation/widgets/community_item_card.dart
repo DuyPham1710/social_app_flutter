@@ -90,10 +90,7 @@ class _CommunityItemState extends State<CommunityItem> {
           borderRadius: BorderRadius.circular(12),
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) =>
-                    CommunityDetailPage(communityId: widget.community.id),
-              ),
+              CommunityDetailPage.route(communityId: widget.community.id),
             );
           },
           child: Container(
@@ -315,10 +312,7 @@ class _CommunityItemState extends State<CommunityItem> {
         style: tonalStyle,
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) =>
-                  CommunityDetailPage(communityId: widget.community.id),
-            ),
+            CommunityDetailPage.route(communityId: widget.community.id),
           );
         },
         child: const Text('Chi tiết'),

@@ -5,7 +5,6 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/community/domain/entities/community_entity.dart';
-import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
@@ -48,12 +47,7 @@ class CommunityPostHeader extends StatelessWidget {
     if (community == null) return;
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => di.s1<CommunityDetailBloc>(),
-          child: CommunityDetailPage(communityId: community!.id),
-        ),
-      ),
+      CommunityDetailPage.route(communityId: community!.id),
     );
   }
 

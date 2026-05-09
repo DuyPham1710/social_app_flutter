@@ -24,6 +24,7 @@ class OtherProfilePage extends StatefulWidget {
 
 class _OtherProfilePageState extends State<OtherProfilePage> {
   final ScrollController _scrollController = ScrollController();
+  static const Duration _fadeDuration = Duration(milliseconds: 260);
 
   @override
   void initState() {
@@ -78,9 +79,19 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
     return Scaffold(
       body: BlocBuilder<OtherProfileBloc, OtherProfileState>(
         builder: (context, state) {
+          if (state is OtherProfileError && state.user == null) {
+            return _fadeContent(
+              key: 'other-profile-error',
+              child: _buildErrorProfile(
+                state.error ?? 'Không thể tải trang cá nhân',
+              ),
+            );
+          }
+
           if (state is OtherProfileLoading || state.user == null) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+            return _fadeContent(
+              key: 'other-profile-loading',
+              child: _buildLoadingProfile(),
             );
           }
 
@@ -88,145 +99,369 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           final posts = state.posts ?? [];
           final commentCounts = state.commentCounts ?? {};
 
-          return RefreshIndicator(
-            color: AppColors.primary,
-            backgroundColor: AppColors.background,
-            onRefresh: () async {
-              _loadData();
-              // Cho animation refresh mượt hơn
-              await Future.delayed(const Duration(milliseconds: 300));
-            },
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  surfaceTintColor: Colors.transparent,
-                  pinned: true,
-                  backgroundColor: AppColors.background,
-                  elevation: 0,
-                  title: Text(
-                    user.fullName ?? "Trang cá nhân",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+          return _fadeContent(
+            key: 'other-profile-loaded-${user.userId}',
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              backgroundColor: AppColors.background,
+              onRefresh: () async {
+                _loadData();
+                // Cho animation refresh mượt hơn
+                await Future.delayed(const Duration(milliseconds: 300));
+              },
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    surfaceTintColor: Colors.transparent,
+                    pinned: true,
+                    backgroundColor: AppColors.background,
+                    elevation: 0,
+                    title: Text(
+                      user.fullName ?? "Trang cá nhân",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
-                ),
 
-                /// Content
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    OtherProfileHeader(user: user),
+                  /// Content
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      OtherProfileHeader(user: user),
 
-                    /// Friend actions
-                    OtherProfileActions(
-                      relationship: state.relationship,
-                      onSendRequest: () {
-                        context.read<FriendProfileBloc>().add(
-                          SendFriendRequest(receiverId: user.userId),
-                        );
-                      },
-                      onCancelRequest: () {
-                        context.read<FriendProfileBloc>().add(
-                          CancelSentFriendRequest(
-                            requestId: state.relationship?.requestId ?? '',
-                          ),
-                        );
-                      },
-                      onAcceptRequest: () {
-                        context.read<FriendProfileBloc>().add(
-                          AcceptFriendRequest(
-                            requestId: state.relationship?.requestId ?? '',
-                            userId: user.userId,
-                          ),
-                        );
-                      },
-                      onRejectRequest: () {
-                        context.read<FriendProfileBloc>().add(
-                          RejectFriendRequest(
-                            requestId: state.relationship?.requestId ?? '',
-                          ),
-                        );
-                      },
-                      onUnfriend: () {
-                        context.read<FriendProfileBloc>().add(
-                          RemoveFriend(friendId: user.userId),
-                        );
-                      },
-                      onMessage: () {
-                        // TODO: open chat
-                      },
-                    ),
-
-                    ProfileInfo(user: user),
-                    Divider(),
-                    FriendListWidget(
-                      onViewAll: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FriendForUserPage(
+                      /// Friend actions
+                      OtherProfileActions(
+                        relationship: state.relationship,
+                        onSendRequest: () {
+                          context.read<FriendProfileBloc>().add(
+                            SendFriendRequest(receiverId: user.userId),
+                          );
+                        },
+                        onCancelRequest: () {
+                          context.read<FriendProfileBloc>().add(
+                            CancelSentFriendRequest(
+                              requestId: state.relationship?.requestId ?? '',
+                            ),
+                          );
+                        },
+                        onAcceptRequest: () {
+                          context.read<FriendProfileBloc>().add(
+                            AcceptFriendRequest(
+                              requestId: state.relationship?.requestId ?? '',
                               userId: user.userId,
-                              username: user.username ?? "user",
-                              fullName: user.fullName ?? "Người dùng",
                             ),
-                          ),
-                        );
-                        _loadData();
-                        // userId: user.userId,
-                      },
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 12),
-
-                    /// Posts
-                    if (posts.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text("Chưa có bài viết nào"),
-                        ),
-                      ),
-
-                    ...posts.map((post) {
-                      final count = commentCounts[post.id] ?? 0;
-                      return PostItem(post: post, commentCount: count);
-                    }),
-
-                    /// Loading more indicator
-                    if (state is OtherProfileLoaded && state.isLoadingMore)
-                      const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-
-                    /// End of posts
-                    if (state is OtherProfileLoaded &&
-                        state.hasNext == false &&
-                        posts.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        child: Center(
-                          child: Text(
-                            "Đã hiển thị hết bài viết",
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14.sp,
+                          );
+                        },
+                        onRejectRequest: () {
+                          context.read<FriendProfileBloc>().add(
+                            RejectFriendRequest(
+                              requestId: state.relationship?.requestId ?? '',
                             ),
-                          ),
-                        ),
+                          );
+                        },
+                        onUnfriend: () {
+                          context.read<FriendProfileBloc>().add(
+                            RemoveFriend(friendId: user.userId),
+                          );
+                        },
+                        onMessage: () {
+                          // TODO: open chat
+                        },
                       ),
-                  ]),
-                ),
-              ],
+
+                      ProfileInfo(user: user),
+                      const Divider(),
+                      FriendListWidget(
+                        onViewAll: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FriendForUserPage(
+                                userId: user.userId,
+                                username: user.username ?? "user",
+                                fullName: user.fullName ?? "Người dùng",
+                              ),
+                            ),
+                          );
+                          _loadData();
+                        },
+                      ),
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      _buildPostsSection(state, posts, commentCounts),
+                    ]),
+                  ),
+                ],
+              ),
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _fadeContent({required String key, required Widget child}) {
+    return AnimatedSwitcher(
+      duration: _fadeDuration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      child: KeyedSubtree(key: ValueKey(key), child: child),
+    );
+  }
+
+  Widget _buildLoadingProfile() {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverAppBar(
+          surfaceTintColor: Colors.transparent,
+          pinned: true,
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          title: const Text(
+            'Trang cá nhân',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildListDelegate([
+            const OtherProfileHeader(isLoading: true),
+            const _ProfileActionSkeleton(),
+            const Divider(),
+            const _ProfileInfoSkeleton(),
+            const Divider(),
+            const _PostSkeletonList(),
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorProfile(String message) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverAppBar(
+          surfaceTintColor: Colors.transparent,
+          pinned: true,
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          title: const Text(
+            'Trang cá nhân',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Color(0xFFE11D48),
+                    size: 42,
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.textSecondary),
+                  ),
+                  SizedBox(height: 14.h),
+                  OutlinedButton.icon(
+                    onPressed: _loadData,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Thử lại'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPostsSection(
+    OtherProfileState state,
+    List posts,
+    Map<String, int> commentCounts,
+  ) {
+    return Column(
+      children: [
+        if (state is OtherProfileLoaded &&
+            posts.isEmpty &&
+            state.currentPage == null)
+          const _PostSkeletonList(),
+        if (state is OtherProfileError)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: Text(
+                state.error ?? 'Không thể tải bài viết',
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+          ),
+        if (posts.isEmpty &&
+            state is! OtherProfileError &&
+            !(state is OtherProfileLoaded && state.currentPage == null))
+          Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Text(
+              "Chưa có bài viết nào",
+              style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+            ),
+          ),
+        ...posts.map((post) {
+          final count = commentCounts[post.id] ?? 0;
+          return PostItem(post: post, commentCount: count);
+        }),
+        if (state is OtherProfileLoaded && state.isLoadingMore)
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          ),
+        if (state is OtherProfileLoaded &&
+            state.hasNext == false &&
+            posts.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Center(
+              child: Text(
+                "Đã hiển thị hết bài viết",
+                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ProfileActionSkeleton extends StatelessWidget {
+  const _ProfileActionSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      child: Row(
+        children: const [
+          Expanded(child: _SkeletonBox(height: 38, radius: 10)),
+          SizedBox(width: 10),
+          _SkeletonBox(width: 92, height: 38, radius: 10),
+          SizedBox(width: 10),
+          _SkeletonBox(width: 44, height: 38, radius: 10),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileInfoSkeleton extends StatelessWidget {
+  const _ProfileInfoSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _SkeletonBox(width: 210, height: 14, radius: 7),
+          SizedBox(height: 10),
+          _SkeletonBox(width: 160, height: 14, radius: 7),
+          SizedBox(height: 10),
+          _SkeletonBox(width: 190, height: 14, radius: 7),
+        ],
+      ),
+    );
+  }
+}
+
+class _PostSkeletonList extends StatelessWidget {
+  const _PostSkeletonList();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      child: Column(
+        children: List.generate(
+          2,
+          (index) => Container(
+            margin: EdgeInsets.only(bottom: 12.h),
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: const Color(0xFFE4E7EC)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    _SkeletonBox(width: 42, height: 42, radius: 21),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SkeletonBox(width: 150, height: 14, radius: 7),
+                          SizedBox(height: 8),
+                          _SkeletonBox(width: 90, height: 12, radius: 6),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 14.h),
+                const _SkeletonBox(width: double.infinity, height: 13, radius: 7),
+                SizedBox(height: 8.h),
+                const _SkeletonBox(width: 230, height: 13, radius: 7),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonBox extends StatelessWidget {
+  final double? width;
+  final double height;
+  final double radius;
+
+  const _SkeletonBox({this.width, required this.height, required this.radius});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9EEF5),
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }

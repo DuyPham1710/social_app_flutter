@@ -82,7 +82,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     final currentState = state;
-    emit(ProfileLoading());
+    emit(
+      ProfileLoading(
+        posts: currentState.posts,
+        commentCounts: currentState.commentCounts,
+        user: currentState.user,
+      ),
+    );
 
     final result = await getProfilePostsUseCase(
       params: GetProfilePostsParams(page: event.page, limit: event.limit),
@@ -124,6 +130,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(
       ProfileLoaded(
         currentState.posts!,
+        commentCounts: currentState.commentCounts,
         currentPage: currentState.currentPage,
         limit: currentState.limit,
         hasNext: currentState.hasNext,
@@ -178,7 +185,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     LoadUserProfileEvent event,
     Emitter<ProfileState> emit,
   ) async {
-    emit(ProfileLoading());
+    emit(const ProfileLoading());
 
     final result = await getUserProfileUseCase();
 

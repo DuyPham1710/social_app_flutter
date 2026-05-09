@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -81,16 +82,16 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                           TextSpan(
                             text: msg,
                             style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
                               fontWeight: FontWeight.normal,
                             ),
                           ),
                           TextSpan(
                             text: ' $communityName',
                             style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                             recognizer: TapGestureRecognizer()
@@ -106,7 +107,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
 
                 Text(
                   time == "0 phút" ? "Vừa xong" : time,
-                  style: TextStyle(color: Colors.grey.shade700),
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                 ),
               ],
             ),
