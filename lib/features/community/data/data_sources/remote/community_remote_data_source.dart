@@ -45,6 +45,22 @@ abstract class CommunityRemoteDataSource {
     @Path('communityId') String communityId,
   );
 
+  @PATCH('/community/{communityId}')
+  @MultiPart()
+  Future<CommunityModel> updateCommunity({
+    @Path('communityId') required String communityId,
+    @Part(name: 'name') String? name,
+    @Part(name: 'description') String? description,
+    @Part(name: 'privacy') String? privacy,
+    @Part(name: 'avatar') List<MultipartFile>? avatar,
+    @Part(name: 'coverImage') List<MultipartFile>? coverImage,
+  });
+
+  @DELETE('/community/{communityId}')
+  Future<void> deleteCommunity(
+    @Path('communityId') String communityId,
+  );
+
   @POST('/community/{communityId}/join')
   Future<void> joinCommunity(@Path('communityId') String communityId);
 

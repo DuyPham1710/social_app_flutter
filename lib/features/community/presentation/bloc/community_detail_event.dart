@@ -45,3 +45,9 @@ class RespondToInviteRequested extends CommunityDetailEvent {
     required this.action,
   });
 }
+
+class DeleteCommunityRequested extends CommunityDetailEvent {
+  final String communityId;
+
+  const DeleteCommunityRequested(this.communityId);
+}

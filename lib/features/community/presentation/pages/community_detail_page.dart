@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/community/presentation/widgets/invite_fri
 import 'package:social_app_fe/features/community/presentation/pages/community_create_post_page.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/features/community/presentation/pages/edit_community_page.dart';
 
 class CommunityDetailPage extends StatefulWidget {
   final String communityId;
@@ -74,38 +75,39 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   }
 
   void _showMembersBottomSheet(BuildContext context) {
+    final state = context.read<CommunityDetailBloc>().state;
+    String? currentRole;
+    if (state is CommunityDetailLoaded) {
+      currentRole = state.userRole;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: Colors.white,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.6,
-        maxChildSize: 0.95,
-        minChildSize: 0.4,
-        builder: (context, scrollController) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: Text(
-                'Thành viên cộng đồng',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: scrollController,
-                child: CommunityMembersWidget(
-                  communityId: widget.communityId,
-                  refreshSeed: _refreshSeed,
-                  isInBottomSheet: true,
+      builder: (bottomSheetContext) => BlocProvider.value(
+        value: context.read<CommunityAdminBloc>(),
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          maxChildSize: 0.95,
+          minChildSize: 0.4,
+          builder: (context, scrollController) => Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: CommunityMembersWidget(
+                    communityId: widget.communityId,
+                    refreshSeed: _refreshSeed,
+                    isInBottomSheet: true,
+                    userRole: currentRole,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -163,6 +165,25 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           child: Text('Duyệt bài viết'),
         ),
       );
+
+      items.add(const PopupMenuDivider(height: 8));
+
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'edit_community',
+          child: Text('Chỉnh sửa nhóm'),
+        ),
+      );
+
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'delete_community',
+          child: Text(
+            'Xóa nhóm',
+            style: TextStyle(color: Color(0xFFB91C1C)),
+          ),
+        ),
+      );
     }
 
     // Leave community (for members)
@@ -207,10 +228,52 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         );
         _showPendingPostsReview(context);
         break;
+      case 'edit_community':
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => EditCommunityPage(
+              initialCommunity: state.community,
+            ),
+          ),
+        ).then((_) => _refreshContent(context));
+        break;
+      case 'delete_community':
+        _showDeleteConfirmation(context);
+        break;
       case 'leave_community':
         _showLeaveConfirmation(context);
         break;
     }
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xóa cộng đồng'),
+        content: const Text(
+          'Bạn có chắc chắn muốn xóa cộng đồng này? Hành động này không thể hoàn tác.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Hủy'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<CommunityDetailBloc>().add(
+                DeleteCommunityRequested(widget.communityId),
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFB91C1C),
+            ),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showPendingMembersReview(BuildContext context) {
@@ -897,7 +960,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           listener: (context, state) {
             if (state is CommunityActionSuccess) {
               showSuccessSnackBar(context, state.message);
-              _refreshContent(context);
+              if (state.message == 'Đã xóa cộng đồng thành công') {
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (mounted) Navigator.of(context).pop(true);
+                });
+              } else {
+                _refreshContent(context);
+              }
             } else if (state is CommunityDetailError) {
               showErrorSnackBar(context, state.message);
             }

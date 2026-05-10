@@ -423,11 +423,41 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         user: post.user,
                         createdAt: post.createdAt,
                         showCommunityInfo: true,
+                        isSaved: _isSaved,
                         onOptionsTap: () {
-                          // TODO: Có thể tái sử dụng bottom sheet tùy chọn giống PostItem nếu muốn
+                          PostOptionsBottomSheet.show(
+                            context,
+                            post: widget.post,
+                            showOwnerActions: false,
+                            onDeleted: () {
+                              if (mounted) {
+                                Navigator.of(context).maybePop(true);
+                              }
+                            },
+                          );
                         },
                         onReportTap: () {
-                          // TODO: Có thể tái sử dụng bottom sheet báo cáo giống PostItem nếu muốn
+                          ReportPostBottomSheet.show(
+                            context,
+                            postId: widget.post.id,
+                            ownerUserId: post.user.userId,
+                          );
+                        },
+                        onSaveTap: () {
+                          if (_isSaved) {
+                            _handleUnsave();
+                          } else {
+                            SavePostBottomSheet.show(
+                              context,
+                              post: widget.post,
+                              onSaved: (savedId) {
+                                setState(() {
+                                  _isSaved = true;
+                                  _savedId = savedId;
+                                });
+                              },
+                            );
+                          }
                         },
                       )
                     else

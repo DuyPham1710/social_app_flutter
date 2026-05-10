@@ -33,8 +33,9 @@ class PostItem extends StatefulWidget {
   final PostEntity post;
   final int commentCount;
   final bool isSaved;
-  final bool
-  isInCommunityDetail; // Nếu true, dùng CommunityPostHeaderBase cho posts có community
+  /// Nếu true, dùng CommunityPostHeaderBase cho posts có community.
+  final bool isInCommunityDetail;
+  final String? communityUserRole;
 
   const PostItem({
     super.key,
@@ -42,6 +43,7 @@ class PostItem extends StatefulWidget {
     this.commentCount = 0,
     this.isSaved = false,
     this.isInCommunityDetail = false,
+    this.communityUserRole,
   });
 
   @override
@@ -69,6 +71,35 @@ class _PostItemState extends State<PostItem> {
           initialImageIndex: initialImageIndex,
         ),
       ),
+    );
+  }
+
+  Future<void> _showPostOptions() async {
+    PostOptionsBottomSheet.show(
+      context,
+      post: widget.post,
+      onDeleted: () {
+        if (mounted) {
+          setState(() {
+            _isRemoved = true;
+          });
+        }
+      },
+    );
+  }
+
+  void _showCommunityPostOptions() {
+    PostOptionsBottomSheet.show(
+      context,
+      post: widget.post,
+      showOwnerActions: false,
+      onDeleted: () {
+        if (mounted) {
+          setState(() {
+            _isRemoved = true;
+          });
+        }
+      },
     );
   }
 
@@ -294,8 +325,10 @@ class _PostItemState extends State<PostItem> {
               CommunityPostHeaderBase(
                 user: user,
                 createdAt: widget.post.createdAt,
+                communityUserRole: widget.communityUserRole,
+                isSaved: _isSaved,
                 onOptionsTap: () {
-                  PostOptionsBottomSheet.show(context, post: widget.post);
+                  _showCommunityPostOptions();
                 },
                 onReportTap: () {
                   ReportPostBottomSheet.show(
@@ -303,6 +336,22 @@ class _PostItemState extends State<PostItem> {
                     postId: widget.post.id,
                     ownerUserId: user.userId,
                   );
+                },
+                onSaveTap: () {
+                  if (_isSaved) {
+                    _handleUnsave();
+                  } else {
+                    SavePostBottomSheet.show(
+                      context,
+                      post: widget.post,
+                      onSaved: (savedId) {
+                        setState(() {
+                          _savedId = savedId;
+                          _isSaved = true;
+                        });
+                      },
+                    );
+                  }
                 },
               )
             else
@@ -312,8 +361,10 @@ class _PostItemState extends State<PostItem> {
                 user: user,
                 createdAt: widget.post.createdAt,
                 showCommunityInfo: true,
+                communityUserRole: widget.communityUserRole,
+                isSaved: _isSaved,
                 onOptionsTap: () {
-                  PostOptionsBottomSheet.show(context, post: widget.post);
+                  _showCommunityPostOptions();
                 },
                 onReportTap: () {
                   ReportPostBottomSheet.show(
@@ -321,6 +372,22 @@ class _PostItemState extends State<PostItem> {
                     postId: widget.post.id,
                     ownerUserId: user.userId,
                   );
+                },
+                onSaveTap: () {
+                  if (_isSaved) {
+                    _handleUnsave();
+                  } else {
+                    SavePostBottomSheet.show(
+                      context,
+                      post: widget.post,
+                      onSaved: (savedId) {
+                        setState(() {
+                          _savedId = savedId;
+                          _isSaved = true;
+                        });
+                      },
+                    );
+                  }
                 },
               ),
           ] else ...[
@@ -333,7 +400,7 @@ class _PostItemState extends State<PostItem> {
               onTagVisibilityTap: _handleTagVisibility,
               onRemoveTagTap: _handleRemoveTag,
               onOptionsTap: () {
-                PostOptionsBottomSheet.show(context, post: widget.post);
+                _showPostOptions();
               },
               isSaved: _isSaved,
               onReportTap: () {

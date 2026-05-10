@@ -23,7 +23,10 @@ class CommunityPostHeader extends StatelessWidget {
   final DateTime? createdAt;
   final VoidCallback? onOptionsTap;
   final VoidCallback? onReportTap;
+  final VoidCallback? onSaveTap;
+  final bool isSaved;
   final bool showCommunityInfo; // Ẩn info nhóm khi xem trong community detail
+  final String? communityUserRole;
 
   const CommunityPostHeader({
     super.key,
@@ -32,7 +35,10 @@ class CommunityPostHeader extends StatelessWidget {
     this.createdAt,
     this.onOptionsTap,
     this.onReportTap,
+    this.onSaveTap,
+    this.isSaved = false,
     this.showCommunityInfo = true, // Default: hiển thị info nhóm
+    this.communityUserRole,
   });
 
   String _timeAgo(DateTime time) {
@@ -244,38 +250,135 @@ class CommunityPostHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              // Menu
-              if (onOptionsTap != null || onReportTap != null)
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'options' && onOptionsTap != null) {
-                      onOptionsTap!();
-                    } else if (value == 'report' && onReportTap != null) {
-                      onReportTap!();
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    if (onOptionsTap != null)
-                      const PopupMenuItem(
-                        value: 'options',
-                        child: Text('Tùy chọn'),
-                      ),
-                    if (onReportTap != null)
-                      const PopupMenuItem(
-                        value: 'report',
-                        child: Text('Báo cáo'),
-                      ),
-                  ],
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: AppColors.textSecondary,
-                    size: 18.sp,
-                  ),
-                ),
+              _StableCurrentUserBuilder(
+                builder: (context, currentUserId) {
+                  if (currentUserId == null) return const SizedBox.shrink();
+
+                  final isOwner = currentUserId == user.userId;
+                  final isCommunityAdmin = communityUserRole == 'admin' ||
+                      community?.admin.userId == currentUserId;
+                  final canDelete = onOptionsTap != null &&
+                      (isOwner || (isCommunityAdmin && !isOwner));
+                  final canSave = onSaveTap != null && !isOwner;
+                  final canReport =
+                      onReportTap != null && !isOwner && !isCommunityAdmin;
+
+                  if (!canDelete && !canSave && !canReport) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return PopupMenuButton<String>(
+                    color: AppColors.background,
+                    onSelected: (value) {
+                      if (value == 'delete') {
+                        onOptionsTap?.call();
+                      } else if (value == 'save') {
+                        onSaveTap?.call();
+                      } else if (value == 'report') {
+                        onReportTap?.call();
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      if (canSave)
+                        PopupMenuItem(
+                          value: 'save',
+                          child: Row(
+                            children: [
+                              Icon(
+                                isSaved
+                                    ? Icons.bookmark_remove_outlined
+                                    : Icons.bookmark_border_rounded,
+                                size: 18.sp,
+                                color: AppColors.textSecondary,
+                              ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                isSaved ? 'Bỏ lưu bài viết' : 'Lưu bài viết',
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (canReport)
+                        PopupMenuItem(
+                          value: 'report',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.flag_outlined,
+                                size: 18.sp,
+                                color:  Colors.red,
+                              ),
+                              SizedBox(width: 8.w),
+                              const Text('Báo cáo bài viết'),
+                            ],
+                          ),
+                        ),
+                      if (canDelete)
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
+                                size: 18.sp,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 8.w),
+                              const Text(
+                                'Xóa bài viết',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: AppColors.textSecondary,
+                      size: 18.sp,
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StableCurrentUserBuilder extends StatefulWidget {
+  final Widget Function(BuildContext context, String? currentUserId) builder;
+
+  const _StableCurrentUserBuilder({required this.builder});
+
+  @override
+  State<_StableCurrentUserBuilder> createState() =>
+      _StableCurrentUserBuilderState();
+}
+
+class _StableCurrentUserBuilderState extends State<_StableCurrentUserBuilder> {
+  late final Future<String?> _currentUserIdFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUserIdFuture = TokenStorage.getUserData()
+        .then((userData) => userData?['id']?.toString());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _currentUserIdFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+
+        return widget.builder(context, snapshot.data);
+      },
     );
   }
 }

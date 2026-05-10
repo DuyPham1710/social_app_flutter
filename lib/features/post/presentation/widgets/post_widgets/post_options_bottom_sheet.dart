@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -8,7 +7,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
-import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
+import 'package:social_app_fe/features/post/domain/usecases/delete_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/update_post_tags_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.dart';
@@ -20,29 +19,45 @@ import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class PostOptionsBottomSheet extends StatefulWidget {
   final PostEntity post;
+  final bool showOwnerActions;
+  final VoidCallback? onDeleted;
 
-  const PostOptionsBottomSheet({super.key, required this.post});
+  const PostOptionsBottomSheet({
+    super.key,
+    required this.post,
+    this.showOwnerActions = true,
+    this.onDeleted,
+  });
 
   @override
   State<PostOptionsBottomSheet> createState() => _PostOptionsBottomSheetState();
 
-  static void show(BuildContext context, {required PostEntity post}) {
+  static void show(
+    BuildContext context, {
+    required PostEntity post,
+    bool showOwnerActions = true,
+    VoidCallback? onDeleted,
+  }) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return PostOptionsBottomSheet(post: post);
+        return PostOptionsBottomSheet(
+          post: post,
+          showOwnerActions: showOwnerActions,
+          onDeleted: onDeleted,
+        );
       },
     );
   }
 }
 
 class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
-  final PostRepository _postRepository = s1<PostRepository>();
   bool _isDeleting = false;
 
   Future<void> _deletePost(BuildContext context) async {
     final postId = widget.post.id;
+    final parentContext = Navigator.of(context).context;
 
     // Hiển thị dialog xác nhận
     final confirmed = await showDialog<bool>(
@@ -79,17 +94,20 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
     });
 
     try {
-      final result = await _postRepository.deletePost(postId: postId);
+      final result = await resolveDeletePostUsecase()(
+        params: DeletePostParams(postId: postId),
+      );
 
       if (mounted) {
         Navigator.pop(context); // Đóng bottom sheet
 
         if (result is DataStateSuccess) {
           // Hiển thị thông báo thành công
-          showSuccessSnackBar(context, 'Đã xóa bài viết');
+          showSuccessSnackBar(parentContext, 'Đã xóa bài viết');
+          widget.onDeleted?.call();
         } else if (result is DataStateError) {
           showErrorSnackBar(
-            context,
+            parentContext,
             'Lỗi: ${result.error?.message ?? "Không thể xóa bài viết"}',
           );
         }
@@ -97,7 +115,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        showErrorSnackBar(context, 'Lỗi: $e');
+        showErrorSnackBar(parentContext, 'Lỗi: $e');
       }
     } finally {
       if (mounted) {
@@ -170,36 +188,38 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
               ),
             ),
             SizedBox(height: 20.h),
-            StoryOptionItemWidget(
-              icon: Icons.lock_outline,
-              title: "Chỉnh sửa quyền riêng tư của bài viết",
-              onTap: () {
-                Navigator.pop(context);
-                final privacyLabel = PrivacyUtil.privacyTypeToLabel(
-                  widget.post.privacyType,
-                );
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider(
-                      create: (_) =>
-                          s1<PrivacyBloc>()..add(GetDefaultPrivacyRequested()),
-                      child: PrivacyPage(
-                        selectedOption: privacyLabel,
-                        postId: widget.post.id,
-                        initialPrivacyType: widget.post.privacyType,
-                        initialFriendsExcept: widget.post.friendsExcept,
-                        initialFriendsDetail: widget.post.friendsDetail,
+            if (widget.showOwnerActions) ...[
+              StoryOptionItemWidget(
+                icon: Icons.lock_outline,
+                title: "Chỉnh sửa quyền riêng tư của bài viết",
+                onTap: () {
+                  Navigator.pop(context);
+                  final privacyLabel = PrivacyUtil.privacyTypeToLabel(
+                    widget.post.privacyType,
+                  );
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider(
+                        create: (_) => s1<PrivacyBloc>()
+                          ..add(GetDefaultPrivacyRequested()),
+                        child: PrivacyPage(
+                          selectedOption: privacyLabel,
+                          postId: widget.post.id,
+                          initialPrivacyType: widget.post.privacyType,
+                          initialFriendsExcept: widget.post.friendsExcept,
+                          initialFriendsDetail: widget.post.friendsDetail,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-            StoryOptionItemWidget(
-              icon: Icons.person_add_alt_1_outlined,
-              title: "Gắn thẻ bạn bè",
-              onTap: () => _updatePostTags(context),
-            ),
+                  );
+                },
+              ),
+              StoryOptionItemWidget(
+                icon: Icons.person_add_alt_1_outlined,
+                title: "Gắn thẻ bạn bè",
+                onTap: () => _updatePostTags(context),
+              ),
+            ],
             StoryOptionItemWidget(
               icon: Icons.delete_outline,
               title: "Xóa bài viết",

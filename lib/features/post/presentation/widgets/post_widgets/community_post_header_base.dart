@@ -20,6 +20,9 @@ class CommunityPostHeaderBase extends StatelessWidget {
   final DateTime? createdAt;
   final VoidCallback? onOptionsTap;
   final VoidCallback? onReportTap;
+  final VoidCallback? onSaveTap;
+  final bool isSaved;
+  final String? communityUserRole;
 
   const CommunityPostHeaderBase({
     super.key,
@@ -27,6 +30,9 @@ class CommunityPostHeaderBase extends StatelessWidget {
     this.createdAt,
     this.onOptionsTap,
     this.onReportTap,
+    this.onSaveTap,
+    this.isSaved = false,
+    this.communityUserRole,
   });
 
   String _timeAgo(DateTime time) {
@@ -109,43 +115,126 @@ class CommunityPostHeaderBase extends StatelessWidget {
               ],
             ),
           ),
-          if (onOptionsTap != null || onReportTap != null)
-            PopupMenuButton<String>(
-              icon: Icon(Icons.more_horiz, size: 20.sp),
-              color: AppColors.background,
-              onSelected: (value) {
-                if (value == 'report') {
-                  onReportTap?.call();
-                } else if (value == 'delete') {
-                  onOptionsTap?.call();
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'report',
-                  child: Row(
-                    children: [
-                      Icon(Icons.flag, size: 18.sp),
-                      SizedBox(width: 8.w),
-                      const Text('Báo cáo'),
-                    ],
-                  ),
-                ),
-                if (onOptionsTap != null)
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, size: 18.sp, color: Colors.red),
-                        SizedBox(width: 8.w),
-                        const Text('Xóa', style: TextStyle(color: Colors.red)),
-                      ],
+          _StableCurrentUserBuilder(
+            builder: (context, currentUserId) {
+              if (currentUserId == null) return const SizedBox.shrink();
+
+              final isOwner = currentUserId == user.userId;
+              final isCommunityAdmin = communityUserRole == 'admin';
+              final canDelete = onOptionsTap != null &&
+                  (isOwner || (isCommunityAdmin && !isOwner));
+              final canSave = onSaveTap != null && !isOwner;
+              final canReport =
+                  onReportTap != null && !isOwner && !isCommunityAdmin;
+
+              if (!canDelete && !canSave && !canReport) {
+                return const SizedBox.shrink();
+              }
+
+              return PopupMenuButton<String>(
+                icon: Icon(Icons.more_horiz, size: 20.sp),
+                color: AppColors.background,
+                onSelected: (value) {
+                  if (value == 'report') {
+                    onReportTap?.call();
+                  } else if (value == 'save') {
+                    onSaveTap?.call();
+                  } else if (value == 'delete') {
+                    onOptionsTap?.call();
+                  }
+                },
+                itemBuilder: (context) => [
+                  if (canSave)
+                    PopupMenuItem(
+                      value: 'save',
+                      child: Row(
+                        children: [
+                          Icon(
+                            isSaved
+                                ? Icons.bookmark_remove_outlined
+                                : Icons.bookmark_border_rounded,
+                            size: 18.sp,
+                            color: AppColors.textSecondary,
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(isSaved ? 'Bỏ lưu bài viết' : 'Lưu bài viết'),
+                        ],
+                      ),
                     ),
-                  ),
-              ],
-            ),
+                  if (canReport)
+                    PopupMenuItem(
+                      value: 'report',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.flag_outlined,
+                            size: 18.sp,
+                            color: AppColors.textSecondary,
+                          ),
+                          SizedBox(width: 8.w),
+                          const Text('Báo cáo bài viết'),
+                        ],
+                      ),
+                    ),
+                  if (canDelete)
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            size: 18.sp,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 8.w),
+                          const Text(
+                            'Xóa bài viết',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _StableCurrentUserBuilder extends StatefulWidget {
+  final Widget Function(BuildContext context, String? currentUserId) builder;
+
+  const _StableCurrentUserBuilder({required this.builder});
+
+  @override
+  State<_StableCurrentUserBuilder> createState() =>
+      _StableCurrentUserBuilderState();
+}
+
+class _StableCurrentUserBuilderState extends State<_StableCurrentUserBuilder> {
+  late final Future<String?> _currentUserIdFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUserIdFuture = TokenStorage.getUserData()
+        .then((userData) => userData?['id']?.toString());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _currentUserIdFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+
+        return widget.builder(context, snapshot.data);
+      },
     );
   }
 }

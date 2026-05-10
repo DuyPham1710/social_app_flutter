@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/community/domain/usecases/join_community_
 import 'package:social_app_fe/features/community/domain/usecases/cancel_join_request_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/leave_community_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/delete_community_usecase.dart';
 
 part 'community_detail_event.dart';
 part 'community_detail_state.dart';
@@ -20,6 +21,7 @@ class CommunityDetailBloc
   final CancelJoinRequestUseCase _cancelJoinRequestUseCase;
   final LeaveCommunityUseCase _leaveCommunityUseCase;
   final RespondToInviteUseCase _respondToInviteUseCase;
+  final DeleteCommunityUseCase _deleteCommunityUseCase;
 
   factory CommunityDetailBloc() {
     return CommunityDetailBloc.withDeps(
@@ -29,6 +31,7 @@ class CommunityDetailBloc
       s1<CancelJoinRequestUseCase>(),
       s1<LeaveCommunityUseCase>(),
       s1<RespondToInviteUseCase>(),
+      s1<DeleteCommunityUseCase>(),
     );
   }
 
@@ -39,6 +42,7 @@ class CommunityDetailBloc
     this._cancelJoinRequestUseCase,
     this._leaveCommunityUseCase,
     this._respondToInviteUseCase,
+    this._deleteCommunityUseCase,
   ) : super(const CommunityDetailInitial()) {
     on<CommunityDetailFetched>(_onCommunityDetailFetched);
     on<JoinCommunityRequested>(_onJoinCommunityRequested);
@@ -46,6 +50,7 @@ class CommunityDetailBloc
     on<LeaveCommunityRequested>(_onLeaveCommunityRequested);
     on<MemberStatusFetched>(_onMemberStatusFetched);
     on<RespondToInviteRequested>(_onRespondToInviteRequested);
+    on<DeleteCommunityRequested>(_onDeleteCommunityRequested);
   }
 
   Future<void> _onCommunityDetailFetched(
@@ -253,6 +258,38 @@ class CommunityDetailBloc
         );
         // Refresh
         add(CommunityDetailFetched(event.communityId));
+      } else if (dataState is DataStateError) {
+        final errorMessage =
+            '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
+        emit(
+          CommunityDetailError(errorMessage, communityId: event.communityId),
+        );
+      }
+    } catch (e) {
+      emit(
+        CommunityDetailError(
+          'Đã xảy ra lỗi: ${e.toString()}',
+          communityId: event.communityId,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleteCommunityRequested(
+    DeleteCommunityRequested event,
+    Emitter<CommunityDetailState> emit,
+  ) async {
+    emit(const CommunityDetailLoading());
+    try {
+      final dataState = await _deleteCommunityUseCase(params: event.communityId);
+
+      if (dataState is DataStateSuccess) {
+        emit(
+          CommunityActionSuccess(
+            'Đã xóa cộng đồng thành công',
+            communityId: event.communityId,
+          ),
+        );
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';

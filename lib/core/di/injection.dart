@@ -82,9 +82,11 @@ import 'package:social_app_fe/features/post/domain/usecases/get_profile_posts_us
 import 'package:social_app_fe/features/post/domain/usecases/get_user_posts_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/view_post_usecase.dart';
 import 'package:social_app_fe/features/save/domain/usecases/get_saved_items_usecase.dart';
+import 'package:social_app_fe/features/save/domain/usecases/unsave_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/react_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/create_post_usecase.dart';
+import 'package:social_app_fe/features/post/domain/usecases/delete_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_caption_translation_eligibility_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/translate_caption_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/update_tag_visibility_usecase.dart';
@@ -149,6 +151,9 @@ import 'package:social_app_fe/features/community/domain/usecases/get_pending_req
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_join_request_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/create_community_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/update_community_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/delete_community_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/kick_member_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_available_friends_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/invite_friend_usecase.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_bloc.dart';
@@ -160,6 +165,26 @@ import 'package:social_app_fe/features/community/presentation/bloc/invite_friend
 import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
 
 final s1 = GetIt.instance;
+
+DeletePostUsecase resolveDeletePostUsecase() {
+  if (!s1.isRegistered<DeletePostUsecase>()) {
+    s1.registerLazySingleton<DeletePostUsecase>(
+      () => DeletePostUsecase(s1()),
+    );
+  }
+
+  return s1<DeletePostUsecase>();
+}
+
+UnsavePostUsecase resolveUnsavePostUsecase() {
+  if (!s1.isRegistered<UnsavePostUsecase>()) {
+    s1.registerLazySingleton<UnsavePostUsecase>(
+      () => UnsavePostUsecase(s1()),
+    );
+  }
+
+  return s1<UnsavePostUsecase>();
+}
 
 Future<void> initializeDependencies() async {
   // Dio
@@ -248,6 +273,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<GetSavedItemsUsecase>(
     () => GetSavedItemsUsecase(s1()),
   );
+  s1.registerLazySingleton<UnsavePostUsecase>(() => UnsavePostUsecase(s1()));
   s1.registerLazySingleton<RegisterUsecase>(() => RegisterUsecase(s1()));
   s1.registerLazySingleton<VerifyOtpUsecase>(() => VerifyOtpUsecase(s1()));
   s1.registerLazySingleton<ResendOtpUsecase>(() => ResendOtpUsecase(s1()));
@@ -283,6 +309,7 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<ViewPostUsecase>(() => ViewPostUsecase(s1()));
   s1.registerLazySingleton<CreatePostUsecase>(() => CreatePostUsecase(s1()));
+  s1.registerLazySingleton<DeletePostUsecase>(() => DeletePostUsecase(s1()));
   s1.registerLazySingleton<ReportPostUseCase>(() => ReportPostUseCase(s1()));
   s1.registerLazySingleton<TranslateCaptionUsecase>(
     () => TranslateCaptionUsecase(s1()),
@@ -303,7 +330,9 @@ Future<void> initializeDependencies() async {
     () => UpdatePostTagsUsecase(s1()),
   );
 
-  s1.registerFactory<SavedItemsBloc>(() => SavedItemsBloc(s1()));
+  s1.registerFactory<SavedItemsBloc>(
+    () => SavedItemsBloc(s1(), resolveUnsavePostUsecase()),
+  );
 
   // Comment UseCases
   s1.registerLazySingleton<ConnectCommentSocketUseCase>(
@@ -826,6 +855,15 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<CreateCommunityUseCase>(
     () => CreateCommunityUseCase(s1()),
   );
+  s1.registerLazySingleton<UpdateCommunityUseCase>(
+    () => UpdateCommunityUseCase(s1()),
+  );
+  s1.registerLazySingleton<DeleteCommunityUseCase>(
+    () => DeleteCommunityUseCase(s1()),
+  );
+  s1.registerLazySingleton<KickMemberUseCase>(
+    () => KickMemberUseCase(s1()),
+  );
 
   // Community BLoCs
   // Community BLoCs
@@ -846,6 +884,7 @@ Future<void> initializeDependencies() async {
       s1<CancelJoinRequestUseCase>(),
       s1<LeaveCommunityUseCase>(),
       s1<RespondToInviteUseCase>(),
+      s1<DeleteCommunityUseCase>(),
     ),
   );
 
@@ -858,7 +897,10 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<CommunityCreateBloc>(
-    () => CommunityCreateBloc(s1<CreateCommunityUseCase>()),
+    () => CommunityCreateBloc(
+      s1<CreateCommunityUseCase>(),
+      s1<UpdateCommunityUseCase>(),
+    ),
   );
 
   s1.registerFactory<CommunityPostsTabBloc>(

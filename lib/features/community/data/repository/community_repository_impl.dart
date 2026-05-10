@@ -60,6 +60,57 @@ class CommunityRepositoryImpl implements CommunityRepository {
   }
 
   @override
+  Future<DataState<CommunityModel>> updateCommunity({
+    required String communityId,
+    String? name,
+    String? description,
+    String? privacy,
+    String? avatar,
+    String? coverImage,
+  }) async {
+    try {
+      MultipartFile? avatarFile;
+      MultipartFile? coverImageFile;
+
+      if (avatar != null && avatar.isNotEmpty && !avatar.startsWith('http')) {
+        avatarFile = await MultipartFile.fromFile(
+          avatar,
+          filename: avatar.split('/').last,
+        );
+      }
+
+      if (coverImage != null && coverImage.isNotEmpty && !coverImage.startsWith('http')) {
+        coverImageFile = await MultipartFile.fromFile(
+          coverImage,
+          filename: coverImage.split('/').last,
+        );
+      }
+
+      final response = await _remoteDataSource.updateCommunity(
+        communityId: communityId,
+        name: name,
+        description: description,
+        privacy: privacy,
+        avatar: avatarFile != null ? [avatarFile] : null,
+        coverImage: coverImageFile != null ? [coverImageFile] : null,
+      );
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> deleteCommunity(String communityId) async {
+    try {
+      await _remoteDataSource.deleteCommunity(communityId);
+      return DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
   Future<DataState<CommunityListModel>> getAllCommunities({
     required int page,
     required int limit,

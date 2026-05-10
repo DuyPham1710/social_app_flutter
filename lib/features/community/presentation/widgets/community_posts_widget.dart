@@ -180,6 +180,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                           post: post,
                           commentCount: _commentCounts[post.id] ?? 0,
                           isInCommunityDetail: true,
+                          communityUserRole: widget.userRole,
                         ),
                       ),
                     );

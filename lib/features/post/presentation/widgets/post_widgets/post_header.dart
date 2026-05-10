@@ -47,11 +47,6 @@ class PostHeader extends StatelessWidget {
     return '${diff.inDays} ngày trước';
   }
 
-  Future<String?> _getCurrentUserId() async {
-    final userData = await TokenStorage.getUserData();
-    return userData?['id'];
-  }
-
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
     final currentUserId = userData?['id'];
@@ -131,10 +126,8 @@ class PostHeader extends StatelessWidget {
               ],
             ),
           ),
-          FutureBuilder<String?>(
-            future: _getCurrentUserId(),
-            builder: (context, snapshot) {
-              final currentUserId = snapshot.data;
+          _StableCurrentUserBuilder(
+            builder: (context, currentUserId) {
               final isOwner = currentUserId == user.userId;
 
               if (isOwner) {
@@ -263,5 +256,40 @@ class PostHeader extends StatelessWidget {
         ),
       ),
     ];
+  }
+}
+
+class _StableCurrentUserBuilder extends StatefulWidget {
+  final Widget Function(BuildContext context, String? currentUserId) builder;
+
+  const _StableCurrentUserBuilder({required this.builder});
+
+  @override
+  State<_StableCurrentUserBuilder> createState() =>
+      _StableCurrentUserBuilderState();
+}
+
+class _StableCurrentUserBuilderState extends State<_StableCurrentUserBuilder> {
+  late final Future<String?> _currentUserIdFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUserIdFuture = TokenStorage.getUserData()
+        .then((userData) => userData?['id']?.toString());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _currentUserIdFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+
+        return widget.builder(context, snapshot.data);
+      },
+    );
   }
 }

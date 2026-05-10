@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
 import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityMembersWidget extends StatefulWidget {
   final String communityId;
   final int refreshSeed;
   final bool isInBottomSheet;
+  final String? userRole;
 
   const CommunityMembersWidget({
     super.key,
     required this.communityId,
     this.refreshSeed = 0,
     this.isInBottomSheet = false,
+    this.userRole,
   });
 
   @override
@@ -24,6 +38,13 @@ class CommunityMembersWidget extends StatefulWidget {
 class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
   late Future<List<MemberModel>> _membersFuture;
   final CommunityRepository _communityRepository = s1<CommunityRepository>();
+  final TextEditingController _searchController = TextEditingController();
+
+  static const Color _surface = Colors.white;
+  static const Color _pageTint = Color(0xFFF7F9FC);
+  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _text = Color(0xFF111827);
+  static const Color _mutedText = Color(0xFF6B7280);
 
   @override
   void initState() {
@@ -36,8 +57,14 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.refreshSeed != widget.refreshSeed ||
         oldWidget.communityId != widget.communityId) {
-      _membersFuture = _loadMembers();
+      _refreshMembers();
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<List<MemberModel>> _loadMembers() async {
@@ -58,136 +85,732 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     return const [];
   }
 
+  void _refreshMembers() {
+    setState(() {
+      _membersFuture = _loadMembers();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.isInBottomSheet) {
-      return _buildMembersContent();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE4E7EC)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x120F172A),
-              blurRadius: 14,
-              offset: Offset(0, 7),
+    final content = widget.isInBottomSheet
+        ? Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            child: _buildMembersContent(),
+          )
+        : Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: _surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: _border),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x100F172A),
+                    blurRadius: 18,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                child: _buildMembersContent(),
+              ),
             ),
-          ],
-        ),
-        child: _buildMembersContent(),
-      ),
+          );
+
+    return BlocListener<CommunityAdminBloc, CommunityAdminState>(
+      listener: (context, state) {
+        if (state is CommunityAdminActionSuccess) {
+          showSuccessSnackBar(context, state.message);
+          _refreshMembers();
+        } else if (state is CommunityAdminError) {
+          showErrorSnackBar(context, state.message);
+        }
+      },
+      child: content,
     );
   }
 
   Widget _buildMembersContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return FutureBuilder<List<MemberModel>>(
+      future: _membersFuture,
+      builder: (context, snapshot) {
+        final members = snapshot.data ?? const <MemberModel>[];
+        final filteredMembers = _filterMembers(members);
+        final isLoading = snapshot.connectionState == ConnectionState.waiting;
+
+        Widget body;
+        if (isLoading) {
+          body = _buildSkeletonLoading();
+        } else if (snapshot.hasError) {
+          body = _buildErrorState(snapshot.error);
+        } else if (members.isEmpty) {
+          body = _buildEmptyState(
+            icon: Icons.groups_2_outlined,
+            title: 'Chưa có thành viên nào',
+            message: 'Khi có người tham gia, danh sách sẽ hiển thị tại đây.',
+          );
+        } else if (filteredMembers.isEmpty) {
+          body = _buildEmptyState(
+            icon: Icons.search_off_rounded,
+            title: 'Không tìm thấy thành viên',
+            message: 'Thử tìm bằng tên hoặc username khác.',
+          );
+        } else {
+          body = _buildMemberList(filteredMembers);
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(
+              totalMembers: members.length,
+              visibleMembers: filteredMembers.length,
+              isLoading: isLoading,
+            ),
+            if (!isLoading && members.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _buildSearchField(),
+            ],
+            const SizedBox(height: 14),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 240),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              child: body,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader({
+    required int totalMembers,
+    required int visibleMembers,
+    required bool isLoading,
+  }) {
+    final countLabel = isLoading
+        ? 'Đang tải'
+        : _searchController.text.trim().isEmpty
+            ? '$totalMembers thành viên'
+            : '$visibleMembers/$totalMembers thành viên';
+
+    return Row(
       children: [
-        if (!widget.isInBottomSheet)
-          const Padding(
-            padding: EdgeInsets.only(bottom: 8),
-            child: Text(
-              'Thành viên',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(
+            Icons.groups_rounded,
+            color: AppColors.primary,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.isInBottomSheet ? 'Danh sách thành viên' : 'Thành viên',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: _text,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                countLabel,
+                style: const TextStyle(
+                  color: _mutedText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Tooltip(
+          message: 'Tải lại',
+          child: IconButton.filledTonal(
+            onPressed: isLoading ? null : _refreshMembers,
+            icon: const Icon(Icons.refresh_rounded),
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFFF3F4F6),
+              foregroundColor: _text,
+              disabledBackgroundColor: const Color(0xFFF3F4F6),
+              disabledForegroundColor: const Color(0xFFB6BEC9),
             ),
           ),
-        FutureBuilder<List<MemberModel>>(
-          future: _membersFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            if (snapshot.hasError) {
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF1F2),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFFECACA)),
-                ),
-                child: Text('Không tải được thành viên: ${snapshot.error}'),
-              );
-            }
-
-            final members = snapshot.data ?? const [];
-            if (members.isEmpty) {
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: const Text('Chưa có thành viên nào hiển thị'),
-              );
-            }
-
-            return Column(
-              children: members.map((member) {
-                final user = member.user;
-                final isAdmin = member.role == 'admin';
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: user.avatarUrl != null
-                          ? NetworkImage(user.avatarUrl!)
-                          : null,
-                      child: user.avatarUrl == null
-                          ? const Icon(Icons.person)
-                          : null,
-                    ),
-                    title: Text(
-                      user.fullName ?? 'Unknown',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(isAdmin ? 'Quản trị viên' : 'Thành viên'),
-                    trailing: isAdmin
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: const Text(
-                              'Admin',
-                              style: TextStyle(
-                                color: Color(0xFF92400E),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          )
-                        : null,
-                  ),
-                );
-              }).toList(),
-            );
-          },
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      onChanged: (_) => setState(() {}),
+      textInputAction: TextInputAction.search,
+      decoration: InputDecoration(
+        hintText: 'Tìm thành viên',
+        prefixIcon: const Icon(Icons.search_rounded, size: 21),
+        suffixIcon: _searchController.text.isEmpty
+            ? null
+            : IconButton(
+                tooltip: 'Xóa tìm kiếm',
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {});
+                },
+                icon: const Icon(Icons.close_rounded, size: 20),
+              ),
+        isDense: true,
+        filled: true,
+        fillColor: _pageTint,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.3),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMemberList(List<MemberModel> members) {
+    return Column(
+      key: ValueKey('data-${members.length}-${_searchController.text}'),
+      children: [
+        for (var index = 0; index < members.length; index++) ...[
+          _MemberTile(
+            member: members[index],
+            canManage: widget.userRole == 'admin' &&
+                members[index].role.toLowerCase() != 'admin',
+            onTap: () => _handleMemberTap(context, members[index].user.userId),
+            onRemove: () => _showKickConfirmation(
+              context,
+              members[index].user.fullName ?? 'Thành viên',
+              members[index].user.userId,
+            ),
+          ),
+          if (index != members.length - 1)
+            const Divider(height: 1, indent: 64, color: Color(0xFFEFF2F6)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildErrorState(Object? error) {
+    return Container(
+      key: const ValueKey('error'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF1F2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFECACA)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Không tải được danh sách',
+                  style: TextStyle(
+                    color: Color(0xFF9F1239),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$error',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFBE123C),
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: _refreshMembers,
+            child: const Text('Thử lại'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState({
+    required IconData icon,
+    required String title,
+    required String message,
+  }) {
+    return Container(
+      key: ValueKey(title),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 18),
+      decoration: BoxDecoration(
+        color: _pageTint,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _border),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 28, color: const Color(0xFF9CA3AF)),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _text,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _mutedText,
+              fontSize: 13,
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoading() {
+    return Column(
+      key: const ValueKey('loading'),
+      children: List.generate(
+        4,
+        (index) => Padding(
+          padding: EdgeInsets.only(bottom: index == 3 ? 0 : 14),
+          child: Row(
+            children: const [
+              _SkeletonBox(width: 48, height: 48, radius: 24),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SkeletonBox(width: 160, height: 14, radius: 7),
+                    SizedBox(height: 9),
+                    _SkeletonBox(width: 108, height: 12, radius: 6),
+                  ],
+                ),
+              ),
+              _SkeletonBox(width: 34, height: 34, radius: 17),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<MemberModel> _filterMembers(List<MemberModel> members) {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) return members;
+
+    return members.where((member) {
+      final user = member.user;
+      final fullName = user.fullName?.toLowerCase() ?? '';
+      final username = user.username?.toLowerCase() ?? '';
+      return fullName.contains(query) || username.contains(query);
+    }).toList();
+  }
+
+  Future<void> _handleMemberTap(BuildContext context, String userId) async {
+    final userData = await TokenStorage.getUserData();
+    final currentUserId = userData?['id'];
+
+    if (!context.mounted) return;
+
+    if (currentUserId == userId) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+            child: const ProfilePage(),
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                s1<OtherProfileBloc>()
+                  ..add(LoadOtherUserProfileEvent(userId: userId)),
+            child: OtherProfilePage(userId: userId),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showKickConfirmation(
+    BuildContext context,
+    String userName,
+    String memberId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Row(
+          children: const [
+            Expanded(child: Text('Xóa thành viên')),
+          ],
+        ),
+        content: Text(
+          'Bạn muốn xóa $userName khỏi cộng đồng? Người này có thể gửi yêu cầu tham gia lại sau.',
+          style: const TextStyle(height: 1.35),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Hủy'),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<CommunityAdminBloc>().add(
+                KickMemberRequested(
+                  communityId: widget.communityId,
+                  memberId: memberId,
+                ),
+              );
+            },
+            label: const Text('Xóa'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MemberTile extends StatelessWidget {
+  final MemberModel member;
+  final bool canManage;
+  final VoidCallback onTap;
+  final VoidCallback onRemove;
+
+  const _MemberTile({
+    required this.member,
+    required this.canManage,
+    required this.onTap,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final user = member.user;
+    final isAdmin = member.role.toLowerCase() == 'admin';
+    final username = user.username?.trim();
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              _MemberAvatar(
+                avatarUrl: user.avatarUrl,
+                fallbackName: user.fullName ?? username ?? '',
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            user.fullName ?? 'Người dùng',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF111827),
+                            ),
+                          ),
+                        ),
+                        if (isAdmin) const SizedBox(width: 8),
+                        if (isAdmin) const _RolePill(isAdmin: true),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        
+                        if (!isAdmin) const _RolePill(isAdmin: false),
+                        if (member.createdAt != null)
+                          _JoinedDate(date: member.createdAt!),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (canManage)
+                PopupMenuButton<String>(
+                  color: AppColors.background,
+                  tooltip: 'Tùy chọn thành viên',
+                  onSelected: (value) {
+                    if (value == 'remove') onRemove();
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      
+                      value: 'remove',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.person_remove_rounded,
+                            color: Color(0xFFDC2626),
+                            size: 20,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Xóa khỏi nhóm',
+                            style: TextStyle(color: Color(0xFFDC2626)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.more_horiz_rounded,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                )
+              else
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFB6BEC9),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MemberAvatar extends StatelessWidget {
+  final String? avatarUrl;
+  final String fallbackName;
+
+  const _MemberAvatar({
+    required this.avatarUrl,
+    required this.fallbackName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = fallbackName.trim().isEmpty
+        ? '?'
+        : fallbackName.trim().characters.first.toUpperCase();
+    final hasAvatar = avatarUrl != null && avatarUrl!.isNotEmpty;
+
+    return Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFFEFF2F6), width: 2),
+      ),
+      child: ClipOval(
+        child: hasAvatar
+            ? Image.network(
+                avatarUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _AvatarFallback(initial: initial),
+              )
+            : _AvatarFallback(initial: initial),
+      ),
+    );
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  final String initial;
+
+  const _AvatarFallback({required this.initial});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.primary.withValues(alpha: 0.12),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w800,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+}
+
+class _RolePill extends StatelessWidget {
+  final bool isAdmin;
+
+  const _RolePill({required this.isAdmin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isAdmin
+            ? const Color(0xFFEFF6FF)
+            : AppColors.primary.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: isAdmin
+              ? const Color(0xFFBFDBFE)
+              : AppColors.primary.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isAdmin ? Icons.verified_user_rounded : Icons.person_rounded,
+            size: 12,
+            color: isAdmin ? const Color(0xFF2563EB) : AppColors.primary,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isAdmin ? 'Admin' : 'Thành viên',
+            style: TextStyle(
+              color: isAdmin ? const Color(0xFF1D4ED8) : AppColors.primary,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _JoinedDate extends StatelessWidget {
+  final DateTime date;
+
+  const _JoinedDate({required this.date});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          Icons.calendar_today_rounded,
+          size: 12,
+          color: Color(0xFF9CA3AF),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          DateFormat('dd/MM/yyyy').format(date.toLocal()),
+          style: const TextStyle(
+            color: Color(0xFF9CA3AF),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SkeletonBox extends StatelessWidget {
+  final double? width;
+  final double height;
+  final double radius;
+
+  const _SkeletonBox({
+    this.width,
+    required this.height,
+    required this.radius,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9EEF5),
+        borderRadius: BorderRadius.circular(radius),
+      ),
     );
   }
 }

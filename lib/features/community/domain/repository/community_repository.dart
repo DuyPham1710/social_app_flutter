@@ -16,6 +16,17 @@ abstract class CommunityRepository {
     String? coverImage,
   });
 
+  Future<DataState<CommunityModel>> updateCommunity({
+    required String communityId,
+    String? name,
+    String? description,
+    String? privacy,
+    String? avatar,
+    String? coverImage,
+  });
+
+  Future<DataState<void>> deleteCommunity(String communityId);
+
   Future<DataState<CommunityListModel>> getAllCommunities({
     required int page,
     required int limit,

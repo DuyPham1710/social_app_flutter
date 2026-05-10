@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/save/domain/entities/saved_entity.dart';
 
 class SavedItemCard extends StatelessWidget {
   final SavedEntity item;
+  final VoidCallback? onTap;
+  final VoidCallback? onRemove;
 
-  const SavedItemCard({Key? key, required this.item}) : super(key: key);
+  const SavedItemCard({
+    super.key,
+    required this.item,
+    this.onTap,
+    this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,105 +24,174 @@ class SavedItemCard extends StatelessWidget {
             item.content.contains('.jpeg') ||
             item.content.contains('cloudinary'));
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
+    return Material(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(12.r),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Content Area
-          if (isImage)
-            AspectRatio(
-              aspectRatio: 1,
-              child: Image.network(
-                item.content,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.error, color: Colors.grey),
-                  );
-                },
+      child: InkWell(
+        onTap: onTap,
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: Colors.grey.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-            )
-          else if (item.content.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.all(12.w),
-              child: Text(
-                item.content,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
-            )
-          else
-            Padding(
-              padding: EdgeInsets.all(12.w),
-              child: Text(
-                'Không có nội dung',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
-
-          // Divider
-          if (item.authorName != null) ...[
-            Divider(height: 1, thickness: 1, color: Colors.grey[200]),
-            // Author Area
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-              child: Row(
+            ],
+          ),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircleAvatar(
-                    radius: 12.r,
-                    backgroundImage:
-                        item.authorAvatar != null &&
-                            item.authorAvatar!.isNotEmpty
-                        ? NetworkImage(item.authorAvatar!)
-                        : const AssetImage('assets/images/default_avatar.png')
-                              as ImageProvider,
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Text(
-                      item.authorName ?? 'Không xác định',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
+                  if (isImage)
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.network(
+                        item.content,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.error, color: Colors.grey),
+                          );
+                        },
+                      ),
+                    )
+                  else if (item.content.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: Text(
+                        item.content,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: EdgeInsets.all(12.w),
+                      child: const Text(
+                        'Không có nội dung',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                     ),
-                  ),
+                  if (item.authorName != null) ...[
+                    Divider(height: 1, thickness: 1, color: Colors.grey[200]),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 8.h,
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 12.r,
+                            backgroundImage:
+                                item.authorAvatar != null &&
+                                    item.authorAvatar!.isNotEmpty
+                                ? NetworkImage(item.authorAvatar!)
+                                : const AssetImage(
+                                        'assets/images/default_avatar.png',
+                                      )
+                                      as ImageProvider,
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Text(
+                              item.authorName ?? 'Không xác định',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
-            ),
-          ],
-        ],
+              Positioned(
+                top: 6.h,
+                right: 6.w,
+                child: PopupMenuButton<String>(
+                  tooltip: 'Tùy chọn',
+                  color: AppColors.background,
+                  onSelected: (value) {
+                    if (value == 'open') {
+                      onTap?.call();
+                    } else if (value == 'remove') {
+                      onRemove?.call();
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 'open',
+                      child: Row(
+                        children: [
+                          Icon(Icons.open_in_new_rounded, size: 18),
+                          SizedBox(width: 8),
+                          Text('Xem chi tiết'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'remove',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.bookmark_remove_outlined,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Bỏ lưu',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  child: Container(
+                    padding: EdgeInsets.all(5.w),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.42),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.more_horiz_rounded,
+                      size: 18.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

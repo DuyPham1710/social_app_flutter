@@ -22,3 +22,12 @@ class ChangeCategoryTab extends SavedItemsEvent {
   @override
   List<Object?> get props => [category];
 }
+
+class RemoveSavedItem extends SavedItemsEvent {
+  final String savedId;
+
+  const RemoveSavedItem(this.savedId);
+
+  @override
+  List<Object?> get props => [savedId];
+}

@@ -10,16 +10,18 @@ import 'package:social_app_fe/features/community/presentation/bloc/community_cre
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
+import 'package:social_app_fe/features/community/data/models/community_model.dart';
 
+class EditCommunityPage extends StatefulWidget {
+  final CommunityModel initialCommunity;
 
-class CreateCommunityPage extends StatefulWidget {
-  const CreateCommunityPage({super.key});
+  const EditCommunityPage({super.key, required this.initialCommunity});
 
   @override
-  State<CreateCommunityPage> createState() => _CreateCommunityPageState();
+  State<EditCommunityPage> createState() => _EditCommunityPageState();
 }
 
-class _CreateCommunityPageState extends State<CreateCommunityPage> {
+class _EditCommunityPageState extends State<EditCommunityPage> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   String _selectedPrivacy = 'public';
@@ -30,8 +32,11 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
+    _nameController = TextEditingController(text: widget.initialCommunity.name);
+    _descriptionController = TextEditingController(text: widget.initialCommunity.description ?? '');
+    _selectedPrivacy = widget.initialCommunity.status ?? 'public';
+    _avatarPath = widget.initialCommunity.avatar;
+    _coverImagePath = widget.initialCommunity.coverImage;
   }
 
   @override
@@ -109,7 +114,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
           backgroundColor: const Color(0xFFF4F7FB),
           appBar: AppBar(
             title: const Text(
-              'Tạo cộng đồng',
+              'Chỉnh sửa cộng đồng',
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             backgroundColor: const Color(0xFFF4F7FB),
@@ -140,7 +145,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                           SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Tạo nhóm mới với ảnh đại diện, ảnh bìa và kiểu riêng tư',
+                              'Chỉnh sửa thông tin nhóm',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
@@ -170,10 +175,15 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                         child: _avatarPath != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(18),
-                                child: Image.file(
-                                  File(_avatarPath!),
-                                  fit: BoxFit.cover,
-                                ),
+                                child: _avatarPath!.startsWith('http')
+                                    ? Image.network(
+                                        _avatarPath!,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        File(_avatarPath!),
+                                        fit: BoxFit.cover,
+                                      ),
                               )
                             : Center(
                                 child: Column(
@@ -222,10 +232,15 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                         child: _coverImagePath != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(18),
-                                child: Image.file(
-                                  File(_coverImagePath!),
-                                  fit: BoxFit.cover,
-                                ),
+                                child: _coverImagePath!.startsWith('http')
+                                    ? Image.network(
+                                        _coverImagePath!,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        File(_coverImagePath!),
+                                        fit: BoxFit.cover,
+                                      ),
                               )
                             : Center(
                                 child: Column(
@@ -373,7 +388,8 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                 }
 
                                   context.read<CommunityCreateBloc>().add(
-                                    CreateCommunityRequested(
+                                    UpdateCommunityRequested(
+                                      communityId: widget.initialCommunity.id,
                                       name: _nameController.text,
                                       description:
                                           _descriptionController.text.isNotEmpty
@@ -404,7 +420,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                 ),
                               )
                             : const Text(
-                                'Tạo cộng đồng',
+                                'Lưu thay đổi',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,

@@ -194,6 +194,80 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
   }
 
   @override
+  Future<CommunityModel> updateCommunity({
+    required String communityId,
+    String? name,
+    String? description,
+    String? privacy,
+    List<MultipartFile>? avatar,
+    List<MultipartFile>? coverImage,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    if (name != null) {
+      _data.fields.add(MapEntry('name', name));
+    }
+    if (description != null) {
+      _data.fields.add(MapEntry('description', description));
+    }
+    if (privacy != null) {
+      _data.fields.add(MapEntry('privacy', privacy));
+    }
+    if (avatar != null) {
+      _data.files.addAll(avatar.map((i) => MapEntry('avatar', i)));
+    }
+    if (coverImage != null) {
+      _data.files.addAll(coverImage.map((i) => MapEntry('coverImage', i)));
+    }
+    final _options = _setStreamType<CommunityModel>(
+      Options(
+            method: 'PATCH',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
+          .compose(
+            _dio.options,
+            '/community/${communityId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late CommunityModel _value;
+    try {
+      _value = CommunityModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<void> deleteCommunity(String communityId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/community/${communityId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
   Future<void> joinCommunity(String communityId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

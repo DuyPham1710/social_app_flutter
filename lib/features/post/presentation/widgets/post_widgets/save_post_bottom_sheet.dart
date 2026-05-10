@@ -6,6 +6,8 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/features/save/presentation/pages/saved_items_page.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class SavePostBottomSheet extends StatefulWidget {
   final PostEntity post;
@@ -64,18 +66,33 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
           }
         }
         
+        final collections = collectionMap.entries.map((e) => {
+          'name': e.key,
+          'image': e.value,
+        }).toList();
+        if (!collectionMap.containsKey('default')) {
+          collections.insert(0, {'name': 'default', 'image': null});
+        }
+
         setState(() {
-          _collections = collectionMap.entries.map((e) => {
-            'name': e.key,
-            'image': e.value,
-          }).toList();
+          _collections = collections;
           _isLoading = false;
         });
       } else {
-        setState(() { _isLoading = false; });
+        setState(() {
+          _collections = [
+            {'name': 'default', 'image': null},
+          ];
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() { _isLoading = false; });
+      setState(() {
+        _collections = [
+          {'name': 'default', 'image': null},
+        ];
+        _isLoading = false;
+      });
     }
   }
 
@@ -100,30 +117,15 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
         
         if (result is DataStateSuccess && result.data != null) {
           widget.onSaved(result.data!.id);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Đã lưu vào $collectionName'),
-              backgroundColor: Colors.green[800],
-            ),
-          );
+          showSuccessSnackBar(context, "Đã lưu bài viết vào bộ sưu tập '$collectionName'");
         } else if (result is DataStateError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${result.error?.message ?? "Không thể lưu bài viết"}'),
-              backgroundColor: Colors.red[800],
-            ),
-          );
+          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể lưu bài viết"}');
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red[800],
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi: $e');
       }
     }
   }
@@ -304,16 +306,14 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                 child: ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.symmetric(vertical: 8.h),
-                  itemCount: _collections.isEmpty ? 1 : _collections.length + 1, // +1 for layout default if not in list
+                  itemCount: _collections.length,
                   itemBuilder: (context, index) {
-                    if (index < _collections.length) {
-                      final item = _collections[index];
-                      return _buildCollectionItem(context, item['name'], item['image']);
-                    } else if (_collections.isNotEmpty && index == _collections.length) {
-                       // Add a default fallback creation item if we have other collections
-                       return const SizedBox.shrink();
-                    }
-                    return const SizedBox.shrink();
+                    final item = _collections[index];
+                    return _buildCollectionItem(
+                      context,
+                      item['name'],
+                      item['image'],
+                    );
                   },
                 ),
               ),
