@@ -299,12 +299,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             print('Error creating AssetEntity from file: $e');
             // Fallback: Show error message
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Không thể thêm ảnh: $e'),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              showErrorSnackBar(context, "Không thể thêm ảnh: $e");
             }
           }
         }

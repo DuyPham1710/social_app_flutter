@@ -9,6 +9,8 @@ import 'package:social_app_fe/features/story/domain/repository/story_repository.
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_option_item_widget.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class StoryOptionsBottomSheet extends StatefulWidget {
   final GroupedUserStoryEntity currentGroup;
@@ -119,30 +121,15 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
           Navigator.of(context).pop();
           
           // Hiển thị thông báo thành công
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Đã xóa tin'),
-              backgroundColor: Colors.green[800],
-            ),
-          );
+          showSuccessSnackBar(context, 'Đã xóa tin');
         } else if (result is DataStateError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${result.error?.message ?? "Không thể xóa tin"}'),
-              backgroundColor: Colors.red[800],
-            ),
-          );
+          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể xóa tin"}');
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Colors.red[800],
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi: $e');
       }
     } finally {
       if (mounted) {
@@ -231,12 +218,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
                 Navigator.pop(context);
                 final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
                 Clipboard.setData(ClipboardData(text: 'story://$storyId'));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Đã sao chép liên kết'),
-                    backgroundColor: Colors.grey[800],
-                  ),
-                );
+                showSuccessSnackBar(context, 'Đã sao chép liên kết');
               },
             ),
             SizedBox(height: 20.h),

@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/services/call_sound_service.dart';
 import 'package:social_app_fe/features/video_call/domain/entities/video_call_entities.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class IncomingCallScreen extends StatefulWidget {
   final IncomingCallEntity callData;
@@ -101,9 +102,7 @@ class _IncomingCallScreenState extends State<IncomingCallScreen>
 
   void _showError(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
-      );
+      showErrorSnackBar(context, message);
     }
   }
 

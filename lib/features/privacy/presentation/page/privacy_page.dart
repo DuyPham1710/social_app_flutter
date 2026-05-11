@@ -16,6 +16,7 @@ import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_event.d
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_state.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_friend_selection_page.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class PrivacyPage extends StatefulWidget {
@@ -219,13 +220,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                         'friendsDetail': _friendsDetailIds,
                       });
                     } else if (state is PrivacyError) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(state.message),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
+                      showErrorSnackBar(context, state.message);
                     }
                   },
                   child: BlocBuilder<PrivacyBloc, PrivacyState>(
@@ -666,21 +661,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
             'friendsDetail': _friendsDetailIds,
           });
         } else if (result is DataStateError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}',
-              ),
-              backgroundColor: Colors.red[800],
-            ),
-          );
+          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red[800]),
-        );
+        showErrorSnackBar(context, 'Lỗi: $e');
       }
     } finally {
       if (mounted) {

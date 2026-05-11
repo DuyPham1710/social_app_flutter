@@ -250,6 +250,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.background,
         title: const Text('Xóa cộng đồng'),
         content: const Text(
           'Bạn có chắc chắn muốn xóa cộng đồng này? Hành động này không thể hoàn tác.',
@@ -755,6 +756,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.background,
         title: const Text('Rời nhóm'),
         content: const Text(
           'Bạn có chắc chắn muốn rời khỏi cộng đồng này? Bạn có thể tham gia lại sau nếu muốn.',

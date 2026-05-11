@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -312,6 +313,7 @@ class PendingCommunityItem extends StatelessWidget {
     showDialog(
       context: outerContext,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.background,
         title: const Text('Hủy yêu cầu'),
         content: const Text(
           'Bạn có chắc muốn hủy yêu cầu tham gia cộng đồng này?',

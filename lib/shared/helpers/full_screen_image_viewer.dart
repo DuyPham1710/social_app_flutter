@@ -8,6 +8,8 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class FullScreenImageViewer extends StatefulWidget {
   final List<String> imageUrls;
@@ -154,20 +156,11 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đã lưu ảnh vào thư viện'),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        showSuccessSnackBar(context, 'Đã lưu ảnh vào thư viện');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi lưu ảnh: $e'),
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khi lưu ảnh: $e');
       }
     }
   }

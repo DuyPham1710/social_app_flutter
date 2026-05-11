@@ -5,6 +5,8 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class ReportPostBottomSheet extends StatefulWidget {
   final String postId;
@@ -117,17 +119,11 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
     if (result is DataStateSuccess) {
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đã gửi báo cáo. Cảm ơn bạn đã đóng góp!'),
-          ),
-        );
+        showSuccessSnackBar(context, 'Đã gửi báo cáo. Cảm ơn bạn đã đóng góp!');
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gửi báo cáo thất bại. Vui lòng thử lại.')),
-        );
+        showErrorSnackBar(context, 'Gửi báo cáo thất bại. Vui lòng thử lại.');
       }
     }
   }
