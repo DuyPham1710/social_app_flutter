@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'package:social_app_fe/core/utils/video_util.dart';
+import 'package:social_app_fe/shared/component/video_player_widget.dart';
 
 class LayoutPostClassic extends StatelessWidget {
   final List<dynamic> urls;
@@ -25,12 +26,9 @@ class LayoutPostClassic extends StatelessWidget {
 
     if (imageData is File) {
       if (VideoUtil.isVideo(imageData)) {
-        // For video files, show a black background with video icon
-        mediaWidget = Container(
-          color: Colors.grey[800],
-          child: Center(
-            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
-          ),
+        // For video files, show video player
+        mediaWidget = VideoPlayerWidget(
+          videoUrl: imageData.path,
         );
       } else {
         // For image files, show the image
@@ -48,12 +46,9 @@ class LayoutPostClassic extends StatelessWidget {
       }
     } else if (imageData is String) {
       if (VideoUtil.isVideo(imageData)) {
-        // For video URLs, show video icon
-        mediaWidget = Container(
-          color: Colors.grey[800],
-          child: Center(
-            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
-          ),
+        // For video URLs, show video player
+        mediaWidget = VideoPlayerWidget(
+          videoUrl: imageData,
         );
       } else {
         mediaWidget = Image.network(
@@ -70,11 +65,8 @@ class LayoutPostClassic extends StatelessWidget {
       }
     } else if (imageData != null && imageData.url != null) {
       if (VideoUtil.isVideo(imageData.url)) {
-        mediaWidget = Container(
-          color: Colors.grey[800],
-          child: Center(
-            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
-          ),
+        mediaWidget = VideoPlayerWidget(
+          videoUrl: imageData.url,
         );
       } else {
         mediaWidget = Image.network(

@@ -161,9 +161,6 @@ class _PostItemState extends State<PostItem> {
       if (mounted) {
         setState(() {
           _isSaved = true;
-          // Note: we don't have _savedId yet unless we query full list, but unsave requires _savedId
-          // This will require getting the saved document. For now, checkSaved API only returns true/false.
-          // Since unsave API needs savedId, we'll fetch the list to find it if it exists.
         });
         _fetchSavedId();
       }
@@ -477,7 +474,7 @@ class _PostItemState extends State<PostItem> {
 
           SizedBox(height: 20.h),
 
-          // Post actions (like, comment, share) - ẩn nếu bài viết đang chờ duyệt
+          // Post actions - ẩn nếu bài viết đang chờ duyệt
           if (widget.post.communityStatus != 'pending')
             PostAction(
               postId: widget.post.id,

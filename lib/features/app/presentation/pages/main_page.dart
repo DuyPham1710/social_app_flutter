@@ -3,10 +3,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/app/presentation/pages/profile_navigation_page.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/custom_bottom_navigation.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
-import 'package:social_app_fe/features/menu/presentation/pages/menu_page.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_event.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_state.dart';
@@ -31,6 +31,7 @@ class _MainPageState extends State<MainPage> {
   late PageController _pageController;
   bool _isBottomNavVisible = true;
   final GlobalKey<HomePageState> _homePageKey = GlobalKey<HomePageState>();
+  Map<String, dynamic>? _currentUserData;
 
   @override
   void initState() {
@@ -65,6 +66,12 @@ class _MainPageState extends State<MainPage> {
       return;
     }
 
+    if (mounted) {
+      setState(() {
+        _currentUserData = userData;
+      });
+    }
+
     final userId = userData['id'] as String?;
     if (userId == null || userId.isEmpty) {
       debugPrint('[MainPage] Invalid userId, skipping socket connection');
@@ -75,6 +82,21 @@ class _MainPageState extends State<MainPage> {
 
     // connect notification socket
     context.read<NotificationBloc>().add(ConnectNotificationSocket(userId));
+  }
+
+  String _getAvtCurrent() {
+    final userData = widget.userData ?? _currentUserData;
+    final avatarUrl = userData?['avatarUrl'] as String?;
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+      return avatarUrl;
+    }
+
+    final avatar = userData?['avatar'] as String?;
+    if (avatar != null && avatar.isNotEmpty) {
+      return avatar;
+    }
+
+    return '';
   }
 
   void _onTabSelected(int index) {
@@ -165,7 +187,7 @@ class _MainPageState extends State<MainPage> {
                     },
                   ),
                   NotificationPage(),
-                  MenuPage(),
+                  ProfileNavigationPage(),
                 ],
               ),
             ),
@@ -187,6 +209,7 @@ class _MainPageState extends State<MainPage> {
                         currentIndex: _currentIndex,
                         onTabSelected: _onTabSelected,
                         unreadCount: notificationState.unread,
+                        avt: _getAvtCurrent(),
                       );
                     },
                   ),
