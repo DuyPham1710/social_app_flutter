@@ -702,7 +702,7 @@ class MessageItem extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
                 child: VideoUtil.isVideo(attachment.url)
-                    ? buildVideoThumbnail()
+                    ? buildVideoThumbnail(attachment.url)
                     : Image.network(
                         attachment.url,
                         fit: BoxFit.cover,

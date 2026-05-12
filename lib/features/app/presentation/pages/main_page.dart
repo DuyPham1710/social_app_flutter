@@ -39,6 +39,7 @@ class _MainPageState extends State<MainPage> {
     _currentIndex = widget.initialTab ?? 0;
     _pageController = PageController(initialPage: _currentIndex);
     _connectSocket();
+    _refreshUserData();
 
     // Reload notifications if opening notification tab
     if (_currentIndex == 3) {
@@ -85,7 +86,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   String _getAvtCurrent() {
-    final userData = widget.userData ?? _currentUserData;
+    final userData = _currentUserData ?? widget.userData;
     final avatarUrl = userData?['avatarUrl'] as String?;
     if (avatarUrl != null && avatarUrl.isNotEmpty) {
       return avatarUrl;
@@ -97,6 +98,15 @@ class _MainPageState extends State<MainPage> {
     }
 
     return '';
+  }
+
+  Future<void> _refreshUserData() async {
+    final userData = await TokenStorage.getUserData();
+    if (!mounted) return;
+    
+    setState(() {
+      _currentUserData = userData;
+    });
   }
 
   void _onTabSelected(int index) {

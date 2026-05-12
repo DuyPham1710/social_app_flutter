@@ -158,7 +158,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                         children: [
                           // Check if it's video or image and display accordingly
                           VideoUtil.isVideo(widget.imageFiles[index])
-                              ? buildVideoThumbnail()
+                              ? buildVideoThumbnail(widget.imageFiles[index].path)
                               : Image.file(
                                   widget.imageFiles[index],
                                   fit: BoxFit.cover,

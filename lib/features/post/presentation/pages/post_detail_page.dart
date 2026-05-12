@@ -582,7 +582,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         }
                       },
                       child: VideoUtil.isVideo(mediaUrls[imageIndex].url)
-                          ? buildVideoThumbnail()
+                          ? buildVideoThumbnail(mediaUrls[imageIndex].url)
                           : Image.network(
                               mediaUrls[imageIndex].url,
                               fit: BoxFit.cover,

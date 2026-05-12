@@ -55,6 +55,7 @@ class _PostItemState extends State<PostItem> {
   EmojiType? _currentUserReaction;
   bool _isSaved = false;
   String? _savedId;
+  int _lastMediaIndex = 0;
   final SaveRepository _saveRepository = s1<SaveRepository>();
   List<String> _visibleOnProfileUserIds = [];
   bool _isRemoved = false; // To hide item if tag removed
@@ -256,6 +257,7 @@ class _PostItemState extends State<PostItem> {
     late final Widget layout;
 
     void onImageTap(int initialIndex) {
+      _lastMediaIndex = initialIndex;
       _openPostDetail(initialImageIndex: initialIndex);
     }
 
@@ -270,12 +272,7 @@ class _PostItemState extends State<PostItem> {
         layout = LayoutPostClassic(urls: urls, onImageTap: onImageTap);
     }
 
-    return GestureDetector(
-      onTap: () {
-        _openPostDetail();
-      },
-      child: layout,
-    );
+    return layout;
   }
 
   @override

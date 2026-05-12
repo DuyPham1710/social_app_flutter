@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/shared/component/video_player_widget.dart';
+import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class LayoutPostFrame extends StatelessWidget {
   final List<dynamic> urls;
@@ -21,15 +22,19 @@ class LayoutPostFrame extends StatelessWidget {
     return sorted;
   }
 
-  Widget _buildImageWidget(dynamic imageData) {
+  Widget _buildImageWidget(dynamic imageData, int index) {
     Widget mediaWidget;
 
     if (imageData is File) {
       // Check if it's a video file first
       if (VideoUtil.isVideo(imageData)) {
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData.path);
+        }
         // For video files, show video player
         mediaWidget = VideoPlayerWidget(
           videoUrl: imageData.path,
+          onOpenDetail: () => onImageTap(index),
         );
       } else {
         // For image files, show the image
@@ -47,9 +52,13 @@ class LayoutPostFrame extends StatelessWidget {
       }
     } else if (imageData is String) {
       if (VideoUtil.isVideo(imageData)) {
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData);
+        }
         // For video URLs, show video player
         mediaWidget = VideoPlayerWidget(
           videoUrl: imageData,
+          onOpenDetail: () => onImageTap(index),
         );
       } else {
         mediaWidget = Image.network(
@@ -66,8 +75,12 @@ class LayoutPostFrame extends StatelessWidget {
       }
     } else if (imageData != null && imageData.url != null) {
       if (VideoUtil.isVideo(imageData)) {
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData.url);
+        }
         mediaWidget = VideoPlayerWidget(
           videoUrl: imageData.url,
+          onOpenDetail: () => onImageTap(index),
         );
       } else {
         mediaWidget = Image.network(
@@ -110,6 +123,10 @@ class LayoutPostFrame extends StatelessWidget {
     // }
 
     return mediaWidget;
+  }
+
+  Widget _buildVideoPreviewPlaceholder(String videoSource) {
+    return buildVideoThumbnail(videoSource);
   }
 
   // Bộ màu pastel dễ nhìn cho background
@@ -161,7 +178,7 @@ class LayoutPostFrame extends StatelessWidget {
             aspectRatio: 1.0,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: _buildImageWidget(orderedUrls[0]),
+                child: _buildImageWidget(orderedUrls[0], 0),
             ),
           ),
         ),
@@ -183,7 +200,7 @@ class LayoutPostFrame extends StatelessWidget {
                     height: 250.h,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: _buildImageWidget(orderedUrls[0]),
+                      child: _buildImageWidget(orderedUrls[0], 0),
                     ),
                   ),
                 ),
@@ -198,7 +215,7 @@ class LayoutPostFrame extends StatelessWidget {
                     height: 250.h,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: _buildImageWidget(orderedUrls[1]),
+                      child: _buildImageWidget(orderedUrls[1], 1),
                     ),
                   ),
                 ),
@@ -247,7 +264,7 @@ class LayoutPostFrame extends StatelessWidget {
             height: 250.h,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: _buildImageWidget(orderedUrls[0]),
+                  child: _buildImageWidget(orderedUrls[0], 0),
             ),
           ),
         ),
@@ -260,7 +277,7 @@ class LayoutPostFrame extends StatelessWidget {
             height: 250.h,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: _buildImageWidget(orderedUrls[1]),
+                  child: _buildImageWidget(orderedUrls[1], 1),
             ),
           ),
         ),
@@ -280,7 +297,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 300.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: _buildImageWidget(orderedUrls[2]),
+                      child: _buildImageWidget(orderedUrls[2], 2),
               ),
             ),
           )
@@ -291,7 +308,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 180.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: _buildImageWidget(orderedUrls[2]),
+                child: _buildImageWidget(orderedUrls[2], 2),
               ),
             ),
           ),
@@ -303,7 +320,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 180.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: _buildImageWidget(orderedUrls[3]),
+                      child: _buildImageWidget(orderedUrls[3], 3),
               ),
             ),
           ),
@@ -318,7 +335,7 @@ class LayoutPostFrame extends StatelessWidget {
                     height: 180.h,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: _buildImageWidget(orderedUrls[4]),
+                      child: _buildImageWidget(orderedUrls[4], 4),
                     ),
                   ),
                 ),
@@ -339,7 +356,7 @@ class LayoutPostFrame extends StatelessWidget {
               height: 180.h,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: _buildImageWidget(imageData),
+                child: _buildImageWidget(imageData, 4),
               ),
             ),
 
