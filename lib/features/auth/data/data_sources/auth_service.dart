@@ -33,4 +33,7 @@ abstract class AuthService {
 
   @POST('/auth/refresh')
   Future<AuthResponse> refreshToken();
+
+  @POST('/user/face-registration')
+  Future<Map<String, dynamic>> registerFace(@Body() Map<String, dynamic> body);
 }

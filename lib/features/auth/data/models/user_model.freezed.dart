@@ -55,6 +55,8 @@ mixin _$UserModel {
   String? get workplace => throw _privateConstructorUsedError;
   @JsonKey(includeIfNull: false)
   String? get relationshipStatus => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  bool? get isFaceRegistered => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -89,6 +91,7 @@ abstract class $UserModelCopyWith<$Res> {
     @JsonKey(includeIfNull: false) String? hometown,
     @JsonKey(includeIfNull: false) String? workplace,
     @JsonKey(includeIfNull: false) String? relationshipStatus,
+    @JsonKey(includeIfNull: false) bool? isFaceRegistered,
   });
 }
 
@@ -124,6 +127,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? hometown = freezed,
     Object? workplace = freezed,
     Object? relationshipStatus = freezed,
+    Object? isFaceRegistered = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -195,6 +199,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.relationshipStatus
                 : relationshipStatus // ignore: cast_nullable_to_non_nullable
                       as String?,
+            isFaceRegistered: freezed == isFaceRegistered
+                ? _value.isFaceRegistered
+                : isFaceRegistered // ignore: cast_nullable_to_non_nullable
+                      as bool?,
           )
           as $Val,
     );
@@ -228,6 +236,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     @JsonKey(includeIfNull: false) String? hometown,
     @JsonKey(includeIfNull: false) String? workplace,
     @JsonKey(includeIfNull: false) String? relationshipStatus,
+    @JsonKey(includeIfNull: false) bool? isFaceRegistered,
   });
 }
 
@@ -262,6 +271,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? hometown = freezed,
     Object? workplace = freezed,
     Object? relationshipStatus = freezed,
+    Object? isFaceRegistered = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -333,6 +343,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.relationshipStatus
             : relationshipStatus // ignore: cast_nullable_to_non_nullable
                   as String?,
+        isFaceRegistered: freezed == isFaceRegistered
+            ? _value.isFaceRegistered
+            : isFaceRegistered // ignore: cast_nullable_to_non_nullable
+                  as bool?,
       ),
     );
   }
@@ -359,6 +373,7 @@ class _$UserModelImpl implements _UserModel {
     @JsonKey(includeIfNull: false) this.hometown,
     @JsonKey(includeIfNull: false) this.workplace,
     @JsonKey(includeIfNull: false) this.relationshipStatus,
+    @JsonKey(includeIfNull: false) this.isFaceRegistered,
   });
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -415,10 +430,13 @@ class _$UserModelImpl implements _UserModel {
   @override
   @JsonKey(includeIfNull: false)
   final String? relationshipStatus;
+  @override
+  @JsonKey(includeIfNull: false)
+  final bool? isFaceRegistered;
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, fullName: $fullName, phoneNumber: $phoneNumber, bio: $bio, avatarUrl: $avatarUrl, dateOfBirth: $dateOfBirth, gender: $gender, email: $email, username: $username, isActive: $isActive, createdAt: $createdAt, coverUrl: $coverUrl, school: $school, currentCity: $currentCity, hometown: $hometown, workplace: $workplace, relationshipStatus: $relationshipStatus)';
+    return 'UserModel(userId: $userId, fullName: $fullName, phoneNumber: $phoneNumber, bio: $bio, avatarUrl: $avatarUrl, dateOfBirth: $dateOfBirth, gender: $gender, email: $email, username: $username, isActive: $isActive, createdAt: $createdAt, coverUrl: $coverUrl, school: $school, currentCity: $currentCity, hometown: $hometown, workplace: $workplace, relationshipStatus: $relationshipStatus, isFaceRegistered: $isFaceRegistered)';
   }
 
   @override
@@ -454,7 +472,9 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.workplace, workplace) ||
                 other.workplace == workplace) &&
             (identical(other.relationshipStatus, relationshipStatus) ||
-                other.relationshipStatus == relationshipStatus));
+                other.relationshipStatus == relationshipStatus) &&
+            (identical(other.isFaceRegistered, isFaceRegistered) ||
+                other.isFaceRegistered == isFaceRegistered));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -478,6 +498,7 @@ class _$UserModelImpl implements _UserModel {
     hometown,
     workplace,
     relationshipStatus,
+    isFaceRegistered,
   );
 
   /// Create a copy of UserModel
@@ -513,6 +534,7 @@ abstract class _UserModel implements UserModel {
     @JsonKey(includeIfNull: false) final String? hometown,
     @JsonKey(includeIfNull: false) final String? workplace,
     @JsonKey(includeIfNull: false) final String? relationshipStatus,
+    @JsonKey(includeIfNull: false) final bool? isFaceRegistered,
   }) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -569,6 +591,9 @@ abstract class _UserModel implements UserModel {
   @override
   @JsonKey(includeIfNull: false)
   String? get relationshipStatus;
+  @override
+  @JsonKey(includeIfNull: false)
+  bool? get isFaceRegistered;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

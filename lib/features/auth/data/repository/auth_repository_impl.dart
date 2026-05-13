@@ -144,4 +144,20 @@ class AuthRepositoryImpl implements AuthRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<Map<String, dynamic>>> registerFace(
+    String userId,
+    List<String> images,
+  ) async {
+    try {
+      final response = await authService.registerFace({
+        'userId': userId,
+        'images': images,
+      });
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

@@ -80,4 +80,17 @@ class ResetPasswordEvent extends AuthEvent {
   List<Object?> get props => [email, otp, newPassword, confirmNewPassword];
 }
 
+class SubmitFaceRegistrationEvent extends AuthEvent {
+  final String userId;
+  final List<String> base64Images;
+
+  const SubmitFaceRegistrationEvent({
+    required this.userId,
+    required this.base64Images,
+  });
+
+  @override
+  List<Object?> get props => [userId, base64Images];
+}
+
 class AuthReset extends AuthEvent {}

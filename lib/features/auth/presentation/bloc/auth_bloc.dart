@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/error_utils.dart';
@@ -9,6 +10,7 @@ import 'package:social_app_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/register_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/reset_password_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'auth_event.dart';
@@ -21,6 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ResendOtpUsecase resendOtpUsecase;
   final UpdatePersonalInfoUsecase updatePersonalInfoUsecase;
   final ResetPasswordUsecase resetPasswordUsecase;
+  final SubmitFaceRegistrationUsecase submitFaceRegistrationUsecase;
 
   AuthBloc({
     required this.loginUsecase,
@@ -29,6 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.resendOtpUsecase,
     required this.updatePersonalInfoUsecase,
     required this.resetPasswordUsecase,
+    required this.submitFaceRegistrationUsecase,
   }) : super(AuthInitial()) {
     on<LoginEvent>(_login);
     on<RegisterEvent>(_register);
@@ -36,6 +40,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendOtpEvent>(_resendOtp);
     on<UpdatePersonalInfoEvent>(_updatePersonalInfo);
     on<ResetPasswordEvent>(_resetPassword);
+    on<SubmitFaceRegistrationEvent>(_submitFaceRegistration);
     on<AuthReset>((event, emit) {
       emit(AuthInitial());
     });
@@ -178,6 +183,52 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
       return;
+    }
+  }
+
+  void _submitFaceRegistration(
+    SubmitFaceRegistrationEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(FaceRegistrationLoading());
+
+    try {
+      debugPrint('[AuthBloc] Submitting face registration for user ${event.userId} (${event.base64Images.length} images)');
+
+      final dataState = await submitFaceRegistrationUsecase(
+        params: SubmitFaceRegistrationParams(
+          userId: event.userId,
+          base64Images: event.base64Images,
+        ),
+      );
+
+      if (dataState is DataStateSuccess && dataState.data != null) {
+        final data = dataState.data!;
+        if (data['success'] == true) {
+          debugPrint('[AuthBloc] Face registration success: ${data['message']}');
+          emit(FaceRegistrationSuccess(
+            message: data['message'] ?? 'Đăng ký khuôn mặt thành công',
+            embeddingsSaved: data['embeddings_saved'] ?? 0,
+          ));
+        } else {
+          debugPrint('[AuthBloc] Face registration failed: ${data['message']}');
+          emit(FaceRegistrationError(
+            message: data['message'] ?? 'Đăng ký khuôn mặt thất bại',
+            failedPose: data['failed_pose'],
+          ));
+        }
+      } else {
+        final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+        debugPrint('[AuthBloc] Face registration error: $errorMessage');
+        emit(FaceRegistrationError(
+          message: errorMessage.isNotEmpty ? errorMessage : 'Lỗi kết nối. Vui lòng thử lại.',
+        ));
+      }
+    } catch (e) {
+      debugPrint('[AuthBloc] Face registration error: $e');
+      emit(FaceRegistrationError(
+        message: 'Đã xảy ra lỗi. Vui lòng thử lại.',
+      ));
     }
   }
 }
