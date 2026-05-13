@@ -128,6 +128,7 @@ class AttachmentEntity extends Equatable {
   final String url;
   final String type; // image, video, file, audio
   final int size;
+  final String? name;
   final int? duration;
   final List<double>? waveform;
 
@@ -135,12 +136,13 @@ class AttachmentEntity extends Equatable {
     required this.url,
     required this.type,
     required this.size,
+    this.name,
     this.duration,
     this.waveform,
   });
 
   @override
-  List<Object?> get props => [url, type, size, duration, waveform];
+  List<Object?> get props => [url, type, size, name, duration, waveform];
 }
 
 class ReactionEntity extends Equatable {

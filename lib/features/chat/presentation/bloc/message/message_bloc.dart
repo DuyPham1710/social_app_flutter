@@ -519,6 +519,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
                 updatedResponse,
                 typingUserId: currentState.typingUserId,
                 isTyping: currentState.isTyping,
+                isUploadingFiles: currentState.isUploadingFiles,
               ),
             );
 
@@ -560,6 +561,18 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   ) async {
     try {
       print('Uploading files for conversation: ${event.conversationId}');
+      
+      final currentState = state;
+      if (currentState is MessagesLoaded) {
+        emit(
+          MessagesLoaded(
+            currentState.messages,
+            typingUserId: currentState.typingUserId,
+            isTyping: currentState.isTyping,
+            isUploadingFiles: true,
+          ),
+        );
+      }
 
       // Upload files và nhận về attachments URLs
       final attachments = await _sendMessageWithFilesUseCase(
@@ -606,6 +619,18 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     } catch (e) {
       print('Error uploading files: $e');
       // Optionally emit error state
+    } finally {
+      final latestState = state;
+      if (latestState is MessagesLoaded) {
+        emit(
+          MessagesLoaded(
+            latestState.messages,
+            typingUserId: latestState.typingUserId,
+            isTyping: latestState.isTyping,
+            isUploadingFiles: false,
+          ),
+        );
+      }
     }
   }
 

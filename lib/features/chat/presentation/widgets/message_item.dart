@@ -179,9 +179,7 @@ class MessageItem extends StatelessWidget {
                               fromMe: fromMe,
                               attachment: message.attachments.first,
                             )
-                          : isAttachment
-                          ? _buildAttachmentsGrid(context, message.attachments)
-                          : _buildNormalMessage(),
+                          : _buildMessageContent(context),
 
                       // Show reactions if any
                       if (hasReactions) _buildReactionBubble(context),
@@ -505,8 +503,18 @@ class MessageItem extends StatelessWidget {
                     ),
                   ),
 
-                // Show attachments if any
-                if (message.attachments.isNotEmpty)
+                // Show file attachments if any
+                if (message.attachments.any((att) => att.type == 'file'))
+                  _buildFileList(
+                    context,
+                    message.attachments
+                        .where((att) => att.type == 'file')
+                        .toList(),
+                  ),
+                // Show media attachments if any
+                if (message.attachments.any(
+                  (att) => att.type == 'image' || att.type == 'video',
+                ))
                   _buildAttachmentsGrid(context, message.attachments),
               ],
             ),
@@ -543,6 +551,123 @@ class MessageItem extends StatelessWidget {
     );
   }
 
+  Widget _buildMessageContent(BuildContext context) {
+    final hasText = message.text != null && message.text!.isNotEmpty;
+    final fileAttachments = message.attachments
+        .where((att) => att.type == 'file')
+        .toList();
+    final mediaAttachments = message.attachments
+        .where((att) => att.type == 'image' || att.type == 'video')
+        .toList();
+
+    return Column(
+      crossAxisAlignment: fromMe
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (hasText) _buildNormalMessage(),
+        if (hasText &&
+            (fileAttachments.isNotEmpty || mediaAttachments.isNotEmpty))
+          SizedBox(height: 4.h),
+        if (fileAttachments.isNotEmpty)
+          _buildFileList(context, fileAttachments),
+        if (fileAttachments.isNotEmpty && mediaAttachments.isNotEmpty)
+          SizedBox(height: 4.h),
+        if (mediaAttachments.isNotEmpty)
+          _buildAttachmentsGrid(context, mediaAttachments),
+      ],
+    );
+  }
+
+  Widget _buildFileList(
+    BuildContext context,
+    List<AttachmentEntity> fileAttachments,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: fromMe
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: fileAttachments.map((file) {
+        return GestureDetector(
+          onTap: () async {
+            String downloadUrl = file.url;
+            final uri = Uri.tryParse(downloadUrl);
+            if (uri != null) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          },
+          child: Container(
+            margin: EdgeInsets.only(top: 4.h),
+            constraints: BoxConstraints(maxWidth: 0.7.sw),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: fromMe ? AppColors.primary : AppColors.textSecondary,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: fromMe ? Colors.transparent : AppColors.textSecondary,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: fromMe
+                        ? Colors.white.withOpacity(0.2)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Icon(
+                    Icons.insert_drive_file,
+                    color: fromMe ? Colors.white : AppColors.primary,
+                    size: 24.sp,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        file.name ?? 'Document',
+                        style: TextStyle(
+                          color: fromMe ? Colors.white : AppColors.textPrimary,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        _formatFileSize(file.size),
+                        style: TextStyle(
+                          color: fromMe
+                              ? Colors.white.withOpacity(0.8)
+                              : AppColors.textSecondary,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+  }
+
   Widget _buildLocationMessage(BuildContext context) {
     final label = message.metadata?.label ?? 'Vị trí';
     final lat = message.metadata?.latitude;
@@ -571,7 +696,7 @@ class MessageItem extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: 0.7.sw),
         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
         decoration: BoxDecoration(
-          color: fromMe ? AppColors.primary : AppColors.textSecondary.withOpacity(0.1),
+          color: fromMe ? AppColors.primary : AppColors.textSecondary,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(14.r),
             topRight: Radius.circular(14.r),
@@ -621,7 +746,7 @@ class MessageItem extends StatelessWidget {
             SizedBox(width: 10.w),
             Icon(
               Icons.open_in_new,
-              color: fromMe ? Colors.white.withOpacity(0.9) : AppColors.textSecondary,
+              color: fromMe ? Colors.white : AppColors.textSecondary,
               size: 18.sp,
             ),
           ],

@@ -8,6 +8,7 @@ class AttachmentModel {
   final String url;
   final String type; // image, video, file, audio
   final int size;
+  final String? name;
   final int? duration; // For audio/video
   final List<double>? waveform; // For audio messages
 
@@ -15,6 +16,7 @@ class AttachmentModel {
     required this.url,
     required this.type,
     required this.size,
+    this.name,
     this.duration,
     this.waveform,
   });
@@ -24,6 +26,7 @@ class AttachmentModel {
       url: json['url'] as String,
       type: json['type'] as String,
       size: json['size'] as int,
+      name: json['name'] as String?,
       duration: json['duration'] as int?,
       waveform: (json['waveform'] as List<dynamic>?)
           ?.whereType<num>()
@@ -36,6 +39,7 @@ class AttachmentModel {
     'url': url,
     'type': type,
     'size': size,
+    'name': name,
     'duration': duration,
     'waveform': waveform,
   };
@@ -44,6 +48,7 @@ class AttachmentModel {
     url: url,
     type: type,
     size: size,
+    name: name,
     duration: duration,
     waveform: waveform,
   );

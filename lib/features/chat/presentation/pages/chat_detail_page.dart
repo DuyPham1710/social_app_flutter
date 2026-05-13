@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
@@ -960,7 +961,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       if (permission == LocationPermission.deniedForever) {
         messenger.showSnackBar(
           const SnackBar(
-            content: Text('Quyền vị trí bị từ chối vĩnh viễn. Đang mở Cài đặt ứng dụng...'),
+            content: Text(
+              'Quyền vị trí bị từ chối vĩnh viễn. Đang mở Cài đặt ứng dụng...',
+            ),
             duration: Duration(seconds: 2),
           ),
         );
@@ -1000,9 +1003,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       _clearReplyMessage();
       _scrollToBottom();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Không thể lấy vị trí: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Không thể lấy vị trí: $e')));
     }
   }
 
@@ -1382,12 +1385,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                     ),
                                     itemCount:
                                         messagesList.length +
-                                        2, // +1 for profile, +1 for typing indicator
+                                        3, // +1 for profile, +1 for uploading, +1 for typing
                                     itemBuilder: (context, index) {
                                       // Với reverse: true, index 0 là item cuối cùng trong list (hiển thị ở dưới cùng)
                                       // index cuối là item đầu tiên trong list (hiển thị ở trên cùng)
                                       // itemCount - 1 - index sẽ là index thực tế trong list
-                                      final itemCount = messagesList.length + 2;
+                                      final itemCount = messagesList.length + 3;
                                       final actualIndex = itemCount - 1 - index;
                                       final pagination =
                                           state.messages.pagination;
@@ -1413,6 +1416,14 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                           friendInfo: widget.friendInfo,
                                           currentUserId: widget.userId,
                                         );
+                                      }
+
+                                      // Uploading indicator ở actualIndex = itemCount - 2
+                                      if (actualIndex == itemCount - 2) {
+                                        if (state.isUploadingFiles) {
+                                          return _buildUploadingIndicator();
+                                        }
+                                        return const SizedBox.shrink();
                                       }
 
                                       // Messages: actualIndex từ 1 đến messagesList.length
@@ -1767,6 +1778,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                               });
                             },
                             onShareLocation: _shareCurrentLocation,
+                            onShareFile: _shareFile,
                           ),
                         ),
                     ],
@@ -1793,6 +1805,46 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             fontWeight: FontWeight.w500,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildUploadingIndicator() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 16.w,
+                  height: 16.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'Đang gửi file...',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2608,6 +2660,67 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Lỗi khi gửi ảnh: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _shareFile() async {
+    try {
+      final result = await FilePicker.pickFiles(
+        allowMultiple: true,
+        type: FileType.any,
+      );
+
+      if (result != null && result.paths.isNotEmpty) {
+        final filePaths = result.paths.whereType<String>().toList();
+
+        if (filePaths.isEmpty) return;
+
+        final conversationId = _currentConversationId ?? widget.conversationId;
+        if (conversationId == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Không thể gửi file: thiếu conversation ID'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+          return;
+        }
+
+        // Stop typing when sending message
+        _typingDebounceTimer?.cancel();
+        final messageBloc = context.read<MessageBloc>();
+        messageBloc.emitTypingStop(widget.userId, conversationId);
+
+        // Send message with files via HTTP
+        messageBloc.add(
+          SendMessageWithFilesEvent(
+            userId: widget.userId,
+            conversationId: conversationId,
+            filePaths: filePaths,
+            replyTo: _replyingMessage?.id,
+          ),
+        );
+
+        // Scroll to bottom after sending
+        _scrollToBottom();
+
+        setState(() {
+          _showAttachmentMenu = false;
+          _replyingMessage = null; // Clear reply if any
+        });
+      }
+    } catch (e) {
+      print('Error picking file: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi chọn file: $e'),
             duration: const Duration(seconds: 2),
           ),
         );

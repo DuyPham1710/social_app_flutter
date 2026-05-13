@@ -42,6 +42,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   // Connection state tracking
   bool _isConnected = false;
   Completer<void>? _connectionCompleter;
+  
+  // Track current conversation for automatic rejoin on reconnect
+  String? _currentJoinedConversationId;
+  String? _currentUserId;
 
   ChatRemoteDataSourceImpl(this._socketClient, this._dio);
 
@@ -86,6 +90,8 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   /// Connect to chat namespace
   @override
   void connect(String userId, String username) {
+    _currentUserId = userId;
+    
     // Reset connection state
     _isConnected = false;
     _connectionCompleter = Completer<void>();
@@ -149,6 +155,18 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       _isConnected = true;
       if (_connectionCompleter != null && !_connectionCompleter!.isCompleted) {
         _connectionCompleter!.complete();
+      }
+
+      // Rejoin conversation if needed (e.g. after background reconnect)
+      if (_currentJoinedConversationId != null && _currentUserId != null) {
+        developer.log(
+          'Rejoining conversation: $_currentJoinedConversationId after reconnect',
+          name: 'ChatDataSource',
+        );
+        _socketClient.emit('conversation:join', {
+          'userId': _currentUserId,
+          'conversationId': _currentJoinedConversationId,
+        });
       }
     });
 
@@ -483,6 +501,9 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     required String userId,
     required String conversationId,
   }) async {
+    _currentUserId = userId;
+    _currentJoinedConversationId = conversationId;
+    
     developer.log(
       'Joining conversation: $conversationId for user: $userId',
       name: 'ChatDataSource',
@@ -529,6 +550,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     required String conversationId,
     required String userId,
   }) async {
+    if (_currentJoinedConversationId == conversationId) {
+      _currentJoinedConversationId = null;
+    }
+    
     developer.log(
       'Leaving conversation: $conversationId (userId: $userId)',
       name: 'ChatDataSource',

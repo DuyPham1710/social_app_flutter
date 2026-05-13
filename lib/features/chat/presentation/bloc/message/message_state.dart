@@ -21,15 +21,17 @@ class MessagesLoaded extends MessageState {
   final MessageResponseEntity messages;
   final String? typingUserId;
   final bool isTyping;
+  final bool isUploadingFiles;
 
   const MessagesLoaded(
     this.messages, {
     this.typingUserId,
     this.isTyping = false,
+    this.isUploadingFiles = false,
   });
 
   @override
-  List<Object?> get props => [messages, typingUserId, isTyping];
+  List<Object?> get props => [messages, typingUserId, isTyping, isUploadingFiles];
 }
 
 class MessagesError extends MessageState {
