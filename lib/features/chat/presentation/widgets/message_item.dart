@@ -13,6 +13,12 @@ import 'package:social_app_fe/features/post/presentation/pages/video_player_scre
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/pdf_viewer_page.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
 
 class MessageItem extends StatelessWidget {
   final MessageEntity message;
@@ -80,6 +86,45 @@ class MessageItem extends StatelessWidget {
 
     // Nếu toàn bộ text là emoji và không quá 5 emoji
     return emojiLength == trimmedText.length && matches.length <= 5;
+  }
+
+  Future<void> _downloadAndOpenFile(
+    BuildContext context,
+    String url,
+    String fileName,
+  ) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đang tải file...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      final tempDir = await getTemporaryDirectory();
+      // Ensure fileName is safe
+      final safeFileName = fileName.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+      final savePath = '${tempDir.path}/$safeFileName';
+
+      final file = File(savePath);
+      if (!await file.exists()) {
+        final dio = Dio();
+        await dio.download(url, savePath);
+      }
+
+      final result = await OpenFilex.open(savePath);
+      if (result.type != ResultType.done && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không tìm thấy ứng dụng để mở file này')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi tải file: $e')));
+      }
+    }
   }
 
   void _showVideoPlayer(BuildContext context, String videoUrl) {
@@ -593,9 +638,32 @@ class MessageItem extends StatelessWidget {
         return GestureDetector(
           onTap: () async {
             String downloadUrl = file.url;
-            final uri = Uri.tryParse(downloadUrl);
-            if (uri != null) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            if (downloadUrl.startsWith('/')) {
+              final baseUrl =
+                  dotenv.env['BASE_URL'] ?? 'http://192.168.100.218:3000/';
+              final baseUrlWithoutTrailingSlash = baseUrl.endsWith('/')
+                  ? baseUrl.substring(0, baseUrl.length - 1)
+                  : baseUrl;
+              downloadUrl = '$baseUrlWithoutTrailingSlash$downloadUrl';
+            }
+
+            final fileName = file.name?.toLowerCase() ?? '';
+            if (fileName.endsWith('.pdf')) {
+              FocusManager.instance.primaryFocus?.unfocus();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => PdfViewerPage(
+                    url: downloadUrl,
+                    fileName: file.name ?? 'Document.pdf',
+                  ),
+                ),
+              );
+            } else {
+              await _downloadAndOpenFile(
+                context,
+                downloadUrl,
+                file.name ?? 'downloaded_file',
+              );
             }
           },
           child: Container(
