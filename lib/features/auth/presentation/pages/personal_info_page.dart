@@ -12,7 +12,6 @@ import 'package:social_app_fe/features/auth/presentation/widgets/modal_gender.da
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 import 'package:social_app_fe/shared/helpers/date_picker_widget.dart';
-import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
 
 class PersonalInfoPage extends StatefulWidget {
   const PersonalInfoPage({super.key});
@@ -95,7 +94,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         listener: (context, state) {
           if (state is AuthLoaded && state.flowType == 'update_personal_info') {
             BlocProvider.of<AuthBloc>(context).add(AuthReset());
-            showDialogSuccess(context, "Cập nhật thông tin cá nhân thành công");
+            // Navigate to face registration page (instead of login)
+            Navigator.pushReplacementNamed(
+              context,
+              '/face-registration',
+              arguments: {'userId': userId},
+            );
           } else if (state is AuthError &&
               state.flowType == 'update_personal_info') {
             final message =

@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/register_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/reset_password_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
@@ -279,6 +280,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<ResendOtpUsecase>(() => ResendOtpUsecase(s1()));
   s1.registerLazySingleton<ResetPasswordUsecase>(
     () => ResetPasswordUsecase(s1()),
+  );
+  s1.registerLazySingleton<SubmitFaceRegistrationUsecase>(
+    () => SubmitFaceRegistrationUsecase(s1()),
   );
   s1.registerLazySingleton<UpdatePersonalInfoUsecase>(
     () => UpdatePersonalInfoUsecase(s1()),
@@ -646,6 +650,7 @@ Future<void> initializeDependencies() async {
       verifyOtpUsecase: s1(),
       resendOtpUsecase: s1(),
       resetPasswordUsecase: s1(),
+      submitFaceRegistrationUsecase: s1(),
       updatePersonalInfoUsecase: s1(),
     ),
   );

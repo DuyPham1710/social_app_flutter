@@ -16,6 +16,7 @@ class UserEntity {
   final String? hometown;
   final String? workplace;
   final String? relationshipStatus;
+  final bool? isFaceRegistered;
 
   const UserEntity({
     required this.userId,
@@ -34,6 +35,7 @@ class UserEntity {
     this.school,
     this.hometown,
     this.relationshipStatus,
-    this.workplace
+    this.workplace,
+    this.isFaceRegistered,
   });
 }

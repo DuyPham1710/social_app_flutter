@@ -25,6 +25,8 @@ import 'package:social_app_fe/features/auth/presentation/pages/otp_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/personal_info_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/register_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:social_app_fe/features/auth/presentation/pages/face_registration_page.dart';
+import 'package:social_app_fe/features/auth/presentation/pages/face_scan_page.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
@@ -503,6 +505,8 @@ class _MyAppState extends State<MyApp> {
             initialRoute: '/splash',
             onGenerateRoute: _onGenerateRoute,
             routes: <String, WidgetBuilder>{
+              '/face-registration': (context) => const FaceRegistrationPage(),
+              '/face-scan': (context) => const FaceScanPage(),
               '/splash': (context) => const SplashPage(),
               '/main': (BuildContext context) {
                 final args =

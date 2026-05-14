@@ -42,3 +42,32 @@ class OtpResendError extends AuthState {
   final String message;
   const OtpResendError(this.message);
 }
+
+// Face Registration States
+class FaceRegistrationLoading extends AuthState {}
+
+class FaceRegistrationSuccess extends AuthState {
+  final String message;
+  final int embeddingsSaved;
+
+  const FaceRegistrationSuccess({
+    required this.message,
+    required this.embeddingsSaved,
+  });
+
+  @override
+  List<Object?> get props => [message, embeddingsSaved];
+}
+
+class FaceRegistrationError extends AuthState {
+  final String message;
+  final String? failedPose;
+
+  const FaceRegistrationError({
+    required this.message,
+    this.failedPose,
+  });
+
+  @override
+  List<Object?> get props => [message, failedPose];
+}
