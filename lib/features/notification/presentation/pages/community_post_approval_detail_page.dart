@@ -246,7 +246,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(14),
                                         child: VideoUtil.isVideo(media.url)
-                                            ? buildVideoThumbnail()
+                                            ? buildVideoThumbnail(media.url)
                                             : Image.network(
                                                 media.url,
                                                 fit: BoxFit.cover,

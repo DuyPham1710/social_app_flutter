@@ -32,9 +32,6 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
 
   static const List<String> _fallbackCategories = [
     'Tất cả',
-    'Bài viết',
-    'Thước phim',
-    'Bình luận',
   ];
 
   String _selectedCategory = 'Tất cả';

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'package:social_app_fe/core/utils/video_util.dart';
+import 'package:social_app_fe/shared/component/video_player_widget.dart';
+import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class LayoutPostClassic extends StatelessWidget {
   final List<dynamic> urls;
@@ -20,17 +22,18 @@ class LayoutPostClassic extends StatelessWidget {
     return sorted;
   }
 
-  Widget _buildImageWidget(dynamic imageData) {
+  Widget _buildImageWidget(dynamic imageData, int index) {
     Widget mediaWidget;
 
     if (imageData is File) {
       if (VideoUtil.isVideo(imageData)) {
-        // For video files, show a black background with video icon
-        mediaWidget = Container(
-          color: Colors.grey[800],
-          child: Center(
-            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
-          ),
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData.path);
+        }
+        // For video files, show video player
+        mediaWidget = VideoPlayerWidget(
+          videoUrl: imageData.path,
+          onOpenDetail: () => onImageTap(index),
         );
       } else {
         // For image files, show the image
@@ -48,12 +51,13 @@ class LayoutPostClassic extends StatelessWidget {
       }
     } else if (imageData is String) {
       if (VideoUtil.isVideo(imageData)) {
-        // For video URLs, show video icon
-        mediaWidget = Container(
-          color: Colors.grey[800],
-          child: Center(
-            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
-          ),
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData);
+        }
+        // For video URLs, show video player
+        mediaWidget = VideoPlayerWidget(
+          videoUrl: imageData,
+          onOpenDetail: () => onImageTap(index),
         );
       } else {
         mediaWidget = Image.network(
@@ -70,11 +74,12 @@ class LayoutPostClassic extends StatelessWidget {
       }
     } else if (imageData != null && imageData.url != null) {
       if (VideoUtil.isVideo(imageData.url)) {
-        mediaWidget = Container(
-          color: Colors.grey[800],
-          child: Center(
-            child: Icon(Icons.videocam, color: Colors.grey[400], size: 32.sp),
-          ),
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData.url);
+        }
+        mediaWidget = VideoPlayerWidget(
+          videoUrl: imageData.url,
+          onOpenDetail: () => onImageTap(index),
         );
       } else {
         mediaWidget = Image.network(
@@ -119,6 +124,10 @@ class LayoutPostClassic extends StatelessWidget {
     return mediaWidget;
   }
 
+  Widget _buildVideoPreviewPlaceholder(String videoSource) {
+    return buildVideoThumbnail(videoSource);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (urls.isEmpty) return const SizedBox.shrink();
@@ -135,7 +144,7 @@ class LayoutPostClassic extends StatelessWidget {
           aspectRatio: 1.0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
-            child: _buildImageWidget(orderedUrls[0]),
+              child: _buildImageWidget(orderedUrls[0], 0),
           ),
         ),
       );
@@ -150,7 +159,7 @@ class LayoutPostClassic extends StatelessWidget {
               flex: 1,
               child: GestureDetector(
                 onTap: () => onImageTap(0),
-                child: _buildImageWidget(orderedUrls[0]),
+                child: _buildImageWidget(orderedUrls[0], 0),
               ),
             ),
 
@@ -161,7 +170,7 @@ class LayoutPostClassic extends StatelessWidget {
               flex: 1,
               child: GestureDetector(
                 onTap: () => onImageTap(1),
-                child: _buildImageWidget(orderedUrls[1]),
+                child: _buildImageWidget(orderedUrls[1], 1),
               ),
             ),
           ],
@@ -184,14 +193,14 @@ class LayoutPostClassic extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(0),
-                  child: _buildImageWidget(orderedUrls[0]),
+                  child: _buildImageWidget(orderedUrls[0], 0),
                 ),
               ),
               SizedBox(width: 4.w),
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(1),
-                  child: _buildImageWidget(orderedUrls[1]),
+                  child: _buildImageWidget(orderedUrls[1], 1),
                 ),
               ),
             ],
@@ -229,7 +238,7 @@ class LayoutPostClassic extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  _buildImageWidget(orderedUrls[i]),
+                  _buildImageWidget(orderedUrls[i], i),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.5),
@@ -255,7 +264,7 @@ class LayoutPostClassic extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () => onImageTap(i),
-              child: _buildImageWidget(orderedUrls[i]),
+                child: _buildImageWidget(orderedUrls[i], i),
             ),
           ),
         );

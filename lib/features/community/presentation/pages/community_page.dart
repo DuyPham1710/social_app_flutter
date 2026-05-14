@@ -772,7 +772,7 @@ class _PostsEmptyState extends StatelessWidget {
   String _messageForStatus(String status) {
     switch (status) {
       case 'pending':
-        return 'Chưa có bài viết chờ duyệt';
+        return 'Không có bài viết nào chờ duyệt';
       case 'approved':
         return 'Chưa có bài viết đã duyệt';
       default:

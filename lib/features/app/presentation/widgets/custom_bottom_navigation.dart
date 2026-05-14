@@ -8,12 +8,14 @@ class CustomBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTabSelected;
   final int unreadCount;
+  final String avt;
 
   const CustomBottomNavigation({
     super.key,
     required this.currentIndex,
     required this.onTabSelected,
     this.unreadCount = 0,
+    required this.avt,
   });
 
   @override
@@ -37,10 +39,7 @@ class CustomBottomNavigation extends StatelessWidget {
                       index: 3,
                       icon: CupertinoIcons.bell,
                     ),
-                    _buildTabItem(
-                      index: 4,
-                      icon: CupertinoIcons.line_horizontal_3,
-                    ),
+                    _buildInfoTabItem(index: 4, avt: avt),
                   ],
                 ),
               ),
@@ -86,6 +85,44 @@ class CustomBottomNavigation extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Icon(icon, size: 26.sp, color: color),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTabItem({required int index, required String avt}) {
+    final isActive = currentIndex == index;
+
+    final color = isActive ? AppColors.primary : AppColors.unselectedIcon;
+    final hasAvatar = avt.isNotEmpty;
+
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onTabSelected(index),
+        child: Center(
+          child: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: color, width: 2),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child: ClipOval(
+                child: hasAvatar
+                    ? Image.network(
+                        avt,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.person, color: color);
+                        },
+                      )
+                    : Icon(Icons.person, color: color),
+              ),
+            ),
+          ),
         ),
       ),
     );
