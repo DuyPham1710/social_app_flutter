@@ -39,14 +39,9 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       // Lấy tất cả các thư mục bao gồm cả ảnh và video
       // Sắp xếp theo thời gian cập nhật mới nhất
       final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
-        type: RequestType.common, 
+        type: RequestType.common,
         filterOption: FilterOptionGroup(
-          orders: [
-            OrderOption(
-              type: OrderOptionType.updateDate,
-              asc: false,
-            ),
-          ],
+          orders: [OrderOption(type: OrderOptionType.updateDate, asc: false)],
         ),
       );
       if (paths.isNotEmpty) {
@@ -54,7 +49,8 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
           setState(() {
             _paths = paths;
             _currentPath = paths.firstWhere(
-              (path) => path.name.toLowerCase().contains('all') ||
+              (path) =>
+                  path.name.toLowerCase().contains('all') ||
                   path.name.toLowerCase().contains('recent') ||
                   path.name.toLowerCase().contains('tất cả'),
               orElse: () => paths.first,
@@ -77,19 +73,16 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   Future<void> _loadAssetsFromPath(AssetPathEntity path) async {
     if (!mounted) return;
     setState(() => _isLoading = true);
-    
-    final entities = await path.getAssetListPaged(
-      page: 0,
-      size: 120,
-    );
-    
+
+    final entities = await path.getAssetListPaged(page: 0, size: 120);
+
     // Sắp xếp theo thời gian mới nhất (modifyDateTime hoặc createDateTime)
     entities.sort((a, b) {
       final dateA = a.createDateTime;
       final dateB = b.createDateTime;
       return dateB.compareTo(dateA); // Mới nhất trước
     });
-    
+
     if (mounted) {
       setState(() {
         _assets
@@ -116,7 +109,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -151,7 +144,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
+            icon: const Icon(Icons.close, color: Colors.black),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           Expanded(
@@ -159,7 +152,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               child: Text(
                 "Tạo tin",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                 ),
@@ -167,7 +160,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
+            icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -198,9 +191,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             label: "Nhạc",
             onTap: () async {
               await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const StoryMusicPickerPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const StoryMusicPickerPage()),
               );
             },
           ),
@@ -220,10 +211,12 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   Widget _buildMultiPickButton() {
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
-        foregroundColor: Colors.white,
-        side: BorderSide(color: Colors.white.withOpacity(0.4)),
+        foregroundColor: Colors.black,
+        side: BorderSide(color: Colors.black.withOpacity(0.1)),
         padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
       ),
       onPressed: () {},
       icon: const Icon(Icons.collections_rounded),
@@ -235,18 +228,18 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
     return GestureDetector(
       onTap: () => _showFolderPicker(),
       child: Row(
-      children: [
-        Text(
+        children: [
+          Text(
             _currentPath?.name ?? "Thư viện",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        SizedBox(width: 6.w),
-        const Icon(Icons.expand_more, color: Colors.white),
-      ],
+          SizedBox(width: 6.w),
+          const Icon(Icons.expand_more, color: Colors.black),
+        ],
       ),
     );
   }
@@ -256,7 +249,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
 
     final selectedPath = await showModalBottomSheet<AssetPathEntity>(
       context: context,
-      backgroundColor: const Color(0xFF1D1F23),
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -270,7 +263,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               height: 4.h,
               margin: EdgeInsets.only(bottom: 16.h),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.black.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -279,7 +272,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               child: Text(
                 "Chọn thư mục",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                 ),
@@ -296,14 +289,16 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                   return ListTile(
                     leading: Icon(
                       Icons.folder,
-                      color: isSelected ? AppColors.primary : Colors.white70,
+                      color: isSelected ? AppColors.primary : Colors.black54,
                     ),
                     title: Text(
                       path.name,
                       style: TextStyle(
-                        color: isSelected ? AppColors.primary : Colors.white,
+                        color: isSelected ? AppColors.primary : Colors.black87,
                         fontSize: 16.sp,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     ),
                     trailing: isSelected
@@ -316,7 +311,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                         return Text(
                           "$count mục",
                           style: TextStyle(
-                            color: Colors.white60,
+                            color: Colors.black54,
                             fontSize: 12.sp,
                           ),
                         );
@@ -342,14 +337,14 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   Widget _buildGrid() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
     if (_permissionDenied) {
       return Center(
         child: Text(
           "Cần quyền truy cập thư viện để hiển thị ảnh/video.",
-          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+          style: TextStyle(color: Colors.black54, fontSize: 14.sp),
           textAlign: TextAlign.center,
         ),
       );
@@ -358,7 +353,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       return Center(
         child: Text(
           "Chưa có ảnh/video trong thư viện.",
-          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+          style: TextStyle(color: Colors.black54, fontSize: 14.sp),
         ),
       );
     }
@@ -388,7 +383,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                       snapshot.data != null) {
                     return Image.memory(snapshot.data!, fit: BoxFit.cover);
                   }
-                  return Container(color: Colors.grey[800]);
+                  return Container(color: Colors.grey[200]);
                 },
               ),
               // Hiển thị icon video và duration
@@ -397,7 +392,10 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                   bottom: 4.h,
                   right: 4.w,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 2.h,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.6),
                       borderRadius: BorderRadius.circular(4.r),
@@ -432,12 +430,16 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                       ],
                     ),
                   ),
-              ),
+                ),
               if (isSelected)
                 Container(
                   color: Colors.black.withOpacity(0.45),
                   child: const Center(
-                    child: Icon(Icons.check_circle, color: AppColors.primary, size: 28),
+                    child: Icon(
+                      Icons.check_circle,
+                      color: AppColors.primary,
+                      size: 28,
+                    ),
                   ),
                 ),
             ],
@@ -466,19 +468,19 @@ class _ActionCard extends StatelessWidget {
       child: Container(
         height: 70.h,
         decoration: BoxDecoration(
-          color: const Color(0xFF1D1F23),
+          color: Colors.grey[100],
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          border: Border.all(color: Colors.black.withOpacity(0.05)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 26.sp),
+            Icon(icon, color: Colors.black87, size: 26.sp),
             SizedBox(height: 6.h),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.black87,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
               ),

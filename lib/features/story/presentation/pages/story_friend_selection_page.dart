@@ -63,29 +63,33 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
           widget.title,
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 18.sp,
             fontWeight: FontWeight.w700,
           ),
         ),
         actions: [
           TextButton(
-            onPressed: (!widget.allowEmptySelection && _selectedFriendIds.isEmpty) ? null : _onDone,
+            onPressed:
+                (!widget.allowEmptySelection && _selectedFriendIds.isEmpty)
+                ? null
+                : _onDone,
             child: Text(
               "Xong",
               style: TextStyle(
-                color: (!widget.allowEmptySelection && _selectedFriendIds.isEmpty)
-                    ? Colors.white54
+                color:
+                    (!widget.allowEmptySelection && _selectedFriendIds.isEmpty)
+                    ? Colors.black38
                     : AppColors.primary,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
@@ -101,28 +105,25 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
             padding: EdgeInsets.all(16.w),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.grey[900]!.withOpacity(0.5),
+                color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: TextField(
                 controller: _searchController,
-                style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                style: TextStyle(color: Colors.black87, fontSize: 14.sp),
                 decoration: InputDecoration(
                   hintText: "Tìm kiếm",
-                  hintStyle: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 14.sp,
-                  ),
+                  hintStyle: TextStyle(color: Colors.black54, fontSize: 14.sp),
                   prefixIcon: Icon(
                     Icons.search,
-                    color: Colors.white54,
+                    color: Colors.black54,
                     size: 20.sp,
                   ),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
                           icon: Icon(
                             Icons.clear,
-                            color: Colors.white54,
+                            color: Colors.black54,
                             size: 20.sp,
                           ),
                           onPressed: () {
@@ -145,7 +146,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
               builder: (context, state) {
                 if (state is FriendLoading) {
                   return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
+                    child: CircularProgressIndicator(color: AppColors.primary),
                   );
                 } else if (state is FriendLoaded) {
                   final friends = state.friends;
@@ -164,7 +165,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                             ? "Chưa có bạn bè"
                             : "Không tìm thấy bạn bè",
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: Colors.black54,
                           fontSize: 14.sp,
                         ),
                       ),
@@ -175,8 +176,9 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                     itemCount: filteredFriends.length,
                     itemBuilder: (context, index) {
                       final friend = filteredFriends[index];
-                      final isSelected =
-                          _selectedFriendIds.contains(friend.userId);
+                      final isSelected = _selectedFriendIds.contains(
+                        friend.userId,
+                      );
                       return _buildFriendItem(friend, isSelected);
                     },
                   );
@@ -184,10 +186,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                   return Center(
                     child: Text(
                       "Lỗi khi tải danh sách bạn bè",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14.sp,
-                      ),
+                      style: TextStyle(color: Colors.black54, fontSize: 14.sp),
                     ),
                   );
                 }
@@ -215,7 +214,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
               children: [
                 CircleAvatar(
                   radius: 24.r,
-                  backgroundColor: Colors.grey[800],
+                  backgroundColor: Colors.grey[200],
                   backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
                       ? NetworkImage(avatarUrl)
                       : null,
@@ -223,7 +222,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                       ? Text(
                           name.isNotEmpty ? name[0].toUpperCase() : '?',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black54,
                             fontSize: 18.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -240,10 +239,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 2,
-                        ),
+                        border: Border.all(color: Colors.white, width: 2),
                       ),
                       child: Icon(
                         Icons.check,
@@ -260,7 +256,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
               child: Text(
                 name,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black87,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                 ),
@@ -273,17 +269,13 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : Colors.white54,
+                  color: isSelected ? AppColors.primary : Colors.black26,
                   width: 2,
                 ),
                 color: isSelected ? AppColors.primary : Colors.transparent,
               ),
               child: isSelected
-                  ? Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 16.sp,
-                    )
+                  ? Icon(Icons.check, color: Colors.white, size: 16.sp)
                   : null,
             ),
           ],
@@ -292,4 +284,3 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
     );
   }
 }
-

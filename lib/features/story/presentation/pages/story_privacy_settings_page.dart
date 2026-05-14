@@ -146,34 +146,28 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         body: const Center(
-          child: CircularProgressIndicator(color: Colors.white),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
       );
     }
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
           "Quyền riêng tư của tin",
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 18.sp,
             fontWeight: FontWeight.w700,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -198,7 +192,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
         Text(
           "Ai có thể xem tin của bạn?",
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 20.sp,
             fontWeight: FontWeight.w700,
           ),
@@ -206,7 +200,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
         SizedBox(height: 8.h),
         Text(
           "Tin của bạn sẽ hiển thị trong 24 giờ.",
-          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+          style: TextStyle(color: Colors.black54, fontSize: 14.sp),
         ),
         SizedBox(height: 20.h),
         _buildPrivacyOption(
@@ -247,7 +241,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
         decoration: BoxDecoration(
-          color: Colors.grey[900]!.withOpacity(0.5),
+          color: Colors.grey[100],
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -256,10 +250,10 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
-                color: Colors.grey[800]!.withOpacity(0.5),
+                color: Colors.grey[200],
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.white, size: 20.sp),
+              child: Icon(icon, color: Colors.black87, size: 20.sp),
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -269,7 +263,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -277,7 +271,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   SizedBox(height: 4.h),
                   Text(
                     description,
-                    style: TextStyle(color: Colors.white70, fontSize: 13.sp),
+                    style: TextStyle(color: Colors.black54, fontSize: 13.sp),
                   ),
                 ],
               ),
@@ -288,7 +282,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : Colors.white54,
+                  color: isSelected ? AppColors.primary : Colors.black26,
                   width: 2,
                 ),
               ),
@@ -371,7 +365,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
             decoration: BoxDecoration(
-              color: Colors.grey[900]!.withOpacity(0.5),
+              color: Colors.grey[100],
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
@@ -383,7 +377,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                       Text(
                         "Ẩn tin với",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -392,7 +386,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                       Text(
                         displayText,
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: Colors.black54,
                           fontSize: 13.sp,
                         ),
                         maxLines: 1,
@@ -401,7 +395,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: Colors.white70, size: 24.sp),
+                Icon(Icons.chevron_right, color: Colors.black54, size: 24.sp),
               ],
             ),
           ),
@@ -475,7 +469,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
             decoration: BoxDecoration(
-              color: Colors.grey[900]!.withOpacity(0.5),
+              color: Colors.grey[100],
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
@@ -484,12 +478,12 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   width: 40.w,
                   height: 40.w,
                   decoration: BoxDecoration(
-                    color: Colors.grey[800]!.withOpacity(0.5),
+                    color: Colors.grey[200],
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.person_outline,
-                    color: Colors.white,
+                    color: Colors.black87,
                     size: 20.sp,
                   ),
                 ),
@@ -501,7 +495,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                       Text(
                         "Tùy chỉnh",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -510,7 +504,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                       Text(
                         displayText,
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: Colors.black54,
                           fontSize: 13.sp,
                         ),
                         maxLines: 1,
@@ -525,7 +519,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : Colors.white54,
+                      color: isSelected ? AppColors.primary : Colors.black26,
                       width: 2,
                     ),
                   ),

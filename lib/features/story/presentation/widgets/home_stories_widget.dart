@@ -26,6 +26,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
   int _currentPage = 1;
   bool _isLoadingMore = false;
   String? _currentUserId;
+  String? _currentUserAvatar;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
     if (userData != null && mounted) {
       setState(() {
         _currentUserId = userData['id'];
+        _currentUserAvatar = userData['avatarUrl'] as String?;
       });
     }
   }
@@ -157,6 +159,14 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(color: AppColors.textSecondary, width: 1),
+                  image:
+                      _currentUserAvatar != null &&
+                          _currentUserAvatar!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(_currentUserAvatar!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
               ),
               Positioned(
