@@ -27,27 +27,30 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       hometown: json['hometown'] as String?,
       workplace: json['workplace'] as String?,
       relationshipStatus: json['relationshipStatus'] as String?,
+      isFaceRegistered: json['isFaceRegistered'] as bool?,
     );
 
-Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
-    <String, dynamic>{
-      '_id': instance.userId,
-      if (instance.fullName case final value?) 'fullName': value,
-      if (instance.phoneNumber case final value?) 'phoneNumber': value,
-      if (instance.bio case final value?) 'bio': value,
-      if (instance.avatarUrl case final value?) 'avatarUrl': value,
-      if (instance.dateOfBirth case final value?) 'dateOfBirth': value,
-      if (instance.gender case final value?) 'gender': value,
-      if (instance.email case final value?) 'email': value,
-      if (instance.username case final value?) 'username': value,
-      if (instance.isActive case final value?) 'isActive': value,
-      if (instance.createdAt?.toIso8601String() case final value?)
-        'createdAt': value,
-      if (instance.coverUrl case final value?) 'coverUrl': value,
-      if (instance.school case final value?) 'school': value,
-      if (instance.currentCity case final value?) 'currentCity': value,
-      if (instance.hometown case final value?) 'hometown': value,
-      if (instance.workplace case final value?) 'workplace': value,
-      if (instance.relationshipStatus case final value?)
-        'relationshipStatus': value,
-    };
+Map<String, dynamic> _$$UserModelImplToJson(
+  _$UserModelImpl instance,
+) => <String, dynamic>{
+  '_id': instance.userId,
+  if (instance.fullName case final value?) 'fullName': value,
+  if (instance.phoneNumber case final value?) 'phoneNumber': value,
+  if (instance.bio case final value?) 'bio': value,
+  if (instance.avatarUrl case final value?) 'avatarUrl': value,
+  if (instance.dateOfBirth case final value?) 'dateOfBirth': value,
+  if (instance.gender case final value?) 'gender': value,
+  if (instance.email case final value?) 'email': value,
+  if (instance.username case final value?) 'username': value,
+  if (instance.isActive case final value?) 'isActive': value,
+  if (instance.createdAt?.toIso8601String() case final value?)
+    'createdAt': value,
+  if (instance.coverUrl case final value?) 'coverUrl': value,
+  if (instance.school case final value?) 'school': value,
+  if (instance.currentCity case final value?) 'currentCity': value,
+  if (instance.hometown case final value?) 'hometown': value,
+  if (instance.workplace case final value?) 'workplace': value,
+  if (instance.relationshipStatus case final value?)
+    'relationshipStatus': value,
+  if (instance.isFaceRegistered case final value?) 'isFaceRegistered': value,
+};
