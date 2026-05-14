@@ -39,6 +39,8 @@ import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:social_app_fe/core/enums/attachment_type.dart';
+import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
@@ -2011,8 +2013,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     final replyText = _replyingMessage!.text?.isNotEmpty == true
         ? _replyingMessage!.text!
         : (_replyingMessage!.attachments.isNotEmpty
-              ? '[${_replyingMessage!.attachments.first.type == 'audio' ? 'Tin nhắn thoại' : 'Ảnh'}]'
-              : '[Tin nhắn]');
+            ? _getAttachmentTypeString(_replyingMessage!.attachments.first.type)
+            : '[Tin nhắn]');
 
     final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
 
@@ -2074,13 +2076,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ),
           ),
 
-          _replyingMessage!.attachments.isNotEmpty &&
-                  _replyingMessage!.attachments.first.type != 'audio'
-              ? Image(
-                  image: NetworkImage(_replyingMessage!.attachments.first.url),
-                  width: 30.w,
-                  height: 40.h,
-                  fit: BoxFit.cover,
+          _replyingMessage!.attachments.isNotEmpty
+              ? _buildReplyAttachmentPreview(
+                  _replyingMessage!.attachments.first,
                 )
               : SizedBox.shrink(),
           GestureDetector(
@@ -2097,6 +2095,41 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         ],
       ),
     );
+  }
+
+  String _getAttachmentTypeString(String type) {
+    if (type == AttachmentType.audio.name) return '[Tin nhắn thoại]';
+    if (type == AttachmentType.image.name) return '[Ảnh]';
+    if (type == AttachmentType.video.name) return '[Video]';
+    if (type == AttachmentType.file.name) return '[Tệp tin]';
+    return '[Đính kèm]';
+  }
+
+  Widget _buildReplyAttachmentPreview(AttachmentEntity attachment) {
+    final type = attachment.type;
+    if (type == AttachmentType.image.name) {
+      return Image.network(
+        attachment.url,
+        width: 30.w,
+        height: 40.h,
+        fit: BoxFit.cover,
+      );
+    } else if (type == AttachmentType.video.name) {
+      return SizedBox(
+        width: 30.w,
+        height: 40.h,
+        child: buildVideoThumbnail(attachment.url, height: 40.h),
+      );
+    } else if (type == AttachmentType.file.name) {
+      return Container(
+        width: 30.w,
+        height: 40.h,
+        color: AppColors.textSecondary.withOpacity(0.1),
+        child:
+            Icon(Icons.insert_drive_file, size: 16.sp, color: AppColors.primary),
+      );
+    }
+    return SizedBox.shrink();
   }
 
   Widget _buildEditPreview() {

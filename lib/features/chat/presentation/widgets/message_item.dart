@@ -481,13 +481,9 @@ class MessageItem extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  message.replyTo!.attachments.isNotEmpty &&
-                          message.replyTo!.attachments.first.type != 'audio'
-                      ? Image.network(
-                          message.replyTo!.attachments.first.url,
-                          width: 40.w,
-                          height: 40.w,
-                          fit: BoxFit.cover,
+                  message.replyTo!.attachments.isNotEmpty
+                      ? _buildReplyAttachmentPreview(
+                          message.replyTo!.attachments.first,
                         )
                       : SizedBox.shrink(),
 
@@ -514,7 +510,9 @@ class MessageItem extends StatelessWidget {
                       // Replied message text
                       Text(
                         message.replyTo!.attachments.isNotEmpty
-                            ? '[${message.replyTo!.attachments.first.type}]'
+                            ? _getAttachmentTypeString(
+                                message.replyTo!.attachments.first.type,
+                              )
                             : message.replyTo!.text,
                         style: TextStyle(
                           color: fromMe
@@ -935,5 +933,43 @@ class MessageItem extends StatelessWidget {
         }),
       ),
     );
+  }
+
+  Widget _buildReplyAttachmentPreview(AttachmentEntity attachment) {
+    final type = attachment.type;
+    if (type == AttachmentType.image.name) {
+      return Image.network(
+        attachment.url,
+        width: 40.w,
+        height: 40.w,
+        fit: BoxFit.cover,
+      );
+    } else if (type == AttachmentType.video.name) {
+      return SizedBox(
+        width: 40.w,
+        height: 40.w,
+        child: buildVideoThumbnail(attachment.url, height: 40.w),
+      );
+    } else if (type == AttachmentType.file.name) {
+      return Container(
+        width: 40.w,
+        height: 40.w,
+        color: AppColors.textSecondary.withOpacity(0.1),
+        child: Icon(
+          Icons.insert_drive_file,
+          size: 20.sp,
+          color: AppColors.primary,
+        ),
+      );
+    }
+    return SizedBox.shrink();
+  }
+
+  String _getAttachmentTypeString(String type) {
+    if (type == AttachmentType.audio.name) return '[Tin nhắn thoại]';
+    if (type == AttachmentType.image.name) return '[Ảnh]';
+    if (type == AttachmentType.video.name) return '[Video]';
+    if (type == AttachmentType.file.name) return '[Tệp tin]';
+    return '[Đính kèm]';
   }
 }
