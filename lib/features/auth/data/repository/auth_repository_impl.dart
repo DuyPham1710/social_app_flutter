@@ -160,4 +160,14 @@ class AuthRepositoryImpl implements AuthRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<Map<String, dynamic>>> deleteFaceRegistration() async {
+    try {
+      final response = await authService.deleteFaceRegistration();
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

@@ -23,6 +23,8 @@ import '../widgets/profile_actions.dart';
 import '../widgets/profile_info.dart';
 import '../widgets/friend_list_widget.dart';
 import '../widgets/create_post_widget.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/privacy_security_page.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/appearance_settings_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -59,26 +61,6 @@ class _ProfilePageState extends State<ProfilePage> {
     context.read<FriendProfileBloc>().add(const LoadFriends());
   }
 
-  void _handleProfileMenuAction(String value) {
-    switch (value) {
-      case 'saved':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SavedItemsPage()),
-        );
-        break;
-      case 'groups':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CommunityPage()),
-        );
-        break;
-      case 'logout':
-        _showLogoutDialog();
-        break;
-    }
-  }
-
   void _showLogoutDialog() {
     showDialog(
       context: context,
@@ -90,10 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: AppColors.background,
               title: Text(
                 'Đăng xuất khỏi tài khoản của bạn?',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 18.sp,
-                ),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 18.sp),
               ),
               actions: [
                 TextButton(
@@ -131,6 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: ProfileMenuDrawer(onLogout: _showLogoutDialog),
       body: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileError) {
@@ -199,43 +179,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           );
                         },
                       ),
-                      PopupMenuButton<String>(
-                        tooltip: 'Menu',
-                        icon: const Icon(
-                          Icons.menu_rounded,
-                          color: AppColors.iconPrimary,
+                      Builder(
+                        builder: (context) => IconButton(
+                          tooltip: 'Menu',
+                          icon: const Icon(
+                            Icons.menu_rounded,
+                            color: AppColors.iconPrimary,
+                          ),
+                          onPressed: () {
+                            Scaffold.of(context).openEndDrawer();
+                          },
                         ),
-                        color: Colors.white,
-                        elevation: 8,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: _handleProfileMenuAction,
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(
-                            value: 'saved',
-                            child: _ProfileMenuOption(
-                              icon: Icons.bookmark_border_rounded,
-                              label: 'Đã lưu',
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'groups',
-                            child: _ProfileMenuOption(
-                              icon: Icons.groups_rounded,
-                              label: 'Nhóm',
-                            ),
-                          ),
-                          PopupMenuDivider(height: 8),
-                          PopupMenuItem(
-                            value: 'logout',
-                            child: _ProfileMenuOption(
-                              icon: Icons.logout_rounded,
-                              label: 'Đăng xuất',
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
                       ),
                       const SizedBox(width: 8),
                     ],
@@ -419,7 +373,9 @@ class _ProfilePageState extends State<ProfilePage> {
               child: CircularProgressIndicator(color: AppColors.primary),
             ),
           ),
-        if (state is ProfileLoaded && state.hasNext == false && posts.isNotEmpty)
+        if (state is ProfileLoaded &&
+            state.hasNext == false &&
+            posts.isNotEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16.h),
             child: Center(
@@ -453,32 +409,185 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class _ProfileMenuOption extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color? color;
+class ProfileMenuDrawer extends StatelessWidget {
+  final VoidCallback onLogout;
 
-  const _ProfileMenuOption({
-    required this.icon,
-    required this.label,
-    this.color,
-  });
+  const ProfileMenuDrawer({super.key, required this.onLogout});
 
   @override
   Widget build(BuildContext context) {
-    final itemColor = color ?? const Color(0xFF111827);
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: itemColor),
-        const SizedBox(width: 10),
-        Text(
-          label,
-          style: TextStyle(
-            color: itemColor,
-            fontWeight: FontWeight.w600,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final itemBgColor = isDark
+        ? Colors.white.withOpacity(0.05)
+        : Colors.black.withOpacity(0.02);
+
+    return Drawer(
+      width: MediaQuery.of(context).size.width * 0.85,
+      backgroundColor: AppColors.background,
+      surfaceTintColor: Colors.transparent,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+
+            Divider(color: AppColors.divider),
+
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                children: [
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.bookmark_rounded,
+                    iconColor: const Color(0xFF8B5CF6), // Purple
+                    title: 'Đã lưu',
+                    bgColor: itemBgColor,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SavedItemsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.groups_rounded,
+                    iconColor: const Color(0xFF3B82F6), // Blue
+                    title: 'Cộng đồng',
+                    bgColor: itemBgColor,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CommunityPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.brightness_medium_rounded,
+                    iconColor: const Color(0xFFF59E0B),
+                    title: 'Giao diện',
+                    bgColor: itemBgColor,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AppearanceSettingsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.security_rounded,
+                    iconColor: const Color(0xFF10B981), // Green
+                    title: 'Quyền riêng tư & bảo mật',
+                    bgColor: itemBgColor,
+                    onTap: () {
+                      final profileBloc = context.read<ProfileBloc>();
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider.value(
+                            value: profileBloc,
+                            child: const PrivacySecurityPage(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildMenuButton(
+                    context,
+                    icon: Icons.logout_rounded,
+                    iconColor: Colors.redAccent,
+                    title: 'Đăng xuất',
+                    bgColor: itemBgColor,
+                    onTap: () {
+                      Navigator.pop(context);
+                      onLogout();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuButton(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required Color bgColor,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.r),
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 22.sp),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14.sp,
+                      color: AppColors.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.textSecondary.withOpacity(0.5),
+                  size: 16.sp,
+                ),
+              ],
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -560,7 +669,11 @@ class _PostSkeletonList extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 14.h),
-                const _SkeletonBox(width: double.infinity, height: 13, radius: 7),
+                const _SkeletonBox(
+                  width: double.infinity,
+                  height: 13,
+                  radius: 7,
+                ),
                 SizedBox(height: 8.h),
                 const _SkeletonBox(width: 230, height: 13, radius: 7),
               ],

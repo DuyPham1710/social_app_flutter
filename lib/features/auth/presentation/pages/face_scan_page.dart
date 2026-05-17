@@ -44,6 +44,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
   int _currentPoseIndex = 0;
   final List<XFile> _capturedImages = [];
   String _userId = '';
+  bool _isPrivacyTab = false;
 
   final List<FacePose> _poses = [
     FacePose.center,
@@ -60,7 +61,9 @@ class _FaceScanPageState extends State<FaceScanPage> {
       final args =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       _userId = args?['userId'] as String? ?? '';
+      _isPrivacyTab = args?['isPrivacyTab'] as bool? ?? false;
       debugPrint('[FaceScan] userId: $_userId');
+      debugPrint('[FaceScan] isPrivacyTab: $_isPrivacyTab');
     });
     _initCamera();
   }
@@ -401,7 +404,17 @@ class _FaceScanPageState extends State<FaceScanPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is FaceRegistrationSuccess) {
-          showDialogSuccess(context, state.message);
+          showDialogSuccess(
+            context,
+            state.message,
+            isNavigateLogin: !_isPrivacyTab,
+          ).then((_) {
+            if (_isPrivacyTab && mounted) {
+              // Pop FaceScanPage and FaceRegistrationPage to go back to PrivacySecurityPage
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            }
+          });
         } else if (state is FaceRegistrationError) {
           _showErrorAndReset(state.message);
         }
