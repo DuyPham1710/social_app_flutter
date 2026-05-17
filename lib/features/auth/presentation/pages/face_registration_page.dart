@@ -5,12 +5,15 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 
 class FaceRegistrationPage extends StatelessWidget {
-  const FaceRegistrationPage({super.key});
+  final bool isPrivacyTab;
+
+  const FaceRegistrationPage({super.key, this.isPrivacyTab = false});
 
   @override
   Widget build(BuildContext context) {
     // Lấy userId từ route arguments (truyền từ personal_info_page)
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final userId = args?['userId'] as String? ?? '';
 
     return Scaffold(
@@ -87,7 +90,10 @@ class FaceRegistrationPage extends StatelessWidget {
                           Navigator.pushNamed(
                             context,
                             '/face-scan',
-                            arguments: {'userId': userId},
+                            arguments: {
+                              'userId': userId,
+                              'isPrivacyTab': isPrivacyTab,
+                            },
                           );
                         },
                         text: "Bắt đầu quét khuôn mặt",
@@ -95,12 +101,16 @@ class FaceRegistrationPage extends StatelessWidget {
                       SizedBox(height: 16.h),
                       GestureDetector(
                         onTap: () {
-                          // Skip face registration and navigate to login
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/login',
-                            (route) => false,
-                          );
+                          if (isPrivacyTab) {
+                            Navigator.pop(context);
+                          } else {
+                            // Skip face registration and navigate to login
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/login',
+                              (route) => false,
+                            );
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.h),

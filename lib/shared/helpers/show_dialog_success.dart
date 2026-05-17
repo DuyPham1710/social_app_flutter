@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-Future<dynamic> showDialogSuccess(BuildContext parentContext, String message) {
+Future<dynamic> showDialogSuccess(
+  BuildContext parentContext,
+  String message, {
+  bool? isNavigateLogin = true,
+}) {
   return showDialog(
     barrierDismissible: false,
     context: parentContext,
     builder: (dialogContext) {
       Future.delayed(Duration(seconds: 3), () {
         Navigator.of(dialogContext).pop(); // đóng dialog
-        Navigator.pushReplacementNamed(parentContext, '/login');
+        if (isNavigateLogin == true) {
+          Navigator.pushReplacementNamed(parentContext, '/login');
+        }
         // Navigator.pushNamed(context, '/login');
       });
 

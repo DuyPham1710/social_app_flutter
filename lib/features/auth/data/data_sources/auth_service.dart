@@ -36,4 +36,7 @@ abstract class AuthService {
 
   @POST('/user/face-registration')
   Future<Map<String, dynamic>> registerFace(@Body() Map<String, dynamic> body);
+
+  @DELETE('/user/face-registration')
+  Future<Map<String, dynamic>> deleteFaceRegistration();
 }

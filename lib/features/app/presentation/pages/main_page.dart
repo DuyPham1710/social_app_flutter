@@ -103,7 +103,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _refreshUserData() async {
     final userData = await TokenStorage.getUserData();
     if (!mounted) return;
-    
+
     setState(() {
       _currentUserData = userData;
     });
@@ -130,8 +130,7 @@ class _MainPageState extends State<MainPage> {
 
   bool _handleScrollNotification(ScrollNotification notification) {
     // Xử lý ẩn/hiện bottom nav bar ở trang Home (0), Friend (1), Notification (3)
-    if (_currentIndex != 0 && _currentIndex != 1 && _currentIndex != 3)
-      return false;
+    if (_currentIndex == 2) return false;
 
     if (notification is UserScrollNotification) {
       if (notification.metrics.axis == Axis.vertical) {

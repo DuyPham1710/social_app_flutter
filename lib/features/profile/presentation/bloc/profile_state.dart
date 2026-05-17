@@ -55,6 +55,9 @@ class ProfileLoaded extends ProfileState {
   final bool isUpdating;
   final bool updateSuccess;
   final String? updateError;
+  final bool isDeletingFace;
+  final bool deleteFaceSuccess;
+  final String? deleteFaceError;
 
   const ProfileLoaded(
     List<PostEntity> posts, {
@@ -69,6 +72,9 @@ class ProfileLoaded extends ProfileState {
     this.isUpdating = false,
     this.updateSuccess = false,
     this.updateError,
+    this.isDeletingFace = false,
+    this.deleteFaceSuccess = false,
+    this.deleteFaceError,
   }) : super(posts: posts);
 
   @override
@@ -77,6 +83,9 @@ class ProfileLoaded extends ProfileState {
     isUpdating,
     updateSuccess,
     updateError,
+    isDeletingFace,
+    deleteFaceSuccess,
+    deleteFaceError,
   ];
 }
 
@@ -95,6 +104,9 @@ extension ProfileLoadedCopyWith on ProfileLoaded {
     bool? isUpdating,
     bool? updateSuccess,
     String? updateError,
+    bool? isDeletingFace,
+    bool? deleteFaceSuccess,
+    String? deleteFaceError,
   }) {
     return ProfileLoaded(
       posts ?? this.posts ?? [],
@@ -107,10 +119,11 @@ extension ProfileLoadedCopyWith on ProfileLoaded {
       user: user ?? this.user,
 
       isUpdating: isUpdating ?? this.isUpdating,
-      updateSuccess:
-          updateSuccess ??
-          false, // Reset về false sau khi emit để tránh snackbar hiện lại
+      updateSuccess: updateSuccess ?? false,
       updateError: updateError,
+      isDeletingFace: isDeletingFace ?? this.isDeletingFace,
+      deleteFaceSuccess: deleteFaceSuccess ?? false,
+      deleteFaceError: deleteFaceError,
     );
   }
 }

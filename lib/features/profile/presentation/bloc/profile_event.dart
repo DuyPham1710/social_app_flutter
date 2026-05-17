@@ -42,3 +42,7 @@ class UpdateUserProfileEvent extends ProfileEvent {
   @override
   List<Object> get props => [params];
 }
+
+class DeleteFaceDataEvent extends ProfileEvent {
+  const DeleteFaceDataEvent();
+}
