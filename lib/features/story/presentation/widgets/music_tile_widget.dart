@@ -26,7 +26,6 @@ class MusicTileWidget extends StatefulWidget {
 }
 
 class _MusicTileWidgetState extends State<MusicTileWidget> {
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -42,15 +41,15 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
           errorBuilder: (_, __, ___) => Container(
             width: 54.w,
             height: 54.w,
-            color: Colors.grey[800],
-            child: const Icon(Icons.music_note, color: Colors.white),
+            color: Colors.grey[200],
+            child: Icon(Icons.music_note, color: Colors.grey[500]),
           ),
         ),
       ),
       title: Text(
         widget.item.title,
         style: TextStyle(
-          color: Colors.white,
+          color: Colors.black87,
           fontSize: 15.sp,
           fontWeight: FontWeight.w700,
         ),
@@ -59,20 +58,13 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
       ),
       subtitle: Text(
         widget.item.artist.name,
-        style: TextStyle(
-          color: Colors.white70,
-          fontSize: 13.sp,
-        ),
+        style: TextStyle(color: Colors.black54, fontSize: 13.sp),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
-            icon: const Icon(Icons.more_horiz, color: Colors.white70),
-            onPressed: () {},
-          ),
           SizedBox(width: 4.w),
           GestureDetector(
             onTap: widget.onPlay,
@@ -81,10 +73,10 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
               children: [
                 CircleAvatar(
                   radius: 18.r,
-                  backgroundColor: Colors.white10,
+                  backgroundColor: Colors.black.withOpacity(0.05),
                   child: Icon(
                     widget.isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: Colors.white,
+                    color: AppColors.primary,
                     size: 22.sp,
                   ),
                 ),
@@ -93,9 +85,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
                     width: 40.r,
                     height: 40.r,
                     child: CustomPaint(
-                      painter: _RotatingDotPainter(
-                        progress: widget.progress!,
-                      ),
+                      painter: _RotatingDotPainter(progress: widget.progress!),
                     ),
                   ),
               ],
@@ -121,7 +111,7 @@ class _RotatingDotPainter extends CustomPainter {
 
     // Vẽ đường tròn nền (màu xám nhạt)
     final backgroundPaint = Paint()
-      ..color = Colors.white.withOpacity(0.2)
+      ..color = Colors.black.withOpacity(0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
@@ -145,7 +135,8 @@ class _RotatingDotPainter extends CustomPainter {
     );
 
     // Tính toán vị trí chấm xanh dựa trên progress (0-1)
-    final angle = -math.pi / 2 + (progress * 2 * math.pi); // Bắt đầu từ trên cùng
+    final angle =
+        -math.pi / 2 + (progress * 2 * math.pi); // Bắt đầu từ trên cùng
     final dotX = center.dx + radius * math.cos(angle);
     final dotY = center.dy + radius * math.sin(angle);
 

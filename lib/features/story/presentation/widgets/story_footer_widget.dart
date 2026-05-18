@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +8,7 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 
-class StoryFooterWidget extends StatelessWidget {
+class StoryFooterWidget extends StatefulWidget {
   final TextEditingController textController;
   final StoryEntity story;
   final String? currentUserId;
@@ -22,9 +23,82 @@ class StoryFooterWidget extends StatelessWidget {
   });
 
   @override
+  State<StoryFooterWidget> createState() => _StoryFooterWidgetState();
+}
+
+class _StoryFooterWidgetState extends State<StoryFooterWidget> {
+  EmojiType? _selectedReact;
+  final List<OverlayEntry> _activeEntries = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedReact = widget.story.isReact;
+  }
+
+  @override
+  void didUpdateWidget(covariant StoryFooterWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.story.id != widget.story.id ||
+        oldWidget.story.isReact != widget.story.isReact) {
+      _selectedReact = widget.story.isReact;
+    }
+  }
+
+  @override
+  void dispose() {
+    final entries = List<OverlayEntry>.from(_activeEntries);
+    _activeEntries.clear();
+    for (final entry in entries) {
+      try {
+        entry.remove();
+      } catch (_) {}
+    }
+    super.dispose();
+  }
+
+  void _spawnFloatingEmojiBurst(
+    BuildContext context,
+    Offset startPosition,
+    String emoji,
+  ) {
+    final overlayState = Overlay.maybeOf(context);
+    if (overlayState == null) return;
+
+    final random = math.Random();
+
+    // Tạo 8 emoji bay lên tạo thành dòng phun nước (fountain effect)
+    for (int i = 0; i < 8; i++) {
+      final delayMs = i * 80 + random.nextInt(40);
+      late OverlayEntry entry;
+
+      entry = OverlayEntry(
+        builder: (context) {
+          return _FloatingEmojiWidget(
+            startPosition: startPosition,
+            emoji: emoji,
+            delayMs: delayMs,
+            onComplete: () {
+              if (mounted && _activeEntries.contains(entry)) {
+                try {
+                  entry.remove();
+                } catch (_) {}
+                _activeEntries.remove(entry);
+              }
+            },
+          );
+        },
+      );
+
+      _activeEntries.add(entry);
+      overlayState.insert(entry);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Nếu là story của chính mình, không hiển thị footer
-    if (isOwnStory) {
+    if (widget.isOwnStory) {
       return const SizedBox.shrink();
     }
 
@@ -41,7 +115,9 @@ class StoryFooterWidget extends StatelessWidget {
           height: 44.h, // Chiều cao cố định cho cả thanh cuộn
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 12.w), // Padding cho 2 đầu
+            padding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+            ), // Padding cho 2 đầu
             children: [
               SizedBox(
                 width: 230.w,
@@ -53,7 +129,7 @@ class StoryFooterWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(24.r),
                   ),
                   child: TextField(
-                    controller: textController,
+                    controller: widget.textController,
                     style: TextStyle(fontSize: 14.sp, color: Colors.white),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
@@ -67,13 +143,39 @@ class StoryFooterWidget extends StatelessWidget {
               ),
 
               ...EmojiType.values.map((emoji) {
+                final isReacted = _selectedReact == emoji;
                 return Padding(
                   // Thêm padding bên trái cho mỗi icon để tạo khoảng cách
                   padding: EdgeInsets.only(left: 8.w),
                   child: _IconReaction(
                     emoji: emoji,
-                    storyId: story.id,
-                    isReacted: story.isReact == emoji,
+                    storyId: widget.story.id,
+                    isReacted: isReacted,
+                    onTap: (details) {
+                      setState(() {
+                        if (isReacted) {
+                          _selectedReact = null;
+                        } else {
+                          _selectedReact = emoji;
+                        }
+                      });
+
+                      if (_selectedReact == emoji) {
+                        _spawnFloatingEmojiBurst(
+                          context,
+                          details.globalPosition,
+                          emoji.icon,
+                        );
+                      }
+
+                      // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
+                      context.read<HomeStoriesBloc>().add(
+                        ReactStoryEvent(
+                          storyId: widget.story.id,
+                          emojiId: emoji.id,
+                        ),
+                      );
+                    },
                   ),
                 );
               }),
@@ -90,10 +192,13 @@ class _IconReaction extends StatelessWidget {
   final EmojiType emoji;
   final String storyId;
   final bool isReacted;
+  final Function(TapDownDetails details) onTap;
+
   const _IconReaction({
     required this.emoji,
     required this.storyId,
     this.isReacted = false,
+    required this.onTap,
   });
 
   @override
@@ -101,39 +206,176 @@ class _IconReaction extends StatelessWidget {
     return GestureDetector(
       // Ngăn event propagation
       behavior: HitTestBehavior.opaque,
-      onTap: () {
-        // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
-        context.read<HomeStoriesBloc>().add(
-          ReactStoryEvent(
-            storyId: storyId,
-            emojiId: emoji.id,
+      onTapDown: onTap,
+      child: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          Container(
+            width: 65.w,
+            height: 65.w,
+            padding: EdgeInsets.all(1.w),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Lottie.asset(
+              emoji.lottieAsset,
+              fit: BoxFit.contain,
+              repeat: true,
+            ),
+          ),
+          if (isReacted)
+            Positioned(
+              top: 2.w,
+              right: 2.w,
+              child: Container(
+                width: 10.w,
+                height: 10.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5.w),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// Widget hiệu ứng emoji bay lên
+class _FloatingEmojiWidget extends StatefulWidget {
+  final Offset startPosition;
+  final String emoji;
+  final int delayMs;
+  final VoidCallback onComplete;
+
+  const _FloatingEmojiWidget({
+    required this.startPosition,
+    required this.emoji,
+    required this.delayMs,
+    required this.onComplete,
+  });
+
+  @override
+  State<_FloatingEmojiWidget> createState() => _FloatingEmojiWidgetState();
+}
+
+class _FloatingEmojiWidgetState extends State<_FloatingEmojiWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late double _swerveWidth;
+  late double _swerveFrequency;
+  late double _targetHeight;
+  late double _scale;
+  late double _angle;
+  bool _isVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final random = math.Random();
+    _swerveWidth =
+        25.0 + random.nextDouble() * 35.0; // Biên độ uốn lượn 25-60px
+    _swerveFrequency = 1.0 + random.nextDouble() * 1.5; // Số nhịp uốn lượn
+    _targetHeight =
+        300.0 + random.nextDouble() * 200.0; // Độ cao bay lên 300-500px
+    _scale = 0.9 + random.nextDouble() * 0.4; // Kích thước ngẫu nhiên
+    _angle = (random.nextDouble() - 0.5) * 0.4; // Góc nghiêng ngẫu nhiên
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 1300 + random.nextInt(400),
+      ), // Thời gian bay 1.3s - 1.7s
+    );
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        widget.onComplete();
+      }
+    });
+
+    _startAnimation();
+  }
+
+  Future<void> _startAnimation() async {
+    if (widget.delayMs > 0) {
+      await Future.delayed(Duration(milliseconds: widget.delayMs));
+    }
+    if (mounted) {
+      setState(() {
+        _isVisible = true;
+      });
+      _controller.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isVisible) return const SizedBox.shrink();
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final progress = _controller.value;
+
+        // Trục Y di chuyển ngược lên trên
+        final currentY = widget.startPosition.dy - (progress * _targetHeight);
+
+        // Trục X chuyển động lượn sóng hình Sin
+        final currentX =
+            widget.startPosition.dx +
+            math.sin(progress * math.pi * 2 * _swerveFrequency) * _swerveWidth;
+
+        // Độ mờ: xuất hiện nhanh, mờ dần về cuối hành trình
+        double opacity = 1.0;
+        if (progress < 0.15) {
+          opacity = progress / 0.15;
+        } else if (progress > 0.6) {
+          opacity = (1.0 - progress) / 0.4;
+        }
+        opacity = opacity.clamp(0.0, 1.0);
+
+        // Kích cỡ: phóng to nhẹ khi vừa bay ra, thu nhỏ dần khi tan biến
+        double currentScale = _scale;
+        if (progress < 0.2) {
+          currentScale = _scale * (progress / 0.2);
+        } else if (progress > 0.7) {
+          currentScale = _scale * ((1.0 - progress) / 0.3);
+        }
+
+        return Positioned(
+          left: currentX - 25, // Căn giữa hộp kích thước 50x50
+          top: currentY - 25,
+          child: IgnorePointer(
+            // Không cản trở các tương tác click khác dưới màn hình
+            child: Opacity(
+              opacity: opacity,
+              child: Transform.rotate(
+                angle: _angle + (progress * 0.15), // Xoay nhẹ khi đang bay
+                child: Transform.scale(
+                  scale: currentScale,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(
+                      widget.emoji,
+                      style: const TextStyle(fontSize: 34),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         );
       },
-      child: Container(
-        width: 56.w,
-        height: 56.w,
-        padding: EdgeInsets.all(6.w),
-        decoration: BoxDecoration(
-          color: isReacted 
-              ? AppColors.primary.withOpacity(0.2)
-              : AppColors.background,
-          borderRadius: BorderRadius.circular(12.r),
-          border: isReacted
-              ? Border.all(color: AppColors.primary, width: 2)
-              : null,
-        ),
-        child: isReacted
-            ? Text(
-                emoji.icon,
-                style: TextStyle(fontSize: 32.sp),
-              )
-            : Lottie.asset(
-                emoji.lottieAsset,
-                fit: BoxFit.contain,
-                repeat: true,
-              ),
-      ),
     );
   }
 }
