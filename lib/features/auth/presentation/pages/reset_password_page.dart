@@ -65,6 +65,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     final otp = args['otp'] as String;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           // Chỉ xử lý state từ reset_password flow
@@ -90,7 +91,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
                     ),
 
                     SizedBox(height: 50.h),
@@ -102,6 +103,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -112,7 +114,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       "Giúp chúng tôi bảo vệ tài khoản của bạn bằng cách chọn mật khẩu mạnh.",
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                     ),
 
@@ -140,7 +142,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               ? CupertinoIcons.eye_slash_fill
                               : CupertinoIcons.eye_fill,
                           size: 22.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.unselectedIcon,
                         ),
                       ),
                     ),
@@ -170,7 +172,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               ? CupertinoIcons.eye_slash_fill
                               : CupertinoIcons.eye_fill,
                           size: 22.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.unselectedIcon,
                         ),
                       ),
                     ),
@@ -197,7 +199,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         Text(
                           "Bạn đã có tài khoản? ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
                           ),

@@ -40,6 +40,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is OtpResendSuccess && state.flowType == 'resend_otp') {
@@ -73,7 +74,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
                     ),
 
                     SizedBox(height: 50.h),
@@ -85,6 +86,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -94,7 +96,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       "Nhập email của bạn để khôi phục tài khoản.",
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                     ),
 
@@ -134,7 +136,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         Text(
                           "Bạn chưa có tài khoản? ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
                           ),

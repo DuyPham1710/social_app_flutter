@@ -12,10 +12,20 @@ class DatePickerWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: AppColors.background,
+              surfaceTintColor: Colors.transparent, // Remove pink tint
+              headerBackgroundColor: AppColors.primary,
+              headerForegroundColor: Colors.white,
+            ),
+            colorScheme: Theme.of(context).colorScheme.copyWith(
               primary: AppColors.primary, // màu nút OK, viền, header
               onPrimary: Colors.white, // màu chữ trong header
-              onSurface: Colors.black, // màu text ngày
+              onSurface: AppColors.textPrimary, // màu text ngày
+              onSurfaceVariant:
+                  AppColors.textSecondary, // màu text năm chưa chọn
+              surface: AppColors.background, // nền lịch
+              surfaceTint: Colors.transparent,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(

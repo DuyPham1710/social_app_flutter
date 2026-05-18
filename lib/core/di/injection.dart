@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/network/dio_client.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
@@ -189,6 +190,11 @@ UnsavePostUsecase resolveUnsavePostUsecase() {
 }
 
 Future<void> initializeDependencies() async {
+  // App Preferences
+  final appPreferences = AppPreferences();
+  await appPreferences.init();
+  s1.registerSingleton<AppPreferences>(appPreferences);
+
   // Dio
   s1.registerSingleton<Dio>(DioClient.instance);
 

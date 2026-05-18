@@ -103,7 +103,10 @@ class CommunityInviteNotificationItem extends StatelessWidget {
                     spans.add(
                       TextSpan(
                         text: ' $msg ',
-                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                        ),
                       ),
                     );
                     spans.add(

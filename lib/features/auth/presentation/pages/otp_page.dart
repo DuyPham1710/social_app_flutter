@@ -53,17 +53,17 @@ class _OtpPageState extends State<OtpPage> {
     }
   }
 
-  final defaultPinTheme = PinTheme(
+  PinTheme get defaultPinTheme => PinTheme(
     width: 50.w,
     height: 50.h,
     textStyle: TextStyle(
       fontSize: 20.sp,
       fontWeight: FontWeight.bold,
-      color: Colors.black,
+      color: AppColors.textPrimary,
     ),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(8.r),
-      border: Border.all(color: Colors.grey),
+      border: Border.all(color: AppColors.divider),
     ),
   );
 
@@ -104,6 +104,7 @@ class _OtpPageState extends State<OtpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           // Chỉ xử lý state từ verify_otp flow
@@ -151,7 +152,7 @@ class _OtpPageState extends State<OtpPage> {
 
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                    child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
                   ),
 
                   SizedBox(height: 50.h),
@@ -163,6 +164,7 @@ class _OtpPageState extends State<OtpPage> {
                       style: TextStyle(
                         fontSize: 24.sp,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -171,7 +173,7 @@ class _OtpPageState extends State<OtpPage> {
 
                   Text(
                     "Nhập mã OTP đã gửi đến ${_email ?? ''}",
-                    style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
                   ),
 
                   SizedBox(height: 40.h),
@@ -182,7 +184,7 @@ class _OtpPageState extends State<OtpPage> {
                     focusedPinTheme: defaultPinTheme.copyWith(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: Colors.black, width: 2.w),
+                        border: Border.all(color: AppColors.textPrimary, width: 2.w),
                       ),
                     ),
                     onChanged: (value) {
@@ -200,7 +202,7 @@ class _OtpPageState extends State<OtpPage> {
                       Text(
                         "Bạn chưa nhận được mã? ",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -249,7 +251,7 @@ class _OtpPageState extends State<OtpPage> {
                       Text(
                         "Bạn đã có tài khoản? ",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),

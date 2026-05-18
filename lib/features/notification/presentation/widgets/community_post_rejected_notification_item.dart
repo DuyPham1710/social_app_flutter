@@ -85,7 +85,8 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                 children: [
                   Builder(
                     builder: (context) {
-                      final msg = message ?? 'đã gửi yêu cầu đăng bài vào cộng đồng';
+                      final msg =
+                          message ?? 'đã gửi yêu cầu đăng bài vào cộng đồng';
 
                       final List<TextSpan> spans = [];
 
@@ -93,13 +94,16 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                       spans.add(
                         TextSpan(
                           text: '$msg ',
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                          ),
                         ),
                       );
                       spans.add(
                         TextSpan(
                           text: communityName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -116,7 +120,10 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
 
                   Text(
                     time == "0 phút" ? "Vừa xong" : time,
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),

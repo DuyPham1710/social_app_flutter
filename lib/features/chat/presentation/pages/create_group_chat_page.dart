@@ -341,10 +341,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
             backgroundColor: AppColors.background,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(
-                CupertinoIcons.back,
-                color: AppColors.textPrimary,
-              ),
+              icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
               onPressed: () async {
                 if (await _onWillPop()) {
                   Navigator.pop(context);
@@ -444,7 +441,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                       color: AppColors.textSecondary,
                       fontSize: 15.sp,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
                       color: AppColors.textSecondary,
                     ),
@@ -582,7 +579,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
               child: GestureDetector(
                 onTap: () => _removeFriend(friend),
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
                     shape: BoxShape.circle,
                   ),

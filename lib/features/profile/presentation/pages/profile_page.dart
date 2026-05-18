@@ -77,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text(
+                  child: Text(
                     'Hủy',
                     style: TextStyle(color: AppColors.textPrimary),
                   ),
@@ -166,10 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     actions: [
                       IconButton(
-                        icon: const Icon(
-                          Icons.search,
-                          color: AppColors.iconPrimary,
-                        ),
+                        icon: Icon(Icons.search, color: AppColors.iconPrimary),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -182,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Builder(
                         builder: (context) => IconButton(
                           tooltip: 'Menu',
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.menu_rounded,
                             color: AppColors.iconPrimary,
                           ),
@@ -330,7 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: AppColors.textSecondary),
                   ),
                   SizedBox(height: 14.h),
                   OutlinedButton.icon(
@@ -357,7 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Center(
               child: Text(
                 state.errorMessage ?? "Không thể tải bài viết",
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
           ),

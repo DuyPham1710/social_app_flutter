@@ -427,7 +427,7 @@ class _ModalCommentState extends State<ModalComment> {
                     width: 40.w,
                     height: 4.h,
                     decoration: BoxDecoration(
-                      color: Colors.grey[400],
+                      color: AppColors.divider,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
@@ -607,7 +607,7 @@ class _ModalCommentState extends State<ModalComment> {
                         ),
                   ),
 
-                  Divider(height: 1.h, color: Colors.grey[300]),
+                  Divider(height: 1.h, color: AppColors.divider),
 
                   const TypingIndicator(),
 

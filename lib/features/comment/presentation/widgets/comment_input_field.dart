@@ -32,8 +32,8 @@ class _CommentInputFieldState extends State<CommentInputField> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+        color: AppColors.background,
+        border: Border(top: BorderSide(color: AppColors.divider)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -43,7 +43,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               width: double.infinity,
-              color: Colors.grey[100],
+              color: AppColors.secondBackground,
               child: Row(
                 children: [
                   Text(
@@ -63,7 +63,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -121,6 +121,11 @@ class _CommentInputFieldState extends State<CommentInputField> {
                     suggestionPosition: SuggestionPosition.Top,
                     maxLines: 5,
                     minLines: 1,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: AppColors.textPrimary,
+                    ),
+                    cursorColor: AppColors.primary,
                     decoration: InputDecoration(
                       // Custom hint text based on reply state
                       hintText: widget.replyingToUserName != null
@@ -152,7 +157,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                         },
                         suggestionBuilder: (data) {
                           return Container(
-                            color: Colors.white,
+                            color: AppColors.background,
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
@@ -177,7 +182,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                                   decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
-                                        color: Colors.grey.withOpacity(0.1),
+                                        color: AppColors.divider,
                                         width: 1,
                                       ),
                                     ),
@@ -203,7 +208,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 14.sp,
-                                                color: Colors.black87,
+                                                color: AppColors.textPrimary,
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -213,7 +218,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                                               '@${data['full_name']}',
                                               style: TextStyle(
                                                 fontSize: 12.sp,
-                                                color: Colors.grey[600],
+                                                color: AppColors.textSecondary,
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,

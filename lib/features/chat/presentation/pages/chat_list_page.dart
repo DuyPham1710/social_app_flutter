@@ -434,7 +434,7 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
                 title: Text(
                   state.user.fullName ?? "Chats",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
@@ -466,10 +466,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
                   IconButton(
                     onPressed: () {},
-                    icon: const Icon(
-                      Icons.settings,
-                      color: AppColors.textPrimary,
-                    ),
+                    icon: Icon(Icons.settings, color: AppColors.textPrimary),
                   ),
                 ],
               ),
@@ -516,7 +513,7 @@ class _ChatListPageState extends State<ChatListPage> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.search,
                                   color: AppColors.textSecondary,
                                 ),
@@ -752,7 +749,8 @@ class _ChatListPageState extends State<ChatListPage> {
                               }
 
                               bool? isOnline;
-                              if (!conversation.isGroup && firstParticipant != null) {
+                              if (!conversation.isGroup &&
+                                  firstParticipant != null) {
                                 final otherUserId = firstParticipant.userId;
                                 final status = _presenceByUserId[otherUserId];
                                 if (status != null) {
@@ -760,9 +758,13 @@ class _ChatListPageState extends State<ChatListPage> {
                                 }
 
                                 if (_chatPresenceService != null &&
-                                    !_presenceRequestedUserIds.contains(otherUserId)) {
+                                    !_presenceRequestedUserIds.contains(
+                                      otherUserId,
+                                    )) {
                                   _presenceRequestedUserIds.add(otherUserId);
-                                  _chatPresenceService!.requestPresence([otherUserId]);
+                                  _chatPresenceService!.requestPresence([
+                                    otherUserId,
+                                  ]);
                                 }
                               }
 

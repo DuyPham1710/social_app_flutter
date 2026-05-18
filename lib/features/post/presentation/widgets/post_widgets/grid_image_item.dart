@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class GridImageItem extends StatefulWidget {
   final AssetEntity asset;
@@ -88,7 +89,7 @@ class _GridImageItemState extends State<GridImageItem>
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               color: widget.isSelected
-                  ? Colors.blue.withOpacity(0.3)
+                  ? AppColors.primary.withOpacity(0.3)
                   : Colors.transparent,
             ),
 
@@ -116,7 +117,7 @@ class _GridImageItemState extends State<GridImageItem>
                 height: 20.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.isSelected ? Colors.blue : Colors.transparent,
+                  color: widget.isSelected ? AppColors.primary : Colors.transparent,
                   border: Border.all(color: Colors.white, width: 1),
                 ),
 

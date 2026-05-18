@@ -27,7 +27,7 @@ class PrivacySecurityPage extends StatelessWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.iconPrimary),
+          icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -357,7 +357,7 @@ class PrivacySecurityPage extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              child: const Text(
+              child: Text(
                 'Hủy',
                 style: TextStyle(color: AppColors.textSecondary),
               ),

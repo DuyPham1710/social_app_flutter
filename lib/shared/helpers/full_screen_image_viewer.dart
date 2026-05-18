@@ -75,10 +75,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(
-                  Icons.download,
-                  color: AppColors.textPrimary,
-                ),
+                leading: Icon(Icons.download, color: AppColors.textPrimary),
                 title: Text(
                   'Lưu ảnh',
                   style: TextStyle(

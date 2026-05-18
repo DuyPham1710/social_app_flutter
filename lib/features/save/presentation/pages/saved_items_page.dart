@@ -18,21 +18,19 @@ import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class SavedItemsPage extends StatefulWidget {
-  const SavedItemsPage({Key? key}) : super(key: key);
+  const SavedItemsPage({super.key});
 
   @override
   State<SavedItemsPage> createState() => _SavedItemsPageState();
 }
 
 class _SavedItemsPageState extends State<SavedItemsPage> {
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  final GetPostDetailUsecase _getPostDetailUsecase =
-      s1<GetPostDetailUsecase>();
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
+  final GetPostDetailUsecase _getPostDetailUsecase = s1<GetPostDetailUsecase>();
 
-  static const List<String> _fallbackCategories = [
-    'Tất cả',
-  ];
+  static const List<String> _fallbackCategories = ['Tất cả'];
 
   String _selectedCategory = 'Tất cả';
   List<String> _currentCategories = _fallbackCategories;
@@ -49,7 +47,10 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     String id,
   ) async {
     if (type != 'post') {
-      showErrorSnackBar(context, 'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu');
+      showErrorSnackBar(
+        context,
+        'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu',
+      );
       return;
     }
 
@@ -69,9 +70,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     if (result is DataStateSuccess<PostEntity> && result.data != null) {
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => PostDetailPage(post: result.data!),
-        ),
+        MaterialPageRoute(builder: (_) => PostDetailPage(post: result.data!)),
       );
     } else {
       showErrorSnackBar(context, 'Không thể mở bài viết đã lưu');
@@ -212,7 +211,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   ),
                 ),
                 SizedBox(width: 12.w),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -257,9 +256,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         message: 'Kiểm tra kết nối rồi thử lại.',
         actionLabel: 'Thử lại',
         onAction: () {
-          context
-              .read<SavedItemsBloc>()
-              .add(const LoadSavedItems(isRefresh: true));
+          context.read<SavedItemsBloc>().add(
+            const LoadSavedItems(isRefresh: true),
+          );
         },
       );
     }
@@ -277,7 +276,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
       }
 
       return SmartRefresher(
-        key: ValueKey('saved-list-${state.currentCategory}-${state.items.length}'),
+        key: ValueKey(
+          'saved-list-${state.currentCategory}-${state.items.length}',
+        ),
         controller: _refreshController,
         enablePullDown: true,
         enablePullUp: !state.hasReachedMax,
@@ -293,9 +294,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
           canLoadingText: 'Thả để tải thêm',
         ),
         onRefresh: () {
-          context
-              .read<SavedItemsBloc>()
-              .add(const LoadSavedItems(isRefresh: true));
+          context.read<SavedItemsBloc>().add(
+            const LoadSavedItems(isRefresh: true),
+          );
         },
         onLoading: () {
           context.read<SavedItemsBloc>().add(const LoadSavedItems());
@@ -310,11 +311,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
             final item = state.items[index];
             return SavedItemCard(
               item: item,
-              onTap: () => _openSavedItem(
-                context,
-                item.type,
-                item.targetId,
-              ),
+              onTap: () => _openSavedItem(context, item.type, item.targetId),
               onRemove: () => _confirmRemoveSavedItem(context, item.id),
             );
           },
@@ -457,9 +454,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   setState(() {
                     _selectedCategory = category;
                   });
-                  context
-                      .read<SavedItemsBloc>()
-                      .add(ChangeCategoryTab(category));
+                  context.read<SavedItemsBloc>().add(
+                    ChangeCategoryTab(category),
+                  );
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
@@ -467,9 +464,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   margin: EdgeInsets.only(right: 12.w),
                   padding: EdgeInsets.symmetric(horizontal: 14.w),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primary
-                        : Colors.white,
+                    color: isSelected ? AppColors.primary : Colors.white,
                     borderRadius: BorderRadius.circular(999.r),
                     border: Border.all(
                       color: isSelected
@@ -506,8 +501,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                           color: isSelected
                               ? Colors.white
                               : AppColors.textPrimary,
-                          fontWeight:
-                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                          fontWeight: isSelected
+                              ? FontWeight.w800
+                              : FontWeight.w600,
                           fontSize: 13.sp,
                         ),
                       ),

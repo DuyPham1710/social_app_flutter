@@ -32,10 +32,7 @@ class SavePostBottomSheet extends StatefulWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return SavePostBottomSheet(
-          post: post,
-          onSaved: onSaved,
-        );
+        return SavePostBottomSheet(post: post, onSaved: onSaved);
       },
     );
   }
@@ -55,21 +52,25 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
 
   Future<void> _loadCollections() async {
     try {
-      final result = await _saveRepository.getSavedByUser(type: 'post', limit: 50);
+      final result = await _saveRepository.getSavedByUser(
+        type: 'post',
+        limit: 50,
+      );
       if (result is DataStateSuccess && result.data != null) {
         // Group by collection name
         final Map<String, String?> collectionMap = {};
         for (var item in result.data!.data) {
           if (!collectionMap.containsKey(item.collection)) {
             // Find a thumbnail from the post content if available (for simplified demo we use content or null)
-            collectionMap[item.collection] = item.content.isNotEmpty ? item.content : null;
+            collectionMap[item.collection] = item.content.isNotEmpty
+                ? item.content
+                : null;
           }
         }
-        
-        final collections = collectionMap.entries.map((e) => {
-          'name': e.key,
-          'image': e.value,
-        }).toList();
+
+        final collections = collectionMap.entries
+            .map((e) => {'name': e.key, 'image': e.value})
+            .toList();
         if (!collectionMap.containsKey('default')) {
           collections.insert(0, {'name': 'default', 'image': null});
         }
@@ -97,7 +98,9 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
   }
 
   Future<void> _saveToCollection(String collectionName) async {
-    setState(() { _isSaving = true; });
+    setState(() {
+      _isSaving = true;
+    });
 
     try {
       String? contentPreview;
@@ -114,12 +117,18 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
 
       if (mounted) {
         Navigator.pop(context); // Close bottom sheet
-        
+
         if (result is DataStateSuccess && result.data != null) {
           widget.onSaved(result.data!.id);
-          showSuccessSnackBar(context, "Đã lưu bài viết vào bộ sưu tập '$collectionName'");
+          showSuccessSnackBar(
+            context,
+            "Đã lưu bài viết vào bộ sưu tập '$collectionName'",
+          );
         } else if (result is DataStateError) {
-          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể lưu bài viết"}');
+          showErrorSnackBar(
+            context,
+            'Lỗi: ${result.error?.message ?? "Không thể lưu bài viết"}',
+          );
         }
       }
     } catch (e) {
@@ -132,25 +141,58 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
 
   Future<void> _showCreateCollectionDialog() async {
     final TextEditingController controller = TextEditingController();
-    
+
     final collectionName = await showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
-          title: const Text('Tạo bộ sưu tập mới', style: TextStyle(fontWeight: FontWeight.bold)),
+          surfaceTintColor: Colors.transparent,
+          title: Text(
+            'Tạo bộ sưu tập mới',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(
+            style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+            cursorColor: AppColors.primary,
+            decoration: InputDecoration(
               hintText: 'Tên bộ sưu tập',
-              border: OutlineInputBorder(),
+              hintStyle: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14.sp,
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12.w,
+                vertical: 10.h,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide(color: AppColors.primary),
+              ),
+              fillColor: AppColors.secondBackground,
+              filled: true,
             ),
             autofocus: true,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Hủy'),
+              child: Text(
+                'Hủy',
+                style: TextStyle(color: AppColors.textPrimary),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -158,7 +200,10 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                   Navigator.pop(context, controller.text.trim());
                 }
               },
-              child: const Text('Tạo', style: TextStyle(color: AppColors.primary)),
+              child: const Text(
+                'Tạo',
+                style: TextStyle(color: AppColors.primary),
+              ),
             ),
           ],
         );
@@ -194,19 +239,21 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                 width: 40.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: AppColors.divider,
                   borderRadius: BorderRadius.circular(2.r),
                 ),
               ),
             ),
             SizedBox(height: 16.h),
-            
+
             InkWell(
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SavedItemsPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const SavedItemsPage(),
+                  ),
                 );
               },
               child: Padding(
@@ -217,7 +264,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                       width: 40.w,
                       height: 40.w,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: AppColors.secondBackground,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.bookmark, color: AppColors.textPrimary),
@@ -232,12 +279,17 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 2.h),
                           Row(
                             children: [
-                              Icon(Icons.lock, size: 12.sp, color: AppColors.textSecondary),
+                              Icon(
+                                Icons.lock,
+                                size: 12.sp,
+                                color: AppColors.textSecondary,
+                              ),
                               SizedBox(width: 4.w),
                               Text(
                                 'Chỉ mình tôi',
@@ -247,7 +299,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                                 ),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -256,7 +308,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                 ),
               ),
             ),
-            
+
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               child: Divider(height: 1, color: AppColors.divider),
@@ -273,6 +325,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   GestureDetector(
@@ -281,7 +334,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                       'Tạo',
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.blue,
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -294,12 +347,16 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
             if (_isLoading)
               const Padding(
                 padding: EdgeInsets.all(32.0),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
               )
             else if (_isSaving)
               const Padding(
                 padding: EdgeInsets.all(32.0),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
               )
             else
               Expanded(
@@ -323,7 +380,11 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
     );
   }
 
-  Widget _buildCollectionItem(BuildContext context, String title, String? imageUrl) {
+  Widget _buildCollectionItem(
+    BuildContext context,
+    String title,
+    String? imageUrl,
+  ) {
     return InkWell(
       onTap: () => _saveToCollection(title),
       child: Padding(
@@ -335,7 +396,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
               width: 50.w,
               height: 50.w,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.secondBackground,
                 borderRadius: BorderRadius.circular(8.r),
                 image: imageUrl != null && imageUrl.isNotEmpty
                     ? DecorationImage(
@@ -345,11 +406,11 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                     : null,
               ),
               child: imageUrl == null || imageUrl.isEmpty
-                  ? Icon(Icons.bookmark_border, color: Colors.grey[600])
+                  ? Icon(Icons.bookmark_border, color: AppColors.unselectedIcon)
                   : null,
             ),
             SizedBox(width: 12.w),
-            
+
             // Info
             Expanded(
               child: Column(
@@ -360,12 +421,17 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(height: 4.h),
                   Row(
                     children: [
-                      Icon(Icons.lock, size: 12.sp, color: AppColors.textSecondary),
+                      Icon(
+                        Icons.lock,
+                        size: 12.sp,
+                        color: AppColors.textSecondary,
+                      ),
                       SizedBox(width: 4.w),
                       Text(
                         'Chỉ mình tôi',
@@ -379,7 +445,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                 ],
               ),
             ),
-            
+
             // Add icon
             Container(
               width: 30.w,
@@ -389,7 +455,11 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.textSecondary, width: 1.5),
               ),
-              child: Icon(Icons.add, size: 20.sp, color: AppColors.textSecondary),
+              child: Icon(
+                Icons.add,
+                size: 20.sp,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),

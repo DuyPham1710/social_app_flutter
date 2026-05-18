@@ -31,7 +31,7 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
     // Cấu hình Mention
     _mentionConfig = Mention(
       trigger: '@',
-      style: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
       data: widget.suggestionList,
       matchAll: false,
       markupBuilder: (trigger, value, display) {
@@ -39,7 +39,7 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
       },
       suggestionBuilder: (data) {
         return Material(
-          color: Colors.white,
+          color: AppColors.background,
           child: InkWell(
             onTap: () {
               widget.mentionKey.currentState!.addMention(data);
@@ -50,7 +50,7 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
                 children: [
                   CircleAvatar(
                     radius: 18.r,
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: AppColors.secondBackground,
                     backgroundImage: NetworkImage(
                       data['photo'] ?? 'https://via.placeholder.com/150',
                     ),
@@ -69,7 +69,7 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
                         ),
                         Text(
                           '@${data['full_name']}',
-                          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                          style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -146,16 +146,17 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: FlutterMentions(
         key: widget.mentionKey,
         suggestionPosition: SuggestionPosition.Bottom,
         maxLines: 10,
         minLines: 1,
-        style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+        style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+        cursorColor: AppColors.primary,
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),

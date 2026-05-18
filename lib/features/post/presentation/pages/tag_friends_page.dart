@@ -154,6 +154,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                   SizedBox(width: 8.w),
                   Expanded(
                     child: TextField(
+                      cursorColor: AppColors.primary,
                       controller: _searchController,
                       style: TextStyle(
                         color: AppColors.textPrimary,

@@ -17,7 +17,7 @@ class FaceRegistrationPage extends StatelessWidget {
     final userId = args?['userId'] as String? ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -36,7 +36,7 @@ class FaceRegistrationPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -46,7 +46,7 @@ class FaceRegistrationPage extends StatelessWidget {
                   "Sử dụng dữ liệu khuôn mặt của bạn để bật các tính năng AI thông minh và bảo vệ tài khoản an toàn hơn.",
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondary,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -117,7 +117,7 @@ class FaceRegistrationPage extends StatelessWidget {
                           child: Text(
                             "Để sau",
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color: AppColors.textSecondary,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -161,7 +161,7 @@ class FaceRegistrationPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 4.h),
@@ -169,7 +169,7 @@ class FaceRegistrationPage extends StatelessWidget {
                 description,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: Colors.grey[600],
+                  color: AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),

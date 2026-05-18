@@ -41,7 +41,9 @@ class StoryFooterWidget extends StatelessWidget {
           height: 44.h, // Chiều cao cố định cho cả thanh cuộn
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 12.w), // Padding cho 2 đầu
+            padding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+            ), // Padding cho 2 đầu
             children: [
               SizedBox(
                 width: 230.w,
@@ -55,7 +57,7 @@ class StoryFooterWidget extends StatelessWidget {
                   child: TextField(
                     controller: textController,
                     style: TextStyle(fontSize: 14.sp, color: Colors.white),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Send message...',
                       hintStyle: TextStyle(
@@ -104,10 +106,7 @@ class _IconReaction extends StatelessWidget {
       onTap: () {
         // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
         context.read<HomeStoriesBloc>().add(
-          ReactStoryEvent(
-            storyId: storyId,
-            emojiId: emoji.id,
-          ),
+          ReactStoryEvent(storyId: storyId, emojiId: emoji.id),
         );
       },
       child: Container(
@@ -115,7 +114,7 @@ class _IconReaction extends StatelessWidget {
         height: 56.w,
         padding: EdgeInsets.all(6.w),
         decoration: BoxDecoration(
-          color: isReacted 
+          color: isReacted
               ? AppColors.primary.withOpacity(0.2)
               : AppColors.background,
           borderRadius: BorderRadius.circular(12.r),
@@ -124,10 +123,7 @@ class _IconReaction extends StatelessWidget {
               : null,
         ),
         child: isReacted
-            ? Text(
-                emoji.icon,
-                style: TextStyle(fontSize: 32.sp),
-              )
+            ? Text(emoji.icon, style: TextStyle(fontSize: 32.sp))
             : Lottie.asset(
                 emoji.lottieAsset,
                 fit: BoxFit.contain,

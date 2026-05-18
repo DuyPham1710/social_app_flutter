@@ -307,7 +307,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
       title: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,
         ),
@@ -380,7 +380,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ),
           title: Text(
             'Bạn bè ngoại trừ...',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
@@ -480,7 +480,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           leading: Icon(getIcon('Bạn bè cụ thể'), color: AppColors.textPrimary),
           title: Text(
             'Bạn bè cụ thể',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
@@ -661,7 +661,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
             'friendsDetail': _friendsDetailIds,
           });
         } else if (result is DataStateError) {
-          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}');
+          showErrorSnackBar(
+            context,
+            'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}',
+          );
         }
       }
     } catch (e) {

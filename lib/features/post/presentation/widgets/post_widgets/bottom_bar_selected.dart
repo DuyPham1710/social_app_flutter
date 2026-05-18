@@ -49,7 +49,7 @@ class BottomBarSelected extends StatelessWidget {
                               return Container(
                                 width: 60.w,
                                 height: 60.h,
-                                color: Colors.grey[800],
+                                color: AppColors.secondBackground,
                               );
                             }
 
@@ -74,7 +74,7 @@ class BottomBarSelected extends StatelessWidget {
                             height: 18.h,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.blueAccent,
+                              color: AppColors.primary,
                             ),
 
                             child: Center(

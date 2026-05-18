@@ -155,7 +155,7 @@ class _ReactionPickerState extends State<ReactionPicker>
                                         vertical: 4.h,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.black87,
+                                        color: AppColors.textPrimary,
                                         borderRadius: BorderRadius.circular(
                                           8.r,
                                         ),
@@ -163,7 +163,7 @@ class _ReactionPickerState extends State<ReactionPicker>
                                       child: Text(
                                         EmojiType.values[_hoveredIndex].label,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: AppColors.background,
                                           fontSize: 10.sp, // Chữ nhỏ hơn
                                           fontWeight: FontWeight.w500,
                                         ),

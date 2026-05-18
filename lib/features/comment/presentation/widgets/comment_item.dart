@@ -232,18 +232,22 @@ class _CommentItemState extends State<CommentItem> {
                               onTap: () {
                                 final user = widget.comment.user;
                                 final userName =
-                                    user.fullName ?? user.username ?? 'Người dùng';
+                                    user.fullName ??
+                                    user.username ??
+                                    'Người dùng';
                                 if (widget.comment.parentId != null) {
                                   widget.onReply!(
                                     user.userId,
-                                    user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                                    user.avatarUrl ??
+                                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                                     widget.comment.parentId!.id,
                                     userName,
                                   );
                                 } else {
                                   widget.onReply!(
                                     user.userId,
-                                    user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                                    user.avatarUrl ??
+                                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                                     widget.comment.id,
                                     userName,
                                   );
@@ -357,7 +361,7 @@ class _CommentItemState extends State<CommentItem> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(10.r),
                 boxShadow: [
                   BoxShadow(
@@ -390,7 +394,10 @@ class _CommentItemState extends State<CommentItem> {
                   SizedBox(width: 4.w),
                   Text(
                     '$totalCount',
-                    style: TextStyle(fontSize: 11.sp, color: Colors.grey[700]),
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -423,7 +430,7 @@ class _CommentItemState extends State<CommentItem> {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            child: ProfilePage(),
           ),
         ),
       );

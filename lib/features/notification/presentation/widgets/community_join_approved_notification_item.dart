@@ -81,7 +81,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: msg,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
@@ -89,7 +89,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                           ),
                           TextSpan(
                             text: ' $communityName',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -107,7 +107,10 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
 
                 Text(
                   time == "0 phút" ? "Vừa xong" : time,
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),

@@ -45,7 +45,7 @@ class FriendSuggestionItem extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            child: ProfilePage(),
           ),
         ),
       );
@@ -71,7 +71,7 @@ class FriendSuggestionItem extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 6.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
@@ -108,6 +108,7 @@ class FriendSuggestionItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -123,7 +124,7 @@ class FriendSuggestionItem extends StatelessWidget {
                         '$mutualFriends bạn chung',
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Colors.black.withOpacity(0.7),
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -143,19 +144,22 @@ class FriendSuggestionItem extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.blue[200]!, width: 1),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.send, color: Colors.blue[700], size: 16.r),
+                        Icon(Icons.send, color: AppColors.primary, size: 16.r),
                         SizedBox(width: 8.w),
                         Text(
                           'Đã gửi lời mời kết bạn',
                           style: TextStyle(
-                            color: Colors.blue[700],
+                            color: AppColors.primary,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -179,8 +183,8 @@ class FriendSuggestionItem extends StatelessWidget {
                       Expanded(
                         child: _buildActionButton(
                           label: 'Gỡ',
-                          background: const Color(0xFFE7E7E7),
-                          foreground: Colors.black,
+                          background: AppColors.secondBackground,
+                          foreground: AppColors.textPrimary,
                           onTap: onRemove ?? () {},
                         ),
                       ),
@@ -214,7 +218,7 @@ class FriendSuggestionItem extends StatelessWidget {
               width: 20.r,
               height: 20.r,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppColors.background, width: 2),
                 shape: BoxShape.circle,
                 image: DecorationImage(
                   image: NetworkImage(mutualFriendAvatars![index]),

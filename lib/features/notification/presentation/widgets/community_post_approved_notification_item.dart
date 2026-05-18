@@ -94,14 +94,18 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
                       spans.add(
                         TextSpan(
                           text: '$msg ',
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
-                          recognizer: TapGestureRecognizer()..onTap = onViewPost,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = onViewPost,
                         ),
                       );
                       spans.add(
                         TextSpan(
                           text: communityName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -118,7 +122,10 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
 
                   Text(
                     time == "0 phút" ? "Vừa xong" : time,
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),

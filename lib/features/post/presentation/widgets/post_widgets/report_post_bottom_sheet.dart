@@ -153,12 +153,16 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     'Hãy cho chúng tôi biết vấn đề của bài viết này để cải thiện trải nghiệm cộng đồng.',
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -168,9 +172,15 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         SizedBox(height: 16.h),
         Text(
           'Lý do nhanh',
-          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
         ),
+
         SizedBox(height: 8.h),
+
         Wrap(
           spacing: 8.w,
           runSpacing: 8.h,
@@ -181,12 +191,18 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                 reason,
                 style: TextStyle(
                   fontSize: 12.sp,
-                  color: isSelected ? Colors.white : Colors.black87,
+                  color: isSelected
+                      ? AppColors.background
+                      : AppColors.textPrimary,
                 ),
               ),
               selected: isSelected,
-              selectedColor: Colors.redAccent,
-              backgroundColor: Colors.grey[200],
+              selectedColor: AppColors.primary,
+              backgroundColor: AppColors.secondBackground,
+              checkmarkColor: isSelected ? AppColors.background : null,
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.divider,
+              ),
               onSelected: (selected) {
                 setState(() {
                   _selectedReason = selected ? reason : null;
@@ -202,29 +218,83 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         SizedBox(height: 16.h),
         Text(
           'Lý do chi tiết',
-          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
         ),
         SizedBox(height: 8.h),
         TextField(
           controller: _reasonController,
-          decoration: const InputDecoration(
+          style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+          cursorColor: AppColors.primary,
+          decoration: InputDecoration(
             hintText: 'Nhập lý do báo cáo...',
-            border: OutlineInputBorder(),
+            hintStyle: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14.sp,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+              vertical: 10.h,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.divider),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.divider),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary),
+            ),
+            fillColor: AppColors.secondBackground,
+            filled: true,
           ),
         ),
         SizedBox(height: 12.h),
         Text(
           'Mô tả thêm (không bắt buộc)',
-          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
         ),
         SizedBox(height: 8.h),
         TextField(
           controller: _descriptionController,
           maxLines: 3,
-          decoration: const InputDecoration(
+          style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+          cursorColor: AppColors.primary,
+          decoration: InputDecoration(
             hintText:
                 'Bạn có thể cung cấp thêm chi tiết để chúng tôi hiểu rõ hơn...',
-            border: OutlineInputBorder(),
+            hintStyle: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14.sp,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+              vertical: 10.h,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.divider),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.divider),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary),
+            ),
+            fillColor: AppColors.secondBackground,
+            filled: true,
           ),
         ),
         SizedBox(height: 16.h),
@@ -232,6 +302,16 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
           children: [
             Expanded(
               child: OutlinedButton(
+                style: ButtonStyle(
+                  side: WidgetStateProperty.all(
+                    BorderSide(color: AppColors.divider),
+                  ),
+                  shape: WidgetStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                ),
                 onPressed: _isSubmitting
                     ? null
                     : () {
@@ -251,16 +331,21 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(AppColors.primary),
+                  shape: WidgetStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
                 ),
                 onPressed: _isSubmitting ? null : _handleSubmit,
                 child: _isSubmitting
                     ? SizedBox(
                         width: 18.w,
                         height: 18.w,
-                        child: const CircularProgressIndicator(
+                        child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            AppColors.background,
                           ),
                         ),
                       )

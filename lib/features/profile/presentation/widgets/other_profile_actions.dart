@@ -34,7 +34,7 @@ class OtherProfileActions extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
+            child: Text(
               'Hủy',
               style: TextStyle(color: AppColors.textSecondary),
             ),
@@ -154,7 +154,7 @@ class OtherProfileActions extends StatelessWidget {
             size: const Size(totalWidth / 2 - 8, buttonHeight),
           ),
           _buildButton(
-            icon: const Icon(Icons.message, color: AppColors.background),
+            icon: Icon(Icons.message, color: AppColors.background),
             label: 'Nhắn tin',
             onPressed: onMessage,
             isElevated: true,

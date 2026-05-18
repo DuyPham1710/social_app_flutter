@@ -305,7 +305,7 @@ class CommentReactionMenu {
                           decoration: BoxDecoration(
                             color: AppColors.background,
                             border: Border.all(
-                              color: Colors.grey.withOpacity(0.2),
+                              color: AppColors.divider,
                             ),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -325,7 +325,7 @@ class CommentReactionMenu {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               'Hủy',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(color: AppColors.textSecondary),
                             ),
                           ),
                           ElevatedButton(
@@ -352,7 +352,7 @@ class CommentReactionMenu {
                             child: Text(
                               'Cập nhật',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.background,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -375,11 +375,11 @@ class CommentReactionMenu {
                 showCupertinoDialog(
                   context: context,
                   builder: (dialogContext) => CupertinoAlertDialog(
-                    title: const Text(
+                    title: Text(
                       'Xóa bình luận',
                       style: TextStyle(color: AppColors.textPrimary),
                     ),
-                    content: const Text(
+                    content: Text(
                       'Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?',
                       style: TextStyle(color: AppColors.textPrimary),
                     ),
@@ -450,9 +450,11 @@ class CommentReactionMenu {
   static Widget _menuItem(
     IconData icon,
     String text, {
-    Color color = AppColors.textPrimary,
+    Color? color,
     VoidCallback? onTap,
   }) {
+    final resolvedColor = color ?? AppColors.textPrimary;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -461,11 +463,11 @@ class CommentReactionMenu {
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           child: Row(
             children: [
-              Icon(icon, color: color, size: 18.sp),
+              Icon(icon, color: resolvedColor, size: 18.sp),
               SizedBox(width: 10.w),
               Text(
                 text,
-                style: TextStyle(color: color, fontSize: 14.sp),
+                style: TextStyle(color: resolvedColor, fontSize: 14.sp),
               ),
             ],
           ),

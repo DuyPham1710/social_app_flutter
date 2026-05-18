@@ -108,7 +108,7 @@ class HomePageState extends State<HomePage> {
                   automaticallyImplyLeading: false,
                   toolbarHeight: 64.h,
                   titleSpacing: 0,
-                  title: const HomeHeaderWidget(),
+                  title: HomeHeaderWidget(),
                 ),
                 SliverToBoxAdapter(
                   child: Column(
@@ -125,7 +125,7 @@ class HomePageState extends State<HomePage> {
                       ),
 
                       if (state is HomeInitializing)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Center(
                             child: Column(
@@ -194,7 +194,7 @@ class HomePageState extends State<HomePage> {
                               child: Text(
                                 "Đã hiển thị hết bài viết",
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: AppColors.textSecondary,
                                   fontSize: 14.sp,
                                 ),
                               ),

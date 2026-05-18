@@ -114,7 +114,7 @@ class CommentContentWidget extends StatelessWidget {
                                     vertical: 2.h,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.background,
                                     borderRadius: BorderRadius.circular(10.r),
                                     boxShadow: [
                                       BoxShadow(
@@ -143,7 +143,7 @@ class CommentContentWidget extends StatelessWidget {
                                         '5',
                                         style: TextStyle(
                                           fontSize: 11.sp,
-                                          color: Colors.grey[700],
+                                          color: AppColors.textSecondary,
                                         ),
                                       ),
                                     ],

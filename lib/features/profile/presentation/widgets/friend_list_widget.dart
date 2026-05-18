@@ -102,7 +102,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Bạn bè",
                 style: TextStyle(
                   fontSize: 20,
@@ -213,7 +213,7 @@ class _FriendCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,

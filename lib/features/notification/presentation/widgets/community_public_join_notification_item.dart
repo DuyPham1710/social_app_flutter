@@ -85,7 +85,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: userName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                       ),
                       TextSpan(
                         text: ' ${message ?? "đã tham gia"} ',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.normal,
@@ -102,7 +102,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                       ),
                       TextSpan(
                         text: communityName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

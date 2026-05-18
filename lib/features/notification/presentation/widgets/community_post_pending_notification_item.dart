@@ -86,12 +86,13 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                 children: [
                   Builder(
                     builder: (context) {
-                      final msg = message ?? ' gửi yêu cầu đăng bài vào cộng đồng';
+                      final msg =
+                          message ?? ' gửi yêu cầu đăng bài vào cộng đồng';
                       final List<TextSpan> spans = [];
                       spans.add(
                         TextSpan(
                           text: userName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -102,7 +103,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                       spans.add(
                         TextSpan(
                           text: msg,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
@@ -112,7 +113,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                       spans.add(
                         TextSpan(
                           text: communityName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -143,7 +144,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 5),
-          const Icon(Icons.more_horiz),
+            const Icon(Icons.more_horiz),
           ],
         ),
       ),

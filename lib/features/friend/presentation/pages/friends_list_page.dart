@@ -110,12 +110,12 @@ class _FriendsListPageState extends State<FriendsListPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.background,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(CupertinoIcons.back, color: Colors.black),
+            icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -123,12 +123,12 @@ class _FriendsListPageState extends State<FriendsListPage> {
             style: TextStyle(
               fontSize: 20.sp,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.textPrimary,
             ),
           ),
           actions: [
             IconButton(
-              icon: const Icon(CupertinoIcons.search, color: Colors.black),
+              icon: Icon(CupertinoIcons.search, color: AppColors.textPrimary),
               onPressed: () {
                 Navigator.pushNamed(context, '/search');
               },
@@ -138,7 +138,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
         body: BlocBuilder<FriendBloc, FriendState>(
           builder: (context, state) {
             if (state is FriendLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator(color: AppColors.primary,));
             } else if (state is FriendLoaded) {
               final friends = state.friends;
 
@@ -163,6 +163,11 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
                     child: TextField(
                       controller: _searchController,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.textPrimary,
+                      ),
+                      cursorColor: AppColors.primary,
                       onChanged: (value) {
                         setState(() {
                           _searchQuery = value;
@@ -170,11 +175,19 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       },
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm bạn bè',
-                        prefixIcon: const Icon(CupertinoIcons.search),
+                        hintStyle: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14.sp,
+                        ),
+                        prefixIcon: Icon(
+                          CupertinoIcons.search,
+                          color: AppColors.textSecondary,
+                        ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   CupertinoIcons.xmark_circle_fill,
+                                  color: AppColors.textSecondary,
                                 ),
                                 onPressed: () {
                                   _searchController.clear();
@@ -190,17 +203,17 @@ class _FriendsListPageState extends State<FriendsListPage> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(color: AppColors.divider),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(color: AppColors.divider),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
                           borderSide: BorderSide(color: AppColors.primary),
                         ),
-                        fillColor: Colors.white,
+                        fillColor: AppColors.secondBackground,
                         filled: true,
                       ),
                     ),
@@ -210,10 +223,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey.shade200,
-                          width: 1,
-                        ),
+                        bottom: BorderSide(color: AppColors.divider, width: 1),
                       ),
                     ),
                     child: Column(
@@ -227,7 +237,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                               style: TextStyle(
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             GestureDetector(
@@ -248,7 +258,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                           '$onlineFriendsCount người đang hoạt động',
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -266,14 +276,14 @@ class _FriendsListPageState extends State<FriendsListPage> {
                                 Icon(
                                   CupertinoIcons.person_2,
                                   size: 64.r,
-                                  color: Colors.grey[400],
+                                  color: AppColors.unselectedIcon,
                                 ),
                                 SizedBox(height: 16.h),
                                 Text(
                                   'Chưa có bạn bè nào',
                                   style: TextStyle(
                                     fontSize: 16.sp,
-                                    color: Colors.grey[600],
+                                    color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -346,7 +356,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       'Lỗi tải dữ liệu',
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.grey[700],
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -355,7 +365,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       state.message,
                       style: TextStyle(
                         fontSize: 14.sp,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -387,7 +397,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
   void _showSortOptions() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
       ),
@@ -402,7 +412,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   width: 40.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppColors.divider,
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
@@ -412,7 +422,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 16.h),
@@ -447,7 +457,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? AppColors.primary : Colors.black,
+                color: isSelected ? AppColors.primary : AppColors.textPrimary,
               ),
             ),
             if (isSelected)
@@ -494,7 +504,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
       ),
@@ -509,7 +519,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   width: 40.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppColors.divider,
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
@@ -522,7 +532,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       CircleAvatar(
                         radius: 30.r,
                         backgroundImage: NetworkImage(avatarUrl),
-                        backgroundColor: Colors.grey[300],
+                        backgroundColor: AppColors.divider,
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
@@ -534,7 +544,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             SizedBox(height: 4.h),
@@ -542,7 +552,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                               _formatFriendsSince(friendsSince),
                               style: TextStyle(
                                 fontSize: 13.sp,
-                                color: Colors.grey[600],
+                                color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -553,7 +563,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                Divider(height: 1, color: Colors.grey[200]),
+                Divider(height: 1, color: AppColors.divider),
                 SizedBox(height: 8.h),
                 _buildOptionItem(
                   icon: CupertinoIcons.chat_bubble_fill,
@@ -597,7 +607,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
             Icon(
               icon,
               color:
-                  iconColor ?? (isDestructive ? Colors.red : Colors.grey[700]),
+                  iconColor ??
+                  (isDestructive ? Colors.red : AppColors.textSecondary),
               size: 24.r,
             ),
             SizedBox(width: 16.w),
@@ -606,7 +617,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w400,
-                color: isDestructive ? Colors.red : Colors.black,
+                color: isDestructive ? Colors.red : AppColors.textPrimary,
               ),
             ),
           ],
@@ -622,12 +633,20 @@ class _FriendsListPageState extends State<FriendsListPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hủy kết bạn'),
-        content: Text('Bạn có chắc chắn muốn hủy kết bạn với $name?'),
+        backgroundColor: AppColors.background,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          'Hủy kết bạn',
+          style: TextStyle(color: AppColors.textPrimary, fontSize: 18.sp),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn hủy kết bạn với $name?',
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text('Hủy', style: TextStyle(color: AppColors.textPrimary)),
           ),
           TextButton(
             onPressed: () {
