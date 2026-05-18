@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class OtpPage extends StatefulWidget {
@@ -72,9 +73,7 @@ class _OtpPageState extends State<OtpPage> {
         context,
       ).add(VerifyOtpEvent(email: _email!, otp: otpCode));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập mã OTP hợp lệ')),
-      );
+      showErrorSnackBar(context, 'Vui lòng nhập mã OTP hợp lệ');
     }
   }
 

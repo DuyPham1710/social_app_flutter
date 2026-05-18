@@ -29,6 +29,8 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/profile_header.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/scroll_to_bottom_button.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/attachment_menu_widget.dart';
@@ -384,9 +386,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   void _showError(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
-      );
+      showErrorSnackBar(context, message);
     }
   }
 
@@ -495,12 +495,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     // Otherwise load first
     if (_loadingEditLogs.contains(message.id)) {
       // Already loading, show loading indicator
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đang tải lịch sử chỉnh sửa...'),
-          duration: Duration(seconds: 1),
-        ),
-      );
+      showInfoSnackBar(context, 'Đang tải lịch sử chỉnh sửa...');
       return;
     }
   }
@@ -790,36 +785,16 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             }
           : null,
       onPin: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tính năng ghim tin nhắn đang phát triển'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+        showInfoSnackBar(context, 'Tính năng ghim tin nhắn đang phát triển');
       },
       onForward: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tính năng chuyển tiếp đang phát triển'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+        showInfoSnackBar(context, 'Tính năng chuyển tiếp đang phát triển');
       },
       onReport: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tính năng báo cáo tin nhắn đang phát triển'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+        showInfoSnackBar(context, 'Tính năng báo cáo tin nhắn đang phát triển');
       },
       onCreateAIImage: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tính năng tạo hình ảnh AI đang phát triển'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+        showInfoSnackBar(context, 'Tính năng tạo hình ảnh AI đang phát triển');
       },
     );
   }
@@ -827,11 +802,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   void _handleReactionSelected(MessageEntity message, EmojiType emoji) {
     final conversationId = _currentConversationId ?? widget.conversationId;
     if (conversationId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không thể thêm reaction: thiếu conversation ID'),
-          duration: Duration(seconds: 2),
-        ),
+      showErrorSnackBar(
+        context,
+        'Không thể thêm reaction: thiếu conversation ID',
       );
       return;
     }
@@ -849,12 +822,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   void _handleCopyMessage(MessageEntity message) {
     Clipboard.setData(ClipboardData(text: message.text!));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Đã sao chép tin nhắn'),
-        duration: Duration(seconds: 1),
-      ),
-    );
+    showSuccessSnackBar(context, 'Đã sao chép tin nhắn');
   }
 
   void _showDeleteMessageOptions(MessageEntity message, bool fromMe) {
@@ -1120,14 +1088,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                               setState(() {
                                 _isCreatingConversation = false;
                               });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Lỗi tạo cuộc trò chuyện: ${state.message}',
-                                  ),
-                                  backgroundColor: Colors.red,
-                                  duration: const Duration(seconds: 3),
-                                ),
+                              showErrorSnackBar(
+                                context,
+                                'Lỗi tạo cuộc trò chuyện: ${state.message}',
                               );
                             }
                           },
@@ -2013,8 +1976,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     final replyText = _replyingMessage!.text?.isNotEmpty == true
         ? _replyingMessage!.text!
         : (_replyingMessage!.attachments.isNotEmpty
-            ? _getAttachmentTypeString(_replyingMessage!.attachments.first.type)
-            : '[Tin nhắn]');
+              ? _getAttachmentTypeString(
+                  _replyingMessage!.attachments.first.type,
+                )
+              : '[Tin nhắn]');
 
     final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
 
@@ -2125,8 +2090,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         width: 30.w,
         height: 40.h,
         color: AppColors.textSecondary.withOpacity(0.1),
-        child:
-            Icon(Icons.insert_drive_file, size: 16.sp, color: AppColors.primary),
+        child: Icon(
+          Icons.insert_drive_file,
+          size: 16.sp,
+          color: AppColors.primary,
+        ),
       );
     }
     return SizedBox.shrink();
@@ -2258,11 +2226,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cần quyền truy cập ảnh để tiếp tục'),
-            duration: Duration(seconds: 2),
-          ),
+        showInfoSnackBar(
+          context,
+          'Cần quyền truy cập ảnh để hiển thị thư viện',
         );
       }
     }
@@ -2313,12 +2279,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           _isLoadingPhotos = false;
           _hasMorePhotos = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi tải ảnh: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khi tải ảnh: $e');
       }
     }
   }
@@ -2462,12 +2423,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error opening camera: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi mở camera: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khi mở camera: $e');
       }
     }
   }
@@ -2576,12 +2532,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     try {
       final conversationId = _currentConversationId ?? widget.conversationId;
       if (conversationId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể gửi ảnh: thiếu conversation ID'),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Không thể gửi ảnh: thiếu conversation ID');
         return;
       }
 
@@ -2611,12 +2562,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error sending captured photo: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi gửi ảnh: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khi gửi ảnh: $e');
       }
     }
   }
@@ -2627,12 +2573,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     try {
       final conversationId = _currentConversationId ?? widget.conversationId;
       if (conversationId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể gửi ảnh: thiếu conversation ID'),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Không thể gửi ảnh: thiếu conversation ID');
+
         return;
       }
 
@@ -2655,12 +2597,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
       if (filePaths.isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Không thể xử lý ảnh'),
-              duration: Duration(seconds: 2),
-            ),
-          );
+          showErrorSnackBar(context, 'Không thể xử lý ảnh');
         }
         return;
       }
@@ -2690,12 +2627,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error sending photos: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi gửi ảnh: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khi gửi ảnh: $e');
       }
     }
   }
@@ -2715,11 +2647,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         final conversationId = _currentConversationId ?? widget.conversationId;
         if (conversationId == null) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Không thể gửi file: thiếu conversation ID'),
-                duration: Duration(seconds: 2),
-              ),
+            showErrorSnackBar(
+              context,
+              'Không thể gửi file: thiếu conversation ID',
             );
           }
           return;
@@ -2751,12 +2681,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error picking file: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khi chọn file: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khi chọn file: $e');
       }
     }
   }

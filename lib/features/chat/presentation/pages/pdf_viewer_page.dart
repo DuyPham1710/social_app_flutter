@@ -22,6 +22,8 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AppColors.divider,
         elevation: 1,
         title: Text(
           widget.fileName,

@@ -13,6 +13,7 @@ import 'dart:ui';
 
 import 'package:social_app_fe/features/comment/presentation/widgets/mention_editable_field.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommentReactionMenu {
   static OverlayEntry? _overlayEntry;
@@ -33,9 +34,11 @@ class CommentReactionMenu {
         final mappedFriends = friends.map((friend) {
           return {
             'id': friend.userId,
-            'display': friend.fullName ?? 'Unknown', 
-            'full_name': friend.fullName ?? 'Unknown', 
-            'photo': friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+            'display': friend.fullName ?? 'Unknown',
+            'full_name': friend.fullName ?? 'Unknown',
+            'photo':
+                friend.avatarUrl ??
+                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           };
         }).toList();
         return mappedFriends;
@@ -46,6 +49,7 @@ class CommentReactionMenu {
     } catch (e) {
       print("Exception khi load friend suggestions: $e");
     }
+    return null;
   }
 
   static void show(
@@ -246,14 +250,16 @@ class CommentReactionMenu {
                   // Nếu đã là reply thì trả về parentId gốc
                   onReply(
                     comment.user.userId,
-                    comment.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                    comment.user.avatarUrl ??
+                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                     comment.parentId!.id,
                     userName,
                   );
                 } else {
                   onReply(
                     comment.user.userId,
-                    comment.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                    comment.user.avatarUrl ??
+                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                     null,
                     userName,
                   );
@@ -433,12 +439,7 @@ class CommentReactionMenu {
               hide();
 
               // (Tùy chọn) Hiển thị thông báo đã sao chép
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Đã sao chép nội dung'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
+              showSuccessSnackBar(context, 'Đã sao chép nội dung');
             },
           ),
         ],

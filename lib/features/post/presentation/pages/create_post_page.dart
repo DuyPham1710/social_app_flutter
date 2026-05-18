@@ -195,9 +195,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cần quyền truy cập ảnh để tiếp tục')),
-      );
+      showErrorSnackBar(context, 'Cần quyền truy cập ảnh để tiếp tục');
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class ReportPostBottomSheet extends StatefulWidget {
@@ -30,10 +31,9 @@ class ReportPostBottomSheet extends StatefulWidget {
     if (currentUserId != null &&
         ownerUserId != null &&
         ownerUserId == currentUserId) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bạn không thể báo cáo bài viết của chính mình.'),
-        ),
+      showErrorSnackBar(
+        context,
+        'Bạn không thể báo cáo bài viết của chính mình.',
       );
       return;
     }
@@ -93,9 +93,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
     final finalReason = reasonText.isNotEmpty ? reasonText : _selectedReason;
 
     if (finalReason == null || finalReason.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn hoặc nhập lý do báo cáo')),
-      );
+      showInfoSnackBar(context, 'Vui lòng chọn hoặc nhập lý do báo cáo');
       return;
     }
 
