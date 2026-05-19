@@ -155,7 +155,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor: AppColors.background,
       navigationBar: CupertinoNavigationBar(
+        backgroundColor: AppColors.background,
+        border: Border(
+          bottom: BorderSide(color: AppColors.divider, width: 0.5),
+        ),
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Icon(
@@ -164,7 +169,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ),
         ),
 
-        middle: Text('Ai có thể xem bài viết của bạn?'),
+        middle: Text(
+          'Ai có thể xem bài viết của bạn?',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
 
         trailing: GestureDetector(
           onTap: () async {
@@ -197,7 +205,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           child: Text(
             'Xong',
             style: TextStyle(
-              color: CupertinoColors.activeBlue,
+              color: AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -322,7 +330,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
         isSelected
             ? CupertinoIcons.check_mark_circled_solid
             : CupertinoIcons.circle,
-        color: isSelected ? CupertinoColors.activeBlue : Colors.grey,
+        color: isSelected ? AppColors.primary : AppColors.textSecondary,
       ),
 
       onTap: () {
@@ -404,7 +412,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                 isSelected
                     ? CupertinoIcons.check_mark_circled_solid
                     : CupertinoIcons.circle,
-                color: isSelected ? CupertinoColors.activeBlue : Colors.grey,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
               ),
             ],
           ),
@@ -504,7 +512,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                 isSelected
                     ? CupertinoIcons.check_mark_circled_solid
                     : CupertinoIcons.circle,
-                color: isSelected ? CupertinoColors.activeBlue : Colors.grey,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
               ),
             ],
           ),
@@ -561,6 +569,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     return Row(
       children: [
         CupertinoSwitch(
+          activeTrackColor: AppColors.primary,
           value: isCurrentDefault || isSetAsDefault,
           onChanged: isUpdating || isCurrentDefault
               ? null

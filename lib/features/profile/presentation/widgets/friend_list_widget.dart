@@ -165,14 +165,15 @@ class _FriendCard extends StatelessWidget {
     final avatarUrl =
         friend.avatarUrl ??
         "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg";
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.secondBackground,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: isDark ? Colors.transparent : Colors.grey.withOpacity(0.15),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -197,12 +198,12 @@ class _FriendCard extends StatelessWidget {
                   height: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade100,
+                    color: AppColors.background,
                     height: double.infinity,
-                    child: const Icon(
+                    child: Icon(
                       Icons.person,
                       size: 40,
-                      color: Colors.grey,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),

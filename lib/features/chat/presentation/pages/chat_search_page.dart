@@ -86,6 +86,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   Expanded(
                     child: CupertinoSearchTextField(
                       controller: _controller,
+                      cursorColor: AppColors.primary,
                       placeholder: "Tìm kiếm",
                       onChanged: (value) {
                         setState(() {});

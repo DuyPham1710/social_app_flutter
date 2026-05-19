@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class EditableTextRow extends StatelessWidget {
   final String text;
@@ -16,9 +17,10 @@ class EditableTextRow extends StatelessWidget {
         text,
         style: TextStyle(
           fontSize: 15,
-          color: Colors.grey.shade700,
+          color: AppColors.textSecondary,
         ),
       ),
     );
   }
 }
+

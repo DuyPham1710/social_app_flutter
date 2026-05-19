@@ -42,15 +42,15 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
           errorBuilder: (_, __, ___) => Container(
             width: 54.w,
             height: 54.w,
-            color: Colors.grey[800],
-            child: const Icon(Icons.music_note, color: Colors.white),
+            color: AppColors.secondBackground,
+            child: Icon(Icons.music_note, color: AppColors.iconPrimary),
           ),
         ),
       ),
       title: Text(
         widget.item.title,
         style: TextStyle(
-          color: Colors.white,
+          color: AppColors.textPrimary,
           fontSize: 15.sp,
           fontWeight: FontWeight.w700,
         ),
@@ -60,7 +60,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
       subtitle: Text(
         widget.item.artist.name,
         style: TextStyle(
-          color: Colors.white70,
+          color: AppColors.textSecondary,
           fontSize: 13.sp,
         ),
         maxLines: 1,
@@ -70,7 +70,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: const Icon(Icons.more_horiz, color: Colors.white70),
+            icon: Icon(Icons.more_horiz, color: AppColors.iconPrimary),
             onPressed: () {},
           ),
           SizedBox(width: 4.w),
@@ -81,10 +81,10 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
               children: [
                 CircleAvatar(
                   radius: 18.r,
-                  backgroundColor: Colors.white10,
+                  backgroundColor: AppColors.secondBackground,
                   child: Icon(
                     widget.isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: Colors.white,
+                    color: AppColors.iconPrimary,
                     size: 22.sp,
                   ),
                 ),
@@ -121,7 +121,7 @@ class _RotatingDotPainter extends CustomPainter {
 
     // Vẽ đường tròn nền (màu xám nhạt)
     final backgroundPaint = Paint()
-      ..color = Colors.white.withOpacity(0.2)
+      ..color = AppColors.divider
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 

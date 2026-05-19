@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 
@@ -37,7 +36,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -51,7 +50,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
                       CupertinoIcons.back,
-                      color: Colors.black,
+                      color: AppColors.iconPrimary,
                       size: 23.r,
                     ),
                     padding: EdgeInsets.zero,
@@ -65,7 +64,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -148,13 +147,17 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(CupertinoIcons.search, size: 64.r, color: Colors.grey[400]),
+          Icon(
+            CupertinoIcons.search,
+            size: 64.r,
+            color: AppColors.textSecondary,
+          ),
           SizedBox(height: 16.h),
           Text(
             'Chưa có lịch sử tìm kiếm',
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -170,18 +173,22 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
         backgroundColor: AppColors.background,
         title: Text(
           'Xóa tất cả lịch sử',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
         ),
         content: Text(
           'Bạn có chắc chắn muốn xóa tất cả lịch sử tìm kiếm?',
-          style: TextStyle(fontSize: 14.sp),
+          style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Hủy',
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
           ),
           TextButton(

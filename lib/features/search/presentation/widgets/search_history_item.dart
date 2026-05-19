@@ -81,7 +81,7 @@ class SearchHistoryItem extends StatelessWidget {
                               ? Icon(
                                   Icons.person,
                                   size: 24.r,
-                                  color: Colors.grey[400],
+                                  color: AppColors.textSecondary,
                                 )
                               : null,
                         )
@@ -89,13 +89,13 @@ class SearchHistoryItem extends StatelessWidget {
                           width: 48.r,
                           height: 48.r,
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
+                            color: AppColors.secondBackground,
                             borderRadius: BorderRadius.circular(24.r),
                           ),
                           child: Icon(
                             CupertinoIcons.search,
                             size: 20.r,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                   SizedBox(width: 12.w),
@@ -293,7 +293,7 @@ class SearchHistoryItem extends StatelessWidget {
                     ? NetworkImage(avatarUrl)
                     : null,
                 child: avatarUrl == null || avatarUrl.isEmpty
-                    ? Icon(Icons.person, size: 24.r, color: Colors.grey[400])
+                    ? Icon(Icons.person, size: 24.r, color: AppColors.textSecondary)
                     : null,
               )
             else
@@ -301,13 +301,13 @@ class SearchHistoryItem extends StatelessWidget {
                 width: 48.r,
                 height: 48.r,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: AppColors.secondBackground,
                   borderRadius: BorderRadius.circular(24.r),
                 ),
                 child: Icon(
                   CupertinoIcons.search,
                   size: 20.r,
-                  color: Colors.grey[600],
+                  color: AppColors.textSecondary,
                 ),
               ),
             SizedBox(width: 12.w),
@@ -321,7 +321,7 @@ class SearchHistoryItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -332,7 +332,7 @@ class SearchHistoryItem extends StatelessWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -347,7 +347,7 @@ class SearchHistoryItem extends StatelessWidget {
                     icon: Icon(
                       CupertinoIcons.xmark,
                       size: 20.r,
-                      color: Colors.grey[600],
+                      color: AppColors.iconPrimary,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -361,7 +361,7 @@ class SearchHistoryItem extends StatelessWidget {
                     icon: Icon(
                       CupertinoIcons.ellipsis,
                       size: 20.r,
-                      color: Colors.grey[600],
+                      color: AppColors.iconPrimary,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

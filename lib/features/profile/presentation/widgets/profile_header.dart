@@ -15,9 +15,10 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -135,10 +136,10 @@ class ProfileHeader extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: AppColors.secondBackground,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.camera_alt_outlined, size: 20),
+                child: Icon(Icons.camera_alt_outlined, size: 20, color: AppColors.iconPrimary),
               ),
             ),
 
@@ -167,7 +168,7 @@ class ProfileHeader extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: Border.all(color: AppColors.background, width: 4),
                       ),
                       child: CircleAvatar(
                         radius: 60,
@@ -183,11 +184,11 @@ class ProfileHeader extends StatelessWidget {
                     right: 4,
                     child: Container(
                       padding: const EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: AppColors.secondBackground,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.camera_alt, size: 18),
+                      child: Icon(Icons.camera_alt, size: 18, color: AppColors.iconPrimary),
                     ),
                   ),
                 ],
@@ -202,7 +203,11 @@ class ProfileHeader extends StatelessWidget {
         Center(
           child: Text(
             user?.fullName ?? 'User Name',
-            style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
             textAlign: TextAlign.center,
           ),
         ),

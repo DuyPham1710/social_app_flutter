@@ -258,7 +258,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111315),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -272,7 +272,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                     Text(
                       "Dành cho bạn",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
                       ),
@@ -302,32 +302,33 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           Expanded(
             child: Container(
               height: 42.h,
               decoration: BoxDecoration(
-                color: const Color(0xFF1C1E21),
+                color: AppColors.secondBackground,
                 borderRadius: BorderRadius.circular(24.r),
               ),
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: Row(
                 children: [
-                  const Icon(Icons.search, color: Colors.white70),
+                  Icon(Icons.search, color: AppColors.iconPrimary),
                   SizedBox(width: 8.w),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      cursorColor: AppColors.primary,
                       onChanged: (value) {
                         setState(() {});
                         _onSearchChanged(value);
                       },
-                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
+                      decoration: InputDecoration(
                         hintText: "Tìm kiếm nhạc",
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
                         border: InputBorder.none,
                         isCollapsed: true,
                       ),
@@ -337,7 +338,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                     IconButton(
                       splashRadius: 18,
                       padding: EdgeInsets.zero,
-                      icon: const Icon(Icons.clear, color: Colors.white70, size: 20),
+                      icon: Icon(Icons.clear, color: AppColors.iconPrimary, size: 20),
                       onPressed: () {
                         _searchController.clear();
                         setState(() {});
@@ -347,7 +348,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                   IconButton(
                     splashRadius: 18,
                     padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.mic_none, color: Colors.white70),
+                    icon: Icon(Icons.mic_none, color: AppColors.iconPrimary),
                     onPressed: () {},
                   ),
                 ],
@@ -363,7 +364,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     // Show loading for initial chart load
     if (!_isSearching && _isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
     
@@ -375,7 +376,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           children: [
             Text(
               _error!,
-              style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
@@ -391,7 +392,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     // Show loading for search
     if (_isSearching && _isSearchLoading && _searchResults.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
     
@@ -403,7 +404,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           children: [
             Text(
               _searchError!,
-              style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
@@ -423,14 +424,14 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           _isSearching 
               ? 'Không tìm thấy bài hát phù hợp.'
               : 'Không có bài hát nào.',
-          style: TextStyle(color: Colors.white70, fontSize: 14.sp),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );
     }
     
     return RefreshIndicator(
       color: AppColors.primary,
-      backgroundColor: const Color(0xFF111315),
+      backgroundColor: AppColors.background,
       onRefresh: _isSearching 
           ? () => _searchTracks(_currentSearchQuery ?? '')
           : _fetchTracks,
@@ -445,7 +446,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               child: const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(color: AppColors.primary),
               ),
             );
           }

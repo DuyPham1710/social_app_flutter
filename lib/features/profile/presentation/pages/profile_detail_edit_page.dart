@@ -132,17 +132,35 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
         children: [
           Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 8),
           TextField(
+            cursorColor: AppColors.primary,
             controller: controller,
+            style: TextStyle(color: AppColors.textPrimary),
             decoration: InputDecoration(
-              prefixIcon: Icon(icon, color: Colors.grey),
+              prefixIcon: Icon(icon, color: AppColors.textSecondary),
+              filled: true,
+              fillColor: AppColors.secondBackground,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
               ),
               hintText: "Nhập $label...",
+              hintStyle: TextStyle(color: AppColors.textSecondary),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
@@ -160,27 +178,52 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Tình trạng quan hệ",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             dropdownColor: AppColors.background,
+            style: TextStyle(color: AppColors.textPrimary),
             value: _selectedRelationshipStatus,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.favorite, color: Colors.red),
+              filled: true,
+              fillColor: AppColors.secondBackground,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
               ),
             ),
-            hint: const Text("Chọn tình trạng quan hệ"),
+            hint: Text(
+              "Chọn tình trạng quan hệ",
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
             items: _relationshipOptions.map((String value) {
-              return DropdownMenuItem<String>(value: value, child: Text(value));
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: TextStyle(color: AppColors.textPrimary),
+                ),
+              );
             }).toList(),
             onChanged: (String? newValue) {
               setState(() {

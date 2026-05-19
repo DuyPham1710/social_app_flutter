@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -8,7 +7,6 @@ import 'package:social_app_fe/features/community/data/models/community_post_mode
 import 'package:social_app_fe/features/community/data/models/community_ref_model.dart';
 import 'package:social_app_fe/features/community/domain/entities/community_entity.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
-import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_event.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/post_loading_page.dart';
@@ -105,9 +103,12 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'Duyệt bài viết',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
           backgroundColor: AppColors.background,
           surfaceTintColor: Colors.transparent,
@@ -140,9 +141,17 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded, size: 48),
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 48,
+                        color: AppColors.iconPrimary,
+                      ),
                       const SizedBox(height: 12),
-                      Text(state.message, textAlign: TextAlign.center),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: AppColors.textPrimary),
+                      ),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         onPressed: () {
@@ -156,6 +165,10 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                         },
                         icon: const Icon(Icons.refresh),
                         label: const Text('Thử lại'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -175,11 +188,16 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.article_outlined, size: 48),
+                      Icon(
+                        Icons.article_outlined,
+                        size: 48,
+                        color: AppColors.iconPrimary,
+                      ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Không tìm thấy bài viết đang chờ duyệt',
                         textAlign: TextAlign.center,
+                        style: TextStyle(color: AppColors.textPrimary),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
@@ -194,6 +212,10 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                         },
                         icon: const Icon(Icons.refresh),
                         label: const Text('Tải lại'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -225,10 +247,10 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                             child: Text(
                               post.caption!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 height: 1.4,
-                                color: Color(0xFF1C1E21),
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -285,6 +307,8 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                             onPressed: () => _handleAction(context, 'approve'),
                             style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
                             ),
                             child: const Text('Duyệt bài'),
                           ),

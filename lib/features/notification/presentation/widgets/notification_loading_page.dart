@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class NotificationLoadingPage extends StatelessWidget {
   const NotificationLoadingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = s1<AppPreferences>().isDarkMode;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
         child: ListView.builder(
           itemCount: 8, // Show 8 skeleton items
           padding: const EdgeInsets.symmetric(vertical: 8),

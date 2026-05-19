@@ -49,7 +49,7 @@ class _SearchPageState extends State<SearchPage> {
           _scrollController.addListener(_onScroll);
           
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.background,
             body: SafeArea(
               child: Column(
                 children: [
@@ -62,7 +62,7 @@ class _SearchPageState extends State<SearchPage> {
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(
                             CupertinoIcons.back,
-                            color: Colors.black,
+                            color: AppColors.iconPrimary,
                             size: 23.r,
                           ),
                           padding: EdgeInsets.zero,
@@ -114,7 +114,7 @@ class _SearchPageState extends State<SearchPage> {
                           message: 'Nhập từ khóa để tìm kiếm',
                         );
                       } else if (state is SearchLoading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
                     } else if (state is SearchError) {
                       return _buildErrorState(state.message, blocContext);
                     } else if (state is SearchLoaded) {
@@ -180,7 +180,7 @@ class _SearchPageState extends State<SearchPage> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.textPrimary,
                 ),
               ),
               TextButton(
@@ -228,14 +228,14 @@ class _SearchPageState extends State<SearchPage> {
           Icon(
             icon,
             size: 64.r,
-            color: Colors.grey[400],
+            color: AppColors.textSecondary,
           ),
           SizedBox(height: 16.h),
           Text(
             message,
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -259,7 +259,7 @@ class _SearchPageState extends State<SearchPage> {
             message,
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey[700],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,

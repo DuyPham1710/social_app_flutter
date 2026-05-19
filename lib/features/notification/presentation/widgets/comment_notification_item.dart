@@ -38,7 +38,7 @@ class CommentNotificationItem extends StatelessWidget {
         spans.add(
           TextSpan(
             text: text.substring(lastIndex, match.start),
-            style: const TextStyle(color: Colors.black), // Style text thường
+            style: TextStyle(color: AppColors.textPrimary), // Style text thường
           ),
         );
       }
@@ -60,7 +60,7 @@ class CommentNotificationItem extends StatelessWidget {
       spans.add(
         TextSpan(
           text: text.substring(lastIndex),
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: AppColors.textPrimary),
         ),
       );
     }
@@ -79,7 +79,7 @@ class CommentNotificationItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
-          style: const TextStyle(fontSize: 16, color: Colors.black),
+          style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
           children: [
             TextSpan(
               text: userName,

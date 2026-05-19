@@ -80,7 +80,7 @@ class PrivacySecurityPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: itemBgColor,
                     borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.divider),
                   ),
                   child: Column(
                     children: [
@@ -162,7 +162,7 @@ class PrivacySecurityPage extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                    style: TextStyle(fontSize: 13.sp, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -196,7 +196,7 @@ class PrivacySecurityPage extends StatelessWidget {
                   width: 40.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: AppColors.divider,
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
@@ -225,7 +225,7 @@ class PrivacySecurityPage extends StatelessWidget {
                       : 'Đăng ký khuôn mặt giúp AI nhận diện bạn trong ảnh và bảo vệ tài khoản tốt hơn.',
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Colors.grey,
+                    color: AppColors.textSecondary,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -271,7 +271,7 @@ class PrivacySecurityPage extends StatelessWidget {
                 SizedBox(height: 12.h),
                 _buildBottomSheetButton(
                   title: 'Hủy',
-                  color: Colors.grey,
+                  color: AppColors.textSecondary,
                   isOutlined: true,
                   onTap: () => Navigator.pop(bottomSheetContext),
                 ),

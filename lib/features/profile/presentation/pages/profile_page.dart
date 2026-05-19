@@ -642,9 +642,9 @@ class _PostSkeletonList extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 12.h),
             padding: EdgeInsets.all(14.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.secondBackground,
               borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(color: const Color(0xFFE4E7EC)),
+              border: Border.all(color: AppColors.divider),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -691,11 +691,12 @@ class _SkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: isDark ? AppColors.background : const Color(0xFFE9EEF5),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

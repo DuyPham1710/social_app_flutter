@@ -27,9 +27,13 @@ class OtherProfileActions extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: const Text('Xác nhận hủy kết bạn'),
-        content: const Text(
+        title: Text(
+          'Xác nhận hủy kết bạn',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
+        content: Text(
           'Bạn có chắc chắn muốn hủy kết bạn với người này không?',
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
@@ -40,12 +44,15 @@ class OtherProfileActions extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () {
               Navigator.pop(ctx);
               onUnfriend?.call();
             },
-            child: const Text('Đồng ý', style: TextStyle(color: Colors.white)),
+            child: const Text('Đồng ý'),
           ),
         ],
       ),
@@ -59,37 +66,39 @@ class OtherProfileActions extends StatelessWidget {
     required bool isElevated,
     required Size size,
   }) {
-    final style = ButtonStyle(
-      minimumSize: WidgetStateProperty.all(size),
-      shape: WidgetStateProperty.all(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
+    final style = ElevatedButton.styleFrom(
       backgroundColor: isElevated
-          ? WidgetStateProperty.all(AppColors.primary)
-          : null,
+          ? AppColors.primary
+          : AppColors.secondBackground,
+      foregroundColor: isElevated ? Colors.white : AppColors.textPrimary,
+      minimumSize: size,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
 
-    return isElevated
-        ? ElevatedButton(
-            onPressed: onPressed,
-            style: style,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                icon,
-                const SizedBox(width: 6),
-                Text(label, style: const TextStyle(color: Colors.white)),
-              ],
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: style,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              color: isElevated ? Colors.white : AppColors.textPrimary,
             ),
-          )
-        : OutlinedButton(
-            onPressed: onPressed,
-            style: style,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [icon, const SizedBox(width: 6), Text(label)],
+            child: icon,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: isElevated ? Colors.white : AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
             ),
-          );
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -107,7 +116,7 @@ class OtherProfileActions extends StatelessWidget {
       case 'none':
         buttons = [
           _buildButton(
-            icon: const Icon(Icons.person_add, color: Colors.white),
+            icon: const Icon(Icons.person_add),
             label: 'Thêm bạn bè',
             onPressed: onSendRequest,
             isElevated: true,
@@ -129,7 +138,7 @@ class OtherProfileActions extends StatelessWidget {
       case 'request_received':
         buttons = [
           _buildButton(
-            icon: const Icon(Icons.check, color: Colors.white),
+            icon: const Icon(Icons.check),
             label: 'Chấp nhận kết bạn',
             onPressed: onAcceptRequest,
             isElevated: true,
@@ -154,7 +163,7 @@ class OtherProfileActions extends StatelessWidget {
             size: const Size(totalWidth / 2 - 8, buttonHeight),
           ),
           _buildButton(
-            icon: Icon(Icons.message, color: AppColors.background),
+            icon: const Icon(Icons.message),
             label: 'Nhắn tin',
             onPressed: onMessage,
             isElevated: true,

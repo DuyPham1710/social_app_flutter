@@ -399,6 +399,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                     Expanded(
                       child: TextField(
                         controller: _groupNameController,
+                        cursorColor: AppColors.primary,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 15.sp,
@@ -431,6 +432,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 child: TextField(
                   controller: _searchController,
+                  cursorColor: AppColors.primary,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15.sp,

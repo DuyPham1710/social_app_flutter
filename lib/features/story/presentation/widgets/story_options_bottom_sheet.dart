@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
@@ -56,21 +57,21 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF2C2C2E),
-          title: const Text(
+          backgroundColor: AppColors.background,
+          title: Text(
             'Xóa tin',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: AppColors.textPrimary),
           ),
-          content: const Text(
+          content: Text(
             'Bạn có chắc chắn muốn xóa tin này không?',
-            style: TextStyle(color: Colors.white70),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text(
+              child: Text(
                 'Hủy',
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
             TextButton(
@@ -144,7 +145,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2E),
+        color: AppColors.background,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20.r),
           topRight: Radius.circular(20.r),
@@ -159,7 +160,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
               width: 40.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),

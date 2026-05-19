@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class ProfileTabs extends StatefulWidget {
   const ProfileTabs({super.key});
@@ -22,9 +23,10 @@ class _ProfileTabsState extends State<ProfileTabs> with TickerProviderStateMixin
       children: [
         TabBar(
           controller: _tabController,
-          indicatorColor: Colors.blue,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.black54,
+          indicatorColor: AppColors.primary,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: AppColors.textSecondary,
+
           tabs: const [
             Tab(text: 'Bài viết'),
             Tab(text: 'Ảnh'),

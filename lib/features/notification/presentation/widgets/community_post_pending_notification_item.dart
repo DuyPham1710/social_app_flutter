@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class CommunityPostPendingNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -35,7 +37,11 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
     return GestureDetector(
       onTap: onViewPost,
       child: Container(
-        color: isRead ? const Color(0xFFFFFFFF) : const Color(0xFFFFF7E8),
+        color: isRead
+            ? AppColors.background
+            : (s1<AppPreferences>().isDarkMode
+                ? const Color(0xFFE6A23C).withOpacity(0.15)
+                : const Color(0xFFFFF7E8)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         margin: const EdgeInsets.only(bottom: 4),
         child: Row(
@@ -46,19 +52,25 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
               child: Stack(
                 children: [
                   ClipOval(
-                    child: Image.network(
-                      avatarUrl,
-                      width: 58,
-                      height: 58,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return CircleAvatar(
-                          radius: 29,
-                          backgroundColor: Colors.grey[300],
-                          child: const Icon(Icons.person),
-                        );
-                      },
-                    ),
+                    child: (avatarUrl.isEmpty || !avatarUrl.startsWith('http'))
+                        ? CircleAvatar(
+                            radius: 29,
+                            backgroundColor: AppColors.secondBackground,
+                            child: Icon(Icons.person, color: AppColors.iconPrimary),
+                          )
+                        : Image.network(
+                            avatarUrl,
+                            width: 58,
+                            height: 58,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return CircleAvatar(
+                                radius: 29,
+                                backgroundColor: AppColors.secondBackground,
+                                child: Icon(Icons.person, color: AppColors.iconPrimary),
+                              );
+                            },
+                          ),
                   ),
                   // Icon overlay for approved
                   Positioned(
@@ -136,7 +148,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                     children: [
                       Text(
                         time == "0 phút" ? "Vừa xong" : time,
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -144,7 +156,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 5),
-            const Icon(Icons.more_horiz),
+            Icon(Icons.more_horiz, color: AppColors.iconPrimary),
           ],
         ),
       ),

@@ -62,13 +62,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(Icons.close, color: AppColors.iconPrimary),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -77,16 +78,29 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: controller,
+                cursorColor: AppColors.primary,
                 maxLines: maxLines,
                 maxLength: maxLength,
                 autofocus: true,
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.divider),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.divider),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppColors.primary, width: 2),
                   ),
                   filled: true,
-                  fillColor: Colors.grey.shade50,
+                  fillColor: AppColors.secondBackground,
                   hintText: "Nhập $title...",
+                  hintStyle: TextStyle(color: AppColors.textSecondary),
+                  counterStyle: TextStyle(color: AppColors.textSecondary),
                 ),
               ),
               const SizedBox(height: 16),

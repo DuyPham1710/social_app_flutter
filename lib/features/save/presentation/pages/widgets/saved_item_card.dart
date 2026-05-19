@@ -24,8 +24,9 @@ class SavedItemCard extends StatelessWidget {
             item.content.contains('.jpeg') ||
             item.content.contains('cloudinary'));
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
-      color: Theme.of(context).cardColor,
+      color: AppColors.secondBackground,
       borderRadius: BorderRadius.circular(12.r),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -33,14 +34,16 @@ class SavedItemCard extends StatelessWidget {
         child: Ink(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.grey.withOpacity(0.2)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            border: Border.all(color: AppColors.divider),
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Stack(
             children: [
@@ -57,7 +60,7 @@ class SavedItemCard extends StatelessWidget {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: Colors.grey[200],
+                            color: AppColors.background,
                             child: const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -65,8 +68,8 @@ class SavedItemCard extends StatelessWidget {
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.error, color: Colors.grey),
+                            color: AppColors.background,
+                            child: Icon(Icons.error, color: AppColors.textSecondary),
                           );
                         },
                       ),
@@ -80,23 +83,23 @@ class SavedItemCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14.sp,
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     )
                   else
                     Padding(
                       padding: EdgeInsets.all(12.w),
-                      child: const Text(
+                      child: Text(
                         'Không có nội dung',
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: AppColors.textSecondary,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
                     ),
                   if (item.authorName != null) ...[
-                    Divider(height: 1, thickness: 1, color: Colors.grey[200]),
+                    Divider(height: 1, thickness: 1, color: AppColors.divider),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 12.w,
@@ -124,6 +127,7 @@ class SavedItemCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -146,18 +150,18 @@ class SavedItemCard extends StatelessWidget {
                       onRemove?.call();
                     }
                   },
-                  itemBuilder: (context) => const [
+                  itemBuilder: (context) => [
                     PopupMenuItem(
                       value: 'open',
                       child: Row(
                         children: [
-                          Icon(Icons.open_in_new_rounded, size: 18),
-                          SizedBox(width: 8),
-                          Text('Xem chi tiết'),
+                          Icon(Icons.open_in_new_rounded, size: 18, color: AppColors.iconPrimary),
+                          const SizedBox(width: 8),
+                          Text('Xem chi tiết', style: TextStyle(color: AppColors.textPrimary)),
                         ],
                       ),
                     ),
-                    PopupMenuItem(
+                    const PopupMenuItem(
                       value: 'remove',
                       child: Row(
                         children: [

@@ -514,7 +514,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           child: PostTranslatableCaption(
                             postId: post.id,
                             caption: post.caption!,
-                            textStyle: TextStyle(fontSize: 14.sp, height: 1.4),
+                            textStyle: TextStyle(
+                              fontSize: 14.sp,
+                              height: 1.4,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
                       ),

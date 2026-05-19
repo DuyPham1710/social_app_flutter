@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class DetailItem extends StatelessWidget {
   final IconData icon;
@@ -20,12 +21,18 @@ class DetailItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: Colors.black54),
+            Icon(icon, size: 18, color: AppColors.textSecondary),
             const SizedBox(width: 8),
-            Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+

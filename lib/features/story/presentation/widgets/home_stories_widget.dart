@@ -131,7 +131,12 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
         if (state is HomeStoriesError) {
           return SizedBox(
             height: 200.w,
-            child: Center(child: Text(state.message)),
+            child: Center(
+              child: Text(
+                state.message,
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+              ),
+            ),
           );
         }
         return SizedBox(height: 200.w);
@@ -156,12 +161,12 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                 width: 80.w,
                 height: 120.w,
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: AppColors.secondBackground,
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: AppColors.textSecondary, width: 1),
+                  border: Border.all(color: AppColors.divider, width: 1),
                   image:
                       _currentUserAvatar != null &&
-                          _currentUserAvatar!.isNotEmpty
+                           _currentUserAvatar!.isNotEmpty
                       ? DecorationImage(
                           image: NetworkImage(_currentUserAvatar!),
                           fit: BoxFit.cover,
@@ -182,7 +187,11 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
           SizedBox(height: 30.h),
           Text(
             "Thêm tin",
-            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
         ],
       ),
@@ -245,7 +254,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                           fit: BoxFit.cover,
                         )
                       : null,
-                  color: story.mediaUrl == null ? Colors.grey[300] : null,
+                  color: story.mediaUrl == null ? AppColors.secondBackground : null,
                 ),
               ),
 
@@ -280,7 +289,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                 bottom: -18.h,
                 child: CircleAvatar(
                   radius: 18.r,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.background,
                   child: CircleAvatar(
                     radius: 16.r,
                     backgroundImage: NetworkImage(
@@ -299,7 +308,11 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
             (_currentUserId != null && story.user.userId == _currentUserId)
                 ? "Tin của bạn"
                 : (story.user.fullName ?? "Unknown"),
-            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
         ],
       ),

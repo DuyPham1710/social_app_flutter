@@ -14,9 +14,10 @@ class OtherProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -136,7 +137,7 @@ class OtherProfileHeader extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: Border.all(color: AppColors.background, width: 4),
                       ),
                       child: CircleAvatar(
                         radius: 60,
@@ -158,7 +159,11 @@ class OtherProfileHeader extends StatelessWidget {
         Center(
           child: Text(
             user?.fullName ?? 'User Name',
-            style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
             textAlign: TextAlign.center,
           ),
         ),

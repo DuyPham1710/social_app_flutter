@@ -51,17 +51,17 @@ class StoryFooterWidget extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(24.r),
                   ),
                   child: TextField(
                     controller: textController,
                     style: TextStyle(fontSize: 14.sp, color: Colors.white),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Send message...',
                       hintStyle: TextStyle(
-                        color: AppColors.textSecondary,
+                        color: Colors.white60,
                       ), // Màu xám nhạt
                     ),
                   ),
@@ -116,7 +116,7 @@ class _IconReaction extends StatelessWidget {
         decoration: BoxDecoration(
           color: isReacted
               ? AppColors.primary.withOpacity(0.2)
-              : AppColors.background,
+              : Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12.r),
           border: isReacted
               ? Border.all(color: AppColors.primary, width: 2)
