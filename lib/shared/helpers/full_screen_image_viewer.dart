@@ -9,6 +9,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class FullScreenImageViewer extends StatefulWidget {
@@ -74,7 +75,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.download, color: AppColors.textPrimary),
+                leading: Icon(Icons.download, color: AppColors.textPrimary),
                 title: Text(
                   'Lưu ảnh',
                   style: TextStyle(
@@ -116,23 +117,14 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
 
       if (!status.isGranted) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Cần quyền truy cập ảnh để lưu ảnh'),
-            ),
-          );
+          showInfoSnackBar(context, 'Cần quyền truy cập ảnh để lưu ảnh');
         }
         return;
       }
 
       // Hiển thị loading
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đang tải ảnh...'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+        showInfoSnackBar(context, 'Đang tải ảnh...');
       }
 
       // Download ảnh

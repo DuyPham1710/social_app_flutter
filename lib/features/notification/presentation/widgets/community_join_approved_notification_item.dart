@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -23,7 +25,11 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: isRead ? const Color(0xFFFFFFFF) : const Color(0xFFEAF3FF),
+      color: isRead
+          ? AppColors.background
+          : (s1<AppPreferences>().isDarkMode
+              ? AppColors.primary.withOpacity(0.12)
+              : const Color(0xFFEAF3FF)),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       // ignore: sort_child_properties_last
       child: Row(
@@ -33,19 +39,25 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
           Stack(
             children: [
               ClipOval(
-                child: Image.network(
-                  avatarUrl,
-                  width: 58,
-                  height: 58,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return CircleAvatar(
-                      radius: 29,
-                      backgroundColor: Colors.grey[300],
-                      child: const Icon(Icons.group),
-                    );
-                  },
-                ),
+                child: (avatarUrl.isEmpty || !avatarUrl.startsWith('http'))
+                    ? CircleAvatar(
+                        radius: 29,
+                        backgroundColor: AppColors.secondBackground,
+                        child: Icon(Icons.group, color: AppColors.iconPrimary),
+                      )
+                    : Image.network(
+                        avatarUrl,
+                        width: 58,
+                        height: 58,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return CircleAvatar(
+                            radius: 29,
+                            backgroundColor: AppColors.secondBackground,
+                            child: Icon(Icons.group, color: AppColors.iconPrimary),
+                          );
+                        },
+                      ),
               ),
               // Icon overlay for approved
               Positioned(
@@ -81,7 +93,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: msg,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
@@ -89,7 +101,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                           ),
                           TextSpan(
                             text: ' $communityName',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -107,12 +119,15 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
 
                 Text(
                   time == "0 phút" ? "Vừa xong" : time,
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.more_horiz),
+          Icon(Icons.more_horiz, color: AppColors.iconPrimary),
         ],
       ),
     );

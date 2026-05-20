@@ -11,6 +11,8 @@ import 'package:social_app_fe/features/chat/presentation/widgets/call_message_it
 import 'package:social_app_fe/features/chat/presentation/widgets/audio_message_bubble.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -94,12 +96,7 @@ class MessageItem extends StatelessWidget {
     String fileName,
   ) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đang tải file...'),
-          duration: Duration(seconds: 1),
-        ),
-      );
+      showInfoSnackBar(context, 'Đang tải file...');
 
       final tempDir = await getTemporaryDirectory();
       // Ensure fileName is safe
@@ -114,15 +111,11 @@ class MessageItem extends StatelessWidget {
 
       final result = await OpenFilex.open(savePath);
       if (result.type != ResultType.done && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Không tìm thấy ứng dụng để mở file này')),
-        );
+        showErrorSnackBar(context, 'Không tìm thấy ứng dụng để mở file này');
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi tải file: $e')));
+        showErrorSnackBar(context, 'Không thể mở file: ${e.toString()}');
       }
     }
   }

@@ -46,7 +46,7 @@ class MenuFooter extends StatelessWidget {
                       onPressed: () {
                         Navigator.pop(context); // đóng dialog
                       },
-                      child: const Text(
+                      child: Text(
                         "Hủy",
                         style: TextStyle(color: AppColors.textPrimary),
                       ),

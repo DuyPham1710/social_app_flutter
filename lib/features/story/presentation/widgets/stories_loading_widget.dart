@@ -32,7 +32,7 @@ class StoriesLoadingWidget extends StatelessWidget {
           height: 120.w,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
-            color: AppColors.textSecondary.withOpacity(0.3),
+            color: AppColors.secondBackground,
           ),
         ),
         SizedBox(height: 30.h),
@@ -41,7 +41,7 @@ class StoriesLoadingWidget extends StatelessWidget {
           height: 12.h,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
-            color: AppColors.textSecondary.withOpacity(0.3),
+            color: AppColors.secondBackground,
           ),
         ),
       ],
@@ -60,7 +60,7 @@ class StoriesLoadingWidget extends StatelessWidget {
               height: 120.w,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
-                color: AppColors.textSecondary.withOpacity(0.3),
+                color: AppColors.secondBackground,
               ),
             ),
             // Avatar loading
@@ -71,7 +71,7 @@ class StoriesLoadingWidget extends StatelessWidget {
                 height: 36.r,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.textSecondary.withOpacity(0.4),
+                  color: AppColors.divider,
                 ),
               ),
             ),
@@ -83,7 +83,7 @@ class StoriesLoadingWidget extends StatelessWidget {
           height: 12.h,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
-            color: AppColors.textSecondary.withOpacity(0.3),
+            color: AppColors.secondBackground,
           ),
         ),
       ],

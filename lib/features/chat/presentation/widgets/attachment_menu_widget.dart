@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 
 class AttachmentMenuWidget extends StatelessWidget {
   final VoidCallback onClose;
@@ -89,10 +90,9 @@ class AttachmentMenuWidget extends StatelessWidget {
             color: AppColors.primary,
             onTap: () {
               onClose();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tính năng Hình ảnh AI đang phát triển'),
-                ),
+              showInfoSnackBar(
+                context,
+                'Tính năng Hình ảnh AI đang phát triển',
               );
             },
           ),

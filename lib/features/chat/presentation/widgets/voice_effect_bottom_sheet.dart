@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice
 import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice_effect_event.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice_effect_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class VoiceEffectBottomSheet extends StatefulWidget {
@@ -91,13 +92,7 @@ class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
               'Đã áp dụng giọng: ${_selectedChip ?? ""}',
             );
           } else if (state is VoiceEffectError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                duration: const Duration(seconds: 3),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showErrorSnackBar(context, state.message);
           }
         },
         builder: (context, state) {

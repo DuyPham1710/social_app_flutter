@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class FriendRequestNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -30,8 +32,10 @@ class FriendRequestNotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: isRead
-          ? const Color(0xFFFFFFFF)
-          : const Color(0xFFEAF3FF), // màu nền khi chưa đọc
+          ? AppColors.background
+          : (s1<AppPreferences>().isDarkMode
+              ? AppColors.primary.withOpacity(0.12)
+              : const Color(0xFFEAF3FF)), // màu nền khi chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       // ignore: sort_child_properties_last
       child: Row(
@@ -43,12 +47,27 @@ class FriendRequestNotificationItem extends StatelessWidget {
             child: Stack(
               children: [
                 ClipOval(
-                  child: Image.network(
-                    avatarUrl,
-                    width: 58,
-                    height: 58,
-                    fit: BoxFit.cover,
-                  ),
+                  child: (avatarUrl.isEmpty || !avatarUrl.startsWith('http'))
+                      ? Container(
+                          width: 58,
+                          height: 58,
+                          color: AppColors.secondBackground,
+                          child: Icon(Icons.person, color: AppColors.iconPrimary, size: 28),
+                        )
+                      : Image.network(
+                          avatarUrl,
+                          width: 58,
+                          height: 58,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 58,
+                              height: 58,
+                              color: AppColors.secondBackground,
+                              child: Icon(Icons.person, color: AppColors.iconPrimary, size: 28),
+                            );
+                          },
+                        ),
                 ),
                 Positioned(
                   right: 0,
@@ -79,8 +98,8 @@ class FriendRequestNotificationItem extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: userName,
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -88,8 +107,8 @@ class FriendRequestNotificationItem extends StatelessWidget {
                       ),
                       TextSpan(
                         text: " đã gửi cho bạn lời mời kết bạn.",
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
                           fontSize: 16,
                         ),
                         recognizer: TapGestureRecognizer()
@@ -105,7 +124,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
                   children: [
                     Text(
                       time == "0 phút" ? "Vừa xong" : time,
-                      style: TextStyle(color: Colors.grey.shade700),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -115,7 +134,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       mutualFriends!,
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ),
 
@@ -147,15 +166,15 @@ class FriendRequestNotificationItem extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: onRemove,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade200,
+                          backgroundColor: AppColors.secondBackground,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Xóa",
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
                         ),
                       ),
                     ),
@@ -166,7 +185,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
           ),
 
           const SizedBox(width: 5),
-          const Icon(Icons.more_horiz),
+          Icon(Icons.more_horiz, color: AppColors.iconPrimary),
         ],
       ),
 

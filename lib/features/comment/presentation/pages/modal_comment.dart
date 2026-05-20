@@ -54,7 +54,7 @@ class _ModalCommentState extends State<ModalComment> {
   String? _replyingToUserName;
   String? _highlightedCommentId;
   bool _hasScrolledToComment = false;
-  
+
   // Track for scrolling to newly sent comment
   int _previousCommentCount = 0;
   bool _shouldScrollToNewComment = false;
@@ -133,7 +133,9 @@ class _ModalCommentState extends State<ModalComment> {
             'id': friend.userId, // ID để gửi lên server
             'display': friend.fullName ?? 'Unknown', // Tên hiển thị khi tag
             'full_name': friend.fullName ?? 'Unknown', // Tên hiển thị dòng dưới
-            'photo': friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+            'photo':
+                friend.avatarUrl ??
+                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           };
         }).toList();
 
@@ -240,7 +242,7 @@ class _ModalCommentState extends State<ModalComment> {
           _tempReplyUser != null) {
         final mentionConfig = Mention(
           trigger: '@',
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
           ),
@@ -255,7 +257,7 @@ class _ModalCommentState extends State<ModalComment> {
         if (currentText.isNotEmpty && !currentText.endsWith(' ')) {
           currentText += ' ';
         }
-        controller.text = currentText + '@';
+        controller.text = '$currentText@';
         controller.selection = TextSelection.fromPosition(
           TextPosition(offset: controller.text.length),
         );
@@ -427,7 +429,7 @@ class _ModalCommentState extends State<ModalComment> {
                     width: 40.w,
                     height: 4.h,
                     decoration: BoxDecoration(
-                      color: Colors.grey[400],
+                      color: AppColors.divider,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
@@ -444,170 +446,171 @@ class _ModalCommentState extends State<ModalComment> {
                   Divider(height: 1.h, color: AppColors.divider),
 
                   Expanded(
-                    child:
-                        BlocListener<CommentDetailsBloc, CommentDetailsState>(
-                          listener: (context, state) {
-                            // Khi comments đã load xong, scroll và highlight
-                            if (state is CommentDetailsLoaded &&
-                                widget.initialCommentId != null) {
-                              _scrollToAndHighlightComment(
-                                state.commentsData!.comments,
-                              );
-                            }
-                            
-                            // Scroll to newly sent comment only if it's a new parent comment (not a reply)
-                            if (state is CommentDetailsLoaded && _shouldScrollToNewComment && !_isSendingReply) {
-                              final currentCount = state.commentsData!.comments.length;
-                              
-                              // Check if new comment was added
-                              if (currentCount > _previousCommentCount) {
-                                _shouldScrollToNewComment = false;
-                                _isSendingReply = false; // Reset flag
-                                
-                                // Scroll to bottom after a short delay
-                                Future.delayed(const Duration(milliseconds: 300), () {
-                                  if (mounted && _itemScrollController.isAttached) {
-                                    final parentComments = state.commentsData!.comments
-                                        .where((c) => c.parentId == null)
-                                        .toList();
-                                    
-                                    if (parentComments.isNotEmpty) {
-                                      _itemScrollController.scrollTo(
-                                        index: parentComments.length - 1,
-                                        duration: const Duration(milliseconds: 300),
-                                        curve: Curves.easeInOut,
-                                      );
-                                    }
-                                  }
-                                });
-                              }
-                              
-                              _previousCommentCount = currentCount;
-                            } else if (state is CommentDetailsLoaded) {
-                              // Just update count without scrolling
-                              _previousCommentCount = state.commentsData!.comments.length;
-                              // Reset flags if we're not scrolling
-                              if (_shouldScrollToNewComment && _isSendingReply) {
-                                _shouldScrollToNewComment = false;
-                                _isSendingReply = false;
-                              }
-                            }
-                          },
-                          child:
-                              BlocBuilder<
-                                CommentDetailsBloc,
-                                CommentDetailsState
-                              >(
-                                builder: (context, state) {
-                                  if (state is CommentDetailsLoading) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: AppColors.primary,
+                    child: BlocListener<CommentDetailsBloc, CommentDetailsState>(
+                      listener: (context, state) {
+                        // Khi comments đã load xong, scroll và highlight
+                        if (state is CommentDetailsLoaded &&
+                            widget.initialCommentId != null) {
+                          _scrollToAndHighlightComment(
+                            state.commentsData!.comments,
+                          );
+                        }
+
+                        // Scroll to newly sent comment only if it's a new parent comment (not a reply)
+                        if (state is CommentDetailsLoaded &&
+                            _shouldScrollToNewComment &&
+                            !_isSendingReply) {
+                          final currentCount =
+                              state.commentsData!.comments.length;
+
+                          // Check if new comment was added
+                          if (currentCount > _previousCommentCount) {
+                            _shouldScrollToNewComment = false;
+                            _isSendingReply = false; // Reset flag
+
+                            // Scroll to bottom after a short delay
+                            Future.delayed(
+                              const Duration(milliseconds: 300),
+                              () {
+                                if (mounted &&
+                                    _itemScrollController.isAttached) {
+                                  final parentComments = state
+                                      .commentsData!
+                                      .comments
+                                      .where((c) => c.parentId == null)
+                                      .toList();
+
+                                  if (parentComments.isNotEmpty) {
+                                    _itemScrollController.scrollTo(
+                                      index: parentComments.length - 1,
+                                      duration: const Duration(
+                                        milliseconds: 300,
                                       ),
+                                      curve: Curves.easeInOut,
                                     );
                                   }
+                                }
+                              },
+                            );
+                          }
 
-                                  if (state is CommentDetailsEmpty) {
-                                    return EmptyCommentsWidget(
-                                      onTapToComment: () {
-                                        _focusNode.requestFocus();
-                                      },
-                                    );
-                                  }
+                          _previousCommentCount = currentCount;
+                        } else if (state is CommentDetailsLoaded) {
+                          // Just update count without scrolling
+                          _previousCommentCount =
+                              state.commentsData!.comments.length;
+                          // Reset flags if we're not scrolling
+                          if (_shouldScrollToNewComment && _isSendingReply) {
+                            _shouldScrollToNewComment = false;
+                            _isSendingReply = false;
+                          }
+                        }
+                      },
+                      child:
+                          BlocBuilder<CommentDetailsBloc, CommentDetailsState>(
+                            builder: (context, state) {
+                              if (state is CommentDetailsLoading) {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.primary,
+                                  ),
+                                );
+                              }
 
-                                  if (state is CommentDetailsError) {
-                                    return Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.error_outline,
-                                            size: 48.w,
-                                            color: Colors.red[400],
-                                          ),
-                                          SizedBox(height: 16.h),
-                                          Text(
-                                            state.errorMessage ??
-                                                'Có lỗi xảy ra',
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              color: Colors.red[600],
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
+                              if (state is CommentDetailsEmpty) {
+                                return EmptyCommentsWidget(
+                                  onTapToComment: () {
+                                    _focusNode.requestFocus();
+                                  },
+                                );
+                              }
+
+                              if (state is CommentDetailsError) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        size: 48.w,
+                                        color: Colors.red[400],
                                       ),
-                                    );
-                                  }
+                                      SizedBox(height: 16.h),
+                                      Text(
+                                        state.errorMessage ?? 'Có lỗi xảy ra',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: Colors.red[600],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
 
-                                  if (state is CommentDetailsLoaded) {
-                                    final comments =
-                                        state.commentsData!.comments;
+                              if (state is CommentDetailsLoaded) {
+                                final comments = state.commentsData!.comments;
 
-                                    final groupedComments =
-                                        _groupCommentsByParent(comments);
+                                final groupedComments = _groupCommentsByParent(
+                                  comments,
+                                );
 
-                                    final parentComments = comments
-                                        .where((c) => c.parentId == null)
-                                        .toList();
+                                final parentComments = comments
+                                    .where((c) => c.parentId == null)
+                                    .toList();
 
-                                    return FutureBuilder<Map<String, dynamic>?>(
-                                      future: TokenStorage.getUserData(),
-                                      builder: (context, snapshot) {
-                                        final currentUserId =
-                                            snapshot.data?['id'];
+                                return FutureBuilder<Map<String, dynamic>?>(
+                                  future: TokenStorage.getUserData(),
+                                  builder: (context, snapshot) {
+                                    final currentUserId = snapshot.data?['id'];
 
-                                        return ScrollablePositionedList.builder(
-                                          itemScrollController:
-                                              _itemScrollController,
-                                          itemPositionsListener:
-                                              _itemPositionsListener,
-                                          itemCount: parentComments.length,
-                                          itemBuilder: (context, index) {
-                                            final parentComment =
-                                                parentComments[index];
-                                            final replies =
-                                                groupedComments[parentComment
-                                                    .id] ??
-                                                [];
+                                    return ScrollablePositionedList.builder(
+                                      itemScrollController:
+                                          _itemScrollController,
+                                      itemPositionsListener:
+                                          _itemPositionsListener,
+                                      itemCount: parentComments.length,
+                                      itemBuilder: (context, index) {
+                                        final parentComment =
+                                            parentComments[index];
+                                        final replies =
+                                            groupedComments[parentComment.id] ??
+                                            [];
 
-                                            // Auto-expand nếu target là reply
-                                            final hasTargetReply = replies.any(
-                                              (r) =>
-                                                  r.id ==
-                                                  widget.initialCommentId,
-                                            );
+                                        // Auto-expand nếu target là reply
+                                        final hasTargetReply = replies.any(
+                                          (r) =>
+                                              r.id == widget.initialCommentId,
+                                        );
 
-                                            return CommentItem(
-                                              comment: parentComment,
-                                              onReply: _handleReply,
-                                              replies: replies,
-                                              showReplies: hasTargetReply,
-                                              currentUserId: currentUserId,
-                                              onUpdateComment:
-                                                  _handleUpdateComment,
-                                              onDeleteComment:
-                                                  _handleDeleteComment,
-                                              onViewHistory: _handleViewHistory,
-                                              isHighlighted:
-                                                  parentComment.id ==
-                                                  _highlightedCommentId,
-                                              targetCommentId:
-                                                  _highlightedCommentId,
-                                            );
-                                          },
+                                        return CommentItem(
+                                          comment: parentComment,
+                                          onReply: _handleReply,
+                                          replies: replies,
+                                          showReplies: hasTargetReply,
+                                          currentUserId: currentUserId,
+                                          onUpdateComment: _handleUpdateComment,
+                                          onDeleteComment: _handleDeleteComment,
+                                          onViewHistory: _handleViewHistory,
+                                          isHighlighted:
+                                              parentComment.id ==
+                                              _highlightedCommentId,
+                                          targetCommentId:
+                                              _highlightedCommentId,
                                         );
                                       },
                                     );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                        ),
+                                  },
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                    ),
                   ),
 
-                  Divider(height: 1.h, color: Colors.grey[300]),
+                  Divider(height: 1.h, color: AppColors.divider),
 
                   const TypingIndicator(),
 
@@ -625,13 +628,13 @@ class _ModalCommentState extends State<ModalComment> {
                     onSendComment: (markupContent, taggedUserIds) {
                       // Check if this is a reply or new parent comment
                       final isReply = _parentId != null;
-                      
+
                       // Set flag to scroll only if it's a new parent comment
                       setState(() {
                         _shouldScrollToNewComment = true;
                         _isSendingReply = isReply;
                       });
-                      
+
                       context.read<CommentBloc>().add(
                         AddCommentEvent(
                           postId: widget.postId,

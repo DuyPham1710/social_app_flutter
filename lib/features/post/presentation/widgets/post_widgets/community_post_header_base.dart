@@ -110,7 +110,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
                   createdAt != null
                       ? _timeAgo(createdAt!)
                       : "Không rõ thời gian",
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
                 ),
               ],
             ),

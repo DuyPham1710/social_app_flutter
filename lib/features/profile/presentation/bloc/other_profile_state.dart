@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
-import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/relationship_status_entity.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 

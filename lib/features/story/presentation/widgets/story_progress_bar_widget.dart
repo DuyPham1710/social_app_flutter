@@ -37,9 +37,7 @@ class StoryProgressBarWidget extends StatelessWidget {
                   return LinearProgressIndicator(
                     value: value,
                     backgroundColor: Colors.white24,
-                    valueColor: const AlwaysStoppedAnimation(
-                      AppColors.primary,
-                    ),
+                    valueColor: AlwaysStoppedAnimation(AppColors.primary),
                     minHeight: 4.h,
                   );
                 },
@@ -51,4 +49,3 @@ class StoryProgressBarWidget extends StatelessWidget {
     );
   }
 }
-

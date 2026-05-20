@@ -17,7 +17,7 @@ class PostsLoadingWidget extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(

@@ -33,7 +33,9 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialCommunity.name);
-    _descriptionController = TextEditingController(text: widget.initialCommunity.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.initialCommunity.description ?? '',
+    );
     _selectedPrivacy = widget.initialCommunity.status ?? 'public';
     _avatarPath = widget.initialCommunity.avatar;
     _coverImagePath = widget.initialCommunity.coverImage;
@@ -195,7 +197,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                                         color: Color(0xFFEAF2FF),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.add_photo_alternate_rounded,
                                         size: 28,
                                         color: AppColors.primary,
@@ -387,19 +389,19 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                                   return;
                                 }
 
-                                  context.read<CommunityCreateBloc>().add(
-                                    UpdateCommunityRequested(
-                                      communityId: widget.initialCommunity.id,
-                                      name: _nameController.text,
-                                      description:
-                                          _descriptionController.text.isNotEmpty
-                                          ? _descriptionController.text
-                                          : null,
-                                      privacy: _selectedPrivacy,
-                                      avatarPath: _avatarPath,
-                                      coverImagePath: _coverImagePath,
-                                    ),
-                                  );
+                                context.read<CommunityCreateBloc>().add(
+                                  UpdateCommunityRequested(
+                                    communityId: widget.initialCommunity.id,
+                                    name: _nameController.text,
+                                    description:
+                                        _descriptionController.text.isNotEmpty
+                                        ? _descriptionController.text
+                                        : null,
+                                    privacy: _selectedPrivacy,
+                                    avatarPath: _avatarPath,
+                                    coverImagePath: _coverImagePath,
+                                  ),
+                                );
                               },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

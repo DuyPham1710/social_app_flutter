@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/enums/media_type.dart';
@@ -16,8 +17,22 @@ class SavedArchivedStoriesPage extends StatelessWidget {
     final usecase = s1<GetMyArchivedStoriesUsecase>();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Tin lưu trữ'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: AppColors.iconPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Tin lưu trữ',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
       body: FutureBuilder<DataState<GroupedStoryListEntity>>(
@@ -28,11 +43,22 @@ class SavedArchivedStoriesPage extends StatelessWidget {
           }
           final state = snapshot.data!;
           if (state is DataStateError) {
-            return Center(child: Text(state.error.toString()));
+            return Center(
+              child: Text(
+                state.error.toString(),
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+            );
           }
-          final data = (state as DataStateSuccess<GroupedStoryListEntity>).data!;
+          final data =
+              (state as DataStateSuccess<GroupedStoryListEntity>).data!;
           if (data.users.isEmpty || data.users.first.stories.isEmpty) {
-            return const Center(child: Text('Chưa có tin lưu trữ nào'));
+            return Center(
+              child: Text(
+                'Chưa có tin lưu trữ nào',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+            );
           }
 
           final group = data.users.first; // user hiện tại
@@ -63,7 +89,10 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                         child: SizedBox(
                           width: 18.w,
                           height: 18.w,
-                          child: CircularProgressIndicator(strokeWidth: 2, value: value),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: value,
+                          ),
                         ),
                       );
                     },
@@ -72,14 +101,16 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                     },
                   );
                 } else {
-                  mediaChild = _StoryMediaPlaceholder(mediaType: story.mediaType);
+                  mediaChild = _StoryMediaPlaceholder(
+                    mediaType: story.mediaType,
+                  );
                 }
 
                 final overlayIcon = story.mediaType == MediaType.video
                     ? Icons.play_circle_fill_rounded
                     : story.mediaType == MediaType.text
-                        ? Icons.text_fields_rounded
-                        : null;
+                    ? Icons.text_fields_rounded
+                    : null;
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(14.r),
@@ -102,7 +133,7 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                         AspectRatio(
                           aspectRatio: 9 / 16,
                           child: ColoredBox(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color: AppColors.secondBackground,
                             child: mediaChild,
                           ),
                         ),
@@ -116,7 +147,11 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                                 color: Colors.black.withOpacity(0.45),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: Icon(overlayIcon, color: Colors.white, size: 18.sp),
+                              child: Icon(
+                                overlayIcon,
+                                color: Colors.white,
+                                size: 18.sp,
+                              ),
                             ),
                           ),
                         Positioned(
@@ -124,13 +159,17 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                           right: 8.w,
                           bottom: 8.w,
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 8.h,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.45),
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: Text(
-                              (story.title == null || story.title!.trim().isEmpty)
+                              (story.title == null ||
+                                      story.title!.trim().isEmpty)
                                   ? 'Tin ${index + 1}'
                                   : story.title!,
                               maxLines: 2,
@@ -166,17 +205,13 @@ class _StoryMediaPlaceholder extends StatelessWidget {
     final icon = mediaType == MediaType.video
         ? Icons.videocam_rounded
         : mediaType == MediaType.text
-            ? Icons.text_fields_rounded
-            : Icons.image_rounded;
+        ? Icons.text_fields_rounded
+        : Icons.image_rounded;
 
     return Container(
       alignment: Alignment.center,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Icon(
-        icon,
-        size: 34.sp,
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
-      ),
+      color: AppColors.secondBackground,
+      child: Icon(icon, size: 34.sp, color: AppColors.textSecondary),
     );
   }
 }

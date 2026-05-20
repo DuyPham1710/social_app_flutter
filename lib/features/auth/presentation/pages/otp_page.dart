@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class OtpPage extends StatefulWidget {
@@ -52,17 +53,17 @@ class _OtpPageState extends State<OtpPage> {
     }
   }
 
-  final defaultPinTheme = PinTheme(
+  PinTheme get defaultPinTheme => PinTheme(
     width: 50.w,
     height: 50.h,
     textStyle: TextStyle(
       fontSize: 20.sp,
       fontWeight: FontWeight.bold,
-      color: Colors.black,
+      color: AppColors.textPrimary,
     ),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(8.r),
-      border: Border.all(color: Colors.grey),
+      border: Border.all(color: AppColors.divider),
     ),
   );
 
@@ -72,9 +73,7 @@ class _OtpPageState extends State<OtpPage> {
         context,
       ).add(VerifyOtpEvent(email: _email!, otp: otpCode));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập mã OTP hợp lệ')),
-      );
+      showErrorSnackBar(context, 'Vui lòng nhập mã OTP hợp lệ');
     }
   }
 
@@ -105,6 +104,7 @@ class _OtpPageState extends State<OtpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           // Chỉ xử lý state từ verify_otp flow
@@ -152,7 +152,7 @@ class _OtpPageState extends State<OtpPage> {
 
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                    child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
                   ),
 
                   SizedBox(height: 50.h),
@@ -164,6 +164,7 @@ class _OtpPageState extends State<OtpPage> {
                       style: TextStyle(
                         fontSize: 24.sp,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -172,7 +173,7 @@ class _OtpPageState extends State<OtpPage> {
 
                   Text(
                     "Nhập mã OTP đã gửi đến ${_email ?? ''}",
-                    style: TextStyle(fontSize: 16.sp, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
                   ),
 
                   SizedBox(height: 40.h),
@@ -183,7 +184,7 @@ class _OtpPageState extends State<OtpPage> {
                     focusedPinTheme: defaultPinTheme.copyWith(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: Colors.black, width: 2.w),
+                        border: Border.all(color: AppColors.textPrimary, width: 2.w),
                       ),
                     ),
                     onChanged: (value) {
@@ -201,7 +202,7 @@ class _OtpPageState extends State<OtpPage> {
                       Text(
                         "Bạn chưa nhận được mã? ",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -250,7 +251,7 @@ class _OtpPageState extends State<OtpPage> {
                       Text(
                         "Bạn đã có tài khoản? ",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/component/add_friend_button.dart';
 
 class ReactActionButton extends StatelessWidget {
@@ -45,13 +46,13 @@ class ReactActionButton extends StatelessWidget {
         }
       },
       style: OutlinedButton.styleFrom(
-        side: BorderSide(color: Colors.grey.shade400),
+        side: BorderSide(color: AppColors.divider),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
       child: Text(
         'Nhắc đến',
-        style: TextStyle(fontSize: 14.sp, color: Colors.black),
+        style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
       ),
     );
   }

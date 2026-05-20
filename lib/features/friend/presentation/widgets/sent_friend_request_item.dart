@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
@@ -46,7 +47,7 @@ class SentFriendRequestItem extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            child: ProfilePage(),
           ),
         ),
       );
@@ -97,7 +98,7 @@ class SentFriendRequestItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -107,7 +108,7 @@ class SentFriendRequestItem extends StatelessWidget {
                       timeAgo,
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.grey[500],
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w400,
                       ),
                       maxLines: 1,
@@ -127,13 +128,13 @@ class SentFriendRequestItem extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(4.w),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                           child: Icon(
                             CupertinoIcons.person_2,
                             size: 14.r,
-                            color: Colors.blue[600],
+                            color: AppColors.primary,
                           ),
                         ),
                       SizedBox(width: 6.w),
@@ -141,7 +142,7 @@ class SentFriendRequestItem extends StatelessWidget {
                         '$mutualFriends bạn chung',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -157,19 +158,23 @@ class SentFriendRequestItem extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: AppColors.secondBackground,
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey[300]!, width: 1),
+                      border: Border.all(color: AppColors.divider, width: 1),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.close, color: Colors.grey[700], size: 16.r),
+                        Icon(
+                          Icons.close,
+                          color: AppColors.textSecondary,
+                          size: 16.r,
+                        ),
                         SizedBox(width: 8.w),
                         Text(
                           'Đã hủy yêu cầu',
                           style: TextStyle(
-                            color: Colors.grey[700],
+                            color: AppColors.textSecondary,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -180,8 +185,8 @@ class SentFriendRequestItem extends StatelessWidget {
                 else
                   _buildActionButton(
                     label: 'Hủy yêu cầu',
-                    background: const Color(0xFFE7E7E7),
-                    foreground: Colors.black,
+                    background: AppColors.secondBackground,
+                    foreground: AppColors.textPrimary,
                     onTap: onCancel ?? () {},
                   ),
               ],
@@ -212,7 +217,7 @@ class SentFriendRequestItem extends StatelessWidget {
               width: 20.r,
               height: 20.r,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppColors.background, width: 2),
                 shape: BoxShape.circle,
                 image: DecorationImage(
                   image: NetworkImage(mutualFriendAvatars![index]),

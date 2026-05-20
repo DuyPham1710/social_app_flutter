@@ -184,10 +184,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'Hủy',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+          child: Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
         ),
       ),
     );

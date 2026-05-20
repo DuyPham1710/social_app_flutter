@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -120,12 +121,7 @@ class _CameraScreenState extends State<CameraScreen> {
         });
 
         // Show error to user
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi khởi tạo camera: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showErrorSnackBar(context, 'Lỗi khởi tạo camera: $e');
       }
     }
   }

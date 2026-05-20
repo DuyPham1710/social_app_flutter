@@ -54,7 +54,7 @@ class FriendRequestItem extends StatelessWidget {
             // Gọi sl<ProfileBloc>() là xong, không cần liệt kê tham số nữa
             create: (_) =>
                 di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            child: ProfilePage(),
           ),
         ),
       );
@@ -104,17 +104,20 @@ class FriendRequestItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+
+                    SizedBox(width: 8.w),
+
                     Text(
                       timeAgo,
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.grey[500],
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -132,13 +135,13 @@ class FriendRequestItem extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(4.w),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                           child: Icon(
                             CupertinoIcons.person_2,
                             size: 14.r,
-                            color: Colors.blue[600],
+                            color: AppColors.primary,
                           ),
                         ),
                       SizedBox(width: 6.w),
@@ -146,7 +149,7 @@ class FriendRequestItem extends StatelessWidget {
                         '$mutualFriends bạn chung',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -194,19 +197,23 @@ class FriendRequestItem extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: AppColors.secondBackground,
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey[300]!, width: 1),
+                      border: Border.all(color: AppColors.divider, width: 1),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.close, color: Colors.grey[700], size: 16.r),
+                        Icon(
+                          Icons.close,
+                          color: AppColors.textSecondary,
+                          size: 16.r,
+                        ),
                         SizedBox(width: 8.w),
                         Text(
                           'Đã gỡ lời mời',
                           style: TextStyle(
-                            color: Colors.grey[700],
+                            color: AppColors.textSecondary,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -229,8 +236,8 @@ class FriendRequestItem extends StatelessWidget {
                       Expanded(
                         child: _buildActionButton(
                           label: 'Xóa',
-                          background: const Color(0xFFE7E7E7),
-                          foreground: Colors.black,
+                          background: AppColors.secondBackground,
+                          foreground: AppColors.textPrimary,
                           onTap: onReject ?? () {},
                         ),
                       ),
@@ -264,7 +271,7 @@ class FriendRequestItem extends StatelessWidget {
               width: 20.r,
               height: 20.r,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppColors.background, width: 2),
                 shape: BoxShape.circle,
                 image: DecorationImage(
                   image: NetworkImage(mutualFriendAvatars![index]),

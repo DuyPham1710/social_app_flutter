@@ -18,13 +18,18 @@ class StoryOptionItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDelete = title.contains('Xóa');
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.textSecondary, size: 24.sp),
+            Icon(
+              icon,
+              color: isDelete ? Colors.red : AppColors.iconPrimary,
+              size: 24.sp,
+            ),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
@@ -33,7 +38,7 @@ class StoryOptionItemWidget extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: isDelete ? Colors.red : AppColors.textPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w400,
                     ),

@@ -9,6 +9,7 @@ import 'package:social_app_fe/config/theme/app_theme.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/network/my_http_overrides.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
@@ -308,7 +309,7 @@ class _MyAppState extends State<MyApp> {
                 : TokenStorage.getUserData(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
+                return Scaffold(
                   body: Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
@@ -497,37 +498,45 @@ class _MyAppState extends State<MyApp> {
           listener: (context, state) {
             _handleVideoCallStateChange(context, state);
           },
-          child: MaterialApp(
-            navigatorKey: _navigatorKey, // Add global navigator key
-            title: 'Namer App',
-            debugShowCheckedModeBanner: false,
-            theme: theme(),
-            initialRoute: '/splash',
-            onGenerateRoute: _onGenerateRoute,
-            routes: <String, WidgetBuilder>{
-              '/face-registration': (context) => const FaceRegistrationPage(),
-              '/face-scan': (context) => const FaceScanPage(),
-              '/splash': (context) => const SplashPage(),
-              '/main': (BuildContext context) {
-                final args =
-                    ModalRoute.of(context)?.settings.arguments
-                        as Map<String, dynamic>?;
-                return MainPage(
-                  userData: userData,
-                  initialTab: args?['initialTab'] as int?,
-                );
-              },
-              '/login': (BuildContext context) => const LoginPage(),
-              '/home': (BuildContext context) => const HomePage(),
-              '/signup': (BuildContext context) => const RegisterPage(),
-              '/forgot-password': (BuildContext context) =>
-                  const ForgotPasswordPage(),
-              '/otp': (BuildContext context) => const OtpPage(),
-              '/personal-info': (BuildContext context) =>
-                  const PersonalInfoPage(),
-              '/reset-password': (BuildContext context) =>
-                  const ResetPasswordPage(),
-              '/search': (BuildContext context) => const SearchPage(),
+          child: ListenableBuilder(
+            listenable: s1<AppPreferences>(),
+            builder: (context, child) {
+              return MaterialApp(
+                navigatorKey: _navigatorKey, // Add global navigator key
+                title: 'Namer App',
+                debugShowCheckedModeBanner: false,
+                theme: theme(),
+                darkTheme: darkTheme(),
+                themeMode: s1<AppPreferences>().themeMode,
+                initialRoute: '/splash',
+                onGenerateRoute: _onGenerateRoute,
+                routes: <String, WidgetBuilder>{
+                  '/face-registration': (context) =>
+                      const FaceRegistrationPage(),
+                  '/face-scan': (context) => const FaceScanPage(),
+                  '/splash': (context) => const SplashPage(),
+                  '/main': (BuildContext context) {
+                    final args =
+                        ModalRoute.of(context)?.settings.arguments
+                            as Map<String, dynamic>?;
+                    return MainPage(
+                      userData: userData,
+                      initialTab: args?['initialTab'] as int?,
+                    );
+                  },
+                  '/login': (BuildContext context) => const LoginPage(),
+                  '/home': (BuildContext context) => const HomePage(),
+                  '/signup': (BuildContext context) => const RegisterPage(),
+                  '/forgot-password': (BuildContext context) =>
+                      const ForgotPasswordPage(),
+                  '/otp': (BuildContext context) => const OtpPage(),
+                  '/personal-info': (BuildContext context) =>
+                      const PersonalInfoPage(),
+                  '/reset-password': (BuildContext context) =>
+                      const ResetPasswordPage(),
+                  '/search': (BuildContext context) => const SearchPage(),
+                },
+              );
             },
           ),
         );

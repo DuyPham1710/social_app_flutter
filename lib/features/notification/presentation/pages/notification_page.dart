@@ -710,13 +710,16 @@ class _NotificationPageState extends State<NotificationPage> {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        title: const Text(
+        title: Text(
           'Thông báo',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, color: AppColors.iconPrimary),
             onPressed: () {
               // Trigger reload
               _currentPage = 1; // Reset page counter
@@ -754,10 +757,15 @@ class _NotificationPageState extends State<NotificationPage> {
               },
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                children: const [
+                children: [
                   SizedBox(
                     height: 400,
-                    child: Center(child: Text('Chưa có thông báo')),
+                    child: Center(
+                      child: Text(
+                        'Chưa có thông báo',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -797,9 +805,10 @@ class _NotificationPageState extends State<NotificationPage> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
                 'Mới',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
             ...unreadNotifications.map((n) => _buildNotificationItem(n)),
@@ -812,9 +821,10 @@ class _NotificationPageState extends State<NotificationPage> {
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
               child: Text(
                 'Cũ hơn',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
           ],
@@ -824,9 +834,11 @@ class _NotificationPageState extends State<NotificationPage> {
 
           // Loading indicator when loading more
           if (state.isLoadingMore)
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Center(child: CircularProgressIndicator()),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
             ),
 
           // Show "end of data" message when no more pages
@@ -836,7 +848,10 @@ class _NotificationPageState extends State<NotificationPage> {
               child: Center(
                 child: Text(
                   'Đã hiển thị hết thông báo',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

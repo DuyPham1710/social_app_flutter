@@ -264,7 +264,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -278,7 +278,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                     Text(
                       "Dành cho bạn",
                       style: TextStyle(
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
                       ),
@@ -299,32 +299,36 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           Expanded(
             child: Container(
               height: 42.h,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: AppColors.secondBackground,
                 borderRadius: BorderRadius.circular(24.r),
               ),
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: Row(
                 children: [
-                  const Icon(Icons.search, color: Colors.black54),
+                  Icon(Icons.search, color: AppColors.iconPrimary),
                   SizedBox(width: 8.w),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      cursorColor: AppColors.primary,
                       onChanged: (value) {
                         setState(() {});
                         _onSearchChanged(value);
                       },
-                      style: TextStyle(color: Colors.black87, fontSize: 14.sp),
-                      decoration: const InputDecoration(
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14.sp,
+                      ),
+                      decoration: InputDecoration(
                         hintText: "Tìm kiếm nhạc",
-                        hintStyle: TextStyle(color: Colors.black54),
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
                         border: InputBorder.none,
                         isCollapsed: true,
                       ),
@@ -334,9 +338,9 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                     IconButton(
                       splashRadius: 18,
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.clear,
-                        color: Colors.black54,
+                        color: AppColors.iconPrimary,
                         size: 20,
                       ),
                       onPressed: () {
@@ -357,9 +361,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   Widget _buildList() {
     // Show loading for initial chart load
     if (!_isSearching && _isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     // Show error for initial chart load
@@ -370,7 +372,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           children: [
             Text(
               _error!,
-              style: TextStyle(color: Colors.black54, fontSize: 14.sp),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
@@ -382,9 +384,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
 
     // Show loading for search
     if (_isSearching && _isSearchLoading && _searchResults.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     // Show search error
@@ -395,7 +395,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           children: [
             Text(
               _searchError!,
-              style: TextStyle(color: Colors.black54, fontSize: 14.sp),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
@@ -415,14 +415,14 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           _isSearching
               ? 'Không tìm thấy bài hát phù hợp.'
               : 'Không có bài hát nào.',
-          style: TextStyle(color: Colors.black54, fontSize: 14.sp),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );
     }
 
     return RefreshIndicator(
       color: AppColors.primary,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       onRefresh: _isSearching
           ? () => _searchTracks(_currentSearchQuery ?? '')
           : _fetchTracks,
@@ -441,7 +441,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
               index == _displayTracks.length) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: const Center(
+              child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
             );
@@ -491,8 +491,8 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       _duration = Duration.zero;
     });
     await _audioPlayer.stop();
-    if (item.preview != null && item.preview!.isNotEmpty) {
-      await _audioPlayer.play(UrlSource(item.preview!));
+    if (item.preview.isNotEmpty) {
+      await _audioPlayer.play(UrlSource(item.preview));
     } else {
       // không có preview
       setState(() {

@@ -44,18 +44,18 @@ class ProfileActions extends StatelessWidget {
           Expanded(
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.grey),
+                side: BorderSide(color: AppColors.divider),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               onPressed: onTapEdit,
-              icon: const Icon(Icons.edit_outlined, color: Colors.black),
-              label: const Text(
+              icon: Icon(Icons.edit_outlined, color: AppColors.textPrimary),
+              label: Text(
                 'Chỉnh sửa thông tin',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: AppColors.textPrimary),
               ),
             ),
           ),

@@ -64,7 +64,7 @@ class _DeleteMessageContent extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textPrimary),
+                    icon: Icon(Icons.close, color: AppColors.textPrimary),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   Expanded(

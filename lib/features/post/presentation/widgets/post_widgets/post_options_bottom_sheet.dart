@@ -64,19 +64,19 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF2C2C2E),
-          title: const Text(
+          backgroundColor: AppColors.background,
+          title: Text(
             'Xóa bài viết',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: AppColors.textPrimary),
           ),
-          content: const Text(
+          content: Text(
             'Bạn có chắc chắn muốn xóa bài viết này không?',
-            style: TextStyle(color: Colors.white70),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Hủy', style: TextStyle(color: Colors.white70)),
+              child: Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),

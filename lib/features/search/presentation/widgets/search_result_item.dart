@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
@@ -74,19 +75,22 @@ class SearchResultItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.secondBackground,
         borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8.r,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8.r,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: InkWell(
         onTap: () => _navigateToProfile(context),
@@ -101,7 +105,7 @@ class SearchResultItem extends StatelessWidget {
                   ? NetworkImage(user.avatarUrl!)
                   : null,
               child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-                  ? Icon(Icons.person, size: 32.r, color: Colors.grey[400])
+                  ? Icon(Icons.person, size: 32.r, color: AppColors.textSecondary)
                   : null,
             ),
             SizedBox(width: 12.w),
@@ -115,6 +119,7 @@ class SearchResultItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   if (user.username != null && user.username!.isNotEmpty) ...[
@@ -123,7 +128,7 @@ class SearchResultItem extends StatelessWidget {
                       '@${user.username}',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -131,7 +136,7 @@ class SearchResultItem extends StatelessWidget {
               ),
             ),
             // Icon mũi tên
-            Icon(Icons.chevron_right, color: Colors.grey[400], size: 24.r),
+            Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 24.r),
           ],
         ),
       ),

@@ -13,6 +13,7 @@ import 'dart:ui';
 
 import 'package:social_app_fe/features/comment/presentation/widgets/mention_editable_field.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
+import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommentReactionMenu {
   static OverlayEntry? _overlayEntry;
@@ -33,9 +34,11 @@ class CommentReactionMenu {
         final mappedFriends = friends.map((friend) {
           return {
             'id': friend.userId,
-            'display': friend.fullName ?? 'Unknown', 
-            'full_name': friend.fullName ?? 'Unknown', 
-            'photo': friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+            'display': friend.fullName ?? 'Unknown',
+            'full_name': friend.fullName ?? 'Unknown',
+            'photo':
+                friend.avatarUrl ??
+                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           };
         }).toList();
         return mappedFriends;
@@ -46,6 +49,7 @@ class CommentReactionMenu {
     } catch (e) {
       print("Exception khi load friend suggestions: $e");
     }
+    return null;
   }
 
   static void show(
@@ -246,14 +250,16 @@ class CommentReactionMenu {
                   // Nếu đã là reply thì trả về parentId gốc
                   onReply(
                     comment.user.userId,
-                    comment.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                    comment.user.avatarUrl ??
+                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                     comment.parentId!.id,
                     userName,
                   );
                 } else {
                   onReply(
                     comment.user.userId,
-                    comment.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                    comment.user.avatarUrl ??
+                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                     null,
                     userName,
                   );
@@ -298,9 +304,7 @@ class CommentReactionMenu {
                           width: double.maxFinite,
                           decoration: BoxDecoration(
                             color: AppColors.background,
-                            border: Border.all(
-                              color: Colors.grey.withOpacity(0.2),
-                            ),
+                            border: Border.all(color: AppColors.divider),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           padding: EdgeInsets.all(8.w),
@@ -319,7 +323,7 @@ class CommentReactionMenu {
                             onPressed: () => Navigator.pop(context),
                             child: Text(
                               'Hủy',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(color: AppColors.textSecondary),
                             ),
                           ),
                           ElevatedButton(
@@ -346,7 +350,7 @@ class CommentReactionMenu {
                             child: Text(
                               'Cập nhật',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.background,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -369,11 +373,11 @@ class CommentReactionMenu {
                 showCupertinoDialog(
                   context: context,
                   builder: (dialogContext) => CupertinoAlertDialog(
-                    title: const Text(
+                    title: Text(
                       'Xóa bình luận',
                       style: TextStyle(color: AppColors.textPrimary),
                     ),
-                    content: const Text(
+                    content: Text(
                       'Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?',
                       style: TextStyle(color: AppColors.textPrimary),
                     ),
@@ -383,7 +387,7 @@ class CommentReactionMenu {
                         onPressed: () {
                           Navigator.of(dialogContext).pop(); // đóng dialog
                         },
-                        child: const Text(
+                        child: Text(
                           'Hủy',
                           style: TextStyle(color: AppColors.primary),
                         ),
@@ -433,12 +437,7 @@ class CommentReactionMenu {
               hide();
 
               // (Tùy chọn) Hiển thị thông báo đã sao chép
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Đã sao chép nội dung'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
+              showSuccessSnackBar(context, 'Đã sao chép nội dung');
             },
           ),
         ],
@@ -449,9 +448,11 @@ class CommentReactionMenu {
   static Widget _menuItem(
     IconData icon,
     String text, {
-    Color color = AppColors.textPrimary,
+    Color? color,
     VoidCallback? onTap,
   }) {
+    final resolvedColor = color ?? AppColors.textPrimary;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -460,11 +461,11 @@ class CommentReactionMenu {
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           child: Row(
             children: [
-              Icon(icon, color: color, size: 18.sp),
+              Icon(icon, color: resolvedColor, size: 18.sp),
               SizedBox(width: 10.w),
               Text(
                 text,
-                style: TextStyle(color: color, fontSize: 14.sp),
+                style: TextStyle(color: resolvedColor, fontSize: 14.sp),
               ),
             ],
           ),

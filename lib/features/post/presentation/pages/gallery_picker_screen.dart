@@ -293,10 +293,10 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
             children: [
               Text(
                 _currentPath?.name ?? 'Thư viện ảnh',
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: AppColors.textPrimary),
               ),
               SizedBox(width: 4.w),
-              const Icon(
+              Icon(
                 CupertinoIcons.chevron_down,
                 color: AppColors.textPrimary,
                 size: 16,
@@ -306,7 +306,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
         ),
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Icon(CupertinoIcons.xmark, color: AppColors.textPrimary),
+          child: Icon(CupertinoIcons.xmark, color: AppColors.textPrimary),
         ),
         trailing: selectedAssets.isNotEmpty
             ? GestureDetector(
@@ -334,7 +334,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
               )
             : GestureDetector(
                 onTap: widget.openCamera,
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.camera,
                   color: AppColors.textPrimary,
                 ),

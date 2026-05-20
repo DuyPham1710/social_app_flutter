@@ -39,9 +39,12 @@ class _FriendPageState extends State<FriendPage>
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        title: const Text(
+        title: Text(
           'Bạn bè',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
         actions: [
           IconButton(
@@ -163,7 +166,7 @@ class _FriendPageState extends State<FriendPage>
             return Container(
               height: 120.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
@@ -173,7 +176,7 @@ class _FriendPageState extends State<FriendPage>
                   ),
                 ],
               ),
-              child: const Center(
+              child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
             );
@@ -193,7 +196,7 @@ class _FriendPageState extends State<FriendPage>
               return Container(
                 height: 100.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
@@ -210,13 +213,13 @@ class _FriendPageState extends State<FriendPage>
                       Icon(
                         CupertinoIcons.person_2,
                         size: 32.r,
-                        color: Colors.grey[400],
+                        color: AppColors.unselectedIcon,
                       ),
                       SizedBox(height: 8.h),
                       Text(
                         'Không có lời mời kết bạn nào',
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondary,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                         ),
@@ -230,7 +233,7 @@ class _FriendPageState extends State<FriendPage>
             // Hiển thị tối đa 3 lời mời đầu tiên
             return Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
@@ -275,7 +278,7 @@ class _FriendPageState extends State<FriendPage>
             return Container(
               height: 100.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
@@ -298,7 +301,7 @@ class _FriendPageState extends State<FriendPage>
                     Text(
                       'Lỗi tải dữ liệu',
                       style: TextStyle(
-                        color: Colors.grey[700],
+                        color: AppColors.textSecondary,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
@@ -362,7 +365,7 @@ class _FriendPageState extends State<FriendPage>
         builder: (context, state) {
           if (state is FriendSuggestionsLoading ||
               (state is FriendPageLoaded && state.isLoadingSuggestions)) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           } else if (state is FriendSuggestionsLoaded ||
@@ -440,7 +443,7 @@ class _FriendPageState extends State<FriendPage>
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         if (trailing != null)

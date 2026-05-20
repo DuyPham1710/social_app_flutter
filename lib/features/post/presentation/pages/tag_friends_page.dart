@@ -122,9 +122,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
     List<Map<String, String>> selectedFriends,
   ) {
     if (state is FriendLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     } else if (state is FriendError) {
       return Center(
         child: Text(
@@ -154,6 +152,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                   SizedBox(width: 8.w),
                   Expanded(
                     child: TextField(
+                      cursorColor: AppColors.primary,
                       controller: _searchController,
                       style: TextStyle(
                         color: AppColors.textPrimary,

@@ -121,7 +121,10 @@ class PostHeader extends StatelessWidget {
                   createdAt != null
                       ? _timeAgo(createdAt!)
                       : "Không rõ thời gian",
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -133,14 +136,23 @@ class PostHeader extends StatelessWidget {
               if (isOwner) {
                 // Nếu là chủ sở hữu, hiển thị icon để mở options
                 return IconButton(
-                  icon: Icon(Icons.more_horiz, size: 20.sp),
+                  icon: Icon(
+                    Icons.more_horiz,
+                    size: 20.sp,
+                    color: AppColors.iconPrimary,
+                  ),
                   onPressed: onOptionsTap,
                 );
               } else {
                 // Nếu không phải chủ sở hữu, hiển thị menu report/share
                 return PopupMenuButton<String>(
-                  icon: Icon(Icons.more_horiz, size: 20.sp),
+                  icon: Icon(
+                    Icons.more_horiz,
+                    size: 20.sp,
+                    color: AppColors.iconPrimary,
+                  ),
                   color: AppColors.background,
+                  surfaceTintColor: Colors.transparent,
                   onSelected: (value) async {
                     if (value == 'report') {
                       onReportTap?.call();
@@ -173,13 +185,16 @@ class PostHeader extends StatelessWidget {
     String? currentUserId,
   ) {
     return [
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'share',
         child: Row(
           children: [
-            Icon(Icons.share, size: 18),
-            SizedBox(width: 8),
-            Text('Chia sẻ'),
+            Icon(Icons.share, size: 18, color: AppColors.iconPrimary),
+            SizedBox(width: 8.w),
+            Text(
+              'Chia sẻ',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
+            ),
           ],
         ),
       ),
@@ -196,18 +211,24 @@ class PostHeader extends StatelessWidget {
               color: AppColors.textSecondary,
             ),
             SizedBox(width: 8.w),
-            Text(isSaved == true ? 'Bỏ lưu bài viết' : 'Lưu bài viết'),
+            Text(
+              isSaved == true ? 'Bỏ lưu bài viết' : 'Lưu bài viết',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
+            ),
           ],
         ),
       ),
 
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 'report',
         child: Row(
           children: [
             Icon(Icons.flag_outlined, size: 18, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Báo cáo bài viết'),
+            SizedBox(width: 8.w),
+            Text(
+              'Báo cáo bài viết',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
+            ),
           ],
         ),
       ),
@@ -237,10 +258,12 @@ class PostHeader extends StatelessWidget {
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
               size: 18,
+              color: AppColors.iconPrimary,
             ),
             SizedBox(width: 8.w),
             Text(
               isVisible ? 'Ẩn khỏi trang cá nhân' : 'Hiển thị ở trang cá nhân',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
             ),
           ],
         ),
@@ -251,7 +274,10 @@ class PostHeader extends StatelessWidget {
           children: [
             Icon(Icons.person_remove_outlined, size: 18, color: Colors.red),
             SizedBox(width: 8.w),
-            Text('Gỡ gắn thẻ', style: TextStyle(color: Colors.red)),
+            Text(
+              'Gỡ gắn thẻ',
+              style: TextStyle(color: Colors.red, fontSize: 14.sp),
+            ),
           ],
         ),
       ),
@@ -275,8 +301,9 @@ class _StableCurrentUserBuilderState extends State<_StableCurrentUserBuilder> {
   @override
   void initState() {
     super.initState();
-    _currentUserIdFuture = TokenStorage.getUserData()
-        .then((userData) => userData?['id']?.toString());
+    _currentUserIdFuture = TokenStorage.getUserData().then(
+      (userData) => userData?['id']?.toString(),
+    );
   }
 
   @override

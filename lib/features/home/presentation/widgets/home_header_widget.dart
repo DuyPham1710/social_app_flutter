@@ -22,7 +22,7 @@ class HomeHeaderWidget extends StatelessWidget {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(12.r)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppColors.textPrimary.withValues(alpha: 0.05),
               blurRadius: 16.r,
               offset: const Offset(0, 6),
             ),
@@ -39,7 +39,11 @@ class HomeHeaderWidget extends StatelessWidget {
             children: [
               Text(
                 'CommonsHub',
-                style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
               Row(
                 children: [
@@ -88,11 +92,8 @@ class HomeHeaderWidget extends StatelessWidget {
             height: 40.w,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.black.withValues(alpha: 0.05),
-              border: Border.all(
-                color: Colors.black.withValues(alpha: 0.1),
-                width: 0.5,
-              ),
+              color: AppColors.unselectedIcon.withValues(alpha: 0.1),
+              border: Border.all(color: AppColors.divider, width: 0.5),
             ),
             child: Center(
               child: Icon(icon, color: AppColors.primary, size: 22.sp),

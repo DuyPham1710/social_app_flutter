@@ -16,6 +16,9 @@ import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class MainPage extends StatefulWidget {
   final Map<String, dynamic>? userData;
@@ -103,7 +106,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _refreshUserData() async {
     final userData = await TokenStorage.getUserData();
     if (!mounted) return;
-    
+
     setState(() {
       _currentUserData = userData;
     });
@@ -130,8 +133,7 @@ class _MainPageState extends State<MainPage> {
 
   bool _handleScrollNotification(ScrollNotification notification) {
     // Xử lý ẩn/hiện bottom nav bar ở trang Home (0), Friend (1), Notification (3)
-    if (_currentIndex != 0 && _currentIndex != 1 && _currentIndex != 3)
-      return false;
+    if (_currentIndex == 2) return false;
 
     if (notification is UserScrollNotification) {
       if (notification.metrics.axis == Axis.vertical) {
@@ -153,82 +155,88 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PostBloc, PostState>(
-      listener: (context, state) {
-        if (state is PostCreated) {
-          showSuccessSnackBar(context, state.message);
-        } else if (state is PostCreateError) {
-          showErrorSnackBar(context, state.message);
-        }
-      },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: _handleScrollNotification,
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  // Mark all notifications as read when leaving notification page
-                  if (_currentIndex == 3 && index != 3) {
-                    final unread = context
-                        .read<NotificationBloc>()
-                        .state
-                        .unread;
-                    if (unread > 0) {
-                      context.read<NotificationBloc>().add(
-                        MarkAllNotificationsRead(),
-                      );
-                    }
-                  }
-                  setState(() {
-                    _currentIndex = index;
-                    _isBottomNavVisible = true; // reset visibility
-                  });
-                },
-                //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-                children: [
-                  HomePage(key: _homePageKey),
-                  FriendPage(),
-                  CreatePostPage(
-                    onPostCreated: () {
-                      _pageController.jumpToPage(0);
-                      setState(() => _currentIndex = 0);
+    return ListenableBuilder(
+      listenable: s1<AppPreferences>(),
+      builder: (context, child) {
+        return BlocListener<PostBloc, PostState>(
+          listener: (context, state) {
+            if (state is PostCreated) {
+              showSuccessSnackBar(context, state.message);
+            } else if (state is PostCreateError) {
+              showErrorSnackBar(context, state.message);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            body: Stack(
+              children: [
+                NotificationListener<ScrollNotification>(
+                  onNotification: _handleScrollNotification,
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      // Mark all notifications as read when leaving notification page
+                      if (_currentIndex == 3 && index != 3) {
+                        final unread = context
+                            .read<NotificationBloc>()
+                            .state
+                            .unread;
+                        if (unread > 0) {
+                          context.read<NotificationBloc>().add(
+                            MarkAllNotificationsRead(),
+                          );
+                        }
+                      }
+                      setState(() {
+                        _currentIndex = index;
+                        _isBottomNavVisible = true; // reset visibility
+                      });
                     },
-                  ),
-                  NotificationPage(),
-                  ProfileNavigationPage(),
-                ],
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                height: _isBottomNavVisible
-                    ? (86.h + MediaQuery.of(context).padding.bottom)
-                    : 0,
-                child: SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  child: BlocBuilder<NotificationBloc, NotificationState>(
-                    builder: (context, notificationState) {
-                      return CustomBottomNavigation(
-                        currentIndex: _currentIndex,
-                        onTabSelected: _onTabSelected,
-                        unreadCount: notificationState.unread,
-                        avt: _getAvtCurrent(),
-                      );
-                    },
+                    //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
+                    children: [
+                      HomePage(key: _homePageKey),
+                      FriendPage(),
+                      CreatePostPage(
+                        onPostCreated: () {
+                          _pageController.jumpToPage(0);
+                          setState(() => _currentIndex = 0);
+                        },
+                      ),
+                      NotificationPage(),
+                      ProfileNavigationPage(),
+                    ],
                   ),
                 ),
-              ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    height: _isBottomNavVisible
+                        ? (86.h + MediaQuery.of(context).padding.bottom)
+                        : 0,
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: BlocBuilder<NotificationBloc, NotificationState>(
+                        builder: (context, notificationState) {
+                          return CustomBottomNavigation(
+                            currentIndex: _currentIndex,
+                            onTabSelected: _onTabSelected,
+                            unreadCount: notificationState.unread,
+                            avt: _getAvtCurrent(),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

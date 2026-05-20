@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
 import 'package:video_player/video_player.dart';
@@ -14,7 +16,6 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  static const _logoImagePath = 'assets/icons/logo.jpg';
   static const _logoVideoPath = 'assets/icons/logo.mp4';
   static const _fallbackIntroDuration = Duration(milliseconds: 1800);
   static const _fadeDuration = Duration(milliseconds: 280);
@@ -136,14 +137,19 @@ class _SplashPageState extends State<SplashPage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(_logoImagePath, fit: BoxFit.cover),
+                Image.asset(
+                  s1<AppPreferences>().isDarkMode 
+                      ? 'assets/icons/dark_logo.png' 
+                      : 'assets/icons/logo.jpg', 
+                  fit: BoxFit.cover,
+                ),
                 if (_isVideoReady)
                   AnimatedOpacity(
                     opacity: _showVideo ? 1 : 0,
                     duration: const Duration(milliseconds: 180),
                     curve: Curves.easeOut,
                     child: Container(
-                      color: Colors.white,
+                      color: AppColors.background,
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
@@ -164,7 +170,7 @@ class _SplashPageState extends State<SplashPage> {
                             ),
                           ),
                           Container(
-                            color: Colors.white.withOpacity(0.08),
+                            color: AppColors.background.withOpacity(0.08),
                           ),
                         ],
                       ),

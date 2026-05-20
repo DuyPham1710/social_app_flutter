@@ -18,21 +18,19 @@ import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class SavedItemsPage extends StatefulWidget {
-  const SavedItemsPage({Key? key}) : super(key: key);
+  const SavedItemsPage({super.key});
 
   @override
   State<SavedItemsPage> createState() => _SavedItemsPageState();
 }
 
 class _SavedItemsPageState extends State<SavedItemsPage> {
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  final GetPostDetailUsecase _getPostDetailUsecase =
-      s1<GetPostDetailUsecase>();
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
+  final GetPostDetailUsecase _getPostDetailUsecase = s1<GetPostDetailUsecase>();
 
-  static const List<String> _fallbackCategories = [
-    'Tất cả',
-  ];
+  static const List<String> _fallbackCategories = ['Tất cả'];
 
   String _selectedCategory = 'Tất cả';
   List<String> _currentCategories = _fallbackCategories;
@@ -49,14 +47,18 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     String id,
   ) async {
     if (type != 'post') {
-      showErrorSnackBar(context, 'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu');
+      showErrorSnackBar(
+        context,
+        'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu',
+      );
       return;
     }
 
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) =>
+          Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
 
     final result = await _getPostDetailUsecase(
@@ -69,9 +71,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     if (result is DataStateSuccess<PostEntity> && result.data != null) {
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => PostDetailPage(post: result.data!),
-        ),
+        MaterialPageRoute(builder: (_) => PostDetailPage(post: result.data!)),
       );
     } else {
       showErrorSnackBar(context, 'Không thể mở bài viết đã lưu');
@@ -85,12 +85,22 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Bỏ lưu mục này?'),
-        content: const Text('Mục này sẽ được xóa khỏi danh sách đã lưu.'),
+        backgroundColor: AppColors.background,
+        title: Text(
+          'Bỏ lưu mục này?',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Mục này sẽ được xóa khỏi danh sách đã lưu.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Hủy'),
+            child: Text(
+              'Hủy',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -111,32 +121,26 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     return BlocProvider(
       create: (context) => s1<SavedItemsBloc>()..add(const LoadSavedItems()),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF7F8FA),
+          backgroundColor: AppColors.background,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: Theme.of(context).iconTheme.color,
-            ),
+            icon: Icon(Icons.arrow_back_rounded, color: AppColors.iconPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
             'Đã lưu',
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: Icon(
-                Icons.search_rounded,
-                color: Theme.of(context).iconTheme.color,
-              ),
+              icon: Icon(Icons.search_rounded, color: AppColors.iconPrimary),
               onPressed: () {
                 // TODO: Handle search within saved items
               },
@@ -212,13 +216,16 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   ),
                 ),
                 SizedBox(width: 12.w),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Tin lưu trữ',
-                        style: TextStyle(fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       SizedBox(height: 3),
                       Text(
@@ -257,9 +264,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         message: 'Kiểm tra kết nối rồi thử lại.',
         actionLabel: 'Thử lại',
         onAction: () {
-          context
-              .read<SavedItemsBloc>()
-              .add(const LoadSavedItems(isRefresh: true));
+          context.read<SavedItemsBloc>().add(
+            const LoadSavedItems(isRefresh: true),
+          );
         },
       );
     }
@@ -277,11 +284,13 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
       }
 
       return SmartRefresher(
-        key: ValueKey('saved-list-${state.currentCategory}-${state.items.length}'),
+        key: ValueKey(
+          'saved-list-${state.currentCategory}-${state.items.length}',
+        ),
         controller: _refreshController,
         enablePullDown: true,
         enablePullUp: !state.hasReachedMax,
-        header: const WaterDropMaterialHeader(
+        header: WaterDropMaterialHeader(
           backgroundColor: AppColors.primary,
           color: Colors.white,
         ),
@@ -293,9 +302,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
           canLoadingText: 'Thả để tải thêm',
         ),
         onRefresh: () {
-          context
-              .read<SavedItemsBloc>()
-              .add(const LoadSavedItems(isRefresh: true));
+          context.read<SavedItemsBloc>().add(
+            const LoadSavedItems(isRefresh: true),
+          );
         },
         onLoading: () {
           context.read<SavedItemsBloc>().add(const LoadSavedItems());
@@ -310,11 +319,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
             final item = state.items[index];
             return SavedItemCard(
               item: item,
-              onTap: () => _openSavedItem(
-                context,
-                item.type,
-                item.targetId,
-              ),
+              onTap: () => _openSavedItem(context, item.type, item.targetId),
               onRemove: () => _confirmRemoveSavedItem(context, item.id),
             );
           },
@@ -336,12 +341,13 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
       itemCount: 8,
       itemBuilder: (context, index) {
         final height = index % 3 == 0 ? 190.h : 142.h;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Container(
           height: height,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.secondBackground,
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: const Color(0xFFE9EEF5)),
+            border: Border.all(color: AppColors.divider),
           ),
           child: Padding(
             padding: EdgeInsets.all(12.w),
@@ -351,7 +357,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE9EEF5),
+                      color: isDark
+                          ? AppColors.background
+                          : const Color(0xFFE9EEF5),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
@@ -457,9 +465,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   setState(() {
                     _selectedCategory = category;
                   });
-                  context
-                      .read<SavedItemsBloc>()
-                      .add(ChangeCategoryTab(category));
+                  context.read<SavedItemsBloc>().add(
+                    ChangeCategoryTab(category),
+                  );
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
@@ -469,14 +477,14 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary
-                        : Colors.white,
+                        : AppColors.secondBackground,
                     borderRadius: BorderRadius.circular(999.r),
                     border: Border.all(
-                      color: isSelected
-                          ? AppColors.primary
-                          : const Color(0xFFE4E7EC),
+                      color: isSelected ? AppColors.primary : AppColors.divider,
                     ),
-                    boxShadow: isSelected
+                    boxShadow:
+                        isSelected &&
+                            Theme.of(context).brightness != Brightness.dark
                         ? [
                             BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.20),
@@ -506,8 +514,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                           color: isSelected
                               ? Colors.white
                               : AppColors.textPrimary,
-                          fontWeight:
-                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                          fontWeight: isSelected
+                              ? FontWeight.w800
+                              : FontWeight.w600,
                           fontSize: 13.sp,
                         ),
                       ),

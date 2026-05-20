@@ -42,26 +42,21 @@ class _CommunityPageState extends State<CommunityPage>
         providerContext.read<CommunityListBloc>().add(
           const CommunityListFetched(page: 1, limit: 10),
         );
-        break;
       case 1:
         providerContext.read<CommunityListBloc>().add(
           const MyCommunitiesFetched(),
         );
-        break;
       case 2:
         providerContext.read<CommunityListBloc>().add(const MyInvitesFetched());
-        break;
       case 3:
         providerContext.read<CommunityListBloc>().add(
           const PendingCommunitiesFetched(),
         );
-        break;
       case 4:
         // Community posts tab
         providerContext.read<CommunityPostsTabBloc>().add(
           const CommunityPostsTabFetched(status: 'all'),
         );
-        break;
     }
   }
 
@@ -320,7 +315,7 @@ class _CommunityPageState extends State<CommunityPage>
                       labelColor: AppColors.primary,
                       unselectedLabelColor: const Color(0xFF9CA3AF),
                       dividerColor: Colors.transparent,
-                      indicator: const UnderlineTabIndicator(
+                      indicator: UnderlineTabIndicator(
                         borderSide: BorderSide(
                           color: AppColors.primary,
                           width: 2.5,
@@ -535,11 +530,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.tune_rounded,
-                    color: Color(0xFF475467),
-                    size: 17,
-                  ),
+                  Icon(Icons.tune_rounded, color: Color(0xFF475467), size: 17),
                   SizedBox(width: 5),
                   Icon(
                     Icons.keyboard_arrow_down_rounded,

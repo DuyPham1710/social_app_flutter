@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/core/utils/ui_utils.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
@@ -60,6 +62,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) async {
           // Chỉ xử lý state từ login flow
@@ -87,7 +90,9 @@ class _LoginPageState extends State<LoginPage> {
 
                     // Logo
                     Image.asset(
-                      'assets/icons/logo.jpg',
+                      s1<AppPreferences>().isDarkMode
+                          ? 'assets/icons/dark_logo.png'
+                          : 'assets/icons/logo.jpg',
                       height: 120.h,
                       width: 120.w,
                     ),
@@ -101,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -144,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? CupertinoIcons.eye_slash_fill
                               : CupertinoIcons.eye_fill,
                           size: 22.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.unselectedIcon,
                         ),
                       ),
                     ),
@@ -171,20 +177,26 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: Divider(thickness: 1, color: Colors.grey),
+                          child: Divider(
+                            thickness: 1,
+                            color: AppColors.divider,
+                          ),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12.h),
                           child: Text(
                             "hoặc",
                             style: TextStyle(
-                              color: Colors.black,
+                              color: AppColors.textPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         Expanded(
-                          child: Divider(thickness: 1, color: Colors.grey),
+                          child: Divider(
+                            thickness: 1,
+                            color: AppColors.divider,
+                          ),
                         ),
                       ],
                     ),
@@ -195,9 +207,9 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       height: 60.h,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.background,
                         borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(color: AppColors.divider),
                       ),
 
                       child: Row(
@@ -214,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -238,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           "Bạn chưa có tài khoản? ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
                           ),

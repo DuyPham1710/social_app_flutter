@@ -170,7 +170,7 @@ class _RecentSearchManagementPageState
           // Recent searches list
           Expanded(
             child: _isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                 : _recentSearches.isEmpty

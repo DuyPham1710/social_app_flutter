@@ -396,9 +396,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       // Lấy file gốc hoặc file đã chỉnh sửa
       final originalFile = _editedImageFile ?? await widget.asset.file;
       if (originalFile == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Không thể đọc file từ thiết bị')),
-        );
+        showErrorSnackBar(context, 'Không thể đọc file từ thiết bị');
         return;
       }
 
@@ -455,9 +453,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     }
 
     if (file == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể đọc file từ thiết bị')),
-      );
+      showErrorSnackBar(context, 'Không thể đọc file từ thiết bị');
       return;
     }
 

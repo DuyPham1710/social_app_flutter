@@ -38,7 +38,7 @@ class CommentNotificationItem extends StatelessWidget {
         spans.add(
           TextSpan(
             text: text.substring(lastIndex, match.start),
-            style: const TextStyle(color: Colors.black), // Style text thường
+            style: TextStyle(color: AppColors.textPrimary), // Style text thường
           ),
         );
       }
@@ -46,7 +46,7 @@ class CommentNotificationItem extends StatelessWidget {
       spans.add(
         TextSpan(
           text: '@${match.group(1)}', // Lấy tên trong group 1
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold, // In đậm mention
             color: AppColors.primary,
           ),
@@ -60,7 +60,7 @@ class CommentNotificationItem extends StatelessWidget {
       spans.add(
         TextSpan(
           text: text.substring(lastIndex),
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: AppColors.textPrimary),
         ),
       );
     }
@@ -79,7 +79,7 @@ class CommentNotificationItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
-          style: const TextStyle(fontSize: 16, color: Colors.black),
+          style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
           children: [
             TextSpan(
               text: userName,
@@ -87,15 +87,16 @@ class CommentNotificationItem extends StatelessWidget {
               recognizer: TapGestureRecognizer()..onTap = onUserTap,
             ),
             const TextSpan(text: ' '),
-            ...[ for (final span in _parseContent(content))
-              if (span is TextSpan)
-                TextSpan(
-                  text: span.text,
-                  style: span.style,
-                  recognizer: TapGestureRecognizer()..onTap = onMessageTap,
-                )
-              else
-                span,
+            ...[
+              for (final span in _parseContent(content))
+                if (span is TextSpan)
+                  TextSpan(
+                    text: span.text,
+                    style: span.style,
+                    recognizer: TapGestureRecognizer()..onTap = onMessageTap,
+                  )
+                else
+                  span,
             ],
           ],
         ),

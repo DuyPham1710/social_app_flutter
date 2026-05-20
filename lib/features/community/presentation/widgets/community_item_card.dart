@@ -89,9 +89,9 @@ class _CommunityItemState extends State<CommunityItem> {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            Navigator.of(context).push(
-              CommunityDetailPage.route(communityId: widget.community.id),
-            );
+            Navigator.of(
+              context,
+            ).push(CommunityDetailPage.route(communityId: widget.community.id));
           },
           child: Container(
             decoration: BoxDecoration(
@@ -132,7 +132,7 @@ class _CommunityItemState extends State<CommunityItem> {
                               ? NetworkImage(avatarUrl)
                               : null,
                           child: avatarUrl == null
-                              ? const Icon(
+                              ? Icon(
                                   Icons.groups_rounded,
                                   color: AppColors.primary,
                                   size: 30,
@@ -311,9 +311,9 @@ class _CommunityItemState extends State<CommunityItem> {
       return FilledButton.tonal(
         style: tonalStyle,
         onPressed: () {
-          Navigator.of(context).push(
-            CommunityDetailPage.route(communityId: widget.community.id),
-          );
+          Navigator.of(
+            context,
+          ).push(CommunityDetailPage.route(communityId: widget.community.id));
         },
         child: const Text('Chi tiết'),
       );

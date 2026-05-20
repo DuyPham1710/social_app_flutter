@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/services/call_sound_service.dart';
 import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/call_feedback_screen.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class VideoCallScreen extends StatefulWidget {
   final String channelId;
@@ -293,9 +294,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   void _showError(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
-      );
+      showErrorSnackBar(context, message);
     }
   }
 

@@ -36,7 +36,6 @@ class _MenuView extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (context) => const CommunityPage()),
         );
-        break;
       case 'Thước phim':
         // Navigate to stories/reels page
         break;

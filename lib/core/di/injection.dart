@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/network/dio_client.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
@@ -10,6 +11,7 @@ import 'package:social_app_fe/features/auth/domain/usecases/register_usecase.dar
 import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registration_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/delete_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
@@ -188,6 +190,11 @@ UnsavePostUsecase resolveUnsavePostUsecase() {
 }
 
 Future<void> initializeDependencies() async {
+  // App Preferences
+  final appPreferences = AppPreferences();
+  await appPreferences.init();
+  s1.registerSingleton<AppPreferences>(appPreferences);
+
   // Dio
   s1.registerSingleton<Dio>(DioClient.instance);
 
@@ -283,6 +290,9 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<SubmitFaceRegistrationUsecase>(
     () => SubmitFaceRegistrationUsecase(s1()),
+  );
+  s1.registerLazySingleton<DeleteFaceRegistrationUsecase>(
+    () => DeleteFaceRegistrationUsecase(s1()),
   );
   s1.registerLazySingleton<UpdatePersonalInfoUsecase>(
     () => UpdatePersonalInfoUsecase(s1()),
@@ -552,6 +562,7 @@ Future<void> initializeDependencies() async {
       loadCommentsUseCase: s1(),
       getUserProfileUseCase: s1(),
       updateUserProfileUseCase: s1(),
+      deleteFaceRegistrationUsecase: s1(),
     ),
   );
   // Trong injection_container.dart (hoặc file DI)

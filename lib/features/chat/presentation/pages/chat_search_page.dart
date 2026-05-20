@@ -86,6 +86,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   Expanded(
                     child: CupertinoSearchTextField(
                       controller: _controller,
+                      cursorColor: AppColors.primary,
                       placeholder: "Tìm kiếm",
                       onChanged: (value) {
                         setState(() {});
@@ -234,7 +235,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           bloc: _chatSearchBloc,
           builder: (context, state) {
             if (state is ChatSearchLoading) {
-              return const Center(
+              return Center(
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: CircularProgressIndicator(color: AppColors.primary),

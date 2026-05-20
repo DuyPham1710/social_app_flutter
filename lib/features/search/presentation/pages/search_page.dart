@@ -6,7 +6,8 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/pages/search_history_page.dart';
-import 'package:social_app_fe/features/search/presentation/widgets/search_bar.dart' as search_widget;
+import 'package:social_app_fe/features/search/presentation/widgets/search_bar.dart'
+    as search_widget;
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_result_item.dart';
 
@@ -47,14 +48,17 @@ class _SearchPageState extends State<SearchPage> {
           _blocContext = blocContext;
           _scrollController.removeListener(_onScroll);
           _scrollController.addListener(_onScroll);
-          
+
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.background,
             body: SafeArea(
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 8.h,
+                    ),
                     child: Row(
                       children: [
                         // Icon back
@@ -62,7 +66,7 @@ class _SearchPageState extends State<SearchPage> {
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(
                             CupertinoIcons.back,
-                            color: Colors.black,
+                            color: AppColors.iconPrimary,
                             size: 23.r,
                           ),
                           padding: EdgeInsets.zero,
@@ -75,23 +79,31 @@ class _SearchPageState extends State<SearchPage> {
                             onSearch: (query) {
                               // Khi nhập từng ký tự: tìm kiếm để hiển thị kết quả (không lưu lịch sử)
                               if (query.trim().isEmpty) {
-                                blocContext.read<SearchBloc>().add(const ClearSearch());
+                                blocContext.read<SearchBloc>().add(
+                                  const ClearSearch(),
+                                );
                               } else {
-                                blocContext.read<SearchBloc>().add(SearchUsers(
-                                  query: query,
-                                  saveToHistory: false,
-                                ));
+                                blocContext.read<SearchBloc>().add(
+                                  SearchUsers(
+                                    query: query,
+                                    saveToHistory: false,
+                                  ),
+                                );
                               }
                             },
                             onSearchSubmitted: (query) {
                               // Khi nhấn Enter: tìm kiếm và lưu vào lịch sử
                               if (query.trim().isEmpty) {
-                                blocContext.read<SearchBloc>().add(const ClearSearch());
+                                blocContext.read<SearchBloc>().add(
+                                  const ClearSearch(),
+                                );
                               } else {
-                                blocContext.read<SearchBloc>().add(SearchUsers(
-                                  query: query,
-                                  saveToHistory: true,
-                                ));
+                                blocContext.read<SearchBloc>().add(
+                                  SearchUsers(
+                                    query: query,
+                                    saveToHistory: true,
+                                  ),
+                                );
                               }
                             },
                             hintText: 'Tìm kiếm',
@@ -101,38 +113,47 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-                // Results
-                Expanded(
-                  child: BlocBuilder<SearchBloc, SearchState>(
-                    builder: (context, state) {
-                      if (state is SearchInitial) {
-                        if (state.history != null && state.history!.isNotEmpty) {
-                          return _buildSearchHistory(state.history!, blocContext);
-                        }
-                        return _buildEmptyState(
-                          icon: CupertinoIcons.search,
-                          message: 'Nhập từ khóa để tìm kiếm',
-                        );
-                      } else if (state is SearchLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                    } else if (state is SearchError) {
-                      return _buildErrorState(state.message, blocContext);
-                    } else if (state is SearchLoaded) {
-                        if (state.results.userResponseDtos.isEmpty) {
+                  // Results
+                  Expanded(
+                    child: BlocBuilder<SearchBloc, SearchState>(
+                      builder: (context, state) {
+                        if (state is SearchInitial) {
+                          if (state.history != null &&
+                              state.history!.isNotEmpty) {
+                            return _buildSearchHistory(
+                              state.history!,
+                              blocContext,
+                            );
+                          }
                           return _buildEmptyState(
-                            icon: CupertinoIcons.person_circle,
-                            message: 'Không tìm thấy kết quả nào',
+                            icon: CupertinoIcons.search,
+                            message: 'Nhập từ khóa để tìm kiếm',
                           );
+                        } else if (state is SearchLoading) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        } else if (state is SearchError) {
+                          return _buildErrorState(state.message, blocContext);
+                        } else if (state is SearchLoaded) {
+                          if (state.results.userResponseDtos.isEmpty) {
+                            return _buildEmptyState(
+                              icon: CupertinoIcons.person_circle,
+                              message: 'Không tìm thấy kết quả nào',
+                            );
+                          }
+                          return _buildResultsList(state, blocContext);
                         }
-                        return _buildResultsList(state, blocContext);
-                      }
-                      return const SizedBox.shrink();
-                    },
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ));
+          );
         },
       ),
     );
@@ -146,7 +167,8 @@ class _SearchPageState extends State<SearchPage> {
       child: ListView.builder(
         controller: _scrollController,
         padding: EdgeInsets.symmetric(horizontal: 12.w),
-        itemCount: state.results.userResponseDtos.length +
+        itemCount:
+            state.results.userResponseDtos.length +
             (state.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == state.results.userResponseDtos.length) {
@@ -155,18 +177,13 @@ class _SearchPageState extends State<SearchPage> {
               child: const Center(child: CircularProgressIndicator()),
             );
           }
-          return SearchResultItem(
-            user: state.results.userResponseDtos[index],
-          );
+          return SearchResultItem(user: state.results.userResponseDtos[index]);
         },
       ),
     );
   }
 
-  Widget _buildSearchHistory(
-    List<dynamic> history,
-    BuildContext blocContext,
-  ) {
+  Widget _buildSearchHistory(List<dynamic> history, BuildContext blocContext) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -180,7 +197,7 @@ class _SearchPageState extends State<SearchPage> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.textPrimary,
                 ),
               ),
               TextButton(
@@ -225,17 +242,13 @@ class _SearchPageState extends State<SearchPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 64.r,
-            color: Colors.grey[400],
-          ),
+          Icon(icon, size: 64.r, color: AppColors.textSecondary),
           SizedBox(height: 16.h),
           Text(
             message,
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -259,7 +272,7 @@ class _SearchPageState extends State<SearchPage> {
             message,
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey[700],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -270,7 +283,9 @@ class _SearchPageState extends State<SearchPage> {
               onPressed: () {
                 final state = blocContext.read<SearchBloc>().state;
                 if (state is SearchLoaded) {
-                  blocContext.read<SearchBloc>().add(SearchUsers(query: state.query));
+                  blocContext.read<SearchBloc>().add(
+                    SearchUsers(query: state.query),
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -285,4 +300,3 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 }
-

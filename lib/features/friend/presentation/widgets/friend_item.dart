@@ -76,7 +76,7 @@ class FriendItem extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+          bottom: BorderSide(color: AppColors.divider, width: 1),
         ),
       ),
       child: Row(
@@ -95,7 +95,7 @@ class FriendItem extends StatelessWidget {
                       ? Icon(
                           CupertinoIcons.person_fill,
                           size: 30.r,
-                          color: Colors.grey[400],
+                          color: AppColors.unselectedIcon,
                         )
                       : null,
                 ),
@@ -118,7 +118,7 @@ class FriendItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -131,7 +131,7 @@ class FriendItem extends StatelessWidget {
                     _getLastSeenText(),
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: Colors.grey[500],
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.w400,
                     ),
                   )
@@ -148,13 +148,13 @@ class FriendItem extends StatelessWidget {
                           width: 16.r,
                           height: 16.r,
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: AppColors.divider,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             CupertinoIcons.person_2_fill,
                             size: 10.r,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       SizedBox(width: 6.w),
@@ -162,7 +162,7 @@ class FriendItem extends StatelessWidget {
                         '$mutualFriends bạn chung',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -200,13 +200,13 @@ class FriendItem extends StatelessWidget {
                         width: 36.r,
                         height: 36.r,
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: AppColors.secondBackground,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.more_horiz,
                           size: 20.r,
-                          color: Colors.grey[700],
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -238,7 +238,7 @@ class FriendItem extends StatelessWidget {
               width: 20.r,
               height: 20.r,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppColors.background, width: 2),
                 shape: BoxShape.circle,
                 image: DecorationImage(
                   image: NetworkImage(mutualFriendAvatars![index]),
@@ -282,7 +282,7 @@ class FriendItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2CD45C),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
+          border: Border.all(color: AppColors.background, width: 2),
         ),
       );
     } else if (lastSeen != null) {
@@ -291,9 +291,9 @@ class FriendItem extends StatelessWidget {
         width: 14.r,
         height: 14.r,
         decoration: BoxDecoration(
-          color: Colors.grey[400],
+          color: AppColors.unselectedIcon,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
+          border: Border.all(color: AppColors.background, width: 2),
         ),
       );
     }

@@ -36,20 +36,22 @@ class TextformfieldCustom extends StatelessWidget {
         controller: controller,
         focusNode: focusNode,
         obscureText: isPassword,
+        style: TextStyle(color: AppColors.textPrimary),
+        cursorColor: AppColors.primary,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.grey),
+          labelStyle: TextStyle(color: AppColors.textSecondary),
           floatingLabelStyle: WidgetStateTextStyle.resolveWith((states) {
             if (states.contains(WidgetState.focused)) {
-              return const TextStyle(color: AppColors.primary);
+              return TextStyle(color: AppColors.primary);
             }
-            return const TextStyle(color: Colors.grey); // khi không focus
+            return TextStyle(color: AppColors.textSecondary); // khi không focus
           }),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
           suffixIcon: suffixIcon,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5.r),
-            borderSide: BorderSide(width: 1.w, color: Colors.grey),
+            borderSide: BorderSide(width: 1.w, color: AppColors.divider),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5.r),

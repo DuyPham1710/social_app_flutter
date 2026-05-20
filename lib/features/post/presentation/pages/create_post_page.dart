@@ -195,9 +195,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cần quyền truy cập ảnh để tiếp tục')),
-      );
+      showErrorSnackBar(context, 'Cần quyền truy cập ảnh để tiếp tục');
     }
   }
 
@@ -687,9 +685,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                           vertical: 4.w,
                                                         ),
                                                     decoration: BoxDecoration(
-                                                      color: Color(
-                                                        0xFF3B82F6,
-                                                      ).withOpacity(0.1),
+                                                      color: AppColors.primary.withOpacity(0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             8.r,
@@ -704,9 +700,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                           getIcon(
                                                             _selectedPrivacyLabel,
                                                           ),
-                                                          color: Color(
-                                                            0xFF3B82F6,
-                                                          ),
+                                                          color: AppColors.primary,
                                                           size: 14.sp,
                                                         ),
 
@@ -715,9 +709,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         Text(
                                                           _selectedPrivacyLabel,
                                                           style: TextStyle(
-                                                            color: Color(
-                                                              0xFF3B82F6,
-                                                            ),
+                                                            color: AppColors.primary,
                                                             fontWeight:
                                                                 FontWeight.w600,
                                                             fontSize: 13.sp,
@@ -728,9 +720,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                                                         Icon(
                                                           Icons.arrow_drop_down,
-                                                          color: Color(
-                                                            0xFF3B82F6,
-                                                          ),
+                                                          color: AppColors.primary,
                                                           size: 18.sp,
                                                         ),
                                                       ],
@@ -759,6 +749,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   /// Ô nhập "Bạn đang nghĩ gì?"
                   TextField(
                     controller: _captionController,
+                    cursorColor: AppColors.primary,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 18.sp,

@@ -63,19 +63,19 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(CupertinoIcons.back, color: Colors.black),
+          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
         ),
-        title: const Text(
+        title: Text(
           'Gợi ý',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -86,7 +86,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             onPressed: () {
               Navigator.pushNamed(context, '/search');
             },
-            icon: const Icon(CupertinoIcons.search, color: Colors.black),
+            icon: Icon(CupertinoIcons.search, color: AppColors.textPrimary),
           ),
         ],
       ),
@@ -123,7 +123,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: AppColors.textPrimary,
             ),
           ),
         );
@@ -202,6 +202,8 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             }
 
             return RefreshIndicator(
+              backgroundColor: AppColors.background,
+              color: AppColors.primary,
               onRefresh: () async {
                 context.read<FriendBloc>().add(const LoadFriendPage());
                 await Future.delayed(const Duration(seconds: 1));
@@ -254,7 +256,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             'Đang tải gợi ý...',
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -277,14 +279,14 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
+                color: AppColors.textPrimary,
               ),
             ),
             SizedBox(height: 8.h),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
             SizedBox(height: 24.h),
             ElevatedButton.icon(
@@ -316,7 +318,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
@@ -391,13 +393,13 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                     width: 120.w,
                     height: 120.w,
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: AppColors.primary.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       CupertinoIcons.person_2,
                       size: 64.r,
-                      color: Colors.blue[300],
+                      color: AppColors.primary,
                     ),
                   ),
                   SizedBox(height: 24.h),
@@ -406,7 +408,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -415,7 +417,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       height: 1.4,
                     ),
                   ),

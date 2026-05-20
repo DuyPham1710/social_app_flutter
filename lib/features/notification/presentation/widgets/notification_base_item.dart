@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class NotificationBaseItem extends StatelessWidget {
   final String avatarUrl;
@@ -28,7 +31,11 @@ class NotificationBaseItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: isRead ? Colors.white : const Color(0xFFEAF3FF), // chưa đọc
+      color: isRead
+          ? AppColors.background
+          : (s1<AppPreferences>().isDarkMode
+              ? AppColors.primary.withOpacity(0.12)
+              : const Color(0xFFEAF3FF)), // chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       // ignore: sort_child_properties_last
       child: Row(
@@ -47,12 +54,27 @@ class NotificationBaseItem extends StatelessWidget {
                           height: 55,
                           fit: BoxFit.cover,
                         )
-                      : Image.network(
-                          avatarUrl,
-                          width: 55,
-                          height: 55,
-                          fit: BoxFit.cover,
-                        ),
+                      : (avatarUrl.isEmpty || !avatarUrl.startsWith('http')
+                          ? Container(
+                              width: 55,
+                              height: 55,
+                              color: AppColors.secondBackground,
+                              child: Icon(Icons.person, color: AppColors.iconPrimary, size: 26),
+                            )
+                          : Image.network(
+                              avatarUrl,
+                              width: 55,
+                              height: 55,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 55,
+                                  height: 55,
+                                  color: AppColors.secondBackground,
+                                  child: Icon(Icons.person, color: AppColors.iconPrimary, size: 26),
+                                );
+                              },
+                            )),
                 ),
                 Positioned(bottom: 0, right: 0, child: iconOverlay),
               ],
@@ -75,7 +97,7 @@ class NotificationBaseItem extends StatelessWidget {
                       preview!,
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.grey.shade700,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -83,13 +105,13 @@ class NotificationBaseItem extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   time == "0 phút" ? "Vừa xong" : time,
-                  style: TextStyle(color: Colors.grey.shade600),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
 
-          const Icon(Icons.more_horiz),
+          Icon(Icons.more_horiz, color: AppColors.iconPrimary),
         ],
       ),
       margin: const EdgeInsets.only(bottom: 2),

@@ -14,7 +14,11 @@ class EmptyCommentsWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 64.w, color: Colors.grey[400]),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 64.w,
+            color: AppColors.unselectedIcon,
+          ),
 
           SizedBox(height: 16.h),
 
@@ -41,14 +45,14 @@ class EmptyCommentsWidget extends StatelessWidget {
 
             ElevatedButton.icon(
               onPressed: onTapToComment,
-              icon: Icon(Icons.edit_outlined, size: 18.w),
+              icon: Icon(Icons.edit_outlined, size: 18.w, color: Colors.white),
               label: Text(
                 'Viết bình luận đầu tiên',
-                style: TextStyle(fontSize: 14.sp),
+                style: TextStyle(fontSize: 14.sp, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.background,
                 padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),

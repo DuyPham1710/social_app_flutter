@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class CommunityPostApprovedNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -33,7 +35,11 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
     return GestureDetector(
       onTap: onViewPost,
       child: Container(
-        color: isRead ? const Color(0xFFFFFFFF) : const Color(0xFFEAF3FF),
+        color: isRead
+            ? AppColors.background
+            : (s1<AppPreferences>().isDarkMode
+                ? AppColors.primary.withOpacity(0.12)
+                : const Color(0xFFEAF3FF)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         margin: const EdgeInsets.only(bottom: 4),
         child: Row(
@@ -45,19 +51,25 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
               child: Stack(
                 children: [
                   ClipOval(
-                    child: Image.network(
-                      avatarUrl,
-                      width: 58,
-                      height: 58,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return CircleAvatar(
-                          radius: 29,
-                          backgroundColor: Colors.grey[300],
-                          child: const Icon(Icons.person),
-                        );
-                      },
-                    ),
+                    child: (avatarUrl.isEmpty || !avatarUrl.startsWith('http'))
+                        ? CircleAvatar(
+                            radius: 29,
+                            backgroundColor: AppColors.secondBackground,
+                            child: Icon(Icons.person, color: AppColors.iconPrimary),
+                          )
+                        : Image.network(
+                            avatarUrl,
+                            width: 58,
+                            height: 58,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return CircleAvatar(
+                                radius: 29,
+                                backgroundColor: AppColors.secondBackground,
+                                child: Icon(Icons.person, color: AppColors.iconPrimary),
+                              );
+                            },
+                          ),
                   ),
                   // Icon overlay for approved
                   Positioned(
@@ -94,14 +106,18 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
                       spans.add(
                         TextSpan(
                           text: '$msg ',
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
-                          recognizer: TapGestureRecognizer()..onTap = onViewPost,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = onViewPost,
                         ),
                       );
                       spans.add(
                         TextSpan(
                           text: communityName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -118,12 +134,15 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
 
                   Text(
                     time == "0 phút" ? "Vừa xong" : time,
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.more_horiz),
+            Icon(Icons.more_horiz, color: AppColors.iconPrimary),
           ],
         ),
       ),

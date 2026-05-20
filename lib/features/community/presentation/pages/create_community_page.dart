@@ -10,8 +10,6 @@ import 'package:social_app_fe/features/community/presentation/bloc/community_cre
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
-
-
 class CreateCommunityPage extends StatefulWidget {
   const CreateCommunityPage({super.key});
 
@@ -185,7 +183,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                         color: Color(0xFFEAF2FF),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.add_photo_alternate_rounded,
                                         size: 28,
                                         color: AppColors.primary,
@@ -372,18 +370,18 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                   return;
                                 }
 
-                                  context.read<CommunityCreateBloc>().add(
-                                    CreateCommunityRequested(
-                                      name: _nameController.text,
-                                      description:
-                                          _descriptionController.text.isNotEmpty
-                                          ? _descriptionController.text
-                                          : null,
-                                      privacy: _selectedPrivacy,
-                                      avatarPath: _avatarPath,
-                                      coverImagePath: _coverImagePath,
-                                    ),
-                                  );
+                                context.read<CommunityCreateBloc>().add(
+                                  CreateCommunityRequested(
+                                    name: _nameController.text,
+                                    description:
+                                        _descriptionController.text.isNotEmpty
+                                        ? _descriptionController.text
+                                        : null,
+                                    privacy: _selectedPrivacy,
+                                    avatarPath: _avatarPath,
+                                    coverImagePath: _coverImagePath,
+                                  ),
+                                );
                               },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

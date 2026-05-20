@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/message/message_bloc.dart';
+import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class CreateGroupChatPage extends StatefulWidget {
   final List<FriendEntity> friends;
@@ -116,12 +117,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi khi chọn ảnh: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorSnackBar(context, 'Lỗi khi chọn ảnh: $e');
     }
   }
 
@@ -233,22 +229,12 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
 
   Future<void> _createGroupChat() async {
     if (_selectedFriends.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn ít nhất 1 người'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorSnackBar(context, 'Vui lòng chọn ít nhất 1 người');
       return;
     }
 
     if (_userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không tìm thấy thông tin người dùng'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorSnackBar(context, 'Không tìm thấy thông tin người dùng');
       return;
     }
 
@@ -289,12 +275,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
         _isCreating = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi khi tạo nhóm chat: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showErrorSnackBar(context, 'Lỗi khi tạo nhóm chat: $e');
     }
   }
 
@@ -348,12 +329,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
             _isCreating = false;
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${state.message}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showErrorSnackBar(context, 'Lỗi: ${state.message}');
         }
       },
       child: WillPopScope(
@@ -365,10 +341,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
             backgroundColor: AppColors.background,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(
-                CupertinoIcons.back,
-                color: AppColors.textPrimary,
-              ),
+              icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
               onPressed: () async {
                 if (await _onWillPop()) {
                   Navigator.pop(context);
@@ -426,6 +399,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                     Expanded(
                       child: TextField(
                         controller: _groupNameController,
+                        cursorColor: AppColors.primary,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 15.sp,
@@ -458,6 +432,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 child: TextField(
                   controller: _searchController,
+                  cursorColor: AppColors.primary,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15.sp,
@@ -468,7 +443,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                       color: AppColors.textSecondary,
                       fontSize: 15.sp,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
                       color: AppColors.textSecondary,
                     ),
@@ -606,7 +581,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
               child: GestureDetector(
                 onTap: () => _removeFriend(friend),
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
                     shape: BoxShape.circle,
                   ),

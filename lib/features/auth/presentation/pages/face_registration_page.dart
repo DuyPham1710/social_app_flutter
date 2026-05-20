@@ -5,16 +5,19 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 
 class FaceRegistrationPage extends StatelessWidget {
-  const FaceRegistrationPage({super.key});
+  final bool isPrivacyTab;
+
+  const FaceRegistrationPage({super.key, this.isPrivacyTab = false});
 
   @override
   Widget build(BuildContext context) {
     // Lấy userId từ route arguments (truyền từ personal_info_page)
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final userId = args?['userId'] as String? ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -33,7 +36,7 @@ class FaceRegistrationPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -43,7 +46,7 @@ class FaceRegistrationPage extends StatelessWidget {
                   "Sử dụng dữ liệu khuôn mặt của bạn để bật các tính năng AI thông minh và bảo vệ tài khoản an toàn hơn.",
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondary,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -87,7 +90,10 @@ class FaceRegistrationPage extends StatelessWidget {
                           Navigator.pushNamed(
                             context,
                             '/face-scan',
-                            arguments: {'userId': userId},
+                            arguments: {
+                              'userId': userId,
+                              'isPrivacyTab': isPrivacyTab,
+                            },
                           );
                         },
                         text: "Bắt đầu quét khuôn mặt",
@@ -95,19 +101,23 @@ class FaceRegistrationPage extends StatelessWidget {
                       SizedBox(height: 16.h),
                       GestureDetector(
                         onTap: () {
-                          // Skip face registration and navigate to login
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/login',
-                            (route) => false,
-                          );
+                          if (isPrivacyTab) {
+                            Navigator.pop(context);
+                          } else {
+                            // Skip face registration and navigate to login
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/login',
+                              (route) => false,
+                            );
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                           child: Text(
                             "Để sau",
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color: AppColors.textSecondary,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -151,7 +161,7 @@ class FaceRegistrationPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 4.h),
@@ -159,7 +169,7 @@ class FaceRegistrationPage extends StatelessWidget {
                 description,
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: Colors.grey[600],
+                  color: AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),

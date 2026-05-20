@@ -46,7 +46,7 @@ class ReactPostNotificationItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
-          style: const TextStyle(fontSize: 16, color: Colors.black),
+          style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
           children: [
             TextSpan(
               text: userName,

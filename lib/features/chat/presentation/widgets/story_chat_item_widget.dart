@@ -34,7 +34,7 @@ class StoryChatItemWidget extends StatelessWidget {
                   child: Container(
                     height: 18,
                     width: 18,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),

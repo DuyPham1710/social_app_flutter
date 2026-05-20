@@ -27,7 +27,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
       builder: (context, state) {
         if (state is FriendLoading) {
           return _buildContainer(
-            child: const Center(
+            child: Center(
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: CircularProgressIndicator(color: AppColors.primary),
@@ -102,7 +102,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Bạn bè",
                 style: TextStyle(
                   fontSize: 20,
@@ -112,7 +112,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               ),
               TextButton(
                 onPressed: widget.onViewAll,
-                child: const Text(
+                child: Text(
                   "Xem tất cả",
                   style: TextStyle(
                     color: AppColors.primary,
@@ -165,14 +165,15 @@ class _FriendCard extends StatelessWidget {
     final avatarUrl =
         friend.avatarUrl ??
         "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg";
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.secondBackground,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: isDark ? Colors.transparent : Colors.grey.withOpacity(0.15),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -197,12 +198,12 @@ class _FriendCard extends StatelessWidget {
                   height: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade100,
+                    color: AppColors.background,
                     height: double.infinity,
-                    child: const Icon(
+                    child: Icon(
                       Icons.person,
                       size: 40,
-                      color: Colors.grey,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -213,7 +214,7 @@ class _FriendCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,

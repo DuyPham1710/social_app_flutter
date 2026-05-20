@@ -78,6 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           // Chỉ xử lý state từ register flow
@@ -112,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         context,
                         ModalRoute.withName('/login'),
                       ),
-                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
                     ),
 
                     SizedBox(height: 50.h),
@@ -124,6 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -182,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ? CupertinoIcons.eye_slash_fill
                               : CupertinoIcons.eye_fill,
                           size: 22.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.unselectedIcon,
                         ),
                       ),
                     ),
@@ -212,7 +214,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ? CupertinoIcons.eye_slash_fill
                               : CupertinoIcons.eye_fill,
                           size: 22.sp,
-                          color: Colors.grey[600],
+                          color: AppColors.unselectedIcon,
                         ),
                       ),
                     ),
@@ -238,7 +240,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         Text(
                           "Bạn đã có tài khoản? ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
                           ),

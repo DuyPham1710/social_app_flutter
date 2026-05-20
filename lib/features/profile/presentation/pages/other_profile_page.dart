@@ -120,7 +120,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     elevation: 0,
                     title: Text(
                       user.fullName ?? "Trang cá nhân",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                       ),
@@ -224,7 +224,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           pinned: true,
           backgroundColor: AppColors.background,
           elevation: 0,
-          title: const Text(
+          title: Text(
             'Trang cá nhân',
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -255,7 +255,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           pinned: true,
           backgroundColor: AppColors.background,
           elevation: 0,
-          title: const Text(
+          title: Text(
             'Trang cá nhân',
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -280,7 +280,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                   Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: AppColors.textSecondary),
                   ),
                   SizedBox(height: 14.h),
                   OutlinedButton.icon(
@@ -314,7 +314,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             child: Center(
               child: Text(
                 state.error ?? 'Không thể tải bài viết',
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
           ),
@@ -333,7 +333,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           return PostItem(post: post, commentCount: count);
         }),
         if (state is OtherProfileLoaded && state.isLoadingMore)
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16),
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),
@@ -411,9 +411,9 @@ class _PostSkeletonList extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 12.h),
             padding: EdgeInsets.all(14.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.secondBackground,
               borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(color: const Color(0xFFE4E7EC)),
+              border: Border.all(color: AppColors.divider),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,7 +435,11 @@ class _PostSkeletonList extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 14.h),
-                const _SkeletonBox(width: double.infinity, height: 13, radius: 7),
+                const _SkeletonBox(
+                  width: double.infinity,
+                  height: 13,
+                  radius: 7,
+                ),
                 SizedBox(height: 8.h),
                 const _SkeletonBox(width: 230, height: 13, radius: 7),
               ],
@@ -456,11 +460,12 @@ class _SkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: isDark ? AppColors.background : const Color(0xFFE9EEF5),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

@@ -11,6 +11,9 @@ import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usec
 import 'dart:async';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 
+import 'package:social_app_fe/features/auth/domain/usecases/delete_face_registration_usecase.dart';
+import 'package:social_app_fe/features/auth/data/models/user_model.dart';
+
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetUserProfileUseCase getUserProfileUseCase;
   final GetProfilePostsUseCase getProfilePostsUseCase;
@@ -18,6 +21,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final LoadCommentsUseCase loadCommentsUseCase;
 
   final UpdateUserProfileUseCase updateUserProfileUseCase;
+  final DeleteFaceRegistrationUsecase deleteFaceRegistrationUsecase;
 
   StreamSubscription? _commentCountSubscription;
   ProfileBloc({
@@ -25,8 +29,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.listenCommentCountUseCase,
     required this.loadCommentsUseCase,
     required this.getUserProfileUseCase,
-
     required this.updateUserProfileUseCase,
+    required this.deleteFaceRegistrationUsecase,
   }) : super(ProfileInitial()) {
     on<LoadUserProfileEvent>(_onLoadUserProfile);
     on<LoadProfilePostsEvent>(_onLoadProfilePosts);
@@ -34,6 +38,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<UpdateProfileCommentCountsEvent>(_onUpdateCommentCounts);
 
     on<UpdateUserProfileEvent>(_onUpdateUserProfile);
+    on<DeleteFaceDataEvent>(_onDeleteFaceData);
     _commentCountSubscription =
         listenCommentCountUseCase(params: const NoParams()).listen((counts) {
           add(UpdateProfileCommentCountsEvent(counts));
@@ -214,6 +219,37 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           user: currentState.user,
         ),
       );
+    }
+  }
+
+  Future<void> _onDeleteFaceData(
+    DeleteFaceDataEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is ProfileLoaded && currentState.user != null) {
+      emit(currentState.copyWith(isDeletingFace: true, deleteFaceSuccess: false, deleteFaceError: null));
+      
+      final result = await deleteFaceRegistrationUsecase();
+
+      if (result is DataStateSuccess) {
+        // Cập nhật isFaceRegistered = false trong UserModel hiện tại
+        final updatedUser = (currentState.user as UserModel).copyWith(
+          isFaceRegistered: false,
+        );
+
+        emit(currentState.copyWith(
+          user: updatedUser,
+          isDeletingFace: false,
+          deleteFaceSuccess: true,
+        ));
+      } else {
+        emit(currentState.copyWith(
+          isDeletingFace: false,
+          deleteFaceSuccess: false,
+          deleteFaceError: result.error?.message ?? "Xóa thất bại",
+        ));
+      }
     }
   }
 

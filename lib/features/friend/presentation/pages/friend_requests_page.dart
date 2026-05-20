@@ -25,17 +25,18 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(CupertinoIcons.back, color: Colors.black),
+          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
         ),
-        title: const Text(
+        title: Text(
           'Lời mời kết bạn',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -46,7 +47,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             onPressed: () {
               _showMoreOptions(context);
             },
-            icon: const Icon(Icons.more_vert, color: Colors.black),
+            icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
           ),
         ],
       ),
@@ -91,7 +92,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(width: 8.w),
@@ -124,7 +125,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -216,6 +217,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             }
 
             return RefreshIndicator(
+              backgroundColor: AppColors.background,
+              color: AppColors.primary,
               onRefresh: () async {
                 context.read<FriendBloc>().add(const LoadFriendPage());
                 await Future.delayed(
@@ -256,7 +259,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             height: 40.w,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[600]!),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
           SizedBox(height: 16.h),
@@ -264,7 +267,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             'Đang tải lời mời kết bạn...',
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -287,14 +290,14 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
+                color: AppColors.textPrimary,
               ),
             ),
             SizedBox(height: 8.h),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
             SizedBox(height: 24.h),
             ElevatedButton.icon(
@@ -304,8 +307,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('Thử lại'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[600],
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.background,
                 padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -328,7 +331,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -364,6 +367,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
 
   Widget _buildEmptyState() {
     return RefreshIndicator(
+      backgroundColor: AppColors.background,
+      color: AppColors.primary,
       onRefresh: () async {
         context.read<FriendBloc>().add(const LoadFriendPage());
         await Future.delayed(const Duration(seconds: 1));
@@ -382,13 +387,13 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                     width: 120.w,
                     height: 120.w,
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: AppColors.primary.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       CupertinoIcons.person_2,
                       size: 64.r,
-                      color: Colors.blue[300],
+                      color: AppColors.primary,
                     ),
                   ),
                   SizedBox(height: 24.h),
@@ -397,7 +402,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -406,7 +411,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       height: 1.4,
                     ),
                   ),
@@ -426,7 +431,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20.r),
             topRight: Radius.circular(20.r),
@@ -440,7 +445,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               height: 4.h,
               margin: EdgeInsets.symmetric(vertical: 12.h),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -451,7 +456,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
@@ -485,11 +490,11 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.blue[600] : Colors.black,
+              color: isSelected ? AppColors.primary : AppColors.textPrimary,
             ),
           ),
           trailing: isSelected
-              ? Icon(Icons.check, color: Colors.blue[600], size: 20)
+              ? Icon(Icons.check, color: AppColors.primary, size: 20)
               : null,
           onTap: () {
             context.read<FriendBloc>().add(
@@ -509,7 +514,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20.r),
             topRight: Radius.circular(20.r),
@@ -524,7 +529,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               height: 4.h,
               margin: EdgeInsets.symmetric(vertical: 12.h),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -533,7 +538,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             ListTile(
               leading: Icon(
                 Icons.send_outlined,
-                color: Colors.black,
+                color: AppColors.textPrimary,
                 size: 24.r,
               ),
               title: Text(
@@ -541,7 +546,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
               onTap: () async {

@@ -13,11 +13,8 @@ import 'package:social_app_fe/features/friend/presentation/pages/friends_list_pa
 
 class FriendHeaderChips extends StatefulWidget {
   final VoidCallback? onNeedRefresh;
-  
-  const FriendHeaderChips({
-    super.key,
-    this.onNeedRefresh,
-  });
+
+  const FriendHeaderChips({super.key, this.onNeedRefresh});
 
   @override
   State<FriendHeaderChips> createState() => _FriendHeaderChipsState();
@@ -43,18 +40,20 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
       if (userData == null || !mounted) return;
 
       final userId = userData['id']?.toString() ?? '';
-      final username = userData['username']?.toString() ?? 
-                      userData['fullName']?.toString() ?? 'User';
+      final username =
+          userData['username']?.toString() ??
+          userData['fullName']?.toString() ??
+          'User';
 
       if (userId.isEmpty) return;
 
       // Khởi tạo service
       final socketClient = s1<SocketClient>(instanceName: 'friendSocket');
       _onlineService = FriendOnlineService(socketClient);
-      
+
       // Kết nối và lắng nghe
       _onlineService!.connect(userId, username);
-      
+
       // Lắng nghe stream số lượng online
       _onlineCountSubscription = _onlineService!.onlineCountStream.listen(
         (count) {
@@ -119,10 +118,8 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
     return Row(
       children: [
         _buildChip(
-          label: _isLoading
-              ? 'Đang tải...'
-              : '$_onlineCount người đang online',
-          leading: _buildOnlineDot()
+          label: _isLoading ? 'Đang tải...' : '$_onlineCount người đang online',
+          leading: _buildOnlineDot(),
         ),
         SizedBox(width: 8.w),
         _buildChip(
@@ -130,9 +127,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
           onTap: () async {
             await Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const FriendsListPage(),
-              ),
+              MaterialPageRoute(builder: (context) => const FriendsListPage()),
             );
             // Gọi callback để reload dữ liệu
             widget.onNeedRefresh?.call();
@@ -181,7 +176,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.textPrimary.withOpacity(0.05),
               blurRadius: 6.r,
               offset: const Offset(0, 2),
             ),
@@ -189,15 +184,13 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
         ),
         child: Row(
           children: [
-            if (leading != null) ...[
-              leading,
-              SizedBox(width: 6.w),
-            ],
+            if (leading != null) ...[leading, SizedBox(width: 6.w)],
             Text(
               label,
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
             ),
           ],
@@ -206,6 +199,3 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
     );
   }
 }
-
-
-

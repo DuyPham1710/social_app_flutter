@@ -90,6 +90,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
     final userId = args['id'];
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthLoaded && state.flowType == 'update_personal_info') {
@@ -121,7 +122,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(CupertinoIcons.back, color: Colors.grey[600]),
+                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
                     ),
 
                     SizedBox(height: 50.h),
@@ -133,6 +134,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),
@@ -143,7 +145,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       "Vui lòng điền đầy đủ thông tin sau",
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                     ),
 
@@ -189,7 +191,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             size: 20.sp,
                             color: dateOfBirthFocusNode.hasFocus
                                 ? AppColors.primary
-                                : Colors.grey,
+                                : AppColors.unselectedIcon,
                           ),
                           onTap: () async {
                             FocusScope.of(
@@ -220,7 +222,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             size: 20.sp,
                             color: genderFocusNode.hasFocus
                                 ? AppColors.primary
-                                : Colors.grey,
+                                : AppColors.unselectedIcon,
                           ),
                           onTap: () async {
                             FocusScope.of(
@@ -283,7 +285,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                         Text(
                           "Bạn đã có tài khoản? ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w600,
                           ),

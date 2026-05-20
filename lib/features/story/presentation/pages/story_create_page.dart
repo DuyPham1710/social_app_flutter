@@ -109,7 +109,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -144,7 +144,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.black),
+            icon: Icon(Icons.close, color: AppColors.iconPrimary),
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           Expanded(
@@ -152,7 +152,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               child: Text(
                 "Tạo tin",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                 ),
@@ -160,7 +160,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
+            icon: Icon(Icons.settings, color: AppColors.iconPrimary),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -211,15 +211,15 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   Widget _buildMultiPickButton() {
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
-        foregroundColor: Colors.black,
-        side: BorderSide(color: Colors.black.withOpacity(0.1)),
+        foregroundColor: AppColors.textPrimary,
+        side: BorderSide(color: AppColors.divider),
         padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
         ),
       ),
       onPressed: () {},
-      icon: const Icon(Icons.collections_rounded),
+      icon: Icon(Icons.collections_rounded, color: AppColors.iconPrimary),
       label: const Text("Chọn nhiều file"),
     );
   }
@@ -232,13 +232,13 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
           Text(
             _currentPath?.name ?? "Thư viện",
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.textPrimary,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
           ),
           SizedBox(width: 6.w),
-          const Icon(Icons.expand_more, color: Colors.black),
+          Icon(Icons.expand_more, color: AppColors.iconPrimary),
         ],
       ),
     );
@@ -249,7 +249,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
 
     final selectedPath = await showModalBottomSheet<AssetPathEntity>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -263,7 +263,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               height: 4.h,
               margin: EdgeInsets.only(bottom: 16.h),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.1),
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -272,7 +272,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               child: Text(
                 "Chọn thư mục",
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                 ),
@@ -289,12 +289,16 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                   return ListTile(
                     leading: Icon(
                       Icons.folder,
-                      color: isSelected ? AppColors.primary : Colors.black54,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.iconPrimary,
                     ),
                     title: Text(
                       path.name,
                       style: TextStyle(
-                        color: isSelected ? AppColors.primary : Colors.black87,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
                         fontSize: 16.sp,
                         fontWeight: isSelected
                             ? FontWeight.w600
@@ -311,7 +315,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                         return Text(
                           "$count mục",
                           style: TextStyle(
-                            color: Colors.black54,
+                            color: AppColors.textSecondary,
                             fontSize: 12.sp,
                           ),
                         );
@@ -336,15 +340,13 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
 
   Widget _buildGrid() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (_permissionDenied) {
       return Center(
         child: Text(
           "Cần quyền truy cập thư viện để hiển thị ảnh/video.",
-          style: TextStyle(color: Colors.black54, fontSize: 14.sp),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
           textAlign: TextAlign.center,
         ),
       );
@@ -353,7 +355,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       return Center(
         child: Text(
           "Chưa có ảnh/video trong thư viện.",
-          style: TextStyle(color: Colors.black54, fontSize: 14.sp),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );
     }
@@ -383,7 +385,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                       snapshot.data != null) {
                     return Image.memory(snapshot.data!, fit: BoxFit.cover);
                   }
-                  return Container(color: Colors.grey[200]);
+                  return Container(color: AppColors.secondBackground);
                 },
               ),
               // Hiển thị icon video và duration
@@ -412,7 +414,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                         Builder(
                           builder: (context) {
                             final duration = asset.duration;
-                            if (duration != null && duration > 0) {
+                            if (duration > 0) {
                               final minutes = duration ~/ 60;
                               final seconds = duration % 60;
                               return Text(
@@ -434,7 +436,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               if (isSelected)
                 Container(
                   color: Colors.black.withOpacity(0.45),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.check_circle,
                       color: AppColors.primary,
@@ -468,19 +470,19 @@ class _ActionCard extends StatelessWidget {
       child: Container(
         height: 70.h,
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: AppColors.secondBackground,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.black.withOpacity(0.05)),
+          border: Border.all(color: AppColors.divider),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.black87, size: 26.sp),
+            Icon(icon, color: AppColors.iconPrimary, size: 26.sp),
             SizedBox(height: 6.h),
             Text(
               label,
               style: TextStyle(
-                color: Colors.black87,
+                color: AppColors.textPrimary,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
               ),

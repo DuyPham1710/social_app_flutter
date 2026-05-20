@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -15,16 +16,23 @@ class SectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
         GestureDetector(
           onTap: onEditTap,
-          child: const Text(
+          child: Text(
             "Chỉnh sửa",
-            style: TextStyle(color: Colors.blue, fontSize: 16),
+            style: TextStyle(color: AppColors.primary, fontSize: 16),
           ),
         )
       ],
     );
   }
 }
+

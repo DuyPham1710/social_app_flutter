@@ -33,6 +33,7 @@ class PostItem extends StatefulWidget {
   final PostEntity post;
   final int commentCount;
   final bool isSaved;
+
   /// Nếu true, dùng CommunityPostHeaderBase cho posts có community.
   final bool isInCommunityDetail;
   final String? communityUserRole;
@@ -432,7 +433,10 @@ class _PostItemState extends State<PostItem> {
                 child: PostTranslatableCaption(
                   postId: widget.post.id,
                   caption: widget.post.caption!,
-                  textStyle: TextStyle(fontSize: 13.sp),
+                  textStyle: TextStyle(
+                    fontSize: 13.sp,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 
@@ -82,7 +83,7 @@ class PostReactInfo extends StatelessWidget {
                         left: (i * 18),
                         child: CircleAvatar(
                           radius: 12,
-                          backgroundColor: Colors.white,
+                          backgroundColor: AppColors.background,
                           child: Text(
                             topEmojis[i].key.icon,
                             style: const TextStyle(fontSize: 18),
@@ -96,7 +97,13 @@ class PostReactInfo extends StatelessWidget {
               SizedBox(width: 30.w),
 
               Expanded(
-                child: Text(displayText, style: TextStyle(fontSize: 12.sp)),
+                child: Text(
+                  displayText,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
             ],
           ),

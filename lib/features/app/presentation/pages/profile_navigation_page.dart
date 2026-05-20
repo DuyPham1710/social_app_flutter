@@ -12,7 +12,7 @@ class ProfileNavigationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<ProfileBloc>(
       create: (_) => di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-      child: const ProfilePage(),
+      child: ProfilePage(),
     );
   }
 }

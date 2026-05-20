@@ -11,14 +11,11 @@ class PostCreatingProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: AppColors.background,
       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
       child: Row(
         children: [
-          const CircularProgressIndicator(
-            color: AppColors.primary,
-            strokeWidth: 3,
-          ),
+          CircularProgressIndicator(color: AppColors.primary, strokeWidth: 3),
           SizedBox(width: 12.w),
           Expanded(
             child: Text(

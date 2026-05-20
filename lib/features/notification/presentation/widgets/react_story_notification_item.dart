@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
 
@@ -45,7 +46,7 @@ class ReactStoryNotificationItem extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
-          style: const TextStyle(fontSize: 16, color: Colors.black),
+          style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
           children: [
             TextSpan(
               text: userName,

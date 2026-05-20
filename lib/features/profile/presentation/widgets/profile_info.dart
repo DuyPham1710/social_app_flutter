@@ -16,7 +16,7 @@ class ProfileInfo extends StatelessWidget {
         children: [
           // Học vấn
           const SizedBox(width: 8),
-          const Text(
+          Text(
             "Giới thiệu",
             style: TextStyle(
               fontSize: 20,

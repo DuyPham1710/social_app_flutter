@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_picker.dart';
@@ -135,7 +136,7 @@ class _PostActionState extends State<PostAction> {
                       : Icon(
                           CupertinoIcons.hand_thumbsup,
                           key: _iconKey,
-                          color: Colors.grey,
+                          color: AppColors.unselectedIcon,
                           size: 24.sp,
                         ),
                 ),
@@ -156,7 +157,13 @@ class _PostActionState extends State<PostAction> {
                     },
                   );
                 },
-                child: Text("$_reactCount", style: TextStyle(fontSize: 12.sp)),
+                child: Text(
+                  "$_reactCount",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
               SizedBox(width: 20.w),
               GestureDetector(
@@ -177,11 +184,17 @@ class _PostActionState extends State<PostAction> {
                   children: [
                     Icon(
                       CupertinoIcons.chat_bubble,
-                      color: Colors.black87,
+                      color: AppColors.unselectedIcon,
                       size: 20.sp,
                     ),
                     SizedBox(width: 4.w),
-                    Text("$commentCount", style: TextStyle(fontSize: 12.sp)),
+                    Text(
+                      "$commentCount",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -208,7 +221,10 @@ class _PostActionState extends State<PostAction> {
                 commentCount > 0
                     ? "Xem tất cả $commentCount bình luận"
                     : "Chưa có bình luận nào",
-                style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ),

@@ -292,9 +292,8 @@ class _ChatListPageState extends State<ChatListPage> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        builder: (context) =>
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
 
       final existingConversation = await _findConversationWithFriend(
@@ -434,7 +433,7 @@ class _ChatListPageState extends State<ChatListPage> {
                 ),
                 title: Text(
                   state.user.fullName ?? "Chats",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
@@ -466,10 +465,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
                   IconButton(
                     onPressed: () {},
-                    icon: const Icon(
-                      Icons.settings,
-                      color: AppColors.textPrimary,
-                    ),
+                    icon: Icon(Icons.settings, color: AppColors.textPrimary),
                   ),
                 ],
               ),
@@ -516,7 +512,7 @@ class _ChatListPageState extends State<ChatListPage> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.search,
                                   color: AppColors.textSecondary,
                                 ),
@@ -752,7 +748,8 @@ class _ChatListPageState extends State<ChatListPage> {
                               }
 
                               bool? isOnline;
-                              if (!conversation.isGroup && firstParticipant != null) {
+                              if (!conversation.isGroup &&
+                                  firstParticipant != null) {
                                 final otherUserId = firstParticipant.userId;
                                 final status = _presenceByUserId[otherUserId];
                                 if (status != null) {
@@ -760,9 +757,13 @@ class _ChatListPageState extends State<ChatListPage> {
                                 }
 
                                 if (_chatPresenceService != null &&
-                                    !_presenceRequestedUserIds.contains(otherUserId)) {
+                                    !_presenceRequestedUserIds.contains(
+                                      otherUserId,
+                                    )) {
                                   _presenceRequestedUserIds.add(otherUserId);
-                                  _chatPresenceService!.requestPresence([otherUserId]);
+                                  _chatPresenceService!.requestPresence([
+                                    otherUserId,
+                                  ]);
                                 }
                               }
 
@@ -810,7 +811,7 @@ class _ChatListPageState extends State<ChatListPage> {
                           return SliverToBoxAdapter(
                             child: Padding(
                               padding: EdgeInsets.all(16.h),
-                              child: const Center(
+                              child: Center(
                                 child: CircularProgressIndicator(
                                   color: AppColors.primary,
                                 ),
@@ -900,7 +901,7 @@ class _ChatListPageState extends State<ChatListPage> {
             ],
           );
         } else if (friendState is FriendLoading) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),

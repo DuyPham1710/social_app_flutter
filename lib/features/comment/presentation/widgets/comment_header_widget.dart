@@ -95,7 +95,7 @@ class CommentHeaderWidget extends StatelessWidget {
                                 left: i * 18.0,
                                 child: CircleAvatar(
                                   radius: 12,
-                                  backgroundColor: Colors.white,
+                                  backgroundColor: AppColors.background,
                                   child: Text(
                                     topEmojis[i].key.icon,
                                     style: const TextStyle(fontSize: 16),
@@ -112,7 +112,7 @@ class CommentHeaderWidget extends StatelessWidget {
                         height: 24.h,
                         child: Icon(
                           CupertinoIcons.hand_thumbsup,
-                          color: Colors.grey,
+                          color: AppColors.unselectedIcon,
                           size: 20.sp,
                         ),
                       ),

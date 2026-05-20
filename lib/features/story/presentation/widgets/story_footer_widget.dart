@@ -237,7 +237,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(24.r),
                   ),
                   child: Row(
@@ -252,7 +252,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                           ),
                           textInputAction: TextInputAction.send,
                           onSubmitted: (value) => _sendStoryReply(context),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Gửi tin nhắn...',
                             hintStyle: TextStyle(
@@ -272,7 +272,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                                 ? SizedBox(
                                     width: 16.w,
                                     height: 16.w,
-                                    child: const CircularProgressIndicator(
+                                    child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         AppColors.primary,
