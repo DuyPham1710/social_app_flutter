@@ -304,9 +304,7 @@ class CommentReactionMenu {
                           width: double.maxFinite,
                           decoration: BoxDecoration(
                             color: AppColors.background,
-                            border: Border.all(
-                              color: AppColors.divider,
-                            ),
+                            border: Border.all(color: AppColors.divider),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           padding: EdgeInsets.all(8.w),
@@ -389,7 +387,7 @@ class CommentReactionMenu {
                         onPressed: () {
                           Navigator.of(dialogContext).pop(); // đóng dialog
                         },
-                        child: const Text(
+                        child: Text(
                           'Hủy',
                           style: TextStyle(color: AppColors.primary),
                         ),

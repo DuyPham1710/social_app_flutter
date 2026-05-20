@@ -1199,7 +1199,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                             child: BlocBuilder<MessageBloc, MessageState>(
                               builder: (context, state) {
                                 if (state is MessagesLoading) {
-                                  return const Center(
+                                  return Center(
                                     child: CircularProgressIndicator(
                                       color: AppColors.primary,
                                     ),
@@ -2823,7 +2823,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             // Grid ảnh
             Flexible(
               child: _isLoadingPhotos
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
                         color: AppColors.primary,
                       ),
@@ -2861,7 +2861,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                         itemBuilder: (context, index) {
                           // Loading indicator ở cuối
                           if (index == _photoList.length) {
-                            return const Center(
+                            return Center(
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: AppColors.primary,

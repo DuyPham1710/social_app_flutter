@@ -364,7 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
             return PostItem(post: post, commentCount: commentCount);
           }),
         if (state is ProfileLoaded && state.isLoadingMore)
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),

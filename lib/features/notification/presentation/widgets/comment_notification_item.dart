@@ -46,7 +46,7 @@ class CommentNotificationItem extends StatelessWidget {
       spans.add(
         TextSpan(
           text: '@${match.group(1)}', // Lấy tên trong group 1
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold, // In đậm mention
             color: AppColors.primary,
           ),
@@ -87,15 +87,16 @@ class CommentNotificationItem extends StatelessWidget {
               recognizer: TapGestureRecognizer()..onTap = onUserTap,
             ),
             const TextSpan(text: ' '),
-            ...[ for (final span in _parseContent(content))
-              if (span is TextSpan)
-                TextSpan(
-                  text: span.text,
-                  style: span.style,
-                  recognizer: TapGestureRecognizer()..onTap = onMessageTap,
-                )
-              else
-                span,
+            ...[
+              for (final span in _parseContent(content))
+                if (span is TextSpan)
+                  TextSpan(
+                    text: span.text,
+                    style: span.style,
+                    recognizer: TapGestureRecognizer()..onTap = onMessageTap,
+                  )
+                else
+                  span,
             ],
           ],
         ),

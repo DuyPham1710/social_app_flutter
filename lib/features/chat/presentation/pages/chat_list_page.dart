@@ -292,9 +292,8 @@ class _ChatListPageState extends State<ChatListPage> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        builder: (context) =>
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
 
       final existingConversation = await _findConversationWithFriend(
@@ -812,7 +811,7 @@ class _ChatListPageState extends State<ChatListPage> {
                           return SliverToBoxAdapter(
                             child: Padding(
                               padding: EdgeInsets.all(16.h),
-                              child: const Center(
+                              child: Center(
                                 child: CircularProgressIndicator(
                                   color: AppColors.primary,
                                 ),
@@ -902,7 +901,7 @@ class _ChatListPageState extends State<ChatListPage> {
             ],
           );
         } else if (friendState is FriendLoading) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.all(16.0),
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),

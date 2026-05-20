@@ -309,7 +309,7 @@ class _MyAppState extends State<MyApp> {
                 : TokenStorage.getUserData(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
+                return Scaffold(
                   body: Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),

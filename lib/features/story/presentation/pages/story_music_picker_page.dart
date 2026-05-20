@@ -23,7 +23,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   bool _isLoading = true;
   String? _error;
   List<DeezerMusicModel> _tracks = [];
-  
+
   // Search state
   bool _isSearching = false;
   bool _isSearchLoading = false;
@@ -32,7 +32,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   int _searchCurrentPage = 0;
   bool _hasMoreSearchResults = true;
   String? _currentSearchQuery;
-  
+
   int? _playingId;
   bool _isPaused = false;
   Duration _position = Duration.zero;
@@ -94,25 +94,27 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       final res = await Dio().get('https://api.deezer.com/chart');
       final data = res.data['tracks']?['data'] as List<dynamic>? ?? [];
       final parsed = data
-          .map((e) => DeezerMusicModel.fromJson({
-                'id': e['id'],
-                'title': e['title'],
-                'preview': e['preview'] ?? '',
-                'artist': {
-                  'id': e['artist']?['id'] ?? 0,
-                  'name': e['artist']?['name'] ?? '',
-                  'picture': e['artist']?['picture'] ??
-                      e['artist']?['picture_medium'] ??
-                      '',
-                },
-                'album': {
-                  'id': e['album']?['id'] ?? 0,
-                  'title': e['album']?['title'] ?? '',
-                  'cover': e['album']?['cover'] ??
-                      e['album']?['cover_medium'] ??
-                      '',
-                },
-              }))
+          .map(
+            (e) => DeezerMusicModel.fromJson({
+              'id': e['id'],
+              'title': e['title'],
+              'preview': e['preview'] ?? '',
+              'artist': {
+                'id': e['artist']?['id'] ?? 0,
+                'name': e['artist']?['name'] ?? '',
+                'picture':
+                    e['artist']?['picture'] ??
+                    e['artist']?['picture_medium'] ??
+                    '',
+              },
+              'album': {
+                'id': e['album']?['id'] ?? 0,
+                'title': e['album']?['title'] ?? '',
+                'cover':
+                    e['album']?['cover'] ?? e['album']?['cover_medium'] ?? '',
+              },
+            }),
+          )
           .toList();
       if (mounted) {
         setState(() {
@@ -137,7 +139,11 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     return _tracks;
   }
 
-  Future<void> _searchTracks(String query, {int page = 0, bool loadMore = false}) async {
+  Future<void> _searchTracks(
+    String query, {
+    int page = 0,
+    bool loadMore = false,
+  }) async {
     if (query.trim().isEmpty) {
       setState(() {
         _isSearching = false;
@@ -164,36 +170,34 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       final index = page * 10;
       final res = await Dio().get(
         'https://api.deezer.com/search',
-        queryParameters: {
-          'q': query,
-          'limit': 10,
-          'index': index,
-        },
+        queryParameters: {'q': query, 'limit': 10, 'index': index},
       );
-      
+
       final data = res.data['data'] as List<dynamic>? ?? [];
       final total = res.data['total'] as int? ?? 0;
-      
+
       final parsed = data
-          .map((e) => DeezerMusicModel.fromJson({
-                'id': e['id'],
-                'title': e['title'],
-                'preview': e['preview'] ?? '',
-                'artist': {
-                  'id': e['artist']?['id'] ?? 0,
-                  'name': e['artist']?['name'] ?? '',
-                  'picture': e['artist']?['picture'] ??
-                      e['artist']?['picture_medium'] ??
-                      '',
-                },
-                'album': {
-                  'id': e['album']?['id'] ?? 0,
-                  'title': e['album']?['title'] ?? '',
-                  'cover': e['album']?['cover'] ??
-                      e['album']?['cover_medium'] ??
-                      '',
-                },
-              }))
+          .map(
+            (e) => DeezerMusicModel.fromJson({
+              'id': e['id'],
+              'title': e['title'],
+              'preview': e['preview'] ?? '',
+              'artist': {
+                'id': e['artist']?['id'] ?? 0,
+                'name': e['artist']?['name'] ?? '',
+                'picture':
+                    e['artist']?['picture'] ??
+                    e['artist']?['picture_medium'] ??
+                    '',
+              },
+              'album': {
+                'id': e['album']?['id'] ?? 0,
+                'title': e['album']?['title'] ?? '',
+                'cover':
+                    e['album']?['cover'] ?? e['album']?['cover_medium'] ?? '',
+              },
+            }),
+          )
           .toList();
 
       if (mounted && _currentSearchQuery == query) {
@@ -223,14 +227,16 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   }
 
   Future<void> _loadMoreSearchResults() async {
-    if (_isSearchLoading || !_hasMoreSearchResults || _currentSearchQuery == null) {
+    if (_isSearchLoading ||
+        !_hasMoreSearchResults ||
+        _currentSearchQuery == null) {
       return;
     }
-    
+
     setState(() {
       _isSearchLoading = true;
     });
-    
+
     await _searchTracks(
       _currentSearchQuery!,
       page: _searchCurrentPage + 1,
@@ -325,7 +331,10 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                         setState(() {});
                         _onSearchChanged(value);
                       },
-                      style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14.sp,
+                      ),
                       decoration: InputDecoration(
                         hintText: "Tìm kiếm nhạc",
                         hintStyle: TextStyle(color: AppColors.textSecondary),
@@ -338,7 +347,11 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                     IconButton(
                       splashRadius: 18,
                       padding: EdgeInsets.zero,
-                      icon: Icon(Icons.clear, color: AppColors.iconPrimary, size: 20),
+                      icon: Icon(
+                        Icons.clear,
+                        color: AppColors.iconPrimary,
+                        size: 20,
+                      ),
                       onPressed: () {
                         _searchController.clear();
                         setState(() {});
@@ -363,11 +376,9 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
   Widget _buildList() {
     // Show loading for initial chart load
     if (!_isSearching && _isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
-    
+
     // Show error for initial chart load
     if (!_isSearching && _error != null) {
       return Center(
@@ -380,22 +391,17 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
-            TextButton(
-              onPressed: _fetchTracks,
-              child: const Text('Thử lại'),
-            ),
+            TextButton(onPressed: _fetchTracks, child: const Text('Thử lại')),
           ],
         ),
       );
     }
-    
+
     // Show loading for search
     if (_isSearching && _isSearchLoading && _searchResults.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
-    
+
     // Show search error
     if (_isSearching && _searchError != null && _searchResults.isEmpty) {
       return Center(
@@ -416,41 +422,46 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
         ),
       );
     }
-    
+
     // Show empty state
     if (_displayTracks.isEmpty) {
       return Center(
         child: Text(
-          _isSearching 
+          _isSearching
               ? 'Không tìm thấy bài hát phù hợp.'
               : 'Không có bài hát nào.',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );
     }
-    
+
     return RefreshIndicator(
       color: AppColors.primary,
       backgroundColor: AppColors.background,
-      onRefresh: _isSearching 
+      onRefresh: _isSearching
           ? () => _searchTracks(_currentSearchQuery ?? '')
           : _fetchTracks,
       child: ListView.separated(
         controller: _scrollController,
         padding: EdgeInsets.symmetric(horizontal: 12.w),
-        itemCount: _displayTracks.length + (_isSearching && _hasMoreSearchResults && _isSearchLoading ? 1 : 0),
+        itemCount:
+            _displayTracks.length +
+            (_isSearching && _hasMoreSearchResults && _isSearchLoading ? 1 : 0),
         separatorBuilder: (_, __) => SizedBox(height: 6.h),
         itemBuilder: (context, index) {
           // Loading indicator khi đang tải thêm
-          if (_isSearching && _hasMoreSearchResults && _isSearchLoading && index == _displayTracks.length) {
+          if (_isSearching &&
+              _hasMoreSearchResults &&
+              _isSearchLoading &&
+              index == _displayTracks.length) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: const Center(
+              child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
             );
           }
-          
+
           final item = _displayTracks[index];
           final isCurrentPlaying = _playingId == item.id && !_isPaused;
           final progress = isCurrentPlaying && _duration.inMilliseconds > 0
@@ -495,8 +506,8 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       _duration = Duration.zero;
     });
     await _audioPlayer.stop();
-    if (item.preview != null && item.preview!.isNotEmpty) {
-      await _audioPlayer.play(UrlSource(item.preview!));
+    if (item.preview.isNotEmpty) {
+      await _audioPlayer.play(UrlSource(item.preview));
     } else {
       // không có preview
       setState(() {

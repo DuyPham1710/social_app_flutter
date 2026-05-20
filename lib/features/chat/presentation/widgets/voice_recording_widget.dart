@@ -475,7 +475,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
                 child: Container(
                   width: 40.w,
                   height: 40.w,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),

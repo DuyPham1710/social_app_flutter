@@ -60,6 +60,7 @@ dependencies:
   file_picker: ^11.0.2
   syncfusion_flutter_pdfviewer: ^31.1.19
   open_filex: ^4.7.0
+  flutter_colorpicker: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

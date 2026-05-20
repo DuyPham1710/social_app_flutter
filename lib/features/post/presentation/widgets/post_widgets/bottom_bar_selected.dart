@@ -72,7 +72,7 @@ class BottomBarSelected extends StatelessWidget {
                           child: Container(
                             width: 18.w,
                             height: 18.h,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: AppColors.primary,
                             ),

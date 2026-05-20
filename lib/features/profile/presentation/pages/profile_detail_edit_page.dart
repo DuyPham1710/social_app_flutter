@@ -91,7 +91,7 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
         actions: [
           TextButton(
             onPressed: _onSave,
-            child: const Text(
+            child: Text(
               "Lưu",
               style: TextStyle(
                 color: AppColors.primary,

@@ -195,8 +195,8 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     final countLabel = isLoading
         ? 'Đang tải'
         : _searchController.text.trim().isEmpty
-            ? '$totalMembers thành viên'
-            : '$visibleMembers/$totalMembers thành viên';
+        ? '$totalMembers thành viên'
+        : '$visibleMembers/$totalMembers thành viên';
 
     return Row(
       children: [
@@ -207,10 +207,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             color: AppColors.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Icon(
-            Icons.groups_rounded,
-            color: AppColors.primary,
-          ),
+          child: Icon(Icons.groups_rounded, color: AppColors.primary),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -291,7 +288,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.3),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.3),
         ),
       ),
     );
@@ -304,7 +301,8 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         for (var index = 0; index < members.length; index++) ...[
           _MemberTile(
             member: members[index],
-            canManage: widget.userRole == 'admin' &&
+            canManage:
+                widget.userRole == 'admin' &&
                 members[index].role.toLowerCase() != 'admin',
             onTap: () => _handleMemberTap(context, members[index].user.userId),
             onRemove: () => _showKickConfirmation(
@@ -360,10 +358,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
               ],
             ),
           ),
-          TextButton(
-            onPressed: _refreshMembers,
-            child: const Text('Thử lại'),
-          ),
+          TextButton(onPressed: _refreshMembers, child: const Text('Thử lại')),
         ],
       ),
     );
@@ -471,8 +466,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) =>
-                s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+            create: (_) => s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
             child: const ProfilePage(),
           ),
         ),
@@ -502,11 +496,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(
-          children: const [
-            Expanded(child: Text('Xóa thành viên')),
-          ],
-        ),
+        title: Row(children: const [Expanded(child: Text('Xóa thành viên'))]),
         content: Text(
           'Bạn muốn xóa $userName khỏi cộng đồng? Người này có thể gửi yêu cầu tham gia lại sau.',
           style: const TextStyle(height: 1.35),
@@ -600,7 +590,6 @@ class _MemberTile extends StatelessWidget {
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        
                         if (!isAdmin) const _RolePill(isAdmin: false),
                         if (member.createdAt != null)
                           _JoinedDate(date: member.createdAt!),
@@ -622,7 +611,6 @@ class _MemberTile extends StatelessWidget {
                   ),
                   itemBuilder: (_) => const [
                     PopupMenuItem(
-                      
                       value: 'remove',
                       child: Row(
                         children: [
@@ -665,10 +653,7 @@ class _MemberAvatar extends StatelessWidget {
   final String? avatarUrl;
   final String fallbackName;
 
-  const _MemberAvatar({
-    required this.avatarUrl,
-    required this.fallbackName,
-  });
+  const _MemberAvatar({required this.avatarUrl, required this.fallbackName});
 
   @override
   Widget build(BuildContext context) {
@@ -709,7 +694,7 @@ class _AvatarFallback extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initial,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.primary,
           fontWeight: FontWeight.w800,
           fontSize: 18,
@@ -796,11 +781,7 @@ class _SkeletonBox extends StatelessWidget {
   final double height;
   final double radius;
 
-  const _SkeletonBox({
-    this.width,
-    required this.height,
-    required this.radius,
-  });
+  const _SkeletonBox({this.width, required this.height, required this.radius});
 
   @override
   Widget build(BuildContext context) {

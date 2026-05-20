@@ -90,7 +90,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
       body: BlocBuilder<CommentBloc, CommentState>(
         builder: (context, state) {
           if (state is CommentHistoryLoading) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }

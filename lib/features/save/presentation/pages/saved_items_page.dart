@@ -57,9 +57,8 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
+      builder: (_) =>
+          Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
 
     final result = await _getPostDetailUsecase(
@@ -291,7 +290,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         controller: _refreshController,
         enablePullDown: true,
         enablePullUp: !state.hasReachedMax,
-        header: const WaterDropMaterialHeader(
+        header: WaterDropMaterialHeader(
           backgroundColor: AppColors.primary,
           color: Colors.white,
         ),

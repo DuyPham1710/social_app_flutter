@@ -333,7 +333,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           return PostItem(post: post, commentCount: count);
         }),
         if (state is OtherProfileLoaded && state.isLoadingMore)
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16),
             child: Center(
               child: CircularProgressIndicator(color: AppColors.primary),

@@ -27,7 +27,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
       builder: (context, state) {
         if (state is FriendLoading) {
           return _buildContainer(
-            child: const Center(
+            child: Center(
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: CircularProgressIndicator(color: AppColors.primary),
@@ -112,7 +112,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               ),
               TextButton(
                 onPressed: widget.onViewAll,
-                child: const Text(
+                child: Text(
                   "Xem tất cả",
                   style: TextStyle(
                     color: AppColors.primary,

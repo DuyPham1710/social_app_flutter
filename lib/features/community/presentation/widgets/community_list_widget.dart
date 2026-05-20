@@ -178,7 +178,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                           : AppColors.primary,
                     ),
                     if (_activeFilter != _CommunityFilter.all)
-                      const Positioned(
+                      Positioned(
                         right: 8,
                         top: 8,
                         child: SizedBox(

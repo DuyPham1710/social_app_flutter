@@ -176,7 +176,7 @@ class _FriendPageState extends State<FriendPage>
                   ),
                 ],
               ),
-              child: const Center(
+              child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
             );
@@ -365,7 +365,7 @@ class _FriendPageState extends State<FriendPage>
         builder: (context, state) {
           if (state is FriendSuggestionsLoading ||
               (state is FriendPageLoaded && state.isLoadingSuggestions)) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           } else if (state is FriendSuggestionsLoaded ||

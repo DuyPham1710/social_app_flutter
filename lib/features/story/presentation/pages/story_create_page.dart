@@ -289,12 +289,16 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                   return ListTile(
                     leading: Icon(
                       Icons.folder,
-                      color: isSelected ? AppColors.primary : AppColors.iconPrimary,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.iconPrimary,
                     ),
                     title: Text(
                       path.name,
                       style: TextStyle(
-                        color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
                         fontSize: 16.sp,
                         fontWeight: isSelected
                             ? FontWeight.w600
@@ -336,9 +340,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
 
   Widget _buildGrid() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (_permissionDenied) {
       return Center(
@@ -412,7 +414,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                         Builder(
                           builder: (context) {
                             final duration = asset.duration;
-                            if (duration != null && duration > 0) {
+                            if (duration > 0) {
                               final minutes = duration ~/ 60;
                               final seconds = duration % 60;
                               return Text(
@@ -434,7 +436,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               if (isSelected)
                 Container(
                   color: Colors.black.withOpacity(0.45),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.check_circle,
                       color: AppColors.primary,

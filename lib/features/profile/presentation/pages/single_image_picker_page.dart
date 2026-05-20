@@ -107,7 +107,9 @@ class _SingleImagePickerPageState extends State<SingleImagePickerPage> {
             child: Text(
               "Lưu",
               style: TextStyle(
-                color: _selectedAsset != null ? AppColors.primary : AppColors.textSecondary,
+                color: _selectedAsset != null
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -116,7 +118,7 @@ class _SingleImagePickerPageState extends State<SingleImagePickerPage> {
         ],
       ),
       body: _assets.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary))
           : GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,

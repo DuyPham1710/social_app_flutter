@@ -142,16 +142,13 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
 
     final style = widget.textStyle ?? TextStyle(fontSize: 13.sp);
 
-    final showTranslateRow = _eligibilityChecked &&
-        _hideTranslateAction == false;
+    final showTranslateRow =
+        _eligibilityChecked && _hideTranslateAction == false;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          captionToShow,
-          style: style,
-        ),
+        Text(captionToShow, style: style),
         if (showTranslateRow) ...[
           SizedBox(height: 4.h),
           Row(
@@ -160,7 +157,10 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
                 SizedBox(
                   width: 14.w,
                   height: 14.w,
-                  child: const CircularProgressIndicator(strokeWidth: 1.5),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1.5,
+                    color: AppColors.primary,
+                  ),
                 ),
               if (_isLoading) SizedBox(width: 6.w),
               TextButton(
@@ -174,10 +174,7 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
                   _translation == null
                       ? 'Xem bản dịch'
                       : (_showTranslated ? 'Xem bản gốc' : 'Xem bản dịch'),
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: AppColors.primary,
-                  ),
+                  style: TextStyle(fontSize: 12.sp, color: AppColors.primary),
                 ),
               ),
             ],
@@ -188,10 +185,7 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
             padding: EdgeInsets.only(top: 2.h),
             child: Text(
               _error!,
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: Colors.red[400],
-              ),
+              style: TextStyle(fontSize: 11.sp, color: Colors.red[400]),
             ),
           ),
       ],

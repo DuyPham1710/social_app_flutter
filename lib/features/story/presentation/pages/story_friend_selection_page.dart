@@ -116,7 +116,10 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                 style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
                 decoration: InputDecoration(
                   hintText: "Tìm kiếm",
-                  hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+                  hintStyle: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14.sp,
+                  ),
                   prefixIcon: Icon(
                     Icons.search,
                     color: AppColors.textSecondary,
@@ -148,7 +151,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
             child: BlocBuilder<FriendBloc, FriendState>(
               builder: (context, state) {
                 if (state is FriendLoading) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   );
                 } else if (state is FriendLoaded) {
@@ -189,7 +192,10 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                   return Center(
                     child: Text(
                       "Lỗi khi tải danh sách bạn bè",
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14.sp,
+                      ),
                     ),
                   );
                 }
@@ -242,7 +248,10 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.background, width: 2),
+                        border: Border.all(
+                          color: AppColors.background,
+                          width: 2,
+                        ),
                       ),
                       child: Icon(
                         Icons.check,

@@ -3,7 +3,8 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
 
 class AppColors {
-  static const Color primary = Color.fromARGB(255, 36, 175, 177);
+  static Color get primary => s1<AppPreferences>().accentColor;
+  static const Color defaultPrimary = Color.fromARGB(255, 36, 175, 177);
 
   static Color get textPrimary =>
       s1<AppPreferences>().isDarkMode ? Colors.white : const Color(0xFF000000);

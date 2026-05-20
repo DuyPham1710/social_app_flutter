@@ -200,10 +200,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                   Navigator.pop(context, controller.text.trim());
                 }
               },
-              child: const Text(
-                'Tạo',
-                style: TextStyle(color: AppColors.primary),
-              ),
+              child: Text('Tạo', style: TextStyle(color: AppColors.primary)),
             ),
           ],
         );
@@ -345,14 +342,14 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
 
             // Collection List
             if (_isLoading)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(32.0),
                 child: Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               )
             else if (_isSaving)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(32.0),
                 child: Center(
                   child: CircularProgressIndicator(color: AppColors.primary),

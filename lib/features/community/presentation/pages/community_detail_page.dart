@@ -26,9 +26,8 @@ class CommunityDetailPage extends StatefulWidget {
     return PageRouteBuilder<void>(
       transitionDuration: fadeTransitionDuration,
       reverseTransitionDuration: fadeTransitionDuration,
-      pageBuilder: (_, __, ___) => CommunityDetailPage(
-        communityId: communityId,
-      ),
+      pageBuilder: (_, __, ___) =>
+          CommunityDetailPage(communityId: communityId),
       transitionsBuilder: (_, animation, __, child) {
         return FadeTransition(
           opacity: CurvedAnimation(
@@ -178,10 +177,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       items.add(
         const PopupMenuItem<String>(
           value: 'delete_community',
-          child: Text(
-            'Xóa nhóm',
-            style: TextStyle(color: Color(0xFFB91C1C)),
-          ),
+          child: Text('Xóa nhóm', style: TextStyle(color: Color(0xFFB91C1C))),
         ),
       );
     }
@@ -208,16 +204,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     switch (value) {
       case 'view_members':
         _showMembersBottomSheet(context);
-        break;
       case 'invite_friends':
         _showInviteFriendsBottomSheet(context);
-        break;
       case 'review_members':
         context.read<CommunityAdminBloc>().add(
           GetPendingRequestsRequested(widget.communityId),
         );
         _showPendingMembersReview(context);
-        break;
       case 'review_posts':
         context.read<CommunityAdminBloc>().add(
           GetPendingPostsRequested(
@@ -227,22 +220,19 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           ),
         );
         _showPendingPostsReview(context);
-        break;
       case 'edit_community':
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => EditCommunityPage(
-              initialCommunity: state.community,
-            ),
-          ),
-        ).then((_) => _refreshContent(context));
-        break;
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (_) =>
+                    EditCommunityPage(initialCommunity: state.community),
+              ),
+            )
+            .then((_) => _refreshContent(context));
       case 'delete_community':
         _showDeleteConfirmation(context);
-        break;
       case 'leave_community':
         _showLeaveConfirmation(context);
-        break;
     }
   }
 
@@ -807,15 +797,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
-      child: KeyedSubtree(
-        key: ValueKey(key),
-        child: child,
-      ),
+      child: KeyedSubtree(key: ValueKey(key), child: child),
     );
   }
 
@@ -850,10 +834,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFE8EEF5),
-                    Color(0xFFD8E1EA),
-                  ],
+                  colors: [Color(0xFFE8EEF5), Color(0xFFD8E1EA)],
                 ),
               ),
               child: Center(
@@ -864,7 +845,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     color: Colors.white.withValues(alpha: 0.85),
                     shape: BoxShape.circle,
                   ),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.all(20),
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
@@ -998,10 +979,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () =>
-                            context.read<CommunityDetailBloc>().add(
-                              CommunityDetailFetched(widget.communityId),
-                            ),
+                        onPressed: () => context
+                            .read<CommunityDetailBloc>()
+                            .add(CommunityDetailFetched(widget.communityId)),
                         child: const Text('Thử lại'),
                       ),
                     ],

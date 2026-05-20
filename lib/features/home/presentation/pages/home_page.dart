@@ -177,7 +177,7 @@ class HomePageState extends State<HomePage> {
                       children: [
                         // Loading indicator khi đang load more
                         if (state.isLoadingMore)
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.all(16.0),
                             child: Center(
                               child: CircularProgressIndicator(

@@ -43,7 +43,7 @@ class TextformfieldCustom extends StatelessWidget {
           labelStyle: TextStyle(color: AppColors.textSecondary),
           floatingLabelStyle: WidgetStateTextStyle.resolveWith((states) {
             if (states.contains(WidgetState.focused)) {
-              return const TextStyle(color: AppColors.primary);
+              return TextStyle(color: AppColors.primary);
             }
             return TextStyle(color: AppColors.textSecondary); // khi không focus
           }),

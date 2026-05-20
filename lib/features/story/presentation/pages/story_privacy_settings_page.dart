@@ -147,7 +147,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        body: const Center(
+        body: Center(
           child: CircularProgressIndicator(color: AppColors.primary),
         ),
       );
@@ -273,7 +273,10 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   SizedBox(height: 4.h),
                   Text(
                     description,
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13.sp,
+                    ),
                   ),
                 ],
               ),
@@ -397,7 +400,11 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 24.sp),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textSecondary,
+                  size: 24.sp,
+                ),
               ],
             ),
           ),

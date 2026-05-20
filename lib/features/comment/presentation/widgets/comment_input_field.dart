@@ -146,7 +146,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                     mentions: [
                       Mention(
                         trigger: '@',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
