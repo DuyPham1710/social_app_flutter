@@ -533,10 +533,11 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<MessageState> emit) {
-    // Validate message - phải có text hoặc attachments hoặc metadata
+    // Validate message - phải có text hoặc attachments hoặc metadata hoặc storyId
     if ((event.text == null || event.text!.isEmpty) &&
         (event.attachments == null || event.attachments!.isEmpty) &&
-        (event.metadata == null || event.metadata!.isEmpty)) {
+        (event.metadata == null || event.metadata!.isEmpty) &&
+        (event.storyId == null || event.storyId!.isEmpty)) {
       print('Cannot send empty message');
       return;
     }
@@ -549,9 +550,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       attachments: event.attachments,
       replyTo: event.replyTo,
       metadata: event.metadata,
+      storyId: event.storyId,
     );
-
-    print('Message sent to conversation: ${event.conversationId}');
     // Note: Message will be added to list via message:new event from backend
   }
 
@@ -561,7 +561,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   ) async {
     try {
       print('Uploading files for conversation: ${event.conversationId}');
-      
+
       final currentState = state;
       if (currentState is MessagesLoaded) {
         emit(
@@ -588,14 +588,17 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       if (attachments.isNotEmpty) {
         // Nếu có duration và waveform (voice message), thêm vào attachment đầu tiên
         List<Map<String, dynamic>> finalAttachments = attachments;
-        
+
         if (event.audioDuration != null && event.audioWaveform != null) {
-          print('Adding voice metadata: duration=${event.audioDuration}s, waveform=${event.audioWaveform!.length} bars');
-          
+          print(
+            'Adding voice metadata: duration=${event.audioDuration}s, waveform=${event.audioWaveform!.length} bars',
+          );
+
           // Clone attachment đầu tiên và thêm duration + waveform
           finalAttachments = attachments.map((attachment) {
             // Chỉ thêm vào attachment đầu tiên (voice message)
-            if (attachment == attachments.first && attachment['type'] == 'audio') {
+            if (attachment == attachments.first &&
+                attachment['type'] == 'audio') {
               return {
                 ...attachment,
                 'duration': event.audioDuration,
@@ -605,7 +608,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
             return attachment;
           }).toList();
         }
-        
+
         add(
           SendMessageEvent(
             userId: event.userId,

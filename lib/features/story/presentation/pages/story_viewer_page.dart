@@ -186,6 +186,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   }
 
   void _resetAndPlay() {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _currentMusicDurationSeconds = widget.durationSeconds;
       _currentVideoDurationSeconds = 0; // Reset video duration
@@ -200,6 +201,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   }
 
   void _close() {
+    FocusManager.instance.primaryFocus?.unfocus();
     _controller.stop();
     _audioPlayer.stop();
     Navigator.of(context).pop();
@@ -439,6 +441,15 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                     story: _currentStory,
                     currentUserId: _currentUserId,
                     isOwnStory: _currentStory.user.userId == _currentUserId,
+                    onFocusChanged: (hasFocus) {
+                      if (hasFocus) {
+                        _controller.stop();
+                        _audioPlayer.pause();
+                      } else {
+                        _controller.forward();
+                        _audioPlayer.resume();
+                      }
+                    },
                   ),
 
                   // Hiển thị số lượng react ở góc trái dưới cho story của chính mình

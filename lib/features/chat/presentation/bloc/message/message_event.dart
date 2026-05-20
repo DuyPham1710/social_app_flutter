@@ -112,6 +112,7 @@ class SendMessageEvent extends MessageEvent {
   final List<Map<String, dynamic>>? attachments; // Attachments URLs từ upload
   final String? replyTo;
   final Map<String, dynamic>? metadata;
+  final String? storyId;
 
   const SendMessageEvent({
     required this.userId,
@@ -120,6 +121,7 @@ class SendMessageEvent extends MessageEvent {
     this.attachments,
     this.replyTo,
     this.metadata,
+    this.storyId,
   });
 
   @override
@@ -130,6 +132,7 @@ class SendMessageEvent extends MessageEvent {
     attachments,
     replyTo,
     metadata,
+    storyId,
   ];
 }
 

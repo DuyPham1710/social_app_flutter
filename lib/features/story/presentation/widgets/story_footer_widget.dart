@@ -7,12 +7,17 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/create_conversation_usecase.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 
 class StoryFooterWidget extends StatefulWidget {
   final TextEditingController textController;
   final StoryEntity story;
   final String? currentUserId;
   final bool isOwnStory;
+  final ValueChanged<bool>? onFocusChanged;
 
   const StoryFooterWidget({
     super.key,
@@ -20,6 +25,7 @@ class StoryFooterWidget extends StatefulWidget {
     required this.story,
     this.currentUserId,
     this.isOwnStory = false,
+    this.onFocusChanged,
   });
 
   @override
@@ -29,11 +35,17 @@ class StoryFooterWidget extends StatefulWidget {
 class _StoryFooterWidgetState extends State<StoryFooterWidget> {
   EmojiType? _selectedReact;
   final List<OverlayEntry> _activeEntries = [];
+  final FocusNode _focusNode = FocusNode();
+  bool _showSendButton = false;
+  bool _isSending = false;
 
   @override
   void initState() {
     super.initState();
     _selectedReact = widget.story.isReact;
+    _focusNode.addListener(_onFocusChange);
+    widget.textController.addListener(_onTextChanged);
+    _showSendButton = widget.textController.text.trim().isNotEmpty;
   }
 
   @override
@@ -47,6 +59,9 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
 
   @override
   void dispose() {
+    widget.textController.removeListener(_onTextChanged);
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
     final entries = List<OverlayEntry>.from(_activeEntries);
     _activeEntries.clear();
     for (final entry in entries) {
@@ -55,6 +70,103 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
       } catch (_) {}
     }
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (widget.onFocusChanged != null) {
+      widget.onFocusChanged!(_focusNode.hasFocus);
+    }
+  }
+
+  void _onTextChanged() {
+    final hasText = widget.textController.text.trim().isNotEmpty;
+    if (hasText != _showSendButton) {
+      setState(() {
+        _showSendButton = hasText;
+      });
+    }
+  }
+
+  Future<void> _sendStoryReply(BuildContext context) async {
+    final text = widget.textController.text.trim();
+    if (text.isEmpty || _isSending) return;
+
+    setState(() {
+      _isSending = true;
+    });
+
+    try {
+      final currentUserId = widget.currentUserId;
+      if (currentUserId == null) {
+        throw Exception('User not logged in');
+      }
+
+      // 1. Create or get conversation with story owner
+      final createConversationUseCase = s1<CreateConversationUseCase>();
+      final result = await createConversationUseCase(
+        params: CreateConversationParams(
+          userId: currentUserId,
+          participantIds: [widget.story.user.userId],
+        ),
+      );
+
+      if (result is DataStateSuccess && result.data != null) {
+        final conversation = result.data!;
+
+        // 2. Send message replying to the story
+        final sendMessageUseCase = s1<SendMessageUseCase>();
+        sendMessageUseCase(
+          userId: currentUserId,
+          conversationId: conversation.id,
+          text: text,
+          storyId: widget.story.id,
+        );
+
+        // Clear input and unfocus
+        widget.textController.clear();
+        _focusNode.unfocus();
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 8.w),
+                  const Text('Đã gửi phản hồi tin'),
+                ],
+              ),
+              backgroundColor: AppColors.primary,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+          );
+        }
+      } else {
+        throw Exception(
+          result.error?.message ?? 'Không thể tạo cuộc hội thoại',
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi: ${e.toString()}'),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSending = false;
+        });
+      }
+    }
   }
 
   void _spawnFloatingEmojiBurst(
@@ -128,16 +240,53 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(24.r),
                   ),
-                  child: TextField(
-                    controller: widget.textController,
-                    style: TextStyle(fontSize: 14.sp, color: Colors.white),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Send message...',
-                      hintStyle: TextStyle(
-                        color: AppColors.textSecondary,
-                      ), // Màu xám nhạt
-                    ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: widget.textController,
+                          focusNode: _focusNode,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textPrimary,
+                          ),
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (value) => _sendStoryReply(context),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Gửi tin nhắn...',
+                            hintStyle: TextStyle(
+                              color: AppColors.textSecondary,
+                            ), // Màu xám nhạt
+                          ),
+                        ),
+                      ),
+                      if (_showSendButton)
+                        GestureDetector(
+                          onTap: _isSending
+                              ? null
+                              : () => _sendStoryReply(context),
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 4.w),
+                            child: _isSending
+                                ? SizedBox(
+                                    width: 16.w,
+                                    height: 16.w,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.primary,
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.send_rounded,
+                                    color: AppColors.primary,
+                                    size: 20.sp,
+                                  ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

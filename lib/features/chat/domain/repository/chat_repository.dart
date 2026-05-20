@@ -75,6 +75,7 @@ abstract class ChatRepository {
     List<Map<String, dynamic>>? attachments,
     String? replyTo,
     Map<String, dynamic>? metadata,
+    String? storyId,
   });
 
   // Upload files and return attachments URLs (HTTP)
