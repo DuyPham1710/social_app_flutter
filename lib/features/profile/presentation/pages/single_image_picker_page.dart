@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/profile/domain/entities/update_user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SingleImagePickerPage extends StatefulWidget {
   final bool isAvatar; // True: Sửa Avatar, False: Sửa ảnh bìa
@@ -100,12 +101,16 @@ class _SingleImagePickerPageState extends State<SingleImagePickerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isAvatar ? "Chọn Ảnh Đại Diện" : "Chọn Ảnh Bìa"),
+        title: Text(
+          widget.isAvatar
+              ? context.l10n.profileChooseAvatar
+              : context.l10n.profileChooseCover,
+        ),
         actions: [
           TextButton(
             onPressed: _selectedAsset != null ? _onSave : null,
             child: Text(
-              "Lưu",
+              context.l10n.commonSave,
               style: TextStyle(
                 color: _selectedAsset != null
                     ? AppColors.primary

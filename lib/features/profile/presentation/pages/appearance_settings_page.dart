@@ -4,6 +4,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/generated/app_localizations.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class AppearanceSettingsPage extends StatefulWidget {
   const AppearanceSettingsPage({super.key});
@@ -14,7 +16,7 @@ class AppearanceSettingsPage extends StatefulWidget {
 
 class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   late Color _selectedAccentColor;
-  late String _selectedAccentName;
+  late String _selectedAccentKey;
 
   // Local state for text size slider
   double _textSizeSliderValue = 2.0;
@@ -24,12 +26,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   bool _reduceMotion = false;
 
   final List<Map<String, dynamic>> _accentColors = [
-    {'name': 'Mặc định', 'color': AppColors.defaultPrimary},
-    {'name': 'Xanh Dương', 'color': const Color(0xFF1877F2)},
-    {'name': 'Hồng Tím', 'color': const Color(0xFFD62976)},
-    {'name': 'Tím Neon', 'color': const Color(0xFF8B5CF6)},
-    {'name': 'Cam Sáng', 'color': const Color(0xFFFF7F50)},
-    {'name': 'Đỏ Coral', 'color': const Color(0xFFFF3B5C)},
+    {'key': 'default', 'color': AppColors.defaultPrimary},
+    {'key': 'blue', 'color': const Color(0xFF1877F2)},
+    {'key': 'pinkPurple', 'color': const Color(0xFFD62976)},
+    {'key': 'neonPurple', 'color': const Color(0xFF8B5CF6)},
+    {'key': 'brightOrange', 'color': const Color(0xFFFF7F50)},
+    {'key': 'coralRed', 'color': const Color(0xFFFF3B5C)},
   ];
 
   @override
@@ -41,9 +43,9 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     final accentColorItem = _accentColors.firstWhere(
       (element) =>
           (element['color'] as Color).value == _selectedAccentColor.value,
-      orElse: () => {'name': 'Tùy chỉnh', 'color': _selectedAccentColor},
+      orElse: () => {'key': 'custom', 'color': _selectedAccentColor},
     );
-    _selectedAccentName = accentColorItem['name'] as String;
+    _selectedAccentKey = accentColorItem['key'] as String;
   }
 
   @override
@@ -55,6 +57,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       builder: (context, _) {
         final isDark = prefs.isDarkMode;
         final currentThemeMode = prefs.themeMode;
+        final l10n = context.l10n;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -72,7 +75,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
-              'Giao diện',
+              l10n.menuAppearance,
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 18.sp,
@@ -88,14 +91,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('CHẾ ĐỘ HIỂN THỊ'),
+                  _buildSectionTitle(l10n.appearanceDisplayModeSection),
                   SizedBox(height: 12.h),
                   Row(
                     children: [
                       // Light mode option
                       Expanded(
                         child: _buildThemeOptionCard(
-                          title: 'Sáng',
+                          title: l10n.appearanceLightMode,
                           isSelected: currentThemeMode == ThemeMode.light,
                           onTap: () => prefs.setThemeMode(ThemeMode.light),
                           previewWidget: _buildLightCardPreview(),
@@ -105,7 +108,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                       // Dark mode option
                       Expanded(
                         child: _buildThemeOptionCard(
-                          title: 'Tối',
+                          title: l10n.appearanceDarkMode,
                           isSelected: currentThemeMode == ThemeMode.dark,
                           onTap: () => prefs.setThemeMode(ThemeMode.dark),
                           previewWidget: _buildDarkCardPreview(),
@@ -115,7 +118,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                       // Auto/System mode option
                       Expanded(
                         child: _buildThemeOptionCard(
-                          title: 'Tự động',
+                          title: l10n.appearanceAutoMode,
                           isSelected: currentThemeMode == ThemeMode.system,
                           onTap: () => prefs.setThemeMode(ThemeMode.system),
                           previewWidget: _buildAutoCardPreview(),
@@ -128,9 +131,9 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildSectionTitle('MÀU CHỦ ĐẠO'),
+                      _buildSectionTitle(l10n.appearanceAccentColorSection),
                       Text(
-                        _selectedAccentName,
+                        _accentName(l10n, _selectedAccentKey),
                         style: TextStyle(
                           color: _selectedAccentColor,
                           fontSize: 14.sp,
@@ -143,7 +146,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   _buildAccentColorPicker(isDark),
                   SizedBox(height: 28.h),
 
-                  _buildSectionTitle('KÍCH THƯỚC CHỮ'),
+                  _buildSectionTitle(l10n.appearanceTextSizeSection),
                   SizedBox(height: 12.h),
                   _buildTextSizeCard(isDark),
                   SizedBox(height: 28.h),
@@ -385,14 +388,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         children:
             _accentColors.map((swatch) {
               final color = swatch['color'] as Color;
-              final name = swatch['name'] as String;
+              final key = swatch['key'] as String;
               final isSelected = _selectedAccentColor.value == color.value;
 
               return GestureDetector(
                 onTap: () {
                   setState(() {
                     _selectedAccentColor = color;
-                    _selectedAccentName = name;
+                    _selectedAccentKey = key;
                   });
                   s1<AppPreferences>().setAccentColor(color);
                 },
@@ -453,7 +456,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         return AlertDialog(
           backgroundColor: AppColors.background,
           title: Text(
-            'Chọn màu chủ đạo',
+            context.l10n.appearanceChooseAccentColor,
             style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 16.sp,
@@ -478,7 +481,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(
-                'Hủy',
+                context.l10n.commonCancel,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
@@ -486,13 +489,13 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               onPressed: () {
                 setState(() {
                   _selectedAccentColor = tempColor;
-                  _selectedAccentName = 'Tùy chỉnh';
+                  _selectedAccentKey = 'custom';
                 });
                 s1<AppPreferences>().setAccentColor(tempColor);
                 Navigator.pop(context);
               },
               child: Text(
-                'Chọn',
+                context.l10n.commonChoose,
                 style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -571,21 +574,21 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Nhỏ',
+                context.l10n.appearanceSmallText,
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 11.sp,
                 ),
               ),
               Text(
-                'Bình thường',
+                context.l10n.appearanceNormalText,
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 11.sp,
                 ),
               ),
               Text(
-                'Lớn',
+                context.l10n.appearanceLargeText,
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 11.sp,
@@ -615,7 +618,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Độ tương phản cao',
+                  context.l10n.appearanceHighContrast,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14.sp,
@@ -626,8 +629,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   activeColor: _selectedAccentColor,
                   activeTrackColor: _selectedAccentColor.withOpacity(0.4),
                   inactiveThumbColor: isDark ? Colors.grey[400] : Colors.white,
-                  inactiveTrackColor: isDark ? const Color(0xFF333333) : const Color(0xFFE0E0E0),
-                  trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+                  inactiveTrackColor: isDark
+                      ? const Color(0xFF333333)
+                      : const Color(0xFFE0E0E0),
+                  trackOutlineColor: MaterialStateProperty.all(
+                    Colors.transparent,
+                  ),
                   onChanged: (value) {
                     setState(() {
                       _highContrast = value;
@@ -645,7 +652,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Giảm chuyển động',
+                  context.l10n.appearanceReduceMotion,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14.sp,
@@ -656,8 +663,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   activeColor: _selectedAccentColor,
                   activeTrackColor: _selectedAccentColor.withOpacity(0.4),
                   inactiveThumbColor: isDark ? Colors.grey[400] : Colors.white,
-                  inactiveTrackColor: isDark ? const Color(0xFF333333) : const Color(0xFFE0E0E0),
-                  trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+                  inactiveTrackColor: isDark
+                      ? const Color(0xFF333333)
+                      : const Color(0xFFE0E0E0),
+                  trackOutlineColor: MaterialStateProperty.all(
+                    Colors.transparent,
+                  ),
                   onChanged: (value) {
                     setState(() {
                       _reduceMotion = value;
@@ -670,5 +681,23 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ],
       ),
     );
+  }
+
+  String _accentName(AppLocalizations l10n, String key) {
+    switch (key) {
+      case 'default':
+        return l10n.appearanceDefaultAccent;
+      case 'blue':
+        return l10n.appearanceBlueAccent;
+      case 'pinkPurple':
+        return l10n.appearancePinkPurpleAccent;
+      case 'neonPurple':
+        return l10n.appearanceNeonPurpleAccent;
+      case 'brightOrange':
+        return l10n.appearanceBrightOrangeAccent;
+      case 'coralRed':
+        return l10n.appearanceCoralRedAccent;
+    }
+    return l10n.appearanceCustomAccentColor;
   }
 }

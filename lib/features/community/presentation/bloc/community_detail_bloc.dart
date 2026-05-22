@@ -281,7 +281,9 @@ class CommunityDetailBloc
   ) async {
     emit(const CommunityDetailLoading());
     try {
-      final dataState = await _deleteCommunityUseCase(params: event.communityId);
+      final dataState = await _deleteCommunityUseCase(
+        params: event.communityId,
+      );
 
       if (dataState is DataStateSuccess) {
         emit(

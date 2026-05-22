@@ -50,15 +50,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     final currentState = state;
-    
+
     // Chỉ thực hiện khi đang ở trạng thái Loaded (đã có data để sửa)
     if (currentState is ProfileLoaded) {
       // 1. Emit trạng thái đang update (loading quay vòng)
-      emit(currentState.copyWith(
-        isUpdating: true,
-        updateSuccess: false,
-        updateError: null,
-      ));
+      emit(
+        currentState.copyWith(
+          isUpdating: true,
+          updateSuccess: false,
+          updateError: null,
+        ),
+      );
 
       // 2. Gọi API
       final result = await updateUserProfileUseCase(event.params);
@@ -66,18 +68,22 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       // 3. Xử lý kết quả
       if (result is DataStateSuccess && result.data != null) {
         // Thành công: Cập nhật user mới vào state -> UI tự đổi
-        emit(currentState.copyWith(
-          isUpdating: false,
-          updateSuccess: true,
-          user: result.data, 
-        ));
+        emit(
+          currentState.copyWith(
+            isUpdating: false,
+            updateSuccess: true,
+            user: result.data,
+          ),
+        );
       } else {
         // Thất bại
-        emit(currentState.copyWith(
-          isUpdating: false,
-          updateSuccess: false,
-          updateError: result.error?.message ?? "Cập nhật thất bại",
-        ));
+        emit(
+          currentState.copyWith(
+            isUpdating: false,
+            updateSuccess: false,
+            updateError: result.error?.message ?? "Cập nhật thất bại",
+          ),
+        );
       }
     }
   }
@@ -228,8 +234,14 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     final currentState = state;
     if (currentState is ProfileLoaded && currentState.user != null) {
-      emit(currentState.copyWith(isDeletingFace: true, deleteFaceSuccess: false, deleteFaceError: null));
-      
+      emit(
+        currentState.copyWith(
+          isDeletingFace: true,
+          deleteFaceSuccess: false,
+          deleteFaceError: null,
+        ),
+      );
+
       final result = await deleteFaceRegistrationUsecase();
 
       if (result is DataStateSuccess) {
@@ -238,17 +250,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           isFaceRegistered: false,
         );
 
-        emit(currentState.copyWith(
-          user: updatedUser,
-          isDeletingFace: false,
-          deleteFaceSuccess: true,
-        ));
+        emit(
+          currentState.copyWith(
+            user: updatedUser,
+            isDeletingFace: false,
+            deleteFaceSuccess: true,
+          ),
+        );
       } else {
-        emit(currentState.copyWith(
-          isDeletingFace: false,
-          deleteFaceSuccess: false,
-          deleteFaceError: result.error?.message ?? "Xóa thất bại",
-        ));
+        emit(
+          currentState.copyWith(
+            isDeletingFace: false,
+            deleteFaceSuccess: false,
+            deleteFaceError: result.error?.message ?? "Xóa thất bại",
+          ),
+        );
       }
     }
   }

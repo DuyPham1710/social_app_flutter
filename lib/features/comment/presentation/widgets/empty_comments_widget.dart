@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class EmptyCommentsWidget extends StatelessWidget {
   final VoidCallback? onTapToComment;
@@ -23,7 +24,7 @@ class EmptyCommentsWidget extends StatelessWidget {
           SizedBox(height: 16.h),
 
           Text(
-            'Chưa có bình luận nào',
+            context.l10n.commentEmptyTitle,
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
@@ -35,7 +36,7 @@ class EmptyCommentsWidget extends StatelessWidget {
           SizedBox(height: 8.h),
 
           Text(
-            'Hãy là người đầu tiên bình luận về bài viết này',
+            context.l10n.commentEmptySubtitle,
             style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             textAlign: TextAlign.center,
           ),
@@ -47,7 +48,7 @@ class EmptyCommentsWidget extends StatelessWidget {
               onPressed: onTapToComment,
               icon: Icon(Icons.edit_outlined, size: 18.w, color: Colors.white),
               label: Text(
-                'Viết bình luận đầu tiên',
+                context.l10n.commentWriteFirst,
                 style: TextStyle(fontSize: 14.sp, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(

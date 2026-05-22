@@ -9,7 +9,9 @@ class ConnectVideoCallUseCase {
     repository.connect(userId, username);
   }
 
-  Future<void> waitForConnection({Duration timeout = const Duration(seconds: 10)}) {
+  Future<void> waitForConnection({
+    Duration timeout = const Duration(seconds: 10),
+  }) {
     return repository.waitForConnection(timeout: timeout);
   }
 }

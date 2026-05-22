@@ -193,7 +193,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(FaceRegistrationLoading());
 
     try {
-      debugPrint('[AuthBloc] Submitting face registration for user ${event.userId} (${event.base64Images.length} images)');
+      debugPrint(
+        '[AuthBloc] Submitting face registration for user ${event.userId} (${event.base64Images.length} images)',
+      );
 
       final dataState = await submitFaceRegistrationUsecase(
         params: SubmitFaceRegistrationParams(
@@ -205,30 +207,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (dataState is DataStateSuccess && dataState.data != null) {
         final data = dataState.data!;
         if (data['success'] == true) {
-          debugPrint('[AuthBloc] Face registration success: ${data['message']}');
-          emit(FaceRegistrationSuccess(
-            message: data['message'] ?? 'Đăng ký khuôn mặt thành công',
-            embeddingsSaved: data['embeddings_saved'] ?? 0,
-          ));
+          debugPrint(
+            '[AuthBloc] Face registration success: ${data['message']}',
+          );
+          emit(
+            FaceRegistrationSuccess(
+              message: data['message'] ?? 'Đăng ký khuôn mặt thành công',
+              embeddingsSaved: data['embeddings_saved'] ?? 0,
+            ),
+          );
         } else {
           debugPrint('[AuthBloc] Face registration failed: ${data['message']}');
-          emit(FaceRegistrationError(
-            message: data['message'] ?? 'Đăng ký khuôn mặt thất bại',
-            failedPose: data['failed_pose'],
-          ));
+          emit(
+            FaceRegistrationError(
+              message: data['message'] ?? 'Đăng ký khuôn mặt thất bại',
+              failedPose: data['failed_pose'],
+            ),
+          );
         }
       } else {
         final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
         debugPrint('[AuthBloc] Face registration error: $errorMessage');
-        emit(FaceRegistrationError(
-          message: errorMessage.isNotEmpty ? errorMessage : 'Lỗi kết nối. Vui lòng thử lại.',
-        ));
+        emit(
+          FaceRegistrationError(
+            message: errorMessage.isNotEmpty
+                ? errorMessage
+                : 'Lỗi kết nối. Vui lòng thử lại.',
+          ),
+        );
       }
     } catch (e) {
       debugPrint('[AuthBloc] Face registration error: $e');
-      emit(FaceRegistrationError(
-        message: 'Đã xảy ra lỗi. Vui lòng thử lại.',
-      ));
+      emit(FaceRegistrationError(message: 'Đã xảy ra lỗi. Vui lòng thử lại.'));
     }
   }
 }

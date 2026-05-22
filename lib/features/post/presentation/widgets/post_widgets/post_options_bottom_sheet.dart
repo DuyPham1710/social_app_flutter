@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_bloc.da
 import 'package:social_app_fe/features/privacy/presentation/bloc/privacy_event.dart';
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_option_item_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -56,6 +57,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
   bool _isDeleting = false;
 
   Future<void> _deletePost(BuildContext context) async {
+    final l10n = context.l10n;
     final postId = widget.post.id;
     final parentContext = Navigator.of(context).context;
 
@@ -66,21 +68,27 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
         return AlertDialog(
           backgroundColor: AppColors.background,
           title: Text(
-            'Xóa bài viết',
+            l10n.postDeleteTitle,
             style: TextStyle(color: AppColors.textPrimary),
           ),
           content: Text(
-            'Bạn có chắc chắn muốn xóa bài viết này không?',
+            l10n.postDeleteConfirmMessage,
             style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text(
+                l10n.commonCancel,
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+              child: Text(
+                l10n.commonDelete,
+                style: const TextStyle(color: Colors.red),
+              ),
             ),
           ],
         );
@@ -103,19 +111,21 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
 
         if (result is DataStateSuccess) {
           // Hiển thị thông báo thành công
-          showSuccessSnackBar(parentContext, 'Đã xóa bài viết');
+          showSuccessSnackBar(parentContext, l10n.postDeleted);
           widget.onDeleted?.call();
         } else if (result is DataStateError) {
           showErrorSnackBar(
             parentContext,
-            'Lỗi: ${result.error?.message ?? "Không thể xóa bài viết"}',
+            l10n.postErrorPrefix(
+              result.error?.message ?? l10n.postDeleteFailed,
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        showErrorSnackBar(parentContext, 'Lỗi: $e');
+        showErrorSnackBar(parentContext, l10n.postErrorPrefix(e.toString()));
       }
     } finally {
       if (mounted) {
@@ -127,6 +137,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
   }
 
   Future<void> _updatePostTags(BuildContext context) async {
+    final l10n = context.l10n;
     final parentContext = Navigator.of(context).context;
     Navigator.pop(context); // Đóng bottom sheet trước
 
@@ -153,12 +164,9 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
 
       if (parentContext.mounted) {
         if (updateResult is DataStateSuccess) {
-          showSuccessSnackBar(parentContext, 'Đã cập nhật gắn thẻ');
+          showSuccessSnackBar(parentContext, l10n.postTagUpdated);
         } else {
-          showErrorSnackBar(
-            parentContext,
-            'Có lỗi xảy ra khi cập nhật gắn thẻ',
-          );
+          showErrorSnackBar(parentContext, l10n.postTagUpdateFailed);
         }
       }
     }
@@ -191,7 +199,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
             if (widget.showOwnerActions) ...[
               StoryOptionItemWidget(
                 icon: Icons.lock_outline,
-                title: "Chỉnh sửa quyền riêng tư của bài viết",
+                title: context.l10n.postEditPrivacy,
                 onTap: () {
                   Navigator.pop(context);
                   final privacyLabel = PrivacyUtil.privacyTypeToLabel(
@@ -200,8 +208,9 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => BlocProvider(
-                        create: (_) => s1<PrivacyBloc>()
-                          ..add(GetDefaultPrivacyRequested()),
+                        create: (_) =>
+                            s1<PrivacyBloc>()
+                              ..add(GetDefaultPrivacyRequested()),
                         child: PrivacyPage(
                           selectedOption: privacyLabel,
                           postId: widget.post.id,
@@ -216,13 +225,13 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
               ),
               StoryOptionItemWidget(
                 icon: Icons.person_add_alt_1_outlined,
-                title: "Gắn thẻ bạn bè",
+                title: context.l10n.postTagFriends,
                 onTap: () => _updatePostTags(context),
               ),
             ],
             StoryOptionItemWidget(
               icon: Icons.delete_outline,
-              title: "Xóa bài viết",
+              title: context.l10n.postDeleteTitle,
               onTap: _isDeleting ? null : () => _deletePost(context),
             ),
             SizedBox(height: 20.h),

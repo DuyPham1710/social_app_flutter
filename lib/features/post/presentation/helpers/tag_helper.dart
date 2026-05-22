@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 
 class TagHelper {
   /// Hiển thị toàn bộ dòng: [Tên chủ bài] cùng với [Tên bạn bè]...
   static Widget buildTitleWithTags({
+    required AppLocalizations l10n,
     required String ownerName,
     required List<String> taggedNames,
     TextStyle? boldStyle,
@@ -37,7 +39,7 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: ownerName, style: bStyle),
-            TextSpan(text: ' cùng với ', style: nStyle),
+            TextSpan(text: l10n.postWith, style: nStyle),
             TextSpan(text: taggedNames[0], style: bStyle),
           ],
         ),
@@ -49,9 +51,9 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: ownerName, style: bStyle),
-            TextSpan(text: ' cùng với ', style: nStyle),
+            TextSpan(text: l10n.postWith, style: nStyle),
             TextSpan(text: taggedNames[0], style: bStyle),
-            TextSpan(text: ' và ', style: nStyle),
+            TextSpan(text: l10n.postAnd, style: nStyle),
             TextSpan(text: taggedNames[1], style: bStyle),
           ],
         ),
@@ -62,10 +64,10 @@ class TagHelper {
       text: TextSpan(
         children: [
           TextSpan(text: ownerName, style: bStyle),
-          TextSpan(text: ' cùng với ', style: nStyle),
+          TextSpan(text: l10n.postWith, style: nStyle),
           TextSpan(text: taggedNames[0], style: bStyle),
-          TextSpan(text: ' và ', style: nStyle),
-          TextSpan(text: '${count - 1} người khác', style: bStyle),
+          TextSpan(text: l10n.postAnd, style: nStyle),
+          TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
         ],
       ),
     );
@@ -73,6 +75,7 @@ class TagHelper {
 
   /// Chỉ hiển thị phần thẻ: [Tên bạn bè 1] và [n người khác]
   static Widget buildTagsOnly({
+    required AppLocalizations l10n,
     required List<String> taggedNames,
     TextStyle? boldStyle,
     TextStyle? normalStyle,
@@ -105,7 +108,7 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: taggedNames[0], style: bStyle),
-            TextSpan(text: ' và ', style: nStyle),
+            TextSpan(text: l10n.postAnd, style: nStyle),
             TextSpan(text: taggedNames[1], style: bStyle),
           ],
         ),
@@ -116,8 +119,8 @@ class TagHelper {
       text: TextSpan(
         children: [
           TextSpan(text: taggedNames[0], style: bStyle),
-          TextSpan(text: ' và ', style: nStyle),
-          TextSpan(text: '${count - 1} người khác', style: bStyle),
+          TextSpan(text: l10n.postAnd, style: nStyle),
+          TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
         ],
       ),
     );

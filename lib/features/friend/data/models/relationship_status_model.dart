@@ -5,7 +5,8 @@ part 'relationship_status_model.freezed.dart';
 part 'relationship_status_model.g.dart';
 
 @freezed
-class RelationshipStatusModel extends RelationshipStatusEntity with _$RelationshipStatusModel {
+class RelationshipStatusModel extends RelationshipStatusEntity
+    with _$RelationshipStatusModel {
   const factory RelationshipStatusModel({
     required String status,
     @JsonKey(includeIfNull: false) String? requestId,
@@ -18,4 +19,3 @@ class RelationshipStatusModel extends RelationshipStatusEntity with _$Relationsh
   factory RelationshipStatusModel.fromJson(Map<String, dynamic> json) =>
       _$RelationshipStatusModelFromJson(json);
 }
-

@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/data/services/chat_presence_service.dart';
 import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatAppbar extends StatefulWidget {
   final bool isGroup;
@@ -96,26 +97,24 @@ class _ChatAppbarState extends State<ChatAppbar> {
     });
   }
 
-  String _formatPresenceText(ChatPresenceStatus status) {
-    if (status.isOnline) return 'Online';
+  String _formatPresenceText(BuildContext context, ChatPresenceStatus status) {
+    if (status.isOnline) return context.l10n.chatOnline;
     final lastSeenAt = status.lastSeenAt?.toLocal();
-    if (lastSeenAt == null) return 'Offline';
+    if (lastSeenAt == null) return context.l10n.chatOffline;
 
     final diff = DateTime.now().difference(lastSeenAt);
-    if (diff.inMinutes < 1) return 'Vừa hoạt động';
-    if (diff.inMinutes < 60) return 'Hoạt động ${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return 'Hoạt động ${diff.inHours} giờ trước';
-    return 'Hoạt động ${diff.inDays} ngày trước';
+    if (diff.inMinutes < 1) return context.l10n.friendJustActive;
+    if (diff.inMinutes < 60) return context.l10n.timeMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return context.l10n.timeHoursAgo(diff.inHours);
+    return context.l10n.timeDaysAgo(diff.inDays);
   }
 
   void _updateDisplayName() {
     if (widget.isGroup) {
-      _displayName = widget.groupName ?? 'Group Chat';
+      _displayName = widget.groupName ?? '';
     } else {
       _displayName =
-          widget.friendInfo?.fullName ??
-          widget.friendInfo?.username ??
-          "Unknown User";
+          widget.friendInfo?.fullName ?? widget.friendInfo?.username ?? '';
     }
   }
 
@@ -129,6 +128,11 @@ class _ChatAppbarState extends State<ChatAppbar> {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = _displayName.isNotEmpty
+        ? _displayName
+        : widget.isGroup
+        ? context.l10n.chatGroupChat
+        : context.l10n.commonUnknown;
     // Lấy avatar hiển thị
     Widget avatarWidget = ChatHelper.buildAvatarWidget(
       isGroup: widget.isGroup,
@@ -160,7 +164,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
             CupertinoPageRoute(
               builder: (context) => ChatInfoPage(
                 isGroup: widget.isGroup,
-                displayName: _displayName,
+                displayName: displayName,
                 groupAvatar: widget.groupAvatar,
                 participants: widget.participants,
                 userInfo: widget.friendInfo,
@@ -190,7 +194,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _displayName,
+                    displayName,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -201,7 +205,9 @@ class _ChatAppbarState extends State<ChatAppbar> {
                   ),
                   if (widget.isGroup && widget.participants != null)
                     Text(
-                      '${widget.participants!.length} thành viên',
+                      context.l10n.chatMembersCount(
+                        widget.participants!.length,
+                      ),
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w400,
@@ -211,8 +217,8 @@ class _ChatAppbarState extends State<ChatAppbar> {
                   else
                     Text(
                       _friendPresence == null
-                          ? "Đang hoạt động"
-                          : _formatPresenceText(_friendPresence!),
+                          ? context.l10n.chatActiveNow
+                          : _formatPresenceText(context, _friendPresence!),
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w400,
@@ -254,7 +260,7 @@ class _ChatAppbarState extends State<ChatAppbar> {
               CupertinoPageRoute(
                 builder: (context) => ChatInfoPage(
                   isGroup: widget.isGroup,
-                  displayName: _displayName,
+                  displayName: displayName,
                   groupAvatar: widget.groupAvatar,
                   participants: widget.participants,
                   userInfo: widget.friendInfo,

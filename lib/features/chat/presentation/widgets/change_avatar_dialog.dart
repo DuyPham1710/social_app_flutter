@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChangeAvatarDialog extends StatelessWidget {
   const ChangeAvatarDialog({super.key});
@@ -15,7 +16,7 @@ class ChangeAvatarDialog extends StatelessWidget {
       title: Padding(
         padding: EdgeInsets.only(top: 8.h),
         child: Text(
-          'Đổi ảnh nhóm',
+          context.l10n.chatChangeGroupPhoto,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
@@ -31,7 +32,7 @@ class ChangeAvatarDialog extends StatelessWidget {
             _buildDialogOption(
               context: context,
               icon: CupertinoIcons.camera_fill,
-              label: 'Chụp ảnh',
+              label: context.l10n.chatTakePhoto,
               onTap: () {
                 Navigator.pop(context);
                 // Xử lý chụp ảnh
@@ -41,7 +42,7 @@ class ChangeAvatarDialog extends StatelessWidget {
             _buildDialogOption(
               context: context,
               icon: CupertinoIcons.photo_fill,
-              label: 'Chọn ảnh',
+              label: context.l10n.chatChoosePhoto,
               onTap: () {
                 Navigator.pop(context);
                 // Xử lý chọn ảnh từ thư viện
@@ -51,7 +52,7 @@ class ChangeAvatarDialog extends StatelessWidget {
             _buildDialogOption(
               context: context,
               icon: CupertinoIcons.sparkles,
-              label: 'Tạo ảnh',
+              label: context.l10n.chatCreatePhoto,
               onTap: () {
                 Navigator.pop(context);
                 // Xử lý tạo ảnh AI

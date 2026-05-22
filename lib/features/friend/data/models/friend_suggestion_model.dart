@@ -4,7 +4,8 @@ import 'package:social_app_fe/features/friend/domain/entities/friend_suggestion_
 part 'friend_suggestion_model.freezed.dart';
 
 @freezed
-class FriendSuggestionModel extends FriendSuggestionEntity with _$FriendSuggestionModel {
+class FriendSuggestionModel extends FriendSuggestionEntity
+    with _$FriendSuggestionModel {
   const factory FriendSuggestionModel({
     @JsonKey(name: '_id') required String userId,
     @JsonKey(includeIfNull: false) String? fullName,
@@ -21,7 +22,7 @@ class FriendSuggestionModel extends FriendSuggestionEntity with _$FriendSuggesti
     if (json.containsKey('mutualFriendsCount')) {
       mutualFriends = (json['mutualFriendsCount'] as num?)?.toInt();
     }
-    
+
     return FriendSuggestionModel(
       userId: json['_id'] as String,
       fullName: json['fullName'] as String?,

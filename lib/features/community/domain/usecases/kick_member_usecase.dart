@@ -6,10 +6,7 @@ class KickMemberParams {
   final String communityId;
   final String memberId;
 
-  KickMemberParams({
-    required this.communityId,
-    required this.memberId,
-  });
+  KickMemberParams({required this.communityId, required this.memberId});
 }
 
 class KickMemberUseCase implements UseCase<DataState<void>, KickMemberParams> {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommentInputField extends StatefulWidget {
   // ... (parameters remain the same)
@@ -47,7 +48,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
               child: Row(
                 children: [
                   Text(
-                    'Đang trả lời ',
+                    context.l10n.commentReplyingPrefix,
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: AppColors.textSecondary,
@@ -58,7 +59,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                   Flexible(
                     child: Text(
                       widget.replyingToUserName == "ME"
-                          ? "bình luận của bạn" // Custom text for self-reply
+                          ? context.l10n.commentYourComment
                           : widget.replyingToUserName!,
                       style: TextStyle(
                         fontSize: 12.sp,
@@ -80,7 +81,7 @@ class _CommentInputFieldState extends State<CommentInputField> {
                       widget.onCancelReply?.call();
                     },
                     child: Text(
-                      'Hủy',
+                      context.l10n.commonCancel,
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
@@ -130,9 +131,11 @@ class _CommentInputFieldState extends State<CommentInputField> {
                       // Custom hint text based on reply state
                       hintText: widget.replyingToUserName != null
                           ? (widget.replyingToUserName == "ME"
-                                ? 'Viết phản hồi...'
-                                : 'Trả lời ${widget.replyingToUserName}...')
-                          : 'Viết bình luận...',
+                                ? context.l10n.commentWriteReplyHint
+                                : context.l10n.commentReplyToHint(
+                                    widget.replyingToUserName!,
+                                  ))
+                          : context.l10n.commentWriteHint,
                       hintStyle: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 14.sp,

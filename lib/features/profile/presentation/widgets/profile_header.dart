@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/image_viewer_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileHeader extends StatelessWidget {
   final UserEntity? user;
@@ -108,7 +109,7 @@ class ProfileHeader extends StatelessWidget {
                       imageUrl:
                           user?.coverUrl ??
                           'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
-                      title: 'Ảnh bìa',
+                      title: context.l10n.profileCoverPhoto,
                     ),
                   ),
                 );
@@ -139,7 +140,11 @@ class ProfileHeader extends StatelessWidget {
                   color: AppColors.secondBackground,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.camera_alt_outlined, size: 20, color: AppColors.iconPrimary),
+                child: Icon(
+                  Icons.camera_alt_outlined,
+                  size: 20,
+                  color: AppColors.iconPrimary,
+                ),
               ),
             ),
 
@@ -160,7 +165,7 @@ class ProfileHeader extends StatelessWidget {
                             imageUrl:
                                 user?.avatarUrl ??
                                 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                            title: 'Ảnh đại diện',
+                            title: context.l10n.profileAvatarPhoto,
                           ),
                         ),
                       );
@@ -168,7 +173,10 @@ class ProfileHeader extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.background, width: 4),
+                        border: Border.all(
+                          color: AppColors.background,
+                          width: 4,
+                        ),
                       ),
                       child: CircleAvatar(
                         radius: 60,
@@ -188,7 +196,11 @@ class ProfileHeader extends StatelessWidget {
                         color: AppColors.secondBackground,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.camera_alt, size: 18, color: AppColors.iconPrimary),
+                      child: Icon(
+                        Icons.camera_alt,
+                        size: 18,
+                        color: AppColors.iconPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -202,7 +214,7 @@ class ProfileHeader extends StatelessWidget {
         // User name
         Center(
           child: Text(
-            user?.fullName ?? 'User Name',
+            user?.fullName ?? context.l10n.profileUserNameFallback,
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -218,7 +230,9 @@ class ProfileHeader extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 40.w),
           child: Text(
-            user?.bio?.isNotEmpty == true ? user!.bio! : 'Chưa có tiểu sử',
+            user?.bio?.isNotEmpty == true
+                ? user!.bio!
+                : context.l10n.profileNoBio,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
             textAlign: TextAlign.center,
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CreatePostWidget extends StatelessWidget {
   final String? avatarUrl;
@@ -40,7 +41,7 @@ class CreatePostWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Text(
-                  "Bạn đang nghĩ gì?",
+                  context.l10n.profileWhatsOnYourMind,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,

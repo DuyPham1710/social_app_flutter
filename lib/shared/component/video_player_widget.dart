@@ -302,7 +302,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             behavior: HitTestBehavior.opaque,
                             onTap: _toggleControlsVisibility,
                             child: Container(
-                              padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 10.h),
+                              padding: EdgeInsets.fromLTRB(
+                                12.w,
+                                10.h,
+                                12.w,
+                                10.h,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.72),
                                 borderRadius: BorderRadius.circular(16.r),
@@ -328,16 +333,30 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                       thumbColor: AppColors.primary,
                                     ),
                                     child: Slider(
-                                      value: _controller.value.position.inMilliseconds
+                                      value: _controller
+                                          .value
+                                          .position
+                                          .inMilliseconds
                                           .clamp(
                                             0,
-                                            _controller.value.duration.inMilliseconds,
+                                            _controller
+                                                .value
+                                                .duration
+                                                .inMilliseconds,
                                           )
                                           .toDouble(),
-                                      max: (_controller.value.duration.inMilliseconds > 0
-                                              ? _controller.value.duration.inMilliseconds
-                                              : 1)
-                                          .toDouble(),
+                                      max:
+                                          (_controller
+                                                          .value
+                                                          .duration
+                                                          .inMilliseconds >
+                                                      0
+                                                  ? _controller
+                                                        .value
+                                                        .duration
+                                                        .inMilliseconds
+                                                  : 1)
+                                              .toDouble(),
                                       onChanged: (value) {
                                         _controller.seekTo(
                                           Duration(milliseconds: value.toInt()),
@@ -349,10 +368,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                     ),
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        _formatDuration(_controller.value.position),
+                                        _formatDuration(
+                                          _controller.value.position,
+                                        ),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 11.sp,
@@ -360,7 +382,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                         ),
                                       ),
                                       Text(
-                                        _formatDuration(_controller.value.duration),
+                                        _formatDuration(
+                                          _controller.value.duration,
+                                        ),
                                         style: TextStyle(
                                           color: Colors.white70,
                                           fontSize: 11.sp,
@@ -400,7 +424,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                               ),
                             ),
                           ),
-                        ),                        
+                        ),
                       ],
                     ),
                   ),

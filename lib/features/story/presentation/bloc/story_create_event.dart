@@ -16,5 +16,3 @@ class CreateStoryRequested extends StoryCreateEvent {
   @override
   List<Object?> get props => [story];
 }
-
-

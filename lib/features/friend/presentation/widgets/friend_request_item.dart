@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendRequestItem extends StatelessWidget {
   final dynamic userId;
@@ -146,7 +147,7 @@ class FriendRequestItem extends StatelessWidget {
                         ),
                       SizedBox(width: 6.w),
                       Text(
-                        '$mutualFriends bạn chung',
+                        context.l10n.friendMutualCount(mutualFriends),
                         style: TextStyle(
                           fontSize: 13.sp,
                           color: AppColors.textSecondary,
@@ -179,7 +180,7 @@ class FriendRequestItem extends StatelessWidget {
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          'Các bạn đã trở thành bạn bè',
+                          context.l10n.friendBecameFriends,
                           style: TextStyle(
                             color: Colors.green[700],
                             fontSize: 13.sp,
@@ -211,7 +212,7 @@ class FriendRequestItem extends StatelessWidget {
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          'Đã gỡ lời mời',
+                          context.l10n.friendRequestRemoved,
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12.sp,
@@ -226,7 +227,7 @@ class FriendRequestItem extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildActionButton(
-                          label: 'Chấp nhận',
+                          label: context.l10n.friendAccept,
                           background: AppColors.primary,
                           foreground: Colors.white,
                           onTap: onAccept ?? () {},
@@ -235,7 +236,7 @@ class FriendRequestItem extends StatelessWidget {
                       SizedBox(width: 12.w),
                       Expanded(
                         child: _buildActionButton(
-                          label: 'Xóa',
+                          label: context.l10n.friendDelete,
                           background: AppColors.secondBackground,
                           foreground: AppColors.textPrimary,
                           onTap: onReject ?? () {},

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendMessageSuggestionItem extends StatelessWidget {
   final String avatar;
@@ -30,7 +31,7 @@ class FriendMessageSuggestionItem extends StatelessWidget {
         ),
       ),
       trailing: Text(
-        "Nhắn tin",
+        context.l10n.profileMessage,
         style: TextStyle(
           color: AppColors.primary,
           fontWeight: FontWeight.bold,

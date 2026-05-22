@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/post/presentation/pages/edit_selected_ima
 import 'package:social_app_fe/shared/component/layout/layout_post_classic.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'dart:io';
 
 class SelectedImagesDisplay extends StatefulWidget {
@@ -76,7 +77,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
       context: context,
       builder: (context) => CupertinoActionSheet(
         title: Text(
-          'Chọn bố cục',
+          context.l10n.postChooseLayout,
           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
 
@@ -103,7 +104,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                 SizedBox(width: 8.w),
 
                 Text(
-                  'Classic',
+                  context.l10n.postLayoutClassic,
                   style: TextStyle(
                     color: _currentLayout == LayoutType.classic
                         ? AppColors.primary
@@ -136,7 +137,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                 SizedBox(width: 8.w),
 
                 Text(
-                  'Column',
+                  context.l10n.postLayoutColumn,
                   style: TextStyle(
                     color: _currentLayout == LayoutType.column
                         ? AppColors.primary
@@ -169,7 +170,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                 SizedBox(width: 8.w),
 
                 Text(
-                  'Frame',
+                  context.l10n.postLayoutFrame,
                   style: TextStyle(
                     color: _currentLayout == LayoutType.frame
                         ? AppColors.primary
@@ -184,7 +185,10 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () => Navigator.pop(context),
-          child: Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
+          child: Text(
+            context.l10n.commonCancel,
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
         ),
       ),
     );
@@ -248,7 +252,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${widget.selectedAssets.length} ảnh được chọn',
+                context.l10n.postSelectedPhotos(widget.selectedAssets.length),
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
@@ -286,7 +290,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                           SizedBox(width: 4.w),
 
                           Text(
-                            _getLayoutName(),
+                            _getLayoutName(context),
                             style: TextStyle(
                               fontSize: 12.sp,
                               color: AppColors.primary,
@@ -390,7 +394,9 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Chỉnh sửa (${widget.selectedAssets.length})',
+                              context.l10n.postEditCount(
+                                widget.selectedAssets.length,
+                              ),
                               style: TextStyle(
                                 color: AppColors.textPrimary,
                                 fontSize: 14.sp,
@@ -421,14 +427,14 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
     }
   }
 
-  String _getLayoutName() {
+  String _getLayoutName(BuildContext context) {
     switch (_currentLayout) {
       case LayoutType.classic:
-        return 'Classic';
+        return context.l10n.postLayoutClassic;
       case LayoutType.column:
-        return 'Column';
+        return context.l10n.postLayoutColumn;
       case LayoutType.frame:
-        return 'Frame';
+        return context.l10n.postLayoutFrame;
     }
   }
 }

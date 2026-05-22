@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendItem extends StatelessWidget {
   final String friendId;
@@ -75,9 +76,7 @@ class FriendItem extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.divider, width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.divider, width: 1)),
       ),
       child: Row(
         children: [
@@ -128,7 +127,7 @@ class FriendItem extends StatelessWidget {
                 // Hiển thị trạng thái online hoặc last seen
                 if (_shouldShowIndicator() && !_isOnline())
                   Text(
-                    _getLastSeenText(),
+                    _getLastSeenText(context),
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: AppColors.textSecondary,
@@ -159,7 +158,7 @@ class FriendItem extends StatelessWidget {
                         ),
                       SizedBox(width: 6.w),
                       Text(
-                        '$mutualFriends bạn chung',
+                        context.l10n.friendMutualCount(mutualFriends),
                         style: TextStyle(
                           fontSize: 13.sp,
                           color: AppColors.textSecondary,
@@ -302,9 +301,10 @@ class FriendItem extends StatelessWidget {
   }
 
   /// Lấy text hiển thị thời gian last seen
-  String _getLastSeenText() {
+  String _getLastSeenText(BuildContext context) {
     if (lastSeen == null) return '';
 
+    final l10n = context.l10n;
     final now = DateTime.now();
     final difference = now.difference(lastSeen!);
 
@@ -313,17 +313,17 @@ class FriendItem extends StatelessWidget {
 
     // Nếu dưới 1 phút
     if (difference.inMinutes < 1) {
-      return 'Vừa hoạt động';
+      return l10n.friendJustActive;
     }
 
     // Nếu dưới 1 giờ
     if (difference.inHours < 1) {
       final minutes = difference.inMinutes;
-      return '$minutes phút trước';
+      return l10n.timeMinutesAgo(minutes);
     }
 
     // Nếu dưới 1 ngày
     final hours = difference.inHours;
-    return '$hours giờ trước';
+    return l10n.timeHoursAgo(hours);
   }
 }

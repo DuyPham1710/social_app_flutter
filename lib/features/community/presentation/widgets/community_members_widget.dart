@@ -8,12 +8,14 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
 import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -123,10 +125,16 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     return BlocListener<CommunityAdminBloc, CommunityAdminState>(
       listener: (context, state) {
         if (state is CommunityAdminActionSuccess) {
-          showSuccessSnackBar(context, state.message);
+          showSuccessSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
           _refreshMembers();
         } else if (state is CommunityAdminError) {
-          showErrorSnackBar(context, state.message);
+          showErrorSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         }
       },
       child: content,
@@ -149,14 +157,14 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         } else if (members.isEmpty) {
           body = _buildEmptyState(
             icon: Icons.groups_2_outlined,
-            title: 'Chưa có thành viên nào',
-            message: 'Khi có người tham gia, danh sách sẽ hiển thị tại đây.',
+            title: context.l10n.communityNoMembers,
+            message: context.l10n.communityNoMembersMessage,
           );
         } else if (filteredMembers.isEmpty) {
           body = _buildEmptyState(
             icon: Icons.search_off_rounded,
-            title: 'Không tìm thấy thành viên',
-            message: 'Thử tìm bằng tên hoặc username khác.',
+            title: context.l10n.communityNoMembersFound,
+            message: context.l10n.communityNoMembersFoundMessage,
           );
         } else {
           body = _buildMemberList(filteredMembers);
@@ -193,10 +201,13 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     required bool isLoading,
   }) {
     final countLabel = isLoading
-        ? 'Đang tải'
+        ? context.l10n.commonLoading
         : _searchController.text.trim().isEmpty
-        ? '$totalMembers thành viên'
-        : '$visibleMembers/$totalMembers thành viên';
+        ? context.l10n.communityMembersCount(totalMembers)
+        : context.l10n.communityVisibleMembersCount(
+            visibleMembers,
+            totalMembers,
+          );
 
     return Row(
       children: [
@@ -215,7 +226,9 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.isInBottomSheet ? 'Danh sách thành viên' : 'Thành viên',
+                widget.isInBottomSheet
+                    ? context.l10n.communityMembersListTitle
+                    : context.l10n.communityMembers,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -237,7 +250,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
           ),
         ),
         Tooltip(
-          message: 'Tải lại',
+          message: context.l10n.commonRefresh,
           child: IconButton.filledTonal(
             onPressed: isLoading ? null : _refreshMembers,
             icon: const Icon(Icons.refresh_rounded),
@@ -259,12 +272,12 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
       onChanged: (_) => setState(() {}),
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
-        hintText: 'Tìm thành viên',
+        hintText: context.l10n.communitySearchMembersHint,
         prefixIcon: const Icon(Icons.search_rounded, size: 21),
         suffixIcon: _searchController.text.isEmpty
             ? null
             : IconButton(
-                tooltip: 'Xóa tìm kiếm',
+                tooltip: context.l10n.communityClearSearch,
                 onPressed: () {
                   _searchController.clear();
                   setState(() {});
@@ -307,7 +320,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             onTap: () => _handleMemberTap(context, members[index].user.userId),
             onRemove: () => _showKickConfirmation(
               context,
-              members[index].user.fullName ?? 'Thành viên',
+              members[index].user.fullName ?? context.l10n.communityMember,
               members[index].user.userId,
             ),
           ),
@@ -337,9 +350,9 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Không tải được danh sách',
-                  style: TextStyle(
+                Text(
+                  context.l10n.communityLoadMembersFailed,
+                  style: const TextStyle(
                     color: Color(0xFF9F1239),
                     fontWeight: FontWeight.w800,
                   ),
@@ -358,7 +371,10 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
               ],
             ),
           ),
-          TextButton(onPressed: _refreshMembers, child: const Text('Thử lại')),
+          TextButton(
+            onPressed: _refreshMembers,
+            child: Text(context.l10n.commonRetry),
+          ),
         ],
       ),
     );
@@ -496,16 +512,20 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(children: const [Expanded(child: Text('Xóa thành viên'))]),
+        title: Row(
+          children: [
+            Expanded(child: Text(context.l10n.communityRemoveMemberTitle)),
+          ],
+        ),
         content: Text(
-          'Bạn muốn xóa $userName khỏi cộng đồng? Người này có thể gửi yêu cầu tham gia lại sau.',
+          context.l10n.communityRemoveMemberConfirm(userName),
           style: const TextStyle(height: 1.35),
         ),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Hủy'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton.icon(
             onPressed: () {
@@ -517,7 +537,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                 ),
               );
             },
-            label: const Text('Xóa'),
+            label: Text(context.l10n.commonDelete),
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFDC2626),
               foregroundColor: Colors.white,
@@ -570,7 +590,7 @@ class _MemberTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            user.fullName ?? 'Người dùng',
+                            user.fullName ?? context.l10n.commonUser,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -602,27 +622,27 @@ class _MemberTile extends StatelessWidget {
               if (canManage)
                 PopupMenuButton<String>(
                   color: AppColors.background,
-                  tooltip: 'Tùy chọn thành viên',
+                  tooltip: context.l10n.communityMemberOptions,
                   onSelected: (value) {
                     if (value == 'remove') onRemove();
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  itemBuilder: (_) => const [
+                  itemBuilder: (_) => [
                     PopupMenuItem(
                       value: 'remove',
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.person_remove_rounded,
                             color: Color(0xFFDC2626),
                             size: 20,
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
-                            'Xóa khỏi nhóm',
-                            style: TextStyle(color: Color(0xFFDC2626)),
+                            context.l10n.communityRemoveFromGroup,
+                            style: const TextStyle(color: Color(0xFFDC2626)),
                           ),
                         ],
                       ),
@@ -734,7 +754,9 @@ class _RolePill extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            isAdmin ? 'Admin' : 'Thành viên',
+            isAdmin
+                ? context.l10n.communityAdmin
+                : context.l10n.communityMember,
             style: TextStyle(
               color: isAdmin ? const Color(0xFF1D4ED8) : AppColors.primary,
               fontSize: 11,

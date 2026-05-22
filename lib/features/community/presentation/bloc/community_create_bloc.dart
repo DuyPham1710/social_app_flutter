@@ -10,8 +10,10 @@ class CommunityCreateBloc
   final CreateCommunityUseCase _createCommunityUseCase;
   final UpdateCommunityUseCase _updateCommunityUseCase;
 
-  CommunityCreateBloc(this._createCommunityUseCase, this._updateCommunityUseCase)
-      : super(const CommunityCreateInitial()) {
+  CommunityCreateBloc(
+    this._createCommunityUseCase,
+    this._updateCommunityUseCase,
+  ) : super(const CommunityCreateInitial()) {
     on<CreateCommunityRequested>(_onCreateCommunityRequested);
     on<UpdateCommunityRequested>(_onUpdateCommunityRequested);
   }
@@ -27,19 +29,22 @@ class CommunityCreateBloc
         params: CreateCommunityParams(
           name: event.name,
           description: event.description,
-          privacy: event.privacy ,
-          avatar: event.avatarPath ,
+          privacy: event.privacy,
+          avatar: event.avatarPath,
           coverImage: event.coverImagePath,
         ),
       );
 
       if (dataState is DataStateSuccess) {
-        emit(CommunityCreateSuccess(
-          community: dataState.data!,
-          message: 'Tạo cộng đồng thành công',
-        ));
+        emit(
+          CommunityCreateSuccess(
+            community: dataState.data!,
+            message: 'Tạo cộng đồng thành công',
+          ),
+        );
       } else if (dataState is DataStateError) {
-        final errorMessage = '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
+        final errorMessage =
+            '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
         emit(CommunityCreateError(errorMessage));
       }
     } catch (e) {
@@ -66,12 +71,15 @@ class CommunityCreateBloc
       );
 
       if (dataState is DataStateSuccess) {
-        emit(CommunityCreateSuccess(
-          community: dataState.data!,
-          message: 'Cập nhật cộng đồng thành công',
-        ));
+        emit(
+          CommunityCreateSuccess(
+            community: dataState.data!,
+            message: 'Cập nhật cộng đồng thành công',
+          ),
+        );
       } else if (dataState is DataStateError) {
-        final errorMessage = '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
+        final errorMessage =
+            '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
         emit(CommunityCreateError(errorMessage));
       }
     } catch (e) {

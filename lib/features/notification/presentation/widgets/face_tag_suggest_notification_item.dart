@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FaceTagSuggestNotificationItem extends StatelessWidget {
   final String message;
@@ -31,9 +32,9 @@ class FaceTagSuggestNotificationItem extends StatelessWidget {
         text: TextSpan(
           style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
           children: [
-            const TextSpan(
-              text: 'Hệ thống ',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            TextSpan(
+              text: '${context.l10n.commonSystem} ',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             TextSpan(
               text: message,

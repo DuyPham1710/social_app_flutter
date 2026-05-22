@@ -11,8 +11,10 @@ import 'package:social_app_fe/features/community/presentation/widgets/my_communi
 import 'package:social_app_fe/features/community/presentation/widgets/my_invites_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/pending_communities_widget.dart';
 import 'package:social_app_fe/features/community/presentation/pages/create_community_page.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -96,7 +98,7 @@ class _CommunityPageState extends State<CommunityPage>
 
     _tabController.animateTo(1);
     providerContext.read<CommunityListBloc>().add(const MyCommunitiesFetched());
-    showSuccessSnackBar(context, 'Đã tạo cộng đồng mới');
+    showSuccessSnackBar(context, context.l10n.communityCreateSuccess);
   }
 
   @override
@@ -203,7 +205,7 @@ class _CommunityPageState extends State<CommunityPage>
                               },
                               icon: const Icon(Icons.arrow_back_rounded),
                               color: const Color(0xFF0F172A),
-                              tooltip: 'Quay lại',
+                              tooltip: context.l10n.commonBack,
                               iconSize: 21,
                               visualDensity: VisualDensity.compact,
                               constraints: const BoxConstraints(
@@ -213,10 +215,10 @@ class _CommunityPageState extends State<CommunityPage>
                               padding: const EdgeInsets.all(6),
                             ),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
                             child: Text(
-                              'Khám phá cộng đồng',
+                              context.l10n.communityExploreTitle,
                               maxLines: 2,
                               softWrap: true,
                               style: TextStyle(
@@ -232,9 +234,9 @@ class _CommunityPageState extends State<CommunityPage>
                             padding: const EdgeInsets.only(left: 10),
                             child: Row(
                               children: [
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    'Tìm những cộng đồng phù hợp với sở thích của bạn',
+                                    context.l10n.communityExploreSubtitle,
                                     maxLines: 2,
                                     softWrap: true,
                                     style: TextStyle(
@@ -264,7 +266,9 @@ class _CommunityPageState extends State<CommunityPage>
                                     ),
                                   ),
                                   icon: const Icon(Icons.group_add, size: 15),
-                                  label: const Text('Tạo nhóm'),
+                                  label: Text(
+                                    context.l10n.communityCreateGroup,
+                                  ),
                                 ),
                               ],
                             ),
@@ -321,11 +325,11 @@ class _CommunityPageState extends State<CommunityPage>
                           width: 2.5,
                         ),
                       ),
-                      tabs: const [
+                      tabs: [
                         Tab(
                           child: Text(
-                            'Tìm kiếm',
-                            style: TextStyle(
+                            context.l10n.communityExploreTab,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -333,8 +337,8 @@ class _CommunityPageState extends State<CommunityPage>
                         ),
                         Tab(
                           child: Text(
-                            'Của tôi',
-                            style: TextStyle(
+                            context.l10n.communityMineTab,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -342,8 +346,8 @@ class _CommunityPageState extends State<CommunityPage>
                         ),
                         Tab(
                           child: Text(
-                            'Lời mời',
-                            style: TextStyle(
+                            context.l10n.communityInvitesTab,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -351,8 +355,8 @@ class _CommunityPageState extends State<CommunityPage>
                         ),
                         Tab(
                           child: Text(
-                            'Chờ duyệt',
-                            style: TextStyle(
+                            context.l10n.communityPendingTab,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -360,8 +364,8 @@ class _CommunityPageState extends State<CommunityPage>
                         ),
                         Tab(
                           child: Text(
-                            'Bài viết',
-                            style: TextStyle(
+                            context.l10n.communityPostsTab,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -459,9 +463,9 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Bài viết',
-                  style: TextStyle(
+                Text(
+                  context.l10n.communityPostsTab,
+                  style: const TextStyle(
                     color: Color(0xFF111827),
                     fontWeight: FontWeight.w800,
                     fontSize: 14,
@@ -471,7 +475,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 180),
                   child: Text(
-                    _statusLabel(currentStatus),
+                    _statusLabel(context, currentStatus),
                     key: ValueKey(currentStatus),
                     style: const TextStyle(
                       color: Color(0xFF667085),
@@ -484,7 +488,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             ),
           ),
           PopupMenuButton<String>(
-            tooltip: 'Lọc bài viết',
+            tooltip: context.l10n.communityFilterPosts,
             initialValue: currentStatus,
             color: Colors.white,
             elevation: 8,
@@ -497,26 +501,26 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 CommunityPostsTabStatusChanged(status: status),
               );
             },
-            itemBuilder: (_) => const [
+            itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'all',
                 child: _PostFilterOption(
                   icon: Icons.dynamic_feed_rounded,
-                  label: 'Tất cả',
+                  label: context.l10n.commonAll,
                 ),
               ),
               PopupMenuItem(
                 value: 'pending',
                 child: _PostFilterOption(
                   icon: Icons.schedule_rounded,
-                  label: 'Chờ duyệt',
+                  label: context.l10n.communityPendingApproval,
                 ),
               ),
               PopupMenuItem(
                 value: 'approved',
                 child: _PostFilterOption(
                   icon: Icons.verified_rounded,
-                  label: 'Đã duyệt',
+                  label: context.l10n.communityApproved,
                 ),
               ),
             ],
@@ -566,7 +570,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
     if (state is CommunityPostsTabError) {
       return _PostsErrorState(
         key: const ValueKey('error'),
-        message: state.message,
+        message: localizedCommunityMessage(context.l10n, state.message),
         onRetry: () {
           context.read<CommunityPostsTabBloc>().add(
             CommunityPostsTabFetched(status: _selectedStatus),
@@ -608,14 +612,14 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
     );
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(BuildContext context, String status) {
     switch (status) {
       case 'pending':
-        return 'Chờ duyệt';
+        return context.l10n.communityPendingApproval;
       case 'approved':
-        return 'Đã duyệt';
+        return context.l10n.communityApproved;
       default:
-        return 'Tất cả';
+        return context.l10n.commonAll;
     }
   }
 
@@ -736,7 +740,7 @@ class _PostsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final message = _messageForStatus(status);
+    final message = _messageForStatus(context, status);
 
     return Center(
       child: Padding(
@@ -760,14 +764,14 @@ class _PostsEmptyState extends StatelessWidget {
     );
   }
 
-  String _messageForStatus(String status) {
+  String _messageForStatus(BuildContext context, String status) {
     switch (status) {
       case 'pending':
-        return 'Không có bài viết nào chờ duyệt';
+        return context.l10n.communityNoPendingPosts;
       case 'approved':
-        return 'Chưa có bài viết đã duyệt';
+        return context.l10n.communityNoApprovedPosts;
       default:
-        return 'Chưa có bài viết nào';
+        return context.l10n.communityNoPosts;
     }
   }
 }
@@ -805,7 +809,7 @@ class _PostsErrorState extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Không tải được bài viết',
+                context.l10n.homeLoadPostsFailed,
                 style: const TextStyle(
                   color: Color(0xFF111827),
                   fontWeight: FontWeight.w800,
@@ -821,7 +825,7 @@ class _PostsErrorState extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Thử lại'),
+                label: Text(context.l10n.commonRetry),
               ),
             ],
           ),

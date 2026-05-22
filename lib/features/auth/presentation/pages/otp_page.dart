@@ -11,6 +11,7 @@ import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
@@ -73,7 +74,7 @@ class _OtpPageState extends State<OtpPage> {
         context,
       ).add(VerifyOtpEvent(email: _email!, otp: otpCode));
     } else {
-      showErrorSnackBar(context, 'Vui lòng nhập mã OTP hợp lệ');
+      showErrorSnackBar(context, context.l10n.authInvalidOtp);
     }
   }
 
@@ -133,7 +134,7 @@ class _OtpPageState extends State<OtpPage> {
             showSuccessSnackBar(context, state.message);
             _startCountdown();
           } else if (state is AuthError && state.flowType == 'verify_otp') {
-            final message = state.errorMessage ?? 'xác thực thất bại';
+            final message = state.errorMessage ?? context.l10n.authVerifyOtpFailed;
             UIUtils.showErrorMessage(context, message);
             BlocProvider.of<AuthBloc>(
               context,
@@ -152,7 +153,10 @@ class _OtpPageState extends State<OtpPage> {
 
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
+                    child: Icon(
+                      CupertinoIcons.back,
+                      color: AppColors.unselectedIcon,
+                    ),
                   ),
 
                   SizedBox(height: 50.h),
@@ -160,7 +164,7 @@ class _OtpPageState extends State<OtpPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Xác thực OTP",
+                      context.l10n.authOtpTitle,
                       style: TextStyle(
                         fontSize: 24.sp,
                         fontWeight: FontWeight.bold,
@@ -172,8 +176,11 @@ class _OtpPageState extends State<OtpPage> {
                   SizedBox(height: 10.h),
 
                   Text(
-                    "Nhập mã OTP đã gửi đến ${_email ?? ''}",
-                    style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
+                    context.l10n.authOtpSentTo(_email ?? ''),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
 
                   SizedBox(height: 40.h),
@@ -184,7 +191,10 @@ class _OtpPageState extends State<OtpPage> {
                     focusedPinTheme: defaultPinTheme.copyWith(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: AppColors.textPrimary, width: 2.w),
+                        border: Border.all(
+                          color: AppColors.textPrimary,
+                          width: 2.w,
+                        ),
                       ),
                     ),
                     onChanged: (value) {
@@ -200,7 +210,7 @@ class _OtpPageState extends State<OtpPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Bạn chưa nhận được mã? ",
+                        context.l10n.authDidNotReceiveCode,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 14.sp,
@@ -214,10 +224,12 @@ class _OtpPageState extends State<OtpPage> {
                             : () => _resendOtp(context),
                         child: Text(
                           state is OtpResendLoading
-                              ? 'Đang gửi lại...'
+                              ? context.l10n.authResendingOtp
                               : _secondsRemaining > 0
-                              ? "Gửi lại trong $_secondsRemaining giây"
-                              : "Gửi lại mã",
+                              ? context.l10n.authResendInSeconds(
+                                  _secondsRemaining,
+                                )
+                              : context.l10n.authResendCode,
                           style: TextStyle(
                             color: _secondsRemaining > 0
                                 ? AppColors.primary
@@ -240,7 +252,7 @@ class _OtpPageState extends State<OtpPage> {
                         )
                       : ButtonCustom(
                           onPressed: () => _verifyOtp(context),
-                          text: "Xác thực",
+                          text: context.l10n.authVerify,
                         ),
 
                   SizedBox(height: 24.h),
@@ -249,7 +261,7 @@ class _OtpPageState extends State<OtpPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Bạn đã có tài khoản? ",
+                        context.l10n.authHasAccount,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 14.sp,
@@ -261,7 +273,7 @@ class _OtpPageState extends State<OtpPage> {
                           Navigator.pushNamed(context, '/login');
                         },
                         child: Text(
-                          "Đăng nhập",
+                          context.l10n.authLogin,
                           style: TextStyle(
                             color: AppColors.primary,
                             fontSize: 14.sp,

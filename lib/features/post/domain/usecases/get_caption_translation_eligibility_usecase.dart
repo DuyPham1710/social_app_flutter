@@ -5,15 +5,18 @@ import 'package:social_app_fe/features/post/domain/repository/post_repository.da
 
 class GetCaptionTranslationEligibilityUsecase
     implements
-        UseCase<DataState<CaptionTranslationEligibilityEntity>,
-            GetCaptionTranslationEligibilityParams> {
+        UseCase<
+          DataState<CaptionTranslationEligibilityEntity>,
+          GetCaptionTranslationEligibilityParams
+        > {
   final PostRepository _repository;
 
   GetCaptionTranslationEligibilityUsecase(this._repository);
 
   @override
-  Future<DataState<CaptionTranslationEligibilityEntity>> call(
-      {GetCaptionTranslationEligibilityParams? params}) {
+  Future<DataState<CaptionTranslationEligibilityEntity>> call({
+    GetCaptionTranslationEligibilityParams? params,
+  }) {
     return _repository.getCaptionTranslationEligibility(
       postId: params!.postId,
       targetLang: params.targetLang,

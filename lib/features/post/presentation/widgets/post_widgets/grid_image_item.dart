@@ -117,7 +117,9 @@ class _GridImageItemState extends State<GridImageItem>
                 height: 20.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.isSelected ? AppColors.primary : Colors.transparent,
+                  color: widget.isSelected
+                      ? AppColors.primary
+                      : Colors.transparent,
                   border: Border.all(color: Colors.white, width: 1),
                 ),
 

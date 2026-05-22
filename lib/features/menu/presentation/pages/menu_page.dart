@@ -10,6 +10,7 @@ import '../widgets/menu_footer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -24,22 +25,22 @@ class MenuPage extends StatelessWidget {
 }
 
 class _MenuView extends StatelessWidget {
-  const _MenuView({super.key});
+  const _MenuView();
 
-  void _handleMenuItemTap(BuildContext context, String label) {
-    switch (label) {
-      case 'Bạn bè':
+  void _handleMenuItemTap(BuildContext context, String itemKey) {
+    switch (itemKey) {
+      case 'friends':
         // Navigate to friends page
         break;
-      case 'Nhóm':
+      case 'groups':
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const CommunityPage()),
         );
-      case 'Thước phim':
+      case 'reels':
         // Navigate to stories/reels page
         break;
-      case 'Khám phá':
+      case 'explore':
         // Navigate to explore/discover page
         break;
     }
@@ -47,6 +48,7 @@ class _MenuView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final mainItems = [
       {
         'icon': SvgPicture.asset(
@@ -54,8 +56,8 @@ class _MenuView extends StatelessWidget {
           width: 26,
           height: 26,
         ),
-        'label': 'Bạn bè',
-        'onTap': () => _handleMenuItemTap(context, 'Bạn bè'),
+        'label': l10n.menuFriends,
+        'onTap': () => _handleMenuItemTap(context, 'friends'),
       },
       {
         'icon': SvgPicture.asset(
@@ -63,8 +65,8 @@ class _MenuView extends StatelessWidget {
           width: 26,
           height: 26,
         ),
-        'label': 'Nhóm',
-        'onTap': () => _handleMenuItemTap(context, 'Nhóm'),
+        'label': l10n.menuGroups,
+        'onTap': () => _handleMenuItemTap(context, 'groups'),
       },
       {
         'icon': SvgPicture.asset(
@@ -72,8 +74,8 @@ class _MenuView extends StatelessWidget {
           width: 26,
           height: 26,
         ),
-        'label': 'Thước phim',
-        'onTap': () => _handleMenuItemTap(context, 'Thước phim'),
+        'label': l10n.menuReels,
+        'onTap': () => _handleMenuItemTap(context, 'reels'),
       },
       {
         'icon': SvgPicture.asset(
@@ -81,8 +83,8 @@ class _MenuView extends StatelessWidget {
           width: 26,
           height: 26,
         ),
-        'label': 'Khám phá',
-        'onTap': () => _handleMenuItemTap(context, 'Khám phá'),
+        'label': l10n.menuExplore,
+        'onTap': () => _handleMenuItemTap(context, 'explore'),
       },
     ];
 
@@ -90,9 +92,12 @@ class _MenuView extends StatelessWidget {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Menu',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        title: Text(
+          l10n.menuTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         backgroundColor: AppColors.background,
         elevation: 0.5,
@@ -118,7 +123,7 @@ class _MenuView extends StatelessWidget {
               builder: (context, state) {
                 if (state is MenuLoadedState) {
                   return MenuHeader(
-                    name: state.user.fullName ?? "User",
+                    name: state.user.fullName ?? l10n.commonUser,
                     avatarUrl:
                         state.user.avatarUrl ??
                         "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
@@ -129,13 +134,13 @@ class _MenuView extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (state is MenuErrorState) {
-                  return Text('Lỗi: ${state.message}');
+                  return Text(l10n.menuError(state.message));
                 }
                 return const SizedBox();
               },
             ),
             const SizedBox(height: 16),
-            MenuSection(title: 'Tiện ích', items: mainItems),
+            MenuSection(title: l10n.menuUtilities, items: mainItems),
             const SizedBox(height: 16),
             const MenuFooter(),
           ],

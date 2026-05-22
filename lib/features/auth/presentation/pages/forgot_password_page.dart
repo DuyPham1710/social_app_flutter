@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 
@@ -55,7 +56,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               },
             );
           } else if (state is AuthError && state.flowType == 'resend_otp') {
-            final message = state.errorMessage ?? 'Gửi OTP thất bại';
+            final message = state.errorMessage ?? context.l10n.authSendOtpFailed;
             UIUtils.showErrorMessage(context, message);
             BlocProvider.of<AuthBloc>(context).add(AuthReset());
           }
@@ -74,7 +75,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
+                      child: Icon(
+                        CupertinoIcons.back,
+                        color: AppColors.unselectedIcon,
+                      ),
                     ),
 
                     SizedBox(height: 50.h),
@@ -82,7 +86,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Quên mật khẩu",
+                        context.l10n.authForgotPassword,
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
@@ -93,7 +97,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     SizedBox(height: 10.h),
 
                     Text(
-                      "Nhập email của bạn để khôi phục tài khoản.",
+                      context.l10n.authForgotPasswordDescription,
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: AppColors.textSecondary,
@@ -103,13 +107,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     SizedBox(height: 50.h),
 
                     TextformfieldCustom(
-                      label: 'Email',
+                      label: context.l10n.authEmail,
                       isPassword: false,
                       controller: _emailController,
                       focusNode: emailFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập email';
+                          return context.l10n.authEnterEmail;
                         }
                         return null;
                       },
@@ -125,7 +129,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           )
                         : ButtonCustom(
                             onPressed: () => _onForgotPasswordPressed(context),
-                            text: "Tiếp tục",
+                            text: context.l10n.authContinue,
                           ),
 
                     SizedBox(height: 24.h),
@@ -134,7 +138,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Bạn chưa có tài khoản? ",
+                          context.l10n.authNoAccount,
                           style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 14.sp,
@@ -146,7 +150,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             Navigator.pushNamed(context, '/signup');
                           },
                           child: Text(
-                            "Đăng ký",
+                            context.l10n.authRegister,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14.sp,

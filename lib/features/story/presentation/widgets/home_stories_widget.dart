@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/story/presentation/pages/story_viewer_pag
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/stories_loading_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 import '../bloc/home_stories_bloc.dart';
 
@@ -134,7 +135,10 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
             child: Center(
               child: Text(
                 state.message,
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14.sp,
+                ),
               ),
             ),
           );
@@ -166,7 +170,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                   border: Border.all(color: AppColors.divider, width: 1),
                   image:
                       _currentUserAvatar != null &&
-                           _currentUserAvatar!.isNotEmpty
+                          _currentUserAvatar!.isNotEmpty
                       ? DecorationImage(
                           image: NetworkImage(_currentUserAvatar!),
                           fit: BoxFit.cover,
@@ -186,7 +190,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
           ),
           SizedBox(height: 30.h),
           Text(
-            "Thêm tin",
+            context.l10n.homeAddStory,
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
@@ -254,7 +258,9 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                           fit: BoxFit.cover,
                         )
                       : null,
-                  color: story.mediaUrl == null ? AppColors.secondBackground : null,
+                  color: story.mediaUrl == null
+                      ? AppColors.secondBackground
+                      : null,
                 ),
               ),
 

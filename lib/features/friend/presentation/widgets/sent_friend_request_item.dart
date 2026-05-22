@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SentFriendRequestItem extends StatelessWidget {
   final dynamic userId;
@@ -139,7 +140,7 @@ class SentFriendRequestItem extends StatelessWidget {
                         ),
                       SizedBox(width: 6.w),
                       Text(
-                        '$mutualFriends bạn chung',
+                        context.l10n.friendMutualCount(mutualFriends),
                         style: TextStyle(
                           fontSize: 13.sp,
                           color: AppColors.textSecondary,
@@ -172,7 +173,7 @@ class SentFriendRequestItem extends StatelessWidget {
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          'Đã hủy yêu cầu',
+                          context.l10n.friendRequestCancelled,
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12.sp,
@@ -184,7 +185,7 @@ class SentFriendRequestItem extends StatelessWidget {
                   )
                 else
                   _buildActionButton(
-                    label: 'Hủy yêu cầu',
+                    label: context.l10n.friendCancelRequest,
                     background: AppColors.secondBackground,
                     foreground: AppColors.textPrimary,
                     onTap: onCancel ?? () {},

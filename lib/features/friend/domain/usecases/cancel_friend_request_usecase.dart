@@ -10,4 +10,3 @@ class CancelFriendRequestUseCase {
     return await friendRepository.cancelFriendRequest(requestId);
   }
 }
-

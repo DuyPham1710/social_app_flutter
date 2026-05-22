@@ -28,6 +28,7 @@ import 'package:social_app_fe/features/save/domain/repository/save_repository.da
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/view_post_usecase.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostItem extends StatefulWidget {
   final PostEntity post;
@@ -201,7 +202,7 @@ class _PostItemState extends State<PostItem> {
           _isSaved = false;
           _savedId = null;
         });
-        showSuccessSnackBar(context, 'Đã bỏ lưu bài viết');
+        showSuccessSnackBar(context, context.l10n.postUnsaveSuccess);
       }
     }
   }

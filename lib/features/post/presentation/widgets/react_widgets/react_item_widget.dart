@@ -3,12 +3,19 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/react_action_button.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactItemWidget extends StatelessWidget {
   final ReactPostEntity react;
   final bool isSend;
   final String? requestId;
-  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
+  final Function(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  )?
+  onMention;
   const ReactItemWidget({
     super.key,
     required this.react,
@@ -19,7 +26,10 @@ class ReactItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bool showMutualFriends = (react.mutualFriendsCount ?? 0) > 0;
+    final displayName =
+        react.user.fullName ?? react.user.username ?? l10n.commonUnknown;
 
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -79,7 +89,7 @@ class ReactItemWidget extends StatelessWidget {
                   : MainAxisAlignment.start,
               children: [
                 Text(
-                  react.user.fullName ?? react.user.username ?? 'Unknown',
+                  displayName,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14.sp,
@@ -90,7 +100,7 @@ class ReactItemWidget extends StatelessWidget {
                 if (showMutualFriends) ...[
                   SizedBox(height: 2.h),
                   Text(
-                    '${react.mutualFriendsCount} bạn chung',
+                    l10n.postMutualFriends(react.mutualFriendsCount ?? 0),
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14.sp,
@@ -110,9 +120,10 @@ class ReactItemWidget extends StatelessWidget {
               isSend: isSend,
               requestId: requestId,
               onMention: onMention,
-              userDisplayName:
-                  react.user.fullName ?? react.user.username ?? 'Unknown',
-              userAvatar: react.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+              userDisplayName: displayName,
+              userAvatar:
+                  react.user.avatarUrl ??
+                  'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
             ),
           ],
         ],

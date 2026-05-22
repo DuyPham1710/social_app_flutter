@@ -37,15 +37,19 @@ class ChatSearchBloc extends Bloc<ChatSearchEvent, ChatSearchState> {
 
     if (result is DataStateSuccess<List<FriendSuggestionEntity>>) {
       final suggestions = result.data ?? [];
-      emit(ChatSearchLoaded(
-        suggestions: suggestions,
-        sentRequestUserIds: const {},
-        userIdToRequestIdMap: const {},
-      ));
+      emit(
+        ChatSearchLoaded(
+          suggestions: suggestions,
+          sentRequestUserIds: const {},
+          userIdToRequestIdMap: const {},
+        ),
+      );
     } else if (result is DataStateError) {
-      emit(ChatSearchError(
-        message: result.error?.message ?? 'Lỗi khi tải gợi ý bạn bè',
-      ));
+      emit(
+        ChatSearchError(
+          message: result.error?.message ?? 'Lỗi khi tải gợi ý bạn bè',
+        ),
+      );
     }
   }
 
@@ -63,18 +67,23 @@ class ChatSearchBloc extends Bloc<ChatSearchEvent, ChatSearchState> {
       // Cập nhật state để đánh dấu đã gửi lời mời và lưu requestId
       final updatedSentIds = Set<String>.from(currentState.sentRequestUserIds)
         ..add(event.receiverId);
-      
-      final updatedMapping = Map<String, String>.from(currentState.userIdToRequestIdMap)
-        ..[event.receiverId] = friendRequest.requestId;
 
-      emit(currentState.copyWith(
-        sentRequestUserIds: updatedSentIds,
-        userIdToRequestIdMap: updatedMapping,
-      ));
+      final updatedMapping = Map<String, String>.from(
+        currentState.userIdToRequestIdMap,
+      )..[event.receiverId] = friendRequest.requestId;
+
+      emit(
+        currentState.copyWith(
+          sentRequestUserIds: updatedSentIds,
+          userIdToRequestIdMap: updatedMapping,
+        ),
+      );
     } else if (result is DataStateError) {
-      emit(ChatSearchError(
-        message: result.error?.message ?? 'Lỗi khi gửi lời mời kết bạn',
-      ));
+      emit(
+        ChatSearchError(
+          message: result.error?.message ?? 'Lỗi khi gửi lời mời kết bạn',
+        ),
+      );
     }
   }
 
@@ -98,18 +107,23 @@ class ChatSearchBloc extends Bloc<ChatSearchEvent, ChatSearchState> {
       // Cập nhật state để đánh dấu đã hủy lời mời
       final updatedSentIds = Set<String>.from(currentState.sentRequestUserIds)
         ..remove(event.userId);
-      
-      final updatedMapping = Map<String, String>.from(currentState.userIdToRequestIdMap)
-        ..remove(event.userId);
 
-      emit(currentState.copyWith(
-        sentRequestUserIds: updatedSentIds,
-        userIdToRequestIdMap: updatedMapping,
-      ));
+      final updatedMapping = Map<String, String>.from(
+        currentState.userIdToRequestIdMap,
+      )..remove(event.userId);
+
+      emit(
+        currentState.copyWith(
+          sentRequestUserIds: updatedSentIds,
+          userIdToRequestIdMap: updatedMapping,
+        ),
+      );
     } else if (result is DataStateError) {
-      emit(ChatSearchError(
-        message: result.error?.message ?? 'Lỗi khi hủy lời mời kết bạn',
-      ));
+      emit(
+        ChatSearchError(
+          message: result.error?.message ?? 'Lỗi khi hủy lời mời kết bạn',
+        ),
+      );
     }
   }
 }

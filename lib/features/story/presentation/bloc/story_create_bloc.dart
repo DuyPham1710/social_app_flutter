@@ -24,21 +24,22 @@ class StoryCreateBloc extends Bloc<StoryCreateEvent, StoryCreateState> {
         emit(StoryCreated());
       } else if (dataState is DataStateError) {
         // Lấy message từ response body của BE (ví dụ: BadRequestException)
-        final errorMessage = dataState.error?.response?.data?['message']
-            ?? dataState.error?.message
-            ?? 'Có lỗi xảy ra khi tạo story';
-        emit(StoryCreateError(message: errorMessage is List ? errorMessage.join(', ') : errorMessage.toString()));
+        final errorMessage =
+            dataState.error?.response?.data?['message'] ??
+            dataState.error?.message ??
+            'Có lỗi xảy ra khi tạo story';
+        emit(
+          StoryCreateError(
+            message: errorMessage is List
+                ? errorMessage.join(', ')
+                : errorMessage.toString(),
+          ),
+        );
       } else {
         emit(const StoryCreateError(message: 'Có lỗi không xác định xảy ra'));
       }
     } catch (e) {
-      emit(
-        StoryCreateError(
-          message: 'Có lỗi xảy ra khi tạo story: $e',
-        ),
-      );
+      emit(StoryCreateError(message: 'Có lỗi xảy ra khi tạo story: $e'));
     }
   }
 }
-
-

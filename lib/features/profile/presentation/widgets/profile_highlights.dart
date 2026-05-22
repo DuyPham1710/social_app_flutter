@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileHighlights extends StatelessWidget {
   const ProfileHighlights({super.key});
@@ -28,9 +29,9 @@ class ProfileHighlights extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildHighlight('Bạn bè', Icons.people),
-          _buildHighlight('Ảnh', Icons.photo_library),
-          _buildHighlight('Reels', Icons.video_library),
+          _buildHighlight(context.l10n.profileFriends, Icons.people),
+          _buildHighlight(context.l10n.profilePhotosTab, Icons.photo_library),
+          _buildHighlight(context.l10n.profileReelsTab, Icons.video_library),
         ],
       ),
     );

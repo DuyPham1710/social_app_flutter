@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/group_avatar_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ConversationItem extends StatelessWidget {
   final String? avatarUrl;
@@ -85,7 +86,7 @@ class ConversationItem extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        preview.contains('null') ? 'Đã kết nối' : preview,
+        preview.contains('null') ? context.l10n.chatConnected : preview,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(

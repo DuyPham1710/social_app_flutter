@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/friend/data/models/friend_model.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/chat_search/chat_search_bloc.dart';
 import 'package:social_app_fe/features/chat/data/services/recent_search_service.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/recent_search_management_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatSearchPage extends StatefulWidget {
   final List<FriendEntity> friends;
@@ -87,7 +88,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                     child: CupertinoSearchTextField(
                       controller: _controller,
                       cursorColor: AppColors.primary,
-                      placeholder: "Tìm kiếm",
+                      placeholder: context.l10n.searchHint,
                       onChanged: (value) {
                         setState(() {});
                       },
@@ -97,7 +98,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   CupertinoButton(
                     padding: EdgeInsets.zero,
                     child: Text(
-                      "Huỷ",
+                      context.l10n.commonCancel,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 16.sp,
@@ -131,7 +132,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Tìm kiếm gần đây",
+              context.l10n.searchRecent,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 14.sp,
@@ -152,7 +153,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 await _loadRecentSearches();
               },
               child: Text(
-                "Chỉnh sửa",
+                context.l10n.commonEdit,
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: 14.sp,
@@ -166,7 +167,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
 
         if (_recentSearches.isEmpty)
           Text(
-            "Chưa có tìm kiếm gần đây",
+            context.l10n.searchNoRecent,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
           )
         else
@@ -188,7 +189,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
 
         SizedBox(height: 20.h),
         Text(
-          "Gợi ý",
+          context.l10n.chatSuggestions,
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 14.sp,
@@ -210,7 +211,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Những người bạn có thể biết",
+              context.l10n.chatPeopleYouMayKnow,
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 14.sp,
@@ -219,7 +220,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             ),
 
             Text(
-              "Xem thêm",
+              context.l10n.commonSeeMore,
               style: TextStyle(
                 color: AppColors.primary,
                 fontSize: 14.sp,
@@ -244,7 +245,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
             } else if (state is ChatSearchLoaded) {
               if (state.suggestions.isEmpty) {
                 return Text(
-                  "Hiện chưa có gợi ý bạn bè",
+                  context.l10n.chatNoFriendSuggestions,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13.sp,
@@ -288,7 +289,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     if (results.isEmpty) {
       return Center(
         child: Text(
-          "Không tìm thấy kết quả",
+          context.l10n.searchNoResults,
           style: TextStyle(color: AppColors.textSecondary),
         ),
       );
@@ -344,7 +345,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
           SizedBox(
             width: 60.w,
             child: Text(
-              fullName ?? username ?? 'Unknown',
+              fullName ?? username ?? context.l10n.commonUnknown,
               style: TextStyle(fontSize: 12.sp),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -367,7 +368,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         backgroundColor: Colors.grey.shade300,
       ),
       title: Text(
-        friend.fullName ?? 'Unknown',
+        friend.fullName ?? context.l10n.commonUnknown,
         style: TextStyle(color: AppColors.textPrimary, fontSize: 15.sp),
       ),
       onTap: () async {
@@ -396,7 +397,9 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
       ),
       title: Text(
         // khi tên quá dài thì hiện ... sau
-        suggestion.fullName ?? suggestion.username ?? 'Unknown',
+        suggestion.fullName ??
+            suggestion.username ??
+            context.l10n.commonUnknown,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(color: AppColors.textPrimary, fontSize: 15.sp),
@@ -404,7 +407,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
       subtitle:
           suggestion.mutualFriends != null && suggestion.mutualFriends! > 0
           ? Text(
-              "${suggestion.mutualFriends} bạn chung",
+              context.l10n.friendMutualCount(suggestion.mutualFriends!),
               style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
             )
           : null,
@@ -449,7 +452,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   ),
                   SizedBox(width: 8.w),
                   Text(
-                    'Hủy lời mời',
+                    context.l10n.friendCancelRequest,
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12.sp,
@@ -459,7 +462,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                 ],
               )
             : Text(
-                'Thêm bạn bè',
+                context.l10n.friendAdd,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12.sp,

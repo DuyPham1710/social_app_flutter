@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ModalGender extends StatelessWidget {
   const ModalGender({super.key});
@@ -9,7 +10,7 @@ class ModalGender extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoActionSheet(
       title: Text(
-        "Chọn giới tính",
+        context.l10n.authChooseGender,
         style: TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 14.sp,
@@ -23,7 +24,7 @@ class ModalGender extends StatelessWidget {
             Navigator.pop(context, "Nam");
           },
           child: Text(
-            "Nam",
+            context.l10n.authGenderMale,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
           ),
         ),
@@ -32,7 +33,7 @@ class ModalGender extends StatelessWidget {
             Navigator.pop(context, "Nữ");
           },
           child: Text(
-            "Nữ",
+            context.l10n.authGenderFemale,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
           ),
         ),
@@ -41,7 +42,7 @@ class ModalGender extends StatelessWidget {
             Navigator.pop(context, "Khác");
           },
           child: Text(
-            "Khác",
+            context.l10n.authGenderOther,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
           ),
         ),
@@ -53,7 +54,7 @@ class ModalGender extends StatelessWidget {
         },
         isDefaultAction: true,
         child: Text(
-          "Hủy",
+          context.l10n.commonCancel,
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 14.sp,

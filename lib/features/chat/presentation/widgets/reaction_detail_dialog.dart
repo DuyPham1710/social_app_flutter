@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactionDetailDialog extends StatefulWidget {
   final List<ReactionEntity> reactions;
@@ -49,7 +50,7 @@ class _ReactionDetailDialogState extends State<ReactionDetailDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Cảm xúc",
+                  context.l10n.commentReactionsTitle,
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
@@ -81,7 +82,7 @@ class _ReactionDetailDialogState extends State<ReactionDetailDialog> {
               child: filteredReactions.isEmpty
                   ? Center(
                       child: Text(
-                        "Chưa có cảm xúc nào",
+                        context.l10n.chatNoReactions,
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                     )
@@ -105,7 +106,8 @@ class _ReactionDetailDialogState extends State<ReactionDetailDialog> {
 
                             Expanded(
                               child: Text(
-                                reaction.user.fullName ?? "Người dùng ẩn danh",
+                                reaction.user.fullName ??
+                                    context.l10n.chatAnonymousUser,
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
@@ -134,7 +136,7 @@ class _ReactionDetailDialogState extends State<ReactionDetailDialog> {
                 children: [
                   // Tab "TẤT CẢ"
                   _buildFilterTab(
-                    label: "TẤT CẢ",
+                    label: context.l10n.commonAll.toUpperCase(),
                     isSelected: _selectedEmoji == null,
                     onTap: () {
                       setState(() {

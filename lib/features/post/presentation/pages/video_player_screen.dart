@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       } else if (widget.videoData is String) {
         _controller = VideoPlayerController.network(widget.videoData);
       } else {
-        throw Exception('Unsupported video type');
+        throw Exception(context.l10n.postUnsupportedVideoType);
       }
 
       _controller.addListener(() {
@@ -88,7 +89,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
 
       // Seek to start position if provided
-      if (widget.startPosition != null && widget.startPosition!.inMilliseconds > 0) {
+      if (widget.startPosition != null &&
+          widget.startPosition!.inMilliseconds > 0) {
         await _controller.seekTo(widget.startPosition!);
       }
 
@@ -98,7 +100,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       if (mounted) {
         setState(() {
           _hasError = true;
-          _errorMessage = 'Không thể phát video: ${e.toString()}';
+          _errorMessage = context.l10n.postPlayVideoFailed(e.toString());
         });
       }
     }
@@ -176,11 +178,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   color: Colors.black.withValues(alpha: 0.6),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                  size: 24.sp,
-                ),
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
               ),
             ),
           ),
@@ -238,15 +236,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     ),
                     child: Slider(
                       value: _controller.value.position.inMilliseconds
-                          .clamp(
-                            0,
-                            _controller.value.duration.inMilliseconds,
-                          )
+                          .clamp(0, _controller.value.duration.inMilliseconds)
                           .toDouble(),
-                      max: (_controller.value.duration.inMilliseconds > 0
-                              ? _controller.value.duration.inMilliseconds
-                              : 1)
-                          .toDouble(),
+                      max:
+                          (_controller.value.duration.inMilliseconds > 0
+                                  ? _controller.value.duration.inMilliseconds
+                                  : 1)
+                              .toDouble(),
                       onChanged: (value) {
                         _controller.seekTo(
                           Duration(milliseconds: value.toInt()),
@@ -313,7 +309,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       SizedBox(height: 24.h),
                       ElevatedButton(
                         onPressed: _initializeVideo,
-                        child: const Text('Thử lại'),
+                        child: Text(context.l10n.commonRetry),
                       ),
                     ],
                   ),
@@ -346,7 +342,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 ),
                                 SizedBox(height: 16.h),
                                 Text(
-                                  'Đang tải video...',
+                                  context.l10n.postLoadingVideo,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16.sp,

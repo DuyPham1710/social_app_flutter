@@ -1,0 +1,1421 @@
+{
+  "@@locale": "vi",
+  "appTitle": "commonhub",
+  "commonCancel": "Hủy",
+  "commonReport": "Báo cáo",
+  "commonBlock": "Chặn",
+  "commonPrivacySupport": "Quyền riêng tư & Hỗ trợ",
+  "commonMoreActions": "Hành động khác",
+  "commonSavePhotoPermissionMessage":"Cần quyền truy cập ảnh để lưu ảnh",
+  "commonSettings": "Cài đặt",
+  "commonOpenSettings": "Mở Cài đặt",
+  "commonRetry": "Thử lại",
+  "commonSend": "Gửi",
+  "commonError": "Lỗi",
+  "commonRestrict": "Hạn chế",
+  "commonEnabled": "Đang bật",
+  "commonUnknown": "Không xác định",
+  "commonUser": "Người dùng",
+  "unableToLoadUserData": "Không thể tải dữ liệu người dùng",
+  "language": "Ngôn ngữ",
+  "languageSystem": "Theo hệ thống",
+  "languageVietnamese": "Tiếng Việt",
+  "languageEnglish": "English",
+  "languageCurrent": "Hiện tại: {language}",
+  "@languageCurrent": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "menuTitle": "Menu",
+  "menuFriends": "Bạn bè",
+  "menuGroups": "Nhóm",
+  "menuReels": "Thước phim",
+  "menuExplore": "Khám phá",
+  "menuUtilities": "Tiện ích",
+  "menuHelpSupport": "Trợ giúp và hỗ trợ",
+  "menuSettingsPrivacy": "Cài đặt và quyền riêng tư",
+  "menuLogout": "Đăng xuất",
+  "menuLogoutDialogTitle": "Đăng xuất khỏi tài khoản của bạn?",
+  "menuError": "Lỗi: {message}",
+  "@menuError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTitle": "Tin nhắn",
+  "chatSearchHint": "Tìm kiếm",
+  "chatYourStory": "Tin của bạn",
+  "chatCreateStory": "Tạo tin",
+  "chatYou": "Bạn",
+  "chatSomeone": "Ai đó",
+  "chatConnected": "Đã kết nối",
+  "chatSentAttachmentPreview": "{senderPrefix}đã gửi {attachmentType}   •   {time}",
+  "@chatSentAttachmentPreview": {
+    "placeholders": {
+      "senderPrefix": {
+        "type": "String"
+      },
+      "attachmentType": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTextPreview": "{prefix}{message}   •   {time}",
+  "@chatTextPreview": {
+    "placeholders": {
+      "prefix": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatGroupCreatedPreview": "{creatorName} vừa tạo nhóm",
+  "@chatGroupCreatedPreview": {
+    "placeholders": {
+      "creatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "messageNoMessagesStartConversation": "Không có tin nhắn nào. Bắt đầu cuộc trò chuyện ngay!",
+  "messageDownloadingFile": "Đang tải file...",
+  "messageFileOpenAppNotFound": "Không tìm thấy ứng dụng để mở file này",
+  "messageFileDownloadError": "Lỗi tải file: {error}",
+  "@messageFileDownloadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDeletedByYou": "Bạn đã xóa tin nhắn này",
+  "messageDeletedByUser": "{name} đã xóa tin nhắn này",
+  "@messageDeletedByUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "messageUnreadCount": "{count, plural, =1{1 tin nhắn chưa đọc} other{{count} tin nhắn chưa đọc}}",
+  "@messageUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "messageEdited": "Đã chỉnh sửa",
+  "messageEditHistoryTitle": "Lịch sử chỉnh sửa",
+  "messageHideEditHistory": "Ẩn lịch sử chỉnh sửa",
+  "messageCurrentVersion": "Hiện tại",
+  "messageLoadingEditHistory": "Đang tải lịch sử chỉnh sửa...",
+  "messageLoadMessagesError": "Lỗi tải tin nhắn: {message}",
+  "@messageLoadMessagesError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "messageSentAt": "Đã gửi {time}",
+  "@messageSentAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "messageLocation": "Vị trí",
+  "messageVoiceAttachment": "[Tin nhắn thoại]",
+  "messageImageAttachment": "[Ảnh]",
+  "messageVideoAttachment": "[Video]",
+  "messageFileAttachment": "[Tệp tin]",
+  "messageGenericAttachment": "[Đính kèm]",
+  "messageDocumentFileName": "Document",
+  "messageDocumentPdfFileName": "Document.pdf",
+  "messageDownloadedFileName": "downloaded_file",
+  "dateYesterday": "Hôm qua",
+  "weekdayMondayShort": "T2",
+  "weekdayTuesdayShort": "T3",
+  "weekdayWednesdayShort": "T4",
+  "weekdayThursdayShort": "T5",
+  "weekdayFridayShort": "T6",
+  "weekdaySaturdayShort": "T7",
+  "weekdaySundayShort": "CN",
+  "weekdayMondayDotShort": "T.2",
+  "weekdayTuesdayDotShort": "T.3",
+  "weekdayWednesdayDotShort": "T.4",
+  "weekdayThursdayDotShort": "T.5",
+  "weekdayFridayDotShort": "T.6",
+  "weekdaySaturdayDotShort": "T.7",
+  "dateAtTime": "{weekday} LÚC {time}",
+  "@dateAtTime": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeMinutesAgo": "{count, plural, =1{1 phút trước} other{{count} phút trước}}",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "timeHoursAgo": "{count, plural, =1{1 giờ trước} other{{count} giờ trước}}",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "timeDaysAgo": "{count, plural, =1{1 ngày trước} other{{count} ngày trước}}",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "commonOk": "OK",
+  "commonSave": "Lưu",
+  "commonDelete": "Xóa",
+  "commonConfirm": "Xác nhận",
+  "commonChoose": "Chọn",
+  "authEmail": "Email",
+  "authPassword": "Mật khẩu",
+  "authNewPassword": "Mật khẩu mới",
+  "authConfirmPassword": "Xác nhận mật khẩu",
+  "authConfirmNewPassword": "Xác nhận mật khẩu mới",
+  "authUsername": "Tên người dùng",
+  "authLogin": "Đăng nhập",
+  "authRegister": "Đăng ký",
+  "authForgotPassword": "Quên mật khẩu",
+  "authForgotPasswordQuestion": "Quên mật khẩu?",
+  "authForgotPasswordDescription": "Nhập email của bạn để khôi phục tài khoản.",
+  "authContinue": "Tiếp tục",
+  "authSave": "Lưu",
+  "authOr": "hoặc",
+  "authLoginWithGoogle": "Đăng nhập với Google",
+  "authNoAccount": "Bạn chưa có tài khoản? ",
+  "authHasAccount": "Bạn đã có tài khoản? ",
+  "authEnterEmail": "Vui lòng nhập email",
+  "authEnterPassword": "Vui lòng nhập mật khẩu",
+  "authEnterUsername": "Vui lòng nhập tên người dùng",
+  "authEnterConfirmPassword": "Vui lòng nhập xác nhận mật khẩu",
+  "authEnterNewPassword": "Vui lòng nhập mật khẩu mới",
+  "authEnterConfirmNewPassword": "Vui lòng nhập xác nhận mật khẩu mới",
+  "authLoginFailed": "Đăng nhập thất bại",
+  "authRegisterFailed": "Đăng ký thất bại",
+  "authSendOtpFailed": "Gửi OTP thất bại",
+  "authVerifyOtpFailed": "Xác thực thất bại",
+  "authResetPassword": "Đặt lại mật khẩu",
+  "authResetPasswordDescription": "Giúp chúng tôi bảo vệ tài khoản của bạn bằng cách chọn mật khẩu mạnh.",
+  "authResetPasswordSuccess": "Đặt lại mật khẩu thành công",
+  "authResetPasswordFailed": "Đặt lại mật khẩu thất bại",
+  "authOtpTitle": "Xác thực OTP",
+  "authOtpSentTo": "Nhập mã OTP đã gửi đến {email}",
+  "@authOtpSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authInvalidOtp": "Vui lòng nhập mã OTP hợp lệ",
+  "authDidNotReceiveCode": "Bạn chưa nhận được mã? ",
+  "authResendingOtp": "Đang gửi lại...",
+  "authResendInSeconds": "Gửi lại trong {seconds} giây",
+  "@authResendInSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authResendCode": "Gửi lại mã",
+  "authVerify": "Xác thực",
+  "authPersonalInfoTitle": "Thông tin cá nhân",
+  "authPersonalInfoDescription": "Vui lòng điền đầy đủ thông tin sau",
+  "authFullName": "Họ và tên",
+  "authPhoneNumber": "Số điện thoại",
+  "authDateOfBirth": "Ngày sinh",
+  "authGender": "Giới tính",
+  "authBio": "Tiểu sử",
+  "authEnterFullName": "Vui lòng nhập họ và tên",
+  "authEnterPhoneNumber": "Vui lòng nhập số điện thoại",
+  "authEnterDateOfBirth": "Vui lòng nhập ngày sinh",
+  "authEnterGender": "Vui lòng nhập giới tính",
+  "authUpdatePersonalInfoFailed": "Cập nhật thông tin cá nhân thất bại",
+  "authChooseGender": "Chọn giới tính",
+  "authGenderMale": "Nam",
+  "authGenderFemale": "Nữ",
+  "authGenderOther": "Khác",
+  "faceScanTitle": "Nhận diện khuôn mặt",
+  "faceScanProcessing": "Đang xử lý...",
+  "faceScanCompleted": "Hoàn tất!",
+  "faceScanHoldStill": "Giữ yên...",
+  "faceScanTooDarkTitle": "Thiếu ánh sáng",
+  "faceScanStep": "Bước {step}/5",
+  "@faceScanStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "faceScanUploading": "Đang gửi dữ liệu khuôn mặt lên máy chủ...",
+  "faceScanStoredSafely": "Dữ liệu khuôn mặt đã được lưu trữ an toàn.",
+  "faceScanTooDarkMessage": "Môi trường quá tối.\nVui lòng tìm nơi có ánh sáng tốt hơn.",
+  "faceScanLookStraight": "Vui lòng nhìn thẳng vào camera",
+  "faceScanLookUp": "Ngẩng đầu lên một chút",
+  "faceScanLookDown": "Cúi đầu xuống một chút",
+  "faceScanLookLeft": "Quay mặt sang trái",
+  "faceScanLookRight": "Quay mặt sang phải",
+  "faceScanMissingAccount": "Không tìm thấy thông tin tài khoản. Vui lòng thử lại.",
+  "faceScanProcessImageFailed": "Đã xảy ra lỗi khi xử lý ảnh. Vui lòng thử lại.",
+  "authErrorTitle": "Lỗi xác thực",
+  "languageSelectTitle": "Chọn ngôn ngữ",
+  "menuSaved": "Đã lưu",
+  "menuCommunity": "Cộng đồng",
+  "menuAppearance": "Giao diện",
+  "menuPrivacySecurity": "Quyền riêng tư & bảo mật",
+  "profileTitle": "Trang cá nhân",
+  "profileLoadPostsError": "Lỗi tải bài viết",
+  "profileLoadError": "Không thể tải trang cá nhân",
+  "profileNoPosts": "Chưa có bài viết nào",
+  "profileEndOfPosts": "Đã hiển thị hết bài viết",
+  "profileAddToStory": "Thêm vào tin",
+  "profileEditInfo": "Chỉnh sửa thông tin",
+  "profileAbout": "Giới thiệu",
+  "profileStudiedAt": "Đã học tại {school}",
+  "@profileStudiedAt": {
+    "placeholders": {
+      "school": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLivesIn": "Sống tại {city}",
+  "@profileLivesIn": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "profileFrom": "Đến từ {place}",
+  "@profileFrom": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "profileWorksAt": "Làm việc tại {workplace}",
+  "@profileWorksAt": {
+    "placeholders": {
+      "workplace": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNoBio": "Chưa có tiểu sử",
+  "profileCoverPhoto": "Ảnh bìa",
+  "profileAvatarPhoto": "Ảnh đại diện",
+  "profileUserNameFallback": "Tên người dùng",
+  "profileEdit": "Chỉnh sửa",
+  "profilePostsTab": "Bài viết",
+  "profilePhotosTab": "Ảnh",
+  "profileReelsTab": "Reels",
+  "profilePostsList": "Danh sách bài viết",
+  "profileYourPhotos": "Ảnh của bạn",
+  "profileYourReels": "Reels của bạn",
+  "profileEditProfileTitle": "Chỉnh sửa trang cá nhân",
+  "profileUpdateFailed": "Cập nhật thất bại",
+  "profileUsername": "Tên người dùng",
+  "profileEditName": "Chỉnh sửa tên",
+  "profileAvatar": "Ảnh đại diện",
+  "profileCover": "Ảnh bìa",
+  "profileBio": "Tiểu sử",
+  "profileEditBio": "Chỉnh sửa tiểu sử",
+  "profileDetails": "Chi tiết",
+  "profileNoBioPlaceholder": "Chưa có tiểu sử",
+  "profileEnterField": "Nhập {field}...",
+  "@profileEnterField": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "profileEditDetailsTitle": "Chỉnh sửa chi tiết",
+  "profileSchool": "Trường học",
+  "profileCurrentCity": "Thành phố hiện tại",
+  "profileHometown": "Quê quán",
+  "profileWorkplace": "Nơi làm việc",
+  "profileRelationshipStatus": "Tình trạng quan hệ",
+  "profileSelectRelationshipStatus": "Chọn tình trạng quan hệ",
+  "profileChooseAvatar": "Chọn ảnh đại diện",
+  "profileChooseCover": "Chọn ảnh bìa",
+  "profileImage": "Hình ảnh",
+  "profileAddWorkplace": "Thêm nơi làm việc",
+  "profileAddRelationshipStatus": "Thêm tình trạng mối quan hệ",
+  "profileWhatsOnYourMind": "Bạn đang nghĩ gì?",
+  "profileNoFriends": "Chưa có bạn bè nào",
+  "profileFriends": "Bạn bè",
+  "profileViewAll": "Xem tất cả",
+  "profileFriendCount": "{count, plural, =0{0 người bạn} =1{1 người bạn} other{{count} người bạn}}",
+  "@profileFriendCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "profileUnnamed": "Không tên",
+  "profileAddFriend": "Thêm bạn bè",
+  "profileCancelFriendRequest": "Hủy yêu cầu kết bạn",
+  "profileAcceptFriend": "Chấp nhận kết bạn",
+  "profileRejectFriend": "Xóa",
+  "profileUnfriend": "Hủy kết bạn",
+  "profileMessage": "Nhắn tin",
+  "profileConfirmUnfriendTitle": "Xác nhận hủy kết bạn",
+  "profileConfirmUnfriendMessage": "Bạn có chắc chắn muốn hủy kết bạn với người này không?",
+  "profileAgree": "Đồng ý",
+  "profileAccountSecurity": "Bảo mật tài khoản",
+  "profileFaceData": "Dữ liệu khuôn mặt",
+  "profileFaceRegistered": "Đã thiết lập",
+  "profileFaceNotRegistered": "Chưa thiết lập",
+  "profileFaceDataSuccessDeleted": "Xóa dữ liệu khuôn mặt thành công",
+  "profileManageFaceData": "Quản lý dữ liệu khuôn mặt",
+  "profileAddFaceData": "Thêm dữ liệu khuôn mặt",
+  "profileFaceDataRegisteredDescription": "Dữ liệu khuôn mặt của bạn đang được sử dụng để nhận diện và bảo vệ tài khoản.",
+  "profileFaceDataUnregisteredDescription": "Đăng ký khuôn mặt giúp AI nhận diện bạn trong ảnh và bảo vệ tài khoản tốt hơn.",
+  "profileDeleteFaceData": "Xóa dữ liệu khuôn mặt",
+  "profileDeleteConfirmTitle": "Xác nhận xóa",
+  "profileDeleteFaceConfirmMessage": "Bạn có chắc chắn muốn xóa toàn bộ dữ liệu khuôn mặt? Hành động này không thể hoàn tác.",
+  "profileDeletingFaceData": "Đang xóa dữ liệu khuôn mặt...",
+  "appearanceDisplayModeSection": "CHẾ ĐỘ HIỂN THỊ",
+  "appearanceAccentColorSection": "MÀU CHỦ ĐẠO",
+  "appearanceTextSizeSection": "KÍCH THƯỚC CHỮ",
+  "appearanceLightMode": "Sáng",
+  "appearanceDarkMode": "Tối",
+  "appearanceAutoMode": "Tự động",
+  "appearanceSmallText": "Nhỏ",
+  "appearanceNormalText": "Bình thường",
+  "appearanceLargeText": "Lớn",
+  "appearanceChooseAccentColor": "Chọn màu chủ đạo",
+  "appearanceCustomAccentColor": "Tùy chỉnh",
+  "appearanceDefaultAccent": "Mặc định",
+  "appearanceBlueAccent": "Xanh dương",
+  "appearancePinkPurpleAccent": "Hồng tím",
+  "appearanceNeonPurpleAccent": "Tím neon",
+  "appearanceBrightOrangeAccent": "Cam sáng",
+  "appearanceCoralRedAccent": "Đỏ coral",
+  "appearanceHighContrast": "Độ tương phản cao",
+  "appearanceReduceMotion": "Giảm chuyển động",
+  "relationshipSingle": "Độc thân",
+  "relationshipDating": "Hẹn hò",
+  "relationshipInRelationship": "Đang hẹn hò",
+  "relationshipMarried": "Đã kết hôn",
+  "relationshipComplicated": "Phức tạp",
+  "relationshipOpen": "Mối quan hệ mở",
+  "relationshipDivorced": "Ly hôn",
+  "menuCreateProfileOrPage": "Tạo trang cá nhân hoặc Trang mới",
+  "commonAll": "Tất cả",
+  "commonBack": "Quay lại",
+  "commonCreate": "Tạo",
+  "commonDetails": "Chi tiết",
+  "commonDone": "Xong",
+  "commonErrorOccurred": "Đã xảy ra lỗi",
+  "commonErrorWithMessage": "Đã xảy ra lỗi: {error}",
+  "@commonErrorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "commonFeatureInDevelopment": "Tính năng đang phát triển",
+  "commonLoading": "Đang tải",
+  "commonNextWithCount": "Tiếp ({count})",
+  "@commonNextWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "commonNo": "Không",
+  "commonRefresh": "Tải lại",
+  "commonSaveChanges": "Lưu thay đổi",
+  "commonServerErrorRetryLater": "Lỗi máy chủ. Vui lòng thử lại sau.",
+  "commonSessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+  "commonSystem": "Hệ thống",
+  "commonUnderstood": "Đã hiểu",
+  "commonUnexpectedErrorRetry": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+  "commonUnknownError": "Lỗi không xác định",
+  "communityAdmin": "Admin",
+  "communityAdminDemoted": "Đã hạ quyền admin",
+  "communityAdminPanelSubtitle": "Duyệt thành viên mới và kiểm duyệt bài viết trước khi hiển thị.",
+  "communityAdminPanelTitle": "Bảng quản trị",
+  "communityApproved": "Đã duyệt",
+  "communityAvatar": "Ảnh đại diện",
+  "communityCancelJoinRequestConfirm": "Bạn có chắc muốn hủy yêu cầu tham gia cộng đồng này?",
+  "communityCancelJoinRequestTitle": "Hủy yêu cầu",
+  "communityCancelRequestSuccess": "Đã hủy yêu cầu tham gia",
+  "communityCannotIdentifyFriend": "Lỗi: Không thể xác định bạn bè",
+  "communityChooseAvatar": "Chọn ảnh đại diện",
+  "communityChooseCover": "Chọn ảnh bìa",
+  "communityChooseFromLibrary": "Chọn từ thư viện",
+  "communityClearSearch": "Xóa tìm kiếm",
+  "communityCoverImage": "Ảnh bìa",
+  "communityCreateGroup": "Tạo nhóm",
+  "communityCreateIntro": "Tạo không gian để bạn bè cùng trao đổi và chia sẻ nội dung.",
+  "communityCreatePostTitle": "Tạo bài viết trong nhóm",
+  "communityCreateSuccess": "Tạo cộng đồng thành công",
+  "communityCreateTitle": "Tạo cộng đồng",
+  "communityDeleteConfirm": "Bạn có chắc muốn xóa cộng đồng này? Hành động này không thể hoàn tác.",
+  "communityDeleteGroup": "Xóa nhóm",
+  "communityDeleteSuccess": "Đã xóa cộng đồng thành công",
+  "communityDeleteTitle": "Xóa cộng đồng",
+  "communityDescription": "Mô tả",
+  "communityDescriptionHint": "Nhập mô tả cộng đồng",
+  "communityEditGroup": "Chỉnh sửa nhóm",
+  "communityEditIntro": "Cập nhật thông tin để thành viên hiểu rõ hơn về cộng đồng.",
+  "communityEditTitle": "Chỉnh sửa cộng đồng",
+  "communityEmpty": "Chưa có cộng đồng nào",
+  "communityExploreSubtitle": "Khám phá nhóm phù hợp và theo dõi các bài viết đang chờ duyệt.",
+  "communityExploreTab": "Khám phá",
+  "communityExploreTitle": "Cộng đồng",
+  "communityFilterPosts": "Lọc bài viết",
+  "communityHandleInviteFailed": "Không thể xử lý lời mời",
+  "communityInviteFriends": "Mời bạn bè",
+  "communityInviteFriendsSubtitle": "Tham gia cộng đồng này",
+  "communityInviteFriendsTitle": "Mời bạn bè",
+  "communityInvitePendingNotice": "Lời mời tham gia cộng đồng đang chờ phản hồi.",
+  "communityInviteSearchHint": "Tìm tên hoặc username...",
+  "communityInviteSendFailed": "Không thể gửi lời mời",
+  "communityInviteSentSuccess": "Đã gửi lời mời thành công",
+  "communityInviteStatusApproved": "Bạn đã chấp nhận lời mời",
+  "communityInviteStatusPending": "Bạn được mời tham gia cộng đồng",
+  "communityInviteStatusRejected": "Bạn đã từ chối lời mời",
+  "communityInvited": "Đã mời",
+  "communityInvitesTab": "Lời mời",
+  "communityInvitesTitle": "Lời mời cộng đồng",
+  "communityJoin": "Tham gia",
+  "communityJoinRequestAccepted": "Đã chấp nhận yêu cầu",
+  "communityJoinRequestPendingMessage": "Yêu cầu tham gia cộng đồng đang chờ bạn xét duyệt.",
+  "communityJoinRequestRejected": "Đã từ chối yêu cầu",
+  "communityJoinRequestSent": "Đã gửi yêu cầu tham gia cộng đồng",
+  "communityJoinShort": "Tham gia",
+  "communityLeaveConfirm": "Bạn có chắc muốn rời khỏi cộng đồng này?",
+  "communityLeaveGroup": "Rời nhóm",
+  "communityLeaveSuccess": "Đã rời khỏi cộng đồng",
+  "communityLoadFriendsFailed": "Lỗi khi tải danh sách bạn bè",
+  "communityLoadInvitesFailed": "Không thể tải lời mời",
+  "communityLoadMembersFailed": "Không tải được danh sách",
+  "communityLoadingFriends": "Đang tải danh sách bạn bè...",
+  "communityMediaCount": "{count} media",
+  "@communityMediaCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityMember": "Thành viên",
+  "communityMemberOnlyContent": "Nội dung chỉ dành cho thành viên",
+  "communityMemberOnlyPostsMessage": "Tham gia cộng đồng để xem bài viết trong nhóm.",
+  "communityMemberOptions": "Tùy chọn thành viên",
+  "communityMemberPromoted": "Đã nâng quyền thành viên",
+  "communityMemberRemoved": "Đã xóa thành viên",
+  "communityMembers": "Thành viên",
+  "communityMembersCount": "{count, plural, =0{0 thành viên} =1{1 thành viên} other{{count} thành viên}}",
+  "@communityMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityMembersListTitle": "Danh sách thành viên",
+  "communityMineTab": "Của tôi",
+  "communityName": "Tên cộng đồng",
+  "communityNameHint": "Nhập tên cộng đồng",
+  "communityNameRequired": "Vui lòng nhập tên cộng đồng",
+  "communityNoApprovedPosts": "Chưa có bài viết đã duyệt",
+  "communityNoAvailableFriends": "Không có bạn bè khả dụng",
+  "communityNoCommunityInvites": "Không có lời mời tham gia cộng đồng",
+  "communityNoDescription": "Chưa có mô tả",
+  "communityNoInviteSearchResults": "Không tìm thấy \"{query}\"",
+  "@communityNoInviteSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "communityNoInvites": "Bạn không có lời mời nào",
+  "communityNoJoinedCommunities": "Bạn chưa tham gia cộng đồng nào",
+  "communityNoMembers": "Chưa có thành viên nào",
+  "communityNoMembersFound": "Không tìm thấy thành viên",
+  "communityNoMembersFoundMessage": "Thử tìm bằng tên hoặc username khác.",
+  "communityNoMembersMessage": "Khi có người tham gia, danh sách sẽ hiển thị tại đây.",
+  "communityNoPendingCommunities": "Chưa có cộng đồng nào đang chờ duyệt",
+  "communityNoPendingPosts": "Không có bài viết đang chờ duyệt",
+  "communityNoPendingRequests": "Không có yêu cầu tham gia đang chờ duyệt",
+  "communityNoPendingReviewPosts": "Không có bài viết nào đang chờ duyệt",
+  "communityNoPosts": "Chưa có bài viết nào",
+  "communityNoPostsMessage": "Các bài viết trong cộng đồng sẽ xuất hiện tại đây.",
+  "communityNoPostsTitle": "Chưa có bài viết",
+  "communityNoSearchResults": "Không tìm thấy cộng đồng phù hợp",
+  "communityPendingApproval": "Chờ duyệt",
+  "communityPendingCommunitiesHint": "Yêu cầu tham gia cộng đồng sẽ xuất hiện tại đây",
+  "communityPendingPostsHint": "Bài viết mới sẽ hiển thị tại đây để bạn kiểm duyệt.",
+  "communityPendingRequestsHint": "Khi có thành viên mới gửi yêu cầu, bạn sẽ thấy ở đây.",
+  "communityPendingTab": "Đang chờ",
+  "communityPickImageError": "Không thể chọn ảnh: {error}",
+  "@communityPickImageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "communityPostApprovedSuccess": "Đã duyệt bài viết",
+  "communityPostNoText": "Bài viết không có nội dung văn bản.",
+  "communityPostPendingApproval": "Bài viết đang chờ quản trị viên duyệt",
+  "communityPostRejectedSuccess": "Đã từ chối bài viết",
+  "communityPostsInGroup": "Bài viết trong nhóm",
+  "communityPostsTab": "Bài viết",
+  "communityPrivacyMembers": "{privacy} · {count, plural, =0{0 thành viên} =1{1 thành viên} other{{count} thành viên}}",
+  "@communityPrivacyMembers": {
+    "placeholders": {
+      "privacy": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityPrivate": "Riêng tư",
+  "communityPrivateGroup": "Nhóm riêng tư",
+  "communityPrivateOnly": "Riêng tư",
+  "communityPublic": "Công khai",
+  "communityPublicGroup": "Nhóm công khai",
+  "communityPublicOnly": "Công khai",
+  "communityRemoveFromGroup": "Xóa khỏi nhóm",
+  "communityRemoveMemberConfirm": "Bạn muốn xóa {name} khỏi cộng đồng? Người này có thể gửi yêu cầu tham gia lại sau.",
+  "@communityRemoveMemberConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "communityRemoveMemberTitle": "Xóa thành viên",
+  "communityReviewMembers": "Duyệt thành viên",
+  "communityReviewMembersSubtitle": "Xác nhận yêu cầu tham gia cộng đồng",
+  "communityReviewPosts": "Duyệt bài viết",
+  "communityReviewPostsSubtitle": "Kiểm tra nội dung trước khi bài được công khai",
+  "communitySearchHint": "Tìm cộng đồng",
+  "communitySearchMembersHint": "Tìm thành viên",
+  "communitySendingInvite": "Đang gửi lời mời...",
+  "communityType": "Loại cộng đồng",
+  "communityUpdateSuccess": "Cập nhật cộng đồng thành công",
+  "communityVisibleMembersCount": "{visible}/{total} thành viên",
+  "@communityVisibleMembersCount": {
+    "placeholders": {
+      "visible": {
+        "type": "num"
+      },
+      "total": {
+        "type": "num"
+      }
+    }
+  },
+  "communityWritePostHint": "Viết bài trong nhóm...",
+  "friendAccept": "Chấp nhận",
+  "friendActiveCount": "{count, plural, =0{0 đang hoạt động} =1{1 đang hoạt động} other{{count} đang hoạt động}}",
+  "@friendActiveCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendAdd": "Thêm bạn bè",
+  "friendBecameFriends": "Đã trở thành bạn bè",
+  "friendCancelRequest": "Hủy yêu cầu",
+  "friendCount": "{count, plural, =0{0 bạn bè} =1{1 bạn bè} other{{count} bạn bè}}",
+  "@friendCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendDelete": "Xóa",
+  "friendFallbackUserWithIndex": "Người dùng {index}",
+  "@friendFallbackUserWithIndex": {
+    "placeholders": {
+      "index": {
+        "type": "num"
+      }
+    }
+  },
+  "friendFriendsOf": "Bạn bè của {name}",
+  "@friendFriendsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendFriendsSince": "Bạn bè từ {month} {year}",
+  "@friendFriendsSince": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "num"
+      }
+    }
+  },
+  "friendJustActive": "Vừa hoạt động",
+  "friendLoadDataError": "Không thể tải dữ liệu bạn bè",
+  "friendLoadError": "Lỗi tải bạn bè: {message}",
+  "@friendLoadError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "friendLoadFriendsFailed": "Không thể tải danh sách bạn bè",
+  "friendLoadSuggestionsUnknownError": "Lỗi không xác định khi tải gợi ý bạn bè",
+  "friendLoadingRequests": "Đang tải lời mời kết bạn...",
+  "friendLoadingSentRequests": "Đang tải lời mời đã gửi...",
+  "friendLoadingSuggestions": "Đang tải gợi ý bạn bè...",
+  "friendLongtimeFriend": "Bạn bè lâu năm",
+  "friendMessageUser": "Nhắn tin cho {name}",
+  "@friendMessageUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendMutualCount": "{count, plural, =0{Không có bạn chung} =1{1 bạn chung} other{{count} bạn chung}}",
+  "@friendMutualCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendNoFriends": "Chưa có bạn bè",
+  "friendNoRequests": "Không có lời mời kết bạn",
+  "friendNoRequestsDescription": "Khi có người gửi lời mời, bạn sẽ thấy tại đây.",
+  "friendNoSentRequests": "Chưa gửi lời mời nào",
+  "friendNoSentRequestsDescription": "Các lời mời kết bạn bạn đã gửi sẽ hiển thị tại đây.",
+  "friendNoSuggestions": "Không có gợi ý bạn bè",
+  "friendNoSuggestionsDescription": "Hãy quay lại sau để xem thêm gợi ý mới.",
+  "friendOnlineCount": "{count, plural, =0{Không có ai online} =1{1 người online} other{{count} người online}}",
+  "@friendOnlineCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendPeopleYouMayKnow": "Những người bạn có thể biết",
+  "friendReject": "Từ chối",
+  "friendRemove": "Gỡ",
+  "friendRequestAccepted": "Đã chấp nhận lời mời kết bạn",
+  "friendRequestCancelled": "Đã hủy yêu cầu",
+  "friendRequestNotFound": "Không tìm thấy lời mời kết bạn",
+  "friendRequestRejected": "Đã từ chối lời mời kết bạn",
+  "friendRequestRemoved": "Đã xóa lời mời kết bạn",
+  "friendRequestSent": "Đã gửi lời mời kết bạn",
+  "friendRequestsTitle": "Lời mời kết bạn",
+  "friendSearchHint": "Tìm kiếm bạn bè",
+  "friendSeeAll": "Xem tất cả",
+  "friendSentRequestsCount": "{count, plural, =0{0 lời mời đã gửi} =1{1 lời mời đã gửi} other{{count} lời mời đã gửi}}",
+  "@friendSentRequestsCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendSentRequestsTitle": "Lời mời đã gửi",
+  "friendSort": "Sắp xếp",
+  "friendSortBy": "Sắp xếp theo",
+  "friendSortLeastMutual": "Ít bạn chung nhất",
+  "friendSortMostMutual": "Nhiều bạn chung nhất",
+  "friendSortName": "Tên",
+  "friendSortNameAz": "Tên A-Z",
+  "friendSortNameZa": "Tên Z-A",
+  "friendSortNewest": "Mới nhất",
+  "friendSortOldest": "Cũ nhất",
+  "friendSortOnline": "Đang online",
+  "friendSortRecent": "Gần đây",
+  "friendSuggestionsTitle": "Gợi ý bạn bè",
+  "friendTitle": "Bạn bè",
+  "friendUnfriendConfirm": "Bạn có chắc muốn hủy kết bạn với {name}?",
+  "@friendUnfriendConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendUnfriendTitle": "Hủy kết bạn",
+  "friendUnfriendUser": "Hủy kết bạn với {name}",
+  "@friendUnfriendUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendViewSentRequests": "Xem lời mời đã gửi",
+  "homeConnecting": "Đang kết nối...",
+  "homeEndOfPosts": "Bạn đã xem hết bài viết",
+  "homeAddStory": "Thêm tin",
+  "homeLoadPostsFailed": "Không thể tải bài viết",
+  "monthName": "Tháng {month}",
+  "@monthName": {
+    "placeholders": {
+      "month": {
+        "type": "num"
+      }
+    }
+  },
+  "notificationAdminNote": "Ghi chú của quản trị viên",
+  "notificationApprove": "Duyệt",
+  "notificationApprovePostAction": "Duyệt bài",
+  "notificationApprovePostTitle": "Duyệt bài viết",
+  "notificationCannotHandleInvite": "Không thể xử lý lời mời này",
+  "notificationCannotHandleJoinRequest": "Không thể xử lý yêu cầu tham gia này",
+  "notificationEmpty": "Chưa có thông báo nào",
+  "notificationEndOfList": "Đã xem hết thông báo",
+  "notificationExplanation": "Giải thích",
+  "notificationFriendRequestMessage": "đã gửi lời mời kết bạn",
+  "notificationInviteAccepted": "Đã chấp nhận lời mời",
+  "notificationInviteFailed": "Không thể xử lý lời mời",
+  "notificationInviteMessage": "đã mời bạn tham gia cộng đồng",
+  "notificationInviteRejected": "Đã từ chối lời mời",
+  "notificationJoinApprovedMessage": "yêu cầu tham gia cộng đồng của bạn đã được chấp nhận",
+  "notificationJoinRejectedMessage": "yêu cầu tham gia cộng đồng của bạn đã bị từ chối",
+  "notificationJoinRequestAccepted": "Đã chấp nhận yêu cầu tham gia",
+  "notificationJoinRequestFailed": "Không thể xử lý yêu cầu tham gia",
+  "notificationJoinRequestMessage": "muốn tham gia cộng đồng",
+  "notificationJoinRequestRejected": "Đã từ chối yêu cầu tham gia",
+  "notificationNew": "Mới",
+  "notificationOlder": "Trước đó",
+  "notificationPendingPostNotFound": "Không tìm thấy bài viết đang chờ duyệt",
+  "notificationPostApprovedMessage": "bài viết của bạn đã được duyệt",
+  "notificationPostPendingMessage": "đã gửi bài viết đang chờ duyệt",
+  "notificationPostRejectedMessage": "bài viết của bạn đã bị từ chối",
+  "notificationPostReportTitle": "Chi tiết báo cáo bài viết",
+  "notificationPublicJoinMessage": "đã tham gia cộng đồng",
+  "notificationRefreshTooltip": "Tải lại thông báo",
+  "notificationReportRejected": "Báo cáo đã bị từ chối",
+  "notificationReportRejectedReason": "Báo cáo không đủ điều kiện xử lý.",
+  "notificationReportReviewed": "Báo cáo đã được xử lý",
+  "notificationReportReviewedReason": "Báo cáo đã được quản trị viên xem xét.",
+  "notificationReportStatus": "Trạng thái: {status}",
+  "@notificationReportStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationTitle": "Thông báo",
+  "postAddCaptionHint": "Thêm chú thích...",
+  "postAddPhotoVideo": "Thêm ảnh/video",
+  "postAddToCollection": "Thêm vào bộ sưu tập",
+  "postAnd": "và",
+  "postCamera": "Camera",
+  "postShareCount": "{count, plural, =0{0 lượt chia sẻ} =1{1 lượt chia sẻ} other{{count} lượt chia sẻ}}",
+  "@postShareCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "postCameraErrorTitle": "Lỗi camera",
+  "postCameraInitFailed": "Không thể khởi tạo camera: {error}",
+  "@postCameraInitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postCameraPermissionMessage": "Vui lòng cấp quyền camera trong cài đặt để tiếp tục.",
+  "postCameraPermissionTitle": "Cần quyền camera",
+  "postCannotAddPhoto": "Không thể thêm ảnh: {error}",
+  "@postCannotAddPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postCheckIn": "Check in",
+  "postChooseFolder": "Chọn thư mục",
+  "postChooseLayout": "Chọn bố cục",
+  "postCollectionNameHint": "Tên bộ sưu tập",
+  "postContentOrPhotoRequired": "Vui lòng nhập nội dung hoặc thêm ảnh/video",
+  "postCreateCollectionTitle": "Tạo bộ sưu tập",
+  "postCreateGenericError": "Đã xảy ra lỗi khi tạo bài viết: {error}",
+  "@postCreateGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postCreateTitle": "Tạo bài viết",
+  "postCreating": "Đang tạo bài viết...",
+  "postCreatingWithProgress": "Đang tạo bài viết... {progress}%",
+  "@postCreatingWithProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "num"
+      }
+    }
+  },
+  "postDeleteConfirmMessage": "Bạn có chắc muốn xóa bài viết này?",
+  "postDeleteFailed": "Không thể xóa bài viết",
+  "postDeleteTitle": "Xóa bài viết",
+  "postDeleted": "Đã xóa bài viết",
+  "postEdit": "Chỉnh sửa",
+  "postEditCount": "Chỉnh sửa ({count})",
+  "@postEditCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postEditPrivacy": "Chỉnh sửa quyền riêng tư",
+  "postErrorPrefix": "Lỗi: {message}",
+  "@postErrorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "postFeeling": "Cảm xúc",
+  "postFeelingActivity": "Cảm xúc/Hoạt động",
+  "postGeneric": "Bài viết",
+  "postGenericError": "Đã xảy ra lỗi",
+  "postHiddenFromProfile": "Đã ẩn khỏi trang cá nhân",
+  "postHideAction": "Ẩn",
+  "postHideFromProfileMessage": "Bài viết này sẽ không hiển thị trên trang cá nhân của bạn.",
+  "postHideFromProfileTitle": "Ẩn khỏi trang cá nhân",
+  "postJustNow": "Vừa xong",
+  "postLabel": "Bài viết",
+  "postLayoutClassic": "Cổ điển",
+  "postLayoutColumn": "Cột",
+  "postLayoutFrame": "Khung",
+  "postLibrary": "Thư viện",
+  "postLiveVideo": "Video trực tiếp",
+  "postLoadingVideo": "Đang tải video...",
+  "postLocation": "Vị trí",
+  "postMediaItemCount": "{count, plural, =0{0 mục} =1{1 mục} other{{count} mục}}",
+  "@postMediaItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postMention": "Nhắc đến",
+  "postMore": "Khác",
+  "postMusic": "Âm nhạc",
+  "postMutualFriends": "{count, plural, =0{Không có bạn chung} =1{1 bạn chung} other{{count} bạn chung}}",
+  "@postMutualFriends": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postNoComments": "Chưa có bình luận",
+  "postNoReactions": "Chưa có lượt bày tỏ cảm xúc",
+  "postNotFound": "Không tìm thấy bài viết",
+  "postOnlyMe": "Chỉ mình tôi",
+  "postOtherPeople": "{count, plural, =1{1 người khác} other{{count} người khác}}",
+  "@postOtherPeople": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postPeopleReactedTitle": "Những người đã bày tỏ cảm xúc",
+  "postPhoto": "Ảnh",
+  "postPhotoLibrary": "Thư viện ảnh",
+  "postPhotoPermissionRequired": "Vui lòng cấp quyền truy cập ảnh để tiếp tục.",
+  "postPhotoVideo": "Ảnh/Video",
+  "postPlayVideoFailed": "Không thể phát video: {error}",
+  "@postPlayVideoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postPoll": "Thăm dò ý kiến",
+  "postReactedFirstUserAndOthers": "{firstUser} và {count, plural, =1{1 người khác} other{{count} người khác}}",
+  "@postReactedFirstUserAndOthers": {
+    "placeholders": {
+      "firstUser": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postReactedYouAndOthers": "Bạn và {count, plural, =1{1 người khác} other{{count} người khác}}",
+  "@postReactedYouAndOthers": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postRecording": "Đang quay",
+  "postRemoveTagAction": "Gỡ thẻ",
+  "postRemoveTagConfirmMessage": "Bạn có chắc muốn gỡ thẻ khỏi bài viết này?",
+  "postRemoveTagTitle": "Gỡ thẻ",
+  "postRemovedTag": "Đã gỡ thẻ",
+  "postReport": "Báo cáo",
+  "postReportDescriptionHint": "Mô tả thêm về vấn đề",
+  "postReportDescriptionLabel": "Mô tả",
+  "postReportDetailReason": "Lý do chi tiết",
+  "postReportFailed": "Không thể gửi báo cáo",
+  "postReportIntro": "Hãy chọn lý do phù hợp để chúng tôi xem xét bài viết này.",
+  "postReportQuickReason": "Lý do nhanh",
+  "postReportReasonHarassment": "Quấy rối hoặc bắt nạt",
+  "postReportReasonHint": "Chọn lý do",
+  "postReportReasonMisinformation": "Thông tin sai lệch",
+  "postReportReasonOffensive": "Nội dung phản cảm",
+  "postReportReasonRequired": "Vui lòng chọn lý do báo cáo",
+  "postReportReasonSpam": "Spam",
+  "postReportReasonViolence": "Bạo lực hoặc nguy hiểm",
+  "postReportSelfNotAllowed": "Bạn không thể báo cáo bài viết của chính mình",
+  "postReportSuccess": "Đã gửi báo cáo",
+  "postReportTitle": "Báo cáo bài viết",
+  "postSave": "Lưu",
+  "postSaveFailed": "Không thể lưu bài viết",
+  "postSaved": "Đã lưu",
+  "postSavedToCollection": "Đã lưu vào {collection}",
+  "@postSavedToCollection": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "postSeeOriginal": "Xem bản gốc",
+  "postSeeTranslation": "Xem bản dịch",
+  "postSelectAllowedFriendsRequired": "Vui lòng chọn bạn bè được phép xem",
+  "postSelectHiddenFriendsRequired": "Vui lòng chọn bạn bè muốn ẩn",
+  "postSelectedPhotos": "{count, plural, =0{Chưa chọn ảnh} =1{1 ảnh đã chọn} other{{count} ảnh đã chọn}}",
+  "@postSelectedPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postSendReport": "Gửi báo cáo",
+  "postShare": "Chia sẻ",
+  "postShowAction": "Hiển thị",
+  "postShowOnProfileMessage": "Bài viết này sẽ hiển thị trên trang cá nhân của bạn.",
+  "postShowOnProfileTitle": "Hiển thị trên trang cá nhân",
+  "postShownOnProfile": "Đã hiển thị trên trang cá nhân",
+  "postSubmit": "Đăng",
+  "postTag": "Gắn thẻ",
+  "postTagFriends": "Gắn thẻ bạn bè",
+  "postTagPeople": "Gắn thẻ người khác",
+  "postTagUpdateFailed": "Không thể cập nhật thẻ",
+  "postTagUpdateFailedWithMessage": "Không thể cập nhật thẻ: {message}",
+  "@postTagUpdateFailedWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "postTagUpdated": "Đã cập nhật thẻ",
+  "postTranslateError": "Không thể dịch nội dung",
+  "postTranslateFailed": "Dịch thất bại",
+  "postUnknownTime": "Không rõ thời gian",
+  "postUnsave": "Bỏ lưu",
+  "postUnsaveSuccess": "Đã bỏ lưu bài viết",
+  "postUnsupportedVideoType": "Định dạng video không được hỗ trợ",
+  "postVideo": "Video",
+  "postViewAllComments": "Xem tất cả {count, plural, =1{1 bình luận} other{{count} bình luận}}",
+  "@postViewAllComments": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postWith": "cùng",
+  "postWriteSomethingHint": "Bạn đang nghĩ gì?",
+  "postYourPost": "Bài viết của bạn",
+  "commonCopy": "Sao chép",
+  "commonContentCopied": "Đã sao chép nội dung",
+  "commonEdit": "Chỉnh sửa",
+  "commonLinkCopied": "Đã sao chép liên kết",
+  "commonNo": "Không",
+  "commonRemove": "Gỡ",
+  "commonSeeMore": "Xem thêm",
+  "commonSendWithCount": "Gửi ({count})",
+  "@commonSendWithCount": {"placeholders": {"count": {"type": "num"}}},
+  "commonUpdate": "Cập nhật",
+  "commonViewAll": "Xem tất cả",
+  "searchHint": "Tìm kiếm",
+  "searchUserHint": "Tìm kiếm người dùng...",
+  "searchEnterKeyword": "Nhập từ khóa để tìm kiếm",
+  "searchNoResults": "Không tìm thấy kết quả nào",
+  "searchRecent": "Tìm kiếm gần đây",
+  "searchHistory": "Lịch sử",
+  "searchNoHistory": "Chưa có lịch sử tìm kiếm",
+  "searchNoRecent": "Chưa có tìm kiếm gần đây",
+  "searchClearAll": "Xóa tất cả",
+  "searchClearAllUppercase": "XÓA TẤT CẢ",
+  "searchClearAllHistoryTitle": "Xóa tất cả lịch sử tìm kiếm",
+  "searchClearAllHistoryConfirm": "Bạn có chắc chắn muốn xóa tất cả lịch sử tìm kiếm? Hành động này không thể hoàn tác.",
+  "searchClearAllHistoryConfirmShort": "Bạn có chắc chắn muốn xóa tất cả lịch sử tìm kiếm?",
+  "searchEditHistory": "Chỉnh sửa lịch sử tìm kiếm",
+  "searchHistoryLocalOnlyDescription": "Các chi tiết thay đổi sẽ chỉ áp dụng cho danh sách tìm kiếm gần đây, thuộc phần lịch sử trên thiết bị này.",
+  "searchHistoryWillAppear": "Các tìm kiếm gần đây sẽ xuất hiện ở đây",
+  "searchRemoveFromHistory": "Gỡ khỏi lịch sử tìm kiếm của bạn.",
+  "searchPinThis": "Ghim nội dung tìm kiếm này",
+  "searchPinLimit": "Bạn chỉ có thể ghim 3 nội dung tìm kiếm cùng lúc.",
+  "friendNoSearchResults": "Không tìm thấy bạn bè",
+  "friendLoadFailed": "Lỗi khi tải danh sách bạn bè",
+  "commentReply": "Trả lời",
+  "commentViewReplies": "Xem {count, plural, =1{1 phản hồi} other{{count} phản hồi}}",
+  "@commentViewReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentEditTitle": "Chỉnh sửa bình luận",
+  "commentEditHint": "Nhập nội dung mới...",
+  "commentDeleteTitle": "Xóa bình luận",
+  "commentDeleteConfirm": "Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?",
+  "commentViewEditHistory": "Xem lịch sử chỉnh sửa",
+  "commentShare": "Chia sẻ bình luận",
+  "commentReactionsTitle": "Biểu cảm về bình luận",
+  "commentEmptyTitle": "Chưa có bình luận nào",
+  "commentEmptySubtitle": "Hãy là người đầu tiên bình luận về bài viết này",
+  "commentWriteFirst": "Viết bình luận đầu tiên",
+  "commentReplyingPrefix": "Đang trả lời ",
+  "commentYourComment": "bình luận của bạn",
+  "commentWriteReplyHint": "Viết phản hồi...",
+  "commentReplyToHint": "Trả lời {user}...",
+  "@commentReplyToHint": {"placeholders": {"user": {"type": "String"}}},
+  "commentWriteHint": "Viết bình luận...",
+  "commentEditHistoryTitle": "Lịch sử chỉnh sửa",
+  "commentNoEditHistory": "Chưa có lịch sử chỉnh sửa",
+  "commentCurrentVersion": "Phiên bản hiện tại",
+  "commentEditVersion": "Lần chỉnh sửa {version} • {time}",
+  "commentOldContent": "Nội dung cũ",
+  "commentNewContent": "Nội dung mới",
+  "@commentEditVersion": {"placeholders": {"version": {"type": "num"}, "time": {"type": "String"}}},
+  "storyPrivacyTitle": "Quyền riêng tư của tin",
+  "storyPrivacyQuestion": "Ai có thể xem tin của bạn?",
+  "storyPrivacyVisibleFor24h": "Tin của bạn sẽ hiển thị trong 24 giờ.",
+  "storyPrivacyPublic": "Công khai",
+  "storyPrivacyPublicDescription": "Bất kỳ ai",
+  "storyPrivacyFriends": "Bạn bè",
+  "storyPrivacyFriendsDescription": "Chỉ bạn bè của bạn",
+  "storyPrivacyHideFrom": "Ẩn tin với",
+  "storyPrivacyCustom": "Tùy chỉnh",
+  "storyPrivacyNoOneSelected": "Chưa chọn ai",
+  "storyPrivacyOnePerson": "1 người",
+  "storyPrivacyAndOthers": "{firstNames} và {count} người khác",
+  "@storyPrivacyAndOthers": {"placeholders": {"firstNames": {"type": "String"}, "count": {"type": "num"}}},
+  "storySelectPeopleToShare": "Chọn người để chia sẻ tin",
+  "storyPrivacyUpdated": "Đã cập nhật quyền riêng tư",
+  "storyPrivacyUpdateFailed": "Không thể cập nhật quyền riêng tư",
+  "storyDeleteTitle": "Xóa tin",
+  "storyDeleteConfirm": "Bạn có chắc chắn muốn xóa tin này không?",
+  "storyDeleted": "Đã xóa tin",
+  "storyDeleteFailed": "Không thể xóa tin",
+  "storyEditPrivacy": "Chỉnh sửa quyền riêng tư của tin",
+  "storySendWithMessenger": "Gửi bằng Messenger",
+  "storySavePhoto": "Lưu ảnh",
+  "storyArchivePhoto": "Lưu trữ ảnh",
+  "storyArchivePhotoDescription": "Gỡ ảnh khỏi tin và lưu vào kho lưu trữ.",
+  "storyDeletePhoto": "Xóa ảnh",
+  "storyCopyShareLink": "Sao chép liên kết để chia sẻ tin này",
+  "storyLinkVisibility": "Tin sẽ hiển thị với đối tượng của {user} trong 24 giờ.",
+  "@storyLinkVisibility": {"placeholders": {"user": {"type": "String"}}},
+  "storyMusic": "Nhạc",
+  "storyMusicLoadFailed": "Không tải được danh sách nhạc. Vui lòng thử lại.",
+  "storyMusicSearchFailed": "Không tìm thấy kết quả. Vui lòng thử lại.",
+  "storyMusicForYou": "Dành cho bạn",
+  "storyMusicSearchHint": "Tìm kiếm nhạc",
+  "storyMusicNoSearchResults": "Không tìm thấy bài hát phù hợp.",
+  "storyMusicEmpty": "Không có bài hát nào.",
+  "storyCreateSuccess": "Tạo tin thành công",
+  "storyImageOnlyEdit": "Chỉ có thể chỉnh sửa ảnh",
+  "storyCannotReadDeviceFile": "Không thể đọc file từ thiết bị",
+  "storyImageEditFailed": "Lỗi khi chỉnh sửa ảnh: {error}",
+  "@storyImageEditFailed": {"placeholders": {"error": {"type": "String"}}},
+  "storyText": "Văn bản",
+  "storyPhotoGroup": "Nhóm ảnh",
+  "storySelectMultipleFiles": "Chọn nhiều file",
+  "storyLibrary": "Thư viện",
+  "storyChooseFolder": "Chọn thư mục",
+  "storyItemCount": "{count} mục",
+  "@storyItemCount": {"placeholders": {"count": {"type": "num"}}},
+  "storyLibraryPermissionRequired": "Cần quyền truy cập thư viện để hiển thị ảnh/video.",
+  "storyNoMediaInLibrary": "Chưa có ảnh/video trong thư viện.",
+  "storyReactedPeople": "Người đã bày tỏ cảm xúc",
+  "storyNoReactions": "Chưa có phản ứng nào",
+  "chatMessageHint": "Nhắn tin...",
+  "chatShareFile": "Chia sẻ file",
+  "chatAiImages": "Hình ảnh AI",
+  "chatAiImagesInDevelopmentMessage": "Tính năng Hình ảnh AI đang phát triển",
+  "chatMembersCount": "{count, plural, =1{1 thành viên} other{{count} thành viên}}",
+  "@chatMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatGroupChat": "Nhóm chat",
+  "chatOnline": "Đang online",
+  "chatOffline": "Ngoại tuyến",
+  "chatActiveNow": "Đang hoạt động",
+  "chatAndOtherMembers": "và {count, plural, =1{1 người khác} other{{count} người khác}}",
+  "@chatAndOtherMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatViewGroupInfo": "Xem thông tin nhóm",
+  "chatViewProfile": "Xem trang cá nhân",
+  "chatFriendsOnFacebook": "Các bạn là bạn bè trên Facebook",
+  "chatYouAndFriendAreFriends": "Bạn và {name} hiện đã là bạn bè.",
+  "@chatYouAndFriendAreFriends": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatThisFriend": "bạn này",
+  "voiceEffectTitle": "Chỉnh sửa giọng nói",
+  "voiceEffectLoading": "Đang chuyển giọng, vui lòng đợi...",
+  "voiceEffectApplied": "Đã áp dụng giọng: {voice}",
+  "@voiceEffectApplied": {
+    "placeholders": {
+      "voice": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceEffectOriginal": "Gốc",
+  "voiceEffectFemale": "Con gái",
+  "voiceEffectDeep": "Trầm",
+  "voiceEffectBaby": "Em bé",
+  "voiceEffectRobot": "Robot",
+  "voiceEffectDemon": "Ác quỷ",
+  "chatGroupLink": "Liên kết nhóm",
+  "chatDeleteChat": "Xóa đoạn chat",
+  "chatConversationInfo": "Thông tin về đoạn chat",
+  "chatViewGroupMembers": "Xem thành viên trong nhóm",
+  "chatLeaveConversation": "Rời khỏi đoạn chat",
+  "chatFeedbackAndReportConversation": "Góp ý và báo cáo cuộc trò chuyện",
+  "chatReadReceipts": "Thông báo đã đọc",
+  "chatTypingIndicators": "Chỉ báo đang nhập",
+  "chatMicrophonePermissionDenied": "Không có quyền truy cập microphone",
+  "chatStartRecordingFailed": "Lỗi khi bắt đầu ghi âm",
+  "chatDownloadingFile": "Đang tải file...",
+  "chatNoAppToOpenFile": "Không tìm thấy ứng dụng để mở file này",
+  "chatOpenFileFailed": "Không thể mở file: {error}",
+  "@chatOpenFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatLoadingEditHistory": "Đang tải lịch sử chỉnh sửa...",
+  "chatPinInDevelopment": "Tính năng ghim tin nhắn đang phát triển",
+  "chatForwardInDevelopment": "Tính năng chuyển tiếp đang phát triển",
+  "chatReportInDevelopment": "Tính năng báo cáo tin nhắn đang phát triển",
+  "chatAiImageInDevelopment": "Tính năng tạo hình ảnh AI đang phát triển",
+  "chatMissingConversationForReaction": "Không thể thêm reaction: thiếu conversation ID",
+  "chatMessageCopied": "Đã sao chép tin nhắn",
+  "chatGpsDisabledOpeningSettings": "GPS đang tắt. Đang mở Cài đặt định vị...",
+  "chatLocationPermissionDenied": "Bạn chưa cấp quyền truy cập vị trí.",
+  "chatLocationPermissionDeniedForever": "Quyền vị trí bị từ chối vĩnh viễn. Đang mở Cài đặt ứng dụng...",
+  "chatSendLocationMessage": "Gửi vị trí",
+  "chatCurrentLocation": "Vị trí hiện tại",
+  "chatGetLocationFailed": "Không thể lấy vị trí: {error}",
+  "@chatGetLocationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatSendingFile": "Đang gửi file...",
+  "chatPhotoPermissionTitle": "Quyền truy cập ảnh",
+  "chatPhotoPermissionMessage": "Ứng dụng cần quyền truy cập ảnh để hiển thị ảnh từ thư viện. Vui lòng cấp quyền trong Cài đặt.",
+  "chatPhotoPermissionRequired": "Cần quyền truy cập ảnh để hiển thị thư viện",
+  "chatLoadPhotosFailed": "Lỗi khi tải ảnh: {error}",
+  "@chatLoadPhotosFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCameraPermissionMessage": "Ứng dụng cần quyền truy cập camera để chụp ảnh.",
+  "chatOpenCameraFailed": "Lỗi khi mở camera: {error}",
+  "@chatOpenCameraFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCapturedPhoto": "Ảnh vừa chụp",
+  "chatTapSendToShare": "Nhấn gửi để chia sẻ",
+  "chatMissingConversationForPhoto": "Không thể gửi ảnh: thiếu conversation ID",
+  "chatSendPhotoFailed": "Lỗi khi gửi ảnh: {error}",
+  "@chatSendPhotoFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCannotProcessPhoto": "Không thể xử lý ảnh",
+  "chatMissingConversationForFile": "Không thể gửi file: thiếu conversation ID",
+  "chatPickFileFailed": "Lỗi khi chọn file: {error}",
+  "@chatPickFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatStartCallFailed": "Không thể thực hiện cuộc gọi: {error}",
+  "@chatStartCallFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCreateConversationFailed": "Lỗi tạo cuộc trò chuyện: {message}",
+  "@chatCreateConversationFailed": {"placeholders": {"message": {"type": "String"}}},
+  "chatDeletedForEveryone": "Đã xóa tin nhắn cho mọi người",
+  "chatDeletedForMe": "Đã xóa tin nhắn cho tôi",
+  "chatOriginalMessageNotFound": "Không tìm thấy tin nhắn gốc",
+  "chatLoadMessagesFailed": "Lỗi khi tải tin nhắn: {message}",
+  "@chatLoadMessagesFailed": {"placeholders": {"message": {"type": "String"}}},
+  "chatMessagePlaceholder": "[Tin nhắn]",
+  "chatMyself": "chính mình",
+  "chatReplyingTo": "Trả lời {name}",
+  "@chatReplyingTo": {"placeholders": {"name": {"type": "String"}}},
+  "chatAudioMessage": "[Tin nhắn thoại]",
+  "chatPhoto": "[Ảnh]",
+  "chatFile": "[Tệp tin]",
+  "chatAttachment": "[Đính kèm]",
+  "chatNoPhotos": "Không có ảnh nào",
+  "chatUserNotFound": "Không tìm thấy người dùng. Vui lòng đăng nhập lại.",
+  "chatFindConversationFailed": "Lỗi khi tìm cuộc trò chuyện: {error}",
+  "@chatFindConversationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatConversationError": "Lỗi cuộc trò chuyện: {message}",
+  "@chatConversationError": {"placeholders": {"message": {"type": "String"}}},
+  "chatConversationsError": "Lỗi danh sách cuộc trò chuyện: {message}",
+  "@chatConversationsError": {"placeholders": {"message": {"type": "String"}}},
+  "chatNoFriendsToStart": "Chưa có bạn bè. Hãy thêm bạn bè để bắt đầu nhắn tin!",
+  "chatSuggestedFriends": "Bạn bè gợi ý để nhắn tin",
+  "chatNoConversations": "Không có cuộc trò chuyện nào",
+  "chatPickImageFailed": "Lỗi khi chọn ảnh: {error}",
+  "@chatPickImageFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatTakePhoto": "Chụp ảnh",
+  "chatChooseFromLibrary": "Chọn từ thư viện",
+  "chatDiscardGroupTitle": "Hủy thao tác?",
+  "chatDiscardGroupMessage": "Bạn có chắc chắn muốn hủy tạo nhóm chat không?",
+  "chatSelectAtLeastOnePerson": "Vui lòng chọn ít nhất 1 người",
+  "chatUserInfoNotFound": "Không tìm thấy thông tin người dùng",
+  "chatCreateGroupFailed": "Lỗi khi tạo nhóm chat: {error}",
+  "@chatCreateGroupFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatNewGroup": "Nhóm chat mới",
+  "chatGroupNameOptional": "Tên nhóm (không bắt buộc)",
+  "chatSuggestions": "Gợi ý",
+  "chatGroupName": "Tên nhóm",
+  "chatCreateGroup": "Tạo nhóm chat",
+  "chatPeopleYouMayKnow": "Những người bạn có thể biết",
+  "chatNoFriendSuggestions": "Hiện chưa có gợi ý bạn bè",
+  "chatDeleteMessageTitle": "Xóa tin nhắn?",
+  "chatDeleteForEveryone": "Xóa đối với mọi người",
+  "chatDeleteForMe": "Xóa cho tôi",
+  "chatChangeGroupPhoto": "Đổi ảnh nhóm",
+  "chatChoosePhoto": "Chọn ảnh",
+  "chatChangeName": "Đổi tên",
+  "chatCreatePhoto": "Tạo ảnh",
+  "chatTheme": "Chủ đề",
+  "chatNickname": "Biệt danh",
+  "chatShareContactInfo": "Chia sẻ thông tin liên hệ",
+  "chatViewMediaFilesLinks": "Xem file phương tiện, file và liên kết",
+  "chatPinnedMessages": "Tin nhắn đã ghim",
+  "chatSearchInConversation": "Tìm kiếm trong cuộc trò chuyện",
+  "chatDeleteConversation": "Xóa cuộc trò chuyện",
+  "chatChangeGroupName": "Đổi tên nhóm",
+  "chatGroupNameChanged": "Đã đổi tên nhóm thành công",
+  "chatChangeGroupNameFailed": "Không thể đổi tên nhóm: {error}",
+  "@chatChangeGroupNameFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatVideoCall": "Cuộc gọi video",
+  "chatAudioCall": "Cuộc gọi thoại",
+  "chatMissedCall": "Nhỡ cuộc gọi",
+  "chatVideoCallMissed": "Đã bỏ lỡ cuộc gọi video",
+  "chatYouDeletedMessage": "Bạn đã xóa tin nhắn này",
+  "chatUserDeletedMessage": "{user} đã xóa tin nhắn này",
+  "@chatUserDeletedMessage": {"placeholders": {"user": {"type": "String"}}},
+  "chatUnreadMessages": "{count} tin nhắn chưa đọc",
+  "@chatUnreadMessages": {"placeholders": {"count": {"type": "num"}}},
+  "chatEdited": "Đã chỉnh sửa",
+  "chatSentAt": "Đã gửi {time}",
+  "@chatSentAt": {"placeholders": {"time": {"type": "String"}}},
+  "chatMore": "Khác",
+  "chatPin": "Ghim",
+  "chatForward": "Chuyển tiếp",
+  "chatCreateAIImage": "Tạo hình ảnh AI",
+  "chatNoReactions": "Chưa có cảm xúc nào",
+  "chatAnonymousUser": "Người dùng ẩn danh",
+  "chatAddMember": "Thêm thành viên",
+  "chatMuteNotifications": "Tắt thông báo",
+  "communityInviteAction": "Mời",
+  "messageDownloadingPhoto":"Đang tải ảnh xuống...",
+  "messageSavePhotoSuccess": "Đã lưu ảnh vào thư viện",
+  "messageSavePhotoError": "Lỗi khi lưu ảnh",
+  "commonMaybeLater": "Để sau",
+  "faceRecognitionSetup": "Thiết lập nhận diện khuôn mặt",
+  "faceRecognitionDescription": "Sử dụng dữ liệu khuôn mặt của bạn để bật các tính năng AI thông minh và bảo vệ tài khoản an toàn hơn.",
+  "faceRecognitionSmartSuggestions": "Gợi ý bạn bè thông minh",
+  "faceRecognitionAutoTagDescription": "AI tự động nhận diện khuôn mặt bạn trong ảnh và đề xuất gắn thẻ chính xác.",
+  "faceRecognitionAntiSpoofing": "Chống giả mạo tài khoản",
+  "faceRecognitionAntiSpoofingDescription": "Ngăn chặn người khác sử dụng hình ảnh của bạn để tạo tài khoản giả mạo.",
+  "faceRecognitionHighSecurity": "Bảo mật tuyệt đối",
+  "faceRecognitionSecurityDescription": "Dữ liệu khuôn mặt được mã hóa an toàn và không chia sẻ cho bên thứ ba.",
+  "faceRecognitionStartScan": "Bắt đầu quét khuôn mặt",
+  "reactionLike": "Thích",
+  "reactionLove": "Yêu thích",
+  "reactionHaha": "Haha",
+  "reactionWow": "Wow",
+  "reactionSad": "Buồn",
+  "reactionAngry": "Phẫn nộ"
+}

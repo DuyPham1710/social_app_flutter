@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostReportDetailModal extends StatelessWidget {
   final String postId;
@@ -49,8 +50,10 @@ class PostReportDetailModal extends StatelessWidget {
     );
   }
 
-  String _getStatusText() {
-    return status == 'reviewed' ? 'đã được xác nhận' : 'đã bị từ chối';
+  String _getStatusText(BuildContext context) {
+    return status == 'reviewed'
+        ? context.l10n.notificationReportReviewed
+        : context.l10n.notificationReportRejected;
   }
 
   Color _getStatusColor() {
@@ -61,14 +64,11 @@ class PostReportDetailModal extends StatelessWidget {
     return status == 'reviewed' ? Icons.visibility_off : Icons.cancel;
   }
 
-  String _getReasonText() {
+  String _getReasonText(BuildContext context) {
     if (status == 'reviewed') {
-      return 'Bài viết của bạn đã bị ẩn do vi phạm các quy tắc cộng đồng. '
-          'Nội dung bài viết đã được xem xét và xác nhận là không phù hợp với tiêu chuẩn của nền tảng. '
-          'Vui lòng đảm bảo các bài viết tiếp theo tuân thủ đúng quy định để tránh vi phạm tương tự.';
+      return context.l10n.notificationReportReviewedReason;
     } else {
-      return 'Báo cáo về bài viết của bạn đã được xem xét và không được xác nhận. '
-          'Bài viết của bạn vẫn hiển thị bình thường và không vi phạm quy tắc cộng đồng.';
+      return context.l10n.notificationReportRejectedReason;
     }
   }
 
@@ -81,14 +81,10 @@ class PostReportDetailModal extends StatelessWidget {
         // Header
         Row(
           children: [
-            Icon(
-              Icons.info_outline,
-              color: AppColors.primary,
-              size: 24.sp,
-            ),
+            Icon(Icons.info_outline, color: AppColors.primary, size: 24.sp),
             SizedBox(width: 8.w),
             Text(
-              'Thông báo về báo cáo bài viết',
+              context.l10n.notificationPostReportTitle,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -126,7 +122,7 @@ class PostReportDetailModal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bài viết:',
+                      context.l10n.postLabel,
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppColors.textSecondary,
@@ -134,7 +130,9 @@ class PostReportDetailModal extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      postTitle.isNotEmpty ? postTitle : 'Bài viết của bạn',
+                      postTitle.isNotEmpty
+                          ? postTitle
+                          : context.l10n.postYourPost,
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
@@ -162,15 +160,13 @@ class PostReportDetailModal extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                _getStatusIcon(),
-                color: _getStatusColor(),
-                size: 20.sp,
-              ),
+              Icon(_getStatusIcon(), color: _getStatusColor(), size: 20.sp),
               SizedBox(width: 8.w),
               Expanded(
                 child: Text(
-                  'Báo cáo ${_getStatusText()}',
+                  context.l10n.notificationReportStatus(
+                    _getStatusText(context),
+                  ),
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
@@ -202,7 +198,7 @@ class PostReportDetailModal extends StatelessWidget {
                   ),
                   SizedBox(width: 8.w),
                   Text(
-                    'Giải thích:',
+                    context.l10n.notificationExplanation,
                     style: TextStyle(
                       fontSize: 14.sp,
                       color: AppColors.textSecondary,
@@ -213,7 +209,7 @@ class PostReportDetailModal extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
               Text(
-                _getReasonText(),
+                _getReasonText(context),
                 style: TextStyle(
                   fontSize: 14.sp,
                   color: AppColors.textPrimary,
@@ -228,10 +224,7 @@ class PostReportDetailModal extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(6.r),
-                    border: Border.all(
-                      color: AppColors.divider,
-                      width: 1,
-                    ),
+                    border: Border.all(color: AppColors.divider, width: 1),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +240,7 @@ class PostReportDetailModal extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Ghi chú từ quản trị viên:',
+                              context.l10n.notificationAdminNote,
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: AppColors.textSecondary,
@@ -285,7 +278,7 @@ class PostReportDetailModal extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 14.h),
             ),
             child: Text(
-              'Đã hiểu',
+              context.l10n.commonUnderstood,
               style: TextStyle(
                 fontSize: 15.sp,
                 color: Colors.white,
@@ -299,4 +292,3 @@ class PostReportDetailModal extends StatelessWidget {
     );
   }
 }
-

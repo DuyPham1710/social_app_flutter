@@ -171,9 +171,7 @@ final s1 = GetIt.instance;
 
 DeletePostUsecase resolveDeletePostUsecase() {
   if (!s1.isRegistered<DeletePostUsecase>()) {
-    s1.registerLazySingleton<DeletePostUsecase>(
-      () => DeletePostUsecase(s1()),
-    );
+    s1.registerLazySingleton<DeletePostUsecase>(() => DeletePostUsecase(s1()));
   }
 
   return s1<DeletePostUsecase>();
@@ -181,9 +179,7 @@ DeletePostUsecase resolveDeletePostUsecase() {
 
 UnsavePostUsecase resolveUnsavePostUsecase() {
   if (!s1.isRegistered<UnsavePostUsecase>()) {
-    s1.registerLazySingleton<UnsavePostUsecase>(
-      () => UnsavePostUsecase(s1()),
-    );
+    s1.registerLazySingleton<UnsavePostUsecase>(() => UnsavePostUsecase(s1()));
   }
 
   return s1<UnsavePostUsecase>();
@@ -877,9 +873,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<DeleteCommunityUseCase>(
     () => DeleteCommunityUseCase(s1()),
   );
-  s1.registerLazySingleton<KickMemberUseCase>(
-    () => KickMemberUseCase(s1()),
-  );
+  s1.registerLazySingleton<KickMemberUseCase>(() => KickMemberUseCase(s1()));
 
   // Community BLoCs
   // Community BLoCs

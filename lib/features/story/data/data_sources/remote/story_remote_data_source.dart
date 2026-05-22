@@ -15,7 +15,7 @@ abstract class StoryRemoteDataSource {
     @Query('page') int page,
     @Query('limit') int limit,
   );
-  
+
   @GET('/story/me/archive')
   Future<GroupedStoryListModel> getMyArchivedStories(
     @Query('page') int page,
@@ -27,6 +27,7 @@ abstract class StoryRemoteDataSource {
     @Query('page') int page,
     @Query('limit') int limit,
   );
+
   /// Tạo story: gửi file và metadata (mediaType, music, privacy,...) trong một request
   @POST('/story')
   @MultiPart()
@@ -49,9 +50,7 @@ abstract class StoryRemoteDataSource {
 
   /// Xóa story
   @DELETE('/story/{storyId}')
-  Future<void> deleteStory(
-    @Path('storyId') String storyId,
-  );
+  Future<void> deleteStory(@Path('storyId') String storyId);
 
   /// Tạo hoặc cập nhật react cho story (trả về null nếu xóa react)
   @POST('/react-story')
@@ -61,9 +60,7 @@ abstract class StoryRemoteDataSource {
 
   /// Lấy danh sách react của một story
   @GET('/react-story/{storyId}')
-  Future<List<ReactStoryModel>> getStoryReacts(
-    @Path('storyId') String storyId,
-  );
+  Future<List<ReactStoryModel>> getStoryReacts(@Path('storyId') String storyId);
 
   /// Kiểm tra user hiện tại có react story không
   @GET('/react-story/user/current/{storyId}')
@@ -80,7 +77,5 @@ abstract class StoryRemoteDataSource {
 
   /// Xóa react của story
   @DELETE('/react-story/{storyId}')
-  Future<void> deleteReactStory(
-    @Path('storyId') String storyId,
-  );
+  Future<void> deleteReactStory(@Path('storyId') String storyId);
 }

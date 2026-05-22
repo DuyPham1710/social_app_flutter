@@ -11,6 +11,8 @@ dependencies:
   equatable: ^2.0.0
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   english_words: ^4.0.0
   flutter_bloc: ^9.1.0
   intl: ^0.20.2
@@ -77,6 +79,7 @@ flutter_icons:
   image_path: "assets/icons/logo.jpg"
 
 flutter:
+  generate: true
   uses-material-design: true
 
   assets:

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_options_bottom_sheet.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryUserInfoWidget extends StatelessWidget {
   final GroupedUserStoryEntity currentGroup;
@@ -18,12 +18,12 @@ class StoryUserInfoWidget extends StatelessWidget {
     required this.onClose,
   });
 
-  String _timeAgo(DateTime time) {
+  String _timeAgo(BuildContext context, DateTime time) {
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    return '${diff.inDays} ngày trước';
+    if (diff.inMinutes == 0) return context.l10n.postJustNow;
+    if (diff.inMinutes < 60) return context.l10n.timeMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return context.l10n.timeHoursAgo(diff.inHours);
+    return context.l10n.timeDaysAgo(diff.inDays);
   }
 
   bool get _isMyStory =>
@@ -37,7 +37,10 @@ class StoryUserInfoWidget extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18.r,
-            backgroundImage: NetworkImage(currentGroup.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg'),
+            backgroundImage: NetworkImage(
+              currentGroup.user.avatarUrl ??
+                  'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+            ),
           ),
           SizedBox(width: 8.w),
           Expanded(
@@ -46,8 +49,8 @@ class StoryUserInfoWidget extends StatelessWidget {
               children: [
                 Text(
                   _isMyStory
-                      ? "Tin của bạn"
-                      : (currentGroup.user.fullName ?? 'Người dùng'),
+                      ? context.l10n.chatYourStory
+                      : (currentGroup.user.fullName ?? context.l10n.commonUser),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14.sp,
@@ -58,9 +61,10 @@ class StoryUserInfoWidget extends StatelessWidget {
                 Text(
                   currentGroup.stories[currentStoryIndex].createdAt != null
                       ? _timeAgo(
+                          context,
                           currentGroup.stories[currentStoryIndex].createdAt!,
                         )
-                      : "Không rõ thời gian",
+                      : context.l10n.postUnknownTime,
                   style: TextStyle(color: Colors.white70, fontSize: 12.sp),
                 ),
               ],

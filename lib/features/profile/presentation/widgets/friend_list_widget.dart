@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendListWidget extends StatefulWidget {
   final VoidCallback? onViewAll;
@@ -51,12 +52,12 @@ class _FriendListWidgetState extends State<FriendListWidget> {
           final friends = state.friends;
           if (friends.isEmpty) {
             return _buildContainer(
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Center(
                   child: Text(
-                    "Chưa có bạn bè nào",
-                    style: TextStyle(color: Colors.grey),
+                    context.l10n.profileNoFriends,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
               ),
@@ -103,7 +104,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Bạn bè",
+                context.l10n.profileFriends,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -113,7 +114,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
               TextButton(
                 onPressed: widget.onViewAll,
                 child: Text(
-                  "Xem tất cả",
+                  context.l10n.profileViewAll,
                   style: TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w500,
@@ -123,7 +124,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
             ],
           ),
           Text(
-            "${friends.length} người bạn" ?? "0 người bạn",
+            context.l10n.profileFriendCount(friends.length),
             style: TextStyle(
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w400,
@@ -161,7 +162,8 @@ class _FriendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = friend.fullName ?? friend.username ?? "Không tên";
+    final name =
+        friend.fullName ?? friend.username ?? context.l10n.profileUnnamed;
     final avatarUrl =
         friend.avatarUrl ??
         "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg";

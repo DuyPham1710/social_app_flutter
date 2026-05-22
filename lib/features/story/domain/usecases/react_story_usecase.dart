@@ -21,26 +21,32 @@ class CreateOrUpdateReactStoryUsecase
 
 /// Usecase để lấy danh sách react của story
 class GetStoryReactsUsecase
-    implements UseCase<DataState<List<ReactStoryEntity>>, GetStoryReactsParams> {
+    implements
+        UseCase<DataState<List<ReactStoryEntity>>, GetStoryReactsParams> {
   final StoryRepository _repository;
 
   GetStoryReactsUsecase(this._repository);
 
   @override
-  Future<DataState<List<ReactStoryEntity>>> call({GetStoryReactsParams? params}) {
+  Future<DataState<List<ReactStoryEntity>>> call({
+    GetStoryReactsParams? params,
+  }) {
     return _repository.getStoryReacts(storyId: params!.storyId);
   }
 }
 
 /// Usecase để kiểm tra user hiện tại có react story không
 class CheckUserReactStoryUsecase
-    implements UseCase<DataState<Map<String, dynamic>?>, CheckUserReactStoryParams> {
+    implements
+        UseCase<DataState<Map<String, dynamic>?>, CheckUserReactStoryParams> {
   final StoryRepository _repository;
 
   CheckUserReactStoryUsecase(this._repository);
 
   @override
-  Future<DataState<Map<String, dynamic>?>> call({CheckUserReactStoryParams? params}) {
+  Future<DataState<Map<String, dynamic>?>> call({
+    CheckUserReactStoryParams? params,
+  }) {
     return _repository.checkUserReactStory(storyId: params!.storyId);
   }
 }
@@ -79,10 +85,7 @@ class ReactStoryParams {
   final String storyId;
   final String emojiId;
 
-  const ReactStoryParams({
-    required this.storyId,
-    required this.emojiId,
-  });
+  const ReactStoryParams({required this.storyId, required this.emojiId});
 }
 
 /// Params cho get story reacts
@@ -105,4 +108,3 @@ class DeleteReactStoryParams {
 
   const DeleteReactStoryParams({required this.storyId});
 }
-

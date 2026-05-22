@@ -4,16 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryFriendSelectionPage extends StatefulWidget {
   final List<String> initialSelectedIds;
-  final String title;
+  final String? title;
   final bool allowEmptySelection;
 
   const StoryFriendSelectionPage({
     super.key,
     this.initialSelectedIds = const [],
-    this.title = "Ẩn tin với",
+    this.title,
     this.allowEmptySelection = false,
   });
 
@@ -73,7 +74,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          widget.title,
+          widget.title ?? context.l10n.storyPrivacyHideFrom,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18.sp,
@@ -87,7 +88,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                 ? null
                 : _onDone,
             child: Text(
-              "Xong",
+              context.l10n.commonDone,
               style: TextStyle(
                 color:
                     (!widget.allowEmptySelection && _selectedFriendIds.isEmpty)
@@ -115,7 +116,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                 cursorColor: AppColors.primary,
                 style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
                 decoration: InputDecoration(
-                  hintText: "Tìm kiếm",
+                  hintText: context.l10n.searchHint,
                   hintStyle: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14.sp,
@@ -168,8 +169,8 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                     return Center(
                       child: Text(
                         _searchQuery.isEmpty
-                            ? "Chưa có bạn bè"
-                            : "Không tìm thấy bạn bè",
+                            ? context.l10n.friendNoFriends
+                            : context.l10n.friendNoSearchResults,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14.sp,
@@ -191,7 +192,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                 } else if (state is FriendError) {
                   return Center(
                     child: Text(
-                      "Lỗi khi tải danh sách bạn bè",
+                      context.l10n.friendLoadFailed,
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 14.sp,
@@ -209,7 +210,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
   }
 
   Widget _buildFriendItem(FriendEntity friend, bool isSelected) {
-    final name = friend.fullName ?? friend.username ?? 'Người dùng';
+    final name = friend.fullName ?? friend.username ?? context.l10n.commonUser;
     final avatarUrl = friend.avatarUrl;
 
     return InkWell(

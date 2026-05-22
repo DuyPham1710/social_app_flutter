@@ -5,14 +5,10 @@ class TypingStopUseCase {
 
   TypingStopUseCase(this._chatRepository);
 
-  void call({
-    required String userId,
-    required String conversationId,
-  }) {
+  void call({required String userId, required String conversationId}) {
     _chatRepository.emitTypingStop(
       userId: userId,
       conversationId: conversationId,
     );
   }
 }
-

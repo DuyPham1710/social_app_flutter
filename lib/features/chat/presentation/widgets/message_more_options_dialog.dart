@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class MessageMoreOptionsDialog {
   static void show({
@@ -72,7 +73,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(16.w),
             child: Text(
-              'Khác',
+              context.l10n.chatMore,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
@@ -91,7 +92,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
           // Options
           _buildOption(
             icon: CupertinoIcons.trash_fill,
-            label: 'Xóa',
+            label: context.l10n.commonDelete,
             onTap: () {
               Navigator.of(context).pop();
               if (onDelete != null) onDelete!();
@@ -101,7 +102,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
           if (fromMe && isFifteenMinutes && onEdit != null)
             _buildOption(
               icon: CupertinoIcons.pencil,
-              label: 'Chỉnh sửa',
+              label: context.l10n.commonEdit,
               onTap: () {
                 Navigator.of(context).pop();
                 if (onEdit != null) onEdit!();
@@ -110,7 +111,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
 
           _buildOption(
             icon: CupertinoIcons.pin_fill,
-            label: 'Ghim',
+            label: context.l10n.chatPin,
             onTap: () {
               Navigator.of(context).pop();
               if (onPin != null) onPin!();
@@ -119,7 +120,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
 
           _buildOption(
             icon: CupertinoIcons.arrowshape_turn_up_right_fill,
-            label: 'Chuyển tiếp',
+            label: context.l10n.chatForward,
             onTap: () {
               Navigator.of(context).pop();
               if (onForward != null) onForward!();
@@ -128,7 +129,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
 
           _buildOption(
             icon: CupertinoIcons.exclamationmark_triangle_fill,
-            label: 'Báo cáo',
+            label: context.l10n.postReport,
             onTap: () {
               Navigator.of(context).pop();
               if (onReport != null) onReport!();
@@ -137,7 +138,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
 
           _buildOption(
             icon: CupertinoIcons.sparkles,
-            label: 'Tạo hình ảnh AI',
+            label: context.l10n.chatCreateAIImage,
             onTap: () {
               Navigator.of(context).pop();
               if (onCreateAIImage != null) onCreateAIImage!();

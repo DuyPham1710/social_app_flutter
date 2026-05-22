@@ -44,6 +44,8 @@ import 'package:social_app_fe/features/video_call/presentation/pages/video_call_
 import 'package:social_app_fe/firebase_options.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/l10n/generated/app_localizations.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -319,11 +321,12 @@ class _MyAppState extends State<MyApp> {
               final currentUserData = snapshot.data;
               final userId = currentUserData?['id'];
               final username = currentUserData?['username'];
+              final l10n = context.l10n;
 
               if (userId == null || username == null) {
                 return Scaffold(
-                  appBar: AppBar(title: const Text('Error')),
-                  body: const Center(child: Text('Unable to load user data')),
+                  appBar: AppBar(title: Text(l10n.commonError)),
+                  body: Center(child: Text(l10n.unableToLoadUserData)),
                 );
               }
 
@@ -449,6 +452,7 @@ class _MyAppState extends State<MyApp> {
 
       final tokenEntity = state.tokenEntity!;
       final incomingCall = state.incomingCall;
+      final l10n = context.l10n;
 
       debugPrint('[App] Navigating to VideoCallScreen...');
       debugPrint('[App] - channelId: ${tokenEntity.channelId}');
@@ -469,10 +473,12 @@ class _MyAppState extends State<MyApp> {
                 callerName:
                     incomingCall?.callerInfo?.fullName ??
                     incomingCall?.callerInfo?.username ??
-                    'Unknown',
+                    l10n.commonUnknown,
                 callerAvatar: incomingCall?.callerInfo?.avatarUrl,
                 receiverName:
-                    userData?['fullName'] ?? userData?['username'] ?? 'You',
+                    userData?['fullName'] ??
+                    userData?['username'] ??
+                    l10n.chatYou,
                 receiverAvatar: userData?['avatarUrl'],
               ),
             ),
@@ -503,11 +509,14 @@ class _MyAppState extends State<MyApp> {
             builder: (context, child) {
               return MaterialApp(
                 navigatorKey: _navigatorKey, // Add global navigator key
-                title: 'Namer App',
+                onGenerateTitle: (context) => context.l10n.appTitle,
                 debugShowCheckedModeBanner: false,
                 theme: theme(),
                 darkTheme: darkTheme(),
                 themeMode: s1<AppPreferences>().themeMode,
+                locale: s1<AppPreferences>().locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
                 initialRoute: '/splash',
                 onGenerateRoute: _onGenerateRoute,
                 routes: <String, WidgetBuilder>{

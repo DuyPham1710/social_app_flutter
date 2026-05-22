@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/image_viewer_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class OtherProfileHeader extends StatelessWidget {
   final UserEntity? user;
@@ -92,8 +93,10 @@ class OtherProfileHeader extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ImageViewerPage(
-                      imageUrl: user?.coverUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
-                      title: 'Ảnh bìa',
+                      imageUrl:
+                          user?.coverUrl ??
+                          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
+                      title: context.l10n.profileCoverPhoto,
                     ),
                   ),
                 );
@@ -105,7 +108,8 @@ class OtherProfileHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                   image: DecorationImage(
                     image: NetworkImage(
-                      user?.coverUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
+                      user?.coverUrl ??
+                          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1744336768/samples/balloons.jpg',
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -128,8 +132,9 @@ class OtherProfileHeader extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => ImageViewerPage(
                             imageUrl:
-                                user?.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                            title: 'Ảnh đại diện',
+                                user?.avatarUrl ??
+                                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                            title: context.l10n.profileAvatarPhoto,
                           ),
                         ),
                       );
@@ -137,12 +142,16 @@ class OtherProfileHeader extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.background, width: 4),
+                        border: Border.all(
+                          color: AppColors.background,
+                          width: 4,
+                        ),
                       ),
                       child: CircleAvatar(
                         radius: 60,
                         backgroundImage: NetworkImage(
-                          user?.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                          user?.avatarUrl ??
+                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                         ),
                       ),
                     ),
@@ -158,7 +167,7 @@ class OtherProfileHeader extends StatelessWidget {
         // User name
         Center(
           child: Text(
-            user?.fullName ?? 'User Name',
+            user?.fullName ?? context.l10n.profileUserNameFallback,
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -174,7 +183,9 @@ class OtherProfileHeader extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 40.w),
           child: Text(
-            user?.bio?.isNotEmpty == true ? user!.bio! : 'Chưa có tiểu sử',
+            user?.bio?.isNotEmpty == true
+                ? user!.bio!
+                : context.l10n.profileNoBio,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
             textAlign: TextAlign.center,
           ),

@@ -184,10 +184,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
 
       if (currentState is FriendPageLoaded) {
         final updatedSuggestions = isAppend
-            ? [
-                ...currentState.friendSuggestions,
-                ...fetchedSuggestions,
-              ]
+            ? [...currentState.friendSuggestions, ...fetchedSuggestions]
             : fetchedSuggestions;
 
         emit(
@@ -201,10 +198,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
         );
       } else if (currentState is FriendSuggestionsLoaded) {
         final updatedSuggestions = isAppend
-            ? [
-                ...currentState.friendSuggestions,
-                ...fetchedSuggestions,
-              ]
+            ? [...currentState.friendSuggestions, ...fetchedSuggestions]
             : fetchedSuggestions;
 
         emit(
@@ -262,8 +256,10 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     // Load cả friend requests và friend suggestions song song
     final requestsFuture = getFriendRequestsUseCase(received: true);
     const suggestionLimit = 10;
-    final suggestionsFuture =
-        getFriendSuggestionsUseCase(page: 1, limit: suggestionLimit);
+    final suggestionsFuture = getFriendSuggestionsUseCase(
+      page: 1,
+      limit: suggestionLimit,
+    );
 
     final results = await Future.wait([requestsFuture, suggestionsFuture]);
     final requestsResult = results[0] as dynamic;

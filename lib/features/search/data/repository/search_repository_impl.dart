@@ -18,7 +18,12 @@ class SearchRepositoryImpl implements SearchRepository {
     bool saveToHistory = true,
   }) async {
     try {
-      final response = await remoteDataSource.searchUsers(query, page, limit, saveToHistory);
+      final response = await remoteDataSource.searchUsers(
+        query,
+        page,
+        limit,
+        saveToHistory,
+      );
       return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);
@@ -26,9 +31,7 @@ class SearchRepositoryImpl implements SearchRepository {
   }
 
   @override
-  Future<DataState<void>> saveViewedUser({
-    required String viewedUserId,
-  }) async {
+  Future<DataState<void>> saveViewedUser({required String viewedUserId}) async {
     try {
       await remoteDataSource.saveViewedUser(viewedUserId);
       return const DataStateSuccess(null);
@@ -71,4 +74,3 @@ class SearchRepositoryImpl implements SearchRepository {
     }
   }
 }
-

@@ -25,6 +25,7 @@ import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityCreatePostPage extends StatefulWidget {
   final String communityId;
@@ -69,10 +70,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     FocusScope.of(context).unfocus();
 
     if (_captionController.text.trim().isEmpty && _selectedAssets.isEmpty) {
-      showErrorSnackBar(
-        context,
-        'Vui lòng nhập nội dung hoặc chọn ảnh để đăng',
-      );
+      showErrorSnackBar(context, context.l10n.postContentOrPhotoRequired);
       return;
     }
 
@@ -111,7 +109,10 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         _isCreatingPost = false;
       });
 
-      showErrorSnackBar(context, 'Có lỗi xảy ra: ${e.toString()}');
+      showErrorSnackBar(
+        context,
+        context.l10n.postCreateGenericError(e.toString()),
+      );
     }
   }
 
@@ -152,7 +153,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     } else {
-      showErrorSnackBar(context, 'Cần quyền truy cập ảnh để tiếp tục');
+      showErrorSnackBar(context, context.l10n.postPhotoPermissionRequired);
     }
   }
 
@@ -165,13 +166,11 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
           showCupertinoDialog(
             context: context,
             builder: (context) => CupertinoAlertDialog(
-              title: const Text('Quyền truy cập Camera'),
-              content: const Text(
-                'Ứng dụng cần quyền truy cập camera và microphone để chụp ảnh và quay video.',
-              ),
+              title: Text(context.l10n.postCameraPermissionTitle),
+              content: Text(context.l10n.postCameraPermissionMessage),
               actions: [
                 CupertinoDialogAction(
-                  child: const Text('OK'),
+                  child: Text(context.l10n.commonOk),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -222,7 +221,10 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
             }
           } catch (e) {
             if (mounted) {
-              showErrorSnackBar(context, 'Không thể thêm ảnh: $e');
+              showErrorSnackBar(
+                context,
+                context.l10n.postCannotAddPhoto(e.toString()),
+              );
             }
           }
         }
@@ -268,38 +270,46 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
               SizedBox(height: 10.h),
               _optionRow(
                 Icons.image,
-                'Ảnh/video',
+                context.l10n.postPhotoVideo,
                 Colors.green,
                 onTap: () => {Navigator.pop(context), _onSelectImage(context)},
               ),
               _optionRow(
                 CupertinoIcons.chart_bar,
-                'Thăm dò ý kiến',
+                context.l10n.postPoll,
                 Colors.orange,
               ),
               _optionRow(
                 Icons.person_add_alt_1,
-                'Gắn thẻ người khác',
+                context.l10n.postTagPeople,
                 Colors.blueAccent,
               ),
               _optionRow(
                 Icons.emoji_emotions,
-                'Cảm xúc/hoạt động',
+                context.l10n.postFeelingActivity,
                 Colors.amber,
               ),
-              _optionRow(Icons.location_on, 'Check in', Colors.redAccent),
+              _optionRow(
+                Icons.location_on,
+                context.l10n.postCheckIn,
+                Colors.redAccent,
+              ),
               _optionRow(
                 Icons.video_camera_front,
-                'Video trực tiếp',
+                context.l10n.postLiveVideo,
                 Colors.pinkAccent,
               ),
               _optionRow(
                 Icons.camera_alt,
-                'Camera',
+                context.l10n.postCamera,
                 Colors.blueAccent,
                 onTap: () => _openCamera(),
               ),
-              _optionRow(Icons.music_note, 'Nhạc', Colors.redAccent),
+              _optionRow(
+                Icons.music_note,
+                context.l10n.postMusic,
+                Colors.redAccent,
+              ),
             ],
           ),
         );
@@ -361,7 +371,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
           if (widget.userRole != 'admin') {
             showSuccessSnackBar(
               context,
-              'Bài viết của bạn đang chờ admin duyệt',
+              context.l10n.communityPostPendingApproval,
             );
           }
         }
@@ -381,7 +391,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
               onPressed: () => Navigator.of(context).maybePop(),
             ),
             title: Text(
-              'Tạo bài viết trong nhóm',
+              context.l10n.communityCreatePostTitle,
               softWrap: true,
               maxLines: 2,
               overflow: TextOverflow.visible,
@@ -420,7 +430,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                             ),
                           )
                         : Text(
-                            'Đăng',
+                            context.l10n.postSubmit,
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
@@ -479,7 +489,8 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            state.user.fullName ?? 'unknown',
+                                            state.user.fullName ??
+                                                context.l10n.commonUnknown,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13.sp,
@@ -547,7 +558,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                     ),
                     maxLines: null,
                     decoration: InputDecoration(
-                      hintText: 'Bạn đang nghĩ gì?',
+                      hintText: context.l10n.postWriteSomethingHint,
                       hintStyle: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 18.sp,

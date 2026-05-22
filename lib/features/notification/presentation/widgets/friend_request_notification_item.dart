@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendRequestNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -34,8 +35,8 @@ class FriendRequestNotificationItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-              ? AppColors.primary.withOpacity(0.12)
-              : const Color(0xFFEAF3FF)), // màu nền khi chưa đọc
+                ? AppColors.primary.withOpacity(0.12)
+                : const Color(0xFFEAF3FF)), // màu nền khi chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       // ignore: sort_child_properties_last
       child: Row(
@@ -52,7 +53,11 @@ class FriendRequestNotificationItem extends StatelessWidget {
                           width: 58,
                           height: 58,
                           color: AppColors.secondBackground,
-                          child: Icon(Icons.person, color: AppColors.iconPrimary, size: 28),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.iconPrimary,
+                            size: 28,
+                          ),
                         )
                       : Image.network(
                           avatarUrl,
@@ -64,7 +69,11 @@ class FriendRequestNotificationItem extends StatelessWidget {
                               width: 58,
                               height: 58,
                               color: AppColors.secondBackground,
-                              child: Icon(Icons.person, color: AppColors.iconPrimary, size: 28),
+                              child: Icon(
+                                Icons.person,
+                                color: AppColors.iconPrimary,
+                                size: 28,
+                              ),
                             );
                           },
                         ),
@@ -106,7 +115,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
                       TextSpan(
-                        text: " đã gửi cho bạn lời mời kết bạn.",
+                        text: context.l10n.notificationFriendRequestMessage,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
@@ -123,7 +132,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      time == "0 phút" ? "Vừa xong" : time,
+                      time == "0 phút" ? context.l10n.postJustNow : time,
                       style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
@@ -153,9 +162,12 @@ class FriendRequestNotificationItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                        child: const Text(
-                          "Xác nhận",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        child: Text(
+                          context.l10n.commonConfirm,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -173,8 +185,11 @@ class FriendRequestNotificationItem extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          "Xóa",
-                          style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
+                          context.l10n.friendDelete,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     ),

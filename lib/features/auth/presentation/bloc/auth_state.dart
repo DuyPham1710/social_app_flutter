@@ -63,10 +63,7 @@ class FaceRegistrationError extends AuthState {
   final String message;
   final String? failedPose;
 
-  const FaceRegistrationError({
-    required this.message,
-    this.failedPose,
-  });
+  const FaceRegistrationError({required this.message, this.failedPose});
 
   @override
   List<Object?> get props => [message, failedPose];

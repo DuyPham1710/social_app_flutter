@@ -12,10 +12,7 @@ class ConnectVideoCall extends VideoCallEvent {
   final String userId;
   final String username;
 
-  const ConnectVideoCall({
-    required this.userId,
-    required this.username,
-  });
+  const ConnectVideoCall({required this.userId, required this.username});
 
   @override
   List<Object?> get props => [userId, username];
@@ -44,10 +41,7 @@ class AcceptCall extends VideoCallEvent {
   final String userId;
   final String callId;
 
-  const AcceptCall({
-    required this.userId,
-    required this.callId,
-  });
+  const AcceptCall({required this.userId, required this.callId});
 
   @override
   List<Object?> get props => [userId, callId];
@@ -58,10 +52,7 @@ class RejectCall extends VideoCallEvent {
   final String userId;
   final String callId;
 
-  const RejectCall({
-    required this.userId,
-    required this.callId,
-  });
+  const RejectCall({required this.userId, required this.callId});
 
   @override
   List<Object?> get props => [userId, callId];
@@ -134,4 +125,3 @@ class DisconnectVideoCall extends VideoCallEvent {
 class ClearCallState extends VideoCallEvent {
   const ClearCallState();
 }
-

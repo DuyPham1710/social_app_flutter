@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dar
 import 'package:social_app_fe/features/profile/presentation/widgets/friend_list_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/other_profile_header.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_info.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import '../widgets/other_profile_actions.dart';
 import '../bloc/other_profile_bloc.dart';
 import '../bloc/other_profile_state.dart';
@@ -83,7 +84,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             return _fadeContent(
               key: 'other-profile-error',
               child: _buildErrorProfile(
-                state.error ?? 'Không thể tải trang cá nhân',
+                state.error ?? context.l10n.profileLoadError,
               ),
             );
           }
@@ -119,7 +120,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     backgroundColor: AppColors.background,
                     elevation: 0,
                     title: Text(
-                      user.fullName ?? "Trang cá nhân",
+                      user.fullName ?? context.l10n.profileTitle,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -182,7 +183,8 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                               builder: (context) => FriendForUserPage(
                                 userId: user.userId,
                                 username: user.username ?? "user",
-                                fullName: user.fullName ?? "Người dùng",
+                                fullName:
+                                    user.fullName ?? context.l10n.commonUser,
                               ),
                             ),
                           );
@@ -225,7 +227,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           backgroundColor: AppColors.background,
           elevation: 0,
           title: Text(
-            'Trang cá nhân',
+            context.l10n.profileTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -256,7 +258,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           backgroundColor: AppColors.background,
           elevation: 0,
           title: Text(
-            'Trang cá nhân',
+            context.l10n.profileTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -286,7 +288,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                   OutlinedButton.icon(
                     onPressed: _loadData,
                     icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Thử lại'),
+                    label: Text(context.l10n.commonRetry),
                   ),
                 ],
               ),
@@ -313,7 +315,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             padding: const EdgeInsets.all(16),
             child: Center(
               child: Text(
-                state.error ?? 'Không thể tải bài viết',
+                state.error ?? context.l10n.profileLoadPostsError,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
@@ -324,7 +326,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           Padding(
             padding: EdgeInsets.all(16.w),
             child: Text(
-              "Chưa có bài viết nào",
+              context.l10n.profileNoPosts,
               style: TextStyle(color: Colors.grey, fontSize: 14.sp),
             ),
           ),
@@ -346,7 +348,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             padding: EdgeInsets.symmetric(vertical: 16.h),
             child: Center(
               child: Text(
-                "Đã hiển thị hết bài viết",
+                context.l10n.profileEndOfPosts,
                 style: TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),

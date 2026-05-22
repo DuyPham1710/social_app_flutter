@@ -9,6 +9,7 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_friend_selection_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -23,7 +24,12 @@ class StoryPrivacySettingsPage extends StatefulWidget {
 }
 
 class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
-  String _selectedPrivacy = "Bạn bè"; // Default: Friends
+  static const _privacyPublic = 'public';
+  static const _privacyFriends = 'friends';
+  static const _privacyFriendsExcept = 'friendsExcept';
+  static const _privacyFriendsDetail = 'friendsDetail';
+
+  String _selectedPrivacy = _privacyFriends;
   List<String> _hiddenFriendIds = [];
   List<String> _allowedFriendIds = [];
   bool _isLoading = true;
@@ -44,7 +50,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
     if (mounted) {
       setState(() {
         if (savedPrivacy != null) {
-          _selectedPrivacy = savedPrivacy;
+          _selectedPrivacy = _normalizePrivacy(savedPrivacy);
         }
         _hiddenFriendIds = savedHiddenIds;
         _allowedFriendIds = savedAllowedIds;
@@ -65,8 +71,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
   Future<void> _saveHiddenFriendIds(List<String> friendIds) async {
     await StoryPrivacyStorage.saveHiddenFriendIds(friendIds);
 
-    // Nếu có storyId và đang chọn "Ẩn tin với", gọi API
-    if (widget.storyId != null && _selectedPrivacy == "Ẩn tin với") {
+    if (widget.storyId != null && _selectedPrivacy == _privacyFriendsExcept) {
       await _updateStoryPrivacy(_selectedPrivacy);
     }
   }
@@ -74,8 +79,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
   Future<void> _saveAllowedFriendIds(List<String> friendIds) async {
     await StoryPrivacyStorage.saveAllowedFriendIds(friendIds);
 
-    // Nếu có storyId và đang chọn "Tùy chỉnh", gọi API
-    if (widget.storyId != null && _selectedPrivacy == "Tùy chỉnh") {
+    if (widget.storyId != null && _selectedPrivacy == _privacyFriendsDetail) {
       await _updateStoryPrivacy(_selectedPrivacy);
     }
   }
@@ -94,14 +98,14 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
       List<String>? friendsDetail;
 
       switch (privacy) {
-        case "Công khai":
+        case _privacyPublic:
           privacyType = PrivacyType.public;
-        case "Bạn bè":
+        case _privacyFriends:
           privacyType = PrivacyType.friends;
-        case "Ẩn tin với":
+        case _privacyFriendsExcept:
           privacyType = PrivacyType.friendsExcept;
           friendsExcept = _hiddenFriendIds.isNotEmpty ? _hiddenFriendIds : null;
-        case "Tùy chỉnh":
+        case _privacyFriendsDetail:
           privacyType = PrivacyType.friendsDetail;
           friendsDetail = _allowedFriendIds.isNotEmpty
               ? _allowedFriendIds
@@ -119,19 +123,21 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
 
       if (result is DataStateSuccess) {
         if (mounted) {
-          showSuccessSnackBar(context, 'Đã cập nhật quyền riêng tư');
+          showSuccessSnackBar(context, context.l10n.storyPrivacyUpdated);
         }
       } else if (result is DataStateError) {
         if (mounted) {
           showErrorSnackBar(
             context,
-            'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}',
+            context.l10n.commonErrorWithMessage(
+              result.error?.message ?? context.l10n.storyPrivacyUpdateFailed,
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi: $e');
+        showErrorSnackBar(context, context.l10n.commonErrorWithMessage('$e'));
       }
     } finally {
       if (mounted) {
@@ -139,6 +145,24 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           _isSaving = false;
         });
       }
+    }
+  }
+
+  String _normalizePrivacy(String value) {
+    switch (value) {
+      case 'Công khai':
+      case _privacyPublic:
+        return _privacyPublic;
+      case 'Ẩn tin với':
+      case _privacyFriendsExcept:
+        return _privacyFriendsExcept;
+      case 'Tùy chỉnh':
+      case _privacyFriendsDetail:
+        return _privacyFriendsDetail;
+      case 'Bạn bè':
+      case _privacyFriends:
+      default:
+        return _privacyFriends;
     }
   }
 
@@ -163,7 +187,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          "Quyền riêng tư của tin",
+          context.l10n.storyPrivacyTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18.sp,
@@ -192,7 +216,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Ai có thể xem tin của bạn?",
+          context.l10n.storyPrivacyQuestion,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 20.sp,
@@ -201,22 +225,22 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
         ),
         SizedBox(height: 8.h),
         Text(
-          "Tin của bạn sẽ hiển thị trong 24 giờ.",
+          context.l10n.storyPrivacyVisibleFor24h,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
         SizedBox(height: 20.h),
         _buildPrivacyOption(
           icon: Icons.public,
-          title: "Công khai",
-          description: "Bất kỳ ai",
-          value: "Công khai",
+          title: context.l10n.storyPrivacyPublic,
+          description: context.l10n.storyPrivacyPublicDescription,
+          value: _privacyPublic,
         ),
         SizedBox(height: 16.h),
         _buildPrivacyOption(
           icon: Icons.people,
-          title: "Bạn bè",
-          description: "Chỉ bạn bè của bạn",
-          value: "Bạn bè",
+          title: context.l10n.storyPrivacyFriends,
+          description: context.l10n.storyPrivacyFriendsDescription,
+          value: _privacyFriends,
         ),
         SizedBox(height: 16.h),
         _buildHideStoryOption(),
@@ -314,43 +338,46 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
         // Get friend names from selected IDs
-        String displayText = "Chưa chọn ai";
+        String displayText = context.l10n.storyPrivacyNoOneSelected;
         if (state is FriendLoaded && _hiddenFriendIds.isNotEmpty) {
           final selectedFriends = state.friends
               .where((f) => _hiddenFriendIds.contains(f.userId))
               .toList();
 
           if (selectedFriends.isEmpty) {
-            displayText = "Chưa chọn ai";
+            displayText = context.l10n.storyPrivacyNoOneSelected;
           } else if (selectedFriends.length == 1) {
             displayText =
                 selectedFriends.first.fullName ??
                 selectedFriends.first.username ??
-                "1 người";
+                context.l10n.storyPrivacyOnePerson;
           } else if (selectedFriends.length <= 3) {
             final names = selectedFriends
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .map((f) => f.fullName ?? f.username ?? context.l10n.commonUser)
                 .join(", ");
             displayText = names;
           } else {
             final firstNames = selectedFriends
                 .take(2)
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .map((f) => f.fullName ?? f.username ?? context.l10n.commonUser)
                 .join(", ");
             final remaining = selectedFriends.length - 2;
-            displayText = "$firstNames và $remaining người khác";
+            displayText = context.l10n.storyPrivacyAndOthers(
+              firstNames,
+              remaining,
+            );
           }
         } else if (_hiddenFriendIds.isEmpty) {
-          displayText = "Chưa chọn ai";
+          displayText = context.l10n.storyPrivacyNoOneSelected;
         }
 
         return GestureDetector(
           onTap: () async {
             // Set privacy type to "Ẩn tin với" first
             setState(() {
-              _selectedPrivacy = "Ẩn tin với";
+              _selectedPrivacy = _privacyFriendsExcept;
             });
-            await _savePrivacy("Ẩn tin với");
+            await _savePrivacy(_privacyFriendsExcept);
 
             final selectedIds = await Navigator.of(context).push<List<String>>(
               MaterialPageRoute(
@@ -380,7 +407,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Ẩn tin với",
+                        context.l10n.storyPrivacyHideFrom,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16.sp,
@@ -417,52 +444,55 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
         // Get friend names from selected IDs
-        String displayText = "Chưa chọn ai";
+        String displayText = context.l10n.storyPrivacyNoOneSelected;
         if (state is FriendLoaded && _allowedFriendIds.isNotEmpty) {
           final selectedFriends = state.friends
               .where((f) => _allowedFriendIds.contains(f.userId))
               .toList();
 
           if (selectedFriends.isEmpty) {
-            displayText = "Chưa chọn ai";
+            displayText = context.l10n.storyPrivacyNoOneSelected;
           } else if (selectedFriends.length == 1) {
             displayText =
                 selectedFriends.first.fullName ??
                 selectedFriends.first.username ??
-                "1 người";
+                context.l10n.storyPrivacyOnePerson;
           } else if (selectedFriends.length <= 3) {
             final names = selectedFriends
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .map((f) => f.fullName ?? f.username ?? context.l10n.commonUser)
                 .join(", ");
             displayText = names;
           } else {
             final firstNames = selectedFriends
                 .take(2)
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
+                .map((f) => f.fullName ?? f.username ?? context.l10n.commonUser)
                 .join(", ");
             final remaining = selectedFriends.length - 2;
-            displayText = "$firstNames và $remaining người khác";
+            displayText = context.l10n.storyPrivacyAndOthers(
+              firstNames,
+              remaining,
+            );
           }
         } else if (_allowedFriendIds.isEmpty) {
-          displayText = "Chưa chọn ai";
+          displayText = context.l10n.storyPrivacyNoOneSelected;
         }
 
-        final isSelected = _selectedPrivacy == "Tùy chỉnh";
+        final isSelected = _selectedPrivacy == _privacyFriendsDetail;
 
         return GestureDetector(
           onTap: () async {
             // First select "Tùy chỉnh" option
             setState(() {
-              _selectedPrivacy = "Tùy chỉnh";
+              _selectedPrivacy = _privacyFriendsDetail;
             });
-            await _savePrivacy("Tùy chỉnh");
+            await _savePrivacy(_privacyFriendsDetail);
 
             // Then navigate to friend selection page
             final selectedIds = await Navigator.of(context).push<List<String>>(
               MaterialPageRoute(
                 builder: (_) => StoryFriendSelectionPage(
                   initialSelectedIds: _allowedFriendIds,
-                  title: "Chọn người để chia sẻ tin",
+                  title: context.l10n.storySelectPeopleToShare,
                   allowEmptySelection: false,
                 ),
               ),
@@ -502,7 +532,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Tùy chỉnh",
+                        context.l10n.storyPrivacyCustom,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16.sp,

@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPostPendingNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -40,8 +41,8 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
         color: isRead
             ? AppColors.background
             : (s1<AppPreferences>().isDarkMode
-                ? const Color(0xFFE6A23C).withOpacity(0.15)
-                : const Color(0xFFFFF7E8)),
+                  ? const Color(0xFFE6A23C).withOpacity(0.15)
+                  : const Color(0xFFFFF7E8)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         margin: const EdgeInsets.only(bottom: 4),
         child: Row(
@@ -56,7 +57,10 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                         ? CircleAvatar(
                             radius: 29,
                             backgroundColor: AppColors.secondBackground,
-                            child: Icon(Icons.person, color: AppColors.iconPrimary),
+                            child: Icon(
+                              Icons.person,
+                              color: AppColors.iconPrimary,
+                            ),
                           )
                         : Image.network(
                             avatarUrl,
@@ -67,7 +71,10 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                               return CircleAvatar(
                                 radius: 29,
                                 backgroundColor: AppColors.secondBackground,
-                                child: Icon(Icons.person, color: AppColors.iconPrimary),
+                                child: Icon(
+                                  Icons.person,
+                                  color: AppColors.iconPrimary,
+                                ),
                               );
                             },
                           ),
@@ -99,7 +106,8 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                   Builder(
                     builder: (context) {
                       final msg =
-                          message ?? ' gửi yêu cầu đăng bài vào cộng đồng';
+                          message ??
+                          context.l10n.notificationPostPendingMessage;
                       final List<TextSpan> spans = [];
                       spans.add(
                         TextSpan(
@@ -147,7 +155,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        time == "0 phút" ? "Vừa xong" : time,
+                        time == "0 phút" ? context.l10n.postJustNow : time,
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ],

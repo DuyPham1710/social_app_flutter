@@ -10,4 +10,3 @@ class AcceptFriendRequestUseCase {
     return await friendRepository.acceptFriendRequest(requestId);
   }
 }
-

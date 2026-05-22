@@ -191,7 +191,7 @@ class CallKitService {
       final params = CallKitParams(
         id: callId,
         nameCaller: receiverName,
-        appName: 'Social App',
+        appName: 'CommonsHub',
         handle: callType == 'video' ? 'Video Call' : 'Audio Call',
         type: callType == 'video' ? 1 : 0,
         extra: callData,

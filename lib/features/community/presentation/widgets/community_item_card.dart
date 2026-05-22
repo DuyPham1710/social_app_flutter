@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityItem extends StatefulWidget {
   final dynamic community;
@@ -62,19 +64,27 @@ class _CommunityItemState extends State<CommunityItem> {
       listener: (context, state) {
         if (state is CommunityActionSuccess &&
             state.communityId == widget.community.id) {
+          final message = localizedCommunityMessage(
+            context.l10n,
+            state.message,
+          );
           // Update local status based on action message
-          if (_memberStatus == null && state.message.contains('gửi yêu cầu')) {
+          if (_memberStatus == null &&
+              message == context.l10n.communityJoinRequestSent) {
             // Just joined
             setState(() => _memberStatus = 'pending');
           } else if (_memberStatus == 'pending' &&
-              state.message.contains('Đã hủy')) {
+              message == context.l10n.communityCancelRequestSuccess) {
             // Cancelled join request
             setState(() => _memberStatus = null);
           }
-          showSuccessSnackBar(context, state.message);
+          showSuccessSnackBar(context, message);
         } else if (state is CommunityDetailError &&
             state.communityId == widget.community.id) {
-          showErrorSnackBar(context, state.message);
+          showErrorSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         } else if (state is CommunityDetailLoaded &&
             widget.community.id == state.community.id) {
           // Sync status when detail loads
@@ -206,9 +216,9 @@ class _CommunityItemState extends State<CommunityItem> {
                                     width: 0.8,
                                   ),
                                 ),
-                                child: const Text(
-                                  'Quản trị viên',
-                                  style: TextStyle(
+                                child: Text(
+                                  context.l10n.communityAdmin,
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF15803D),
@@ -234,7 +244,9 @@ class _CommunityItemState extends State<CommunityItem> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        '${widget.community.memberCount} thành viên',
+                                        context.l10n.communityMembersCount(
+                                          widget.community.memberCount ?? 0,
+                                        ),
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: Color(0xFF6B7280),
@@ -315,7 +327,7 @@ class _CommunityItemState extends State<CommunityItem> {
             context,
           ).push(CommunityDetailPage.route(communityId: widget.community.id));
         },
-        child: const Text('Chi tiết'),
+        child: Text(context.l10n.commonDetails),
       );
     }
 
@@ -328,7 +340,7 @@ class _CommunityItemState extends State<CommunityItem> {
             CancelJoinRequestRequested(widget.community.id),
           );
         },
-        child: const Text('Hủy yêu cầu'),
+        child: Text(context.l10n.friendCancelRequest),
       );
     }
 
@@ -341,7 +353,7 @@ class _CommunityItemState extends State<CommunityItem> {
           JoinCommunityRequested(widget.community.id),
         );
       },
-      child: const Text('Tham gia'),
+      child: Text(context.l10n.communityJoinShort),
     );
   }
 

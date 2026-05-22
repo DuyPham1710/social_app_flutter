@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_b
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatInfoPage extends StatefulWidget {
   final bool isGroup;
@@ -80,7 +81,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 PopupMenuItem<String>(
                   value: 'change_avatar',
                   child: Text(
-                    'Đổi ảnh nhóm',
+                    context.l10n.chatChangeGroupPhoto,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15.sp,
@@ -91,7 +92,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 PopupMenuItem<String>(
                   value: 'change_name',
                   child: Text(
-                    'Đổi tên',
+                    context.l10n.chatChangeName,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15.sp,
@@ -102,7 +103,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 PopupMenuItem<String>(
                   value: 'delete_conversation',
                   child: Text(
-                    'Xóa cuộc trò chuyện',
+                    context.l10n.chatDeleteConversation,
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 15.sp,
@@ -113,7 +114,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 PopupMenuItem<String>(
                   value: 'leave_group',
                   child: Text(
-                    'Rời nhóm',
+                    context.l10n.communityLeaveGroup,
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 15.sp,
@@ -211,7 +212,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                     child: Text(
                       _groupName.isNotEmpty
                           ? _groupName
-                          : widget.userInfo?.fullName ?? "Tên người dùng",
+                          : widget.userInfo?.fullName ?? context.l10n.authUsername,
                       style: TextStyle(
                         fontSize: 22.sp,
                         fontWeight: FontWeight.bold,
@@ -233,19 +234,19 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 _buildActionBtn(
                   onTap: () => widget.onInitiateCall?.call('audio'),
                   icon: CupertinoIcons.phone_fill,
-                  label: "Gọi thoại",
+                  label: context.l10n.chatAudioCall,
                 ),
                 _buildActionBtn(
                   onTap: () => widget.onInitiateCall?.call('video'),
                   icon: CupertinoIcons.videocam_fill,
-                  label: "Gọi video",
+                  label: context.l10n.chatVideoCall,
                 ),
 
                 widget.isGroup
                     ? _buildActionBtn(
                         onTap: () {},
                         icon: Icons.person_add,
-                        label: "Thêm thành viên",
+                        label: context.l10n.chatAddMember,
                         size: 20.sp,
                       )
                     : _buildActionBtn(
@@ -268,13 +269,13 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                           );
                         },
                         icon: CupertinoIcons.person_fill,
-                        label: "Trang cá nhân",
+                        label: context.l10n.profileTitle,
                         size: 22.sp,
                       ),
                 _buildActionBtn(
                   onTap: () {},
                   icon: CupertinoIcons.bell_fill,
-                  label: "Tắt thông báo",
+                  label: context.l10n.chatMuteNotifications,
                   size: 20.sp,
                 ),
               ],
@@ -284,10 +285,10 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             Divider(thickness: 8.h, color: AppColors.divider.withOpacity(0.1)),
 
             // SECTION: TÙY CHỈNH
-            _buildSectionTitle("Tùy chỉnh"),
+            _buildSectionTitle(context.l10n.appearanceCustomAccentColor),
             _buildListTile(
               iconWidget: _buildCircleIcon(Colors.orange, isGradient: true),
-              title: "Chủ đề",
+              title: context.l10n.chatTheme,
               onTap: () {},
             ),
 
@@ -297,7 +298,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Biệt danh",
+              title: context.l10n.chatNickname,
               onTap: () {},
             ),
 
@@ -315,7 +316,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 : SizedBox.shrink(),
 
             // SECTION: HÀNH ĐỘNG KHÁC
-            _buildSectionTitle("Hành động khác"),
+            _buildSectionTitle(context.l10n.commonMoreActions),
             !widget.isGroup
                 ? _buildListTile(
                     iconWidget: Icon(
@@ -323,7 +324,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                       color: AppColors.textPrimary,
                       size: 24.sp,
                     ),
-                    title: "Tạo nhóm chat",
+                    title: context.l10n.chatCreateGroup,
                     onTap: () {},
                   )
                 : SizedBox.shrink(),
@@ -333,7 +334,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Xem file phương tiện, file và liên kết",
+              title: context.l10n.chatViewMediaFilesLinks,
               onTap: () {},
             ),
             _buildListTile(
@@ -342,7 +343,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Tin nhắn đã ghim",
+              title: context.l10n.chatPinnedMessages,
               onTap: () {},
             ),
             _buildListTile(
@@ -351,7 +352,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Tìm kiếm trong cuộc trò chuyện",
+              title: context.l10n.chatSearchInConversation,
               onTap: () {},
             ),
             _buildListTile(
@@ -360,7 +361,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Chia sẻ thông tin liên hệ",
+              title: context.l10n.chatShareContactInfo,
               onTap: () {},
             ),
 
@@ -373,7 +374,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             ),
 
             // SECTION: QUYỀN RIÊNG TƯ & HỖ TRỢ
-            _buildSectionTitle("Quyền riêng tư & Hỗ trợ"),
+            _buildSectionTitle(context.l10n.commonPrivacySupport),
 
             _buildListTile(
               iconWidget: Icon(
@@ -381,7 +382,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Thông báo đã đọc",
+              title: context.l10n.chatReadReceipts,
               onTap: () {},
             ),
             _buildListTile(
@@ -390,8 +391,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Chỉ báo đang nhập",
-              subtitle: "Đang bật",
+              title: context.l10n.chatTypingIndicators,
+              subtitle: context.l10n.commonEnabled,
               onTap: () {},
             ),
             _buildListTile(
@@ -400,7 +401,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Hạn chế",
+              title: context.l10n.commonRestrict,
               onTap: () {},
             ),
             _buildListTile(
@@ -409,7 +410,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Chặn",
+              title: context.l10n.commonBlock,
               onTap: () {},
             ),
             _buildListTile(
@@ -418,8 +419,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
-              title: "Báo cáo",
-              subtitle: "Góp ý và báo cáo cuộc trò chuyện",
+              title: context.l10n.commonReport,
+              subtitle: context.l10n.chatFeedbackAndReportConversation,
               onTap: () {},
             ),
 
@@ -427,7 +428,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             if (widget.isGroup) ...[
               _buildListTile(
                 iconWidget: Icon(Icons.logout, color: Colors.red, size: 24.sp),
-                title: "Rời khỏi đoạn chat",
+                title: context.l10n.chatLeaveConversation,
                 onTap: () {
                   // Xử lý rời khỏi đoạn chat
                 },
@@ -438,7 +439,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                   color: Colors.red,
                   size: 24.sp,
                 ),
-                title: "Xóa đoạn chat",
+                title: context.l10n.chatDeleteChat,
                 onTap: () {
                   // Xử lý xóa đoạn chat
                 },
@@ -456,7 +457,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Thông tin về đoạn chat"),
+        _buildSectionTitle(context.l10n.chatConversationInfo),
 
         _buildListTile(
           iconWidget: Icon(
@@ -464,8 +465,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             color: AppColors.textPrimary,
             size: 24.sp,
           ),
-          title: "Xem thành viên trong nhóm",
-          subtitle: "${participants.length} thành viên",
+          title: context.l10n.chatViewGroupMembers,
+          subtitle: context.l10n.chatMembersCount(participants.length),
           onTap: () {},
         ),
         _buildListTile(
@@ -474,7 +475,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             color: AppColors.textPrimary,
             size: 24.sp,
           ),
-          title: "Liên kết nhóm",
+          title: context.l10n.chatGroupLink,
           onTap: () {},
         ),
         SizedBox(height: 10.h),
@@ -628,7 +629,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) => ChangeGroupNameDialog(
-        currentName: _groupName.isNotEmpty ? _groupName : "Tên nhóm",
+        currentName: _groupName.isNotEmpty ? _groupName : context.l10n.chatGroupName,
         conversationId: widget.conversationId,
         userId: widget.userId,
       ),

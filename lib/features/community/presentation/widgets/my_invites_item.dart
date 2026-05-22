@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
@@ -73,23 +75,36 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
         if (state is CommunityActionSuccess) {
           // Only update this item if the requestId matches
           if (state.requestId != null && state.requestId == widget.invite.id) {
-            if (state.message.contains('chấp nhận')) {
+            final message = localizedCommunityMessage(
+              context.l10n,
+              state.message,
+            );
+            if (message == context.l10n.notificationInviteAccepted) {
               setState(() {
                 _status = _InviteResponseStatus.approved;
                 _isLoading = false;
               });
-              showSuccessSnackBar(context, 'Đã chấp nhận lời mời');
-            } else if (state.message.contains('từ chối')) {
+              showSuccessSnackBar(
+                context,
+                context.l10n.notificationInviteAccepted,
+              );
+            } else if (message == context.l10n.notificationInviteRejected) {
               setState(() {
                 _status = _InviteResponseStatus.rejected;
                 _isLoading = false;
               });
-              showSuccessSnackBar(context, 'Đã từ chối lời mời');
+              showSuccessSnackBar(
+                context,
+                context.l10n.notificationInviteRejected,
+              );
             }
           }
         } else if (state is CommunityDetailError) {
           setState(() => _isLoading = false);
-          showErrorSnackBar(context, state.message);
+          showErrorSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         }
       },
       child: Container(
@@ -121,7 +136,11 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                           ? NetworkImage(avatarUrl)
                           : null,
                       child: avatarUrl.isEmpty
-                          ? const Icon(Icons.group, size: 28, color: Color(0xFF9CA3AF))
+                          ? const Icon(
+                              Icons.group,
+                              size: 28,
+                              color: Color(0xFF9CA3AF),
+                            )
                           : null,
                     ),
                     Positioned(
@@ -168,7 +187,7 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        _getStatusMessage(),
+                        _getStatusMessage(context),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -212,15 +231,18 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                                 ),
                               ),
                             )
-                          : const Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.check_circle_outline,
-                                    size: 16, color: Colors.white),
-                                SizedBox(width: 6),
+                                const Icon(
+                                  Icons.check_circle_outline,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'Chấp nhận',
-                                  style: TextStyle(
+                                  context.l10n.friendAccept,
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
@@ -239,7 +261,9 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 11),
                         side: const BorderSide(
-                            color: Color(0xFFD0D5DD), width: 1.5),
+                          color: Color(0xFFD0D5DD),
+                          width: 1.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -255,14 +279,18 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                                 ),
                               ),
                             )
-                          : const Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.close, size: 16, color: Color(0xFF667085)),
-                                SizedBox(width: 6),
+                                const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Color(0xFF667085),
+                                ),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'Từ chối',
-                                  style: TextStyle(
+                                  context.l10n.friendReject,
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF667085),
@@ -306,8 +334,8 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                       const SizedBox(width: 6),
                       Text(
                         _status == _InviteResponseStatus.approved
-                            ? 'Đã chấp nhận'
-                            : 'Đã từ chối',
+                            ? context.l10n.notificationInviteAccepted
+                            : context.l10n.notificationInviteRejected,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -326,14 +354,14 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
     );
   }
 
-  String _getStatusMessage() {
+  String _getStatusMessage(BuildContext context) {
     switch (_status) {
       case _InviteResponseStatus.pending:
-        return 'Bạn được mời tham gia cộng đồng';
+        return context.l10n.communityInviteStatusPending;
       case _InviteResponseStatus.approved:
-        return 'Bạn đã chấp nhận lời mời';
+        return context.l10n.communityInviteStatusApproved;
       case _InviteResponseStatus.rejected:
-        return 'Bạn đã từ chối lời mời';
+        return context.l10n.communityInviteStatusRejected;
     }
   }
 

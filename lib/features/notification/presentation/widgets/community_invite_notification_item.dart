@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityInviteNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -104,7 +105,8 @@ class CommunityInviteNotificationItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final msg = message ?? 'đã mời bạn tham gia';
+                    final msg =
+                        message ?? context.l10n.notificationInviteMessage;
 
                     final List<TextSpan> spans = [];
                     spans.add(
@@ -146,7 +148,7 @@ class CommunityInviteNotificationItem extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 Text(
-                  time == "0 phút" ? "Vừa xong" : time,
+                  time == "0 phút" ? context.l10n.postJustNow : time,
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
 
@@ -165,9 +167,12 @@ class CommunityInviteNotificationItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                        child: const Text(
-                          'Chấp nhận',
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                        child: Text(
+                          context.l10n.friendAccept,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -185,7 +190,7 @@ class CommunityInviteNotificationItem extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Xóa',
+                          context.l10n.friendDelete,
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.textPrimary,

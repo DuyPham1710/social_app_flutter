@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class DeleteMessageBottomSheet {
   static void show({
@@ -69,7 +70,7 @@ class _DeleteMessageContent extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      'Xóa tin nhắn?',
+                      context.l10n.chatDeleteMessageTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18.sp,
@@ -86,7 +87,7 @@ class _DeleteMessageContent extends StatelessWidget {
             if (isMyMessage) ...[
               _DeleteOption(
                 icon: CupertinoIcons.trash_fill,
-                text: 'Xóa đối với mọi người',
+                text: context.l10n.chatDeleteForEveryone,
                 onTap: () {
                   Navigator.of(context).pop();
                   onDeleteForEveryone();
@@ -96,7 +97,7 @@ class _DeleteMessageContent extends StatelessWidget {
             ],
             _DeleteOption(
               icon: CupertinoIcons.trash_fill,
-              text: 'Xóa cho tôi',
+              text: context.l10n.chatDeleteForMe,
               onTap: () {
                 Navigator.of(context).pop();
                 onDeleteForMe();

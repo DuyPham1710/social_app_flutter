@@ -6,6 +6,8 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_request_item.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/sent_friend_requests_page.dart';
+import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendRequestsPage extends StatefulWidget {
   const FriendRequestsPage({super.key});
@@ -34,7 +36,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
         ),
         title: Text(
-          'Lời mời kết bạn',
+          context.l10n.friendRequestsTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18,
@@ -88,7 +90,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               Row(
                 children: [
                   Text(
-                    'Lời mời kết bạn',
+                    context.l10n.friendRequestsTitle,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
@@ -121,7 +123,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   _showSortOptions(context);
                 },
                 child: Text(
-                  'Sắp xếp',
+                  context.l10n.friendSort,
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
@@ -146,7 +148,11 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.green,
@@ -168,7 +174,11 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.red,
@@ -178,7 +188,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               action: SnackBarAction(
-                label: 'Thử lại',
+                label: context.l10n.commonRetry,
                 textColor: Colors.white,
                 onPressed: () {
                   context.read<FriendBloc>().add(const LoadFriendPage());
@@ -264,7 +274,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'Đang tải lời mời kết bạn...',
+            context.l10n.friendLoadingRequests,
             style: TextStyle(
               fontSize: 14.sp,
               color: AppColors.textSecondary,
@@ -286,7 +296,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
             SizedBox(height: 16.h),
             Text(
-              'Có lỗi xảy ra',
+              context.l10n.commonErrorOccurred,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
@@ -295,7 +305,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             ),
             SizedBox(height: 8.h),
             Text(
-              message,
+              localizedFriendActionMessage(context.l10n, message),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
@@ -305,7 +315,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 context.read<FriendBloc>().add(const LoadFriendPage());
               },
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Thử lại'),
+              label: Text(context.l10n.commonRetry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.background,
@@ -346,7 +356,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         userId: request.senderId,
         name: request.displayName,
         mutualFriends: request.displayMutualFriends,
-        timeAgo: request.formattedTimeAgo,
+        timeAgo: localizedFriendTimeAgo(context.l10n, request.createdAt),
         avatarUrl: request.displayAvatarUrl,
         mutualFriendAvatars: request.mutualFriendAvatars,
         isAccepted: isAccepted,
@@ -398,7 +408,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   ),
                   SizedBox(height: 24.h),
                   Text(
-                    'Không có lời mời kết bạn nào',
+                    context.l10n.friendNoRequests,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
@@ -407,7 +417,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    'Khi có người gửi lời mời kết bạn,\nbạn sẽ thấy chúng ở đây',
+                    context.l10n.friendNoRequestsDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -452,7 +462,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
-                'Sắp xếp theo',
+                context.l10n.friendSortBy,
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -461,12 +471,20 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               ),
             ),
             SizedBox(height: 16.h),
-            _buildSortOption('Thời gian gần nhất', 'time', false),
-            _buildSortOption('Thời gian xa nhất', 'time', true),
-            _buildSortOption('Tên A-Z', 'name', true),
-            _buildSortOption('Tên Z-A', 'name', false),
-            _buildSortOption('Nhiều bạn chung nhất', 'mutualFriends', false),
-            _buildSortOption('Ít bạn chung nhất', 'mutualFriends', true),
+            _buildSortOption(context.l10n.friendSortNewest, 'time', false),
+            _buildSortOption(context.l10n.friendSortOldest, 'time', true),
+            _buildSortOption(context.l10n.friendSortNameAz, 'name', true),
+            _buildSortOption(context.l10n.friendSortNameZa, 'name', false),
+            _buildSortOption(
+              context.l10n.friendSortMostMutual,
+              'mutualFriends',
+              false,
+            ),
+            _buildSortOption(
+              context.l10n.friendSortLeastMutual,
+              'mutualFriends',
+              true,
+            ),
             SizedBox(height: 16.h),
           ],
         ),
@@ -542,7 +560,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 size: 24.r,
               ),
               title: Text(
-                'Xem lời mời kết bạn đã gửi',
+                context.l10n.friendViewSentRequests,
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w500,

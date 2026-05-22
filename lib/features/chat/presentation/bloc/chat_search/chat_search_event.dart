@@ -8,10 +8,7 @@ class LoadFriendSuggestions extends ChatSearchEvent {
   final int page;
   final int limit;
 
-  const LoadFriendSuggestions({
-    this.page = 1,
-    this.limit = 4,
-  });
+  const LoadFriendSuggestions({this.page = 1, this.limit = 4});
 }
 
 class SendFriendRequestFromSearch extends ChatSearchEvent {

@@ -11,6 +11,8 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 /// Community Post Header Base
 /// Đơn giản như PostHeader nhưng với navigation logic của CommunityPostHeader
@@ -34,14 +36,6 @@ class CommunityPostHeaderBase extends StatelessWidget {
     this.isSaved = false,
     this.communityUserRole,
   });
-
-  String _timeAgo(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    return '${diff.inDays} ngày trước';
-  }
 
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
@@ -99,7 +93,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
                 GestureDetector(
                   onTap: () => _navigateToProfile(context),
                   child: Text(
-                    user.fullName ?? "Người dùng",
+                    user.fullName ?? context.l10n.commonUser,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14.sp,
@@ -107,10 +101,11 @@ class CommunityPostHeaderBase extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  createdAt != null
-                      ? _timeAgo(createdAt!)
-                      : "Không rõ thời gian",
-                  style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
+                  localizedPostTime(context.l10n, createdAt),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -121,7 +116,8 @@ class CommunityPostHeaderBase extends StatelessWidget {
 
               final isOwner = currentUserId == user.userId;
               final isCommunityAdmin = communityUserRole == 'admin';
-              final canDelete = onOptionsTap != null &&
+              final canDelete =
+                  onOptionsTap != null &&
                   (isOwner || (isCommunityAdmin && !isOwner));
               final canSave = onSaveTap != null && !isOwner;
               final canReport =
@@ -157,7 +153,11 @@ class CommunityPostHeaderBase extends StatelessWidget {
                             color: AppColors.textSecondary,
                           ),
                           SizedBox(width: 8.w),
-                          Text(isSaved ? 'Bỏ lưu bài viết' : 'Lưu bài viết'),
+                          Text(
+                            isSaved
+                                ? context.l10n.postUnsave
+                                : context.l10n.postSave,
+                          ),
                         ],
                       ),
                     ),
@@ -172,7 +172,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
                             color: AppColors.textSecondary,
                           ),
                           SizedBox(width: 8.w),
-                          const Text('Báo cáo bài viết'),
+                          Text(context.l10n.postReport),
                         ],
                       ),
                     ),
@@ -187,9 +187,9 @@ class CommunityPostHeaderBase extends StatelessWidget {
                             color: Colors.red,
                           ),
                           SizedBox(width: 8.w),
-                          const Text(
-                            'Xóa bài viết',
-                            style: TextStyle(color: Colors.red),
+                          Text(
+                            context.l10n.postDeleteTitle,
+                            style: const TextStyle(color: Colors.red),
                           ),
                         ],
                       ),
@@ -220,8 +220,9 @@ class _StableCurrentUserBuilderState extends State<_StableCurrentUserBuilder> {
   @override
   void initState() {
     super.initState();
-    _currentUserIdFuture = TokenStorage.getUserData()
-        .then((userData) => userData?['id']?.toString());
+    _currentUserIdFuture = TokenStorage.getUserData().then(
+      (userData) => userData?['id']?.toString(),
+    );
   }
 
   @override

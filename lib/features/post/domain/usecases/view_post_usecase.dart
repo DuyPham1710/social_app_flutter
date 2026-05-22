@@ -19,4 +19,3 @@ class ViewPostParams {
 
   const ViewPostParams({required this.postId});
 }
-

@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_b
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileHeader extends StatelessWidget {
   final bool isGroup;
@@ -29,7 +30,7 @@ class ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isGroup) {
       // Group chat profile
-      final displayName = groupName ?? 'Group Chat';
+      final displayName = groupName ?? context.l10n.chatGroupChat;
       final displayAvatar = groupAvatar ?? 'https://i.pravatar.cc/200';
       final memberCount = participants?.length ?? 0;
       return Container(
@@ -71,7 +72,7 @@ class ProfileHeader extends StatelessWidget {
 
             // Số thành viên
             Text(
-              '$memberCount thành viên',
+              context.l10n.chatMembersCount(memberCount),
               style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
             ),
 
@@ -99,7 +100,7 @@ class ProfileHeader extends StatelessWidget {
                               Text(
                                 participant.fullName ??
                                     participant.username ??
-                                    'User',
+                                    context.l10n.commonUser,
                                 style: TextStyle(
                                   color: AppColors.textPrimary,
                                   fontSize: 13.sp,
@@ -113,7 +114,9 @@ class ProfileHeader extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(top: 4.h),
                       child: Text(
-                        'và ${participants!.length - 3} người khác',
+                        context.l10n.chatAndOtherMembers(
+                          participants!.length - 3,
+                        ),
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 12.sp,
@@ -141,7 +144,7 @@ class ProfileHeader extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: Text(
-                  "Xem thông tin nhóm",
+                  context.l10n.chatViewGroupInfo,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 13.sp,
@@ -172,7 +175,9 @@ class ProfileHeader extends StatelessWidget {
 
           // Tên hiển thị
           Text(
-            friendInfo?.fullName ?? friendInfo?.username ?? "Unknown User",
+            friendInfo?.fullName ??
+                friendInfo?.username ??
+                context.l10n.commonUnknown,
             style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 22.sp,
@@ -184,7 +189,7 @@ class ProfileHeader extends StatelessWidget {
           Text(
             friendInfo?.username != null
                 ? "@${friendInfo!.username}"
-                : "@unknown",
+                : "@${context.l10n.commonUnknown}",
             style: TextStyle(
               color: AppColors.textSecondary, // Màu xám nhạt
               fontSize: 12.sp,
@@ -195,7 +200,7 @@ class ProfileHeader extends StatelessWidget {
 
           // Dòng thông tin context (Bạn bè chung, v.v.)
           Text(
-            "Các bạn là bạn bè trên Facebook",
+            context.l10n.chatFriendsOnFacebook,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
           ),
           SizedBox(height: 4.h),
@@ -239,7 +244,7 @@ class ProfileHeader extends StatelessWidget {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: Text(
-                "Xem trang cá nhân",
+                context.l10n.chatViewProfile,
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 13.sp,
@@ -253,7 +258,10 @@ class ProfileHeader extends StatelessWidget {
 
           // Status footer
           Text(
-            "Bạn và ${friendInfo?.fullName?.split(' ').last ?? 'bạn này'} hiện đã là bạn bè.",
+            context.l10n.chatYouAndFriendAreFriends(
+              friendInfo?.fullName?.split(' ').last ??
+                  context.l10n.chatThisFriend,
+            ),
             style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
           ),
         ],

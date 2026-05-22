@@ -8,6 +8,7 @@ import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../comment/domain/usecases/listen_comment_count_usecase.dart';
 import '../../../comment/domain/usecases/load_comment_usecase.dart';
 import '../../../profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class MenuHeader extends StatelessWidget {
   final String name;
@@ -29,12 +30,12 @@ class MenuHeader extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            builder: (_) => BlocProvider(
+              create: (_) =>
+                  di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+              child: const ProfilePage(),
+            ),
           ),
-        ),
         );
       },
       child: Row(
@@ -54,7 +55,7 @@ class MenuHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Tạo trang cá nhân hoặc Trang mới',
+                  context.l10n.menuCreateProfileOrPage,
                   style: TextStyle(color: Colors.grey[600], fontSize: 13),
                 ),
               ],

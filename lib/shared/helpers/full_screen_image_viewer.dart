@@ -8,6 +8,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
@@ -77,7 +78,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
               ListTile(
                 leading: Icon(Icons.download, color: AppColors.textPrimary),
                 title: Text(
-                  'Lưu ảnh',
+                  context.l10n.storySavePhoto,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 16.sp,
@@ -117,14 +118,14 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
 
       if (!status.isGranted) {
         if (mounted) {
-          showInfoSnackBar(context, 'Cần quyền truy cập ảnh để lưu ảnh');
+          showInfoSnackBar(context, context.l10n.commonSavePhotoPermissionMessage);
         }
         return;
       }
 
       // Hiển thị loading
       if (mounted) {
-        showInfoSnackBar(context, 'Đang tải ảnh...');
+        showInfoSnackBar(context, context.l10n.messageDownloadingPhoto);
       }
 
       // Download ảnh
@@ -148,11 +149,11 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       }
 
       if (mounted) {
-        showSuccessSnackBar(context, 'Đã lưu ảnh vào thư viện');
+        showSuccessSnackBar(context, context.l10n.messageSavePhotoSuccess);
       }
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi khi lưu ảnh: $e');
+        showErrorSnackBar(context, context.l10n.messageSavePhotoError);
       }
     }
   }

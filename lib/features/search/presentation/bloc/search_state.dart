@@ -45,5 +45,3 @@ class SearchError extends SearchState {
 
   const SearchError({required this.message});
 }
-
-

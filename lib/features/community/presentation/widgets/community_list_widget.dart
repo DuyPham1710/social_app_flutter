@@ -1,10 +1,12 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_item_card.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 enum _CommunityFilter { all, publicOnly, privateOnly }
 
@@ -96,9 +98,9 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
               ),
               child: TextField(
                 controller: _searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Tìm cộng đồng...',
-                  prefixIcon: Icon(Icons.search_rounded, size: 18),
+                decoration: InputDecoration(
+                  hintText: context.l10n.communitySearchHint,
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 10),
@@ -123,29 +125,38 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                   _activeFilter = value;
                 });
               },
-              itemBuilder: (context) => const [
+              itemBuilder: (context) => [
                 PopupMenuItem(
                   value: _CommunityFilter.all,
                   height: 34,
                   child: Text(
-                    'Tất cả',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    context.l10n.commonAll,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _CommunityFilter.publicOnly,
                   height: 34,
                   child: Text(
-                    'Công khai',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    context.l10n.communityPublicOnly,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _CommunityFilter.privateOnly,
                   height: 34,
                   child: Text(
-                    'Riêng tư',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    context.l10n.communityPrivateOnly,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -235,8 +246,8 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                           const SizedBox(height: 12),
                           Text(
                             state.searchQuery != null
-                                ? 'Không tìm thấy cộng đồng phù hợp'
-                                : 'Chưa có cộng đồng nào',
+                                ? context.l10n.communityNoSearchResults
+                                : context.l10n.communityEmpty,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.grey[700],
@@ -273,7 +284,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 28),
               child: Text(
-                state.message,
+                localizedCommunityMessage(context.l10n, state.message),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Color(0xFFB42318)),
               ),

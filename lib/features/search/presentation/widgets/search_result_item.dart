@@ -19,6 +19,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:social_app_fe/features/search/domain/repository/search_repository.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SearchResultItem extends StatelessWidget {
   final UserEntity user;
@@ -105,7 +106,11 @@ class SearchResultItem extends StatelessWidget {
                   ? NetworkImage(user.avatarUrl!)
                   : null,
               child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-                  ? Icon(Icons.person, size: 32.r, color: AppColors.textSecondary)
+                  ? Icon(
+                      Icons.person,
+                      size: 32.r,
+                      color: AppColors.textSecondary,
+                    )
                   : null,
             ),
             SizedBox(width: 12.w),
@@ -115,7 +120,7 @@ class SearchResultItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.fullName ?? user.username ?? 'Người dùng',
+                    user.fullName ?? user.username ?? context.l10n.commonUser,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,
@@ -136,7 +141,11 @@ class SearchResultItem extends StatelessWidget {
               ),
             ),
             // Icon mũi tên
-            Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 24.r),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+              size: 24.r,
+            ),
           ],
         ),
       ),

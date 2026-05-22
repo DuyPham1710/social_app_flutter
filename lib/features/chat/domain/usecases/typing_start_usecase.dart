@@ -5,14 +5,10 @@ class TypingStartUseCase {
 
   TypingStartUseCase(this._chatRepository);
 
-  void call({
-    required String userId,
-    required String conversationId,
-  }) {
+  void call({required String userId, required String conversationId}) {
     _chatRepository.emitTypingStart(
       userId: userId,
       conversationId: conversationId,
     );
   }
 }
-

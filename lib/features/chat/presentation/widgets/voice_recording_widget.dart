@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/voice_effect_bottom_sheet.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -132,7 +133,10 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
         }
       } else {
         if (mounted) {
-          showErrorSnackBar(context, 'Không có quyền truy cập microphone');
+          showErrorSnackBar(
+            context,
+            context.l10n.chatMicrophonePermissionDenied,
+          );
 
           widget.onCancel();
         }
@@ -140,7 +144,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
     } catch (e) {
       print('Error starting recording: $e');
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi khi bắt đầu ghi âm');
+        showErrorSnackBar(context, context.l10n.chatStartRecordingFailed);
         widget.onCancel();
       }
     }
@@ -458,7 +462,7 @@ class _VoiceRecordingWidgetState extends State<VoiceRecordingWidget>
                       ),
                       SizedBox(width: 6.w),
                       Text(
-                        'Chỉnh sửa',
+                        context.l10n.commonEdit,
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 14.sp,

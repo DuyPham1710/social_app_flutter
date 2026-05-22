@@ -69,7 +69,10 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
                         ),
                         Text(
                           '@${data['full_name']}',
-                          style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -111,16 +114,15 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
         );
       }
 
-      // --- BƯỚC QUAN TRỌNG NHẤT ĐỂ FIX CRASH ---
-      // 2. Thêm thủ công dấu '@' để thư viện có cái mà replace
+      // Thêm thủ công dấu '@' để thư viện có cái mà replace
       controller.text += '@';
 
-      // 3. Cập nhật con trỏ về ngay sau dấu '@'
+      // Cập nhật con trỏ về ngay sau dấu '@'
       controller.selection = TextSelection.fromPosition(
         TextPosition(offset: controller.text.length),
       );
 
-      // 4. Gọi addMention (Thư viện sẽ tìm dấu '@' trước con trỏ và thay thế nó)
+      // Gọi addMention (Thư viện sẽ tìm dấu '@' trước con trỏ và thay thế nó)
       state.addMention({
         'id': match.group(2) ?? '', // ID
         'display': match.group(1) ?? '', // Name
@@ -131,7 +133,6 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
       lastIndex = match.end;
     }
 
-    // 5. Thêm nốt phần text còn lại sau mention cuối cùng
     if (lastIndex < widget.initialMarkup!.length) {
       controller.text += widget.initialMarkup!.substring(lastIndex);
     }

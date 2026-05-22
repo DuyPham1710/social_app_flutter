@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SearchHistoryPage extends StatelessWidget {
   const SearchHistoryPage({super.key});
@@ -60,7 +61,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
                   // Title
                   Expanded(
                     child: Text(
-                      'Lịch sử',
+                      context.l10n.searchHistory,
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.w700,
@@ -88,7 +89,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
                           _showClearAllDialog(context, searchBloc);
                         },
                         child: Text(
-                          'Xóa tất cả',
+                          context.l10n.searchClearAll,
                           style: TextStyle(
                             fontSize: 14.sp,
                             color: AppColors.primary,
@@ -154,7 +155,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'Chưa có lịch sử tìm kiếm',
+            context.l10n.searchNoHistory,
             style: TextStyle(
               fontSize: 16.sp,
               color: AppColors.textSecondary,
@@ -172,7 +173,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.background,
         title: Text(
-          'Xóa tất cả lịch sử',
+          context.l10n.searchClearAllHistoryTitle,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
@@ -180,14 +181,14 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
           ),
         ),
         content: Text(
-          'Bạn có chắc chắn muốn xóa tất cả lịch sử tìm kiếm?',
+          context.l10n.searchClearAllHistoryConfirmShort,
           style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Hủy',
+              context.l10n.commonCancel,
               style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
           ),
@@ -198,7 +199,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
               searchBloc.add(const ClearAllSearchHistory());
             },
             child: Text(
-              'Xóa',
+              context.l10n.commonDelete,
               style: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.red,

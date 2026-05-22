@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityCreatePostWidget extends StatelessWidget {
   final String? avatarUrl;
@@ -55,15 +56,18 @@ class CommunityCreatePostWidget extends StatelessWidget {
             child: GestureDetector(
               onTap: onCreatePost,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0F2F5),
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(color: const Color(0xFFDADDE1)),
                 ),
-                child: const Text(
-                  'Viết bài trong nhóm...',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.communityWritePostHint,
+                  style: const TextStyle(
                     color: Color(0xFF65676B),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

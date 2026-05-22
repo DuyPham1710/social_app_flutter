@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/restart_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import '../bloc/menu_bloc.dart';
 import '../bloc/menu_event.dart';
 
@@ -17,17 +18,17 @@ class MenuFooter extends StatelessWidget {
         const Divider(),
         ListTile(
           leading: const Icon(Icons.help_outline),
-          title: const Text('Trợ giúp và hỗ trợ'),
+          title: Text(context.l10n.menuHelpSupport),
           onTap: () {},
         ),
         ListTile(
           leading: const Icon(Icons.settings),
-          title: const Text('Cài đặt và quyền riêng tư'),
+          title: Text(context.l10n.menuSettingsPrivacy),
           onTap: () {},
         ),
         ListTile(
           leading: const Icon(Icons.logout, color: Colors.red),
-          title: const Text('Đăng xuất'),
+          title: Text(context.l10n.menuLogout),
           onTap: () {
             showDialog(
               context: context,
@@ -35,7 +36,7 @@ class MenuFooter extends StatelessWidget {
                 return AlertDialog(
                   backgroundColor: AppColors.background,
                   title: Text(
-                    "Đăng xuất khỏi tài khoản của bạn?",
+                    context.l10n.menuLogoutDialogTitle,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 18.sp,
@@ -47,7 +48,7 @@ class MenuFooter extends StatelessWidget {
                         Navigator.pop(context); // đóng dialog
                       },
                       child: Text(
-                        "Hủy",
+                        context.l10n.commonCancel,
                         style: TextStyle(color: AppColors.textPrimary),
                       ),
                     ),
@@ -71,9 +72,9 @@ class MenuFooter extends StatelessWidget {
                           (route) => false,
                         );
                       },
-                      child: const Text(
-                        "Đăng xuất",
-                        style: TextStyle(color: Colors.red),
+                      child: Text(
+                        context.l10n.menuLogout,
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   ],

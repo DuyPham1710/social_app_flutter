@@ -36,6 +36,7 @@ import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostEntity post;
@@ -183,13 +184,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
       if (mounted) {
         if (result is DataStateSuccess) {
-          showSuccessSnackBar(context, 'Đã cập nhật thẻ thành công');
+          showSuccessSnackBar(context, context.l10n.postTagUpdated);
 
           setState(() {});
         } else {
           showErrorSnackBar(
             context,
-            'Cập nhật thẻ thất bại: ${result.error?.message}',
+            context.l10n.postTagUpdateFailedWithMessage(
+              result.error?.message ?? context.l10n.postTagUpdateFailed,
+            ),
           );
         }
       }
@@ -319,7 +322,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           _isSaved = false;
           _savedId = null;
         });
-        showSuccessSnackBar(context, 'Đã bỏ lưu bài viết');
+        showSuccessSnackBar(context, context.l10n.postUnsaveSuccess);
       }
     }
   }
@@ -401,7 +404,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ),
                           Expanded(
                             child: Text(
-                              post.user.fullName ?? 'Unknown',
+                              post.user.fullName ?? context.l10n.commonUnknown,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: AppColors.textPrimary,

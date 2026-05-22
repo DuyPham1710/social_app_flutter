@@ -7,10 +7,12 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_event.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_state.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class EditCommunityPage extends StatefulWidget {
   final CommunityModel initialCommunity;
@@ -61,7 +63,10 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
         });
       }
     } catch (e) {
-      showErrorSnackBar(context, 'Lỗi chọn ảnh: ${e.toString()}');
+      showErrorSnackBar(
+        context,
+        context.l10n.communityPickImageError(e.toString()),
+      );
     }
   }
 
@@ -75,7 +80,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Chụp ảnh'),
+              title: Text(context.l10n.postCamera),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera, isAvatar: isAvatar);
@@ -83,7 +88,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
             ),
             ListTile(
               leading: const Icon(Icons.image),
-              title: const Text('Chọn từ thư viện'),
+              title: Text(context.l10n.communityChooseFromLibrary),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery, isAvatar: isAvatar);
@@ -102,22 +107,28 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
       child: BlocListener<CommunityCreateBloc, CommunityCreateState>(
         listener: (context, state) {
           if (state is CommunityCreateSuccess) {
-            showSuccessSnackBar(context, state.message);
+            showSuccessSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
             Future.delayed(const Duration(seconds: 1), () {
               if (mounted) {
                 Navigator.of(context).pop(state.community);
               }
             });
           } else if (state is CommunityCreateError) {
-            showErrorSnackBar(context, state.message);
+            showErrorSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           }
         },
         child: Scaffold(
           backgroundColor: const Color(0xFFF4F7FB),
           appBar: AppBar(
-            title: const Text(
-              'Chỉnh sửa cộng đồng',
-              style: TextStyle(fontWeight: FontWeight.w700),
+            title: Text(
+              context.l10n.communityEditTitle,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             backgroundColor: const Color(0xFFF4F7FB),
             elevation: 0,
@@ -141,14 +152,17 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                           end: Alignment.bottomRight,
                         ),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.groups_2_rounded, color: Colors.white),
-                          SizedBox(width: 10),
+                          const Icon(
+                            Icons.groups_2_rounded,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Chỉnh sửa thông tin nhóm',
-                              style: TextStyle(
+                              context.l10n.communityEditIntro,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -159,9 +173,9 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                     ),
                     const SizedBox(height: 18),
                     // Avatar Section
-                    const Text(
-                      'Ảnh đại diện',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    Text(
+                      context.l10n.communityAvatar,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
@@ -205,7 +219,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Chọn ảnh đại diện',
+                                      context.l10n.communityChooseAvatar,
                                       style: TextStyle(color: Colors.grey[700]),
                                     ),
                                   ],
@@ -216,9 +230,9 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                     const SizedBox(height: 24),
 
                     // Cover Image Section
-                    const Text(
-                      'Ảnh bìa',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    Text(
+                      context.l10n.communityCoverImage,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
@@ -262,7 +276,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Chọn ảnh bìa',
+                                      context.l10n.communityChooseCover,
                                       style: TextStyle(color: Colors.grey[700]),
                                     ),
                                   ],
@@ -273,15 +287,15 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                     const SizedBox(height: 24),
 
                     // Name Field
-                    const Text(
-                      'Tên cộng đồng',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    Text(
+                      context.l10n.communityName,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        hintText: 'Nhập tên cộng đồng',
+                        hintText: context.l10n.communityNameHint,
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -298,16 +312,16 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                     const SizedBox(height: 16),
 
                     // Description Field
-                    const Text(
-                      'Mô tả',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    Text(
+                      context.l10n.communityDescription,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _descriptionController,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        hintText: 'Nhập mô tả về cộng đồng',
+                        hintText: context.l10n.communityDescriptionHint,
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -324,9 +338,9 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                     const SizedBox(height: 16),
 
                     // Privacy Dropdown
-                    const Text(
-                      'Kiểu cộng đồng',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    Text(
+                      context.l10n.communityType,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
@@ -338,7 +352,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                             children: [
                               const Icon(Icons.public, size: 20),
                               const SizedBox(width: 8),
-                              const Text('Công khai (Public)'),
+                              Text(context.l10n.communityPublic),
                             ],
                           ),
                         ),
@@ -348,7 +362,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                             children: [
                               const Icon(Icons.lock, size: 20),
                               const SizedBox(width: 8),
-                              const Text('Riêng tư (Private)'),
+                              Text(context.l10n.communityPrivate),
                             ],
                           ),
                         ),
@@ -384,7 +398,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                                 if (_nameController.text.isEmpty) {
                                   showErrorSnackBar(
                                     context,
-                                    'Vui lòng nhập tên cộng đồng',
+                                    context.l10n.communityNameRequired,
                                   );
                                   return;
                                 }
@@ -421,9 +435,9 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                                   ),
                                 ),
                               )
-                            : const Text(
-                                'Lưu thay đổi',
-                                style: TextStyle(
+                            : Text(
+                                context.l10n.commonSaveChanges,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

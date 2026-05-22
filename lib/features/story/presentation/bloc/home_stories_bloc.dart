@@ -51,10 +51,7 @@ class HomeStoriesBloc extends Bloc<HomeStoriesEvent, HomeStoriesState> {
     Emitter<HomeStoriesState> emit,
   ) async {
     final dataState = await createOrUpdateReactStoryUsecase(
-      params: ReactStoryParams(
-        storyId: event.storyId,
-        emojiId: event.emojiId,
-      ),
+      params: ReactStoryParams(storyId: event.storyId, emojiId: event.emojiId),
     );
     // dataState.data có thể null khi xóa react (toggle off), nhưng vẫn là thành công
     // Kiểm tra error để biết có lỗi không
@@ -75,10 +72,7 @@ class HomeStoriesBloc extends Bloc<HomeStoriesEvent, HomeStoriesState> {
       params: GetStoryReactsParams(storyId: event.storyId),
     );
     if (dataState.data != null) {
-      emit(StoryReactsLoaded(
-        storyId: event.storyId,
-        reacts: dataState.data!,
-      ));
+      emit(StoryReactsLoaded(storyId: event.storyId, reacts: dataState.data!));
     } else {
       emit(HomeStoriesError("Không thể tải reacts của story"));
     }
@@ -92,10 +86,12 @@ class HomeStoriesBloc extends Bloc<HomeStoriesEvent, HomeStoriesState> {
       params: CheckUserReactStoryParams(storyId: event.storyId),
     );
     if (dataState.data != null) {
-      emit(UserReactStoryChecked(
-        storyId: event.storyId,
-        userReact: dataState.data,
-      ));
+      emit(
+        UserReactStoryChecked(
+          storyId: event.storyId,
+          userReact: dataState.data,
+        ),
+      );
     } else {
       emit(HomeStoriesError("Không thể kiểm tra react của user"));
     }
@@ -106,10 +102,7 @@ class HomeStoriesBloc extends Bloc<HomeStoriesEvent, HomeStoriesState> {
     Emitter<HomeStoriesState> emit,
   ) async {
     final dataState = await updateReactStoryUsecase(
-      params: ReactStoryParams(
-        storyId: event.storyId,
-        emojiId: event.emojiId,
-      ),
+      params: ReactStoryParams(storyId: event.storyId, emojiId: event.emojiId),
     );
     if (dataState.data != null) {
       emit(ReactStorySuccess(event.storyId));

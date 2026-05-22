@@ -13,6 +13,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/po
 import 'package:social_app_fe/features/story/presentation/widgets/home_stories_widget.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -135,7 +136,7 @@ class HomePageState extends State<HomePage> {
                                 ),
                                 SizedBox(height: 8),
                                 Text(
-                                  "Đang kết nối...",
+                                  context.l10n.homeConnecting,
                                   style: TextStyle(
                                     color: AppColors.textSecondary,
                                     fontSize: 12,
@@ -153,7 +154,8 @@ class HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(16.0),
                           child: Center(
                             child: Text(
-                              state.errorMessage ?? "Không thể tải bài viết",
+                              state.errorMessage ??
+                                  context.l10n.homeLoadPostsFailed,
                               style: const TextStyle(color: Colors.red),
                             ),
                           ),
@@ -192,7 +194,7 @@ class HomePageState extends State<HomePage> {
                             padding: EdgeInsets.symmetric(vertical: 16.h),
                             child: Center(
                               child: Text(
-                                "Đã hiển thị hết bài viết",
+                                context.l10n.homeEndOfPosts,
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
                                   fontSize: 14.sp,

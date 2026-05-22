@@ -22,5 +22,3 @@ class StoryCreateError extends StoryCreateState {
   @override
   List<Object?> get props => [message];
 }
-
-

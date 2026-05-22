@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/profile/presentation/widgets/editable_ima
 import 'package:social_app_fe/features/profile/presentation/widgets/editable_text_row.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_detail_info_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/section_header.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class ProfileEditPage extends StatefulWidget {
@@ -47,6 +48,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
+        final l10n = context.l10n;
         return Padding(
           padding: EdgeInsets.only(
             left: 16,
@@ -98,7 +100,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ),
                   filled: true,
                   fillColor: AppColors.secondBackground,
-                  hintText: "Nhập $title...",
+                  hintText: l10n.profileEnterField(title),
                   hintStyle: TextStyle(color: AppColors.textSecondary),
                   counterStyle: TextStyle(color: AppColors.textSecondary),
                 ),
@@ -119,9 +121,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     onSave(controller.text.trim());
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    "Lưu",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    l10n.commonSave,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -163,6 +168,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // BlocListener để lắng nghe kết quả Update (Thành công/Thất bại)
     return BlocListener<ProfileBloc, ProfileState>(
       // Lắng nghe trạng thái cập nhật (updateSuccess)
@@ -173,7 +179,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             Navigator.pop(context);
             // Trang ProfilePage cha sẽ tự động tải lại dữ liệu (như đã thiết lập ở file trước)
           } else if (state.updateError != null) {
-            showErrorSnackBar(context, 'Cập nhật thất bại');
+            showErrorSnackBar(context, context.l10n.profileUpdateFailed);
           }
         }
       },
@@ -184,7 +190,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text("Chỉnh sửa trang cá nhân"),
+          title: Text(l10n.profileEditProfileTitle),
           centerTitle: true,
         ),
         body: ListView(
@@ -194,10 +200,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
             // --- TÊN NGƯỜI DÙNG ---
             SectionHeader(
-              title: "Tên người dùng",
+              title: l10n.profileUsername,
               onEditTap: () => _showEditBottomSheet(
                 context: context,
-                title: "Chỉnh sửa tên",
+                title: l10n.profileEditName,
                 initialValue: widget.user?.fullName,
                 maxLength: 50,
                 onSave: (newName) {
@@ -211,12 +217,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 },
               ),
             ),
-            EditableTextRow(text: widget.user?.fullName ?? "Người dùng"),
+            EditableTextRow(text: widget.user?.fullName ?? l10n.commonUser),
             const SizedBox(height: 24),
 
             // --- ẢNH ĐẠI DIỆN ---
             SectionHeader(
-              title: "Ảnh đại diện",
+              title: l10n.profileAvatar,
               onEditTap: () => _navigateToImagePicker(true), // isAvatar = true
             ),
             const SizedBox(height: 8),
@@ -236,7 +242,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
             // --- ẢNH BÌA ---
             SectionHeader(
-              title: "Ảnh bìa",
+              title: l10n.profileCover,
               onEditTap: () =>
                   _navigateToImagePicker(false), // isAvatar = false
             ),
@@ -255,10 +261,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
             // --- TIỂU SỬ ---
             SectionHeader(
-              title: "Tiểu sử",
+              title: l10n.profileBio,
               onEditTap: () => _showEditBottomSheet(
                 context: context,
-                title: "Chỉnh sửa tiểu sử",
+                title: l10n.profileEditBio,
                 initialValue: widget.user?.bio,
                 maxLines: 3,
                 maxLength: 100,
@@ -269,13 +275,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 },
               ),
             ),
-            EditableTextRow(text: widget.user?.bio ?? "Chưa có tiểu sử"),
+            EditableTextRow(
+              text: widget.user?.bio ?? l10n.profileNoBioPlaceholder,
+            ),
 
             const SizedBox(height: 24),
 
             // --- CHI TIẾT ---
             SectionHeader(
-              title: "Chi tiết",
+              title: l10n.profileDetails,
               onEditTap: _navigateToDetailEdit, // Mở trang sửa chi tiết
             ),
             ProfileDetailInfoWidget(user: widget.user),

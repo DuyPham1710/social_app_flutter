@@ -84,9 +84,7 @@ abstract class PostRepository {
   });
 
   /// Gỡ gắn thẻ
-  Future<DataState<void>> removeTag({
-    required String postId,
-  });
+  Future<DataState<void>> removeTag({required String postId});
 
   /// Cập nhật danh sách gắn thẻ của bài viết
   Future<DataState<void>> updatePostTags({

@@ -13,6 +13,7 @@ import 'dart:ui';
 
 import 'package:social_app_fe/features/comment/presentation/widgets/mention_editable_field.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friends_usecase.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommentReactionMenu {
@@ -106,7 +107,7 @@ class CommentReactionMenu {
                       SizedBox(height: 12.h),
 
                       // Hiển thị lại comment
-                      _buildCommentBubble(comment),
+                      _buildCommentBubble(context, comment),
 
                       SizedBox(height: 12.h),
 
@@ -167,7 +168,10 @@ class CommentReactionMenu {
     );
   }
 
-  static Widget _buildCommentBubble(CommentEntity comment) {
+  static Widget _buildCommentBubble(
+    BuildContext context,
+    CommentEntity comment,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
       decoration: BoxDecoration(
@@ -179,7 +183,7 @@ class CommentReactionMenu {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            comment.user.fullName ?? 'Unknown',
+            comment.user.fullName ?? context.l10n.commonUnknown,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 13.sp,
@@ -239,12 +243,14 @@ class CommentReactionMenu {
         children: [
           _menuItem(
             Icons.reply,
-            'Trả lời',
+            context.l10n.commentReply,
             onTap: () {
               hide();
               if (onReply != null) {
                 final userName =
-                    comment.user.fullName ?? comment.user.username ?? 'Unknown';
+                    comment.user.fullName ??
+                    comment.user.username ??
+                    context.l10n.commonUnknown;
 
                 if (comment.parentId != null) {
                   // Nếu đã là reply thì trả về parentId gốc
@@ -271,7 +277,7 @@ class CommentReactionMenu {
           if (currentUserId != null && comment.user.userId == currentUserId)
             _menuItem(
               Icons.edit,
-              'Chỉnh sửa',
+              context.l10n.commonEdit,
               onTap: () async {
                 hide(); // Ẩn menu reaction
 
@@ -285,7 +291,7 @@ class CommentReactionMenu {
                 showDialog(
                   context: context,
                   builder: (context) {
-                    // 🔥 QUAN TRỌNG: Bọc Portal ở đây để sửa lỗi màn hình đỏ
+                    //  QUAN TRỌNG: Bọc Portal ở đây để sửa lỗi màn hình đỏ
                     return Portal(
                       child: AlertDialog(
                         backgroundColor: AppColors.background,
@@ -293,7 +299,7 @@ class CommentReactionMenu {
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         title: Text(
-                          'Chỉnh sửa bình luận',
+                          context.l10n.commentEditTitle,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -314,7 +320,7 @@ class CommentReactionMenu {
                             mentionKey: mentionKey,
                             suggestionList: suggestionList,
                             initialMarkup: comment.content,
-                            hintText: 'Nhập nội dung mới...',
+                            hintText: context.l10n.commentEditHint,
                           ),
                         ),
 
@@ -322,7 +328,7 @@ class CommentReactionMenu {
                           TextButton(
                             onPressed: () => Navigator.pop(context),
                             child: Text(
-                              'Hủy',
+                              context.l10n.commonCancel,
                               style: TextStyle(color: AppColors.textSecondary),
                             ),
                           ),
@@ -348,7 +354,7 @@ class CommentReactionMenu {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              'Cập nhật',
+                              context.l10n.commonUpdate,
                               style: TextStyle(
                                 color: AppColors.background,
                                 fontWeight: FontWeight.bold,
@@ -366,7 +372,7 @@ class CommentReactionMenu {
           if (currentUserId != null && comment.user.userId == currentUserId)
             _menuItem(
               Icons.delete,
-              'Xóa',
+              context.l10n.commonDelete,
               color: Colors.red,
               onTap: () {
                 hide();
@@ -374,11 +380,11 @@ class CommentReactionMenu {
                   context: context,
                   builder: (dialogContext) => CupertinoAlertDialog(
                     title: Text(
-                      'Xóa bình luận',
+                      context.l10n.commentDeleteTitle,
                       style: TextStyle(color: AppColors.textPrimary),
                     ),
                     content: Text(
-                      'Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?',
+                      context.l10n.commentDeleteConfirm,
                       style: TextStyle(color: AppColors.textPrimary),
                     ),
                     actions: [
@@ -388,7 +394,7 @@ class CommentReactionMenu {
                           Navigator.of(dialogContext).pop(); // đóng dialog
                         },
                         child: Text(
-                          'Hủy',
+                          context.l10n.commonCancel,
                           style: TextStyle(color: AppColors.primary),
                         ),
                       ),
@@ -398,9 +404,9 @@ class CommentReactionMenu {
                           onDeleteComment?.call(comment.id, comment.postId);
                           Navigator.of(dialogContext).pop(); // đóng dialog
                         },
-                        child: const Text(
-                          'Xóa',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        child: Text(
+                          context.l10n.commonDelete,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -413,16 +419,16 @@ class CommentReactionMenu {
           if (currentUserId != null && comment.user.userId == currentUserId)
             _menuItem(
               Icons.visibility,
-              'Xem lịch sử chỉnh sửa',
+              context.l10n.commentViewEditHistory,
               onTap: () {
                 hide();
                 onViewHistory?.call(comment.id, comment.content);
               },
             ),
-          _menuItem(Icons.share, 'Chia sẻ bình luận'),
+          _menuItem(Icons.share, context.l10n.commentShare),
           _menuItem(
             Icons.copy,
-            'Sao chép',
+            context.l10n.commonCopy,
             onTap: () {
               // 1. Dùng Regex để biến đổi @[Name](ID) thành @Name
               final String cleanText = comment.content.replaceAllMapped(
@@ -437,7 +443,7 @@ class CommentReactionMenu {
               hide();
 
               // (Tùy chọn) Hiển thị thông báo đã sao chép
-              showSuccessSnackBar(context, 'Đã sao chép nội dung');
+              showSuccessSnackBar(context, context.l10n.commonContentCopied);
             },
           ),
         ],

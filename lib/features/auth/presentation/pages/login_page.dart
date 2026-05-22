@@ -9,6 +9,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
@@ -73,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
             await FcmService().updateFcmToken();
             Navigator.pushReplacementNamed(context, '/main');
           } else if (state is AuthError && state.flowType == 'login') {
-            final errorMsg = state.errorMessage ?? 'Đăng nhập thất bại';
+            final errorMsg = state.errorMessage ?? context.l10n.authLoginFailed;
             UIUtils.showErrorMessage(context, errorMsg);
           }
         },
@@ -102,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Đăng nhập",
+                        context.l10n.authLogin,
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
@@ -114,13 +115,13 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 20.h),
 
                     TextformfieldCustom(
-                      label: 'Email',
+                      label: context.l10n.authEmail,
                       isPassword: false,
                       controller: _emailController,
                       focusNode: emailFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập email';
+                          return context.l10n.authEnterEmail;
                         }
                         return null;
                       },
@@ -129,13 +130,13 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 20.h),
 
                     TextformfieldCustom(
-                      label: 'Mật khẩu',
+                      label: context.l10n.authPassword,
                       isPassword: _isPasswordVisible,
                       controller: _passwordController,
                       focusNode: passwordFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập mật khẩu';
+                          return context.l10n.authEnterPassword;
                         }
                         return null;
                       },
@@ -164,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushNamed(context, '/forgot-password');
                         },
                         child: Text(
-                          "Quên mật khẩu?",
+                          context.l10n.authForgotPasswordQuestion,
                           style: TextStyle(
                             fontSize: 14.sp,
                             color: AppColors.primary,
@@ -185,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12.h),
                           child: Text(
-                            "hoặc",
+                            context.l10n.authOr,
                             style: TextStyle(
                               color: AppColors.textPrimary,
                               fontWeight: FontWeight.w600,
@@ -222,7 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           SizedBox(width: 12.w),
                           Text(
-                            "Đăng nhập với Google",
+                            context.l10n.authLoginWithGoogle,
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w500,
@@ -239,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                         ? CircularProgressIndicator(color: AppColors.primary)
                         : ButtonCustom(
                             onPressed: () => _onLoginPressed(context),
-                            text: "Đăng nhập",
+                            text: context.l10n.authLogin,
                           ),
 
                     SizedBox(height: 24.h),
@@ -248,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Bạn chưa có tài khoản? ",
+                          context.l10n.authNoAccount,
                           style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 14.sp,
@@ -260,7 +261,7 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.pushNamed(context, '/signup');
                           },
                           child: Text(
-                            "Đăng ký",
+                            context.l10n.authRegister,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14.sp,

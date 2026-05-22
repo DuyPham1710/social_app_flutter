@@ -23,16 +23,11 @@ abstract class SearchRemoteDataSource {
   );
 
   @GET('/user/search/history')
-  Future<List<SearchHistoryModel>> getSearchHistory(
-    @Query('limit') int limit,
-  );
+  Future<List<SearchHistoryModel>> getSearchHistory(@Query('limit') int limit);
 
   @DELETE('/user/search/history/{id}')
-  Future<Map<String, dynamic>> deleteSearchHistory(
-    @Path('id') String id,
-  );
+  Future<Map<String, dynamic>> deleteSearchHistory(@Path('id') String id);
 
   @DELETE('/user/search/history/clear')
   Future<Map<String, dynamic>> clearAllSearchHistory();
 }
-

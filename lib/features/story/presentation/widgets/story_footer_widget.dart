@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryFooterWidget extends StatelessWidget {
   final TextEditingController textController;
@@ -57,10 +58,10 @@ class StoryFooterWidget extends StatelessWidget {
                   child: TextField(
                     controller: textController,
                     style: TextStyle(fontSize: 14.sp, color: Colors.white),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'Send message...',
-                      hintStyle: TextStyle(
+                      hintText: context.l10n.chatMessageHint,
+                      hintStyle: const TextStyle(
                         color: Colors.white60,
                       ), // Màu xám nhạt
                     ),

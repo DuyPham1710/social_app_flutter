@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileTabs extends StatefulWidget {
   const ProfileTabs({super.key});
@@ -8,7 +9,8 @@ class ProfileTabs extends StatefulWidget {
   State<ProfileTabs> createState() => _ProfileTabsState();
 }
 
-class _ProfileTabsState extends State<ProfileTabs> with TickerProviderStateMixin {
+class _ProfileTabsState extends State<ProfileTabs>
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -27,20 +29,20 @@ class _ProfileTabsState extends State<ProfileTabs> with TickerProviderStateMixin
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
 
-          tabs: const [
-            Tab(text: 'Bài viết'),
-            Tab(text: 'Ảnh'),
-            Tab(text: 'Reels'),
+          tabs: [
+            Tab(text: context.l10n.profilePostsTab),
+            Tab(text: context.l10n.profilePhotosTab),
+            Tab(text: context.l10n.profileReelsTab),
           ],
         ),
         SizedBox(
           height: 400, // placeholder chiều cao vùng nội dung
           child: TabBarView(
             controller: _tabController,
-            children: const [
-              Center(child: Text('Danh sách bài viết')),
-              Center(child: Text('Ảnh của bạn')),
-              Center(child: Text('Reels của bạn')),
+            children: [
+              Center(child: Text(context.l10n.profilePostsList)),
+              Center(child: Text(context.l10n.profileYourPhotos)),
+              Center(child: Text(context.l10n.profileYourReels)),
             ],
           ),
         ),

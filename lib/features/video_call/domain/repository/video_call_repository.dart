@@ -3,7 +3,9 @@ import 'package:social_app_fe/features/video_call/domain/entities/video_call_ent
 
 abstract class VideoCallRepository {
   void connect(String userId, String username);
-  Future<void> waitForConnection({Duration timeout = const Duration(seconds: 10)});
+  Future<void> waitForConnection({
+    Duration timeout = const Duration(seconds: 10),
+  });
 
   Future<CallResponseEntity> createCall({
     required String userId,

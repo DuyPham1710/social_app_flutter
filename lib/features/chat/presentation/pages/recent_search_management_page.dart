@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/data/services/recent_search_service.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class RecentSearchManagementPage extends StatefulWidget {
   const RecentSearchManagementPage({super.key});
@@ -40,18 +41,9 @@ class _RecentSearchManagementPageState
     }
   }
 
-  Future<void> _removeRecentSearch(String userId, String name) async {
+  Future<void> _removeRecentSearch(String userId) async {
     await _recentSearchService.removeRecentSearch(userId);
     await _loadRecentSearches();
-
-    // if (mounted) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text('Đã xóa $name khỏi lịch sử tìm kiếm'),
-    //       duration: const Duration(seconds: 2),
-    //     ),
-    //   );
-    // }
   }
 
   Future<void> _clearAllRecentSearches() async {
@@ -61,24 +53,25 @@ class _RecentSearchManagementPageState
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
         title: Text(
-          'Xóa tất cả lịch sử tìm kiếm',
+          context.l10n.searchClearAllHistoryTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
-        content: const Text(
-          'Bạn có chắc chắn muốn xóa tất cả lịch sử tìm kiếm? Hành động này không thể hoàn tác.',
-        ),
+        content: Text(context.l10n.searchClearAllHistoryConfirm),
         actions: [
           TextButton(
-            child: Text('Hủy', style: TextStyle(color: AppColors.textPrimary)),
+            child: Text(
+              context.l10n.commonCancel,
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
             onPressed: () => Navigator.pop(context, false),
           ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Xóa tất cả'),
+            child: Text(context.l10n.searchClearAll),
             onPressed: () => Navigator.pop(context, true),
           ),
         ],
@@ -88,15 +81,6 @@ class _RecentSearchManagementPageState
     if (shouldClear == true) {
       await _recentSearchService.clearRecentSearches();
       await _loadRecentSearches();
-
-      // if (mounted) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(
-      //       content: Text('Đã xóa tất cả lịch sử tìm kiếm'),
-      //       duration: Duration(seconds: 2),
-      //     ),
-      //   );
-      // }
     }
   }
 
@@ -113,7 +97,7 @@ class _RecentSearchManagementPageState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Chỉnh sửa lịch sử tìm kiếm',
+          context.l10n.searchEditHistory,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18.sp,
@@ -128,7 +112,7 @@ class _RecentSearchManagementPageState
             width: double.infinity,
             padding: EdgeInsets.all(16.w),
             child: Text(
-              'Các chi tiết thay đổi sẽ chỉ áp dụng cho danh sách tìm kiếm gần đây, thuộc phần lịch sử trên thiết bị này.',
+              context.l10n.searchHistoryLocalOnlyDescription,
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14.sp,
@@ -144,7 +128,7 @@ class _RecentSearchManagementPageState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Tìm kiếm gần đây',
+                  context.l10n.searchRecent,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 16.sp,
@@ -155,7 +139,7 @@ class _RecentSearchManagementPageState
                   GestureDetector(
                     onTap: _clearAllRecentSearches,
                     child: Text(
-                      'XÓA TẤT CẢ',
+                      context.l10n.searchClearAllUppercase,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 14.sp,
@@ -185,7 +169,7 @@ class _RecentSearchManagementPageState
                         ),
                         SizedBox(height: 16.h),
                         Text(
-                          'Chưa có lịch sử tìm kiếm',
+                          context.l10n.searchNoHistory,
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 16.sp,
@@ -193,7 +177,7 @@ class _RecentSearchManagementPageState
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'Các tìm kiếm gần đây sẽ xuất hiện ở đây',
+                          context.l10n.searchHistoryWillAppear,
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14.sp,
@@ -210,7 +194,7 @@ class _RecentSearchManagementPageState
                       final name =
                           searchData['fullName'] ??
                           searchData['username'] ??
-                          'Unknown';
+                          context.l10n.commonUnknown;
                       final avatarUrl = searchData['avatarUrl'];
                       final userId = searchData['userId'] ?? '';
 
@@ -250,14 +234,14 @@ class _RecentSearchManagementPageState
                             ),
                           ),
                           subtitle: Text(
-                            'Đã kết nối',
+                            context.l10n.chatConnected,
                             style: TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 12.sp,
                             ),
                           ),
                           trailing: GestureDetector(
-                            onTap: () => _removeRecentSearch(userId, name),
+                            onTap: () => _removeRecentSearch(userId),
                             child: Container(
                               padding: EdgeInsets.all(8.w),
                               child: Icon(

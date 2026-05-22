@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostCreatingProgress extends StatelessWidget {
   final double? progress; // 0.0 - 1.0 (tùy bạn có muốn tính % không)
@@ -20,8 +21,10 @@ class PostCreatingProgress extends StatelessWidget {
           Expanded(
             child: Text(
               progress != null
-                  ? "Đang đăng bài... ${(progress! * 100).toStringAsFixed(0)}%"
-                  : "Đang đăng bài...",
+                  ? context.l10n.postCreatingWithProgress(
+                      (progress! * 100).round(),
+                    )
+                  : context.l10n.postCreating,
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14.sp,

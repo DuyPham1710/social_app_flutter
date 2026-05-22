@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -44,7 +45,7 @@ class _ChangeGroupNameDialogState extends State<ChangeGroupNameDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       contentPadding: EdgeInsets.zero,
       title: Text(
-        'Đổi tên nhóm',
+        context.l10n.chatChangeGroupName,
         style: TextStyle(
           fontSize: 18.sp,
           fontWeight: FontWeight.w600,
@@ -97,7 +98,7 @@ class _ChangeGroupNameDialogState extends State<ChangeGroupNameDialog> {
                   _nameController.clear();
                 },
                 child: Text(
-                  'Gỡ',
+                  context.l10n.commonRemove,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 15.sp,
@@ -108,7 +109,7 @@ class _ChangeGroupNameDialogState extends State<ChangeGroupNameDialog> {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
-                  'Hủy',
+                  context.l10n.commonCancel,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 15.sp,
@@ -134,12 +135,12 @@ class _ChangeGroupNameDialogState extends State<ChangeGroupNameDialog> {
                         Navigator.pop(context, newName);
                         showSuccessSnackBar(
                           context,
-                          'Đã đổi tên nhóm thành công',
+                          context.l10n.chatGroupNameChanged,
                         );
                       } catch (e) {
                         showErrorSnackBar(
                           context,
-                          'Không thể đổi tên nhóm: $e',
+                          context.l10n.chatChangeGroupNameFailed('$e'),
                         );
                       }
                     } else {
@@ -148,7 +149,7 @@ class _ChangeGroupNameDialogState extends State<ChangeGroupNameDialog> {
                   }
                 },
                 child: Text(
-                  'Lưu',
+                  context.l10n.commonSave,
                   style: TextStyle(
                     color: AppColors.primary,
                     fontSize: 15.sp,

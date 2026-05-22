@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/comment/domain/entities/react_comment_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactionListModal extends StatelessWidget {
   final List<ReactCommentEntity> reacts;
@@ -66,7 +67,7 @@ class ReactionListModal extends StatelessWidget {
             ),
           ),
           Text(
-            'Biểu cảm về bình luận',
+            context.l10n.commentReactionsTitle,
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -89,13 +90,14 @@ class ReactionListModal extends StatelessWidget {
                       radius: 20.r,
                       backgroundColor: AppColors.secondBackground,
                       backgroundImage: NetworkImage(
-                        react.user.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                        react.user.avatarUrl ??
+                            'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
                       ),
                     ),
                     title: Text(
                       react.user.userId == currentUserId
-                          ? 'Bạn'
-                          : react.user.fullName ?? 'Unknown',
+                          ? context.l10n.chatYou
+                          : react.user.fullName ?? context.l10n.commonUnknown,
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w600,

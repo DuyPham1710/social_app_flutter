@@ -39,7 +39,7 @@ class StoryRepositoryImpl implements StoryRepository {
       return DataStateError(e);
     }
   }
-  
+
   @override
   Future<DataState<void>> createStory({
     required CreateStoryEntity story,
@@ -152,9 +152,7 @@ class StoryRepositoryImpl implements StoryRepository {
       }
 
       // Build request body
-      final Map<String, dynamic> body = {
-        'privacy_type': privacyTypeString,
-      };
+      final Map<String, dynamic> body = {'privacy_type': privacyTypeString};
 
       if (friendsExcept != null && friendsExcept.isNotEmpty) {
         body['friends_except'] = friendsExcept;
@@ -172,9 +170,7 @@ class StoryRepositoryImpl implements StoryRepository {
   }
 
   @override
-  Future<DataState<void>> deleteStory({
-    required String storyId,
-  }) async {
+  Future<DataState<void>> deleteStory({required String storyId}) async {
     try {
       await remoteDataSource.deleteStory(storyId);
       return const DataStateSuccess(null);
@@ -195,7 +191,7 @@ class StoryRepositoryImpl implements StoryRepository {
       });
       return DataStateSuccess(response);
     } on DioException catch (e) {
-      if (e.response?.statusCode == 204 || 
+      if (e.response?.statusCode == 204 ||
           (e.response?.statusCode == 200 && e.response?.data == null)) {
         return DataStateSuccess(null);
       }
@@ -233,10 +229,9 @@ class StoryRepositoryImpl implements StoryRepository {
     required String emojiId,
   }) async {
     try {
-      final response = await remoteDataSource.updateReactStory(
-        storyId,
-        {'emojiId': emojiId},
-      );
+      final response = await remoteDataSource.updateReactStory(storyId, {
+        'emojiId': emojiId,
+      });
       return DataStateSuccess(response);
     } on DioException catch (e) {
       return DataStateError(e);
@@ -244,9 +239,7 @@ class StoryRepositoryImpl implements StoryRepository {
   }
 
   @override
-  Future<DataState<void>> deleteReactStory({
-    required String storyId,
-  }) async {
+  Future<DataState<void>> deleteReactStory({required String storyId}) async {
     try {
       await remoteDataSource.deleteReactStory(storyId);
       return const DataStateSuccess(null);

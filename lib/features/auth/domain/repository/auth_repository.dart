@@ -19,7 +19,10 @@ abstract class AuthRepository {
 
   Future<DataState<UserEntity>> refreshToken();
 
-  Future<DataState<Map<String, dynamic>>> registerFace(String userId, List<String> images);
+  Future<DataState<Map<String, dynamic>>> registerFace(
+    String userId,
+    List<String> images,
+  );
 
   Future<DataState<Map<String, dynamic>>> deleteFaceRegistration();
 }

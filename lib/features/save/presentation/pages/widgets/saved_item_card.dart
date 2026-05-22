@@ -69,7 +69,10 @@ class SavedItemCard extends StatelessWidget {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: AppColors.background,
-                            child: Icon(Icons.error, color: AppColors.textSecondary),
+                            child: Icon(
+                              Icons.error,
+                              color: AppColors.textSecondary,
+                            ),
                           );
                         },
                       ),
@@ -155,9 +158,16 @@ class SavedItemCard extends StatelessWidget {
                       value: 'open',
                       child: Row(
                         children: [
-                          Icon(Icons.open_in_new_rounded, size: 18, color: AppColors.iconPrimary),
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            size: 18,
+                            color: AppColors.iconPrimary,
+                          ),
                           const SizedBox(width: 8),
-                          Text('Xem chi tiết', style: TextStyle(color: AppColors.textPrimary)),
+                          Text(
+                            'Xem chi tiết',
+                            style: TextStyle(color: AppColors.textPrimary),
+                          ),
                         ],
                       ),
                     ),
@@ -171,10 +181,7 @@ class SavedItemCard extends StatelessWidget {
                             color: Colors.red,
                           ),
                           SizedBox(width: 8),
-                          Text(
-                            'Bỏ lưu',
-                            style: TextStyle(color: Colors.red),
-                          ),
+                          Text('Bỏ lưu', style: TextStyle(color: Colors.red)),
                         ],
                       ),
                     ),

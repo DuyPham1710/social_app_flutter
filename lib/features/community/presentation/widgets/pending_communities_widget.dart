@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -26,9 +28,15 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
       child: BlocConsumer<CommunityListBloc, CommunityListState>(
         listener: (context, state) {
           if (state is CommunityListActionSuccess) {
-            showSuccessSnackBar(context, state.message);
+            showSuccessSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           } else if (state is CommunityListError) {
-            showErrorSnackBar(context, state.message);
+            showErrorSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           }
         },
         builder: (context, state) {
@@ -51,7 +59,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Chưa có cộng đồng nào đang chờ duyệt',
+                        context.l10n.communityNoPendingCommunities,
                         style: TextStyle(
                           color: Colors.grey[700],
                           fontWeight: FontWeight.w600,
@@ -59,7 +67,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Yêu cầu tham gia cộng đồng sẽ xuất hiện tại đây',
+                        context.l10n.communityPendingCommunitiesHint,
                         style: TextStyle(color: Colors.grey[500], fontSize: 12),
                       ),
                     ],
@@ -92,7 +100,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                     Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
                     const SizedBox(height: 12),
                     Text(
-                      state.message,
+                      localizedCommunityMessage(context.l10n, state.message),
                       textAlign: TextAlign.center,
                       style: const TextStyle(color: Color(0xFFB42318)),
                     ),
@@ -103,7 +111,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                           const PendingCommunitiesFetched(),
                         );
                       },
-                      child: const Text('Thử lại'),
+                      child: Text(context.l10n.commonRetry),
                     ),
                   ],
                 ),
@@ -134,9 +142,9 @@ class PendingCommunityItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          Navigator.of(context).push(
-            CommunityDetailPage.route(communityId: community.id),
-          );
+          Navigator.of(
+            context,
+          ).push(CommunityDetailPage.route(communityId: community.id));
         },
         child: Container(
           decoration: BoxDecoration(
@@ -230,7 +238,7 @@ class PendingCommunityItem extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '$memberCount thành viên',
+                            context.l10n.communityMembersCount(memberCount),
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],
@@ -247,9 +255,9 @@ class PendingCommunityItem extends StatelessWidget {
                               border: Border.all(color: Colors.orange[200]!),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
-                              'Chờ duyệt',
-                              style: TextStyle(
+                            child: Text(
+                              context.l10n.communityPendingApproval,
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFFF97316),
@@ -292,9 +300,9 @@ class PendingCommunityItem extends StatelessWidget {
                     onPressed: () {
                       _showCancelConfirmDialog(context, community.id);
                     },
-                    child: const Text(
-                      'Hủy yêu cầu',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.friendCancelRequest,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -314,14 +322,12 @@ class PendingCommunityItem extends StatelessWidget {
       context: outerContext,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: const Text('Hủy yêu cầu'),
-        content: const Text(
-          'Bạn có chắc muốn hủy yêu cầu tham gia cộng đồng này?',
-        ),
+        title: Text(outerContext.l10n.communityCancelJoinRequestTitle),
+        content: Text(outerContext.l10n.communityCancelJoinRequestConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Không'),
+            child: Text(outerContext.l10n.commonNo),
           ),
           TextButton(
             onPressed: () {
@@ -330,7 +336,10 @@ class PendingCommunityItem extends StatelessWidget {
                 CancelPendingCommunityRequested(communityId),
               );
             },
-            child: const Text('Hủy', style: TextStyle(color: Colors.red)),
+            child: Text(
+              outerContext.l10n.commonCancel,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

@@ -19,10 +19,7 @@ class SaveRepositoryImpl implements SaveRepository {
     String? note,
   }) async {
     try {
-      final body = <String, dynamic>{
-        'targetId': targetId,
-        'type': type,
-      };
+      final body = <String, dynamic>{'targetId': targetId, 'type': type};
       if (content != null) body['content'] = content;
       if (collection != null) body['collection'] = collection;
       if (note != null) body['note'] = note;

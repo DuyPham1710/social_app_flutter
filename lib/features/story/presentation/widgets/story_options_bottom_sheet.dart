@@ -10,13 +10,13 @@ import 'package:social_app_fe/features/story/domain/repository/story_repository.
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_option_item_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class StoryOptionsBottomSheet extends StatefulWidget {
   final GroupedUserStoryEntity currentGroup;
   final int currentStoryIndex;
-  
 
   const StoryOptionsBottomSheet({
     super.key,
@@ -25,12 +25,13 @@ class StoryOptionsBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<StoryOptionsBottomSheet> createState() => _StoryOptionsBottomSheetState();
+  State<StoryOptionsBottomSheet> createState() =>
+      _StoryOptionsBottomSheetState();
 
   static void show(
-  BuildContext context, {
-  required GroupedUserStoryEntity currentGroup,
-  required int currentStoryIndex,
+    BuildContext context, {
+    required GroupedUserStoryEntity currentGroup,
+    required int currentStoryIndex,
   }) {
     showModalBottomSheet(
       context: context,
@@ -51,7 +52,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
 
   Future<void> _deleteStory(BuildContext context) async {
     final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
-    
+
     // Hiển thị dialog xác nhận
     final confirmed = await showDialog<bool>(
       context: context,
@@ -59,26 +60,26 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
         return AlertDialog(
           backgroundColor: AppColors.background,
           title: Text(
-            'Xóa tin',
+            context.l10n.storyDeleteTitle,
             style: TextStyle(color: AppColors.textPrimary),
           ),
           content: Text(
-            'Bạn có chắc chắn muốn xóa tin này không?',
+            context.l10n.storyDeleteConfirm,
             style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(
-                'Hủy',
+                context.l10n.commonCancel,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text(
-                'Xóa',
-                style: TextStyle(color: Colors.red),
+              child: Text(
+                context.l10n.commonDelete,
+                style: const TextStyle(color: Colors.red),
               ),
             ),
           ],
@@ -97,7 +98,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
 
       if (mounted) {
         Navigator.pop(context); // Đóng bottom sheet
-        
+
         if (result is DataStateSuccess) {
           // Reload danh sách story trước khi đóng story viewer
           // HomeStoriesBloc được provide ở main.dart nên có thể truy cập từ bất kỳ context nào
@@ -111,26 +112,33 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             // Nếu không tìm thấy, thử tìm trong context hiện tại
             try {
               final homeStoriesBloc = context.read<HomeStoriesBloc>();
-              homeStoriesBloc.add(const LoadHomeStoriesEvent(page: 1, limit: 10));
+              homeStoriesBloc.add(
+                const LoadHomeStoriesEvent(page: 1, limit: 10),
+              );
             } catch (_) {
               // Nếu vẫn không tìm thấy, không sao - story đã được xóa trên server
               // Khi user quay lại trang home, story sẽ tự động không còn trong danh sách
             }
           }
-          
+
           // Đóng story viewer và quay về màn hình trước
           Navigator.of(context).pop();
-          
+
           // Hiển thị thông báo thành công
-          showSuccessSnackBar(context, 'Đã xóa tin');
+          showSuccessSnackBar(context, context.l10n.storyDeleted);
         } else if (result is DataStateError) {
-          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể xóa tin"}');
+          showErrorSnackBar(
+            context,
+            context.l10n.commonErrorWithMessage(
+              result.error?.message ?? context.l10n.storyDeleteFailed,
+            ),
+          );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        showErrorSnackBar(context, 'Lỗi: $e');
+        showErrorSnackBar(context, context.l10n.commonErrorWithMessage('$e'));
       }
     } finally {
       if (mounted) {
@@ -167,22 +175,21 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             SizedBox(height: 20.h),
             StoryOptionItemWidget(
               icon: Icons.lock_outline,
-              title: "Chỉnh sửa quyền riêng tư của tin",
+              title: context.l10n.storyEditPrivacy,
               onTap: () {
                 Navigator.pop(context);
-                final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
+                final storyId =
+                    widget.currentGroup.stories[widget.currentStoryIndex].id;
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => StoryPrivacySettingsPage(
-                      storyId: storyId,
-                    ),
+                    builder: (_) => StoryPrivacySettingsPage(storyId: storyId),
                   ),
                 );
               },
             ),
             StoryOptionItemWidget(
               icon: Icons.message_outlined,
-              title: "Gửi bằng Messenger",
+              title: context.l10n.storySendWithMessenger,
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Implement Messenger sharing
@@ -190,7 +197,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             ),
             StoryOptionItemWidget(
               icon: Icons.download_outlined,
-              title: "Lưu ảnh",
+              title: context.l10n.storySavePhoto,
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Implement save photo
@@ -198,8 +205,8 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             ),
             StoryOptionItemWidget(
               icon: Icons.archive_outlined,
-              title: "Lưu trữ ảnh",
-              subtitle: "Gỡ ảnh khỏi tin và lưu vào kho lưu trữ.",
+              title: context.l10n.storyArchivePhoto,
+              subtitle: context.l10n.storyArchivePhotoDescription,
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Implement archive photo
@@ -207,19 +214,21 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             ),
             StoryOptionItemWidget(
               icon: Icons.delete_outline,
-              title: "Xóa ảnh",
+              title: context.l10n.storyDeletePhoto,
               onTap: _isDeleting ? null : () => _deleteStory(context),
             ),
             StoryOptionItemWidget(
               icon: Icons.link_outlined,
-              title: "Sao chép liên kết để chia sẻ tin này",
-              subtitle:
-                  "Tin sẽ hiển thị với đối tượng của ${widget.currentGroup.user.fullName ?? 'bạn'} trong 24 giờ.",
+              title: context.l10n.storyCopyShareLink,
+              subtitle: context.l10n.storyLinkVisibility(
+                widget.currentGroup.user.fullName ?? context.l10n.chatYou,
+              ),
               onTap: () {
                 Navigator.pop(context);
-                final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
+                final storyId =
+                    widget.currentGroup.stories[widget.currentStoryIndex].id;
                 Clipboard.setData(ClipboardData(text: 'story://$storyId'));
-                showSuccessSnackBar(context, 'Đã sao chép liên kết');
+                showSuccessSnackBar(context, context.l10n.commonLinkCopied);
               },
             ),
             SizedBox(height: 20.h),
@@ -228,6 +237,4 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
       ),
     );
   }
-
 }
-

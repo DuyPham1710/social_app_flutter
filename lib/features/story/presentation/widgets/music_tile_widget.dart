@@ -26,7 +26,6 @@ class MusicTileWidget extends StatefulWidget {
 }
 
 class _MusicTileWidgetState extends State<MusicTileWidget> {
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -59,10 +58,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
       ),
       subtitle: Text(
         widget.item.artist.name,
-        style: TextStyle(
-          color: AppColors.textSecondary,
-          fontSize: 13.sp,
-        ),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -93,9 +89,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
                     width: 40.r,
                     height: 40.r,
                     child: CustomPaint(
-                      painter: _RotatingDotPainter(
-                        progress: widget.progress!,
-                      ),
+                      painter: _RotatingDotPainter(progress: widget.progress!),
                     ),
                   ),
               ],
@@ -145,7 +139,8 @@ class _RotatingDotPainter extends CustomPainter {
     );
 
     // Tính toán vị trí chấm xanh dựa trên progress (0-1)
-    final angle = -math.pi / 2 + (progress * 2 * math.pi); // Bắt đầu từ trên cùng
+    final angle =
+        -math.pi / 2 + (progress * 2 * math.pi); // Bắt đầu từ trên cùng
     final dotX = center.dx + radius * math.cos(angle);
     final dotY = center.dy + radius * math.sin(angle);
 

@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
@@ -70,10 +71,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         listener: (context, state) {
           // Chỉ xử lý state từ reset_password flow
           if (state is AuthLoaded && state.flowType == 'reset_password') {
-            showDialogSuccess(context, "Đặt lại mật khẩu thành công");
+            showDialogSuccess(context, context.l10n.authResetPasswordSuccess);
             //   BlocProvider.of<AuthBloc>(context).add(AuthReset());
           } else if (state is AuthError && state.flowType == 'reset_password') {
-            final message = state.errorMessage ?? 'Đặt lại mật khẩu thất bại';
+            final message =
+                state.errorMessage ?? context.l10n.authResetPasswordFailed;
             UIUtils.showErrorMessage(context, message);
           }
         },
@@ -91,7 +93,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
+                      child: Icon(
+                        CupertinoIcons.back,
+                        color: AppColors.unselectedIcon,
+                      ),
                     ),
 
                     SizedBox(height: 50.h),
@@ -99,7 +104,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Đặt lại mật khẩu",
+                        context.l10n.authResetPassword,
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
@@ -111,7 +116,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     SizedBox(height: 10.h),
 
                     Text(
-                      "Giúp chúng tôi bảo vệ tài khoản của bạn bằng cách chọn mật khẩu mạnh.",
+                      context.l10n.authResetPasswordDescription,
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: AppColors.textSecondary,
@@ -121,13 +126,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     SizedBox(height: 40.h),
 
                     TextformfieldCustom(
-                      label: "Mật khẩu mới",
+                      label: context.l10n.authNewPassword,
                       isPassword: _isPasswordVisible,
                       controller: newPasswordController,
                       focusNode: newPasswordFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập mật khẩu mới';
+                          return context.l10n.authEnterNewPassword;
                         }
                         return null;
                       },
@@ -150,13 +155,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     SizedBox(height: 20.h),
 
                     TextformfieldCustom(
-                      label: "Xác nhận mật khẩu mới",
+                      label: context.l10n.authConfirmNewPassword,
                       isPassword: _isConfirmPasswordVisible,
                       controller: confirmPasswordController,
                       focusNode: confirmPasswordFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập xác nhận mật khẩu mới';
+                          return context.l10n.authEnterConfirmNewPassword;
                         }
                         return null;
                       },
@@ -188,7 +193,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         : ButtonCustom(
                             onPressed: () =>
                                 _onSaveSubmitted(context, email, otp),
-                            text: "Lưu",
+                            text: context.l10n.authSave,
                           ),
 
                     SizedBox(height: 24.h),
@@ -197,7 +202,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Bạn đã có tài khoản? ",
+                          context.l10n.authHasAccount,
                           style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 14.sp,
@@ -209,7 +214,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             Navigator.pushNamed(context, '/login');
                           },
                           child: Text(
-                            "Đăng nhập",
+                            context.l10n.authLogin,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14.sp,
