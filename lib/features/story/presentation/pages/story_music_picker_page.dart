@@ -359,12 +359,6 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                         _onSearchChanged('');
                       },
                     ),
-                  IconButton(
-                    splashRadius: 18,
-                    padding: EdgeInsets.zero,
-                    icon: Icon(Icons.mic_none, color: AppColors.iconPrimary),
-                    onPressed: () {},
-                  ),
                 ],
               ),
             ),

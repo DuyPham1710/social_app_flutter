@@ -533,10 +533,11 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<MessageState> emit) {
-    // Validate message - phải có text hoặc attachments hoặc metadata
+    // Validate message - phải có text hoặc attachments hoặc metadata hoặc storyId
     if ((event.text == null || event.text!.isEmpty) &&
         (event.attachments == null || event.attachments!.isEmpty) &&
-        (event.metadata == null || event.metadata!.isEmpty)) {
+        (event.metadata == null || event.metadata!.isEmpty) &&
+        (event.storyId == null || event.storyId!.isEmpty)) {
       print('Cannot send empty message');
       return;
     }
@@ -549,9 +550,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       attachments: event.attachments,
       replyTo: event.replyTo,
       metadata: event.metadata,
+      storyId: event.storyId,
     );
-
-    print('Message sent to conversation: ${event.conversationId}');
     // Note: Message will be added to list via message:new event from backend
   }
 

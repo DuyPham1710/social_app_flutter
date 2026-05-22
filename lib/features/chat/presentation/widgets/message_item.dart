@@ -135,6 +135,7 @@ class MessageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isReplying = message.replyTo != null;
+    final isStoryReply = message.story != null;
     final hasReactions = message.reactions.isNotEmpty;
     final isEdited = message.isEdited;
     final isDeleteforEveryone = message.deletedForEveryone;
@@ -198,6 +199,8 @@ class MessageItem extends StatelessWidget {
                           ? _buildDeletedMessage(context, lastName, fromMe)
                           : isReplying
                           ? _buildReplyMessage(context)
+                          : isStoryReply
+                          ? _buildStoryReplyMessage(context)
                           : isLocationMessage
                           ? _buildLocationMessage(context)
                           : isHasMetaData
@@ -567,6 +570,89 @@ class MessageItem extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStoryReplyMessage(BuildContext context) {
+    final story = message.story!;
+    return Container(
+      constraints: BoxConstraints(maxWidth: 0.7.sw),
+      decoration: BoxDecoration(
+        color: fromMe
+            ? AppColors.primary
+            : AppColors.textSecondary.withOpacity(0.1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(14.r),
+          topRight: Radius.circular(14.r),
+          bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+          bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Story Reply header card
+          Container(
+            margin: EdgeInsets.all(8.w),
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: fromMe
+                  ? AppColors.background
+                  : AppColors.textSecondary.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border(
+                left: BorderSide(
+                  color: fromMe ? Colors.white70 : AppColors.primary,
+                  width: 3.w,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Story thumbnail preview
+                if (story.mediaUrl != null && story.mediaUrl!.isNotEmpty) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6.r),
+                    child: Container(
+                      width: 40.w,
+                      height: 55.w,
+                      color: AppColors.iconPrimary,
+                      child: Image.network(
+                        story.mediaUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.broken_image,
+                          size: 20.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                ],
+              ],
+            ),
+          ),
+
+          // Replied Text message
+          if (message.text != null && message.text!.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(left: 14.w, right: 14.w, bottom: 8.h),
+              child: Text(
+                message.text!,
+                style: TextStyle(
+                  color: fromMe ? AppColors.background : AppColors.textPrimary,
+                  fontSize: 14.sp,
+                ),
+              ),
+            )
+          else
+            SizedBox(height: 4.h),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
 import 'parent_message_model.dart';
+import 'story_reply_model.dart';
 
 class AttachmentModel {
   final String url;
@@ -201,6 +202,7 @@ class MessageModel {
   final List<UserModel>? deletedFor;
   final bool isEdited;
   final MessageMetadataModel? metadata;
+  final StoryReplyModel? story;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -217,6 +219,7 @@ class MessageModel {
     this.deletedFor,
     this.isEdited = false,
     this.metadata,
+    this.story,
     required this.createdAt,
     this.updatedAt,
   });
@@ -279,6 +282,31 @@ class MessageModel {
       }
     }
 
+    // Parse story if present
+    StoryReplyModel? story;
+    if (json['story'] != null && json['story'] is Map) {
+      try {
+        final storyMap = json['story'] is Map<String, dynamic>
+            ? json['story'] as Map<String, dynamic>
+            : Map<String, dynamic>.from(json['story'] as Map);
+        story = StoryReplyModel.fromJson(storyMap);
+      } catch (e) {
+        print('Error parsing story reply: $e');
+        story = null;
+      }
+    } else if (json['storyId'] != null && json['storyId'] is Map) {
+      // Fallback if backend returned populated story inside storyId field
+      try {
+        final storyMap = json['storyId'] is Map<String, dynamic>
+            ? json['storyId'] as Map<String, dynamic>
+            : Map<String, dynamic>.from(json['storyId'] as Map);
+        story = StoryReplyModel.fromJson(storyMap);
+      } catch (e) {
+        print('Error parsing storyId as story: $e');
+        story = null;
+      }
+    }
+
     return MessageModel(
       id: json['_id'] as String,
       conversationId: json['conversationId'] as String?,
@@ -304,6 +332,7 @@ class MessageModel {
       ),
       isEdited: json['isEdited'] as bool? ?? false,
       metadata: metadata,
+      story: story,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -324,6 +353,7 @@ class MessageModel {
     'deletedFor': deletedFor?.map((e) => e.toJson()).toList(),
     'isEdited': isEdited,
     'metadata': metadata?.toJson(),
+    'story': story?.toJson(),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt?.toIso8601String(),
   };
@@ -341,6 +371,7 @@ class MessageModel {
     deletedFor: deletedFor?.map((e) => e.toEntity()).toList(),
     isEdited: isEdited,
     metadata: metadata?.toEntity(),
+    story: story?.toEntity(),
     createdAt: createdAt,
     updatedAt: updatedAt,
   );
