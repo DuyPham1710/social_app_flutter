@@ -16,6 +16,7 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
   final VoidCallback? onUserTap;
   final VoidCallback? onViewPost;
   final VoidCallback? onCommunityTap;
+  final String actionText;
 
   const CommunityPostApprovedNotificationItem({
     super.key,
@@ -29,6 +30,7 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
     this.onUserTap,
     this.onViewPost,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -105,9 +107,7 @@ class CommunityPostApprovedNotificationItem extends StatelessWidget {
                 children: [
                   Builder(
                     builder: (context) {
-                      final msg =
-                          message ??
-                          context.l10n.notificationPostApprovedMessage;
+                      final msg = actionText;
 
                       final List<TextSpan> spans = [];
 

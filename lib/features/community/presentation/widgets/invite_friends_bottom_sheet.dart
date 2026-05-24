@@ -123,9 +123,9 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
           maxChildSize: 0.95,
           minChildSize: 0.4,
           builder: (context, scrollController) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(24),
                 topRight: Radius.circular(24),
               ),
@@ -144,7 +144,7 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
@@ -171,9 +171,9 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                 const SizedBox(height: 2),
                                 Text(
                                   context.l10n.communityInviteFriendsSubtitle,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
-                                    color: Color(0xFF6B7280),
+                                    color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -191,25 +191,23 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                         },
                         decoration: InputDecoration(
                           hintText: context.l10n.communityInviteSearchHint,
-                          hintStyle: const TextStyle(
-                            color: Color(0xFF9CA3AF),
+                          hintStyle: TextStyle(
+                            color: AppColors.textSecondary,
                             fontSize: 13,
                           ),
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.search,
-                            color: Color(0xFF9CA3AF),
+                            color: AppColors.textSecondary,
                             size: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFE5EAF0),
-                            ),
+                            borderSide: BorderSide(color: AppColors.divider),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFE5EAF0),
+                            borderSide: BorderSide(
+                              color: AppColors.divider,
                               width: 1,
                             ),
                           ),
@@ -225,8 +223,9 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                             vertical: 12,
                           ),
                           filled: true,
-                          fillColor: const Color(0xFFFAFAFA),
+                          fillColor: AppColors.secondBackground,
                         ),
+                        style: TextStyle(color: AppColors.textPrimary),
                       ),
                     ],
                   ),
@@ -245,8 +244,8 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                               const SizedBox(height: 12),
                               Text(
                                 context.l10n.communityLoadingFriends,
-                                style: const TextStyle(
-                                  color: Color(0xFF6B7280),
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
                                   fontSize: 13,
                                 ),
                               ),
@@ -280,8 +279,8 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                   state.message,
                                 ),
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Color(0xFF374151),
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -330,8 +329,8 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                               const SizedBox(height: 12),
                               Text(
                                 context.l10n.communitySendingInvite,
-                                style: const TextStyle(
-                                  color: Color(0xFF6B7280),
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
                                   fontSize: 13,
                                 ),
                               ),
@@ -356,20 +355,20 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[200],
+                                  color: AppColors.secondBackground,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
                                   Icons.people_outline,
                                   size: 32,
-                                  color: Colors.grey[500],
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                               const SizedBox(height: 12),
                               Text(
                                 context.l10n.communityNoAvailableFriends,
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: AppColors.textSecondary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -399,7 +398,9 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                               Icon(
                                 Icons.search_off,
                                 size: 48,
-                                color: Colors.grey[400],
+                                color: AppColors.textSecondary.withValues(
+                                  alpha: 0.75,
+                                ),
                               ),
                               const SizedBox(height: 12),
                               Text(
@@ -407,7 +408,7 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                   _searchQuery,
                                 ),
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: AppColors.textSecondary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -454,15 +455,16 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.background,
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                      color: const Color(0xFFE5EAF0),
+                                      color: AppColors.divider,
                                       width: 1,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.04),
+                                        color: AppColors.textSecondary
+                                            .withValues(alpha: 0.06),
                                         blurRadius: 6,
                                         offset: const Offset(0, 2),
                                       ),
@@ -475,9 +477,8 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                             _viewProfile(context, friendId),
                                         child: CircleAvatar(
                                           radius: 26,
-                                          backgroundColor: const Color(
-                                            0xFFF3F4F6,
-                                          ),
+                                          backgroundColor:
+                                              AppColors.secondBackground,
                                           backgroundImage:
                                               friendAvatar.isNotEmpty
                                               ? NetworkImage(friendAvatar)
@@ -487,7 +488,9 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                                   friendName.isNotEmpty
                                                       ? friendName[0]
                                                       : '?',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
+                                                    color:
+                                                        AppColors.textPrimary,
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -506,10 +509,10 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                             children: [
                                               Text(
                                                 friendName,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
-                                                  color: Color(0xFF101828),
+                                                  color: AppColors.textPrimary,
                                                 ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
@@ -517,9 +520,10 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                               const SizedBox(height: 4),
                                               Text(
                                                 '@$friendUsername',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 12,
-                                                  color: Color(0xFF9CA3AF),
+                                                  color:
+                                                      AppColors.textSecondary,
                                                   fontWeight: FontWeight.w400,
                                                 ),
                                                 maxLines: 1,
@@ -540,11 +544,10 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                             vertical: 8,
                                           ),
                                           backgroundColor: isInvited
-                                              ? const Color(0xFFE5E7EB)
+                                              ? AppColors.secondBackground
                                               : AppColors.primary,
-                                          disabledBackgroundColor: const Color(
-                                            0xFFE5E7EB,
-                                          ),
+                                          disabledBackgroundColor:
+                                              AppColors.secondBackground,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               8,
@@ -561,7 +564,7 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                                   : Icons.person_add,
                                               size: 14,
                                               color: isInvited
-                                                  ? const Color(0xFF9CA3AF)
+                                                  ? AppColors.textSecondary
                                                   : Colors.white,
                                             ),
                                             const SizedBox(width: 4),
@@ -577,8 +580,8 @@ class _InviteFriendsBottomSheetState extends State<InviteFriendsBottomSheet> {
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
                                                 color: isInvited
-                                                    ? const Color(0xFF9CA3AF)
-                                                    : AppColors.background,
+                                                    ? AppColors.textSecondary
+                                                    : Colors.white,
                                               ),
                                             ),
                                           ],

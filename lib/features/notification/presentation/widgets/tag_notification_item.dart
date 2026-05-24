@@ -13,6 +13,7 @@ class TagNotificationItem extends StatelessWidget {
   final String? postId;
   final VoidCallback? onUserTap;
   final VoidCallback? onMessageTap;
+  final String actionText;
 
   const TagNotificationItem({
     super.key,
@@ -25,6 +26,7 @@ class TagNotificationItem extends StatelessWidget {
     this.postId,
     this.onUserTap,
     this.onMessageTap,
+    required this.actionText,
   });
 
   @override
@@ -46,7 +48,7 @@ class TagNotificationItem extends StatelessWidget {
               recognizer: TapGestureRecognizer()..onTap = onUserTap,
             ),
             TextSpan(
-              text: ' $message',
+              text: ' $actionText',
               recognizer: TapGestureRecognizer()..onTap = onMessageTap,
             ),
           ],

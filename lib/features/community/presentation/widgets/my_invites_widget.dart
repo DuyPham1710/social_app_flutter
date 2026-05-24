@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/my_invites_item.dart';
@@ -36,13 +37,13 @@ class _MyInvitesWidgetState extends State<MyInvitesWidget> {
                       Icon(
                         Icons.mark_email_unread_outlined,
                         size: 54,
-                        color: Colors.grey[400],
+                        color: AppColors.textSecondary.withValues(alpha: 0.75),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         context.l10n.communityNoInvites,
                         style: TextStyle(
-                          color: Colors.grey[700],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -135,9 +136,9 @@ class _InviteSkeletonCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5EAF0)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: const Row(
         children: [
@@ -180,7 +181,7 @@ class _SkeletonBlock extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: const Color(0xFFE4E7EC),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

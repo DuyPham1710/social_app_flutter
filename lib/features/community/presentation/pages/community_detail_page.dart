@@ -50,7 +50,6 @@ class CommunityDetailPage extends StatefulWidget {
 class _CommunityDetailPageState extends State<CommunityDetailPage> {
   int _refreshSeed = 0;
 
-  static const Color _pageBackground = Color(0xFFF0F2F5);
   static const Duration _pageFadeDuration =
       CommunityDetailPage.fadeTransitionDuration;
 
@@ -86,7 +85,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       builder: (bottomSheetContext) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: DraggableScrollableSheet(
@@ -119,7 +118,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       builder: (context) =>
           InviteFriendsBottomSheet(communityId: widget.communityId),
     );
@@ -275,7 +274,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: _buildMembersReviewSheet(context),
@@ -288,7 +287,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: _buildPostsReviewSheet(context),
@@ -320,18 +319,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.group_add_rounded,
                     size: 46,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textSecondary,
                   ),
                   const SizedBox(height: 12),
                   Text(
                     context.l10n.communityNoPendingRequests,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -394,18 +393,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.fact_check_outlined,
                     size: 46,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textSecondary,
                   ),
                   const SizedBox(height: 12),
                   Text(
                     context.l10n.communityNoPendingReviewPosts,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -453,10 +452,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-        ),
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: Row(
         children: [
@@ -464,10 +461,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFE7F0FF),
+              color: AppColors.secondBackground,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF1D4ED8)),
+            child: Icon(icon, color: AppColors.primary),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -476,18 +473,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF111827),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -505,9 +502,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -516,12 +513,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: request.user.avatarUrl != null
                     ? NetworkImage(request.user.avatarUrl!)
                     : null,
                 child: request.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -533,18 +530,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       request.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _formatTimeAgo(request.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -615,9 +612,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -627,12 +624,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: post.user.avatarUrl != null
                     ? NetworkImage(post.user.avatarUrl!)
                     : null,
                 child: post.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -644,18 +641,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       post.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _formatTimeAgo(post.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -673,8 +670,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               fontSize: 13,
               height: 1.35,
               color: caption.isNotEmpty
-                  ? const Color(0xFF111827)
-                  : const Color(0xFF6B7280),
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -688,11 +685,11 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   post.urls.first.url,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFFF3F4F6),
+                    color: AppColors.secondBackground,
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       Icons.broken_image_rounded,
-                      color: Color(0xFF9CA3AF),
+                      color: AppColors.textSecondary,
                       size: 26,
                     ),
                   ),
@@ -815,75 +812,82 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   }
 
   Widget _buildLoadingPage() {
-    return CustomScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      slivers: [
-        SliverAppBar(
-          titleSpacing: 0,
-          title: Container(
-            width: 150,
-            height: 16,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE4E7EC),
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            color: const Color(0xFF1C1E21),
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-          expandedHeight: 240,
-          pinned: true,
-          backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF1C1E21),
-          surfaceTintColor: Colors.transparent,
-          scrolledUnderElevation: 0,
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFE8EEF5), Color(0xFFD8E1EA)],
-                ),
+    return ColoredBox(
+      color: AppColors.secondBackground,
+      child: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            titleSpacing: 0,
+            title: Container(
+              width: 150,
+              height: 16,
+              decoration: BoxDecoration(
+                color: AppColors.textSecondary.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(999),
               ),
-              child: Center(
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    shape: BoxShape.circle,
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              color: AppColors.iconPrimary,
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+            expandedHeight: 240,
+            pinned: true,
+            backgroundColor: AppColors.background,
+            foregroundColor: AppColors.iconPrimary,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.textSecondary.withValues(alpha: 0.08),
+                      AppColors.textSecondary.withValues(alpha: 0.16),
+                    ],
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      color: AppColors.primary,
+                ),
+                child: Center(
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: AppColors.background.withValues(alpha: 0.85),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildLoadingCard(height: 118),
-                const SizedBox(height: 12),
-                _buildLoadingCard(height: 92, compact: true),
-                const SizedBox(height: 12),
-                _buildLoadingCard(height: 210),
-              ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLoadingCard(height: 118),
+                  const SizedBox(height: 12),
+                  _buildLoadingCard(height: 92, compact: true),
+                  const SizedBox(height: 12),
+                  _buildLoadingCard(height: 210),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -892,12 +896,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       height: height,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE4E7EC)),
-        boxShadow: const [
+        border: Border.all(
+          color: AppColors.textSecondary.withValues(alpha: 0.12),
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F0F172A),
+            color: AppColors.textSecondary.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -928,7 +934,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         width: width == double.infinity ? null : width,
         height: 14,
         decoration: BoxDecoration(
-          color: const Color(0xFFE9EEF5),
+          color: AppColors.textSecondary.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(999),
         ),
       ),
@@ -949,7 +955,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: _pageBackground,
+        backgroundColor: AppColors.secondBackground,
         body: BlocConsumer<CommunityDetailBloc, CommunityDetailState>(
           listener: (context, state) {
             if (state is CommunityActionSuccess) {
@@ -999,6 +1005,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                             state.message,
                           ),
                           textAlign: TextAlign.center,
+                          style: TextStyle(color: AppColors.textPrimary),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -1031,14 +1038,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                           state.community.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF1C1E21),
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         leading: IconButton(
                           icon: const Icon(Icons.arrow_back_rounded),
-                          color: const Color(0xFF1C1E21),
+                          color: AppColors.iconPrimary,
                           onPressed: () => Navigator.of(context).maybePop(),
                         ),
                         actions: [
@@ -1056,8 +1063,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                         ],
                         expandedHeight: 240,
                         pinned: true,
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF1C1E21),
+                        backgroundColor: AppColors.background,
+                        foregroundColor: AppColors.iconPrimary,
                         surfaceTintColor: Colors.transparent,
                         scrolledUnderElevation: 0,
                         flexibleSpace: FlexibleSpaceBar(
@@ -1068,11 +1075,11 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
-                                      color: const Color(0xFFBCC0C4),
-                                      child: const Center(
+                                      color: AppColors.secondBackground,
+                                      child: Center(
                                         child: Icon(
                                           Icons.image_not_supported,
-                                          color: Color(0xFF65676B),
+                                          color: AppColors.textSecondary,
                                           size: 36,
                                         ),
                                       ),
@@ -1120,9 +1127,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                     ),
                                   ),
                               onLeave: () =>
-                                  context.read<CommunityDetailBloc>().add(
-                                    LeaveCommunityRequested(widget.communityId),
-                                  ),
+                                  _showLeaveConfirmation(context),
                               onManage: null,
                             ),
                             const SizedBox(height: 8),

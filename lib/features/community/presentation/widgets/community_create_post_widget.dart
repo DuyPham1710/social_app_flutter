@@ -21,11 +21,11 @@ class CommunityCreatePostWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F000000),
+            color: AppColors.textSecondary.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: Offset(0, 4),
           ),
@@ -41,12 +41,12 @@ class CommunityCreatePostWidget extends StatelessWidget {
 
               return CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFE4E6EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: currentAvatarUrl != null
                     ? NetworkImage(currentAvatarUrl)
                     : null,
                 child: currentAvatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF65676B))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               );
             },
@@ -61,16 +61,21 @@ class CommunityCreatePostWidget extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F2F5),
+                  color: AppColors.secondBackground,
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: const Color(0xFFDADDE1)),
+                  border: Border.all(color: AppColors.divider),
                 ),
-                child: Text(
-                  context.l10n.communityWritePostHint,
-                  style: const TextStyle(
-                    color: Color(0xFF65676B),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    context.l10n.communityWritePostHint,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
@@ -78,10 +83,7 @@ class CommunityCreatePostWidget extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(
-              Icons.photo_library_outlined,
-              color: Color(0xFF1877F2),
-            ),
+            icon: Icon(Icons.photo_library_outlined, color: AppColors.primary),
             onPressed: onCreatePost,
           ),
         ],

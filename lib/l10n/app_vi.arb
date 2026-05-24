@@ -823,9 +823,25 @@
   "notificationApprovePostTitle": "Duyệt bài viết",
   "notificationCannotHandleInvite": "Không thể xử lý lời mời này",
   "notificationCannotHandleJoinRequest": "Không thể xử lý yêu cầu tham gia này",
+  "notificationCommentedOnYourPost": "đã bình luận về bài viết của bạn:",
+  "notificationCommunityJoinApprovedByAdmin": "Admin đã chấp nhận yêu cầu tham gia cộng đồng",
+  "notificationCommunityJoined": "đã tham gia cộng đồng",
+  "notificationCommunityJoinRejectedByAdmin": "Admin đã từ chối yêu cầu tham gia cộng đồng",
+  "notificationCommunityJoinRequestSent": "đã gửi yêu cầu tham gia cộng đồng",
+  "notificationCommunityPostApprovedByAdmin": "Admin đã duyệt bài viết của bạn trong cộng đồng",
+  "notificationCommunityPostRejectedByAdmin": "Admin đã từ chối bài viết của bạn trong cộng đồng",
+  "notificationCommunityPostRequestSent": "đã gửi yêu cầu đăng bài vào cộng đồng",
   "notificationEmpty": "Chưa có thông báo nào",
   "notificationEndOfList": "Đã xem hết thông báo",
   "notificationExplanation": "Giải thích",
+  "notificationFaceTagSuggestions": "Nhận diện {count} người trong ảnh của bạn. Gắn thẻ ngay!",
+  "@notificationFaceTagSuggestions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "notificationFriendRequestMessage": "đã gửi lời mời kết bạn",
   "notificationInviteAccepted": "Đã chấp nhận lời mời",
   "notificationInviteFailed": "Không thể xử lý lời mời",
@@ -837,15 +853,21 @@
   "notificationJoinRequestFailed": "Không thể xử lý yêu cầu tham gia",
   "notificationJoinRequestMessage": "muốn tham gia cộng đồng",
   "notificationJoinRequestRejected": "Đã từ chối yêu cầu tham gia",
+  "notificationMentionedYouInComment": "đã nhắc đến bạn trong một bình luận:",
   "notificationNew": "Mới",
+  "notificationNewFriendRequest": "Bạn có lời mời kết bạn mới",
   "notificationOlder": "Trước đó",
   "notificationPendingPostNotFound": "Không tìm thấy bài viết đang chờ duyệt",
+  "notificationPostedWithYou": "đã đăng một bài viết có mặt bạn",
   "notificationPostApprovedMessage": "bài viết của bạn đã được duyệt",
   "notificationPostPendingMessage": "đã gửi bài viết đang chờ duyệt",
   "notificationPostRejectedMessage": "bài viết của bạn đã bị từ chối",
   "notificationPostReportTitle": "Chi tiết báo cáo bài viết",
   "notificationPublicJoinMessage": "đã tham gia cộng đồng",
   "notificationRefreshTooltip": "Tải lại thông báo",
+  "notificationReactedToYourComment": "đã thả cảm xúc về bình luận của bạn:",
+  "notificationReactedToYourPost": "đã bày tỏ cảm xúc về bài viết của bạn:",
+  "notificationReactedToYourStory": "đã bày tỏ cảm xúc về tin của bạn của bạn:",
   "notificationReportRejected": "Báo cáo đã bị từ chối",
   "notificationReportRejectedReason": "Báo cáo không đủ điều kiện xử lý.",
   "notificationReportReviewed": "Báo cáo đã được xử lý",
@@ -858,6 +880,7 @@
       }
     }
   },
+  "notificationTaggedYouInPost": "đã gắn thẻ bạn trong một bài viết",
   "notificationTitle": "Thông báo",
   "postAddCaptionHint": "Thêm chú thích...",
   "postAddPhotoVideo": "Thêm ảnh/video",
@@ -929,6 +952,46 @@
     }
   },
   "postEditPrivacy": "Chỉnh sửa quyền riêng tư",
+  "privacyPostQuestion": "Ai có thể xem bài viết của bạn?",
+  "privacyPostPublic": "Công khai",
+  "privacyPostPublicDescription": "Bất kỳ ai ở trên hoặc ngoài App",
+  "privacyPostFriends": "Bạn bè",
+  "privacyPostFriendsDescription": "Bạn bè của bạn trên App",
+  "privacyPostFriendsExcept": "Bạn bè ngoại trừ...",
+  "privacyPostFriendsExceptDescription": "Ẩn bài viết khỏi một số bạn bè",
+  "privacyPostSpecificFriends": "Bạn bè cụ thể",
+  "privacyPostSpecificFriendsDescription": "Chỉ hiển thị với một vài bạn",
+  "privacyPostOnlyMe": "Chỉ mình tôi",
+  "privacyPostOnlyMeDescription": "Chỉ mình tôi",
+  "privacyPostEditDescription": "Bạn có thể thay đổi ai có thể xem bài viết này.",
+  "privacyPostCreateDescription": "Bài viết của bạn sẽ hiển thị trên Bảng feed, trang cá nhân và trong kết quả tìm kiếm.\n\nTùy đối tượng mặc định là {defaultPrivacy}, nhưng bạn có thể thay đổi đối tượng của riêng bài viết này.",
+  "@privacyPostCreateDescription": {
+    "placeholders": {
+      "defaultPrivacy": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyPostNoOneSelected": "Chưa chọn ai",
+  "privacyPostOnePerson": "1 người",
+  "privacyPostFallbackUser": "Người dùng",
+  "privacyPostAndOthers": "{firstNames} và {count} người khác",
+  "@privacyPostAndOthers": {
+    "placeholders": {
+      "firstNames": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "privacyPostHideFromTitle": "Ẩn bài viết với",
+  "privacyPostSelectPeopleToShare": "Chọn người để chia sẻ bài viết",
+  "privacyPostCurrentDefault": "Đây là đối tượng mặc định hiện tại",
+  "privacyPostSetAsDefault": "Đặt làm đối tượng mặc định",
+  "privacyPostUpdated": "Đã cập nhật quyền riêng tư",
+  "privacyPostUpdateFailed": "Không thể cập nhật quyền riêng tư",
   "postErrorPrefix": "Lỗi: {message}",
   "@postErrorPrefix": {
     "placeholders": {

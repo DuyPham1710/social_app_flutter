@@ -42,11 +42,11 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
   final CommunityRepository _communityRepository = s1<CommunityRepository>();
   final TextEditingController _searchController = TextEditingController();
 
-  static const Color _surface = Colors.white;
-  static const Color _pageTint = Color(0xFFF7F9FC);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _text = Color(0xFF111827);
-  static const Color _mutedText = Color(0xFF6B7280);
+  static Color get _surface => AppColors.background;
+  static Color get _pageTint => AppColors.secondBackground;
+  static Color get _border => AppColors.divider;
+  static Color get _text => AppColors.textPrimary;
+  static Color get _mutedText => AppColors.textSecondary;
 
   @override
   void initState() {
@@ -107,9 +107,9 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                 color: _surface,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: _border),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x100F172A),
+                    color: AppColors.textSecondary.withValues(alpha: 0.08),
                     blurRadius: 18,
                     offset: Offset(0, 8),
                   ),
@@ -231,7 +231,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                     : context.l10n.communityMembers,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
                   color: _text,
@@ -240,7 +240,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
               const SizedBox(height: 2),
               Text(
                 countLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   color: _mutedText,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -255,10 +255,12 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             onPressed: isLoading ? null : _refreshMembers,
             icon: const Icon(Icons.refresh_rounded),
             style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF3F4F6),
+              backgroundColor: AppColors.secondBackground,
               foregroundColor: _text,
-              disabledBackgroundColor: const Color(0xFFF3F4F6),
-              disabledForegroundColor: const Color(0xFFB6BEC9),
+              disabledBackgroundColor: AppColors.secondBackground,
+              disabledForegroundColor: AppColors.textSecondary.withValues(
+                alpha: 0.55,
+              ),
             ),
           ),
         ),
@@ -273,7 +275,12 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: context.l10n.communitySearchMembersHint,
-        prefixIcon: const Icon(Icons.search_rounded, size: 21),
+        hintStyle: TextStyle(color: AppColors.textSecondary),
+        prefixIcon: Icon(
+          Icons.search_rounded,
+          size: 21,
+          color: AppColors.textSecondary,
+        ),
         suffixIcon: _searchController.text.isEmpty
             ? null
             : IconButton(
@@ -282,7 +289,11 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                   _searchController.clear();
                   setState(() {});
                 },
-                icon: const Icon(Icons.close_rounded, size: 20),
+                icon: Icon(
+                  Icons.close_rounded,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
               ),
         isDense: true,
         filled: true,
@@ -293,17 +304,18 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _border),
+          borderSide: BorderSide(color: _border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _border),
+          borderSide: BorderSide(color: _border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: AppColors.primary, width: 1.3),
         ),
       ),
+      style: TextStyle(color: AppColors.textPrimary),
     );
   }
 
@@ -325,7 +337,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             ),
           ),
           if (index != members.length - 1)
-            const Divider(height: 1, indent: 64, color: Color(0xFFEFF2F6)),
+            Divider(height: 1, indent: 64, color: AppColors.divider),
         ],
       ],
     );
@@ -337,9 +349,11 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF1F2),
+        color: const Color(0xFFE11D48).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFECACA)),
+        border: Border.all(
+          color: const Color(0xFFE11D48).withValues(alpha: 0.28),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,17 +413,17 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
           Container(
             width: 52,
             height: 52,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.background,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 28, color: const Color(0xFF9CA3AF)),
+            child: Icon(icon, size: 28, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 12),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               color: _text,
               fontSize: 15,
               fontWeight: FontWeight.w800,
@@ -419,11 +433,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: _mutedText,
-              fontSize: 13,
-              height: 1.35,
-            ),
+            style: TextStyle(color: _mutedText, fontSize: 13, height: 1.35),
           ),
         ],
       ),
@@ -593,10 +603,10 @@ class _MemberTile extends StatelessWidget {
                             user.fullName ?? context.l10n.commonUser,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF111827),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -648,18 +658,18 @@ class _MemberTile extends StatelessWidget {
                       ),
                     ),
                   ],
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
                     child: Icon(
                       Icons.more_horiz_rounded,
-                      color: Color(0xFF6B7280),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 )
               else
-                const Icon(
+                Icon(
                   Icons.chevron_right_rounded,
-                  color: Color(0xFFB6BEC9),
+                  color: AppColors.textSecondary.withValues(alpha: 0.55),
                 ),
             ],
           ),
@@ -687,7 +697,7 @@ class _MemberAvatar extends StatelessWidget {
       height: 52,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: const Color(0xFFEFF2F6), width: 2),
+        border: Border.all(color: AppColors.divider, width: 2),
       ),
       child: ClipOval(
         child: hasAvatar
@@ -735,12 +745,12 @@ class _RolePill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isAdmin
-            ? const Color(0xFFEFF6FF)
+            ? AppColors.primary.withValues(alpha: 0.12)
             : AppColors.primary.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: isAdmin
-              ? const Color(0xFFBFDBFE)
+              ? AppColors.primary.withValues(alpha: 0.24)
               : AppColors.primary.withValues(alpha: 0.18),
         ),
       ),
@@ -750,7 +760,7 @@ class _RolePill extends StatelessWidget {
           Icon(
             isAdmin ? Icons.verified_user_rounded : Icons.person_rounded,
             size: 12,
-            color: isAdmin ? const Color(0xFF2563EB) : AppColors.primary,
+            color: AppColors.primary,
           ),
           const SizedBox(width: 4),
           Text(
@@ -758,7 +768,7 @@ class _RolePill extends StatelessWidget {
                 ? context.l10n.communityAdmin
                 : context.l10n.communityMember,
             style: TextStyle(
-              color: isAdmin ? const Color(0xFF1D4ED8) : AppColors.primary,
+              color: AppColors.primary,
               fontSize: 11,
               fontWeight: FontWeight.w800,
             ),
@@ -779,16 +789,16 @@ class _JoinedDate extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(
+        Icon(
           Icons.calendar_today_rounded,
           size: 12,
-          color: Color(0xFF9CA3AF),
+          color: AppColors.textSecondary,
         ),
         const SizedBox(width: 4),
         Text(
           DateFormat('dd/MM/yyyy').format(date.toLocal()),
-          style: const TextStyle(
-            color: Color(0xFF9CA3AF),
+          style: TextStyle(
+            color: AppColors.textSecondary,
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
@@ -811,7 +821,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

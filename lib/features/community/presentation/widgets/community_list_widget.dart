@@ -85,12 +85,12 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             child: Container(
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE5EAF0)),
-                boxShadow: const [
+                border: Border.all(color: AppColors.divider),
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x0D0F172A),
+                    color: AppColors.textSecondary.withValues(alpha: 0.08),
                     blurRadius: 8,
                     offset: Offset(0, 3),
                   ),
@@ -100,11 +100,17 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: context.l10n.communitySearchHint,
-                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                  hintStyle: TextStyle(color: AppColors.textSecondary),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    size: 18,
+                    color: AppColors.textSecondary,
+                  ),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 10),
                 ),
+                style: TextStyle(color: AppColors.textPrimary),
                 onChanged: _onSearchChanged,
               ),
             ),
@@ -118,7 +124,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             ),
             child: PopupMenuButton<_CommunityFilter>(
               initialValue: _activeFilter,
-              color: Colors.white,
+              color: AppColors.background,
               padding: EdgeInsets.zero,
               onSelected: (value) {
                 setState(() {
@@ -131,7 +137,8 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                   height: 34,
                   child: Text(
                     context.l10n.commonAll,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -142,7 +149,8 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                   height: 34,
                   child: Text(
                     context.l10n.communityPublicOnly,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -153,7 +161,8 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                   height: 34,
                   child: Text(
                     context.l10n.communityPrivateOnly,
-                    style: const TextStyle(
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -167,12 +176,12 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE5EAF0)),
-                  boxShadow: const [
+                  border: Border.all(color: AppColors.divider),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x0D0F172A),
+                      color: AppColors.textSecondary.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: Offset(0, 3),
                     ),
@@ -185,7 +194,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                       Icons.tune_rounded,
                       size: 16,
                       color: _activeFilter == _CommunityFilter.all
-                          ? const Color(0xFF344054)
+                          ? AppColors.textSecondary
                           : AppColors.primary,
                     ),
                     if (_activeFilter != _CommunityFilter.all)
@@ -241,7 +250,9 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                           Icon(
                             Icons.groups_2_outlined,
                             size: 54,
-                            color: Colors.grey[400],
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.75,
+                            ),
                           ),
                           const SizedBox(height: 12),
                           Text(
@@ -250,7 +261,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                                 : context.l10n.communityEmpty,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.grey[700],
+                              color: AppColors.textSecondary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -365,9 +376,9 @@ class _SkeletonCommunityCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5EAF0)),
+          border: Border.all(color: AppColors.divider),
         ),
         child: const Row(
           children: [
@@ -423,7 +434,7 @@ class _SkeletonBlock extends StatelessWidget {
             height: height,
             width: width,
             decoration: BoxDecoration(
-              color: const Color(0xFFE4E7EC),
+              color: AppColors.textSecondary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(radius),
             ),
           ),

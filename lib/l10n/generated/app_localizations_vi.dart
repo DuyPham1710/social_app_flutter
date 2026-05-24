@@ -1683,6 +1683,37 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể xử lý yêu cầu tham gia này';
 
   @override
+  String get notificationCommentedOnYourPost =>
+      'đã bình luận về bài viết của bạn:';
+
+  @override
+  String get notificationCommunityJoinApprovedByAdmin =>
+      'Admin đã chấp nhận yêu cầu tham gia cộng đồng';
+
+  @override
+  String get notificationCommunityJoined => 'đã tham gia cộng đồng';
+
+  @override
+  String get notificationCommunityJoinRejectedByAdmin =>
+      'Admin đã từ chối yêu cầu tham gia cộng đồng';
+
+  @override
+  String get notificationCommunityJoinRequestSent =>
+      'đã gửi yêu cầu tham gia cộng đồng';
+
+  @override
+  String get notificationCommunityPostApprovedByAdmin =>
+      'Admin đã duyệt bài viết của bạn trong cộng đồng';
+
+  @override
+  String get notificationCommunityPostRejectedByAdmin =>
+      'Admin đã từ chối bài viết của bạn trong cộng đồng';
+
+  @override
+  String get notificationCommunityPostRequestSent =>
+      'đã gửi yêu cầu đăng bài vào cộng đồng';
+
+  @override
   String get notificationEmpty => 'Chưa có thông báo nào';
 
   @override
@@ -1690,6 +1721,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get notificationExplanation => 'Giải thích';
+
+  @override
+  String notificationFaceTagSuggestions(int count) {
+    return 'Nhận diện $count người trong ảnh của bạn. Gắn thẻ ngay!';
+  }
 
   @override
   String get notificationFriendRequestMessage => 'đã gửi lời mời kết bạn';
@@ -1728,7 +1764,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notificationJoinRequestRejected => 'Đã từ chối yêu cầu tham gia';
 
   @override
+  String get notificationMentionedYouInComment =>
+      'đã nhắc đến bạn trong một bình luận:';
+
+  @override
   String get notificationNew => 'Mới';
+
+  @override
+  String get notificationNewFriendRequest => 'Bạn có lời mời kết bạn mới';
 
   @override
   String get notificationOlder => 'Trước đó';
@@ -1736,6 +1779,9 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get notificationPendingPostNotFound =>
       'Không tìm thấy bài viết đang chờ duyệt';
+
+  @override
+  String get notificationPostedWithYou => 'đã đăng một bài viết có mặt bạn';
 
   @override
   String get notificationPostApprovedMessage =>
@@ -1758,6 +1804,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notificationRefreshTooltip => 'Tải lại thông báo';
 
   @override
+  String get notificationReactedToYourComment =>
+      'đã thả cảm xúc về bình luận của bạn:';
+
+  @override
+  String get notificationReactedToYourPost =>
+      'đã bày tỏ cảm xúc về bài viết của bạn:';
+
+  @override
+  String get notificationReactedToYourStory =>
+      'đã bày tỏ cảm xúc về tin của bạn của bạn:';
+
+  @override
   String get notificationReportRejected => 'Báo cáo đã bị từ chối';
 
   @override
@@ -1775,6 +1833,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String notificationReportStatus(String status) {
     return 'Trạng thái: $status';
   }
+
+  @override
+  String get notificationTaggedYouInPost => 'đã gắn thẻ bạn trong một bài viết';
 
   @override
   String get notificationTitle => 'Thông báo';
@@ -1883,6 +1944,82 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get postEditPrivacy => 'Chỉnh sửa quyền riêng tư';
+
+  @override
+  String get privacyPostQuestion => 'Ai có thể xem bài viết của bạn?';
+
+  @override
+  String get privacyPostPublic => 'Công khai';
+
+  @override
+  String get privacyPostPublicDescription => 'Bất kỳ ai ở trên hoặc ngoài App';
+
+  @override
+  String get privacyPostFriends => 'Bạn bè';
+
+  @override
+  String get privacyPostFriendsDescription => 'Bạn bè của bạn trên App';
+
+  @override
+  String get privacyPostFriendsExcept => 'Bạn bè ngoại trừ...';
+
+  @override
+  String get privacyPostFriendsExceptDescription =>
+      'Ẩn bài viết khỏi một số bạn bè';
+
+  @override
+  String get privacyPostSpecificFriends => 'Bạn bè cụ thể';
+
+  @override
+  String get privacyPostSpecificFriendsDescription =>
+      'Chỉ hiển thị với một vài bạn';
+
+  @override
+  String get privacyPostOnlyMe => 'Chỉ mình tôi';
+
+  @override
+  String get privacyPostOnlyMeDescription => 'Chỉ mình tôi';
+
+  @override
+  String get privacyPostEditDescription =>
+      'Bạn có thể thay đổi ai có thể xem bài viết này.';
+
+  @override
+  String privacyPostCreateDescription(String defaultPrivacy) {
+    return 'Bài viết của bạn sẽ hiển thị trên Bảng feed, trang cá nhân và trong kết quả tìm kiếm.\n\nTùy đối tượng mặc định là $defaultPrivacy, nhưng bạn có thể thay đổi đối tượng của riêng bài viết này.';
+  }
+
+  @override
+  String get privacyPostNoOneSelected => 'Chưa chọn ai';
+
+  @override
+  String get privacyPostOnePerson => '1 người';
+
+  @override
+  String get privacyPostFallbackUser => 'Người dùng';
+
+  @override
+  String privacyPostAndOthers(String firstNames, num count) {
+    return '$firstNames và $count người khác';
+  }
+
+  @override
+  String get privacyPostHideFromTitle => 'Ẩn bài viết với';
+
+  @override
+  String get privacyPostSelectPeopleToShare => 'Chọn người để chia sẻ bài viết';
+
+  @override
+  String get privacyPostCurrentDefault => 'Đây là đối tượng mặc định hiện tại';
+
+  @override
+  String get privacyPostSetAsDefault => 'Đặt làm đối tượng mặc định';
+
+  @override
+  String get privacyPostUpdated => 'Đã cập nhật quyền riêng tư';
+
+  @override
+  String get privacyPostUpdateFailed => 'Không thể cập nhật quyền riêng tư';
 
   @override
   String postErrorPrefix(String message) {

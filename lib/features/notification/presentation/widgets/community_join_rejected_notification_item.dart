@@ -15,6 +15,7 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
   final VoidCallback? onUserTap;
   final VoidCallback? onCommunityTap;
   final String? message;
+  final String actionText;
 
   const CommunityJoinRejectedNotificationItem({
     super.key,
@@ -27,6 +28,7 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
     required this.isRead,
     this.onUserTap,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -102,7 +104,7 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
                 Builder(
                   builder: (context) {
                     final msg =
-                        message ?? context.l10n.notificationJoinRejectedMessage;
+                      actionText;
                     return RichText(
                       text: TextSpan(
                         children: [

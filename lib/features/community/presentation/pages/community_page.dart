@@ -144,23 +144,28 @@ class _CommunityPageState extends State<CommunityPage>
           });
 
           return Scaffold(
-            backgroundColor: const Color(0xFFF4F7FB),
+            backgroundColor: AppColors.secondBackground,
             appBar: AppBar(
               toolbarHeight: 172,
               titleSpacing: 0,
               automaticallyImplyLeading: false,
               title: const SizedBox.shrink(),
-              backgroundColor: const Color(0xFFF4F7FB),
+              backgroundColor: AppColors.secondBackground,
+              foregroundColor: AppColors.iconPrimary,
               elevation: 0,
               scrolledUnderElevation: 0,
+              surfaceTintColor: Colors.transparent,
               flexibleSpace: Stack(
                 children: [
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xFFCCFBF1), Color(0xFFEFF6FF)],
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.18),
+                          AppColors.background,
+                        ],
                       ),
                     ),
                   ),
@@ -172,7 +177,7 @@ class _CommunityPageState extends State<CommunityPage>
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.35),
+                        color: AppColors.background.withValues(alpha: 0.35),
                       ),
                     ),
                   ),
@@ -184,7 +189,7 @@ class _CommunityPageState extends State<CommunityPage>
                       height: 110,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.28),
+                        color: AppColors.background.withValues(alpha: 0.28),
                       ),
                     ),
                   ),
@@ -204,7 +209,7 @@ class _CommunityPageState extends State<CommunityPage>
                                 }
                               },
                               icon: const Icon(Icons.arrow_back_rounded),
-                              color: const Color(0xFF0F172A),
+                              color: AppColors.iconPrimary,
                               tooltip: context.l10n.commonBack,
                               iconSize: 21,
                               visualDensity: VisualDensity.compact,
@@ -225,7 +230,7 @@ class _CommunityPageState extends State<CommunityPage>
                                 fontSize: 24,
                                 height: 1.1,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF0F172A),
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -241,7 +246,7 @@ class _CommunityPageState extends State<CommunityPage>
                                     softWrap: true,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: Color(0xFF475467),
+                                      color: AppColors.textSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -281,20 +286,20 @@ class _CommunityPageState extends State<CommunityPage>
               ),
             ),
             body: DecoratedBox(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFFF4F7FB), Color(0xFFFFFFFF)],
+                  colors: [AppColors.secondBackground, AppColors.background],
                 ),
               ),
               child: Column(
                 children: [
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                        bottom: BorderSide(color: AppColors.divider, width: 1),
                       ),
                     ),
                     child: TabBar(
@@ -317,7 +322,7 @@ class _CommunityPageState extends State<CommunityPage>
                         vertical: 4,
                       ),
                       labelColor: AppColors.primary,
-                      unselectedLabelColor: const Color(0xFF9CA3AF),
+                      unselectedLabelColor: AppColors.textSecondary,
                       dividerColor: Colors.transparent,
                       indicator: UnderlineTabIndicator(
                         borderSide: BorderSide(
@@ -432,12 +437,12 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
       padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5EAF0)),
-        boxShadow: const [
+        border: Border.all(color: AppColors.divider),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F0F172A),
+            color: AppColors.textSecondary.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: Offset(0, 3),
           ),
@@ -449,7 +454,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -465,8 +470,8 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               children: [
                 Text(
                   context.l10n.communityPostsTab,
-                  style: const TextStyle(
-                    color: Color(0xFF111827),
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w800,
                     fontSize: 14,
                   ),
@@ -477,8 +482,8 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                   child: Text(
                     _statusLabel(context, currentStatus),
                     key: ValueKey(currentStatus),
-                    style: const TextStyle(
-                      color: Color(0xFF667085),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                       fontSize: 12,
                     ),
@@ -490,7 +495,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
           PopupMenuButton<String>(
             tooltip: context.l10n.communityFilterPosts,
             initialValue: currentStatus,
-            color: Colors.white,
+            color: AppColors.background,
             elevation: 8,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -527,18 +532,22 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.secondBackground,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE5EAF0)),
+                border: Border.all(color: AppColors.divider),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.tune_rounded, color: Color(0xFF475467), size: 17),
-                  SizedBox(width: 5),
+                  Icon(
+                    Icons.tune_rounded,
+                    color: AppColors.textSecondary,
+                    size: 17,
+                  ),
+                  const SizedBox(width: 5),
                   Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: Color(0xFF667085),
+                    color: AppColors.textSecondary,
                     size: 18,
                   ),
                 ],
@@ -649,9 +658,9 @@ class _PostFilterOption extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: Color(0xFF111827),
+            color: AppColors.textPrimary,
           ),
         ),
       ],
@@ -673,12 +682,12 @@ class _PostsTabSkeleton extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE4E7EC)),
-              boxShadow: const [
+              border: Border.all(color: AppColors.divider),
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x0F0F172A),
+                  color: AppColors.textSecondary.withValues(alpha: 0.08),
                   blurRadius: 10,
                   offset: Offset(0, 3),
                 ),
@@ -717,7 +726,7 @@ class _PostsTabSkeleton extends StatelessWidget {
                     aspectRatio: 16 / 8.5,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE9EEF5),
+                        color: AppColors.textSecondary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -748,13 +757,17 @@ class _PostsEmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.article_outlined, size: 54, color: Colors.grey[400]),
+            Icon(
+              Icons.article_outlined,
+              size: 54,
+              color: AppColors.textSecondary.withValues(alpha: 0.75),
+            ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey[600],
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -795,9 +808,11 @@ class _PostsErrorState extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF1F2),
+            color: const Color(0xFFE11D48).withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFFECACA)),
+            border: Border.all(
+              color: const Color(0xFFE11D48).withValues(alpha: 0.28),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -810,8 +825,8 @@ class _PostsErrorState extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 context.l10n.homeLoadPostsFailed,
-                style: const TextStyle(
-                  color: Color(0xFF111827),
+                style: TextStyle(
+                  color: AppColors.textPrimary,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -819,7 +834,7 @@ class _PostsErrorState extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF667085)),
+                style: TextStyle(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
@@ -848,7 +863,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

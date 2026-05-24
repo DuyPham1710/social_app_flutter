@@ -166,6 +166,7 @@ class _NotificationPageState extends State<NotificationPage> {
           content: notification.message,
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
+          actionText: context.l10n.notificationCommentedOnYourPost,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -189,6 +190,7 @@ class _NotificationPageState extends State<NotificationPage> {
           content: notification.message,
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
+          actionText: context.l10n.notificationReactedToYourComment,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -215,6 +217,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           postId: notification.targetId,
+          actionText: context.l10n.notificationReactedToYourPost,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -234,6 +237,7 @@ class _NotificationPageState extends State<NotificationPage> {
           content: notification.content ?? '',
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
+          actionText: context.l10n.notificationReactedToYourStory,
           storyId: notification.targetId,
           onUserTap: () {
             _handleViewerProfileTap(context, notification.sender?.userId);
@@ -267,6 +271,7 @@ class _NotificationPageState extends State<NotificationPage> {
           message: notification.message,
           time: _timeAgo(context, notification.createdAt),
           postId: notification.targetId,
+          actionText: context.l10n.notificationPostedWithYou,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -283,6 +288,7 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           message: notification.message,
+          actionText: context.l10n.notificationTaggedYouInPost,
           time: _timeAgo(context, notification.createdAt),
           postId: notification.targetId,
           onUserTap: () {
@@ -327,6 +333,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoined,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -374,6 +381,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoinRequestSent,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -474,6 +482,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoinApprovedByAdmin,
           onCommunityTap: () {
             final id = notification.targetId;
             if (id != null) {
@@ -497,6 +506,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoinRejectedByAdmin,
           onUserTap: () {},
           onCommunityTap: () {
             final id = notification.targetId;
@@ -522,6 +532,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityPostApprovedByAdmin,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -572,6 +583,7 @@ class _NotificationPageState extends State<NotificationPage> {
           userId: notification.sender?.userId ?? '',
           communityName: notification.content ?? 'Community',
           time: _timeAgo(context, notification.createdAt),
+          actionText: context.l10n.notificationCommunityPostRequestSent,
           isRead: notification.isRead,
           message: notification.message,
           onUserTap: () {
@@ -665,6 +677,7 @@ class _NotificationPageState extends State<NotificationPage> {
           time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityPostRejectedByAdmin,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(

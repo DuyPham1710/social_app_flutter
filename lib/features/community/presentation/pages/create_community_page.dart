@@ -64,13 +64,14 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
   void _showImageSourceMenu({required bool isAvatar}) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: AppColors.background,
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt),
+              leading: Icon(Icons.camera_alt, color: AppColors.iconPrimary),
               title: Text(context.l10n.postCamera),
               onTap: () {
                 Navigator.pop(context);
@@ -78,7 +79,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.image),
+              leading: Icon(Icons.image, color: AppColors.iconPrimary),
               title: Text(context.l10n.communityChooseFromLibrary),
               onTap: () {
                 Navigator.pop(context);
@@ -115,15 +116,20 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
           }
         },
         child: Scaffold(
-          backgroundColor: const Color(0xFFF4F7FB),
+          backgroundColor: AppColors.secondBackground,
           appBar: AppBar(
             title: Text(
               context.l10n.communityCreateTitle,
-              style: const TextStyle(fontWeight: FontWeight.w700),
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            backgroundColor: const Color(0xFFF4F7FB),
+            backgroundColor: AppColors.secondBackground,
+            foregroundColor: AppColors.iconPrimary,
             elevation: 0,
             scrolledUnderElevation: 0,
+            surfaceTintColor: Colors.transparent,
           ),
           body: BlocBuilder<CommunityCreateBloc, CommunityCreateState>(
             builder: (context, state) {
@@ -131,42 +137,13 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1363DF), Color(0xFF0096C7)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.groups_2_rounded,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              context.l10n.communityCreateIntro,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    // Avatar Section
+                  children: [                    // Avatar Section
                     Text(
                       context.l10n.communityAvatar,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
@@ -175,9 +152,9 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                         width: double.infinity,
                         height: 180,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.background,
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFFD0D5DD)),
+                          border: Border.all(color: AppColors.divider),
                         ),
                         child: _avatarPath != null
                             ? ClipRRect(
@@ -193,8 +170,10 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                   children: [
                                     Container(
                                       padding: const EdgeInsets.all(10),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFEAF2FF),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.12,
+                                        ),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
@@ -206,7 +185,9 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                     const SizedBox(height: 8),
                                     Text(
                                       context.l10n.communityChooseAvatar,
-                                      style: TextStyle(color: Colors.grey[700]),
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -218,7 +199,10 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                     // Cover Image Section
                     Text(
                       context.l10n.communityCoverImage,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
@@ -227,9 +211,9 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                         width: double.infinity,
                         height: 150,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.background,
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFFD0D5DD)),
+                          border: Border.all(color: AppColors.divider),
                         ),
                         child: _coverImagePath != null
                             ? ClipRRect(
@@ -245,20 +229,24 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                   children: [
                                     Container(
                                       padding: const EdgeInsets.all(10),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFE8FBF5),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.12,
+                                        ),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.wallpaper_rounded,
                                         size: 28,
-                                        color: Color(0xFF0F766E),
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       context.l10n.communityChooseCover,
-                                      style: TextStyle(color: Colors.grey[700]),
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -270,32 +258,42 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                     // Name Field
                     Text(
                       context.l10n.communityName,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _nameController,
                       decoration: InputDecoration(
                         hintText: context.l10n.communityNameHint,
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.background,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFD0D5DD),
-                          ),
+                          borderSide: BorderSide(color: AppColors.divider),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary),
                         ),
                       ),
+                      style: TextStyle(color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: 16),
 
                     // Description Field
                     Text(
                       context.l10n.communityDescription,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     TextField(
@@ -303,35 +301,49 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                       maxLines: 4,
                       decoration: InputDecoration(
                         hintText: context.l10n.communityDescriptionHint,
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.background,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFD0D5DD),
-                          ),
+                          borderSide: BorderSide(color: AppColors.divider),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary),
                         ),
                       ),
+                      style: TextStyle(color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: 16),
 
                     // Privacy Dropdown
                     Text(
                       context.l10n.communityType,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       value: _selectedPrivacy,
+                      dropdownColor: AppColors.background,
+                      iconEnabledColor: AppColors.iconPrimary,
+                      style: TextStyle(color: AppColors.textPrimary),
                       items: [
                         DropdownMenuItem(
                           value: 'public',
                           child: Row(
                             children: [
-                              const Icon(Icons.public, size: 20),
+                              Icon(
+                                Icons.public,
+                                size: 20,
+                                color: AppColors.iconPrimary,
+                              ),
                               const SizedBox(width: 8),
                               Text(context.l10n.communityPublic),
                             ],
@@ -341,7 +353,11 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                           value: 'private',
                           child: Row(
                             children: [
-                              const Icon(Icons.lock, size: 20),
+                              Icon(
+                                Icons.lock,
+                                size: 20,
+                                color: AppColors.iconPrimary,
+                              ),
                               const SizedBox(width: 8),
                               Text(context.l10n.communityPrivate),
                             ],
@@ -355,15 +371,17 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                       },
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.background,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFD0D5DD),
-                          ),
+                          borderSide: BorderSide(color: AppColors.divider),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primary),
                         ),
                       ),
                     ),
@@ -399,6 +417,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                               },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),

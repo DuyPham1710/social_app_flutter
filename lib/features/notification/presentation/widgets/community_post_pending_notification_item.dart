@@ -17,6 +17,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
   final VoidCallback? onViewPost;
   final VoidCallback? onCommunityTap;
   final VoidCallback? onReviewTap;
+  final String actionText;
 
   const CommunityPostPendingNotificationItem({
     super.key,
@@ -31,6 +32,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
     this.onViewPost,
     this.onCommunityTap,
     this.onReviewTap,
+    required this.actionText,
   });
 
   @override
@@ -106,8 +108,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                   Builder(
                     builder: (context) {
                       final msg =
-                          message ??
-                          context.l10n.notificationPostPendingMessage;
+                        actionText;
                       final List<TextSpan> spans = [];
                       spans.add(
                         TextSpan(

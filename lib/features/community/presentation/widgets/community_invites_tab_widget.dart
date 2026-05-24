@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
@@ -54,11 +55,18 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.mail_outline, size: 64, color: Colors.grey[400]),
+                    Icon(
+                      Icons.mail_outline,
+                      size: 64,
+                      color: AppColors.textSecondary.withValues(alpha: 0.75),
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       context.l10n.communityNoCommunityInvites,
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),
@@ -136,8 +144,11 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                       vertical: 8,
                     ),
                     child: Material(
-                      color: Colors.white,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(12),
+                      shadowColor: AppColors.textSecondary.withValues(
+                        alpha: 0.08,
+                      ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         child: Padding(
@@ -162,7 +173,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                         ? Icon(
                                             Icons.groups,
                                             size: 28,
-                                            color: Colors.grey[600],
+                                            color: AppColors.textSecondary,
                                           )
                                         : null,
                                   ),
@@ -175,9 +186,10 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                       children: [
                                         Text(
                                           communityName,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
+                                            color: AppColors.textPrimary,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -188,7 +200,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                             communityDescription!,
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Colors.grey[600],
+                                              color: AppColors.textSecondary,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -200,7 +212,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                           ),
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey[500],
+                                            color: AppColors.textSecondary,
                                           ),
                                         ),
                                       ],

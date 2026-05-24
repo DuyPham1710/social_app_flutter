@@ -12,6 +12,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   final bool isRead;
   final VoidCallback? onCommunityTap;
   final String? message;
+  final String actionText;
 
   const CommunityJoinApprovedNotificationItem({
     super.key,
@@ -21,6 +22,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
     required this.time,
     required this.isRead,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -89,8 +91,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final msg =
-                        message ?? context.l10n.notificationJoinApprovedMessage;
+                    final msg = actionText;
                     return RichText(
                       text: TextSpan(
                         children: [

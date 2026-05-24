@@ -1537,7 +1537,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get friendPeopleYouMayKnow => 'People you may know';
+  String get friendPeopleYouMayKnow => 'Recommended for you';
 
   @override
   String get friendReject => 'Reject';
@@ -1666,7 +1666,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationApprove => 'Approve';
 
   @override
-  String get notificationApprovePostAction => 'Approve post';
+  String get notificationApprovePostAction => 'Approve';
 
   @override
   String get notificationApprovePostTitle => 'Review post';
@@ -1679,6 +1679,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unable to handle this join request';
 
   @override
+  String get notificationCommentedOnYourPost => 'commented on your post:';
+
+  @override
+  String get notificationCommunityJoinApprovedByAdmin =>
+      'Admin approved your community join request';
+
+  @override
+  String get notificationCommunityJoined => 'joined the community';
+
+  @override
+  String get notificationCommunityJoinRejectedByAdmin =>
+      'Admin rejected your community join request';
+
+  @override
+  String get notificationCommunityJoinRequestSent =>
+      'sent a request to join the community';
+
+  @override
+  String get notificationCommunityPostApprovedByAdmin =>
+      'Admin approved your post in the community';
+
+  @override
+  String get notificationCommunityPostRejectedByAdmin =>
+      'Admin rejected your post in the community';
+
+  @override
+  String get notificationCommunityPostRequestSent =>
+      'sent a post request to the community';
+
+  @override
   String get notificationEmpty => 'No notifications yet';
 
   @override
@@ -1686,6 +1716,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationExplanation => 'Explanation';
+
+  @override
+  String notificationFaceTagSuggestions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Recognized $count people in your photo. Tag them now!',
+      one: 'Recognized 1 person in your photo. Tag them now!',
+      zero: 'Recognized 0 people in your photo. Tag them now!',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get notificationFriendRequestMessage => 'sent you a friend request';
@@ -1723,13 +1765,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationJoinRequestRejected => 'Join request rejected';
 
   @override
+  String get notificationMentionedYouInComment => 'mentioned you in a comment:';
+
+  @override
   String get notificationNew => 'New';
+
+  @override
+  String get notificationNewFriendRequest => 'You have a new friend request';
 
   @override
   String get notificationOlder => 'Earlier';
 
   @override
   String get notificationPendingPostNotFound => 'Pending post not found';
+
+  @override
+  String get notificationPostedWithYou => 'posted something with you in it';
 
   @override
   String get notificationPostApprovedMessage => 'your post was approved';
@@ -1751,6 +1802,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationRefreshTooltip => 'Refresh notifications';
 
   @override
+  String get notificationReactedToYourComment => 'reacted to your comment:';
+
+  @override
+  String get notificationReactedToYourPost => 'reacted to your post:';
+
+  @override
+  String get notificationReactedToYourStory => 'reacted to your story:';
+
+  @override
   String get notificationReportRejected => 'Report rejected';
 
   @override
@@ -1768,6 +1828,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String notificationReportStatus(String status) {
     return 'Status: $status';
   }
+
+  @override
+  String get notificationTaggedYouInPost => 'tagged you in a post';
 
   @override
   String get notificationTitle => 'Notifications';
@@ -1877,6 +1940,84 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get postEditPrivacy => 'Edit privacy';
+
+  @override
+  String get privacyPostQuestion => 'Who can see your post?';
+
+  @override
+  String get privacyPostPublic => 'Public';
+
+  @override
+  String get privacyPostPublicDescription => 'Anyone on or off the app';
+
+  @override
+  String get privacyPostFriends => 'Friends';
+
+  @override
+  String get privacyPostFriendsDescription => 'Your friends on the app';
+
+  @override
+  String get privacyPostFriendsExcept => 'Friends except...';
+
+  @override
+  String get privacyPostFriendsExceptDescription =>
+      'Hide this post from some friends';
+
+  @override
+  String get privacyPostSpecificFriends => 'Specific friends';
+
+  @override
+  String get privacyPostSpecificFriendsDescription =>
+      'Only show this to a few friends';
+
+  @override
+  String get privacyPostOnlyMe => 'Only me';
+
+  @override
+  String get privacyPostOnlyMeDescription => 'Only me';
+
+  @override
+  String get privacyPostEditDescription =>
+      'You can change who can see this post.';
+
+  @override
+  String privacyPostCreateDescription(String defaultPrivacy) {
+    return 'Your post will appear in Feed, on your profile, and in search results.\n\nThe default audience is $defaultPrivacy, but you can change the audience for this post.';
+  }
+
+  @override
+  String get privacyPostNoOneSelected => 'No one selected';
+
+  @override
+  String get privacyPostOnePerson => '1 person';
+
+  @override
+  String get privacyPostFallbackUser => 'User';
+
+  @override
+  String privacyPostAndOthers(String firstNames, num count) {
+    return '$firstNames and $count others';
+  }
+
+  @override
+  String get privacyPostHideFromTitle => 'Hide post from';
+
+  @override
+  String get privacyPostSelectPeopleToShare =>
+      'Choose people to share this post with';
+
+  @override
+  String get privacyPostCurrentDefault =>
+      'This is your current default audience';
+
+  @override
+  String get privacyPostSetAsDefault => 'Set as default audience';
+
+  @override
+  String get privacyPostUpdated => 'Privacy updated';
+
+  @override
+  String get privacyPostUpdateFailed => 'Unable to update privacy';
 
   @override
   String postErrorPrefix(String message) {

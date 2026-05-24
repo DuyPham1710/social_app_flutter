@@ -3006,6 +3006,54 @@ abstract class AppLocalizations {
   /// **'Không thể xử lý yêu cầu tham gia này'**
   String get notificationCannotHandleJoinRequest;
 
+  /// No description provided for @notificationCommentedOnYourPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã bình luận về bài viết của bạn:'**
+  String get notificationCommentedOnYourPost;
+
+  /// No description provided for @notificationCommunityJoinApprovedByAdmin.
+  ///
+  /// In vi, this message translates to:
+  /// **'Admin đã chấp nhận yêu cầu tham gia cộng đồng'**
+  String get notificationCommunityJoinApprovedByAdmin;
+
+  /// No description provided for @notificationCommunityJoined.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã tham gia cộng đồng'**
+  String get notificationCommunityJoined;
+
+  /// No description provided for @notificationCommunityJoinRejectedByAdmin.
+  ///
+  /// In vi, this message translates to:
+  /// **'Admin đã từ chối yêu cầu tham gia cộng đồng'**
+  String get notificationCommunityJoinRejectedByAdmin;
+
+  /// No description provided for @notificationCommunityJoinRequestSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã gửi yêu cầu tham gia cộng đồng'**
+  String get notificationCommunityJoinRequestSent;
+
+  /// No description provided for @notificationCommunityPostApprovedByAdmin.
+  ///
+  /// In vi, this message translates to:
+  /// **'Admin đã duyệt bài viết của bạn trong cộng đồng'**
+  String get notificationCommunityPostApprovedByAdmin;
+
+  /// No description provided for @notificationCommunityPostRejectedByAdmin.
+  ///
+  /// In vi, this message translates to:
+  /// **'Admin đã từ chối bài viết của bạn trong cộng đồng'**
+  String get notificationCommunityPostRejectedByAdmin;
+
+  /// No description provided for @notificationCommunityPostRequestSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã gửi yêu cầu đăng bài vào cộng đồng'**
+  String get notificationCommunityPostRequestSent;
+
   /// No description provided for @notificationEmpty.
   ///
   /// In vi, this message translates to:
@@ -3023,6 +3071,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Giải thích'**
   String get notificationExplanation;
+
+  /// No description provided for @notificationFaceTagSuggestions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận diện {count} người trong ảnh của bạn. Gắn thẻ ngay!'**
+  String notificationFaceTagSuggestions(int count);
 
   /// No description provided for @notificationFriendRequestMessage.
   ///
@@ -3090,11 +3144,23 @@ abstract class AppLocalizations {
   /// **'Đã từ chối yêu cầu tham gia'**
   String get notificationJoinRequestRejected;
 
+  /// No description provided for @notificationMentionedYouInComment.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã nhắc đến bạn trong một bình luận:'**
+  String get notificationMentionedYouInComment;
+
   /// No description provided for @notificationNew.
   ///
   /// In vi, this message translates to:
   /// **'Mới'**
   String get notificationNew;
+
+  /// No description provided for @notificationNewFriendRequest.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có lời mời kết bạn mới'**
+  String get notificationNewFriendRequest;
 
   /// No description provided for @notificationOlder.
   ///
@@ -3107,6 +3173,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Không tìm thấy bài viết đang chờ duyệt'**
   String get notificationPendingPostNotFound;
+
+  /// No description provided for @notificationPostedWithYou.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã đăng một bài viết có mặt bạn'**
+  String get notificationPostedWithYou;
 
   /// No description provided for @notificationPostApprovedMessage.
   ///
@@ -3144,6 +3216,24 @@ abstract class AppLocalizations {
   /// **'Tải lại thông báo'**
   String get notificationRefreshTooltip;
 
+  /// No description provided for @notificationReactedToYourComment.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã thả cảm xúc về bình luận của bạn:'**
+  String get notificationReactedToYourComment;
+
+  /// No description provided for @notificationReactedToYourPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã bày tỏ cảm xúc về bài viết của bạn:'**
+  String get notificationReactedToYourPost;
+
+  /// No description provided for @notificationReactedToYourStory.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã bày tỏ cảm xúc về tin của bạn của bạn:'**
+  String get notificationReactedToYourStory;
+
   /// No description provided for @notificationReportRejected.
   ///
   /// In vi, this message translates to:
@@ -3173,6 +3263,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Trạng thái: {status}'**
   String notificationReportStatus(String status);
+
+  /// No description provided for @notificationTaggedYouInPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã gắn thẻ bạn trong một bài viết'**
+  String get notificationTaggedYouInPost;
 
   /// No description provided for @notificationTitle.
   ///
@@ -3347,6 +3443,144 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chỉnh sửa quyền riêng tư'**
   String get postEditPrivacy;
+
+  /// No description provided for @privacyPostQuestion.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ai có thể xem bài viết của bạn?'**
+  String get privacyPostQuestion;
+
+  /// No description provided for @privacyPostPublic.
+  ///
+  /// In vi, this message translates to:
+  /// **'Công khai'**
+  String get privacyPostPublic;
+
+  /// No description provided for @privacyPostPublicDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bất kỳ ai ở trên hoặc ngoài App'**
+  String get privacyPostPublicDescription;
+
+  /// No description provided for @privacyPostFriends.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn bè'**
+  String get privacyPostFriends;
+
+  /// No description provided for @privacyPostFriendsDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn bè của bạn trên App'**
+  String get privacyPostFriendsDescription;
+
+  /// No description provided for @privacyPostFriendsExcept.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn bè ngoại trừ...'**
+  String get privacyPostFriendsExcept;
+
+  /// No description provided for @privacyPostFriendsExceptDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn bài viết khỏi một số bạn bè'**
+  String get privacyPostFriendsExceptDescription;
+
+  /// No description provided for @privacyPostSpecificFriends.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn bè cụ thể'**
+  String get privacyPostSpecificFriends;
+
+  /// No description provided for @privacyPostSpecificFriendsDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ hiển thị với một vài bạn'**
+  String get privacyPostSpecificFriendsDescription;
+
+  /// No description provided for @privacyPostOnlyMe.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ mình tôi'**
+  String get privacyPostOnlyMe;
+
+  /// No description provided for @privacyPostOnlyMeDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ mình tôi'**
+  String get privacyPostOnlyMeDescription;
+
+  /// No description provided for @privacyPostEditDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có thể thay đổi ai có thể xem bài viết này.'**
+  String get privacyPostEditDescription;
+
+  /// No description provided for @privacyPostCreateDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bài viết của bạn sẽ hiển thị trên Bảng feed, trang cá nhân và trong kết quả tìm kiếm.\n\nTùy đối tượng mặc định là {defaultPrivacy}, nhưng bạn có thể thay đổi đối tượng của riêng bài viết này.'**
+  String privacyPostCreateDescription(String defaultPrivacy);
+
+  /// No description provided for @privacyPostNoOneSelected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa chọn ai'**
+  String get privacyPostNoOneSelected;
+
+  /// No description provided for @privacyPostOnePerson.
+  ///
+  /// In vi, this message translates to:
+  /// **'1 người'**
+  String get privacyPostOnePerson;
+
+  /// No description provided for @privacyPostFallbackUser.
+  ///
+  /// In vi, this message translates to:
+  /// **'Người dùng'**
+  String get privacyPostFallbackUser;
+
+  /// No description provided for @privacyPostAndOthers.
+  ///
+  /// In vi, this message translates to:
+  /// **'{firstNames} và {count} người khác'**
+  String privacyPostAndOthers(String firstNames, num count);
+
+  /// No description provided for @privacyPostHideFromTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn bài viết với'**
+  String get privacyPostHideFromTitle;
+
+  /// No description provided for @privacyPostSelectPeopleToShare.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn người để chia sẻ bài viết'**
+  String get privacyPostSelectPeopleToShare;
+
+  /// No description provided for @privacyPostCurrentDefault.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đây là đối tượng mặc định hiện tại'**
+  String get privacyPostCurrentDefault;
+
+  /// No description provided for @privacyPostSetAsDefault.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đặt làm đối tượng mặc định'**
+  String get privacyPostSetAsDefault;
+
+  /// No description provided for @privacyPostUpdated.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã cập nhật quyền riêng tư'**
+  String get privacyPostUpdated;
+
+  /// No description provided for @privacyPostUpdateFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể cập nhật quyền riêng tư'**
+  String get privacyPostUpdateFailed;
 
   /// No description provided for @postErrorPrefix.
   ///

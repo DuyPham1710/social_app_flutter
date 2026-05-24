@@ -17,6 +17,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
   final VoidCallback? onCommunityTap;
+  final String actionText;
 
   const CommunityJoinRequestNotificationItem({
     super.key,
@@ -31,6 +32,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
     this.onAccept,
     this.onReject,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -117,7 +119,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                       ),
                       TextSpan(
                         text:
-                            ' ${message ?? context.l10n.notificationJoinRequestMessage} ',
+                            ' ${actionText} ',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,

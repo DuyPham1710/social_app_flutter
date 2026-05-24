@@ -20,6 +20,8 @@ class FaceTagSuggestNotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final count = int.tryParse(message ?? '') ?? 0;
+    final String actionText = context.l10n.notificationFaceTagSuggestions(count);
     return NotificationBaseItem(
       isRead: isRead,
       avatarUrl: 'assets/icons/logo.jpg',
@@ -37,7 +39,7 @@ class FaceTagSuggestNotificationItem extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             TextSpan(
-              text: message,
+              text: actionText,
               recognizer: TapGestureRecognizer()..onTap = onTap,
             ),
           ],

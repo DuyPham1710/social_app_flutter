@@ -753,7 +753,7 @@
       }
     }
   },
-  "friendPeopleYouMayKnow": "People you may know",
+  "friendPeopleYouMayKnow": "Recommended for you",
   "friendReject": "Reject",
   "friendRemove": "Remove",
   "friendRequestAccepted": "Friend request accepted",
@@ -819,13 +819,29 @@
   },
   "notificationAdminNote": "Admin note",
   "notificationApprove": "Approve",
-  "notificationApprovePostAction": "Approve post",
+  "notificationApprovePostAction": "Approve",
   "notificationApprovePostTitle": "Review post",
   "notificationCannotHandleInvite": "Unable to handle this invite",
   "notificationCannotHandleJoinRequest": "Unable to handle this join request",
+  "notificationCommentedOnYourPost": "commented on your post:",
+  "notificationCommunityJoinApprovedByAdmin": "Admin approved your community join request",
+  "notificationCommunityJoined": "joined the community",
+  "notificationCommunityJoinRejectedByAdmin": "Admin rejected your community join request",
+  "notificationCommunityJoinRequestSent": "sent a request to join the community",
+  "notificationCommunityPostApprovedByAdmin": "Admin approved your post in the community",
+  "notificationCommunityPostRejectedByAdmin": "Admin rejected your post in the community",
+  "notificationCommunityPostRequestSent": "sent a post request to the community",
   "notificationEmpty": "No notifications yet",
   "notificationEndOfList": "You have seen all notifications",
   "notificationExplanation": "Explanation",
+  "notificationFaceTagSuggestions": "{count, plural, =0{Recognized 0 people in your photo. Tag them now!} =1{Recognized 1 person in your photo. Tag them now!} other{Recognized {count} people in your photo. Tag them now!}}",
+  "@notificationFaceTagSuggestions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "notificationFriendRequestMessage": "sent you a friend request",
   "notificationInviteAccepted": "Invite accepted",
   "notificationInviteFailed": "Unable to handle invite",
@@ -837,15 +853,21 @@
   "notificationJoinRequestFailed": "Unable to handle join request",
   "notificationJoinRequestMessage": "wants to join the community",
   "notificationJoinRequestRejected": "Join request rejected",
+  "notificationMentionedYouInComment": "mentioned you in a comment:",
   "notificationNew": "New",
+  "notificationNewFriendRequest": "You have a new friend request",
   "notificationOlder": "Earlier",
   "notificationPendingPostNotFound": "Pending post not found",
+  "notificationPostedWithYou": "posted something with you in it",
   "notificationPostApprovedMessage": "your post was approved",
   "notificationPostPendingMessage": "submitted a post waiting for review",
   "notificationPostRejectedMessage": "your post was rejected",
   "notificationPostReportTitle": "Post report details",
   "notificationPublicJoinMessage": "joined the community",
   "notificationRefreshTooltip": "Refresh notifications",
+  "notificationReactedToYourComment": "reacted to your comment:",
+  "notificationReactedToYourPost": "reacted to your post:",
+  "notificationReactedToYourStory": "reacted to your story:",
   "notificationReportRejected": "Report rejected",
   "notificationReportRejectedReason": "The report did not meet the requirements for action.",
   "notificationReportReviewed": "Report reviewed",
@@ -858,6 +880,7 @@
       }
     }
   },
+  "notificationTaggedYouInPost": "tagged you in a post",
   "notificationTitle": "Notifications",
   "postAddCaptionHint": "Add a caption...",
   "postAddPhotoVideo": "Add photo/video",
@@ -929,6 +952,46 @@
     }
   },
   "postEditPrivacy": "Edit privacy",
+  "privacyPostQuestion": "Who can see your post?",
+  "privacyPostPublic": "Public",
+  "privacyPostPublicDescription": "Anyone on or off the app",
+  "privacyPostFriends": "Friends",
+  "privacyPostFriendsDescription": "Your friends on the app",
+  "privacyPostFriendsExcept": "Friends except...",
+  "privacyPostFriendsExceptDescription": "Hide this post from some friends",
+  "privacyPostSpecificFriends": "Specific friends",
+  "privacyPostSpecificFriendsDescription": "Only show this to a few friends",
+  "privacyPostOnlyMe": "Only me",
+  "privacyPostOnlyMeDescription": "Only me",
+  "privacyPostEditDescription": "You can change who can see this post.",
+  "privacyPostCreateDescription": "Your post will appear in Feed, on your profile, and in search results.\n\nThe default audience is {defaultPrivacy}, but you can change the audience for this post.",
+  "@privacyPostCreateDescription": {
+    "placeholders": {
+      "defaultPrivacy": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyPostNoOneSelected": "No one selected",
+  "privacyPostOnePerson": "1 person",
+  "privacyPostFallbackUser": "User",
+  "privacyPostAndOthers": "{firstNames} and {count} others",
+  "@privacyPostAndOthers": {
+    "placeholders": {
+      "firstNames": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "privacyPostHideFromTitle": "Hide post from",
+  "privacyPostSelectPeopleToShare": "Choose people to share this post with",
+  "privacyPostCurrentDefault": "This is your current default audience",
+  "privacyPostSetAsDefault": "Set as default audience",
+  "privacyPostUpdated": "Privacy updated",
+  "privacyPostUpdateFailed": "Unable to update privacy",
   "postErrorPrefix": "Error: {message}",
   "@postErrorPrefix": {
     "placeholders": {

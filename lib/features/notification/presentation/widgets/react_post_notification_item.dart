@@ -3,6 +3,8 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
+import 'package:social_app_fe/features/comment/utils/comment_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactPostNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -15,6 +17,7 @@ class ReactPostNotificationItem extends StatelessWidget {
   final String? postId;
   final VoidCallback? onUserTap;
   final VoidCallback? onMessageTap;
+  final String actionText;
 
   const ReactPostNotificationItem({
     super.key,
@@ -28,6 +31,7 @@ class ReactPostNotificationItem extends StatelessWidget {
     this.postId,
     this.onUserTap,
     this.onMessageTap,
+    required this.actionText,
   });
 
   @override
@@ -36,6 +40,7 @@ class ReactPostNotificationItem extends StatelessWidget {
       (e) => e.name == content,
       orElse: () => EmojiType.haha,
     );
+    final String resolvedActionText = localizedReactionLabel(context.l10n, message);
 
     return NotificationBaseItem(
       isRead: isRead,
@@ -54,7 +59,12 @@ class ReactPostNotificationItem extends StatelessWidget {
               recognizer: TapGestureRecognizer()..onTap = onUserTap,
             ),
             TextSpan(
-              text: ' $message',
+              text: ' $actionText ',
+              recognizer: TapGestureRecognizer()..onTap = onMessageTap,
+            ),
+            TextSpan(
+              text: ' $resolvedActionText',
+              style: TextStyle(color: AppColors.textPrimary),
               recognizer: TapGestureRecognizer()..onTap = onMessageTap,
             ),
           ],

@@ -105,8 +105,7 @@ class CommunityInviteNotificationItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final msg =
-                        message ?? context.l10n.notificationInviteMessage;
+                    final msg = context.l10n.notificationInviteMessage;
 
                     final List<TextSpan> spans = [];
                     spans.add(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
@@ -28,12 +29,12 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F8FF),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFD4E5FF)),
-          boxShadow: const [
+          border: Border.all(color: AppColors.divider),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x1A1E40AF),
+              color: AppColors.textSecondary.withValues(alpha: 0.08),
               blurRadius: 18,
               offset: Offset(0, 8),
             ),
@@ -44,14 +45,14 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
           children: [
             Row(
               children: [
-                const Icon(Icons.shield_rounded, color: Color(0xFF1D4ED8)),
+                Icon(Icons.shield_rounded, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(
                   context.l10n.communityAdminPanelTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E3A8A),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -59,8 +60,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             const SizedBox(height: 6),
             Text(
               context.l10n.communityAdminPanelSubtitle,
-              style: const TextStyle(
-                color: Color(0xFF334155),
+              style: TextStyle(
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -70,8 +71,10 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                 Expanded(
                   child: FilledButton.tonalIcon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFE4EEFF),
-                      foregroundColor: const Color(0xFF1E40AF),
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      foregroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -91,7 +94,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                 Expanded(
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF1D4ED8),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -125,7 +128,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
@@ -213,7 +216,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
@@ -309,10 +312,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-        ),
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: Row(
         children: [
@@ -320,10 +321,10 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFE7F0FF),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF1D4ED8)),
+            child: Icon(icon, color: AppColors.primary),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -332,18 +333,18 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF111827),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -363,9 +364,9 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,12 +375,12 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: request.user.avatarUrl != null
                     ? NetworkImage(request.user.avatarUrl!)
                     : null,
                 child: request.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -391,10 +392,10 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                       request.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -403,9 +404,9 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                         context.l10n,
                         request.createdAt,
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -423,9 +424,9 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
           const SizedBox(height: 10),
           Text(
             context.l10n.communityJoinRequestPendingMessage,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Color(0xFF4B5563),
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -503,9 +504,9 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -515,12 +516,12 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: post.user.avatarUrl != null
                     ? NetworkImage(post.user.avatarUrl!)
                     : null,
                 child: post.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -532,18 +533,18 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                       post.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       localizedCommunityTimeAgo(context.l10n, post.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -567,8 +568,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               fontSize: 14,
               height: 1.35,
               color: caption.isNotEmpty
-                  ? const Color(0xFF111827)
-                  : const Color(0xFF6B7280),
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -582,11 +583,11 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   post.urls.first.url,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFFF3F4F6),
+                    color: AppColors.secondBackground,
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       Icons.broken_image_rounded,
-                      color: Color(0xFF9CA3AF),
+                      color: AppColors.textSecondary,
                       size: 26,
                     ),
                   ),
@@ -701,24 +702,28 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 46, color: const Color(0xFF94A3B8)),
+            Icon(
+              icon,
+              size: 46,
+              color: AppColors.textSecondary.withValues(alpha: 0.75),
+            ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               hint,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFF64748B),
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),

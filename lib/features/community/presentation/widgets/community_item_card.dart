@@ -105,12 +105,12 @@ class _CommunityItemState extends State<CommunityItem> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
+              border: Border.all(color: AppColors.divider, width: 1),
               boxShadow: [
-                const BoxShadow(
-                  color: Color(0x0F0F172A),
+                BoxShadow(
+                  color: AppColors.textSecondary.withValues(alpha: 0.08),
                   blurRadius: 8,
                   offset: Offset(0, 2),
                 ),
@@ -129,7 +129,9 @@ class _CommunityItemState extends State<CommunityItem> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: AppColors.textSecondary.withValues(
+                                alpha: 0.08,
+                              ),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -137,7 +139,7 @@ class _CommunityItemState extends State<CommunityItem> {
                         ),
                         child: CircleAvatar(
                           radius: 30,
-                          backgroundColor: Colors.white,
+                          backgroundColor: AppColors.secondBackground,
                           backgroundImage: avatarUrl != null
                               ? NetworkImage(avatarUrl)
                               : null,
@@ -157,15 +159,17 @@ class _CommunityItemState extends State<CommunityItem> {
                           width: 24,
                           height: 24,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.background,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFFDDE3EA),
+                              color: AppColors.divider,
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
+                                color: AppColors.textSecondary.withValues(
+                                  alpha: 0.08,
+                                ),
                                 blurRadius: 4,
                                 offset: const Offset(0, 1),
                               ),
@@ -177,7 +181,7 @@ class _CommunityItemState extends State<CommunityItem> {
                                 : Icons.public_rounded,
                             size: 12,
                             color: isPrivate
-                                ? const Color(0xFF6B7280)
+                                ? AppColors.textSecondary
                                 : const Color(0xFF0F766E),
                           ),
                         ),
@@ -196,10 +200,10 @@ class _CommunityItemState extends State<CommunityItem> {
                           children: [
                             Text(
                               widget.community.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF1F2937),
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             if (_myRole == 'admin')
@@ -209,19 +213,19 @@ class _CommunityItemState extends State<CommunityItem> {
                                   vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFDEF7EC),
+                                  color: AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
-                                    color: const Color(0xFF86EFAC),
+                                    color: AppColors.primary.withValues(alpha: 0.3),
                                     width: 0.8,
                                   ),
                                 ),
                                 child: Text(
                                   context.l10n.communityAdmin,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF15803D),
+                                    color: AppColors.primary,
                                   ),
                                 ),
                               ),
@@ -237,19 +241,19 @@ class _CommunityItemState extends State<CommunityItem> {
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.people_outline_rounded,
                                         size: 13,
-                                        color: Color(0xFF6B7280),
+                                        color: AppColors.textSecondary,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         context.l10n.communityMembersCount(
                                           widget.community.memberCount ?? 0,
                                         ),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
-                                          color: Color(0xFF6B7280),
+                                          color: AppColors.textSecondary,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -262,9 +266,9 @@ class _CommunityItemState extends State<CommunityItem> {
                                         description,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
-                                          color: Color(0xFF9CA3AF),
+                                          color: AppColors.textSecondary,
                                           fontWeight: FontWeight.w400,
                                         ),
                                       ),
@@ -305,17 +309,17 @@ class _CommunityItemState extends State<CommunityItem> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      backgroundColor: const Color(0xFFE6F7F4),
-      foregroundColor: const Color(0xFF0F766E),
+      backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+      foregroundColor: AppColors.primary,
       elevation: 0,
     );
     final outlineStyle = OutlinedButton.styleFrom(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      foregroundColor: const Color(0xFF6B7280),
-      side: const BorderSide(color: Color(0xFFD1D5DB), width: 0.8),
-      backgroundColor: const Color(0xFFF3F4F6),
+      foregroundColor: AppColors.textSecondary,
+      side: BorderSide(color: AppColors.divider, width: 0.8),
+      backgroundColor: AppColors.secondBackground,
     );
 
     // Đã tham gia (memberStatus == 'member' hoặc myRole != null)

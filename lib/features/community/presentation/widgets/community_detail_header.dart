@@ -41,11 +41,12 @@ class CommunityDetailHeader extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
+          border: Border.all(color: AppColors.divider),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
+              color: AppColors.textSecondary.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: Offset(0, 3),
             ),
@@ -58,15 +59,15 @@ class CommunityDetailHeader extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: const Color(0xFFE4E6EB),
+                  backgroundColor: AppColors.secondBackground,
                   backgroundImage: community.avatar != null
                       ? NetworkImage(community.avatar!)
                       : null,
                   child: community.avatar == null
-                      ? const Icon(
+                      ? Icon(
                           Icons.groups,
                           size: 30,
-                          color: Color(0xFF65676B),
+                          color: AppColors.textSecondary,
                         )
                       : null,
                 ),
@@ -78,10 +79,10 @@ class CommunityDetailHeader extends StatelessWidget {
                       Text(
                         community.name,
                         softWrap: true,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF1C1E21),
+                          color: AppColors.textPrimary,
                           height: 1.1,
                         ),
                       ),
@@ -91,8 +92,8 @@ class CommunityDetailHeader extends StatelessWidget {
                           privacyLabel,
                           community.memberCount ?? 0,
                         ),
-                        style: const TextStyle(
-                          color: Color(0xFF65676B),
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -133,7 +134,7 @@ class CommunityDetailHeader extends StatelessWidget {
               Text(
                 community.description!,
                 style: TextStyle(
-                  color: const Color(0xFF1C1E21),
+                  color: AppColors.textPrimary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   height: 1.35,
@@ -146,17 +147,17 @@ class CommunityDetailHeader extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F2F5),
+                  color: AppColors.secondBackground,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   context.l10n.communityNoDescription,
-                  style: TextStyle(color: Colors.grey[700]),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ),
 
             const SizedBox(height: 14),
-            const Divider(height: 1, color: Color(0xFFE4E6EB)),
+            Divider(height: 1, color: AppColors.divider),
             const SizedBox(height: 14),
 
             if (memberStatus == 'none')
@@ -176,7 +177,7 @@ class CommunityDetailHeader extends StatelessWidget {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1877F2),
+                    backgroundColor: AppColors.primary,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
@@ -195,8 +196,8 @@ class CommunityDetailHeader extends StatelessWidget {
                       label: Text(context.l10n.friendCancelRequest),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: const BorderSide(color: Color(0xFFCCD0D5)),
-                        foregroundColor: const Color(0xFF1C1E21),
+                        side: BorderSide(color: AppColors.divider),
+                        foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -291,12 +292,12 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipTextColor = textColor ?? const Color(0xFF475467);
+    final chipTextColor = textColor ?? AppColors.textSecondary;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: backgroundColor ?? const Color(0xFFF0F2F5),
+        color: backgroundColor ?? AppColors.secondBackground,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

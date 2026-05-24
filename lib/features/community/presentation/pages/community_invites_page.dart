@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_invites_tab_widget.dart';
@@ -20,10 +21,11 @@ class _CommunityInvitesPageState extends State<CommunityInvitesPage> {
         title: Text(context.l10n.communityInvitesTitle),
         centerTitle: false,
         elevation: 0.5,
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1C1E21),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.iconPrimary,
+        surfaceTintColor: Colors.transparent,
       ),
-      backgroundColor: const Color(0xFFF0F2F5),
+      backgroundColor: AppColors.secondBackground,
       body: BlocProvider(
         create: (_) => s1<CommunityInvitesBloc>(),
         child: const CommunityInvitesTabWidget(),

@@ -37,14 +37,14 @@ class _MyCommunitiesWidgetState extends State<MyCommunitiesWidget> {
                       Icon(
                         Icons.group_off_rounded,
                         size: 54,
-                        color: Colors.grey[400],
+                        color: AppColors.textSecondary.withValues(alpha: 0.75),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         context.l10n.communityNoJoinedCommunities,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.grey[700],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -111,12 +111,12 @@ class _CommunityItemSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
-        boxShadow: const [
+        border: Border.all(color: AppColors.divider, width: 1),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F0F172A),
+            color: AppColors.textSecondary.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -138,12 +138,9 @@ class _CommunityItemSkeleton extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE9EEF5),
+                      color: AppColors.textSecondary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFDDE3EA),
-                        width: 1,
-                      ),
+                      border: Border.all(color: AppColors.divider, width: 1),
                     ),
                   ),
                 ),
@@ -206,7 +203,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

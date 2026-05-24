@@ -110,12 +110,12 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE5EAF0), width: 1),
+          border: Border.all(color: AppColors.divider, width: 1),
           boxShadow: [
             BoxShadow(
-              color: const Color(0x0D101828),
+              color: AppColors.textSecondary.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
               spreadRadius: 0,
@@ -131,15 +131,15 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                   children: [
                     CircleAvatar(
                       radius: 28,
-                      backgroundColor: const Color(0xFFF3F4F6),
+                      backgroundColor: AppColors.secondBackground,
                       backgroundImage: avatarUrl.isNotEmpty
                           ? NetworkImage(avatarUrl)
                           : null,
                       child: avatarUrl.isEmpty
-                          ? const Icon(
+                          ? Icon(
                               Icons.group,
                               size: 28,
-                              color: Color(0xFF9CA3AF),
+                              color: AppColors.textSecondary,
                             )
                           : null,
                     ),
@@ -152,10 +152,13 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(
+                            color: AppColors.background,
+                            width: 2,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -179,10 +182,10 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                         communityName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
-                          color: Color(0xFF101828),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -215,6 +218,7 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 11),
                         backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -260,40 +264,38 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                           : () => _onRejectPressed(communityId),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 11),
-                        side: const BorderSide(
-                          color: Color(0xFFD0D5DD),
-                          width: 1.5,
-                        ),
+                        foregroundColor: AppColors.textSecondary,
+                        side: BorderSide(color: AppColors.divider, width: 1.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: _isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 18,
                               width: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF667085),
+                                  AppColors.textSecondary,
                                 ),
                               ),
                             )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.close,
                                   size: 16,
-                                  color: Color(0xFF667085),
+                                  color: AppColors.textSecondary,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   context.l10n.friendReject,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF667085),
+                                    color: AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -368,7 +370,7 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
   Color _getStatusColor() {
     switch (_status) {
       case _InviteResponseStatus.pending:
-        return const Color(0xFF667085);
+        return AppColors.textSecondary;
       case _InviteResponseStatus.approved:
         return const Color(0xFF059669);
       case _InviteResponseStatus.rejected:

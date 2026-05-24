@@ -424,8 +424,8 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                         ? SizedBox(
                             width: 14.sp,
                             height: 14.sp,
-                            child: const CircularProgressIndicator(
-                              color: Colors.white,
+                            child:  CircularProgressIndicator(
+                              color: AppColors.background,
                               strokeWidth: 2,
                             ),
                           )
@@ -504,9 +504,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                                               vertical: 4.w,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: const Color(
-                                                0xFF3B82F6,
-                                              ).withOpacity(0.1),
+                                              color: AppColors.primary.withOpacity(0.1),
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
                                             ),
@@ -517,18 +515,14 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                                                   getIcon(
                                                     _selectedPrivacyLabel,
                                                   ),
-                                                  color: const Color(
-                                                    0xFF3B82F6,
-                                                  ),
+                                                  color: AppColors.primary,
                                                   size: 14.sp,
                                                 ),
                                                 SizedBox(width: 4.w),
                                                 Text(
                                                   _selectedPrivacyLabel,
                                                   style: TextStyle(
-                                                    color: const Color(
-                                                      0xFF3B82F6,
-                                                    ),
+                                                    color: AppColors.primary,
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 13.sp,
                                                   ),

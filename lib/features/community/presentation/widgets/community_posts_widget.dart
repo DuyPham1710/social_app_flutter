@@ -115,10 +115,10 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Text(
             context.l10n.communityPostsInGroup,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1C1E21),
+              color: AppColors.textPrimary,
             ),
           ),
         ),
@@ -127,9 +127,9 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             key: 'locked',
             child: _buildInfoCard(
               icon: Icons.lock_outline_rounded,
-              iconColor: const Color(0xFF64748B),
-              backgroundColor: const Color(0xFFF8FAFC),
-              borderColor: const Color(0xFFE2E8F0),
+              iconColor: AppColors.textSecondary,
+              backgroundColor: AppColors.background,
+              borderColor: AppColors.divider,
               title: context.l10n.communityMemberOnlyContent,
               message: context.l10n.communityMemberOnlyPostsMessage,
             ),
@@ -156,8 +156,8 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                   child: _buildInfoCard(
                     icon: Icons.post_add_rounded,
                     iconColor: AppColors.primary,
-                    backgroundColor: const Color(0xFFF8FAFC),
-                    borderColor: const Color(0xFFE2E8F0),
+                    backgroundColor: AppColors.background,
+                    borderColor: AppColors.divider,
                     title: context.l10n.communityNoPostsTitle,
                     message: context.l10n.communityNoPostsMessage,
                   ),
@@ -215,12 +215,12 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE4E7EC)),
-                boxShadow: const [
+                border: Border.all(color: AppColors.divider),
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x0F0F172A),
+                    color: AppColors.textSecondary.withValues(alpha: 0.08),
                     blurRadius: 10,
                     offset: Offset(0, 4),
                   ),
@@ -259,7 +259,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                       aspectRatio: 16 / 9,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE9EEF5),
+                          color: AppColors.textSecondary.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
@@ -281,9 +281,11 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF1F2),
+          color: const Color(0xFFE11D48).withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFFECACA)),
+          border: Border.all(
+            color: const Color(0xFFE11D48).withValues(alpha: 0.28),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,8 +301,8 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 Expanded(
                   child: Text(
                     context.l10n.homeLoadPostsFailed,
-                    style: const TextStyle(
-                      color: Color(0xFF101828),
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -347,7 +349,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.74),
+                color: AppColors.secondBackground.withValues(alpha: 0.74),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor, size: 22),
@@ -359,16 +361,16 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Color(0xFF101828),
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     message,
-                    style: const TextStyle(
-                      color: Color(0xFF667085),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       height: 1.25,
                     ),
@@ -427,7 +429,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );
