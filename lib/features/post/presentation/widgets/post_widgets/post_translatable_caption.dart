@@ -37,7 +37,7 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
   bool? _hideTranslateAction;
   bool _eligibilityChecked = false;
 
-  String get _deviceTargetLang => deviceTranslationTargetLang();
+  String get _appTargetLang => appTranslationTargetLang(context);
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
     final result = await usecase(
       params: GetCaptionTranslationEligibilityParams(
         postId: widget.postId,
-        targetLang: _deviceTargetLang,
+        targetLang: _appTargetLang,
       ),
     );
 
@@ -99,7 +99,7 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
       final result = await usecase(
         params: TranslateCaptionParams(
           postId: widget.postId,
-          targetLang: _deviceTargetLang,
+          targetLang: _appTargetLang,
         ),
       );
 

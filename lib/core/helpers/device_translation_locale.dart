@@ -1,8 +1,15 @@
-import 'dart:ui' show PlatformDispatcher, Locale;
+import 'package:flutter/material.dart' show BuildContext, Localizations, Locale;
+import 'dart:ui' show PlatformDispatcher;
 
 /// Mã ngôn ngữ đích gửi lên API dịch (BCP 47), theo locale hệ thống.
 String deviceTranslationTargetLang() {
   final locale = PlatformDispatcher.instance.locale;
+  return localeToTranslationTarget(locale);
+}
+
+/// Mã ngôn ngữ đích gửi lên API dịch (BCP 47), theo locale của app.
+String appTranslationTargetLang(BuildContext context) {
+  final locale = Localizations.localeOf(context);
   return localeToTranslationTarget(locale);
 }
 
