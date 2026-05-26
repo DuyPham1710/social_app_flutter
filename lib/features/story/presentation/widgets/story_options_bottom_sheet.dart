@@ -16,7 +16,6 @@ import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 class StoryOptionsBottomSheet extends StatefulWidget {
   final GroupedUserStoryEntity currentGroup;
   final int currentStoryIndex;
-  
 
   const StoryOptionsBottomSheet({
     super.key,
@@ -25,12 +24,13 @@ class StoryOptionsBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<StoryOptionsBottomSheet> createState() => _StoryOptionsBottomSheetState();
+  State<StoryOptionsBottomSheet> createState() =>
+      _StoryOptionsBottomSheetState();
 
   static void show(
-  BuildContext context, {
-  required GroupedUserStoryEntity currentGroup,
-  required int currentStoryIndex,
+    BuildContext context, {
+    required GroupedUserStoryEntity currentGroup,
+    required int currentStoryIndex,
   }) {
     showModalBottomSheet(
       context: context,
@@ -51,7 +51,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
 
   Future<void> _deleteStory(BuildContext context) async {
     final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
-    
+
     // Hiển thị dialog xác nhận
     final confirmed = await showDialog<bool>(
       context: context,
@@ -76,10 +76,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text(
-                'Xóa',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -97,7 +94,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
 
       if (mounted) {
         Navigator.pop(context); // Đóng bottom sheet
-        
+
         if (result is DataStateSuccess) {
           // Reload danh sách story trước khi đóng story viewer
           // HomeStoriesBloc được provide ở main.dart nên có thể truy cập từ bất kỳ context nào
@@ -111,20 +108,25 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             // Nếu không tìm thấy, thử tìm trong context hiện tại
             try {
               final homeStoriesBloc = context.read<HomeStoriesBloc>();
-              homeStoriesBloc.add(const LoadHomeStoriesEvent(page: 1, limit: 10));
+              homeStoriesBloc.add(
+                const LoadHomeStoriesEvent(page: 1, limit: 10),
+              );
             } catch (_) {
               // Nếu vẫn không tìm thấy, không sao - story đã được xóa trên server
               // Khi user quay lại trang home, story sẽ tự động không còn trong danh sách
             }
           }
-          
+
           // Đóng story viewer và quay về màn hình trước
           Navigator.of(context).pop();
-          
+
           // Hiển thị thông báo thành công
           showSuccessSnackBar(context, 'Đã xóa tin');
         } else if (result is DataStateError) {
-          showErrorSnackBar(context, 'Lỗi: ${result.error?.message ?? "Không thể xóa tin"}');
+          showErrorSnackBar(
+            context,
+            'Lỗi: ${result.error?.message ?? "Không thể xóa tin"}',
+          );
         }
       }
     } catch (e) {
@@ -170,30 +172,13 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
               title: "Chỉnh sửa quyền riêng tư của tin",
               onTap: () {
                 Navigator.pop(context);
-                final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
+                final storyId =
+                    widget.currentGroup.stories[widget.currentStoryIndex].id;
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => StoryPrivacySettingsPage(
-                      storyId: storyId,
-                    ),
+                    builder: (_) => StoryPrivacySettingsPage(storyId: storyId),
                   ),
                 );
-              },
-            ),
-            StoryOptionItemWidget(
-              icon: Icons.message_outlined,
-              title: "Gửi bằng Messenger",
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Implement Messenger sharing
-              },
-            ),
-            StoryOptionItemWidget(
-              icon: Icons.download_outlined,
-              title: "Lưu ảnh",
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Implement save photo
               },
             ),
             StoryOptionItemWidget(
@@ -210,24 +195,10 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
               title: "Xóa ảnh",
               onTap: _isDeleting ? null : () => _deleteStory(context),
             ),
-            StoryOptionItemWidget(
-              icon: Icons.link_outlined,
-              title: "Sao chép liên kết để chia sẻ tin này",
-              subtitle:
-                  "Tin sẽ hiển thị với đối tượng của ${widget.currentGroup.user.fullName ?? 'bạn'} trong 24 giờ.",
-              onTap: () {
-                Navigator.pop(context);
-                final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
-                Clipboard.setData(ClipboardData(text: 'story://$storyId'));
-                showSuccessSnackBar(context, 'Đã sao chép liên kết');
-              },
-            ),
             SizedBox(height: 20.h),
           ],
         ),
       ),
     );
   }
-
 }
-

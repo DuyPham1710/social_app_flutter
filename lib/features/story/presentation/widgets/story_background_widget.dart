@@ -200,12 +200,11 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
         );
       }
 
-      return SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: _videoController!.value.size.width,
-            height: _videoController!.value.size.height,
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: AspectRatio(
+            aspectRatio: _videoController!.value.aspectRatio,
             child: VideoPlayer(_videoController!),
           ),
         ),
