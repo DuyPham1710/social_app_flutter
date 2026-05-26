@@ -10,6 +10,7 @@ import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_online_service.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_suggestions_page.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friends_list_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendHeaderChips extends StatefulWidget {
   final VoidCallback? onNeedRefresh;
@@ -115,39 +116,45 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _buildChip(
-          label: _isLoading ? 'Đang tải...' : '$_onlineCount người đang online',
-          leading: _buildOnlineDot(),
-        ),
-        SizedBox(width: 8.w),
-        _buildChip(
-          label: 'Bạn bè',
-          onTap: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const FriendsListPage()),
-            );
-            // Gọi callback để reload dữ liệu
-            widget.onNeedRefresh?.call();
-          },
-        ),
-        SizedBox(width: 8.w),
-        _buildChip(
-          label: 'Gợi ý',
-          onTap: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const FriendSuggestionsPage(),
-              ),
-            );
-            // Gọi callback để reload dữ liệu
-            widget.onNeedRefresh?.call();
-          },
-        ),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildChip(
+            label: _isLoading
+                ? context.l10n.commonLoading
+                : context.l10n.friendOnlineCount(_onlineCount),
+            leading: _buildOnlineDot(),
+          ),
+          SizedBox(width: 8.w),
+          _buildChip(
+            label: context.l10n.friendTitle,
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FriendsListPage()),
+              );
+              // Gọi callback để reload dữ liệu
+              widget.onNeedRefresh?.call();
+            },
+          ),
+          SizedBox(width: 8.w),
+          _buildChip(
+            label: context.l10n.friendSuggestionsTitle,
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FriendSuggestionsPage(),
+                ),
+              );
+              // Gọi callback để reload dữ liệu
+              widget.onNeedRefresh?.call();
+            },
+          ),
+        ],
+      ),
     );
   }
 

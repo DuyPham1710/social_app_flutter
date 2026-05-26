@@ -14,7 +14,9 @@ class VideoCallRepositoryImpl implements VideoCallRepository {
   }
 
   @override
-  Future<void> waitForConnection({Duration timeout = const Duration(seconds: 10)}) {
+  Future<void> waitForConnection({
+    Duration timeout = const Duration(seconds: 10),
+  }) {
     return remoteDataSource.waitForConnection(timeout: timeout);
   }
 

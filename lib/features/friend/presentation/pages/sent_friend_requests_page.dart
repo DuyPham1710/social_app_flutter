@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/sent_friend_request_item.dart';
+import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SentFriendRequestsPage extends StatefulWidget {
   const SentFriendRequestsPage({super.key});
@@ -34,7 +36,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
           icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
         ),
         title: Text(
-          'Lời mời đã gửi',
+          context.l10n.friendSentRequestsTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18,
@@ -78,7 +80,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Text(
-            'Đã gửi $requestCount lời mời',
+            context.l10n.friendSentRequestsCount(requestCount),
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
@@ -100,7 +102,11 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.green,
@@ -122,7 +128,11 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.red,
@@ -189,7 +199,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'Đang tải lời mời đã gửi...',
+            context.l10n.friendLoadingSentRequests,
             style: TextStyle(
               fontSize: 14.sp,
               color: AppColors.textSecondary,
@@ -211,7 +221,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
             Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
             SizedBox(height: 16.h),
             Text(
-              'Có lỗi xảy ra',
+              context.l10n.commonErrorOccurred,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
@@ -220,7 +230,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
             ),
             SizedBox(height: 8.h),
             Text(
-              message,
+              localizedFriendActionMessage(context.l10n, message),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
@@ -230,7 +240,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                 context.read<FriendBloc>().add(const LoadSentFriendRequests());
               },
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Thử lại'),
+              label: Text(context.l10n.commonRetry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -268,7 +278,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         userId: request.receiverId,
         name: request.displayName,
         mutualFriends: request.displayMutualFriends,
-        timeAgo: request.formattedTimeAgo,
+        timeAgo: localizedFriendTimeAgo(context.l10n, request.createdAt),
         avatarUrl: request.displayAvatarUrl,
         mutualFriendAvatars: request.mutualFriendAvatars,
         isCancelled: isCancelled,
@@ -314,7 +324,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                   ),
                   SizedBox(height: 24.h),
                   Text(
-                    'Không có lời mời đã gửi',
+                    context.l10n.friendNoSentRequests,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
@@ -323,7 +333,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    'Bạn chưa gửi lời mời kết bạn nào',
+                    context.l10n.friendNoSentRequestsDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,

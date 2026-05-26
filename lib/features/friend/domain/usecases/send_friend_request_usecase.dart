@@ -11,5 +11,3 @@ class SendFriendRequestUseCase {
     return await friendRepository.sendFriendRequest(receiverId);
   }
 }
-
-

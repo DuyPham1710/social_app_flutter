@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -26,9 +28,15 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
       child: BlocConsumer<CommunityListBloc, CommunityListState>(
         listener: (context, state) {
           if (state is CommunityListActionSuccess) {
-            showSuccessSnackBar(context, state.message);
+            showSuccessSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           } else if (state is CommunityListError) {
-            showErrorSnackBar(context, state.message);
+            showErrorSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           }
         },
         builder: (context, state) {
@@ -47,20 +55,23 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                       Icon(
                         Icons.hourglass_empty_rounded,
                         size: 54,
-                        color: Colors.grey[400],
+                        color: AppColors.textSecondary.withValues(alpha: 0.75),
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Chưa có cộng đồng nào đang chờ duyệt',
+                        context.l10n.communityNoPendingCommunities,
                         style: TextStyle(
-                          color: Colors.grey[700],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Yêu cầu tham gia cộng đồng sẽ xuất hiện tại đây',
-                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                        context.l10n.communityPendingCommunitiesHint,
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -92,7 +103,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                     Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
                     const SizedBox(height: 12),
                     Text(
-                      state.message,
+                      localizedCommunityMessage(context.l10n, state.message),
                       textAlign: TextAlign.center,
                       style: const TextStyle(color: Color(0xFFB42318)),
                     ),
@@ -103,7 +114,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                           const PendingCommunitiesFetched(),
                         );
                       },
-                      child: const Text('Thử lại'),
+                      child: Text(context.l10n.commonRetry),
                     ),
                   ],
                 ),
@@ -134,18 +145,18 @@ class PendingCommunityItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          Navigator.of(context).push(
-            CommunityDetailPage.route(communityId: community.id),
-          );
+          Navigator.of(
+            context,
+          ).push(CommunityDetailPage.route(communityId: community.id));
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
+            border: Border.all(color: AppColors.divider, width: 1),
             boxShadow: [
-              const BoxShadow(
-                color: Color(0x0F0F172A),
+              BoxShadow(
+                color: AppColors.textSecondary.withValues(alpha: 0.08),
                 blurRadius: 8,
                 offset: Offset(0, 2),
               ),
@@ -168,7 +179,9 @@ class PendingCommunityItem extends StatelessWidget {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
+                                color: AppColors.textSecondary.withValues(
+                                  alpha: 0.08,
+                                ),
                                 blurRadius: 6,
                                 offset: const Offset(0, 2),
                               ),
@@ -176,7 +189,7 @@ class PendingCommunityItem extends StatelessWidget {
                           ),
                           child: CircleAvatar(
                             radius: 28,
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.secondBackground,
                             backgroundImage:
                                 (avatarUrl != null && avatarUrl.isNotEmpty)
                                 ? NetworkImage(avatarUrl)
@@ -184,7 +197,7 @@ class PendingCommunityItem extends StatelessWidget {
                             child: (avatarUrl == null || avatarUrl.isEmpty)
                                 ? Icon(
                                     Icons.groups_rounded,
-                                    color: Colors.blue[300],
+                                    color: AppColors.primary,
                                     size: 28,
                                   )
                                 : null,
@@ -200,7 +213,7 @@ class PendingCommunityItem extends StatelessWidget {
                               color: Colors.orange,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white,
+                                color: AppColors.background,
                                 width: 1.5,
                               ),
                             ),
@@ -223,17 +236,18 @@ class PendingCommunityItem extends StatelessWidget {
                             community.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '$memberCount thành viên',
+                            context.l10n.communityMembersCount(memberCount),
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -247,9 +261,9 @@ class PendingCommunityItem extends StatelessWidget {
                               border: Border.all(color: Colors.orange[200]!),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
-                              'Chờ duyệt',
-                              style: TextStyle(
+                            child: Text(
+                              context.l10n.communityPendingApproval,
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFFF97316),
@@ -270,7 +284,7 @@ class PendingCommunityItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       height: 1.4,
                     ),
                   ),
@@ -281,8 +295,8 @@ class PendingCommunityItem extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      foregroundColor: Colors.grey[800],
+                      backgroundColor: AppColors.secondBackground,
+                      foregroundColor: AppColors.textPrimary,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(
@@ -292,9 +306,9 @@ class PendingCommunityItem extends StatelessWidget {
                     onPressed: () {
                       _showCancelConfirmDialog(context, community.id);
                     },
-                    child: const Text(
-                      'Hủy yêu cầu',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.friendCancelRequest,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -314,14 +328,12 @@ class PendingCommunityItem extends StatelessWidget {
       context: outerContext,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: const Text('Hủy yêu cầu'),
-        content: const Text(
-          'Bạn có chắc muốn hủy yêu cầu tham gia cộng đồng này?',
-        ),
+        title: Text(outerContext.l10n.communityCancelJoinRequestTitle),
+        content: Text(outerContext.l10n.communityCancelJoinRequestConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Không'),
+            child: Text(outerContext.l10n.commonNo),
           ),
           TextButton(
             onPressed: () {
@@ -330,7 +342,10 @@ class PendingCommunityItem extends StatelessWidget {
                 CancelPendingCommunityRequested(communityId),
               );
             },
-            child: const Text('Hủy', style: TextStyle(color: Colors.red)),
+            child: Text(
+              outerContext.l10n.commonCancel,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -350,9 +365,9 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
+            border: Border.all(color: AppColors.divider, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,7 +379,7 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
                     height: 56,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey[300],
+                      color: AppColors.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -375,13 +390,13 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
                         Container(
                           width: 150,
                           height: 12,
-                          color: Colors.grey[300],
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 8),
                         Container(
                           width: 100,
                           height: 10,
-                          color: Colors.grey[200],
+                          color: AppColors.textSecondary.withValues(alpha: 0.2),
                         ),
                       ],
                     ),
@@ -393,7 +408,7 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
                 width: double.infinity,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: AppColors.textSecondary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),

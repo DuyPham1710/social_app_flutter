@@ -61,7 +61,7 @@ class ClearCommentCacheEvent extends CommentDetailsEvent {
 class ReactCommentEvent extends CommentDetailsEvent {
   final String commentId;
   final EmojiType emoji;
-  final String currentUserId; 
+  final String currentUserId;
   final String? currentUserAvatar;
 
   const ReactCommentEvent({

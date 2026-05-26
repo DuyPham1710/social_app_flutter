@@ -7,6 +7,7 @@ import 'package:social_app_fe/features/comment/domain/entities/comment-log_entit
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class CommentHistoryPage extends StatefulWidget {
@@ -78,7 +79,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Lịch sử chỉnh sửa',
+          context.l10n.commentEditHistoryTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 16.sp,
@@ -114,7 +115,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      'Chưa có lịch sử chỉnh sửa',
+                      context.l10n.commentNoEditHistory,
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: AppColors.textSecondary,
@@ -151,7 +152,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                           ),
                           SizedBox(width: 8.w),
                           Text(
-                            'Phiên bản hiện tại',
+                            context.l10n.commentCurrentVersion,
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
@@ -196,7 +197,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
           Icon(Icons.error_outline, size: 64.sp, color: Colors.red),
           SizedBox(height: 16.h),
           Text(
-            'Có lỗi xảy ra',
+            context.l10n.commonErrorOccurred,
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
@@ -225,7 +226,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
               ),
             ),
             child: Text(
-              'Thử lại',
+              context.l10n.commonRetry,
               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
             ),
           ),
@@ -281,7 +282,8 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      historyItem.editedBy.fullName ?? 'Unknown User',
+                      historyItem.editedBy.fullName ??
+                          context.l10n.commonUnknown,
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -289,7 +291,12 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                       ),
                     ),
                     Text(
-                      'Lần chỉnh sửa ${index + 1} • ${historyItem.createdAt != null ? timeago.format(historyItem.createdAt!) : 'Không rõ thời gian'}',
+                      context.l10n.commentEditVersion(
+                        index + 1,
+                        historyItem.createdAt != null
+                            ? timeago.format(historyItem.createdAt!)
+                            : context.l10n.postUnknownTime,
+                      ),
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppColors.textSecondary,
@@ -323,7 +330,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                     ),
                     SizedBox(width: 6.w),
                     Text(
-                      'Nội dung cũ',
+                      context.l10n.commentOldContent,
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
@@ -362,7 +369,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                     ),
                     SizedBox(width: 6.w),
                     Text(
-                      'Nội dung mới',
+                      context.l10n.commentNewContent,
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,

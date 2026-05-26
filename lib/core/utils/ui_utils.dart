@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class UIUtils {
@@ -7,12 +8,12 @@ class UIUtils {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Lỗi xác thực'),
+          title: Text(context.l10n.authErrorTitle),
           content: SingleChildScrollView(child: Text(message)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
+              child: Text(context.l10n.commonOk),
             ),
           ],
         ),

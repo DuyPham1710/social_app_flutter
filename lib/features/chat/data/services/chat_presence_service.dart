@@ -7,10 +7,7 @@ class ChatPresenceStatus {
   final bool isOnline;
   final DateTime? lastSeenAt;
 
-  const ChatPresenceStatus({
-    required this.isOnline,
-    this.lastSeenAt,
-  });
+  const ChatPresenceStatus({required this.isOnline, this.lastSeenAt});
 }
 
 class ChatPresenceService {
@@ -30,10 +27,7 @@ class ChatPresenceService {
 
   ChatPresenceService(this._socketClient);
 
-  void connect({
-    required String userId,
-    required String username,
-  }) {
+  void connect({required String userId, required String username}) {
     if (_isConnected && _socketClient.isConnected) return;
 
     _socketClient.connect(
@@ -52,7 +46,10 @@ class ChatPresenceService {
   void _setupListeners() {
     _socketClient.on('connected').listen((_) {
       _isConnected = true;
-      developer.log('ChatPresenceService connected', name: 'ChatPresenceService');
+      developer.log(
+        'ChatPresenceService connected',
+        name: 'ChatPresenceService',
+      );
     });
 
     _socketClient.on('presence:list').listen((data) {
@@ -83,7 +80,10 @@ class ChatPresenceService {
           _presenceController.add(Map.unmodifiable(_presenceByUserId));
         }
       } catch (e) {
-        developer.log('Error parsing presence:list: $e', name: 'ChatPresenceService');
+        developer.log(
+          'Error parsing presence:list: $e',
+          name: 'ChatPresenceService',
+        );
       }
     });
 
@@ -98,7 +98,10 @@ class ChatPresenceService {
         );
         _presenceController.add(Map.unmodifiable(_presenceByUserId));
       } catch (e) {
-        developer.log('Error parsing presence:online: $e', name: 'ChatPresenceService');
+        developer.log(
+          'Error parsing presence:online: $e',
+          name: 'ChatPresenceService',
+        );
       }
     });
 
@@ -123,7 +126,10 @@ class ChatPresenceService {
         );
         _presenceController.add(Map.unmodifiable(_presenceByUserId));
       } catch (e) {
-        developer.log('Error parsing presence:offline: $e', name: 'ChatPresenceService');
+        developer.log(
+          'Error parsing presence:offline: $e',
+          name: 'ChatPresenceService',
+        );
       }
     });
 
@@ -137,7 +143,8 @@ class ChatPresenceService {
     _socketClient.emit('presence:get', {'userIds': userIds});
   }
 
-  ChatPresenceStatus? getUserPresence(String userId) => _presenceByUserId[userId];
+  ChatPresenceStatus? getUserPresence(String userId) =>
+      _presenceByUserId[userId];
 
   void dispose() {
     _isConnected = false;
@@ -145,4 +152,3 @@ class ChatPresenceService {
     _presenceController.close();
   }
 }
-

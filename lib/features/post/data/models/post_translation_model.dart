@@ -18,4 +18,3 @@ class PostTranslationModel extends PostTranslationEntity
   factory PostTranslationModel.fromJson(Map<String, dynamic> json) =>
       _$PostTranslationModelFromJson(json);
 }
-

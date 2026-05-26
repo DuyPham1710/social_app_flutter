@@ -23,9 +23,6 @@ class SubmitFaceRegistrationUsecase
   Future<DataState<Map<String, dynamic>>> call({
     SubmitFaceRegistrationParams? params,
   }) {
-    return _authRepository.registerFace(
-      params!.userId,
-      params.base64Images,
-    );
+    return _authRepository.registerFace(params!.userId, params.base64Images);
   }
 }

@@ -30,7 +30,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<LoadSearchHistory>(_onLoadSearchHistory);
     on<DeleteSearchHistory>(_onDeleteSearchHistory);
     on<ClearAllSearchHistory>(_onClearAllSearchHistory);
-    
+
     // Tự động load lịch sử khi khởi tạo
     add(const LoadSearchHistory(limit: 10));
   }
@@ -59,15 +59,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     // Chỉ emit kết quả nếu query vẫn còn là query hiện tại (tránh race condition)
     if (_currentSearchQuery == event.query) {
       if (dataState is DataStateSuccess) {
-        emit(SearchLoaded(
-          results: dataState.data!,
-          query: event.query,
-          currentPage: 1,
-        ));
+        emit(
+          SearchLoaded(
+            results: dataState.data!,
+            query: event.query,
+            currentPage: 1,
+          ),
+        );
       } else if (dataState is DataStateError) {
-        emit(SearchError(
-          message: dataState.error?.message ?? 'Lỗi tìm kiếm',
-        ));
+        emit(SearchError(message: dataState.error?.message ?? 'Lỗi tìm kiếm'));
       }
     }
   }
@@ -92,7 +92,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     if (dataState is DataStateSuccess) {
       final newResults = dataState.data!;
-      
+
       // Kiểm tra xem newResults có phải là SearchResultModel không
       if (newResults is SearchResultModel) {
         final currentResults = currentState.results;
@@ -108,39 +108,44 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             pagination: newResults.pagination,
           );
 
-          emit(SearchLoaded(
-            results: updatedResults,
-            query: currentState.query,
-            currentPage: currentState.currentPage + 1,
-          ));
+          emit(
+            SearchLoaded(
+              results: updatedResults,
+              query: currentState.query,
+              currentPage: currentState.currentPage + 1,
+            ),
+          );
         } else {
           // Fallback: chỉ thêm kết quả mới nếu không thể combine
-          emit(SearchLoaded(
-            results: newResults,
-            query: currentState.query,
-            currentPage: currentState.currentPage + 1,
-          ));
+          emit(
+            SearchLoaded(
+              results: newResults,
+              query: currentState.query,
+              currentPage: currentState.currentPage + 1,
+            ),
+          );
         }
       } else {
         // Nếu không phải SearchResultModel, chỉ emit kết quả mới
-        emit(SearchLoaded(
-          results: newResults,
-          query: currentState.query,
-          currentPage: currentState.currentPage + 1,
-        ));
+        emit(
+          SearchLoaded(
+            results: newResults,
+            query: currentState.query,
+            currentPage: currentState.currentPage + 1,
+          ),
+        );
       }
     } else if (dataState is DataStateError) {
       emit(currentState.copyWith(isLoadingMore: false));
-      emit(SearchError(
-        message: dataState.error?.message ?? 'Lỗi tải thêm kết quả',
-      ));
+      emit(
+        SearchError(
+          message: dataState.error?.message ?? 'Lỗi tải thêm kết quả',
+        ),
+      );
     }
   }
 
-  void _onClearSearch(
-    ClearSearch event,
-    Emitter<SearchState> emit,
-  ) {
+  void _onClearSearch(ClearSearch event, Emitter<SearchState> emit) {
     _currentSearchQuery = null;
     // Load lại lịch sử khi clear search
     add(const LoadSearchHistory(limit: 10));
@@ -164,13 +169,16 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     final currentState = state;
-    final dataState = await deleteSearchHistoryUseCase(historyId: event.historyId);
+    final dataState = await deleteSearchHistoryUseCase(
+      historyId: event.historyId,
+    );
 
     if (dataState is DataStateSuccess) {
       // Nếu đang ở SearchInitial (đang xem lịch sử), reload lịch sử
       if (currentState is SearchInitial) {
         // Nếu có nhiều hơn 10 items, có nghĩa là đang ở trang lịch sử đầy đủ
-        final limit = currentState.history != null && currentState.history!.length > 10
+        final limit =
+            currentState.history != null && currentState.history!.length > 10
             ? 100
             : 10;
         // Reload lịch sử sau khi xóa
@@ -189,10 +197,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     final currentState = state;
-    
+
     // Emit loading state
     emit(SearchLoading());
-    
+
     final dataState = await clearAllSearchHistoryUseCase();
 
     if (dataState is DataStateSuccess) {
@@ -215,4 +223,3 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
   }
 }
-

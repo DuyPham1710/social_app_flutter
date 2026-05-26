@@ -11,6 +11,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
@@ -99,31 +100,31 @@ class _FaceScanPageState extends State<FaceScanPage> {
     }
   }
 
-  String get _instructionTitle {
-    if (_isUploading) return "Đang xử lý...";
-    if (_isFinished) return "Hoàn tất!";
-    if (_isCapturing) return "Giữ yên...";
-    if (_isTooDark) return "Thiếu ánh sáng";
-    return "Bước ${_currentPoseIndex + 1}/5";
+  String _instructionTitle(BuildContext context) {
+    if (_isUploading) return context.l10n.faceScanProcessing;
+    if (_isFinished) return context.l10n.faceScanCompleted;
+    if (_isCapturing) return context.l10n.faceScanHoldStill;
+    if (_isTooDark) return context.l10n.faceScanTooDarkTitle;
+    return context.l10n.faceScanStep(_currentPoseIndex + 1);
   }
 
-  String get _instructionText {
-    if (_isUploading) return "Đang gửi dữ liệu khuôn mặt lên máy chủ...";
-    if (_isFinished) return "Dữ liệu khuôn mặt đã được lưu trữ an toàn.";
+  String _instructionText(BuildContext context) {
+    if (_isUploading) return context.l10n.faceScanUploading;
+    if (_isFinished) return context.l10n.faceScanStoredSafely;
     if (_isTooDark)
-      return "Môi trường quá tối.\nVui lòng tìm nơi có ánh sáng tốt hơn.";
+      return context.l10n.faceScanTooDarkMessage;
 
     switch (_poses[_currentPoseIndex]) {
       case FacePose.center:
-        return "Vui lòng nhìn thẳng vào camera";
+        return context.l10n.faceScanLookStraight;
       case FacePose.up:
-        return "Ngẩng đầu lên một chút";
+        return context.l10n.faceScanLookUp;
       case FacePose.down:
-        return "Cúi đầu xuống một chút";
+        return context.l10n.faceScanLookDown;
       case FacePose.left:
-        return "Quay mặt sang trái";
+        return context.l10n.faceScanLookLeft;
       case FacePose.right:
-        return "Quay mặt sang phải";
+        return context.l10n.faceScanLookRight;
     }
   }
 
@@ -302,9 +303,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
   Future<void> _submitFaceRegistration() async {
     if (_userId.isEmpty) {
       debugPrint('[FaceScan] userId is empty, cannot submit');
-      _showErrorAndReset(
-        'Không tìm thấy thông tin tài khoản. Vui lòng thử lại.',
-      );
+      _showErrorAndReset(context.l10n.faceScanMissingAccount);
       return;
     }
 
@@ -335,7 +334,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
       }
     } catch (e) {
       debugPrint('[FaceScan] Error converting images: $e');
-      _showErrorAndReset('Đã xảy ra lỗi khi xử lý ảnh. Vui lòng thử lại.');
+      _showErrorAndReset(context.l10n.faceScanProcessImageFailed);
     }
   }
 
@@ -451,7 +450,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
 
                     Expanded(
                       child: Text(
-                        "Nhận diện khuôn mặt",
+                        context.l10n.faceScanTitle,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -592,7 +591,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      _instructionTitle,
+                      _instructionTitle(context),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: _isFinished ? Colors.green : Colors.white,
@@ -602,7 +601,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
                     ),
                     SizedBox(height: 12.h),
                     Text(
-                      _instructionText,
+                      _instructionText(context),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.grey[400],

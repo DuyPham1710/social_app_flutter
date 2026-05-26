@@ -8,6 +8,8 @@ import 'package:social_app_fe/features/friend/presentation/widgets/friend_header
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_request_item.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_suggestion_item.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_requests_page.dart';
+import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendPage extends StatefulWidget {
   const FriendPage({super.key});
@@ -40,7 +42,7 @@ class _FriendPageState extends State<FriendPage>
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: Text(
-          'Bạn bè',
+          context.l10n.friendTitle,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -75,8 +77,8 @@ class _FriendPageState extends State<FriendPage>
 
                 // Lời mời kết bạn
                 _buildSectionHeader(
-                  title: 'Lời mời kết bạn',
-                  trailing: 'Xem tất cả',
+                  title: context.l10n.friendRequestsTitle,
+                  trailing: context.l10n.friendSeeAll,
                   onTapTrailing: () async {
                     await Navigator.push(
                       context,
@@ -96,7 +98,7 @@ class _FriendPageState extends State<FriendPage>
                 SizedBox(height: 20.h),
 
                 // Những người bạn có thể biết
-                _buildSectionHeader(title: 'Những người bạn có thể biết'),
+                _buildSectionHeader(title: context.l10n.friendPeopleYouMayKnow),
                 SizedBox(height: 8.h),
                 _buildFriendSuggestionsSection(),
               ],
@@ -117,7 +119,11 @@ class _FriendPageState extends State<FriendPage>
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.green,
@@ -139,7 +145,11 @@ class _FriendPageState extends State<FriendPage>
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.red,
@@ -217,7 +227,7 @@ class _FriendPageState extends State<FriendPage>
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        'Không có lời mời kết bạn nào',
+                        context.l10n.friendNoRequests,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14.sp,
@@ -255,7 +265,10 @@ class _FriendPageState extends State<FriendPage>
                     userId: request.senderId,
                     name: request.displayName,
                     mutualFriends: request.displayMutualFriends,
-                    timeAgo: request.formattedTimeAgo,
+                    timeAgo: localizedFriendTimeAgo(
+                      context.l10n,
+                      request.createdAt,
+                    ),
                     avatarUrl: request.displayAvatarUrl,
                     mutualFriendAvatars: request.mutualFriendAvatars,
                     isAccepted: isAccepted,
@@ -299,7 +312,7 @@ class _FriendPageState extends State<FriendPage>
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      'Lỗi tải dữ liệu',
+                      context.l10n.friendLoadDataError,
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 14.sp,
@@ -312,7 +325,7 @@ class _FriendPageState extends State<FriendPage>
                         context.read<FriendBloc>().add(const LoadFriendPage());
                       },
                       child: Text(
-                        'Thử lại',
+                        context.l10n.commonRetry,
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: AppColors.primary,
@@ -337,7 +350,9 @@ class _FriendPageState extends State<FriendPage>
         if (state is FriendActionSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                localizedFriendActionMessage(context.l10n, state.message),
+              ),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 2),
             ),
@@ -345,7 +360,9 @@ class _FriendPageState extends State<FriendPage>
         } else if (state is FriendActionError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                localizedFriendActionMessage(context.l10n, state.message),
+              ),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 2),
             ),
@@ -382,7 +399,7 @@ class _FriendPageState extends State<FriendPage>
                 final isSent = sentRequestUserIds.contains(suggestion.userId);
                 return FriendSuggestionItem(
                   userId: suggestion.userId,
-                  name: suggestion.fullName ?? 'Người dùng',
+                  name: suggestion.fullName ?? context.l10n.commonUser,
                   mutualFriends: suggestion.mutualFriends ?? 0,
                   avatarUrl:
                       suggestion.avatarUrl ??
@@ -408,13 +425,13 @@ class _FriendPageState extends State<FriendPage>
                 3,
                 (index) => FriendSuggestionItem(
                   userId: "68e9d3fa7ae32fe700d1d3cc",
-                  name: 'Người dùng ${index + 1}',
+                  name: context.l10n.friendFallbackUserWithIndex(index + 1),
                   mutualFriends: 5 + index,
                   avatarUrl: 'https://i.pravatar.cc/150?img=${index + 10}',
                   onAddFriend: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Chức năng đang được phát triển'),
+                      SnackBar(
+                        content: Text(context.l10n.commonFeatureInDevelopment),
                         backgroundColor: Colors.orange,
                       ),
                     );

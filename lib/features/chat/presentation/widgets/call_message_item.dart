@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class VideoCallMessageItem extends StatelessWidget {
   final bool fromMe;
@@ -30,16 +31,18 @@ class VideoCallMessageItem extends StatelessWidget {
     return '0:${secs.toString().padLeft(2, '0')}';
   }
 
-  String _getStatusText() {
+  String _getStatusText(BuildContext context) {
     switch (callStatus) {
       case 'completed':
-        return duration != null ? _formatDuration(duration!) : 'Cuộc gọi video';
+        return duration != null
+            ? _formatDuration(duration!)
+            : context.l10n.chatVideoCall;
       case 'missed':
-        return 'Nhỡ cuộc gọi';
+        return context.l10n.chatMissedCall;
       case 'rejected':
-        return 'Đã bỏ lỡ cuộc gọi video';
+        return context.l10n.chatVideoCallMissed;
       default:
-        return 'Cuộc gọi video';
+        return context.l10n.chatVideoCall;
     }
   }
 
@@ -92,7 +95,9 @@ class VideoCallMessageItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                callType == 'video' ? 'Cuộc gọi video' : 'Cuộc gọi thoại',
+                callType == 'video'
+                    ? context.l10n.chatVideoCall
+                    : context.l10n.chatAudioCall,
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
@@ -125,7 +130,7 @@ class VideoCallMessageItem extends StatelessWidget {
                     ),
 
                   Text(
-                    _getStatusText(),
+                    _getStatusText(context),
                     style: TextStyle(fontSize: 12.sp, color: _getStatusColor()),
                   ),
                 ],

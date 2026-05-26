@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/add_friend_button.dart';
 
 class ReactActionButton extends StatelessWidget {
@@ -8,7 +9,13 @@ class ReactActionButton extends StatelessWidget {
   final bool? isFriend;
   final bool isSend;
   final String? requestId;
-  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
+  final Function(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  )?
+  onMention;
   final String userDisplayName;
   final String userAvatar;
 
@@ -51,7 +58,7 @@ class ReactActionButton extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
       child: Text(
-        'Nhắc đến',
+        context.l10n.postMention,
         style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
       ),
     );

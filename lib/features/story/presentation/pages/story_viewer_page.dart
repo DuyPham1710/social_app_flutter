@@ -37,11 +37,11 @@ class _StoryViewerPageState extends State<StoryViewerPage>
 
   // Audio player for Deezer preview
   late final AudioPlayer _audioPlayer;
-  
+
   int _currentMusicDurationSeconds = 10; // Mặc định 10 giây nếu không có nhạc
-  
+
   int _currentVideoDurationSeconds = 0; // 0 = chưa có video hoặc chưa load
-  
+
   bool _durationUpdatedForCurrentStory = false;
 
   // Thêm biến để theo dõi vị trí kéo
@@ -52,7 +52,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       1.0; // 1.0 = trượt sang trái (Next), -1.0 = trượt sang phải (Prev)
   // biến theo dõi vị trí kéo ngang khi vuốt giữa các nhóm
   double _horizontalOffset = 0.0;
-  
+
   // Current user ID để kiểm tra story của chính user
   String? _currentUserId;
 
@@ -77,7 +77,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     _controller.forward();
     _playCurrentPreview();
   }
-  
+
   Future<void> _loadCurrentUserId() async {
     final userData = await TokenStorage.getUserData();
     if (userData != null && mounted) {
@@ -86,18 +86,18 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       });
     }
   }
-  
+
   void _setupAudioPlayerListeners() {
     _audioPlayer.onDurationChanged.listen((duration) {
       if (mounted && duration.inSeconds > 0) {
         final newDuration = duration.inSeconds;
         final isFirstUpdate = !_durationUpdatedForCurrentStory;
-        
+
         setState(() {
           _currentMusicDurationSeconds = newDuration;
           _durationUpdatedForCurrentStory = true;
         });
-        
+
         if (_currentStory.mediaType != MediaType.video) {
           // Cập nhật duration của AnimationController
           if (isFirstUpdate) {
@@ -111,16 +111,16 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       }
     });
   }
-  
+
   void _onVideoDurationChanged(int durationSeconds) {
     if (mounted && durationSeconds > 0) {
       final isFirstUpdate = !_durationUpdatedForCurrentStory;
-      
+
       setState(() {
         _currentVideoDurationSeconds = durationSeconds;
         _durationUpdatedForCurrentStory = true;
       });
-      
+
       if (isFirstUpdate) {
         _controller.duration = Duration(seconds: durationSeconds);
         _controller.reset();
@@ -143,9 +143,10 @@ class _StoryViewerPageState extends State<StoryViewerPage>
           }
         });
   }
-  
+
   int _getStoryDuration() {
-    if (_currentStory.mediaType == MediaType.video && _currentVideoDurationSeconds > 0) {
+    if (_currentStory.mediaType == MediaType.video &&
+        _currentVideoDurationSeconds > 0) {
       return _currentVideoDurationSeconds;
     }
     if (_currentStory.music != null && _currentMusicDurationSeconds > 0) {
@@ -153,24 +154,25 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     }
     return widget.durationSeconds;
   }
-  
+
   void _updateControllerDuration(int durationSeconds) {
     if (_controller.duration?.inSeconds != durationSeconds) {
       final wasPlaying = _controller.isAnimating;
       final wasCompleted = _controller.status == AnimationStatus.completed;
-      
+
       double newValue = 0.0;
       if (wasPlaying && !wasCompleted) {
-        final oldDuration = _controller.duration?.inSeconds ?? widget.durationSeconds;
+        final oldDuration =
+            _controller.duration?.inSeconds ?? widget.durationSeconds;
         if (oldDuration > 0) {
           newValue = (_controller.value * oldDuration) / durationSeconds;
           newValue = newValue.clamp(0.0, 1.0);
         }
       }
-      
+
       _controller.duration = Duration(seconds: durationSeconds);
       _controller.value = newValue;
-      
+
       if (wasPlaying && !wasCompleted) {
         _controller.forward();
       }
@@ -193,7 +195,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       _durationUpdatedForCurrentStory = false;
     });
     _updateControllerDuration(widget.durationSeconds);
-    
+
     _controller.stop();
     _controller.reset();
     _controller.forward();
@@ -249,7 +251,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       await _audioPlayer.stop();
       setState(() {
         _currentMusicDurationSeconds = widget.durationSeconds;
-        _durationUpdatedForCurrentStory = true; 
+        _durationUpdatedForCurrentStory = true;
       });
       _updateControllerDuration(widget.durationSeconds);
       return;
@@ -261,7 +263,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     } catch (_) {
       setState(() {
         _currentMusicDurationSeconds = widget.durationSeconds;
-        _durationUpdatedForCurrentStory = true; 
+        _durationUpdatedForCurrentStory = true;
       });
       _updateControllerDuration(widget.durationSeconds);
     }
@@ -272,17 +274,16 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     final height = MediaQuery.of(context).size.height;
     final dx = details.globalPosition.dx;
     final dy = details.globalPosition.dy;
-    
 
     final isOwnStory = _currentStory.user.userId == _currentUserId;
     final footerHeight = 80.0; // Chiều cao ước tính của footer area
     final isInFooterArea = dy > (height - footerHeight);
-    
+
     // Nếu tap vào footer area và không phải story của chính mình, không xử lý
     if (!isOwnStory && isInFooterArea) {
       return;
     }
-    
+
     if (dx < width / 2) {
       _onPrev();
     } else {
@@ -418,7 +419,9 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                 children: [
                   // Media
                   StoryBackgroundWidget(
-                    key: ValueKey('${_currentGroupIndex}_${_currentStoryIndex}_${_currentStory.mediaUrl}'),
+                    key: ValueKey(
+                      '${_currentGroupIndex}_${_currentStoryIndex}_${_currentStory.mediaUrl}',
+                    ),
                     mediaUrl: _currentStory.mediaUrl,
                     mediaType: _currentStory.mediaType,
                     dragOffset: _dragOffset,
@@ -457,7 +460,10 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                     StoryReactCountWidget(
                       story: _currentStory,
                       onTap: () {
-                        StoryReactsBottomSheet.show(context, story: _currentStory);
+                        StoryReactsBottomSheet.show(
+                          context,
+                          story: _currentStory,
+                        );
                       },
                     ),
                 ],

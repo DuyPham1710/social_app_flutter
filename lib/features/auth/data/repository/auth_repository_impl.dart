@@ -98,10 +98,12 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final userData = await TokenStorage.getUserData();
       if (userData == null) {
-        return DataStateError(DioException(
-        requestOptions: RequestOptions(path: ''),
-        error: "No user data found"
-      ));
+        return DataStateError(
+          DioException(
+            requestOptions: RequestOptions(path: ''),
+            error: "No user data found",
+          ),
+        );
       }
 
       final user = UserModel(
@@ -114,10 +116,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return DataStateSuccess(user);
     } catch (e) {
-      return DataStateError(DioException(
-        requestOptions: RequestOptions(path: ''),
-        error: "Failed to load user"
-      ));
+      return DataStateError(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          error: "Failed to load user",
+        ),
+      );
     }
   }
 

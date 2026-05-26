@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/post/domain/entities/caption_translation_
 import 'package:social_app_fe/features/post/domain/entities/post_translation_entity.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_caption_translation_eligibility_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/translate_caption_usecase.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostTranslatableCaption extends StatefulWidget {
   final String postId;
@@ -118,12 +119,12 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
         }
       } else if (result is DataStateError) {
         setState(() {
-          _error = result.error?.message ?? 'Không thể dịch caption';
+          _error = result.error?.message ?? context.l10n.postTranslateFailed;
         });
       }
     } catch (e) {
       setState(() {
-        _error = 'Đã xảy ra lỗi khi dịch caption';
+        _error = context.l10n.postTranslateError;
       });
     } finally {
       if (mounted) {
@@ -172,8 +173,10 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
                 onPressed: _isLoading ? null : _toggleTranslation,
                 child: Text(
                   _translation == null
-                      ? 'Xem bản dịch'
-                      : (_showTranslated ? 'Xem bản gốc' : 'Xem bản dịch'),
+                      ? context.l10n.postSeeTranslation
+                      : (_showTranslated
+                            ? context.l10n.postSeeOriginal
+                            : context.l10n.postSeeTranslation),
                   style: TextStyle(fontSize: 12.sp, color: AppColors.primary),
                 ),
               ),

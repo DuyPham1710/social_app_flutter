@@ -10,5 +10,3 @@ class RemoveFriendUseCase {
     return await friendRepository.removeFriend(friendId);
   }
 }
-
-

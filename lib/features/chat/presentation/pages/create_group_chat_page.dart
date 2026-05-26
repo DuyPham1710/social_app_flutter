@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/message/message_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class CreateGroupChatPage extends StatefulWidget {
@@ -117,7 +118,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
         });
       }
     } catch (e) {
-      showErrorSnackBar(context, 'Lỗi khi chọn ảnh: $e');
+      showErrorSnackBar(context, context.l10n.chatPickImageFailed('$e'));
     }
   }
 
@@ -141,7 +142,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                   size: 24.sp,
                 ),
                 title: Text(
-                  'Chụp ảnh',
+                  context.l10n.chatTakePhoto,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14.sp,
@@ -159,7 +160,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                   size: 24.sp,
                 ),
                 title: Text(
-                  'Chọn từ thư viện',
+                  context.l10n.chatChooseFromLibrary,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 14.sp,
@@ -190,7 +191,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
           borderRadius: BorderRadius.circular(16.r),
         ),
         title: Text(
-          'Hủy thao tác?',
+          context.l10n.chatDiscardGroupTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 16.sp,
@@ -198,21 +199,21 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
           ),
         ),
         content: Text(
-          'Bạn có chắc chắn muốn hủy tạo nhóm chat không?',
+          context.l10n.chatDiscardGroupMessage,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Không',
+              context.l10n.commonNo,
               style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'Hủy',
+              context.l10n.commonCancel,
               style: TextStyle(
                 color: Colors.red,
                 fontSize: 14.sp,
@@ -229,12 +230,12 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
 
   Future<void> _createGroupChat() async {
     if (_selectedFriends.isEmpty) {
-      showErrorSnackBar(context, 'Vui lòng chọn ít nhất 1 người');
+      showErrorSnackBar(context, context.l10n.chatSelectAtLeastOnePerson);
       return;
     }
 
     if (_userId == null) {
-      showErrorSnackBar(context, 'Không tìm thấy thông tin người dùng');
+      showErrorSnackBar(context, context.l10n.chatUserInfoNotFound);
       return;
     }
 
@@ -275,7 +276,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
         _isCreating = false;
       });
 
-      showErrorSnackBar(context, 'Lỗi khi tạo nhóm chat: $e');
+      showErrorSnackBar(context, context.l10n.chatCreateGroupFailed('$e'));
     }
   }
 
@@ -329,7 +330,10 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
             _isCreating = false;
           });
 
-          showErrorSnackBar(context, 'Lỗi: ${state.message}');
+          showErrorSnackBar(
+            context,
+            context.l10n.commonErrorWithMessage(state.message),
+          );
         }
       },
       child: WillPopScope(
@@ -349,7 +353,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
               },
             ),
             title: Text(
-              'Nhóm chat mới',
+              context.l10n.chatNewGroup,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -405,7 +409,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                           fontSize: 15.sp,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'Tên nhóm (không bắt buộc)',
+                          hintText: context.l10n.chatGroupNameOptional,
                           hintStyle: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 15.sp,
@@ -438,7 +442,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                     fontSize: 15.sp,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Tìm kiếm',
+                    hintText: context.l10n.searchHint,
                     hintStyle: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 15.sp,
@@ -483,7 +487,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Gợi ý',
+                    context.l10n.chatSuggestions,
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14.sp,
@@ -534,7 +538,7 @@ class _CreateGroupChatPageState extends State<CreateGroupChatPage> {
                             ),
                           )
                         : Text(
-                            'Tạo nhóm chat',
+                            context.l10n.chatCreateGroup,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16.sp,

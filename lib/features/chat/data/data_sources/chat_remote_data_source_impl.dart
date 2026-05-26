@@ -42,7 +42,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   // Connection state tracking
   bool _isConnected = false;
   Completer<void>? _connectionCompleter;
-  
+
   // Track current conversation for automatic rejoin on reconnect
   String? _currentJoinedConversationId;
   String? _currentUserId;
@@ -91,7 +91,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   void connect(String userId, String username) {
     _currentUserId = userId;
-    
+
     // Reset connection state
     _isConnected = false;
     _connectionCompleter = Completer<void>();
@@ -503,7 +503,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }) async {
     _currentUserId = userId;
     _currentJoinedConversationId = conversationId;
-    
+
     developer.log(
       'Joining conversation: $conversationId for user: $userId',
       name: 'ChatDataSource',
@@ -553,7 +553,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     if (_currentJoinedConversationId == conversationId) {
       _currentJoinedConversationId = null;
     }
-    
+
     developer.log(
       'Leaving conversation: $conversationId (userId: $userId)',
       name: 'ChatDataSource',
@@ -953,7 +953,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
       return newFilePath;
     } on DioException catch (e) {
-      developer.log('Voice effect dio error: ${e.message}', name: 'ChatDataSource');
+      developer.log(
+        'Voice effect dio error: ${e.message}',
+        name: 'ChatDataSource',
+      );
       if (e.response?.statusCode == 400) {
         throw Exception('Preset giọng không hợp lệ.');
       } else if (e.response?.statusCode == 503) {

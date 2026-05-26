@@ -7,14 +7,12 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/react_story_entity.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_react_list_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryReactsBottomSheet extends StatefulWidget {
   final StoryEntity story;
 
-  const StoryReactsBottomSheet({
-    super.key,
-    required this.story,
-  });
+  const StoryReactsBottomSheet({super.key, required this.story});
 
   static void show(BuildContext context, {required StoryEntity story}) {
     showModalBottomSheet(
@@ -123,12 +121,15 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(CupertinoIcons.xmark, color: AppColors.textPrimary),
+                  icon: Icon(
+                    CupertinoIcons.xmark,
+                    color: AppColors.textPrimary,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
                   child: Text(
-                    'Người đã bày tỏ cảm xúc',
+                    context.l10n.storyReactedPeople,
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 16.sp,
@@ -161,7 +162,10 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Tất cả', style: TextStyle(fontSize: 14.sp)),
+                    Text(
+                      context.l10n.commonAll,
+                      style: TextStyle(fontSize: 14.sp),
+                    ),
                     SizedBox(width: 8.w),
                     Text(
                       totalCount.toString(),
@@ -207,14 +211,15 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
 
                 // Tabs cho từng emoji
                 ...uniqueEmojis.map((emoji) {
-                  final emojiReacts = widget.story.reacts
-                      .where((react) => react.emoji == emoji)
-                      .toList()
-                    ..sort(
-                      (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
-                        a.createdAt ?? DateTime.now(),
-                      ),
-                    );
+                  final emojiReacts =
+                      widget.story.reacts
+                          .where((react) => react.emoji == emoji)
+                          .toList()
+                        ..sort(
+                          (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
+                            a.createdAt ?? DateTime.now(),
+                          ),
+                        );
                   return StoryReactListWidget(reacts: emojiReacts);
                 }),
               ],
@@ -225,4 +230,3 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
     );
   }
 }
-

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileActions extends StatelessWidget {
   final VoidCallback? onTapEdit;
@@ -32,11 +33,11 @@ class ProfileActions extends StatelessWidget {
                 );
               },
               icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-              label: const Text(
-                'Thêm vào tin',
+              label: Text(
+                context.l10n.profileAddToStory,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -52,7 +53,7 @@ class ProfileActions extends StatelessWidget {
               onPressed: onTapEdit,
               icon: Icon(Icons.edit_outlined, color: AppColors.textPrimary),
               label: Text(
-                'Chỉnh sửa thông tin',
+                context.l10n.profileEditInfo,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: AppColors.textPrimary),

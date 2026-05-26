@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/usecases/get_community_posts_usecase.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPostsWidget extends StatefulWidget {
   final String communityId;
@@ -110,14 +111,14 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Text(
-            'Bài viết trong nhóm',
+            context.l10n.communityPostsInGroup,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1C1E21),
+              color: AppColors.textPrimary,
             ),
           ),
         ),
@@ -126,11 +127,11 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             key: 'locked',
             child: _buildInfoCard(
               icon: Icons.lock_outline_rounded,
-              iconColor: const Color(0xFF64748B),
-              backgroundColor: const Color(0xFFF8FAFC),
-              borderColor: const Color(0xFFE2E8F0),
-              title: 'Nội dung dành cho thành viên',
-              message: 'Bạn cần là thành viên để xem bài viết trong nhóm.',
+              iconColor: AppColors.textSecondary,
+              backgroundColor: AppColors.background,
+              borderColor: AppColors.divider,
+              title: context.l10n.communityMemberOnlyContent,
+              message: context.l10n.communityMemberOnlyPostsMessage,
             ),
           )
         else
@@ -145,10 +146,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               }
 
               if (snapshot.hasError) {
-                return _fadeContent(
-                  key: 'error',
-                  child: _buildErrorState(),
-                );
+                return _fadeContent(key: 'error', child: _buildErrorState());
               }
 
               final posts = snapshot.data ?? const [];
@@ -158,10 +156,10 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                   child: _buildInfoCard(
                     icon: Icons.post_add_rounded,
                     iconColor: AppColors.primary,
-                    backgroundColor: const Color(0xFFF8FAFC),
-                    borderColor: const Color(0xFFE2E8F0),
-                    title: 'Chưa có bài viết',
-                    message: 'Các bài viết trong nhóm sẽ hiển thị tại đây.',
+                    backgroundColor: AppColors.background,
+                    borderColor: AppColors.divider,
+                    title: context.l10n.communityNoPostsTitle,
+                    message: context.l10n.communityNoPostsMessage,
                   ),
                 );
               }
@@ -199,15 +197,9 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
-      child: KeyedSubtree(
-        key: ValueKey(key),
-        child: child,
-      ),
+      child: KeyedSubtree(key: ValueKey(key), child: child),
     );
   }
 
@@ -223,12 +215,12 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE4E7EC)),
-                boxShadow: const [
+                border: Border.all(color: AppColors.divider),
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x0F0F172A),
+                    color: AppColors.textSecondary.withValues(alpha: 0.08),
                     blurRadius: 10,
                     offset: Offset(0, 4),
                   ),
@@ -267,7 +259,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                       aspectRatio: 16 / 9,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE9EEF5),
+                          color: AppColors.textSecondary.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
@@ -289,16 +281,18 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF1F2),
+          color: const Color(0xFFE11D48).withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFFECACA)),
+          border: Border.all(
+            color: const Color(0xFFE11D48).withValues(alpha: 0.28),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline_rounded,
                   color: Color(0xFFE11D48),
                   size: 22,
@@ -306,9 +300,9 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Không tải được bài viết',
+                    context.l10n.homeLoadPostsFailed,
                     style: TextStyle(
-                      color: Color(0xFF101828),
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -323,7 +317,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 });
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Thử lại'),
+              label: Text(context.l10n.commonRetry),
             ),
           ],
         ),
@@ -355,7 +349,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.74),
+                color: AppColors.secondBackground.withValues(alpha: 0.74),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor, size: 22),
@@ -367,16 +361,16 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Color(0xFF101828),
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     message,
-                    style: const TextStyle(
-                      color: Color(0xFF667085),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       height: 1.25,
                     ),
@@ -435,7 +429,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

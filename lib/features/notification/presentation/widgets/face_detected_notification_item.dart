@@ -13,6 +13,7 @@ class FaceDetectedNotificationItem extends StatelessWidget {
   final String? postId;
   final VoidCallback? onUserTap;
   final VoidCallback? onMessageTap;
+  final String actionText;
 
   const FaceDetectedNotificationItem({
     super.key,
@@ -25,6 +26,7 @@ class FaceDetectedNotificationItem extends StatelessWidget {
     this.postId,
     this.onUserTap,
     this.onMessageTap,
+    required this.actionText,
   });
 
   @override
@@ -46,7 +48,7 @@ class FaceDetectedNotificationItem extends StatelessWidget {
               recognizer: TapGestureRecognizer()..onTap = onUserTap,
             ),
             TextSpan(
-              text: ' $message',
+              text: ' $actionText',
               recognizer: TapGestureRecognizer()..onTap = onMessageTap,
             ),
           ],

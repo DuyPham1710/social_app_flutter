@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/domain/entities/relationship_status_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class OtherProfileActions extends StatelessWidget {
   final RelationshipStatusEntity? relationship;
@@ -28,18 +29,18 @@ class OtherProfileActions extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
         title: Text(
-          'Xác nhận hủy kết bạn',
+          context.l10n.profileConfirmUnfriendTitle,
           style: TextStyle(color: AppColors.textPrimary),
         ),
         content: Text(
-          'Bạn có chắc chắn muốn hủy kết bạn với người này không?',
+          context.l10n.profileConfirmUnfriendMessage,
           style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Hủy',
+              context.l10n.commonCancel,
               style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
@@ -52,7 +53,7 @@ class OtherProfileActions extends StatelessWidget {
               Navigator.pop(ctx);
               onUnfriend?.call();
             },
-            child: const Text('Đồng ý'),
+            child: Text(context.l10n.profileAgree),
           ),
         ],
       ),
@@ -117,7 +118,7 @@ class OtherProfileActions extends StatelessWidget {
         buttons = [
           _buildButton(
             icon: const Icon(Icons.person_add),
-            label: 'Thêm bạn bè',
+            label: context.l10n.profileAddFriend,
             onPressed: onSendRequest,
             isElevated: true,
             size: const Size(totalWidth, buttonHeight),
@@ -128,7 +129,7 @@ class OtherProfileActions extends StatelessWidget {
         buttons = [
           _buildButton(
             icon: const Icon(Icons.cancel),
-            label: 'Hủy yêu cầu kết bạn',
+            label: context.l10n.profileCancelFriendRequest,
             onPressed: onCancelRequest,
             isElevated: false,
             size: const Size(totalWidth, buttonHeight),
@@ -139,14 +140,14 @@ class OtherProfileActions extends StatelessWidget {
         buttons = [
           _buildButton(
             icon: const Icon(Icons.check),
-            label: 'Chấp nhận kết bạn',
+            label: context.l10n.profileAcceptFriend,
             onPressed: onAcceptRequest,
             isElevated: true,
             size: const Size(totalWidth / 2 - 8, buttonHeight),
           ),
           _buildButton(
             icon: const Icon(Icons.clear),
-            label: 'Xóa',
+            label: context.l10n.profileRejectFriend,
             onPressed: onRejectRequest,
             isElevated: false,
             size: const Size(totalWidth / 2 - 8, buttonHeight),
@@ -157,14 +158,14 @@ class OtherProfileActions extends StatelessWidget {
         buttons = [
           _buildButton(
             icon: const Icon(Icons.remove_circle),
-            label: 'Hủy kết bạn',
+            label: context.l10n.profileUnfriend,
             onPressed: () => _confirmUnfriend(context),
             isElevated: false,
             size: const Size(totalWidth / 2 - 8, buttonHeight),
           ),
           _buildButton(
             icon: const Icon(Icons.message),
-            label: 'Nhắn tin',
+            label: context.l10n.profileMessage,
             onPressed: onMessage,
             isElevated: true,
             size: const Size(totalWidth / 2 - 8, buttonHeight),

@@ -42,6 +42,7 @@ import 'package:social_app_fe/features/video_call/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/video_call/presentation/pages/video_call_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:social_app_fe/core/enums/attachment_type.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class ChatDetailPage extends StatefulWidget {
@@ -380,7 +381,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
       // BlocListener sẽ tự động navigate khi state thay đổi
     } catch (e) {
-      _showError('Không thể thực hiện cuộc gọi: $e');
+      _showError(context.l10n.chatStartCallFailed('$e'));
     }
   }
 
@@ -495,7 +496,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     // Otherwise load first
     if (_loadingEditLogs.contains(message.id)) {
       // Already loading, show loading indicator
-      showInfoSnackBar(context, 'Đang tải lịch sử chỉnh sửa...');
+      showInfoSnackBar(context, context.l10n.chatLoadingEditHistory);
       return;
     }
   }
@@ -785,16 +786,16 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             }
           : null,
       onPin: () {
-        showInfoSnackBar(context, 'Tính năng ghim tin nhắn đang phát triển');
+        showInfoSnackBar(context, context.l10n.chatPinInDevelopment);
       },
       onForward: () {
-        showInfoSnackBar(context, 'Tính năng chuyển tiếp đang phát triển');
+        showInfoSnackBar(context, context.l10n.chatForwardInDevelopment);
       },
       onReport: () {
-        showInfoSnackBar(context, 'Tính năng báo cáo tin nhắn đang phát triển');
+        showInfoSnackBar(context, context.l10n.chatReportInDevelopment);
       },
       onCreateAIImage: () {
-        showInfoSnackBar(context, 'Tính năng tạo hình ảnh AI đang phát triển');
+        showInfoSnackBar(context, context.l10n.chatAiImageInDevelopment);
       },
     );
   }
@@ -804,7 +805,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     if (conversationId == null) {
       showErrorSnackBar(
         context,
-        'Không thể thêm reaction: thiếu conversation ID',
+        context.l10n.chatMissingConversationForReaction,
       );
       return;
     }
@@ -822,7 +823,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   void _handleCopyMessage(MessageEntity message) {
     Clipboard.setData(ClipboardData(text: message.text!));
-    showSuccessSnackBar(context, 'Đã sao chép tin nhắn');
+    showSuccessSnackBar(context, context.l10n.chatMessageCopied);
   }
 
   void _showDeleteMessageOptions(MessageEntity message, bool fromMe) {
@@ -909,9 +910,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text('GPS đang tắt. Đang mở Cài đặt định vị...'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(context.l10n.chatGpsDisabledOpeningSettings),
+            duration: const Duration(seconds: 2),
           ),
         );
         await Geolocator.openLocationSettings();
@@ -924,17 +925,15 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       }
       if (permission == LocationPermission.denied) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('Bạn chưa cấp quyền truy cập vị trí.')),
+          SnackBar(content: Text(context.l10n.chatLocationPermissionDenied)),
         );
         return;
       }
       if (permission == LocationPermission.deniedForever) {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Quyền vị trí bị từ chối vĩnh viễn. Đang mở Cài đặt ứng dụng...',
-            ),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(context.l10n.chatLocationPermissionDeniedForever),
+            duration: const Duration(seconds: 2),
           ),
         );
         await Geolocator.openAppSettings();
@@ -958,13 +957,13 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         SendMessageEvent(
           userId: widget.userId,
           conversationId: conversationId,
-          text: 'Gửi vị trí',
+          text: context.l10n.chatSendLocationMessage,
           metadata: {
             'type': 'location',
             'latitude': lat,
             'longitude': lng,
             'mapUrl': mapUrl,
-            'label': 'Vị trí hiện tại',
+            'label': context.l10n.chatCurrentLocation,
           },
           replyTo: _replyingMessage?.id,
         ),
@@ -973,9 +972,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       _clearReplyMessage();
       _scrollToBottom();
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Không thể lấy vị trí: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.chatGetLocationFailed('$e'))),
+      );
     }
   }
 
@@ -1029,7 +1028,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             state.activeCall != null) {
           _handleCallCreated(state.activeCall!);
         } else if (state.status == VideoCallStatus.error) {
-          _showError(state.errorMessage ?? 'Unknown error');
+          _showError(state.errorMessage ?? context.l10n.commonUnknown);
         }
       },
       child: Scaffold(
@@ -1090,7 +1089,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                               });
                               showErrorSnackBar(
                                 context,
-                                'Lỗi tạo cuộc trò chuyện: ${state.message}',
+                                context.l10n.chatCreateConversationFailed(
+                                  state.message ?? context.l10n.commonUnknown,
+                                ),
                               );
                             }
                           },
@@ -1158,18 +1159,21 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                             (!wasDeletedForMe &&
                                                 isDeletedForMe))) {
                                       // Show success snackbar
-                                      WidgetsBinding.instance.addPostFrameCallback((
-                                        _,
-                                      ) {
-                                        if (mounted) {
-                                          showSuccessSnackBar(
-                                            context,
-                                            isDeletedForEveryone
-                                                ? 'Đã xóa tin nhắn cho mọi người'
-                                                : 'Đã xóa tin nhắn cho tôi',
-                                          );
-                                        }
-                                      });
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                            if (mounted) {
+                                              showSuccessSnackBar(
+                                                context,
+                                                isDeletedForEveryone
+                                                    ? context
+                                                          .l10n
+                                                          .chatDeletedForEveryone
+                                                    : context
+                                                          .l10n
+                                                          .chatDeletedForMe,
+                                              );
+                                            }
+                                          });
                                     }
 
                                     // Nếu message được update và isEdited = true, invalidate cache và reload
@@ -1251,9 +1255,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                           content: Text(
-                                            'Không tìm thấy tin nhắn gốc',
+                                            context
+                                                .l10n
+                                                .chatOriginalMessageNotFound,
                                           ),
                                         ),
                                       );
@@ -1327,7 +1333,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                           ),
                                           Center(
                                             child: Text(
-                                              'không có tin nhắn nào. Bắt đầu cuộc trò chuyện ngay!',
+                                              context.l10n
+                                                  .messageNoMessagesStartConversation,
                                               style: TextStyle(
                                                 color: AppColors.textSecondary,
                                               ),
@@ -1674,7 +1681,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                'Error loading messages: ${state.message}',
+                                                context.l10n
+                                                    .chatLoadMessagesFailed(
+                                                      state.message,
+                                                    ),
                                                 style: const TextStyle(
                                                   color: Colors.red,
                                                 ),
@@ -1699,7 +1709,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                         );
                                                   }
                                                 },
-                                                child: const Text('Retry'),
+                                                child: Text(
+                                                  context.l10n.commonRetry,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -1799,7 +1811,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                 ),
                 SizedBox(width: 8.w),
                 Text(
-                  'Đang gửi file...',
+                  context.l10n.chatSendingFile,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14.sp,
@@ -1939,7 +1951,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                         ? TextInputType.multiline
                         : TextInputType.text,
                     decoration: InputDecoration(
-                      hintText: "Nhắn tin...",
+                      hintText: context.l10n.chatMessageHint,
                       hintStyle: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.textSecondary,
@@ -1979,19 +1991,20 @@ class _ChatDetailPageState extends State<ChatDetailPage>
               ? _getAttachmentTypeString(
                   _replyingMessage!.attachments.first.type,
                 )
-              : '[Tin nhắn]');
+              : context.l10n.chatMessagePlaceholder);
 
     final isReplyingToMe = _replyingMessage!.sender.userId == widget.userId;
 
     String name;
     if (isReplyingToMe) {
       // Trường hợp trả lời chính mình
-      name = 'chính mình';
+      name = context.l10n.chatMyself;
     } else {
       // Trả lời người khác, lấy chữ cái cuối của tên
-      final fullName = _replyingMessage!.sender.fullName ?? 'Unknown';
+      final fullName =
+          _replyingMessage!.sender.fullName ?? context.l10n.commonUnknown;
       final parts = fullName.split(' ');
-      name = parts.isNotEmpty ? parts.last : 'Unknown';
+      name = parts.isNotEmpty ? parts.last : context.l10n.commonUnknown;
     }
 
     return Container(
@@ -2018,7 +2031,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Trả lời $name',
+                  context.l10n.chatReplyingTo(name),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12.sp,
@@ -2063,11 +2076,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   String _getAttachmentTypeString(String type) {
-    if (type == AttachmentType.audio.name) return '[Tin nhắn thoại]';
-    if (type == AttachmentType.image.name) return '[Ảnh]';
-    if (type == AttachmentType.video.name) return '[Video]';
-    if (type == AttachmentType.file.name) return '[Tệp tin]';
-    return '[Đính kèm]';
+    if (type == AttachmentType.audio.name) return context.l10n.chatAudioMessage;
+    if (type == AttachmentType.image.name) return context.l10n.chatPhoto;
+    if (type == AttachmentType.video.name) return context.l10n.postVideo;
+    if (type == AttachmentType.file.name) return context.l10n.chatFile;
+    return context.l10n.chatAttachment;
   }
 
   Widget _buildReplyAttachmentPreview(AttachmentEntity attachment) {
@@ -2204,17 +2217,15 @@ class _ChatDetailPageState extends State<ChatDetailPage>
         showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-            title: const Text('Quyền truy cập ảnh'),
-            content: const Text(
-              'Ứng dụng cần quyền truy cập ảnh để hiển thị ảnh từ thư viện. Vui lòng cấp quyền trong Cài đặt.',
-            ),
+            title: Text(context.l10n.chatPhotoPermissionTitle),
+            content: Text(context.l10n.chatPhotoPermissionMessage),
             actions: [
               CupertinoDialogAction(
-                child: const Text('Hủy'),
+                child: Text(context.l10n.commonCancel),
                 onPressed: () => Navigator.pop(context),
               ),
               CupertinoDialogAction(
-                child: const Text('Mở Cài đặt'),
+                child: Text(context.l10n.commonOpenSettings),
                 onPressed: () {
                   Navigator.pop(context);
                   openAppSettings();
@@ -2226,10 +2237,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       }
     } else {
       if (mounted) {
-        showInfoSnackBar(
-          context,
-          'Cần quyền truy cập ảnh để hiển thị thư viện',
-        );
+        showInfoSnackBar(context, context.l10n.chatPhotoPermissionRequired);
       }
     }
   }
@@ -2279,7 +2287,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           _isLoadingPhotos = false;
           _hasMorePhotos = false;
         });
-        showErrorSnackBar(context, 'Lỗi khi tải ảnh: $e');
+        showErrorSnackBar(context, context.l10n.chatLoadPhotosFailed('$e'));
       }
     }
   }
@@ -2384,17 +2392,15 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           showCupertinoDialog(
             context: context,
             builder: (context) => CupertinoAlertDialog(
-              title: const Text('Quyền truy cập Camera'),
-              content: const Text(
-                'Ứng dụng cần quyền truy cập camera để chụp ảnh.',
-              ),
+              title: Text(context.l10n.postCameraPermissionTitle),
+              content: Text(context.l10n.chatCameraPermissionMessage),
               actions: [
                 CupertinoDialogAction(
-                  child: const Text('Hủy'),
+                  child: Text(context.l10n.commonCancel),
                   onPressed: () => Navigator.pop(context),
                 ),
                 CupertinoDialogAction(
-                  child: const Text('Mở Cài đặt'),
+                  child: Text(context.l10n.commonOpenSettings),
                   onPressed: () {
                     Navigator.pop(context);
                     openAppSettings();
@@ -2423,7 +2429,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error opening camera: $e');
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi khi mở camera: $e');
+        showErrorSnackBar(context, context.l10n.chatOpenCameraFailed('$e'));
       }
     }
   }
@@ -2456,7 +2462,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Ảnh vừa chụp',
+                  context.l10n.chatCapturedPhoto,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14.sp,
@@ -2465,7 +2471,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Nhấn gửi để chia sẻ',
+                  context.l10n.chatTapSendToShare,
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: AppColors.textSecondary,
@@ -2493,7 +2499,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    'Gửi',
+                    context.l10n.commonSend,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.sp,
@@ -2532,7 +2538,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     try {
       final conversationId = _currentConversationId ?? widget.conversationId;
       if (conversationId == null) {
-        showErrorSnackBar(context, 'Không thể gửi ảnh: thiếu conversation ID');
+        showErrorSnackBar(
+          context,
+          context.l10n.chatMissingConversationForPhoto,
+        );
         return;
       }
 
@@ -2562,7 +2571,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error sending captured photo: $e');
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi khi gửi ảnh: $e');
+        showErrorSnackBar(context, context.l10n.chatSendPhotoFailed('$e'));
       }
     }
   }
@@ -2573,7 +2582,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     try {
       final conversationId = _currentConversationId ?? widget.conversationId;
       if (conversationId == null) {
-        showErrorSnackBar(context, 'Không thể gửi ảnh: thiếu conversation ID');
+        showErrorSnackBar(
+          context,
+          context.l10n.chatMissingConversationForPhoto,
+        );
 
         return;
       }
@@ -2597,7 +2609,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
       if (filePaths.isEmpty) {
         if (mounted) {
-          showErrorSnackBar(context, 'Không thể xử lý ảnh');
+          showErrorSnackBar(context, context.l10n.chatCannotProcessPhoto);
         }
         return;
       }
@@ -2627,7 +2639,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error sending photos: $e');
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi khi gửi ảnh: $e');
+        showErrorSnackBar(context, context.l10n.chatSendPhotoFailed('$e'));
       }
     }
   }
@@ -2649,7 +2661,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           if (mounted) {
             showErrorSnackBar(
               context,
-              'Không thể gửi file: thiếu conversation ID',
+              context.l10n.chatMissingConversationForFile,
             );
           }
           return;
@@ -2681,7 +2693,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     } catch (e) {
       print('Error picking file: $e');
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi khi chọn file: $e');
+        showErrorSnackBar(context, context.l10n.chatPickFileFailed('$e'));
       }
     }
   }
@@ -2793,7 +2805,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                           borderRadius: BorderRadius.circular(16.r),
                         ),
                         child: Text(
-                          'Gửi (${_selectedPhotos.length})',
+                          context.l10n.commonSendWithCount(
+                            _selectedPhotos.length,
+                          ),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14.sp,
@@ -2831,7 +2845,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                   : _photoList.isEmpty
                   ? Center(
                       child: Text(
-                        'Không có ảnh nào',
+                        context.l10n.chatNoPhotos,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14.sp,

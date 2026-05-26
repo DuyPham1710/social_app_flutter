@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class EditSelectedImagePage extends StatefulWidget {
@@ -83,7 +84,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
         ),
 
         title: Text(
-          'Chỉnh sửa',
+          context.l10n.postEdit,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18.sp,
@@ -113,7 +114,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                   Navigator.pop(context, widget.imageFiles);
                 },
                 child: Text(
-                  'Xong',
+                  context.l10n.commonDone,
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
@@ -158,7 +159,9 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                         children: [
                           // Check if it's video or image and display accordingly
                           VideoUtil.isVideo(widget.imageFiles[index])
-                              ? buildVideoThumbnail(widget.imageFiles[index].path)
+                              ? buildVideoThumbnail(
+                                  widget.imageFiles[index].path,
+                                )
                               : Image.file(
                                   widget.imageFiles[index],
                                   fit: BoxFit.cover,
@@ -192,7 +195,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                                     ),
                                     SizedBox(width: 4.w),
                                     Text(
-                                      'Video',
+                                      context.l10n.postVideo,
                                       style: TextStyle(
                                         color: AppColors.textSecondary,
                                         fontSize: 14.sp,
@@ -283,7 +286,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                                       ),
                                       SizedBox(width: 4.w),
                                       Text(
-                                        'Chỉnh sửa',
+                                        context.l10n.postEdit,
                                         style: TextStyle(
                                           color: AppColors.textPrimary,
                                           fontSize: 14.sp,
@@ -376,7 +379,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
           size: 22.sp,
         ),
         label: Text(
-          'Thêm ảnh/video',
+          context.l10n.postAddPhotoVideo,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 16.sp,
@@ -394,7 +397,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
         controller: _captionControllers[index],
         style: TextStyle(color: AppColors.textPrimary, fontSize: 15.sp),
         decoration: InputDecoration(
-          hintText: 'Thêm chú thích...',
+          hintText: context.l10n.postAddCaptionHint,
           hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
           filled: true,
           fillColor: AppColors.background.withOpacity(0.5),

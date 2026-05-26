@@ -18,6 +18,7 @@ import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPostApprovalDetailPage extends StatelessWidget {
   final String notificationId;
@@ -104,7 +105,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
         backgroundColor: AppColors.background,
         appBar: AppBar(
           title: Text(
-            'Duyệt bài viết',
+            context.l10n.notificationApprovePostTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -164,7 +165,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Thử lại'),
+                        label: Text(context.l10n.commonRetry),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -195,7 +196,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Không tìm thấy bài viết đang chờ duyệt',
+                        context.l10n.notificationPendingPostNotFound,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: AppColors.textPrimary),
                       ),
@@ -211,7 +212,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Tải lại'),
+                        label: Text(context.l10n.commonRefresh),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -298,7 +299,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                               foregroundColor: Colors.red,
                               side: const BorderSide(color: Colors.red),
                             ),
-                            child: const Text('Từ chối'),
+                            child: Text(context.l10n.friendReject),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -310,7 +311,9 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
                             ),
-                            child: const Text('Duyệt bài'),
+                            child: Text(
+                              context.l10n.notificationApprovePostAction,
+                            ),
                           ),
                         ),
                       ],

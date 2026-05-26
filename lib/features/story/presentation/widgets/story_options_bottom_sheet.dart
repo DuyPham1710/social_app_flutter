@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/story/domain/repository/story_repository.
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_option_item_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -59,24 +60,27 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
         return AlertDialog(
           backgroundColor: AppColors.background,
           title: Text(
-            'Xóa tin',
+            context.l10n.storyDeleteTitle,
             style: TextStyle(color: AppColors.textPrimary),
           ),
           content: Text(
-            'Bạn có chắc chắn muốn xóa tin này không?',
+            context.l10n.storyDeleteConfirm,
             style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(
-                'Hủy',
+                context.l10n.commonCancel,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+              child: Text(
+                context.l10n.commonDelete,
+                style: const TextStyle(color: Colors.red),
+              ),
             ),
           ],
         );
@@ -121,18 +125,20 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
           Navigator.of(context).pop();
 
           // Hiển thị thông báo thành công
-          showSuccessSnackBar(context, 'Đã xóa tin');
+          showSuccessSnackBar(context, context.l10n.storyDeleted);
         } else if (result is DataStateError) {
           showErrorSnackBar(
             context,
-            'Lỗi: ${result.error?.message ?? "Không thể xóa tin"}',
+            context.l10n.commonErrorWithMessage(
+              result.error?.message ?? context.l10n.storyDeleteFailed,
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        showErrorSnackBar(context, 'Lỗi: $e');
+        showErrorSnackBar(context, context.l10n.commonErrorWithMessage('$e'));
       }
     } finally {
       if (mounted) {
@@ -169,7 +175,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             SizedBox(height: 20.h),
             StoryOptionItemWidget(
               icon: Icons.lock_outline,
-              title: "Chỉnh sửa quyền riêng tư của tin",
+              title: context.l10n.storyEditPrivacy,
               onTap: () {
                 Navigator.pop(context);
                 final storyId =
@@ -183,8 +189,8 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             ),
             StoryOptionItemWidget(
               icon: Icons.archive_outlined,
-              title: "Lưu trữ ảnh",
-              subtitle: "Gỡ ảnh khỏi tin và lưu vào kho lưu trữ.",
+              title: context.l10n.storyArchivePhoto,
+              subtitle: context.l10n.storyArchivePhotoDescription,
               onTap: () {
                 Navigator.pop(context);
                 // TODO: Implement archive photo
@@ -192,7 +198,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             ),
             StoryOptionItemWidget(
               icon: Icons.delete_outline,
-              title: "Xóa ảnh",
+              title: context.l10n.storyDeletePhoto,
               onTap: _isDeleting ? null : () => _deleteStory(context),
             ),
             SizedBox(height: 20.h),

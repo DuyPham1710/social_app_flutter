@@ -8,42 +8,54 @@ class GetFriendRequestsUseCase {
 
   GetFriendRequestsUseCase(this.friendRepository);
 
-  Future<DataState<List<FriendRequestEntity>>> call({bool received = true}) async {
-    final result = received 
+  Future<DataState<List<FriendRequestEntity>>> call({
+    bool received = true,
+  }) async {
+    final result = received
         ? await friendRepository.getReceivedRequests()
         : await friendRepository.getSentRequests();
-    
+
     if (result is DataStateSuccess) {
       // Load mutual friend avatars cho từng request
       final requestsWithAvatars = await _loadMutualFriendAvatars(result.data!);
       return DataStateSuccess(requestsWithAvatars);
     }
-    
+
     return result;
   }
-  
-  Future<List<FriendRequestEntity>> _loadMutualFriendAvatars(List<FriendRequestEntity> requests) async {
+
+  Future<List<FriendRequestEntity>> _loadMutualFriendAvatars(
+    List<FriendRequestEntity> requests,
+  ) async {
     final updatedRequests = <FriendRequestEntity>[];
-    
+
     for (final request in requests) {
       String? targetUserId;
       if (request.senderId is String) {
         targetUserId = request.senderId as String;
       } else if (request.senderId is Map<String, dynamic>) {
-        targetUserId = (request.senderId as Map<String, dynamic>)['_id'] as String?;
+        targetUserId =
+            (request.senderId as Map<String, dynamic>)['_id'] as String?;
       }
-      
+
       if (targetUserId != null) {
         // Load mutual friends (tối đa 3)
-        final mutualResult = await friendRepository.getMutualFriends(targetUserId, limit: 3);
-        
+        final mutualResult = await friendRepository.getMutualFriends(
+          targetUserId,
+          limit: 3,
+        );
+
         if (mutualResult is DataStateSuccess && mutualResult.data!.isNotEmpty) {
           // Lấy avatarUrl từ mutual friends
           final avatars = mutualResult.data!
-              .map((friend) => friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg')
+              .map(
+                (friend) =>
+                    friend.avatarUrl ??
+                    'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+              )
               .take(3)
               .toList();
-          
+
           final mutualFriendsCount = mutualResult.data!.length;
           // Tạo request mới với avatars và số lượng bạn chung
           if (request is FriendRequestModel) {
@@ -70,5 +82,3 @@ class GetFriendRequestsUseCase {
     return updatedRequests;
   }
 }
-
-

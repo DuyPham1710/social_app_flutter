@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SearchBar extends StatefulWidget {
   final Function(String) onSearch;
@@ -65,11 +66,8 @@ class _SearchBarState extends State<SearchBar> {
         autofocus: false,
         cursorColor: AppColors.primary,
         decoration: InputDecoration(
-          hintText: widget.hintText ?? 'Tìm kiếm người dùng...',
-          hintStyle: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 14.sp,
-          ),
+          hintText: widget.hintText ?? context.l10n.searchUserHint,
+          hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
@@ -99,4 +97,3 @@ class _SearchBarState extends State<SearchBar> {
     );
   }
 }
-

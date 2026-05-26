@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_suggestion_item.dart';
+import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendSuggestionsPage extends StatefulWidget {
   const FriendSuggestionsPage({super.key});
@@ -73,7 +75,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
           icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
         ),
         title: Text(
-          'Gợi ý',
+          context.l10n.friendSuggestionsTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18,
@@ -119,7 +121,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Text(
-            'Những người bạn có thể biết',
+            context.l10n.friendPeopleYouMayKnow,
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
@@ -141,7 +143,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.green,
@@ -163,7 +169,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(state.message)),
+                  Expanded(
+                    child: Text(
+                      localizedFriendActionMessage(context.l10n, state.message),
+                    ),
+                  ),
                 ],
               ),
               backgroundColor: Colors.red,
@@ -173,7 +183,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               action: SnackBarAction(
-                label: 'Thử lại',
+                label: context.l10n.commonRetry,
                 textColor: Colors.white,
                 onPressed: () {
                   context.read<FriendBloc>().add(const LoadFriendPage());
@@ -253,7 +263,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
           ),
           SizedBox(height: 16.h),
           Text(
-            'Đang tải gợi ý...',
+            context.l10n.friendLoadingSuggestions,
             style: TextStyle(
               fontSize: 14.sp,
               color: AppColors.textSecondary,
@@ -275,7 +285,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
             SizedBox(height: 16.h),
             Text(
-              'Có lỗi xảy ra',
+              context.l10n.commonErrorOccurred,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
@@ -284,7 +294,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
             ),
             SizedBox(height: 8.h),
             Text(
-              message,
+              localizedFriendActionMessage(context.l10n, message),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
             ),
@@ -294,7 +304,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                 context.read<FriendBloc>().add(const LoadFriendPage());
               },
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Thử lại'),
+              label: Text(context.l10n.commonRetry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -330,7 +340,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
       ),
       child: FriendSuggestionItem(
         userId: suggestion.userId,
-        name: suggestion.fullName ?? 'Người dùng',
+        name: suggestion.fullName ?? context.l10n.commonUser,
         mutualFriends: suggestion.mutualFriends ?? 0,
         avatarUrl:
             suggestion.avatarUrl ??
@@ -404,7 +414,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                   ),
                   SizedBox(height: 24.h),
                   Text(
-                    'Không có gợi ý nào',
+                    context.l10n.friendNoSuggestions,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
@@ -413,7 +423,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    'Hiện tại không có gợi ý kết bạn nào\ncho bạn',
+                    context.l10n.friendNoSuggestionsDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,
@@ -427,7 +437,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
                       context.read<FriendBloc>().add(const LoadFriendPage());
                     },
                     icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('Làm mới'),
+                    label: Text(context.l10n.commonRefresh),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,

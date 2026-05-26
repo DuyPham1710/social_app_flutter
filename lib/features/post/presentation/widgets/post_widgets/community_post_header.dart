@@ -13,6 +13,8 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 /// Community Post Header
 /// Shows: Community Badge > Community Name + Avatar | User Name | Time
@@ -40,14 +42,6 @@ class CommunityPostHeader extends StatelessWidget {
     this.showCommunityInfo = true, // Default: hiển thị info nhóm
     this.communityUserRole,
   });
-
-  String _timeAgo(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    return '${diff.inDays} ngày trước';
-  }
 
   Future<void> _navigateToCommunity(BuildContext context) async {
     if (community == null) return;
@@ -192,7 +186,7 @@ class CommunityPostHeader extends StatelessWidget {
                       GestureDetector(
                         onTap: () => _navigateToCommunity(context),
                         child: Text(
-                          community?.name ?? "Community",
+                          community?.name ?? context.l10n.menuCommunity,
                           style: TextStyle(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.bold,
@@ -209,7 +203,9 @@ class CommunityPostHeader extends StatelessWidget {
                       child: Row(
                         children: [
                           Text(
-                            user.fullName ?? user.username ?? "Unknown",
+                            user.fullName ??
+                                user.username ??
+                                context.l10n.commonUnknown,
                             style: TextStyle(
                               fontSize: 11.sp,
                               color: AppColors.textSecondary,
@@ -239,7 +235,7 @@ class CommunityPostHeader extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          createdAt != null ? _timeAgo(createdAt!) : "Vừa xong",
+                          localizedPostTime(context.l10n, createdAt),
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: AppColors.textSecondary,
@@ -255,9 +251,11 @@ class CommunityPostHeader extends StatelessWidget {
                   if (currentUserId == null) return const SizedBox.shrink();
 
                   final isOwner = currentUserId == user.userId;
-                  final isCommunityAdmin = communityUserRole == 'admin' ||
+                  final isCommunityAdmin =
+                      communityUserRole == 'admin' ||
                       community?.admin.userId == currentUserId;
-                  final canDelete = onOptionsTap != null &&
+                  final canDelete =
+                      onOptionsTap != null &&
                       (isOwner || (isCommunityAdmin && !isOwner));
                   final canSave = onSaveTap != null && !isOwner;
                   final canReport =
@@ -293,7 +291,9 @@ class CommunityPostHeader extends StatelessWidget {
                               ),
                               SizedBox(width: 8.w),
                               Text(
-                                isSaved ? 'Bỏ lưu bài viết' : 'Lưu bài viết',
+                                isSaved
+                                    ? context.l10n.postUnsave
+                                    : context.l10n.postSave,
                               ),
                             ],
                           ),
@@ -306,10 +306,10 @@ class CommunityPostHeader extends StatelessWidget {
                               Icon(
                                 Icons.flag_outlined,
                                 size: 18.sp,
-                                color:  Colors.red,
+                                color: Colors.red,
                               ),
                               SizedBox(width: 8.w),
-                              const Text('Báo cáo bài viết'),
+                              Text(context.l10n.postReport),
                             ],
                           ),
                         ),
@@ -324,9 +324,9 @@ class CommunityPostHeader extends StatelessWidget {
                                 color: Colors.red,
                               ),
                               SizedBox(width: 8.w),
-                              const Text(
-                                'Xóa bài viết',
-                                style: TextStyle(color: Colors.red),
+                              Text(
+                                context.l10n.postDeleteTitle,
+                                style: const TextStyle(color: Colors.red),
                               ),
                             ],
                           ),
@@ -364,8 +364,9 @@ class _StableCurrentUserBuilderState extends State<_StableCurrentUserBuilder> {
   @override
   void initState() {
     super.initState();
-    _currentUserIdFuture = TokenStorage.getUserData()
-        .then((userData) => userData?['id']?.toString());
+    _currentUserIdFuture = TokenStorage.getUserData().then(
+      (userData) => userData?['id']?.toString(),
+    );
   }
 
   @override

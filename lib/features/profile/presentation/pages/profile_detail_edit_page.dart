@@ -5,6 +5,8 @@ import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/profile/domain/entities/update_user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/utils/profile_localization.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileDetailEditPage extends StatefulWidget {
   final UserEntity? user;
@@ -85,14 +87,15 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chỉnh sửa chi tiết"),
+        title: Text(l10n.profileEditDetailsTitle),
         actions: [
           TextButton(
             onPressed: _onSave,
             child: Text(
-              "Lưu",
+              l10n.commonSave,
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -105,14 +108,22 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildTextField("Trường học", _schoolController, Icons.school),
+          _buildTextField(l10n.profileSchool, _schoolController, Icons.school),
           _buildTextField(
-            "Thành phố hiện tại",
+            l10n.profileCurrentCity,
             _currentCityController,
             Icons.location_city,
           ),
-          _buildTextField("Quê quán", _hometownController, Icons.home),
-          _buildTextField("Nơi làm việc", _workplaceController, Icons.work),
+          _buildTextField(
+            l10n.profileHometown,
+            _hometownController,
+            Icons.home,
+          ),
+          _buildTextField(
+            l10n.profileWorkplace,
+            _workplaceController,
+            Icons.work,
+          ),
           _buildRelationshipDropdown(),
           const SizedBox(height: 30),
         ],
@@ -159,7 +170,7 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(color: AppColors.primary, width: 2),
               ),
-              hintText: "Nhập $label...",
+              hintText: context.l10n.profileEnterField(label),
               hintStyle: TextStyle(color: AppColors.textSecondary),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -179,7 +190,7 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Tình trạng quan hệ",
+            context.l10n.profileRelationshipStatus,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
@@ -213,14 +224,14 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
               ),
             ),
             hint: Text(
-              "Chọn tình trạng quan hệ",
+              context.l10n.profileSelectRelationshipStatus,
               style: TextStyle(color: AppColors.textSecondary),
             ),
             items: _relationshipOptions.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(
-                  value,
+                  localizedRelationshipStatus(context.l10n, value),
                   style: TextStyle(color: AppColors.textPrimary),
                 ),
               );

@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 import 'package:social_app_fe/features/privacy/domain/entities/privacy_entity.dart';
@@ -18,6 +19,7 @@ import 'package:social_app_fe/features/story/presentation/pages/story_friend_sel
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PrivacyPage extends StatefulWidget {
   final String selectedOption;
@@ -72,12 +74,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
     }
   }
 
-  final List<Map<String, String>> baseOptions = [
-    {'label': 'Công khai', 'desc': 'Bất kỳ ai ở trên hoặc ngoài App'},
-    {'label': 'Bạn bè', 'desc': 'Bạn bè của bạn trên App'},
-    {'label': 'Bạn bè ngoại trừ...', 'desc': 'Ẩn bài viết khỏi một số bạn bè'},
-    {'label': 'Bạn bè cụ thể', 'desc': 'Chỉ hiển thị với một vài bạn'},
-    {'label': 'Chỉ mình tôi', 'desc': 'Chỉ mình tôi'},
+  final List<String> baseOptions = [
+    'Công khai',
+    'Bạn bè',
+    'Bạn bè ngoại trừ...',
+    'Bạn bè cụ thể',
+    'Chỉ mình tôi',
   ];
 
   String _privacyTypeToLabel(PrivacyType privacyType) {
@@ -93,6 +95,82 @@ class _PrivacyPageState extends State<PrivacyPage> {
       case PrivacyType.private:
         return "Chỉ mình tôi";
     }
+  }
+
+  String _localizedPrivacyLabel(BuildContext context, String label) {
+    switch (label) {
+      case 'Công khai':
+        return context.l10n.privacyPostPublic;
+      case 'Bạn bè':
+        return context.l10n.privacyPostFriends;
+      case 'Bạn bè ngoại trừ...':
+        return context.l10n.privacyPostFriendsExcept;
+      case 'Bạn bè cụ thể':
+        return context.l10n.privacyPostSpecificFriends;
+      case 'Chỉ mình tôi':
+        return context.l10n.privacyPostOnlyMe;
+      default:
+        return label;
+    }
+  }
+
+  String _localizedPrivacyDescription(BuildContext context, String label) {
+    switch (label) {
+      case 'Công khai':
+        return context.l10n.privacyPostPublicDescription;
+      case 'Bạn bè':
+        return context.l10n.privacyPostFriendsDescription;
+      case 'Bạn bè ngoại trừ...':
+        return context.l10n.privacyPostFriendsExceptDescription;
+      case 'Bạn bè cụ thể':
+        return context.l10n.privacyPostSpecificFriendsDescription;
+      case 'Chỉ mình tôi':
+        return context.l10n.privacyPostOnlyMeDescription;
+      default:
+        return '';
+    }
+  }
+
+  String _fallbackUserName(BuildContext context) {
+    return context.l10n.privacyPostFallbackUser;
+  }
+
+  String _selectedFriendsSummary(
+    BuildContext context,
+    List<FriendEntity> selectedFriends,
+  ) {
+    if (selectedFriends.isEmpty) {
+      return context.l10n.privacyPostNoOneSelected;
+    }
+
+    if (selectedFriends.length == 1) {
+      return selectedFriends.first.fullName ??
+          selectedFriends.first.username ??
+          context.l10n.privacyPostOnePerson;
+    }
+
+    if (selectedFriends.length <= 3) {
+      return selectedFriends
+          .map(
+            (friend) =>
+                friend.fullName ??
+                friend.username ??
+                _fallbackUserName(context),
+          )
+          .join(', ');
+    }
+
+    final firstNames = selectedFriends
+        .take(2)
+        .map(
+          (friend) =>
+              friend.fullName ?? friend.username ?? _fallbackUserName(context),
+        )
+        .join(', ');
+    return context.l10n.privacyPostAndOthers(
+      firstNames,
+      selectedFriends.length - 2,
+    );
   }
 
   void _loadInitialFriends() {
@@ -170,7 +248,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
         ),
 
         middle: Text(
-          'Ai có thể xem bài viết của bạn?',
+          context.l10n.privacyPostQuestion,
           style: TextStyle(color: AppColors.textPrimary),
         ),
 
@@ -203,7 +281,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             }
           },
           child: Text(
-            'Xong',
+            context.l10n.commonDone,
             style: TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
@@ -259,10 +337,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
       defaultPrivacy = state.selectedPrivacy;
     }
 
+    final defaultPrivacyLabel = _localizedPrivacyLabel(context, defaultPrivacy);
     String description = widget.postId != null
-        ? 'Bạn có thể thay đổi ai có thể xem bài viết này.'
-        : 'Bài viết của bạn sẽ hiển thị trên Bảng feed, trang cá nhân và trong kết quả tìm kiếm.\n\n'
-              'Tùy đối tượng mặc định là $defaultPrivacy, nhưng bạn có thể thay đổi đối tượng của riêng bài viết này.';
+        ? context.l10n.privacyPostEditDescription
+        : context.l10n.privacyPostCreateDescription(defaultPrivacyLabel);
 
     return Text(
       description,
@@ -286,7 +364,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
     if (state is PrivacyError) {
       return Column(
         children: [
-          Text('Lỗi: ${state.message}', style: TextStyle(color: Colors.red)),
+          Text(
+            context.l10n.postErrorPrefix(state.message),
+            style: const TextStyle(color: Colors.red),
+          ),
           SizedBox(height: 16.h),
           ...baseOptions.map((item) => _buildOptionTile(item)),
         ],
@@ -298,9 +379,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
     );
   }
 
-  Widget _buildOptionTile(Map<String, String> item) {
-    final isSelected = selected == item['label'];
-    final label = item['label']!;
+  Widget _buildOptionTile(String label) {
+    final isSelected = selected == label;
 
     // Xử lý đặc biệt cho "Bạn bè ngoại trừ..." và "Bạn bè cụ thể"
     if (label == 'Bạn bè ngoại trừ...') {
@@ -314,7 +394,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
       leading: Icon(getIcon(label), color: AppColors.textPrimary),
 
       title: Text(
-        label,
+        _localizedPrivacyLabel(context, label),
         style: TextStyle(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,
@@ -322,7 +402,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
       ),
 
       subtitle: Text(
-        item['desc']!,
+        _localizedPrivacyDescription(context, label),
         style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
       ),
 
@@ -352,32 +432,13 @@ class _PrivacyPageState extends State<PrivacyPage> {
   Widget _buildFriendsExceptTile(bool isSelected) {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
-        String displayText = "Chưa chọn ai";
+        String displayText = context.l10n.privacyPostNoOneSelected;
         if (state is FriendLoaded && _friendsExceptIds.isNotEmpty) {
           final selectedFriends = state.friends
               .where((f) => _friendsExceptIds.contains(f.userId))
               .toList();
 
-          if (selectedFriends.isEmpty) {
-            displayText = "Chưa chọn ai";
-          } else if (selectedFriends.length == 1) {
-            displayText =
-                selectedFriends.first.fullName ??
-                selectedFriends.first.username ??
-                "1 người";
-          } else if (selectedFriends.length <= 3) {
-            final names = selectedFriends
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
-                .join(", ");
-            displayText = names;
-          } else {
-            final firstNames = selectedFriends
-                .take(2)
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
-                .join(", ");
-            final remaining = selectedFriends.length - 2;
-            displayText = "$firstNames và $remaining người khác";
-          }
+          displayText = _selectedFriendsSummary(context, selectedFriends);
         }
 
         return ListTile(
@@ -387,7 +448,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             color: AppColors.textPrimary,
           ),
           title: Text(
-            'Bạn bè ngoại trừ...',
+            context.l10n.privacyPostFriendsExcept,
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -429,7 +490,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
               MaterialPageRoute(
                 builder: (_) => StoryFriendSelectionPage(
                   initialSelectedIds: _friendsExceptIds,
-                  title: "Ẩn bài viết với",
+                  title: context.l10n.privacyPostHideFromTitle,
                 ),
               ),
             );
@@ -455,39 +516,20 @@ class _PrivacyPageState extends State<PrivacyPage> {
   Widget _buildFriendsDetailTile(bool isSelected) {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
-        String displayText = "Chưa chọn ai";
+        String displayText = context.l10n.privacyPostNoOneSelected;
         if (state is FriendLoaded && _friendsDetailIds.isNotEmpty) {
           final selectedFriends = state.friends
               .where((f) => _friendsDetailIds.contains(f.userId))
               .toList();
 
-          if (selectedFriends.isEmpty) {
-            displayText = "Chưa chọn ai";
-          } else if (selectedFriends.length == 1) {
-            displayText =
-                selectedFriends.first.fullName ??
-                selectedFriends.first.username ??
-                "1 người";
-          } else if (selectedFriends.length <= 3) {
-            final names = selectedFriends
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
-                .join(", ");
-            displayText = names;
-          } else {
-            final firstNames = selectedFriends
-                .take(2)
-                .map((f) => f.fullName ?? f.username ?? "Người dùng")
-                .join(", ");
-            final remaining = selectedFriends.length - 2;
-            displayText = "$firstNames và $remaining người khác";
-          }
+          displayText = _selectedFriendsSummary(context, selectedFriends);
         }
 
         return ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 4),
           leading: Icon(getIcon('Bạn bè cụ thể'), color: AppColors.textPrimary),
           title: Text(
-            'Bạn bè cụ thể',
+            context.l10n.privacyPostSpecificFriends,
             style: TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -529,7 +571,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
               MaterialPageRoute(
                 builder: (_) => StoryFriendSelectionPage(
                   initialSelectedIds: _friendsDetailIds,
-                  title: "Chọn người để chia sẻ bài viết",
+                  title: context.l10n.privacyPostSelectPeopleToShare,
                   allowEmptySelection: false,
                 ),
               ),
@@ -586,8 +628,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
         Expanded(
           child: Text(
             isCurrentDefault
-                ? 'Đây là đối tượng mặc định hiện tại'
-                : 'Đặt làm đối tượng mặc định',
+                ? context.l10n.privacyPostCurrentDefault
+                : context.l10n.privacyPostSetAsDefault,
             style: TextStyle(
               color: isCurrentDefault
                   ? AppColors.textSecondary.withOpacity(0.6)
@@ -662,7 +704,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
       if (mounted) {
         if (result is DataStateSuccess) {
-          showSuccessSnackBar(context, 'Đã cập nhật quyền riêng tư');
+          showSuccessSnackBar(context, context.l10n.privacyPostUpdated);
 
           Navigator.pop(context, {
             'label': selected,
@@ -672,13 +714,15 @@ class _PrivacyPageState extends State<PrivacyPage> {
         } else if (result is DataStateError) {
           showErrorSnackBar(
             context,
-            'Lỗi: ${result.error?.message ?? "Không thể cập nhật quyền riêng tư"}',
+            context.l10n.postErrorPrefix(
+              result.error?.message ?? context.l10n.privacyPostUpdateFailed,
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, 'Lỗi: $e');
+        showErrorSnackBar(context, context.l10n.postErrorPrefix(e.toString()));
       }
     } finally {
       if (mounted) {

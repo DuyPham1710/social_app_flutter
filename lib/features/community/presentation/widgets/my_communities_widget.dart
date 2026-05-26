@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_item_card.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class MyCommunitiesWidget extends StatefulWidget {
   const MyCommunitiesWidget({super.key});
@@ -35,14 +37,14 @@ class _MyCommunitiesWidgetState extends State<MyCommunitiesWidget> {
                       Icon(
                         Icons.group_off_rounded,
                         size: 54,
-                        color: Colors.grey[400],
+                        color: AppColors.textSecondary.withValues(alpha: 0.75),
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Bạn chưa tham gia cộng đồng nào',
+                        context.l10n.communityNoJoinedCommunities,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.grey[700],
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -71,7 +73,7 @@ class _MyCommunitiesWidgetState extends State<MyCommunitiesWidget> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 28),
                 child: Text(
-                  state.message,
+                  localizedCommunityMessage(context.l10n, state.message),
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Color(0xFFB42318)),
                 ),
@@ -95,10 +97,7 @@ class _MyCommunitiesSkeleton extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       itemCount: 5,
       itemBuilder: (context, index) {
-        return _AnimatedIn(
-          index: index,
-          child: const _CommunityItemSkeleton(),
-        );
+        return _AnimatedIn(index: index, child: const _CommunityItemSkeleton());
       },
       separatorBuilder: (_, __) => const SizedBox(height: 12),
     );
@@ -112,12 +111,12 @@ class _CommunityItemSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDDE3EA), width: 1),
-        boxShadow: const [
+        border: Border.all(color: AppColors.divider, width: 1),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F0F172A),
+            color: AppColors.textSecondary.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -139,12 +138,9 @@ class _CommunityItemSkeleton extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE9EEF5),
+                      color: AppColors.textSecondary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFDDE3EA),
-                        width: 1,
-                      ),
+                      border: Border.all(color: AppColors.divider, width: 1),
                     ),
                   ),
                 ),
@@ -157,9 +153,7 @@ class _CommunityItemSkeleton extends StatelessWidget {
                 children: [
                   const Row(
                     children: [
-                      Expanded(
-                        child: _SkeletonBox(height: 16, radius: 8),
-                      ),
+                      Expanded(child: _SkeletonBox(height: 16, radius: 8)),
                       SizedBox(width: 42),
                     ],
                   ),
@@ -181,9 +175,7 @@ class _CommunityItemSkeleton extends StatelessWidget {
                   const Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Expanded(
-                        child: _SkeletonBox(height: 11, radius: 6),
-                      ),
+                      Expanded(child: _SkeletonBox(height: 11, radius: 6)),
                       SizedBox(width: 12),
                       _SkeletonBox(width: 72, height: 30, radius: 18),
                     ],
@@ -211,7 +203,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9EEF5),
+        color: AppColors.textSecondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

@@ -1,8 +1,7 @@
 import 'package:social_app_fe/core/usecase/usecase.dart';
 import 'package:social_app_fe/features/notification/domain/repository/notification_repository.dart';
 
-class MarkNotificationReadUseCase
-    implements SyncUseCase<void, String> {
+class MarkNotificationReadUseCase implements SyncUseCase<void, String> {
   final NotificationRepository repository;
 
   MarkNotificationReadUseCase(this.repository);

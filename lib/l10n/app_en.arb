@@ -1,0 +1,1484 @@
+{
+  "@@locale": "en",
+  "appTitle": "commonhub",
+  "commonCancel": "Cancel",
+  "commonReport": "Report",
+  "commonBlock": "Block",
+  "commonPrivacySupport": "Privacy & support",
+  "commonMoreActions": "More actions",
+  "commonSavePhotoPermissionMessage":"Photo access permission is required to save images",
+  "commonSettings": "Settings",
+  "commonOpenSettings": "Open Settings",
+  "commonRetry": "Try again",
+  "commonSend": "Send",
+  "commonError": "Error",
+  "commonRestrict": "Restrict",
+  "commonEnabled": "Enabled",
+  "commonUnknown": "Unknown",
+  "commonUser": "User",
+  "unableToLoadUserData": "Unable to load user data",
+  "language": "Language",
+  "languageSystem": "System default",
+  "languageVietnamese": "Tiếng Việt",
+  "languageEnglish": "English",
+  "languageCurrent": "Current: {language}",
+  "@languageCurrent": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "menuTitle": "Menu",
+  "menuFriends": "Friends",
+  "menuGroups": "Groups",
+  "menuReels": "Reels",
+  "menuExplore": "Explore",
+  "menuUtilities": "Shortcuts",
+  "menuHelpSupport": "Help & support",
+  "menuSettingsPrivacy": "Settings & privacy",
+  "menuLogout": "Log out",
+  "menuLogoutDialogTitle": "Log out of your account?",
+  "menuError": "Error: {message}",
+  "@menuError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTitle": "Chats",
+  "chatSearchHint": "Search",
+  "chatYourStory": "Your story",
+  "chatCreateStory": "Create story",
+  "chatYou": "You",
+  "chatSomeone": "Someone",
+  "chatConnected": "Connected",
+  "chatSentAttachmentPreview": "{senderPrefix}sent {attachmentType}   •   {time}",
+  "@chatSentAttachmentPreview": {
+    "placeholders": {
+      "senderPrefix": {
+        "type": "String"
+      },
+      "attachmentType": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatTextPreview": "{prefix}{message}   •   {time}",
+  "@chatTextPreview": {
+    "placeholders": {
+      "prefix": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "chatGroupCreatedPreview": "{creatorName} created the group",
+  "@chatGroupCreatedPreview": {
+    "placeholders": {
+      "creatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "messageNoMessagesStartConversation": "No messages yet. Start the conversation now!",
+  "messageDownloadingFile": "Downloading file...",
+  "messageFileOpenAppNotFound": "No app found to open this file",
+  "messageFileDownloadError": "File download failed: {error}",
+  "@messageFileDownloadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDeletedByYou": "You deleted this message",
+  "messageDeletedByUser": "{name} deleted this message",
+  "@messageDeletedByUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "messageUnreadCount": "{count, plural, =1{1 unread message} other{{count} unread messages}}",
+  "@messageUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "messageEdited": "Edited",
+  "messageEditHistoryTitle": "Edit history",
+  "messageHideEditHistory": "Hide edit history",
+  "messageCurrentVersion": "Current",
+  "messageLoadingEditHistory": "Loading edit history...",
+  "messageLoadMessagesError": "Error loading messages: {message}",
+  "@messageLoadMessagesError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "messageSentAt": "Sent {time}",
+  "@messageSentAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "messageLocation": "Location",
+  "messageVoiceAttachment": "[Voice message]",
+  "messageImageAttachment": "[Photo]",
+  "messageVideoAttachment": "[Video]",
+  "messageFileAttachment": "[File]",
+  "messageGenericAttachment": "[Attachment]",
+  "messageDocumentFileName": "Document",
+  "messageDocumentPdfFileName": "Document.pdf",
+  "messageDownloadedFileName": "downloaded_file",
+  "dateYesterday": "Yesterday",
+  "weekdayMondayShort": "Mon",
+  "weekdayTuesdayShort": "Tue",
+  "weekdayWednesdayShort": "Wed",
+  "weekdayThursdayShort": "Thu",
+  "weekdayFridayShort": "Fri",
+  "weekdaySaturdayShort": "Sat",
+  "weekdaySundayShort": "Sun",
+  "weekdayMondayDotShort": "Mon",
+  "weekdayTuesdayDotShort": "Tue",
+  "weekdayWednesdayDotShort": "Wed",
+  "weekdayThursdayDotShort": "Thu",
+  "weekdayFridayDotShort": "Fri",
+  "weekdaySaturdayDotShort": "Sat",
+  "dateAtTime": "{weekday} at {time}",
+  "@dateAtTime": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "timeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "timeDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "commonOk": "OK",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonConfirm": "Confirm",
+  "commonChoose": "Choose",
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authNewPassword": "New password",
+  "authConfirmPassword": "Confirm password",
+  "authConfirmNewPassword": "Confirm new password",
+  "authUsername": "Username",
+  "authLogin": "Log in",
+  "authRegister": "Sign up",
+  "authForgotPassword": "Forgot password",
+  "authForgotPasswordQuestion": "Forgot password?",
+  "authForgotPasswordDescription": "Enter your email to recover your account.",
+  "authContinue": "Continue",
+  "authSave": "Save",
+  "authOr": "or",
+  "authLoginWithGoogle": "Log in with Google",
+  "authNoAccount": "Don't have an account? ",
+  "authHasAccount": "Already have an account? ",
+  "authEnterEmail": "Please enter your email",
+  "authEnterPassword": "Please enter your password",
+  "authEnterUsername": "Please enter your username",
+  "authEnterConfirmPassword": "Please enter your password confirmation",
+  "authEnterNewPassword": "Please enter your new password",
+  "authEnterConfirmNewPassword": "Please enter your new password confirmation",
+  "authLoginFailed": "Login failed",
+  "authRegisterFailed": "Sign up failed",
+  "authSendOtpFailed": "Failed to send OTP",
+  "authVerifyOtpFailed": "Verification failed",
+  "authResetPassword": "Reset password",
+  "authResetPasswordDescription": "Help us protect your account by choosing a strong password.",
+  "authResetPasswordSuccess": "Password reset successfully",
+  "authResetPasswordFailed": "Password reset failed",
+  "authOtpTitle": "OTP verification",
+  "authOtpSentTo": "Enter the OTP sent to {email}",
+  "@authOtpSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authInvalidOtp": "Please enter a valid OTP",
+  "authDidNotReceiveCode": "Didn't receive the code? ",
+  "authResendingOtp": "Resending...",
+  "authResendInSeconds": "Resend in {seconds} seconds",
+  "@authResendInSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authResendCode": "Resend code",
+  "authVerify": "Verify",
+  "authPersonalInfoTitle": "Personal information",
+  "authPersonalInfoDescription": "Please complete the information below",
+  "authFullName": "Full name",
+  "authPhoneNumber": "Phone number",
+  "authDateOfBirth": "Date of birth",
+  "authGender": "Gender",
+  "authBio": "Bio",
+  "authEnterFullName": "Please enter your full name",
+  "authEnterPhoneNumber": "Please enter your phone number",
+  "authEnterDateOfBirth": "Please enter your date of birth",
+  "authEnterGender": "Please enter your gender",
+  "authUpdatePersonalInfoFailed": "Failed to update personal information",
+  "authChooseGender": "Choose gender",
+  "authGenderMale": "Male",
+  "authGenderFemale": "Female",
+  "authGenderOther": "Other",
+  "faceScanTitle": "Face recognition",
+  "faceScanProcessing": "Processing...",
+  "faceScanCompleted": "Completed!",
+  "faceScanHoldStill": "Hold still...",
+  "faceScanTooDarkTitle": "Not enough light",
+  "faceScanStep": "Step {step}/5",
+  "@faceScanStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "faceScanUploading": "Uploading face data to the server...",
+  "faceScanStoredSafely": "Your face data has been stored securely.",
+  "faceScanTooDarkMessage": "The environment is too dark.\nPlease move to a brighter place.",
+  "faceScanLookStraight": "Please look straight at the camera",
+  "faceScanLookUp": "Raise your head slightly",
+  "faceScanLookDown": "Lower your head slightly",
+  "faceScanLookLeft": "Turn your face to the left",
+  "faceScanLookRight": "Turn your face to the right",
+  "faceScanMissingAccount": "Account information was not found. Please try again.",
+  "faceScanProcessImageFailed": "An error occurred while processing the image. Please try again.",
+  "authErrorTitle": "Authentication error",
+  "languageSelectTitle": "Choose language",
+  "menuSaved": "Saved",
+  "menuCommunity": "Communities",
+  "menuAppearance": "Appearance",
+  "menuPrivacySecurity": "Privacy & security",
+  "profileTitle": "Profile",
+  "profileLoadPostsError": "Unable to load posts",
+  "profileLoadError": "Unable to load profile",
+  "profileNoPosts": "No posts yet",
+  "profileEndOfPosts": "All posts shown",
+  "profileAddToStory": "Add to story",
+  "profileEditInfo": "Edit details",
+  "profileAbout": "About",
+  "profileStudiedAt": "Studied at {school}",
+  "@profileStudiedAt": {
+    "placeholders": {
+      "school": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLivesIn": "Lives in {city}",
+  "@profileLivesIn": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "profileFrom": "From {place}",
+  "@profileFrom": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "profileWorksAt": "Works at {workplace}",
+  "@profileWorksAt": {
+    "placeholders": {
+      "workplace": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNoBio": "No bio yet",
+  "profileCoverPhoto": "Cover photo",
+  "profileAvatarPhoto": "Profile photo",
+  "profileUserNameFallback": "User Name",
+  "profileEdit": "Edit",
+  "profilePostsTab": "Posts",
+  "profilePhotosTab": "Photos",
+  "profileReelsTab": "Reels",
+  "profilePostsList": "Post list",
+  "profileYourPhotos": "Your photos",
+  "profileYourReels": "Your reels",
+  "profileEditProfileTitle": "Edit profile",
+  "profileUpdateFailed": "Update failed",
+  "profileUsername": "User name",
+  "profileEditName": "Edit name",
+  "profileAvatar": "Profile photo",
+  "profileCover": "Cover photo",
+  "profileBio": "Bio",
+  "profileEditBio": "Edit bio",
+  "profileDetails": "Details",
+  "profileNoBioPlaceholder": "No bio yet",
+  "profileEnterField": "Enter {field}...",
+  "@profileEnterField": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "profileEditDetailsTitle": "Edit details",
+  "profileSchool": "School",
+  "profileCurrentCity": "Current city",
+  "profileHometown": "Hometown",
+  "profileWorkplace": "Workplace",
+  "profileRelationshipStatus": "Relationship status",
+  "profileSelectRelationshipStatus": "Choose relationship status",
+  "profileChooseAvatar": "Choose profile photo",
+  "profileChooseCover": "Choose cover photo",
+  "profileImage": "Image",
+  "profileAddWorkplace": "Add workplace",
+  "profileAddRelationshipStatus": "Add relationship status",
+  "profileWhatsOnYourMind": "What's on your mind?",
+  "profileNoFriends": "No friends yet",
+  "profileFriends": "Friends",
+  "profileViewAll": "View all",
+  "profileFriendCount": "{count, plural, =0{No friends} =1{1 friend} other{{count} friends}}",
+  "@profileFriendCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "profileUnnamed": "No name",
+  "profileAddFriend": "Add friend",
+  "profileCancelFriendRequest": "Cancel friend request",
+  "profileAcceptFriend": "Accept request",
+  "profileRejectFriend": "Delete",
+  "profileUnfriend": "Unfriend",
+  "profileMessage": "Message",
+  "profileConfirmUnfriendTitle": "Confirm unfriend",
+  "profileConfirmUnfriendMessage": "Are you sure you want to unfriend this person?",
+  "profileAgree": "Agree",
+  "profileAccountSecurity": "Account security",
+  "profileFaceData": "Face data",
+  "profileFaceRegistered": "Set up",
+  "profileFaceNotRegistered": "Not set up",
+  "profileFaceDataSuccessDeleted": "Face data deleted successfully",
+  "profileManageFaceData": "Manage face data",
+  "profileAddFaceData": "Add face data",
+  "profileFaceDataRegisteredDescription": "Your face data is being used for recognition and account protection.",
+  "profileFaceDataUnregisteredDescription": "Registering your face helps AI recognize you in photos and better protect your account.",
+  "profileDeleteFaceData": "Delete face data",
+  "profileDeleteConfirmTitle": "Confirm deletion",
+  "profileDeleteFaceConfirmMessage": "Are you sure you want to delete all face data? This action cannot be undone.",
+  "profileDeletingFaceData": "Deleting face data...",
+  "appearanceDisplayModeSection": "DISPLAY MODE",
+  "appearanceAccentColorSection": "ACCENT COLOR",
+  "appearanceTextSizeSection": "TEXT SIZE",
+  "appearanceLightMode": "Light",
+  "appearanceDarkMode": "Dark",
+  "appearanceAutoMode": "Auto",
+  "appearanceSmallText": "Small",
+  "appearanceNormalText": "Normal",
+  "appearanceLargeText": "Large",
+  "appearanceChooseAccentColor": "Choose accent color",
+  "appearanceCustomAccentColor": "Custom",
+  "appearanceDefaultAccent": "Default",
+  "appearanceBlueAccent": "Blue",
+  "appearancePinkPurpleAccent": "Pink purple",
+  "appearanceNeonPurpleAccent": "Neon purple",
+  "appearanceBrightOrangeAccent": "Bright orange",
+  "appearanceCoralRedAccent": "Coral red",
+  "appearanceHighContrast": "High contrast",
+  "appearanceReduceMotion": "Reduce motion",
+  "relationshipSingle": "Single",
+  "relationshipDating": "Dating",
+  "relationshipInRelationship": "In a relationship",
+  "relationshipMarried": "Married",
+  "relationshipComplicated": "It's complicated",
+  "relationshipOpen": "Open relationship",
+  "relationshipDivorced": "Divorced",
+  "menuCreateProfileOrPage": "Create a profile or new Page",
+  "commonAll": "All",
+  "commonBack": "Back",
+  "commonCreate": "Create",
+  "commonDetails": "Details",
+  "commonDone": "Done",
+  "commonErrorOccurred": "An error occurred",
+  "commonErrorWithMessage": "An error occurred: {error}",
+  "@commonErrorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "commonFeatureInDevelopment": "Feature in development",
+  "commonLoading": "Loading",
+  "commonNextWithCount": "Next ({count})",
+  "@commonNextWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "commonNo": "No",
+  "commonRefresh": "Refresh",
+  "commonSaveChanges": "Save changes",
+  "commonServerErrorRetryLater": "Server error. Please try again later.",
+  "commonSessionExpired": "Your session has expired. Please sign in again.",
+  "commonSystem": "System",
+  "commonUnderstood": "Got it",
+  "commonUnexpectedErrorRetry": "An unexpected error occurred. Please try again.",
+  "commonUnknownError": "Unknown error",
+  "communityAdmin": "Admin",
+  "communityAdminDemoted": "Admin role removed",
+  "communityAdminPanelSubtitle": "Review new members and moderate posts before they appear.",
+  "communityAdminPanelTitle": "Admin panel",
+  "communityApproved": "Approved",
+  "communityAvatar": "Avatar",
+  "communityCancelJoinRequestConfirm": "Are you sure you want to cancel this community join request?",
+  "communityCancelJoinRequestTitle": "Cancel request",
+  "communityCancelRequestSuccess": "Join request cancelled",
+  "communityCannotIdentifyFriend": "Error: Unable to identify friend",
+  "communityChooseAvatar": "Choose avatar",
+  "communityChooseCover": "Choose cover image",
+  "communityChooseFromLibrary": "Choose from library",
+  "communityClearSearch": "Clear search",
+  "communityCoverImage": "Cover image",
+  "communityCreateGroup": "Create group",
+  "communityCreateIntro": "Create a space for friends to discuss and share content.",
+  "communityCreatePostTitle": "Create group post",
+  "communityCreateSuccess": "Community created successfully",
+  "communityCreateTitle": "Create community",
+  "communityDeleteConfirm": "Are you sure you want to delete this community? This action cannot be undone.",
+  "communityDeleteGroup": "Delete group",
+  "communityDeleteSuccess": "Community deleted successfully",
+  "communityDeleteTitle": "Delete community",
+  "communityDescription": "Description",
+  "communityDescriptionHint": "Enter a community description",
+  "communityEditGroup": "Edit group",
+  "communityEditIntro": "Update details so members understand this community better.",
+  "communityEditTitle": "Edit community",
+  "communityEmpty": "No communities yet",
+  "communityExploreSubtitle": "Discover relevant groups and keep track of posts waiting for review.",
+  "communityExploreTab": "Explore",
+  "communityExploreTitle": "Communities",
+  "communityFilterPosts": "Filter posts",
+  "communityHandleInviteFailed": "Unable to process invite",
+  "communityInviteFriends": "Invite friends",
+  "communityInviteFriendsSubtitle": "Join this community",
+  "communityInviteFriendsTitle": "Invite friends",
+  "communityInvitePendingNotice": "Your community invite is waiting for a response.",
+  "communityInviteSearchHint": "Search name or username...",
+  "communityInviteSendFailed": "Unable to send invite",
+  "communityInviteSentSuccess": "Invite sent successfully",
+  "communityInviteStatusApproved": "You accepted the invite",
+  "communityInviteStatusPending": "You were invited to join this community",
+  "communityInviteStatusRejected": "You rejected the invite",
+  "communityInvited": "Invited",
+  "communityInvitesTab": "Invites",
+  "communityInvitesTitle": "Community invites",
+  "communityJoin": "Join",
+  "communityJoinRequestAccepted": "Join request accepted",
+  "communityJoinRequestPendingMessage": "This community join request is waiting for your review.",
+  "communityJoinRequestRejected": "Join request rejected",
+  "communityJoinRequestSent": "Community join request sent",
+  "communityJoinShort": "Join",
+  "communityLeaveConfirm": "Are you sure you want to leave this community?",
+  "communityLeaveGroup": "Leave group",
+  "communityLeaveSuccess": "You left the community",
+  "communityLoadFriendsFailed": "Error loading friends list",
+  "communityLoadInvitesFailed": "Unable to load invites",
+  "communityLoadMembersFailed": "Unable to load list",
+  "communityLoadingFriends": "Loading friends list...",
+  "communityMediaCount": "{count} media",
+  "@communityMediaCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityMember": "Member",
+  "communityMemberOnlyContent": "Members-only content",
+  "communityMemberOnlyPostsMessage": "Join the community to view group posts.",
+  "communityMemberOptions": "Member options",
+  "communityMemberPromoted": "Member promoted",
+  "communityMemberRemoved": "Member removed",
+  "communityMembers": "Members",
+  "communityMembersCount": "{count, plural, =0{0 members} =1{1 member} other{{count} members}}",
+  "@communityMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityMembersListTitle": "Members list",
+  "communityMineTab": "Mine",
+  "communityName": "Community name",
+  "communityNameHint": "Enter community name",
+  "communityNameRequired": "Please enter a community name",
+  "communityNoApprovedPosts": "No approved posts yet",
+  "communityNoAvailableFriends": "No available friends",
+  "communityNoCommunityInvites": "No community invites",
+  "communityNoDescription": "No description yet",
+  "communityNoInviteSearchResults": "No results for \"{query}\"",
+  "@communityNoInviteSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "communityNoInvites": "You have no invites",
+  "communityNoJoinedCommunities": "You have not joined any communities yet",
+  "communityNoMembers": "No members yet",
+  "communityNoMembersFound": "No members found",
+  "communityNoMembersFoundMessage": "Try searching by another name or username.",
+  "communityNoMembersMessage": "When people join, the member list will appear here.",
+  "communityNoPendingCommunities": "No pending communities",
+  "communityNoPendingPosts": "No pending posts",
+  "communityNoPendingRequests": "No pending join requests",
+  "communityNoPendingReviewPosts": "No posts waiting for review",
+  "communityNoPosts": "No posts yet",
+  "communityNoPostsMessage": "Community posts will appear here.",
+  "communityNoPostsTitle": "No posts yet",
+  "communityNoSearchResults": "No matching communities found",
+  "communityPendingApproval": "Pending",
+  "communityPendingCommunitiesHint": "Community join requests will appear here",
+  "communityPendingPostsHint": "New posts will appear here for review.",
+  "communityPendingRequestsHint": "New member requests will appear here.",
+  "communityPendingTab": "Pending",
+  "communityPickImageError": "Unable to choose image: {error}",
+  "@communityPickImageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "communityPostApprovedSuccess": "Post approved",
+  "communityPostNoText": "This post has no text content.",
+  "communityPostPendingApproval": "Post is waiting for admin approval",
+  "communityPostRejectedSuccess": "Post rejected",
+  "communityPostsInGroup": "Group posts",
+  "communityPostsTab": "Posts",
+  "communityPrivacyMembers": "{privacy} · {count, plural, =0{0 members} =1{1 member} other{{count} members}}",
+  "@communityPrivacyMembers": {
+    "placeholders": {
+      "privacy": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityPrivate": "Private",
+  "communityPrivateGroup": "Private group",
+  "communityPrivateOnly": "Private",
+  "communityPublic": "Public",
+  "communityPublicGroup": "Public group",
+  "communityPublicOnly": "Public",
+  "communityRemoveFromGroup": "Remove from group",
+  "communityRemoveMemberConfirm": "Remove {name} from this community? This person can request to join again later.",
+  "@communityRemoveMemberConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "communityRemoveMemberTitle": "Remove member",
+  "communityReviewMembers": "Review members",
+  "communityReviewMembersSubtitle": "Confirm community join requests",
+  "communityReviewPosts": "Review posts",
+  "communityReviewPostsSubtitle": "Check content before posts go public",
+  "communitySearchHint": "Search communities",
+  "communitySearchMembersHint": "Search members",
+  "communitySendingInvite": "Sending invite...",
+  "communityType": "Community type",
+  "communityUpdateSuccess": "Community updated successfully",
+  "communityVisibleMembersCount": "{visible}/{total} members",
+  "@communityVisibleMembersCount": {
+    "placeholders": {
+      "visible": {
+        "type": "num"
+      },
+      "total": {
+        "type": "num"
+      }
+    }
+  },
+  "communityWritePostHint": "Write something in the group...",
+  "friendAccept": "Accept",
+  "friendActiveCount": "{count, plural, =0{0 active} =1{1 active} other{{count} active}}",
+  "@friendActiveCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendAdd": "Add friend",
+  "friendBecameFriends": "You became friends",
+  "friendCancelRequest": "Cancel request",
+  "friendCount": "{count, plural, =0{0 friends} =1{1 friend} other{{count} friends}}",
+  "@friendCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendDelete": "Delete",
+  "friendFallbackUserWithIndex": "User {index}",
+  "@friendFallbackUserWithIndex": {
+    "placeholders": {
+      "index": {
+        "type": "num"
+      }
+    }
+  },
+  "friendFriendsOf": "{name}'s friends",
+  "@friendFriendsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendFriendsSince": "Friends since {month} {year}",
+  "@friendFriendsSince": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "num"
+      }
+    }
+  },
+  "friendJustActive": "Just active",
+  "friendLoadDataError": "Unable to load friend data",
+  "friendLoadError": "Error loading friends: {message}",
+  "@friendLoadError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "friendLoadFriendsFailed": "Unable to load friends list",
+  "friendLoadSuggestionsUnknownError": "Unknown error loading friend suggestions",
+  "friendLoadingRequests": "Loading friend requests...",
+  "friendLoadingSentRequests": "Loading sent requests...",
+  "friendLoadingSuggestions": "Loading friend suggestions...",
+  "friendLongtimeFriend": "Longtime friend",
+  "friendMessageUser": "Message {name}",
+  "@friendMessageUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendMutualCount": "{count, plural, =0{No mutual friends} =1{1 mutual friend} other{{count} mutual friends}}",
+  "@friendMutualCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendNoFriends": "No friends yet",
+  "friendNoRequests": "No friend requests",
+  "friendNoRequestsDescription": "When someone sends a request, you will see it here.",
+  "friendNoSentRequests": "No sent requests",
+  "friendNoSentRequestsDescription": "Friend requests you send will appear here.",
+  "friendNoSuggestions": "No friend suggestions",
+  "friendNoSuggestionsDescription": "Check back later for more suggestions.",
+  "friendOnlineCount": "{count, plural, =0{No one online} =1{1 person online} other{{count} people online}}",
+  "@friendOnlineCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendPeopleYouMayKnow": "Recommended for you",
+  "friendReject": "Reject",
+  "friendRemove": "Remove",
+  "friendRequestAccepted": "Friend request accepted",
+  "friendRequestCancelled": "Request cancelled",
+  "friendRequestNotFound": "Friend request not found",
+  "friendRequestRejected": "Friend request rejected",
+  "friendRequestRemoved": "Friend request removed",
+  "friendRequestSent": "Friend request sent",
+  "friendRequestsTitle": "Friend requests",
+  "friendSearchHint": "Search friends",
+  "friendSeeAll": "See all",
+  "friendSentRequestsCount": "{count, plural, =0{0 sent requests} =1{1 sent request} other{{count} sent requests}}",
+  "@friendSentRequestsCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "friendSentRequestsTitle": "Sent requests",
+  "friendSort": "Sort",
+  "friendSortBy": "Sort by",
+  "friendSortLeastMutual": "Fewest mutual friends",
+  "friendSortMostMutual": "Most mutual friends",
+  "friendSortName": "Name",
+  "friendSortNameAz": "Name A-Z",
+  "friendSortNameZa": "Name Z-A",
+  "friendSortNewest": "Newest",
+  "friendSortOldest": "Oldest",
+  "friendSortOnline": "Online",
+  "friendSortRecent": "Recent",
+  "friendSuggestionsTitle": "Friend suggestions",
+  "friendTitle": "Friends",
+  "friendUnfriendConfirm": "Are you sure you want to unfriend {name}?",
+  "@friendUnfriendConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendUnfriendTitle": "Unfriend",
+  "friendUnfriendUser": "Unfriend {name}",
+  "@friendUnfriendUser": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "friendViewSentRequests": "View sent requests",
+  "homeConnecting": "Connecting...",
+  "homeAddStory": "Add story",
+  "homeEndOfPosts": "You have seen all posts",
+  "homeLoadPostsFailed": "Unable to load posts",
+  "monthName": "Month {month}",
+  "@monthName": {
+    "placeholders": {
+      "month": {
+        "type": "num"
+      }
+    }
+  },
+  "notificationAdminNote": "Admin note",
+  "notificationApprove": "Approve",
+  "notificationApprovePostAction": "Approve",
+  "notificationApprovePostTitle": "Review post",
+  "notificationCannotHandleInvite": "Unable to handle this invite",
+  "notificationCannotHandleJoinRequest": "Unable to handle this join request",
+  "notificationCommentedOnYourPost": "commented on your post:",
+  "notificationCommunityJoinApprovedByAdmin": "Admin approved your community join request",
+  "notificationCommunityJoined": "joined the community",
+  "notificationCommunityJoinRejectedByAdmin": "Admin rejected your community join request",
+  "notificationCommunityJoinRequestSent": "sent a request to join the community",
+  "notificationCommunityPostApprovedByAdmin": "Admin approved your post in the community",
+  "notificationCommunityPostRejectedByAdmin": "Admin rejected your post in the community",
+  "notificationCommunityPostRequestSent": "sent a post request to the community",
+  "notificationEmpty": "No notifications yet",
+  "notificationEndOfList": "You have seen all notifications",
+  "notificationExplanation": "Explanation",
+  "notificationFaceTagSuggestions": "{count, plural, =0{Recognized 0 people in your photo. Tag them now!} =1{Recognized 1 person in your photo. Tag them now!} other{Recognized {count} people in your photo. Tag them now!}}",
+  "@notificationFaceTagSuggestions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationFriendRequestMessage": "sent you a friend request",
+  "notificationInviteAccepted": "Invite accepted",
+  "notificationInviteFailed": "Unable to handle invite",
+  "notificationInviteMessage": "invited you to join a community",
+  "notificationInviteRejected": "Invite rejected",
+  "notificationJoinApprovedMessage": "your community join request was approved",
+  "notificationJoinRejectedMessage": "your community join request was rejected",
+  "notificationJoinRequestAccepted": "Join request accepted",
+  "notificationJoinRequestFailed": "Unable to handle join request",
+  "notificationJoinRequestMessage": "wants to join the community",
+  "notificationJoinRequestRejected": "Join request rejected",
+  "notificationMentionedYouInComment": "mentioned you in a comment:",
+  "notificationNew": "New",
+  "notificationNewFriendRequest": "You have a new friend request",
+  "notificationOlder": "Earlier",
+  "notificationPendingPostNotFound": "Pending post not found",
+  "notificationPostedWithYou": "posted something with you in it",
+  "notificationPostApprovedMessage": "your post was approved",
+  "notificationPostPendingMessage": "submitted a post waiting for review",
+  "notificationPostRejectedMessage": "your post was rejected",
+  "notificationPostReportTitle": "Post report details",
+  "notificationPublicJoinMessage": "joined the community",
+  "notificationRefreshTooltip": "Refresh notifications",
+  "notificationReactedToYourComment": "reacted to your comment:",
+  "notificationReactedToYourPost": "reacted to your post:",
+  "notificationReactedToYourStory": "reacted to your story:",
+  "notificationReportRejected": "Report rejected",
+  "notificationReportRejectedReason": "The report did not meet the requirements for action.",
+  "notificationReportReviewed": "Report reviewed",
+  "notificationReportReviewedReason": "The report was reviewed by an admin.",
+  "notificationReportStatus": "Status: {status}",
+  "@notificationReportStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationTaggedYouInPost": "tagged you in a post",
+  "notificationTitle": "Notifications",
+  "postAddCaptionHint": "Add a caption...",
+  "postAddPhotoVideo": "Add photo/video",
+  "postAddToCollection": "Add to collection",
+  "postAnd": "and",
+  "postCamera": "Camera",
+  "postShareCount": "{count, plural, =0{0 shares} =1{1 share} other{{count} shares}}",
+  "@postShareCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "postCameraErrorTitle": "Camera error",
+  "postCameraInitFailed": "Unable to initialize camera: {error}",
+  "@postCameraInitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postCameraPermissionMessage": "Please allow camera access in settings to continue.",
+  "postCameraPermissionTitle": "Camera permission required",
+  "postCannotAddPhoto": "Unable to add photo: {error}",
+  "@postCannotAddPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postCheckIn": "Check in",
+  "postChooseFolder": "Choose folder",
+  "postChooseLayout": "Choose layout",
+  "postCollectionNameHint": "Collection name",
+  "postContentOrPhotoRequired": "Please enter content or add a photo/video",
+  "postCreateCollectionTitle": "Create collection",
+  "postCreateGenericError": "An error occurred while creating the post: {error}",
+  "@postCreateGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postCreateTitle": "Create post",
+  "postCreating": "Creating post...",
+  "postCreatingWithProgress": "Creating post... {progress}%",
+  "@postCreatingWithProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "num"
+      }
+    }
+  },
+  "postDeleteConfirmMessage": "Are you sure you want to delete this post?",
+  "postDeleteFailed": "Unable to delete post",
+  "postDeleteTitle": "Delete post",
+  "postDeleted": "Post deleted",
+  "postEdit": "Edit",
+  "postEditCount": "Edit ({count})",
+  "@postEditCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postEditPrivacy": "Edit privacy",
+  "privacyPostQuestion": "Who can see your post?",
+  "privacyPostPublic": "Public",
+  "privacyPostPublicDescription": "Anyone on or off the app",
+  "privacyPostFriends": "Friends",
+  "privacyPostFriendsDescription": "Your friends on the app",
+  "privacyPostFriendsExcept": "Friends except...",
+  "privacyPostFriendsExceptDescription": "Hide this post from some friends",
+  "privacyPostSpecificFriends": "Specific friends",
+  "privacyPostSpecificFriendsDescription": "Only show this to a few friends",
+  "privacyPostOnlyMe": "Only me",
+  "privacyPostOnlyMeDescription": "Only me",
+  "privacyPostEditDescription": "You can change who can see this post.",
+  "privacyPostCreateDescription": "Your post will appear in Feed, on your profile, and in search results.\n\nThe default audience is {defaultPrivacy}, but you can change the audience for this post.",
+  "@privacyPostCreateDescription": {
+    "placeholders": {
+      "defaultPrivacy": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyPostNoOneSelected": "No one selected",
+  "privacyPostOnePerson": "1 person",
+  "privacyPostFallbackUser": "User",
+  "privacyPostAndOthers": "{firstNames} and {count} others",
+  "@privacyPostAndOthers": {
+    "placeholders": {
+      "firstNames": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "privacyPostHideFromTitle": "Hide post from",
+  "privacyPostSelectPeopleToShare": "Choose people to share this post with",
+  "privacyPostCurrentDefault": "This is your current default audience",
+  "privacyPostSetAsDefault": "Set as default audience",
+  "privacyPostUpdated": "Privacy updated",
+  "privacyPostUpdateFailed": "Unable to update privacy",
+  "postErrorPrefix": "Error: {message}",
+  "@postErrorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "postFeeling": "Feeling",
+  "postFeelingActivity": "Feeling/Activity",
+  "postGeneric": "Post",
+  "postGenericError": "An error occurred",
+  "postHiddenFromProfile": "Hidden from profile",
+  "postHideAction": "Hide",
+  "postHideFromProfileMessage": "This post will no longer appear on your profile.",
+  "postHideFromProfileTitle": "Hide from profile",
+  "postJustNow": "Just now",
+  "postLabel": "Post",
+  "postLayoutClassic": "Classic",
+  "postLayoutColumn": "Column",
+  "postLayoutFrame": "Frame",
+  "postLibrary": "Library",
+  "postLiveVideo": "Live video",
+  "postLoadingVideo": "Loading video...",
+  "postLocation": "Location",
+  "postMediaItemCount": "{count, plural, =0{0 items} =1{1 item} other{{count} items}}",
+  "@postMediaItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postMention": "Mention",
+  "postMore": "More",
+  "postMusic": "Music",
+  "postMutualFriends": "{count, plural, =0{No mutual friends} =1{1 mutual friend} other{{count} mutual friends}}",
+  "@postMutualFriends": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postNoComments": "No comments yet",
+  "postNoReactions": "No reactions yet",
+  "postNotFound": "Post not found",
+  "postOnlyMe": "Only me",
+  "postOtherPeople": "{count, plural, =1{1 other person} other{{count} other people}}",
+  "@postOtherPeople": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postPeopleReactedTitle": "People who reacted",
+  "postPhoto": "Photo",
+  "postPhotoLibrary": "Photo library",
+  "postPhotoPermissionRequired": "Please allow photo access to continue.",
+  "postPhotoVideo": "Photo/Video",
+  "postPlayVideoFailed": "Unable to play video: {error}",
+  "@postPlayVideoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postPoll": "Poll",
+  "postReactedFirstUserAndOthers": "{firstUser} and {count, plural, =1{1 other person} other{{count} others}}",
+  "@postReactedFirstUserAndOthers": {
+    "placeholders": {
+      "firstUser": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postReactedYouAndOthers": "You and {count, plural, =1{1 other person} other{{count} others}}",
+  "@postReactedYouAndOthers": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postRecording": "Recording",
+  "postRemoveTagAction": "Remove tag",
+  "postRemoveTagConfirmMessage": "Are you sure you want to remove this tag from the post?",
+  "postRemoveTagTitle": "Remove tag",
+  "postRemovedTag": "Tag removed",
+  "postReport": "Report",
+  "postReportDescriptionHint": "Add more details about the issue",
+  "postReportDescriptionLabel": "Description",
+  "postReportDetailReason": "Detailed reason",
+  "postReportFailed": "Unable to send report",
+  "postReportIntro": "Choose the right reason so we can review this post.",
+  "postReportQuickReason": "Quick reason",
+  "postReportReasonHarassment": "Harassment or bullying",
+  "postReportReasonHint": "Choose a reason",
+  "postReportReasonMisinformation": "Misinformation",
+  "postReportReasonOffensive": "Offensive content",
+  "postReportReasonRequired": "Please choose a report reason",
+  "postReportReasonSpam": "Spam",
+  "postReportReasonViolence": "Violence or danger",
+  "postReportSelfNotAllowed": "You cannot report your own post",
+  "postReportSuccess": "Report sent",
+  "postReportTitle": "Report post",
+  "postSave": "Save",
+  "postSaveFailed": "Unable to save post",
+  "postSaved": "Saved",
+  "postSavedToCollection": "Saved to {collection}",
+  "@postSavedToCollection": {
+    "placeholders": {
+      "collection": {
+        "type": "String"
+      }
+    }
+  },
+  "postSeeOriginal": "See original",
+  "postSeeTranslation": "See translation",
+  "postSelectAllowedFriendsRequired": "Please choose friends who can view this",
+  "postSelectHiddenFriendsRequired": "Please choose friends to hide from",
+  "postSelectedPhotos": "{count, plural, =0{No photos selected} =1{1 photo selected} other{{count} photos selected}}",
+  "@postSelectedPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postSendReport": "Send report",
+  "postShare": "Share",
+  "postShowAction": "Show",
+  "postShowOnProfileMessage": "This post will appear on your profile.",
+  "postShowOnProfileTitle": "Show on profile",
+  "postShownOnProfile": "Shown on profile",
+  "postSubmit": "Post",
+  "postTag": "Tag",
+  "postTagFriends": "Tag friends",
+  "postTagPeople": "Tag people",
+  "postTagUpdateFailed": "Unable to update tags",
+  "postTagUpdateFailedWithMessage": "Unable to update tags: {message}",
+  "@postTagUpdateFailedWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "postTagUpdated": "Tags updated",
+  "postTranslateError": "Unable to translate content",
+  "postTranslateFailed": "Translation failed",
+  "postUnknownTime": "Unknown time",
+  "postUnsave": "Unsave",
+  "postUnsaveSuccess": "Post unsaved",
+  "postUnsupportedVideoType": "Unsupported video type",
+  "postVideo": "Video",
+  "postViewAllComments": "View all {count, plural, =1{1 comment} other{{count} comments}}",
+  "@postViewAllComments": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "postWith": "with",
+  "postWriteSomethingHint": "What's on your mind?",
+  "postYourPost": "Your post",
+  "commonCopy": "Copy",
+  "commonContentCopied": "Content copied",
+  "commonEdit": "Edit",
+  "commonLinkCopied": "Link copied",
+  "commonNo": "No",
+  "commonRemove": "Remove",
+  "commonSeeMore": "See more",
+  "commonSendWithCount": "Send ({count})",
+  "@commonSendWithCount": {"placeholders": {"count": {"type": "num"}}},
+  "commonUpdate": "Update",
+  "commonViewAll": "View all",
+  "searchHint": "Search",
+  "searchUserHint": "Search users...",
+  "searchEnterKeyword": "Enter a keyword to search",
+  "searchNoResults": "No results found",
+  "searchRecent": "Recent searches",
+  "searchHistory": "History",
+  "searchNoHistory": "No search history yet",
+  "searchNoRecent": "No recent searches",
+  "searchClearAll": "Clear all",
+  "searchClearAllUppercase": "CLEAR ALL",
+  "searchClearAllHistoryTitle": "Clear all search history",
+  "searchClearAllHistoryConfirm": "Are you sure you want to clear all search history? This action cannot be undone.",
+  "searchClearAllHistoryConfirmShort": "Are you sure you want to clear all search history?",
+  "searchEditHistory": "Edit search history",
+  "searchHistoryLocalOnlyDescription": "Changes only apply to recent searches in the history on this device.",
+  "searchHistoryWillAppear": "Recent searches will appear here",
+  "searchRemoveFromHistory": "Remove from your search history.",
+  "searchPinThis": "Pin this search",
+  "searchPinLimit": "You can only pin 3 searches at the same time.",
+  "friendNoSearchResults": "No friends found",
+  "friendLoadFailed": "Failed to load friends",
+  "commentReply": "Reply",
+  "commentViewReplies": "View {count, plural, =1{1 reply} other{{count} replies}}",
+  "@commentViewReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentEditTitle": "Edit comment",
+  "commentEditHint": "Enter new content...",
+  "commentDeleteTitle": "Delete comment",
+  "commentDeleteConfirm": "Are you sure you want to permanently delete this comment?",
+  "commentViewEditHistory": "View edit history",
+  "commentShare": "Share comment",
+  "commentReactionsTitle": "Comment reactions",
+  "commentEmptyTitle": "No comments yet",
+  "commentEmptySubtitle": "Be the first to comment on this post",
+  "commentWriteFirst": "Write the first comment",
+  "commentReplyingPrefix": "Replying to ",
+  "commentYourComment": "your comment",
+  "commentWriteReplyHint": "Write a reply...",
+  "commentReplyToHint": "Reply to {user}...",
+  "@commentReplyToHint": {"placeholders": {"user": {"type": "String"}}},
+  "commentWriteHint": "Write a comment...",
+  "commentEditHistoryTitle": "Edit history",
+  "commentNoEditHistory": "No edit history yet",
+  "commentCurrentVersion": "Current version",
+  "commentEditVersion": "Edit {version} • {time}",
+  "commentOldContent": "Old content",
+  "commentNewContent": "New content",
+  "@commentEditVersion": {"placeholders": {"version": {"type": "num"}, "time": {"type": "String"}}},
+  "storyPrivacyTitle": "Story privacy",
+  "storyPrivacyQuestion": "Who can see your story?",
+  "storyPrivacyVisibleFor24h": "Your story will be visible for 24 hours.",
+  "storyPrivacyPublic": "Public",
+  "storyPrivacyPublicDescription": "Anyone",
+  "storyPrivacyFriends": "Friends",
+  "storyPrivacyFriendsDescription": "Only your friends",
+  "storyPrivacyHideFrom": "Hide story from",
+  "storyPrivacyCustom": "Custom",
+  "storyPrivacyNoOneSelected": "No one selected",
+  "storyPrivacyOnePerson": "1 person",
+  "storyPrivacyAndOthers": "{firstNames} and {count} others",
+  "@storyPrivacyAndOthers": {"placeholders": {"firstNames": {"type": "String"}, "count": {"type": "num"}}},
+  "storySelectPeopleToShare": "Choose people to share your story with",
+  "storyPrivacyUpdated": "Privacy updated",
+  "storyPrivacyUpdateFailed": "Could not update privacy",
+  "storyDeleteTitle": "Delete story",
+  "storyDeleteConfirm": "Are you sure you want to delete this story?",
+  "storyDeleted": "Story deleted",
+  "storyDeleteFailed": "Could not delete story",
+  "storyEditPrivacy": "Edit story privacy",
+  "storySendWithMessenger": "Send with Messenger",
+  "storySavePhoto": "Save photo",
+  "storyArchivePhoto": "Archive photo",
+  "storyArchivePhotoDescription": "Remove the photo from your story and save it to archive.",
+  "storyDeletePhoto": "Delete photo",
+  "storyCopyShareLink": "Copy link to share this story",
+  "storyLinkVisibility": "The story will be visible to {user}'s audience for 24 hours.",
+  "@storyLinkVisibility": {"placeholders": {"user": {"type": "String"}}},
+  "storyMusic": "Music",
+  "storyMusicLoadFailed": "Could not load music. Please try again.",
+  "storyMusicSearchFailed": "No results found. Please try again.",
+  "storyMusicForYou": "For you",
+  "storyMusicSearchHint": "Search music",
+  "storyMusicNoSearchResults": "No matching songs found.",
+  "storyMusicEmpty": "No songs available.",
+  "storyCreateSuccess": "Story created",
+  "storyImageOnlyEdit": "Only photos can be edited",
+  "storyCannotReadDeviceFile": "Could not read file from device",
+  "storyImageEditFailed": "Failed to edit image: {error}",
+  "@storyImageEditFailed": {"placeholders": {"error": {"type": "String"}}},
+  "storyText": "Text",
+  "storyPhotoGroup": "Photo group",
+  "storySelectMultipleFiles": "Select multiple files",
+  "storyLibrary": "Library",
+  "storyChooseFolder": "Choose folder",
+  "storyItemCount": "{count} items",
+  "@storyItemCount": {"placeholders": {"count": {"type": "num"}}},
+  "storyLibraryPermissionRequired": "Library access is required to show photos/videos.",
+  "storyNoMediaInLibrary": "No photos/videos in the library yet.",
+  "storyReactedPeople": "People who reacted",
+  "storyNoReactions": "No reactions yet",
+  "chatMessageHint": "Message...",
+  "chatShareFile": "Share file",
+  "chatAiImages": "AI images",
+  "chatAiImagesInDevelopmentMessage": "AI image feature is under development",
+  "chatMembersCount": "{count, plural, =1{1 member} other{{count} members}}",
+  "@chatMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatGroupChat": "Group chat",
+  "chatOnline": "Online",
+  "chatOffline": "Offline",
+  "chatActiveNow": "Active now",
+  "chatAndOtherMembers": "and {count, plural, =1{1 other person} other{{count} others}}",
+  "@chatAndOtherMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatViewGroupInfo": "View group info",
+  "chatViewProfile": "View profile",
+  "chatFriendsOnFacebook": "You are friends on Facebook",
+  "chatYouAndFriendAreFriends": "You and {name} are now friends.",
+  "@chatYouAndFriendAreFriends": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatThisFriend": "this friend",
+  "voiceEffectTitle": "Edit voice",
+  "voiceEffectLoading": "Changing voice, please wait...",
+  "voiceEffectApplied": "Applied voice: {voice}",
+  "@voiceEffectApplied": {
+    "placeholders": {
+      "voice": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceEffectOriginal": "Original",
+  "voiceEffectFemale": "Female",
+  "voiceEffectDeep": "Deep",
+  "voiceEffectBaby": "Baby",
+  "voiceEffectRobot": "Robot",
+  "voiceEffectDemon": "Demon",
+  "chatGroupLink": "Group link",
+  "chatDeleteChat": "Delete chat",
+  "chatConversationInfo": "Chat info",
+  "chatViewGroupMembers": "View group members",
+  "chatLeaveConversation": "Leave chat",
+  "chatFeedbackAndReportConversation": "Feedback and report conversation",
+  "chatReadReceipts": "Read receipts",
+  "chatTypingIndicators": "Typing indicators",
+  "chatMicrophonePermissionDenied": "No microphone permission",
+  "chatStartRecordingFailed": "Failed to start recording",
+  "chatDownloadingFile": "Downloading file...",
+  "chatNoAppToOpenFile": "No app found to open this file",
+  "chatOpenFileFailed": "Could not open file: {error}",
+  "@chatOpenFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatLoadingEditHistory": "Loading edit history...",
+  "chatPinInDevelopment": "Pin message is in development",
+  "chatForwardInDevelopment": "Forward message is in development",
+  "chatReportInDevelopment": "Report message is in development",
+  "chatAiImageInDevelopment": "AI image generation is in development",
+  "chatMissingConversationForReaction": "Could not add reaction: missing conversation ID",
+  "chatMessageCopied": "Message copied",
+  "chatGpsDisabledOpeningSettings": "GPS is off. Opening location settings...",
+  "chatLocationPermissionDenied": "Location permission was not granted.",
+  "chatLocationPermissionDeniedForever": "Location permission is permanently denied. Opening app settings...",
+  "chatSendLocationMessage": "Send location",
+  "chatCurrentLocation": "Current location",
+  "chatGetLocationFailed": "Could not get location: {error}",
+  "@chatGetLocationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatSendingFile": "Sending file...",
+  "chatPhotoPermissionTitle": "Photo access",
+  "chatPhotoPermissionMessage": "The app needs photo access to show photos from your library. Please grant permission in Settings.",
+  "chatPhotoPermissionRequired": "Photo access is required to show the library",
+  "chatLoadPhotosFailed": "Failed to load photos: {error}",
+  "@chatLoadPhotosFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCameraPermissionMessage": "The app needs camera access to take photos.",
+  "chatOpenCameraFailed": "Failed to open camera: {error}",
+  "@chatOpenCameraFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCapturedPhoto": "Captured photo",
+  "chatTapSendToShare": "Tap send to share",
+  "chatMissingConversationForPhoto": "Could not send photo: missing conversation ID",
+  "chatSendPhotoFailed": "Failed to send photo: {error}",
+  "@chatSendPhotoFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCannotProcessPhoto": "Could not process photo",
+  "chatMissingConversationForFile": "Could not send file: missing conversation ID",
+  "chatPickFileFailed": "Failed to choose file: {error}",
+  "@chatPickFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatStartCallFailed": "Could not start call: {error}",
+  "@chatStartCallFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatCreateConversationFailed": "Failed to create conversation: {message}",
+  "@chatCreateConversationFailed": {"placeholders": {"message": {"type": "String"}}},
+  "chatDeletedForEveryone": "Message deleted for everyone",
+  "chatDeletedForMe": "Message deleted for me",
+  "chatOriginalMessageNotFound": "Original message not found",
+  "chatLoadMessagesFailed": "Failed to load messages: {message}",
+  "@chatLoadMessagesFailed": {"placeholders": {"message": {"type": "String"}}},
+  "chatMessagePlaceholder": "[Message]",
+  "chatMyself": "myself",
+  "chatReplyingTo": "Replying to {name}",
+  "@chatReplyingTo": {"placeholders": {"name": {"type": "String"}}},
+  "chatAudioMessage": "[Voice message]",
+  "chatPhoto": "[Photo]",
+  "chatFile": "[File]",
+  "chatAttachment": "[Attachment]",
+  "chatNoPhotos": "No photos",
+  "chatUserNotFound": "User not found. Please log in again.",
+  "chatFindConversationFailed": "Error finding conversation: {error}",
+  "@chatFindConversationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatConversationError": "Conversation error: {message}",
+  "@chatConversationError": {"placeholders": {"message": {"type": "String"}}},
+  "chatConversationsError": "Conversations error: {message}",
+  "@chatConversationsError": {"placeholders": {"message": {"type": "String"}}},
+  "chatNoFriendsToStart": "No friends found. Add some friends to start chatting!",
+  "chatSuggestedFriends": "Suggested friends to message",
+  "chatNoConversations": "No conversations found",
+  "chatPickImageFailed": "Failed to choose image: {error}",
+  "@chatPickImageFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatTakePhoto": "Take photo",
+  "chatChooseFromLibrary": "Choose from library",
+  "chatDiscardGroupTitle": "Discard changes?",
+  "chatDiscardGroupMessage": "Are you sure you want to cancel creating this group chat?",
+  "chatSelectAtLeastOnePerson": "Please select at least 1 person",
+  "chatUserInfoNotFound": "User information not found",
+  "chatCreateGroupFailed": "Failed to create group chat: {error}",
+  "@chatCreateGroupFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatNewGroup": "New group chat",
+  "chatGroupNameOptional": "Group name (optional)",
+  "chatSuggestions": "Suggestions",
+  "chatGroupName": "Group name",
+  "chatCreateGroup": "Create group chat",
+  "chatPeopleYouMayKnow": "Suggested for you",
+  "chatNoFriendSuggestions": "No friend suggestions yet",
+  "chatDeleteMessageTitle": "Delete message?",
+  "chatDeleteForEveryone": "Delete for everyone",
+  "chatDeleteForMe": "Delete for me",
+  "chatChangeGroupPhoto": "Change group photo",
+  "chatChoosePhoto": "Choose photo",
+  "chatChangeName": "Rename",
+  "chatCreatePhoto": "Create photo",
+  "chatTheme": "Theme",
+  "chatNickname": "Nickname",
+  "chatShareContactInfo": "Share contact info",
+  "chatViewMediaFilesLinks": "View media, files, and links",
+  "chatPinnedMessages": "Pinned messages",
+  "chatSearchInConversation": "Search in conversation",
+  "chatDeleteConversation": "Delete conversation",
+  "chatChangeGroupName": "Change group name",
+  "chatGroupNameChanged": "Group name changed",
+  "chatChangeGroupNameFailed": "Could not change group name: {error}",
+  "@chatChangeGroupNameFailed": {"placeholders": {"error": {"type": "String"}}},
+  "chatVideoCall": "Video call",
+  "chatAudioCall": "Audio call",
+  "chatMissedCall": "Missed call",
+  "chatVideoCallMissed": "Missed video call",
+  "chatYouDeletedMessage": "You deleted this message",
+  "chatUserDeletedMessage": "{user} deleted this message",
+  "@chatUserDeletedMessage": {"placeholders": {"user": {"type": "String"}}},
+  "chatUnreadMessages": "{count} unread messages",
+  "@chatUnreadMessages": {"placeholders": {"count": {"type": "num"}}},
+  "chatEdited": "Edited",
+  "chatSentAt": "Sent {time}",
+  "@chatSentAt": {"placeholders": {"time": {"type": "String"}}},
+  "chatMore": "More",
+  "chatPin": "Pin",
+  "chatForward": "Forward",
+  "chatCreateAIImage": "Create AI image",
+  "chatNoReactions": "No reactions yet",
+  "chatAnonymousUser": "Anonymous user",
+  "chatAddMember": "Add member",
+  "chatMuteNotifications": "Mute notifications",
+  "communityInviteAction": "Invite",
+  "messageDownloadingPhoto":"Downloading image...",
+  "messageSavePhotoSuccess": "Image saved to gallery",
+  "messageSavePhotoError":"Failed to save image",
+  "commonMaybeLater": "Maybe later",
+  "faceRecognitionSetup": "Set up face recognition",
+  "faceRecognitionDescription": "Use your facial data to enable smart AI features and enhance account security.",
+  "faceRecognitionSmartSuggestions": "Smart friend suggestions",
+  "faceRecognitionAutoTagDescription": "AI automatically recognizes your face in photos and suggests accurate tags.",
+  "faceRecognitionAntiSpoofing": "Account anti-spoofing",
+  "faceRecognitionAntiSpoofingDescription": "Prevent others from using your photos to create fake accounts.",
+  "faceRecognitionHighSecurity": "Maximum security",
+  "faceRecognitionSecurityDescription": "Your facial data is securely encrypted and never shared with third parties.",
+  "faceRecognitionStartScan": "Start face scan",
+  "reactionLike": "Like",
+  "reactionLove": "Love",
+  "reactionHaha": "Haha",
+  "reactionWow": "Wow",
+  "reactionSad": "Sad",
+  "reactionAngry": "Angry"
+}

@@ -14,10 +14,9 @@ abstract class StoryRepository {
     int page = 1,
     int limit = 20,
   });
+
   /// Tạo story, không cần trả về dữ liệu chi tiết, chỉ cần biết thành công/thất bại.
-  Future<DataState<void>> createStory({
-    required CreateStoryEntity story,
-  });
+  Future<DataState<void>> createStory({required CreateStoryEntity story});
 
   /// Cập nhật quyền riêng tư của story
   Future<DataState<void>> updateStoryPrivacy({
@@ -28,9 +27,7 @@ abstract class StoryRepository {
   });
 
   /// Xóa story
-  Future<DataState<void>> deleteStory({
-    required String storyId,
-  });
+  Future<DataState<void>> deleteStory({required String storyId});
 
   /// Tạo hoặc cập nhật react cho story (trả về null nếu xóa react)
   Future<DataState<ReactStoryEntity?>> createOrUpdateReactStory({
@@ -55,7 +52,5 @@ abstract class StoryRepository {
   });
 
   /// Xóa react của story
-  Future<DataState<void>> deleteReactStory({
-    required String storyId,
-  });
+  Future<DataState<void>> deleteReactStory({required String storyId});
 }

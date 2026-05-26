@@ -18,6 +18,7 @@ import 'package:social_app_fe/features/profile/presentation/pages/profile_page.d
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/features/search/domain/entities/search_history_entity.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SearchHistoryItem extends StatelessWidget {
   final SearchHistoryEntity history;
@@ -34,7 +35,7 @@ class SearchHistoryItem extends StatelessWidget {
     final displayName = hasViewedUser
         ? (history.viewedUser!.fullName ??
               history.viewedUser!.username ??
-              'Người dùng')
+              context.l10n.commonUser)
         : history.query!;
     final avatarUrl = hasViewedUser ? history.viewedUser!.avatarUrl : null;
 
@@ -137,7 +138,7 @@ class SearchHistoryItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Xóa',
+                            context.l10n.commonDelete,
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -146,7 +147,7 @@ class SearchHistoryItem extends StatelessWidget {
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            'Gỡ khỏi lịch sử tìm kiếm của bạn.',
+                            context.l10n.searchRemoveFromHistory,
                             style: TextStyle(
                               fontSize: 13.sp,
                               color: AppColors.textSecondary,
@@ -180,7 +181,7 @@ class SearchHistoryItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Ghim nội dung tìm kiếm này',
+                            context.l10n.searchPinThis,
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w500,
@@ -189,7 +190,7 @@ class SearchHistoryItem extends StatelessWidget {
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            'Bạn chỉ có thể ghim 3 nội dung tìm kiếm cùng lúc.',
+                            context.l10n.searchPinLimit,
                             style: TextStyle(
                               fontSize: 13.sp,
                               color: AppColors.textSecondary,
@@ -269,7 +270,7 @@ class SearchHistoryItem extends StatelessWidget {
     final displayName = hasViewedUser
         ? (history.viewedUser!.fullName ??
               history.viewedUser!.username ??
-              'Người dùng')
+              context.l10n.commonUser)
         : history.query!;
     final avatarUrl = hasViewedUser ? history.viewedUser!.avatarUrl : null;
     final subtitle = hasViewedUser
@@ -293,7 +294,11 @@ class SearchHistoryItem extends StatelessWidget {
                     ? NetworkImage(avatarUrl)
                     : null,
                 child: avatarUrl == null || avatarUrl.isEmpty
-                    ? Icon(Icons.person, size: 24.r, color: AppColors.textSecondary)
+                    ? Icon(
+                        Icons.person,
+                        size: 24.r,
+                        color: AppColors.textSecondary,
+                      )
                     : null,
               )
             else

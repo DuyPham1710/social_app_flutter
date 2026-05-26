@@ -10,4 +10,3 @@ class RejectFriendRequestUseCase {
     return await friendRepository.rejectFriendRequest(requestId);
   }
 }
-

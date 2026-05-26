@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class AttachmentMenuWidget extends StatelessWidget {
   final VoidCallback onClose;
@@ -39,7 +40,7 @@ class AttachmentMenuWidget extends StatelessWidget {
           SizedBox(height: 8.h),
           _buildAttachmentMenuItem(
             context: context,
-            title: 'Chia sẻ file',
+            title: context.l10n.chatShareFile,
             icon: CupertinoIcons.doc_fill,
             color: AppColors.primary,
             onTap: () {
@@ -55,7 +56,7 @@ class AttachmentMenuWidget extends StatelessWidget {
 
           _buildAttachmentMenuItem(
             context: context,
-            title: 'Vị trí',
+            title: context.l10n.messageLocation,
             icon: CupertinoIcons.location_solid,
             color: AppColors.primary,
             onTap: () {
@@ -85,14 +86,14 @@ class AttachmentMenuWidget extends StatelessWidget {
           // ),
           _buildAttachmentMenuItem(
             context: context,
-            title: 'Hình ảnh AI',
+            title: context.l10n.chatAiImages,
             icon: CupertinoIcons.sparkles,
             color: AppColors.primary,
             onTap: () {
               onClose();
               showInfoSnackBar(
                 context,
-                'Tính năng Hình ảnh AI đang phát triển',
+                context.l10n.chatAiImagesInDevelopmentMessage,
               );
             },
           ),

@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class MessageActionSheet {
   static void show({
@@ -310,7 +311,7 @@ class _MessageActionContentState extends State<_MessageActionContent>
                       // Reply Action
                       _buildActionItem(
                         icon: CupertinoIcons.arrowshape_turn_up_left_fill,
-                        label: 'Trả lời',
+                        label: context.l10n.commentReply,
                         onTap: widget.onReply,
                       ),
 
@@ -320,7 +321,7 @@ class _MessageActionContentState extends State<_MessageActionContent>
                           widget.onCopy != null)
                         _buildActionItem(
                           icon: CupertinoIcons.doc_on_doc_fill,
-                          label: 'Sao chép',
+                          label: context.l10n.commonCopy,
                           onTap: widget.onCopy!,
                         ),
 
@@ -328,7 +329,7 @@ class _MessageActionContentState extends State<_MessageActionContent>
                       if (widget.fromMe && widget.onDelete != null)
                         _buildActionItem(
                           icon: CupertinoIcons.trash_fill,
-                          label: 'Xóa',
+                          label: context.l10n.commonDelete,
                           onTap: widget.onDelete!,
                           isDestructive: true,
                         ),
@@ -336,7 +337,7 @@ class _MessageActionContentState extends State<_MessageActionContent>
                       // More Action
                       _buildActionItem(
                         icon: CupertinoIcons.line_horizontal_3,
-                        label: 'Khác',
+                        label: context.l10n.chatMore,
                         onTap: widget.onMore!,
                       ),
                     ],

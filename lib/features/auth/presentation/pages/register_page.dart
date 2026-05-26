@@ -7,6 +7,7 @@ import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 
@@ -92,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
               },
             );
           } else if (state is AuthError && state.flowType == 'register') {
-            final message = state.errorMessage ?? 'Đăng ký thất bại';
+            final message = state.errorMessage ?? context.l10n.authRegisterFailed;
             UIUtils.showErrorMessage(context, message);
           }
         },
@@ -113,7 +114,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         context,
                         ModalRoute.withName('/login'),
                       ),
-                      child: Icon(CupertinoIcons.back, color: AppColors.unselectedIcon),
+                      child: Icon(
+                        CupertinoIcons.back,
+                        color: AppColors.unselectedIcon,
+                      ),
                     ),
 
                     SizedBox(height: 50.h),
@@ -121,7 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Đăng ký",
+                        context.l10n.authRegister,
                         style: TextStyle(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.bold,
@@ -133,13 +137,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 50.h),
 
                     TextformfieldCustom(
-                      label: 'Email',
+                      label: context.l10n.authEmail,
                       isPassword: false,
                       controller: _emailController,
                       focusNode: emailFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập email';
+                          return context.l10n.authEnterEmail;
                         }
                         return null;
                       },
@@ -148,13 +152,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 20.h),
 
                     TextformfieldCustom(
-                      label: 'Tên người dùng',
+                      label: context.l10n.authUsername,
                       isPassword: false,
                       controller: _usernameController,
                       focusNode: usernameFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập tên người dùng';
+                          return context.l10n.authEnterUsername;
                         }
                         return null;
                       },
@@ -163,13 +167,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 20.h),
 
                     TextformfieldCustom(
-                      label: 'Mật khẩu',
+                      label: context.l10n.authPassword,
                       isPassword: _isPasswordVisible,
                       controller: _passwordController,
                       focusNode: passwordFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập mật khẩu';
+                          return context.l10n.authEnterPassword;
                         }
                         return null;
                       },
@@ -192,13 +196,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 20.h),
 
                     TextformfieldCustom(
-                      label: 'Xác nhận mật khẩu',
+                      label: context.l10n.authConfirmPassword,
                       isPassword: _isConfirmPasswordVisible,
                       controller: _confirmPasswordController,
                       focusNode: confirmPasswordFocusNode,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập xác nhận mật khẩu';
+                          return context.l10n.authEnterConfirmPassword;
                         }
                         return null;
                       },
@@ -229,7 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           )
                         : ButtonCustom(
                             onPressed: () => _onRegisterPressed(context),
-                            text: "Đăng ký",
+                            text: context.l10n.authRegister,
                           ),
 
                     SizedBox(height: 24.h),
@@ -238,7 +242,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Bạn đã có tài khoản? ",
+                          context.l10n.authHasAccount,
                           style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 14.sp,
@@ -250,7 +254,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             Navigator.pushNamed(context, '/login');
                           },
                           child: Text(
-                            "Đăng nhập",
+                            context.l10n.authLogin,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 14.sp,

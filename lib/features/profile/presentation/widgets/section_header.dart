@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -27,12 +28,11 @@ class SectionHeader extends StatelessWidget {
         GestureDetector(
           onTap: onEditTap,
           child: Text(
-            "Chỉnh sửa",
+            context.l10n.profileEdit,
             style: TextStyle(color: AppColors.primary, fontSize: 16),
           ),
-        )
+        ),
       ],
     );
   }
 }
-

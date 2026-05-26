@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_picker.dart';
+import 'package:social_app_fe/features/comment/utils/comment_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactionText extends StatefulWidget {
   final String commentId;
@@ -49,7 +51,7 @@ class _ReactionTextState extends State<ReactionText> {
   void _onReactionSelected(EmojiType reaction) {
     // Lưu lại giá trị cũ để xử lý callback
     final oldReaction = _currentReaction;
-    
+
     setState(() {
       if (_currentReaction == reaction) {
         _currentReaction = null;
@@ -67,16 +69,15 @@ class _ReactionTextState extends State<ReactionText> {
     if (_currentReaction != null) {
       // Trường hợp đang có react -> bấm vào để bỏ (Unlike)
       final reactionToRemove = _currentReaction!; // Lưu lại để gửi lên parent
-      
+
       setState(() {
         _currentReaction = null;
       });
-      
+
       // Cần gọi callback để Parent biết và xóa khỏi list & gọi API
       if (widget.onReactionChanged != null) {
-         widget.onReactionChanged!(widget.commentId, reactionToRemove);
+        widget.onReactionChanged!(widget.commentId, reactionToRemove);
       }
-      
     } else {
       // Trường hợp chưa có react -> bấm vào để Like mặc định
       setState(() {
@@ -100,7 +101,7 @@ class _ReactionTextState extends State<ReactionText> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           child: Text(
-            _currentReaction?.label ?? 'Thích',
+            localizedReactionLabel(context.l10n, _currentReaction?.label ?? 'Thích'),
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,

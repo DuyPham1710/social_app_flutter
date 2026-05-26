@@ -79,7 +79,9 @@ class CommunityRepositoryImpl implements CommunityRepository {
         );
       }
 
-      if (coverImage != null && coverImage.isNotEmpty && !coverImage.startsWith('http')) {
+      if (coverImage != null &&
+          coverImage.isNotEmpty &&
+          !coverImage.startsWith('http')) {
         coverImageFile = await MultipartFile.fromFile(
           coverImage,
           filename: coverImage.split('/').last,

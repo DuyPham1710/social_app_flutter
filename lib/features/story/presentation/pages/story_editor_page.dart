@@ -18,6 +18,7 @@ import 'package:social_app_fe/features/story/presentation/bloc/story_create_even
 import 'package:social_app_fe/features/story/presentation/bloc/story_create_state.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_music_picker_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -32,6 +33,10 @@ class StoryEditorPage extends StatefulWidget {
 }
 
 class _StoryEditorPageState extends State<StoryEditorPage> {
+  static const _privacyPublic = 'public';
+  static const _privacyFriends = 'friends';
+  static const _privacyFriendsDetail = 'friendsDetail';
+
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   bool _isVideoPlaying = false;
@@ -96,7 +101,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         child: BlocListener<StoryCreateBloc, StoryCreateState>(
           listener: (context, state) {
             if (state is StoryCreated) {
-              showSuccessSnackBar(context, "Tạo tin thành công");
+              showSuccessSnackBar(context, context.l10n.storyCreateSuccess);
               Navigator.of(context).maybePop();
             } else if (state is StoryCreateError) {
               showErrorSnackBar(context, state.message);
@@ -196,7 +201,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         children: [
           _buildMenuButton(
             icon: Icons.sticky_note_2_outlined,
-            label: "Chỉnh sửa",
+            label: context.l10n.commonEdit,
             onTap: () => _openImageEditor(),
           ),
           SizedBox(height: 20.h),
@@ -268,7 +273,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
           ),
           SizedBox(height: 4.h),
           Text(
-            "Nhạc",
+            context.l10n.storyMusic,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
@@ -366,7 +371,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                             ),
                           )
                         : Text(
-                            "Chia sẻ",
+                            context.l10n.postShare,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15.sp,
@@ -388,7 +393,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     if (widget.asset.type == AssetType.video) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Chỉ có thể chỉnh sửa ảnh')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.storyImageOnlyEdit)));
       return;
     }
 
@@ -396,7 +401,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       // Lấy file gốc hoặc file đã chỉnh sửa
       final originalFile = _editedImageFile ?? await widget.asset.file;
       if (originalFile == null) {
-        showErrorSnackBar(context, 'Không thể đọc file từ thiết bị');
+        showErrorSnackBar(context, context.l10n.storyCannotReadDeviceFile);
         return;
       }
 
@@ -436,9 +441,11 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi khi chỉnh sửa ảnh: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.storyImageEditFailed(e.toString())),
+          ),
+        );
       }
     }
   }
@@ -453,7 +460,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     }
 
     if (file == null) {
-      showErrorSnackBar(context, 'Không thể đọc file từ thiết bị');
+      showErrorSnackBar(context, context.l10n.storyCannotReadDeviceFile);
       return;
     }
 
@@ -474,14 +481,17 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     List<String>? friendsDetail;
 
     switch (privacyLabel) {
-      case "Công khai":
+      case 'Công khai':
+      case _privacyPublic:
         privacyType = core_privacy.PrivacyType.public;
-      case "Tùy chỉnh":
+      case 'Tùy chỉnh':
+      case _privacyFriendsDetail:
         privacyType = core_privacy.PrivacyType.friendsDetail;
         friendsDetail = allowedFriendIds.isNotEmpty
             ? List.of(allowedFriendIds)
             : null;
-      case "Bạn bè":
+      case 'Bạn bè':
+      case _privacyFriends:
       default:
         if (hiddenFriendIds.isNotEmpty) {
           privacyType = core_privacy.PrivacyType.friendsExcept;

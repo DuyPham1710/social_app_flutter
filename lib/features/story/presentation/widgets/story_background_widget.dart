@@ -32,8 +32,8 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.mediaType == MediaType.video && 
-        widget.mediaUrl != null && 
+    if (widget.mediaType == MediaType.video &&
+        widget.mediaUrl != null &&
         widget.mediaUrl!.isNotEmpty) {
       _initializeVideo();
     }
@@ -42,16 +42,16 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
   @override
   void didUpdateWidget(StoryBackgroundWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Nếu mediaUrl hoặc mediaType thay đổi, khởi tạo lại video
     if (widget.mediaType == MediaType.video &&
         widget.mediaUrl != null &&
         widget.mediaUrl!.isNotEmpty &&
-        (oldWidget.mediaUrl != widget.mediaUrl || 
-         oldWidget.mediaType != widget.mediaType)) {
+        (oldWidget.mediaUrl != widget.mediaUrl ||
+            oldWidget.mediaType != widget.mediaType)) {
       _disposeVideo().then((_) => _initializeVideo());
     }
-    
+
     // Điều khiển play/pause dựa trên shouldPlay
     if (_videoController != null && _isVideoInitialized && mounted) {
       if (widget.shouldPlay) {
@@ -82,7 +82,7 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
       _videoController!.addListener(_videoListener);
 
       await _videoController!.initialize();
-      
+
       if (!mounted) {
         _videoController?.dispose();
         return;
@@ -102,21 +102,22 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
 
       _videoController!.setLooping(true);
       _videoController!.setVolume(1.0);
-      
+
       // Lấy duration của video và gửi về parent
       final videoDuration = _videoController!.value.duration;
-      if (videoDuration.inSeconds > 0 && widget.onVideoDurationChanged != null) {
+      if (videoDuration.inSeconds > 0 &&
+          widget.onVideoDurationChanged != null) {
         widget.onVideoDurationChanged!(videoDuration.inSeconds);
       }
-      
+
       // Đảm bảo video được play sau khi khởi tạo
       if (mounted) {
         await _videoController!.play();
         // Kiểm tra lại sau một khoảng thời gian ngắn để đảm bảo video đang play
         Future.delayed(const Duration(milliseconds: 100), () {
-          if (mounted && 
-              _videoController != null && 
-              _isVideoInitialized && 
+          if (mounted &&
+              _videoController != null &&
+              _isVideoInitialized &&
               !_videoController!.value.isPlaying &&
               widget.shouldPlay) {
             _videoController!.play();
@@ -136,7 +137,9 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
   }
 
   void _videoListener() {
-    if (_videoController != null && _videoController!.value.hasError && mounted) {
+    if (_videoController != null &&
+        _videoController!.value.hasError &&
+        mounted) {
       setState(() {
         _hasError = true;
       });
@@ -164,7 +167,9 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(widget.dragOffset.dy != 0 ? 12.0 : 0.0),
+        borderRadius: BorderRadius.circular(
+          widget.dragOffset.dy != 0 ? 12.0 : 0.0,
+        ),
         child: _buildMediaContent(),
       ),
     );
@@ -180,11 +185,7 @@ class _StoryBackgroundWidgetState extends State<StoryBackgroundWidget> {
         return Container(
           color: Colors.grey[900],
           child: const Center(
-            child: Icon(
-              Icons.error_outline,
-              color: Colors.white70,
-              size: 48,
-            ),
+            child: Icon(Icons.error_outline, color: Colors.white70, size: 48),
           ),
         );
       }

@@ -29,6 +29,7 @@ import 'package:social_app_fe/features/post/presentation/pages/edit_selected_ima
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
@@ -71,24 +72,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     // Kiểm tra nếu cả caption và ảnh đều trống
     if (_captionController.text.trim().isEmpty && _selectedAssets.isEmpty) {
-      showErrorSnackBar(
-        context,
-        'Vui lòng nhập nội dung hoặc chọn ảnh để đăng',
-      );
+      showErrorSnackBar(context, context.l10n.postContentOrPhotoRequired);
       return;
     }
 
     // Validation: Nếu chọn friends_except hoặc friends_detail, phải có danh sách bạn bè
     if (_selectedPrivacy == PrivacyType.friendsExcept &&
         _friendsExceptIds.isEmpty) {
-      showErrorSnackBar(context, 'Vui lòng chọn bạn bè cần ẩn bài viết');
+      showErrorSnackBar(context, context.l10n.postSelectHiddenFriendsRequired);
 
       return;
     }
 
     if (_selectedPrivacy == PrivacyType.friendsDetail &&
         _friendsDetailIds.isEmpty) {
-      showErrorSnackBar(context, 'Vui lòng chọn bạn bè được phép xem bài viết');
+      showErrorSnackBar(context, context.l10n.postSelectAllowedFriendsRequired);
 
       return;
     }
@@ -148,9 +146,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
         _isCreatingPost = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra: ${e.toString()}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.postCreateGenericError(e.toString())),
+        ),
+      );
     }
   }
 
@@ -195,7 +195,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     } else {
-      showErrorSnackBar(context, 'Cần quyền truy cập ảnh để tiếp tục');
+      showErrorSnackBar(context, context.l10n.postPhotoPermissionRequired);
     }
   }
 
@@ -217,7 +217,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   Widget _buildTaggedText() {
     final taggedNames = _taggedUsers.map((e) => e['name']!).toList();
-    return TagHelper.buildTagsOnly(taggedNames: taggedNames);
+    return TagHelper.buildTagsOnly(
+      l10n: context.l10n,
+      taggedNames: taggedNames,
+    );
   }
 
   Future<void> _openCamera() async {
@@ -231,14 +234,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
           showCupertinoDialog(
             context: context,
             builder: (context) => CupertinoAlertDialog(
-              title: const Text('Quyền truy cập Camera'),
-              content: const Text(
-                'Ứng dụng cần quyền truy cập camera và microphone để chụp ảnh và quay video.',
-              ),
+              title: Text(context.l10n.postCameraPermissionTitle),
+              content: Text(context.l10n.postCameraPermissionMessage),
 
               actions: [
                 CupertinoDialogAction(
-                  child: const Text('OK'),
+                  child: Text(context.l10n.commonOk),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -297,7 +298,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
             print('Error creating AssetEntity from file: $e');
             // Fallback: Show error message
             if (mounted) {
-              showErrorSnackBar(context, "Không thể thêm ảnh: $e");
+              showErrorSnackBar(
+                context,
+                context.l10n.postCannotAddPhoto(e.toString()),
+              );
             }
           }
         }
@@ -354,38 +358,46 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
               _optionRow(
                 Icons.image,
-                "Ảnh/video",
+                context.l10n.postPhotoVideo,
                 Colors.green,
                 onTap: () => {Navigator.pop(context), _onSelectImage(context)},
               ),
               _optionRow(
                 CupertinoIcons.chart_bar,
-                "Thăm dò ý kiến",
+                context.l10n.postPoll,
                 Colors.orange,
               ),
               _optionRow(
                 Icons.person_add_alt_1,
-                "Gắn thẻ người khác",
+                context.l10n.postTagPeople,
                 Colors.blueAccent,
               ),
               _optionRow(
                 Icons.emoji_emotions,
-                "Cảm xúc/hoạt động",
+                context.l10n.postFeelingActivity,
                 Colors.amber,
               ),
-              _optionRow(Icons.location_on, "Check in", Colors.redAccent),
+              _optionRow(
+                Icons.location_on,
+                context.l10n.postCheckIn,
+                Colors.redAccent,
+              ),
               _optionRow(
                 Icons.video_camera_front,
-                "Video trực tiếp",
+                context.l10n.postLiveVideo,
                 Colors.pinkAccent,
               ),
               _optionRow(
                 Icons.camera_alt,
-                "Camera",
+                context.l10n.postCamera,
                 Colors.blueAccent,
                 onTap: () => _openCamera(),
               ),
-              _optionRow(Icons.music_note, "Nhạc", Colors.redAccent),
+              _optionRow(
+                Icons.music_note,
+                context.l10n.postMusic,
+                Colors.redAccent,
+              ),
             ],
           ),
         );
@@ -459,7 +471,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             automaticallyImplyLeading: false,
 
             title: Text(
-              'Tạo bài viết',
+              context.l10n.postCreateTitle,
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 20.sp,
@@ -496,7 +508,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             ),
                           )
                         : Text(
-                            'Đăng',
+                            context.l10n.postSubmit,
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
@@ -566,7 +578,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                             children: [
                                               Text(
                                                 state.user.fullName ??
-                                                    'unknown',
+                                                    context.l10n.commonUnknown,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 14.sp,
@@ -575,7 +587,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                               ),
                                               if (_taggedUsers.isNotEmpty) ...[
                                                 Text(
-                                                  ' cùng với ',
+                                                  context.l10n.postWith,
                                                   style: TextStyle(
                                                     fontSize: 14.sp,
                                                     color:
@@ -685,7 +697,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                           vertical: 4.w,
                                                         ),
                                                     decoration: BoxDecoration(
-                                                      color: AppColors.primary.withOpacity(0.1),
+                                                      color: AppColors.primary
+                                                          .withOpacity(0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             8.r,
@@ -700,7 +713,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                           getIcon(
                                                             _selectedPrivacyLabel,
                                                           ),
-                                                          color: AppColors.primary,
+                                                          color:
+                                                              AppColors.primary,
                                                           size: 14.sp,
                                                         ),
 
@@ -709,7 +723,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         Text(
                                                           _selectedPrivacyLabel,
                                                           style: TextStyle(
-                                                            color: AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontWeight:
                                                                 FontWeight.w600,
                                                             fontSize: 13.sp,
@@ -720,7 +735,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                                                         Icon(
                                                           Icons.arrow_drop_down,
-                                                          color: AppColors.primary,
+                                                          color:
+                                                              AppColors.primary,
                                                           size: 18.sp,
                                                         ),
                                                       ],
@@ -756,7 +772,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     ),
                     maxLines: null,
                     decoration: InputDecoration(
-                      hintText: 'Bạn đang nghĩ gì?',
+                      hintText: context.l10n.postWriteSomethingHint,
                       hintStyle: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 18.sp,
@@ -829,19 +845,25 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     children: [
                       _bottomIcon(
                         Icons.image_outlined,
-                        "Thư viện",
+                        context.l10n.postLibrary,
                         onTap: () => _onSelectImage(context),
                       ),
                       _bottomIcon(
                         Icons.person_add_alt_1,
-                        "Gắn thẻ",
+                        context.l10n.postTag,
                         onTap: _openTagFriends,
                       ),
-                      _bottomIcon(Icons.emoji_emotions_outlined, "Cảm xúc"),
-                      _bottomIcon(Icons.location_on_outlined, "Vị trí"),
+                      _bottomIcon(
+                        Icons.emoji_emotions_outlined,
+                        context.l10n.postFeeling,
+                      ),
+                      _bottomIcon(
+                        Icons.location_on_outlined,
+                        context.l10n.postLocation,
+                      ),
                       _bottomIcon(
                         CupertinoIcons.ellipsis,
-                        "Thêm",
+                        context.l10n.postMore,
                         onTap: () => _showMoreOptions(context),
                       ),
                     ],

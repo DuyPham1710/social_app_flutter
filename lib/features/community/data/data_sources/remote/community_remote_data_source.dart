@@ -57,9 +57,7 @@ abstract class CommunityRemoteDataSource {
   });
 
   @DELETE('/community/{communityId}')
-  Future<void> deleteCommunity(
-    @Path('communityId') String communityId,
-  );
+  Future<void> deleteCommunity(@Path('communityId') String communityId);
 
   @POST('/community/{communityId}/join')
   Future<void> joinCommunity(@Path('communityId') String communityId);

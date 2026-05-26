@@ -5,6 +5,7 @@ import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/react_item_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactListWidget extends StatelessWidget {
   final List<ReactPostEntity> reacts;
@@ -22,7 +23,7 @@ class ReactListWidget extends StatelessWidget {
     if (reacts.isEmpty) {
       return Center(
         child: Text(
-          'Chưa có ai bày tỏ cảm xúc',
+          context.l10n.postNoReactions,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );

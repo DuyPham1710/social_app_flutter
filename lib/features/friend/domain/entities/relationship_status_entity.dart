@@ -6,4 +6,3 @@ abstract class RelationshipStatusEntity {
   bool? get canAcceptRequest;
   bool? get canRejectRequest;
 }
-

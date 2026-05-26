@@ -45,6 +45,7 @@ import '../widgets/post_report_detail_modal.dart';
 import '../widgets/post_report_notification_item.dart';
 import '../widgets/face_detected_notification_item.dart';
 import '../widgets/tag_notification_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -102,12 +103,13 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  String _timeAgo(DateTime time) {
+  String _timeAgo(BuildContext context, DateTime time) {
+    final l10n = context.l10n;
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    return '${diff.inDays} ngày trước';
+    if (diff.inMinutes == 0) return l10n.postJustNow;
+    if (diff.inMinutes < 60) return l10n.timeMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.timeHoursAgo(diff.inHours);
+    return l10n.timeDaysAgo(diff.inDays);
   }
 
   void _markAsRead(String notificationId) {
@@ -123,7 +125,7 @@ class _NotificationPageState extends State<NotificationPage> {
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           mutualFriends: '',
           onUserTap: () {
@@ -162,8 +164,9 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           content: notification.message,
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
+          actionText: context.l10n.notificationCommentedOnYourPost,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -185,8 +188,9 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           content: notification.message,
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
+          actionText: context.l10n.notificationReactedToYourComment,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -210,9 +214,10 @@ class _NotificationPageState extends State<NotificationPage> {
           userId: notification.sender?.userId ?? '',
           message: notification.message,
           content: notification.content ?? '',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           postId: notification.targetId,
+          actionText: context.l10n.notificationReactedToYourPost,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -230,8 +235,9 @@ class _NotificationPageState extends State<NotificationPage> {
           userId: notification.sender?.userId ?? '',
           message: notification.message,
           content: notification.content ?? '',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
+          actionText: context.l10n.notificationReactedToYourStory,
           storyId: notification.targetId,
           onUserTap: () {
             _handleViewerProfileTap(context, notification.sender?.userId);
@@ -244,7 +250,7 @@ class _NotificationPageState extends State<NotificationPage> {
         return PostReportNotificationItem(
           message: notification.message,
           note: notification.content,
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           postId: notification.targetId,
           onTap: () {
@@ -263,8 +269,9 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           message: notification.message,
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           postId: notification.targetId,
+          actionText: context.l10n.notificationPostedWithYou,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
           },
@@ -281,7 +288,8 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           message: notification.message,
-          time: _timeAgo(notification.createdAt),
+          actionText: context.l10n.notificationTaggedYouInPost,
+          time: _timeAgo(context, notification.createdAt),
           postId: notification.targetId,
           onUserTap: () {
             _handleViewerProfileTap(context, notification);
@@ -293,7 +301,7 @@ class _NotificationPageState extends State<NotificationPage> {
       case NotificationType.FACE_TAG_SUGGEST:
         return FaceTagSuggestNotificationItem(
           message: notification.message,
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           onTap: () {
             List<String> suggestedIds = [];
@@ -322,9 +330,10 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           communityName: notification.content ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoined,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -369,9 +378,10 @@ class _NotificationPageState extends State<NotificationPage> {
               notification.community?.name ??
               notification.content ??
               'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoinRequestSent,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -420,7 +430,7 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           communityName: notification.community?.name ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
           onUserTap: () {
@@ -469,9 +479,10 @@ class _NotificationPageState extends State<NotificationPage> {
               notification.community?.avatar ??
               'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
           communityName: notification.content ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoinApprovedByAdmin,
           onCommunityTap: () {
             final id = notification.targetId;
             if (id != null) {
@@ -492,9 +503,10 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: 'Admin',
           userId: '',
           communityName: notification.content ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityJoinRejectedByAdmin,
           onUserTap: () {},
           onCommunityTap: () {
             final id = notification.targetId;
@@ -517,9 +529,10 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           communityName: notification.content ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityPostApprovedByAdmin,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -569,7 +582,8 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           communityName: notification.content ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
+          actionText: context.l10n.notificationCommunityPostRequestSent,
           isRead: notification.isRead,
           message: notification.message,
           onUserTap: () {
@@ -660,9 +674,10 @@ class _NotificationPageState extends State<NotificationPage> {
           userName: notification.sender?.fullName ?? '',
           userId: notification.sender?.userId ?? '',
           communityName: notification.content ?? 'Community',
-          time: _timeAgo(notification.createdAt),
+          time: _timeAgo(context, notification.createdAt),
           isRead: notification.isRead,
           message: notification.message,
+          actionText: context.l10n.notificationCommunityPostRejectedByAdmin,
           onUserTap: () {
             if (notification.sender?.userId != null) {
               Navigator.push(
@@ -711,7 +726,7 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Thông báo',
+          context.l10n.notificationTitle,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -725,7 +740,7 @@ class _NotificationPageState extends State<NotificationPage> {
               _currentPage = 1; // Reset page counter
               context.read<NotificationBloc>().add(ReloadNotifications());
             },
-            tooltip: 'Tải lại thông báo',
+            tooltip: context.l10n.notificationRefreshTooltip,
           ),
         ],
       ),
@@ -762,7 +777,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     height: 400,
                     child: Center(
                       child: Text(
-                        'Chưa có thông báo',
+                        context.l10n.notificationEmpty,
                         style: TextStyle(color: AppColors.textSecondary),
                       ),
                     ),
@@ -804,7 +819,7 @@ class _NotificationPageState extends State<NotificationPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
-                'Mới',
+                context.l10n.notificationNew,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -820,7 +835,7 @@ class _NotificationPageState extends State<NotificationPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
               child: Text(
-                'Cũ hơn',
+                context.l10n.notificationOlder,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -847,7 +862,7 @@ class _NotificationPageState extends State<NotificationPage> {
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                 child: Text(
-                  'Đã hiển thị hết thông báo',
+                  context.l10n.notificationEndOfList,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
@@ -914,7 +929,7 @@ class _NotificationPageState extends State<NotificationPage> {
         // Post doesn't exist or error loading
         Navigator.of(context).pop(); // Close loading page
 
-        showErrorSnackBar(context, 'Bài viết không tồn tại');
+        showErrorSnackBar(context, context.l10n.postNotFound);
 
         // Delete the notification
         try {
@@ -944,9 +959,9 @@ class _NotificationPageState extends State<NotificationPage> {
     final result = await s1<AcceptFriendRequestUseCase>()(targetId);
     if (result is DataStateSuccess) {
       // Update UI immediately by removing from local state
-      showSuccessSnackBar(context, "Đã chấp nhận lời mời kết bạn");
+      showSuccessSnackBar(context, context.l10n.friendRequestAccepted);
     } else {
-      showErrorSnackBar(context, "Lời mời kết bạn không tồn tại");
+      showErrorSnackBar(context, context.l10n.friendRequestNotFound);
     }
 
     try {
@@ -963,9 +978,9 @@ class _NotificationPageState extends State<NotificationPage> {
     // Then handle server operations
     final result = await s1<RejectFriendRequestUseCase>()(targetId);
     if (result is DataStateSuccess) {
-      showSuccessSnackBar(context, "Đã từ chối lời mời kết bạn");
+      showSuccessSnackBar(context, context.l10n.friendRequestRejected);
     } else {
-      showErrorSnackBar(context, "Lời mời kết bạn không tồn tại");
+      showErrorSnackBar(context, context.l10n.friendRequestNotFound);
     }
 
     // Delete from server in background
@@ -982,7 +997,10 @@ class _NotificationPageState extends State<NotificationPage> {
         requestId.isEmpty ||
         communityId == null ||
         communityId.isEmpty) {
-      showErrorSnackBar(context, "Không thể xử lý yêu cầu tham gia");
+      showErrorSnackBar(
+        context,
+        context.l10n.notificationCannotHandleJoinRequest,
+      );
       // Delete from server in background
       try {
         s1<DeleteNotificationUseCase>()(params: notification.id);
@@ -1003,9 +1021,12 @@ class _NotificationPageState extends State<NotificationPage> {
     );
 
     if (result is DataStateSuccess) {
-      showSuccessSnackBar(context, "Đã chấp nhận yêu cầu tham gia");
+      showSuccessSnackBar(
+        context,
+        context.l10n.notificationJoinRequestAccepted,
+      );
     } else {
-      showErrorSnackBar(context, "Lỗi khi xử lý yêu cầu tham gia");
+      showErrorSnackBar(context, context.l10n.notificationJoinRequestFailed);
     }
 
     // Delete from server in background
@@ -1022,7 +1043,10 @@ class _NotificationPageState extends State<NotificationPage> {
         requestId.isEmpty ||
         communityId == null ||
         communityId.isEmpty) {
-      showErrorSnackBar(context, "Không thể xử lý yêu cầu tham gia");
+      showErrorSnackBar(
+        context,
+        context.l10n.notificationCannotHandleJoinRequest,
+      );
       try {
         s1<DeleteNotificationUseCase>()(params: notification.id);
       } catch (e) {}
@@ -1042,9 +1066,12 @@ class _NotificationPageState extends State<NotificationPage> {
     );
 
     if (result is DataStateSuccess) {
-      showSuccessSnackBar(context, "Đã từ chối yêu cầu tham gia");
+      showSuccessSnackBar(
+        context,
+        context.l10n.notificationJoinRequestRejected,
+      );
     } else {
-      showErrorSnackBar(context, "Lỗi khi xử lý yêu cầu tham gia");
+      showErrorSnackBar(context, context.l10n.notificationJoinRequestFailed);
     }
 
     // Delete from server in background
@@ -1061,7 +1088,7 @@ class _NotificationPageState extends State<NotificationPage> {
         requestId.isEmpty ||
         communityId == null ||
         communityId.isEmpty) {
-      showErrorSnackBar(context, "Không thể xử lý lời mời tham gia");
+      showErrorSnackBar(context, context.l10n.notificationCannotHandleInvite);
       // Delete from server in background
       try {
         s1<DeleteNotificationUseCase>()(params: notification.id);
@@ -1082,9 +1109,9 @@ class _NotificationPageState extends State<NotificationPage> {
     );
 
     if (result is DataStateSuccess) {
-      showSuccessSnackBar(context, "Đã chấp nhận lời mời tham gia");
+      showSuccessSnackBar(context, context.l10n.notificationInviteAccepted);
     } else {
-      showErrorSnackBar(context, "Lỗi khi xử lý lời mời tham gia");
+      showErrorSnackBar(context, context.l10n.notificationInviteFailed);
     }
 
     // Delete from server in background
@@ -1101,7 +1128,7 @@ class _NotificationPageState extends State<NotificationPage> {
         requestId.isEmpty ||
         communityId == null ||
         communityId.isEmpty) {
-      showErrorSnackBar(context, "Không thể xử lý lời mời tham gia");
+      showErrorSnackBar(context, context.l10n.notificationCannotHandleInvite);
       try {
         s1<DeleteNotificationUseCase>()(params: notification.id);
       } catch (e) {}
@@ -1121,9 +1148,9 @@ class _NotificationPageState extends State<NotificationPage> {
     );
 
     if (result is DataStateSuccess) {
-      showSuccessSnackBar(context, "Đã từ chối lời mời tham gia");
+      showSuccessSnackBar(context, context.l10n.notificationInviteRejected);
     } else {
-      showErrorSnackBar(context, "Lỗi khi xử lý lời mời tham gia");
+      showErrorSnackBar(context, context.l10n.notificationInviteFailed);
     }
 
     // Delete from server in background
@@ -1193,7 +1220,7 @@ class _NotificationPageState extends State<NotificationPage> {
           // Post doesn't exist or error loading
           Navigator.of(context).pop(); // Close loading page
 
-          showErrorSnackBar(context, 'Bài viết không tồn tại');
+          showErrorSnackBar(context, context.l10n.postNotFound);
 
           // Delete the notification
           try {
@@ -1231,9 +1258,9 @@ class _NotificationPageState extends State<NotificationPage> {
     } else {
       // Fallback: tìm "bài viết của bạn"
       if (message.contains('bài viết của bạn')) {
-        postTitle = 'Bài viết của bạn';
+        postTitle = context.l10n.postYourPost;
       } else {
-        postTitle = 'Bài viết';
+        postTitle = context.l10n.postGeneric;
       }
     }
 

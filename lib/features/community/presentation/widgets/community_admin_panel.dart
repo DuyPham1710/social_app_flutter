@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -26,12 +29,12 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F8FF),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFD4E5FF)),
-          boxShadow: const [
+          border: Border.all(color: AppColors.divider),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x1A1E40AF),
+              color: AppColors.textSecondary.withValues(alpha: 0.08),
               blurRadius: 18,
               offset: Offset(0, 8),
             ),
@@ -40,25 +43,25 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.shield_rounded, color: Color(0xFF1D4ED8)),
-                SizedBox(width: 8),
+                Icon(Icons.shield_rounded, color: AppColors.primary),
+                const SizedBox(width: 8),
                 Text(
-                  'Bảng quản trị',
+                  context.l10n.communityAdminPanelTitle,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E3A8A),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Duyệt thành viên mới và kiểm duyệt bài viết trước khi hiển thị.',
+            Text(
+              context.l10n.communityAdminPanelSubtitle,
               style: TextStyle(
-                color: Color(0xFF334155),
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -68,8 +71,10 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                 Expanded(
                   child: FilledButton.tonalIcon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFE4EEFF),
-                      foregroundColor: const Color(0xFF1E40AF),
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      foregroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -82,14 +87,14 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                       _showPendingRequests(context);
                     },
                     icon: const Icon(Icons.how_to_reg_rounded),
-                    label: const Text('Duyệt thành viên'),
+                    label: Text(context.l10n.communityReviewMembers),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF1D4ED8),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -107,7 +112,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                       _showPendingPosts(context);
                     },
                     icon: const Icon(Icons.fact_check_rounded),
-                    label: const Text('Duyệt bài viết'),
+                    label: Text(context.l10n.communityReviewPosts),
                   ),
                 ),
               ],
@@ -123,7 +128,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
@@ -134,14 +139,20 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   _processingRequestIds.clear();
                 });
               }
-              showSuccessSnackBar(context, state.message);
+              showSuccessSnackBar(
+                context,
+                localizedCommunityMessage(context.l10n, state.message),
+              );
             } else if (state is CommunityAdminError) {
               if (mounted) {
                 setState(() {
                   _processingRequestIds.clear();
                 });
               }
-              showErrorSnackBar(context, state.message);
+              showErrorSnackBar(
+                context,
+                localizedCommunityMessage(context.l10n, state.message),
+              );
             }
           },
           builder: (context, state) {
@@ -151,8 +162,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               if (state.requests.isEmpty) {
                 content = _buildEmptyState(
                   icon: Icons.group_add_rounded,
-                  message: 'Không có yêu cầu tham gia đang chờ duyệt',
-                  hint: 'Khi có thành viên mới gửi yêu cầu, bạn sẽ thấy ở đây.',
+                  message: context.l10n.communityNoPendingRequests,
+                  hint: context.l10n.communityPendingRequestsHint,
                 );
               } else {
                 content = ListView.separated(
@@ -171,7 +182,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               content = const Center(child: CircularProgressIndicator());
             } else if (state is CommunityAdminError) {
               content = _buildErrorState(
-                message: state.message,
+                message: localizedCommunityMessage(context.l10n, state.message),
                 onRetry: () {
                   context.read<CommunityAdminBloc>().add(
                     GetPendingRequestsRequested(widget.communityId),
@@ -187,8 +198,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                 children: [
                   _buildSheetHeader(
                     icon: Icons.how_to_reg_rounded,
-                    title: 'Duyệt thành viên',
-                    subtitle: 'Xác nhận yêu cầu tham gia cộng đồng',
+                    title: context.l10n.communityReviewMembers,
+                    subtitle: context.l10n.communityReviewMembersSubtitle,
                   ),
                   Expanded(child: content),
                 ],
@@ -205,7 +216,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
@@ -216,14 +227,20 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   _processingPostIds.clear();
                 });
               }
-              showSuccessSnackBar(context, state.message);
+              showSuccessSnackBar(
+                context,
+                localizedCommunityMessage(context.l10n, state.message),
+              );
             } else if (state is CommunityAdminError) {
               if (mounted) {
                 setState(() {
                   _processingPostIds.clear();
                 });
               }
-              showErrorSnackBar(context, state.message);
+              showErrorSnackBar(
+                context,
+                localizedCommunityMessage(context.l10n, state.message),
+              );
             }
           },
           builder: (context, state) {
@@ -233,8 +250,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               if (state.posts.isEmpty) {
                 content = _buildEmptyState(
                   icon: Icons.fact_check_outlined,
-                  message: 'Không có bài viết nào đang chờ duyệt',
-                  hint: 'Bài viết mới sẽ hiển thị tại đây để bạn kiểm duyệt.',
+                  message: context.l10n.communityNoPendingReviewPosts,
+                  hint: context.l10n.communityPendingPostsHint,
                 );
               } else {
                 content = ListView.separated(
@@ -253,7 +270,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               content = const Center(child: CircularProgressIndicator());
             } else if (state is CommunityAdminError) {
               content = _buildErrorState(
-                message: state.message,
+                message: localizedCommunityMessage(context.l10n, state.message),
                 onRetry: () {
                   context.read<CommunityAdminBloc>().add(
                     GetPendingPostsRequested(
@@ -273,8 +290,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                 children: [
                   _buildSheetHeader(
                     icon: Icons.fact_check_rounded,
-                    title: 'Duyệt bài viết',
-                    subtitle: 'Kiểm tra nội dung trước khi bài được công khai',
+                    title: context.l10n.communityReviewPosts,
+                    subtitle: context.l10n.communityReviewPostsSubtitle,
                   ),
                   Expanded(child: content),
                 ],
@@ -295,10 +312,8 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-        ),
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: Row(
         children: [
@@ -306,10 +321,10 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFE7F0FF),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF1D4ED8)),
+            child: Icon(icon, color: AppColors.primary),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -318,18 +333,18 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF111827),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -349,9 +364,9 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,12 +375,12 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: request.user.avatarUrl != null
                     ? NetworkImage(request.user.avatarUrl!)
                     : null,
                 child: request.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -374,21 +389,24 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      request.user.fullName ?? 'Người dùng',
+                      request.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _formatTimeAgo(request.createdAt),
-                      style: const TextStyle(
+                      localizedCommunityTimeAgo(
+                        context.l10n,
+                        request.createdAt,
+                      ),
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -397,18 +415,18 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               ),
               _buildStatusChip(
                 icon: Icons.pending_actions_rounded,
-                label: 'Đang chờ',
+                label: context.l10n.communityPendingApproval,
                 foreground: const Color(0xFF7C3AED),
                 background: const Color(0xFFF3E8FF),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Yêu cầu tham gia cộng đồng đang chờ bạn xét duyệt.',
+          Text(
+            context.l10n.communityJoinRequestPendingMessage,
             style: TextStyle(
               fontSize: 13,
-              color: Color(0xFF4B5563),
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -431,7 +449,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.close_rounded),
-                  label: const Text('Từ chối'),
+                  label: Text(context.l10n.friendReject),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFB91C1C),
                     side: const BorderSide(color: Color(0xFFFCA5A5)),
@@ -461,7 +479,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                           ),
                         )
                       : const Icon(Icons.check_rounded),
-                  label: const Text('Chấp nhận'),
+                  label: Text(context.l10n.friendAccept),
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF16A34A),
                     foregroundColor: Colors.white,
@@ -486,9 +504,9 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,12 +516,12 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: post.user.avatarUrl != null
                     ? NetworkImage(post.user.avatarUrl!)
                     : null,
                 child: post.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -512,21 +530,21 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post.user.fullName ?? 'Người dùng',
+                      post.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _formatTimeAgo(post.createdAt),
-                      style: const TextStyle(
+                      localizedCommunityTimeAgo(context.l10n, post.createdAt),
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -535,7 +553,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
               ),
               _buildStatusChip(
                 icon: Icons.article_outlined,
-                label: '${post.urls.length} media',
+                label: context.l10n.communityMediaCount(post.urls.length),
                 foreground: const Color(0xFF1D4ED8),
                 background: const Color(0xFFE8F1FF),
               ),
@@ -543,17 +561,15 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
           ),
           const SizedBox(height: 12),
           Text(
-            caption.isNotEmpty
-                ? caption
-                : 'Bài viết không có nội dung văn bản.',
+            caption.isNotEmpty ? caption : context.l10n.communityPostNoText,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
               height: 1.35,
               color: caption.isNotEmpty
-                  ? const Color(0xFF111827)
-                  : const Color(0xFF6B7280),
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -567,11 +583,11 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                   post.urls.first.url,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFFF3F4F6),
+                    color: AppColors.secondBackground,
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       Icons.broken_image_rounded,
-                      color: Color(0xFF9CA3AF),
+                      color: AppColors.textSecondary,
                       size: 26,
                     ),
                   ),
@@ -598,7 +614,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.close_rounded),
-                  label: const Text('Từ chối'),
+                  label: Text(context.l10n.friendReject),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFB91C1C),
                     side: const BorderSide(color: Color(0xFFFCA5A5)),
@@ -628,7 +644,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
                           ),
                         )
                       : const Icon(Icons.check_rounded),
-                  label: const Text('Duyệt bài'),
+                  label: Text(context.l10n.notificationApprovePostAction),
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF16A34A),
                     foregroundColor: Colors.white,
@@ -686,24 +702,28 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 46, color: const Color(0xFF94A3B8)),
+            Icon(
+              icon,
+              size: 46,
+              color: AppColors.textSecondary.withValues(alpha: 0.75),
+            ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF0F172A),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               hint,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFF64748B),
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -737,7 +757,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Tải lại'),
+              label: Text(context.l10n.commonRefresh),
             ),
           ],
         ),
@@ -777,33 +797,5 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
         action: action,
       ),
     );
-  }
-
-  String _formatTimeAgo(DateTime? value) {
-    if (value == null) {
-      return 'Không rõ thời gian';
-    }
-
-    final now = DateTime.now();
-    final date = value.toLocal();
-    final diff = now.difference(date);
-
-    if (diff.inSeconds < 60) {
-      return 'Vừa xong';
-    }
-    if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} phút trước';
-    }
-    if (diff.inHours < 24) {
-      return '${diff.inHours} giờ trước';
-    }
-    if (diff.inDays < 7) {
-      return '${diff.inDays} ngày trước';
-    }
-
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year;
-    return '$day/$month/$year';
   }
 }

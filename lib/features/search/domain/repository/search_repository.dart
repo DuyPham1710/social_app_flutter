@@ -10,19 +10,13 @@ abstract class SearchRepository {
     bool saveToHistory = true,
   });
 
-  Future<DataState<void>> saveViewedUser({
-    required String viewedUserId,
-  });
+  Future<DataState<void>> saveViewedUser({required String viewedUserId});
 
   Future<DataState<List<SearchHistoryEntity>>> getSearchHistory({
     int limit = 10,
   });
 
-  Future<DataState<void>> deleteSearchHistory({
-    required String historyId,
-  });
+  Future<DataState<void>> deleteSearchHistory({required String historyId});
 
   Future<DataState<void>> clearAllSearchHistory();
 }
-
-

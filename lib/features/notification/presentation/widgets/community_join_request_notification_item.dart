@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityJoinRequestNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -16,6 +17,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
   final VoidCallback? onCommunityTap;
+  final String actionText;
 
   const CommunityJoinRequestNotificationItem({
     super.key,
@@ -30,6 +32,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
     this.onAccept,
     this.onReject,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -38,8 +41,8 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-              ? AppColors.primary.withOpacity(0.12)
-              : const Color(0xFFEAF3FF)),
+                ? AppColors.primary.withOpacity(0.12)
+                : const Color(0xFFEAF3FF)),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       margin: const EdgeInsets.only(bottom: 4),
       child: Row(
@@ -55,7 +58,10 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                       ? CircleAvatar(
                           radius: 29,
                           backgroundColor: AppColors.secondBackground,
-                          child: Icon(Icons.person, color: AppColors.iconPrimary),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.iconPrimary,
+                          ),
                         )
                       : Image.network(
                           avatarUrl,
@@ -66,7 +72,10 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                             return CircleAvatar(
                               radius: 29,
                               backgroundColor: AppColors.secondBackground,
-                              child: Icon(Icons.person, color: AppColors.iconPrimary),
+                              child: Icon(
+                                Icons.person,
+                                color: AppColors.iconPrimary,
+                              ),
                             );
                           },
                         ),
@@ -109,7 +118,8 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
                       TextSpan(
-                        text: ' ${message ?? "đã gửi yêu cầu tham gia"} ',
+                        text:
+                            ' ${actionText} ',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
@@ -133,7 +143,7 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 Text(
-                  time == "0 phút" ? "Vừa xong" : time,
+                  time == "0 phút" ? context.l10n.postJustNow : time,
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
 
@@ -152,9 +162,12 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                        child: const Text(
-                          'Phê duyệt',
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                        child: Text(
+                          context.l10n.notificationApprove,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -172,8 +185,11 @@ class CommunityJoinRequestNotificationItem extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Từ chối',
-                          style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                          context.l10n.friendReject,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     ),

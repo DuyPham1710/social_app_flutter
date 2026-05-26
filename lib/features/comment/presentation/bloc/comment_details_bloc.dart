@@ -152,7 +152,6 @@ class CommentDetailsBloc
   ) async {
     final currentState = state;
     if (currentState is CommentDetailsLoaded) {
-
       final currentEntities = currentState.commentsData?.comments;
       if (currentEntities == null) return;
 
@@ -160,7 +159,6 @@ class CommentDetailsBloc
       if (index == -1) return;
 
       final commentEntity = currentEntities[index];
-
 
       CommentModel commentModel;
       if (commentEntity is CommentModel) {
@@ -225,7 +223,6 @@ class CommentDetailsBloc
                   >(), // Ensure type safety if list expects Models
             );
       } else {
-
         updatedData = (currentState.commentsData as CommentsLoadedModel)
             .copyWith(comments: updatedList.cast<CommentModel>());
       }

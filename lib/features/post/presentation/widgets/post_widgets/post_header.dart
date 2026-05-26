@@ -12,6 +12,8 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostHeader extends StatelessWidget {
   final UserEntity user;
@@ -38,14 +40,6 @@ class PostHeader extends StatelessWidget {
     this.onTagVisibilityTap,
     this.onRemoveTagTap,
   });
-
-  String _timeAgo(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    return '${diff.inDays} ngày trước';
-  }
 
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
@@ -80,11 +74,13 @@ class PostHeader extends StatelessWidget {
   }
 
   Widget _buildTitleText(BuildContext context) {
-    final ownerName = user.fullName ?? "Người dùng";
+    final l10n = context.l10n;
+    final ownerName = user.fullName ?? l10n.commonUser;
     final taggedNames =
-        taggedUsers?.map((u) => u.fullName ?? "Người dùng").toList() ?? [];
+        taggedUsers?.map((u) => u.fullName ?? l10n.commonUser).toList() ?? [];
 
     return TagHelper.buildTitleWithTags(
+      l10n: l10n,
       ownerName: ownerName,
       taggedNames: taggedNames,
     );
@@ -118,9 +114,7 @@ class PostHeader extends StatelessWidget {
                   child: _buildTitleText(context),
                 ),
                 Text(
-                  createdAt != null
-                      ? _timeAgo(createdAt!)
-                      : "Không rõ thời gian",
+                  localizedPostTime(context.l10n, createdAt),
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: AppColors.textSecondary,
@@ -192,7 +186,7 @@ class PostHeader extends StatelessWidget {
             Icon(Icons.share, size: 18, color: AppColors.iconPrimary),
             SizedBox(width: 8.w),
             Text(
-              'Chia sẻ',
+              context.l10n.postShare,
               style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
             ),
           ],
@@ -212,7 +206,7 @@ class PostHeader extends StatelessWidget {
             ),
             SizedBox(width: 8.w),
             Text(
-              isSaved == true ? 'Bỏ lưu bài viết' : 'Lưu bài viết',
+              isSaved == true ? context.l10n.postUnsave : context.l10n.postSave,
               style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
             ),
           ],
@@ -226,7 +220,7 @@ class PostHeader extends StatelessWidget {
             Icon(Icons.flag_outlined, size: 18, color: Colors.red),
             SizedBox(width: 8.w),
             Text(
-              'Báo cáo bài viết',
+              context.l10n.postReport,
               style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
             ),
           ],
@@ -234,11 +228,14 @@ class PostHeader extends StatelessWidget {
       ),
 
       // Thêm các option cho người được tag
-      ..._buildTagOptions(currentUserId),
+      ..._buildTagOptions(context, currentUserId),
     ];
   }
 
-  List<PopupMenuEntry<String>> _buildTagOptions(String? currentUserId) {
+  List<PopupMenuEntry<String>> _buildTagOptions(
+    BuildContext context,
+    String? currentUserId,
+  ) {
     if (currentUserId == null) return [];
 
     // Kiểm tra xem current user có trong danh sách taggedUsers không
@@ -262,7 +259,9 @@ class PostHeader extends StatelessWidget {
             ),
             SizedBox(width: 8.w),
             Text(
-              isVisible ? 'Ẩn khỏi trang cá nhân' : 'Hiển thị ở trang cá nhân',
+              isVisible
+                  ? context.l10n.postHideFromProfileTitle
+                  : context.l10n.postShowOnProfileTitle,
               style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
             ),
           ],
@@ -275,7 +274,7 @@ class PostHeader extends StatelessWidget {
             Icon(Icons.person_remove_outlined, size: 18, color: Colors.red),
             SizedBox(width: 8.w),
             Text(
-              'Gỡ gắn thẻ',
+              context.l10n.postRemoveTagTitle,
               style: TextStyle(color: Colors.red, fontSize: 14.sp),
             ),
           ],

@@ -11,7 +11,7 @@ class GetSentFriendRequestsUseCase {
 
   Future<DataState<List<SentFriendRequestEntity>>> call() async {
     final result = await friendRepository.getSentRequests();
-    
+
     if (result is DataStateSuccess) {
       // Convert FriendRequestEntity to SentFriendRequestEntity
       final sentRequests = result.data!.map((request) {
@@ -27,7 +27,7 @@ class GetSentFriendRequestsUseCase {
           mutualFriendAvatars: request.mutualFriendAvatars,
         );
       }).toList();
-      
+
       // Load mutual friend avatars cho từng request
       final requestsWithAvatars = await _loadMutualFriendAvatars(sentRequests);
       return DataStateSuccess(requestsWithAvatars);
@@ -36,50 +36,61 @@ class GetSentFriendRequestsUseCase {
     if (result.error != null) {
       return DataStateError(result.error!);
     } else {
-      return DataStateError(DioException(
-        requestOptions: RequestOptions(path: 'unknown'),
-        message: 'Unknown error in getSentRequests',
-      ));
+      return DataStateError(
+        DioException(
+          requestOptions: RequestOptions(path: 'unknown'),
+          message: 'Unknown error in getSentRequests',
+        ),
+      );
     }
-
   }
-  
+
   String? _getReceiverName(dynamic receiverId) {
     if (receiverId is Map<String, dynamic>) {
       return receiverId['fullName'] as String?;
     }
     return null;
   }
-  
+
   String? _getReceiverAvatarUrl(dynamic receiverId) {
     if (receiverId is Map<String, dynamic>) {
       return receiverId['avatarUrl'] as String?;
     }
     return null;
   }
-  
-  Future<List<SentFriendRequestEntity>> _loadMutualFriendAvatars(List<SentFriendRequestEntity> requests) async {
+
+  Future<List<SentFriendRequestEntity>> _loadMutualFriendAvatars(
+    List<SentFriendRequestEntity> requests,
+  ) async {
     final updatedRequests = <SentFriendRequestEntity>[];
-    
+
     for (final request in requests) {
       String? targetUserId;
       if (request.receiverId is String) {
         targetUserId = request.receiverId as String;
       } else if (request.receiverId is Map<String, dynamic>) {
-        targetUserId = (request.receiverId as Map<String, dynamic>)['_id'] as String?;
+        targetUserId =
+            (request.receiverId as Map<String, dynamic>)['_id'] as String?;
       }
-      
+
       if (targetUserId != null) {
         // Load mutual friends (tối đa 3)
-        final mutualResult = await friendRepository.getMutualFriends(targetUserId, limit: 3);
-        
+        final mutualResult = await friendRepository.getMutualFriends(
+          targetUserId,
+          limit: 3,
+        );
+
         if (mutualResult is DataStateSuccess && mutualResult.data!.isNotEmpty) {
           // Lấy avatarUrl từ mutual friends
           final avatars = mutualResult.data!
-              .map((friend) => friend.avatarUrl ?? 'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg')
+              .map(
+                (friend) =>
+                    friend.avatarUrl ??
+                    'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+              )
               .take(3)
               .toList();
-          
+
           final mutualFriendsCount = mutualResult.data!.length;
           // Tạo request mới với avatars và số lượng bạn chung
           if (request is SentFriendRequestModel) {
@@ -106,7 +117,3 @@ class GetSentFriendRequestsUseCase {
     return updatedRequests;
   }
 }
-
-
-
-

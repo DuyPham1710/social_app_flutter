@@ -44,11 +44,7 @@ class ProfileInitial extends ProfileState {
 }
 
 class ProfileLoading extends ProfileState {
-  const ProfileLoading({
-    super.posts,
-    super.commentCounts,
-    super.user,
-  });
+  const ProfileLoading({super.posts, super.commentCounts, super.user});
 }
 
 class ProfileLoaded extends ProfileState {

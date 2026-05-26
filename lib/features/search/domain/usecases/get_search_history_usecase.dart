@@ -7,11 +7,7 @@ class GetSearchHistoryUseCase {
 
   GetSearchHistoryUseCase(this.repository);
 
-  Future<DataState<List<SearchHistoryEntity>>> call({
-    int limit = 10,
-  }) {
+  Future<DataState<List<SearchHistoryEntity>>> call({int limit = 10}) {
     return repository.getSearchHistory(limit: limit);
   }
 }
-
-

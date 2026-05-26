@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -11,6 +12,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
   final bool isRead;
   final VoidCallback? onCommunityTap;
   final String? message;
+  final String actionText;
 
   const CommunityJoinApprovedNotificationItem({
     super.key,
@@ -20,6 +22,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
     required this.time,
     required this.isRead,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -28,8 +31,8 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-              ? AppColors.primary.withOpacity(0.12)
-              : const Color(0xFFEAF3FF)),
+                ? AppColors.primary.withOpacity(0.12)
+                : const Color(0xFFEAF3FF)),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       // ignore: sort_child_properties_last
       child: Row(
@@ -54,7 +57,10 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                           return CircleAvatar(
                             radius: 29,
                             backgroundColor: AppColors.secondBackground,
-                            child: Icon(Icons.group, color: AppColors.iconPrimary),
+                            child: Icon(
+                              Icons.group,
+                              color: AppColors.iconPrimary,
+                            ),
                           );
                         },
                       ),
@@ -85,9 +91,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final msg =
-                        message ??
-                        'Yêu cầu tham gia cộng đồng của bạn đã được phê duyệt';
+                    final msg = actionText;
                     return RichText(
                       text: TextSpan(
                         children: [
@@ -118,7 +122,7 @@ class CommunityJoinApprovedNotificationItem extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 Text(
-                  time == "0 phút" ? "Vừa xong" : time,
+                  time == "0 phút" ? context.l10n.postJustNow : time,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,

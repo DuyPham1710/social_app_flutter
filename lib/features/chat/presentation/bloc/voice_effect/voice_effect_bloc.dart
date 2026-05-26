@@ -8,7 +8,8 @@ import 'voice_effect_state.dart';
 class VoiceEffectBloc extends Bloc<VoiceEffectEvent, VoiceEffectState> {
   final ApplyVoiceEffectUseCase _applyVoiceEffectUseCase;
 
-  VoiceEffectBloc(this._applyVoiceEffectUseCase) : super(const VoiceEffectInitial()) {
+  VoiceEffectBloc(this._applyVoiceEffectUseCase)
+    : super(const VoiceEffectInitial()) {
     on<ApplyVoiceEffectEvent>(_onApplyVoiceEffect);
   }
 
@@ -29,7 +30,12 @@ class VoiceEffectBloc extends Bloc<VoiceEffectEvent, VoiceEffectState> {
       if (dataState is DataStateSuccess && dataState.data != null) {
         emit(VoiceEffectSuccess(dataState.data!));
       } else if (dataState is DataStateError) {
-        emit(VoiceEffectError(dataState.error?.message?.replaceAll('Exception: ', '') ?? 'Không thể chuyển giọng. Vui lòng thử lại.'));
+        emit(
+          VoiceEffectError(
+            dataState.error?.message?.replaceAll('Exception: ', '') ??
+                'Không thể chuyển giọng. Vui lòng thử lại.',
+          ),
+        );
       }
     } catch (e) {
       emit(VoiceEffectError(e.toString().replaceAll('Exception: ', '')));

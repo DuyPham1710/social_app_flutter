@@ -57,7 +57,12 @@ class AddCommentEvent extends CommentEvent {
   final String? parentId;
   final List<String>? taggedUserIds;
 
-  AddCommentEvent({required this.postId, required this.content, this.parentId, this.taggedUserIds});
+  AddCommentEvent({
+    required this.postId,
+    required this.content,
+    this.parentId,
+    this.taggedUserIds,
+  });
 }
 
 class UpdateCommentEvent extends CommentEvent {

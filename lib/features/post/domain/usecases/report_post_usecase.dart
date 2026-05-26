@@ -2,8 +2,7 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/usecase/usecase.dart';
 import 'package:social_app_fe/features/post/domain/repository/post_repository.dart';
 
-class ReportPostUseCase
-    implements UseCase<DataState<void>, ReportPostParams> {
+class ReportPostUseCase implements UseCase<DataState<void>, ReportPostParams> {
   final PostRepository _repository;
 
   ReportPostUseCase(this._repository);

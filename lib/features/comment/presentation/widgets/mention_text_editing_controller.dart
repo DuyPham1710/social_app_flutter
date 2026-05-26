@@ -30,7 +30,7 @@ class MentionTextEditingController extends TextEditingController {
     int lastMatchEnd = 0;
 
     for (final Match match in matches) {
-      // 1. Thêm văn bản thông thường NẰM TRƯỚC mention
+      //Thêm văn bản thông thường NẰM TRƯỚC mention
       if (match.start > lastMatchEnd) {
         children.add(
           TextSpan(
@@ -40,7 +40,7 @@ class MentionTextEditingController extends TextEditingController {
         );
       }
 
-      // 2. Thêm văn bản mention VỚI STYLE ĐẶC BIỆT
+      // Thêm văn bản mention VỚI STYLE ĐẶC BIỆT
       children.add(
         TextSpan(
           text: text.substring(match.start, match.end),
@@ -53,7 +53,7 @@ class MentionTextEditingController extends TextEditingController {
       lastMatchEnd = match.end;
     }
 
-    // 3. Thêm bất kỳ văn bản thông thường nào CÒN LẠI sau mention cuối cùng
+    // Thêm bất kỳ văn bản thông thường nào CÒN LẠI sau mention cuối cùng
     if (lastMatchEnd < text.length) {
       children.add(TextSpan(text: text.substring(lastMatchEnd), style: style));
     }

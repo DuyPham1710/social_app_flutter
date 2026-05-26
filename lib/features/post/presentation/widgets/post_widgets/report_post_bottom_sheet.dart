@@ -5,6 +5,8 @@ import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/post/domain/usecases/report_post_usecase.dart';
+import 'package:social_app_fe/l10n/generated/app_localizations.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
@@ -25,16 +27,16 @@ class ReportPostBottomSheet extends StatefulWidget {
     String? ownerUserId,
   }) async {
     final userData = await TokenStorage.getUserData();
+    if (!context.mounted) return;
+
     final currentUserId = userData?['id'];
+    final l10n = context.l10n;
 
     // Không cho phép báo cáo bài viết của chính mình
     if (currentUserId != null &&
         ownerUserId != null &&
         ownerUserId == currentUserId) {
-      showErrorSnackBar(
-        context,
-        'Bạn không thể báo cáo bài viết của chính mình.',
-      );
+      showErrorSnackBar(context, l10n.postReportSelfNotAllowed);
       return;
     }
 
@@ -69,16 +71,16 @@ class ReportPostBottomSheet extends StatefulWidget {
 class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
   final TextEditingController _reasonController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final List<String> _quickReasons = const [
-    'Nội dung phản cảm',
-    'Bạo lực / thù hằn',
-    'Lừa đảo / spam',
-    'Thông tin sai lệch',
-    'Quấy rối / xúc phạm',
-  ];
-
   String? _selectedReason;
   bool _isSubmitting = false;
+
+  List<String> _quickReasons(AppLocalizations l10n) => [
+    l10n.postReportReasonOffensive,
+    l10n.postReportReasonViolence,
+    l10n.postReportReasonSpam,
+    l10n.postReportReasonMisinformation,
+    l10n.postReportReasonHarassment,
+  ];
 
   @override
   void dispose() {
@@ -88,12 +90,13 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
   }
 
   Future<void> _handleSubmit() async {
+    final l10n = context.l10n;
     final reasonText = _reasonController.text.trim();
     final descriptionText = _descriptionController.text.trim();
     final finalReason = reasonText.isNotEmpty ? reasonText : _selectedReason;
 
     if (finalReason == null || finalReason.isEmpty) {
-      showInfoSnackBar(context, 'Vui lòng chọn hoặc nhập lý do báo cáo');
+      showInfoSnackBar(context, l10n.postReportReasonRequired);
       return;
     }
 
@@ -117,17 +120,20 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
     if (result is DataStateSuccess) {
       if (mounted) {
         Navigator.of(context).pop();
-        showSuccessSnackBar(context, 'Đã gửi báo cáo. Cảm ơn bạn đã đóng góp!');
+        showSuccessSnackBar(context, l10n.postReportSuccess);
       }
     } else {
       if (mounted) {
-        showErrorSnackBar(context, 'Gửi báo cáo thất bại. Vui lòng thử lại.');
+        showErrorSnackBar(context, l10n.postReportFailed);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final quickReasons = _quickReasons(l10n);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +155,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Báo cáo bài viết',
+                    l10n.postReportTitle,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
@@ -158,7 +164,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Hãy cho chúng tôi biết vấn đề của bài viết này để cải thiện trải nghiệm cộng đồng.',
+                    l10n.postReportIntro,
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: AppColors.textSecondary,
@@ -171,7 +177,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         ),
         SizedBox(height: 16.h),
         Text(
-          'Lý do nhanh',
+          l10n.postReportQuickReason,
           style: TextStyle(
             fontSize: 13.sp,
             fontWeight: FontWeight.w600,
@@ -184,7 +190,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         Wrap(
           spacing: 8.w,
           runSpacing: 8.h,
-          children: _quickReasons.map((reason) {
+          children: quickReasons.map((reason) {
             final isSelected = _selectedReason == reason;
             return ChoiceChip(
               label: Text(
@@ -217,7 +223,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         ),
         SizedBox(height: 16.h),
         Text(
-          'Lý do chi tiết',
+          l10n.postReportDetailReason,
           style: TextStyle(
             fontSize: 13.sp,
             fontWeight: FontWeight.w600,
@@ -230,7 +236,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
           style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
           cursorColor: AppColors.primary,
           decoration: InputDecoration(
-            hintText: 'Nhập lý do báo cáo...',
+            hintText: l10n.postReportReasonHint,
             hintStyle: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14.sp,
@@ -257,7 +263,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         ),
         SizedBox(height: 12.h),
         Text(
-          'Mô tả thêm (không bắt buộc)',
+          l10n.postReportDescriptionLabel,
           style: TextStyle(
             fontSize: 13.sp,
             fontWeight: FontWeight.w600,
@@ -271,8 +277,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
           style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
           cursorColor: AppColors.primary,
           decoration: InputDecoration(
-            hintText:
-                'Bạn có thể cung cấp thêm chi tiết để chúng tôi hiểu rõ hơn...',
+            hintText: l10n.postReportDescriptionHint,
             hintStyle: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14.sp,
@@ -318,7 +323,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                         Navigator.of(context).pop();
                       },
                 child: Text(
-                  'Hủy',
+                  l10n.commonCancel,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14.sp,
@@ -350,7 +355,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                         ),
                       )
                     : Text(
-                        'Gửi báo cáo',
+                        l10n.postSendReport,
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: AppColors.background,

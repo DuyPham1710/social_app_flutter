@@ -239,14 +239,11 @@ class CommentRemoteDataSource {
   /// Setup listeners cho comment history events
   void _setupCommentHistoryListeners() {
     _socketClient.on('commentHistoryLoaded').listen((data) {
-      developer.log(
-        'Comment history loaded event',
-        name: 'CommentDataSource',
-      );
+      developer.log('Comment history loaded event', name: 'CommentDataSource');
       try {
         final commentHistoryLoadedModel = CommentLogsLoadedModel.fromJson(data);
         _commentHistoryLoadedController.add(commentHistoryLoadedModel);
-        
+
         developer.log(
           'Loaded ${commentHistoryLoadedModel.count} history entries for comment ${commentHistoryLoadedModel.commentId}',
           name: 'CommentDataSource',

@@ -31,7 +31,12 @@ class MessagesLoaded extends MessageState {
   });
 
   @override
-  List<Object?> get props => [messages, typingUserId, isTyping, isUploadingFiles];
+  List<Object?> get props => [
+    messages,
+    typingUserId,
+    isTyping,
+    isUploadingFiles,
+  ];
 }
 
 class MessagesError extends MessageState {

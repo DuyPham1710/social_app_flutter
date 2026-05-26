@@ -9,6 +9,7 @@ import 'package:social_app_fe/features/comment/presentation/widgets/reaction_pic
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostAction extends StatefulWidget {
   final String postId;
@@ -219,8 +220,8 @@ class _PostActionState extends State<PostAction> {
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: Text(
                 commentCount > 0
-                    ? "Xem tất cả $commentCount bình luận"
-                    : "Chưa có bình luận nào",
+                    ? context.l10n.postViewAllComments(commentCount)
+                    : context.l10n.postNoComments,
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: AppColors.textSecondary,

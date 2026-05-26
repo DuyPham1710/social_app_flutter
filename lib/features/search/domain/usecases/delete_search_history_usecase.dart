@@ -6,10 +6,7 @@ class DeleteSearchHistoryUseCase {
 
   DeleteSearchHistoryUseCase(this.repository);
 
-  Future<DataState<void>> call({
-    required String historyId,
-  }) {
+  Future<DataState<void>> call({required String historyId}) {
     return repository.deleteSearchHistory(historyId: historyId);
   }
 }
-

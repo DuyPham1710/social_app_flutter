@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/search/presentation/widgets/search_bar.da
     as search_widget;
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_result_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -106,7 +107,7 @@ class _SearchPageState extends State<SearchPage> {
                                 );
                               }
                             },
-                            hintText: 'Tìm kiếm',
+                            hintText: context.l10n.searchHint,
                           ),
                         ),
                       ],
@@ -127,7 +128,7 @@ class _SearchPageState extends State<SearchPage> {
                           }
                           return _buildEmptyState(
                             icon: CupertinoIcons.search,
-                            message: 'Nhập từ khóa để tìm kiếm',
+                            message: context.l10n.searchEnterKeyword,
                           );
                         } else if (state is SearchLoading) {
                           return Center(
@@ -141,7 +142,7 @@ class _SearchPageState extends State<SearchPage> {
                           if (state.results.userResponseDtos.isEmpty) {
                             return _buildEmptyState(
                               icon: CupertinoIcons.person_circle,
-                              message: 'Không tìm thấy kết quả nào',
+                              message: context.l10n.searchNoResults,
                             );
                           }
                           return _buildResultsList(state, blocContext);
@@ -193,7 +194,7 @@ class _SearchPageState extends State<SearchPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Mới đây',
+                context.l10n.searchRecent,
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
@@ -213,7 +214,7 @@ class _SearchPageState extends State<SearchPage> {
                   );
                 },
                 child: Text(
-                  'Xem tất cả',
+                  context.l10n.commonViewAll,
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.primary,
@@ -292,7 +293,7 @@ class _SearchPageState extends State<SearchPage> {
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Thử lại'),
+              child: Text(context.l10n.commonRetry),
             ),
           ],
         ],

@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPublicJoinNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -14,6 +15,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
   final String? message;
   final VoidCallback? onUserTap;
   final VoidCallback? onCommunityTap;
+  final String actionText;
 
   const CommunityPublicJoinNotificationItem({
     super.key,
@@ -26,6 +28,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
     required this.isRead,
     this.onUserTap,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -34,8 +37,8 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-              ? AppColors.primary.withOpacity(0.12)
-              : const Color(0xFFEAF3FF)),
+                ? AppColors.primary.withOpacity(0.12)
+                : const Color(0xFFEAF3FF)),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       margin: const EdgeInsets.only(bottom: 4),
       child: Row(
@@ -51,7 +54,10 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                       ? CircleAvatar(
                           radius: 29,
                           backgroundColor: AppColors.secondBackground,
-                          child: Icon(Icons.person, color: AppColors.iconPrimary),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.iconPrimary,
+                          ),
                         )
                       : Image.network(
                           avatarUrl,
@@ -62,7 +68,10 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                             return CircleAvatar(
                               radius: 29,
                               backgroundColor: AppColors.secondBackground,
-                              child: Icon(Icons.person, color: AppColors.iconPrimary),
+                              child: Icon(
+                                Icons.person,
+                                color: AppColors.iconPrimary,
+                              ),
                             );
                           },
                         ),
@@ -105,7 +114,8 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
                       TextSpan(
-                        text: ' ${message ?? "đã tham gia"} ',
+                        text:
+                          ' ${actionText} ',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
@@ -129,7 +139,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 Text(
-                  time == "0 phút" ? "Vừa xong" : time,
+                  time == "0 phút" ? context.l10n.postJustNow : time,
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],

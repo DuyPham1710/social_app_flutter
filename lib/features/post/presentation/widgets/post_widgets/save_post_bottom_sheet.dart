@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/features/save/presentation/pages/saved_items_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -98,6 +99,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
   }
 
   Future<void> _saveToCollection(String collectionName) async {
+    final l10n = context.l10n;
     setState(() {
       _isSaving = true;
     });
@@ -122,24 +124,25 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
           widget.onSaved(result.data!.id);
           showSuccessSnackBar(
             context,
-            "Đã lưu bài viết vào bộ sưu tập '$collectionName'",
+            l10n.postSavedToCollection(collectionName),
           );
         } else if (result is DataStateError) {
           showErrorSnackBar(
             context,
-            'Lỗi: ${result.error?.message ?? "Không thể lưu bài viết"}',
+            l10n.postErrorPrefix(result.error?.message ?? l10n.postSaveFailed),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        showErrorSnackBar(context, 'Lỗi: $e');
+        showErrorSnackBar(context, l10n.postErrorPrefix(e.toString()));
       }
     }
   }
 
   Future<void> _showCreateCollectionDialog() async {
+    final l10n = context.l10n;
     final TextEditingController controller = TextEditingController();
 
     final collectionName = await showDialog<String>(
@@ -149,7 +152,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
           backgroundColor: AppColors.background,
           surfaceTintColor: Colors.transparent,
           title: Text(
-            'Tạo bộ sưu tập mới',
+            l10n.postCreateCollectionTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -160,7 +163,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
             style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
             cursorColor: AppColors.primary,
             decoration: InputDecoration(
-              hintText: 'Tên bộ sưu tập',
+              hintText: l10n.postCollectionNameHint,
               hintStyle: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14.sp,
@@ -190,7 +193,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(
-                'Hủy',
+                l10n.commonCancel,
                 style: TextStyle(color: AppColors.textPrimary),
               ),
             ),
@@ -200,7 +203,10 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                   Navigator.pop(context, controller.text.trim());
                 }
               },
-              child: Text('Tạo', style: TextStyle(color: AppColors.primary)),
+              child: Text(
+                l10n.commonCreate,
+                style: TextStyle(color: AppColors.primary),
+              ),
             ),
           ],
         );
@@ -272,7 +278,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Đã lưu',
+                            context.l10n.postSaved,
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
@@ -289,7 +295,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                               ),
                               SizedBox(width: 4.w),
                               Text(
-                                'Chỉ mình tôi',
+                                context.l10n.postOnlyMe,
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   color: AppColors.textSecondary,
@@ -318,7 +324,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Thêm vào bộ sưu tập',
+                    context.l10n.postAddToCollection,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -328,7 +334,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                   GestureDetector(
                     onTap: _showCreateCollectionDialog,
                     child: Text(
-                      'Tạo',
+                      context.l10n.commonCreate,
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: AppColors.primary,
@@ -431,7 +437,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        'Chỉ mình tôi',
+                        context.l10n.postOnlyMe,
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: AppColors.textSecondary,

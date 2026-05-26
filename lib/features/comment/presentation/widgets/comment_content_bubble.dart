@@ -3,6 +3,7 @@ import 'package:flutter_parsed_text/flutter_parsed_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommentContentBubble extends StatelessWidget {
   final UserEntity user;
@@ -36,7 +37,7 @@ class CommentContentBubble extends StatelessWidget {
           GestureDetector(
             onTap: onTapProfile,
             child: Text(
-              user.fullName ?? 'Unknown',
+              user.fullName ?? context.l10n.commonUnknown,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13.sp,

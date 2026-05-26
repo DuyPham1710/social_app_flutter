@@ -5,6 +5,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/post/domain/usecases/update_tag_visibility_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/remove_tag_usecase.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -15,32 +16,35 @@ class TagActionHelper {
     required bool isVisible,
     required Function() onSuccess,
   }) async {
+    final l10n = context.l10n;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
         title: Text(
-          isVisible ? 'Hiển thị trên trang cá nhân' : 'Ẩn khỏi trang cá nhân',
+          isVisible
+              ? l10n.postShowOnProfileTitle
+              : l10n.postHideFromProfileTitle,
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         content: Text(
           isVisible
-              ? 'Bài viết này sẽ xuất hiện trên trang cá nhân của bạn và mọi người có thể nhìn thấy nó ở đó.'
-              : 'Bài viết này có thể vẫn xuất hiện ở những nơi khác.',
+              ? l10n.postShowOnProfileMessage
+              : l10n.postHideFromProfileMessage,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Hủy',
+              l10n.commonCancel,
               style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              isVisible ? 'Hiển thị' : 'Ẩn',
+              isVisible ? l10n.postShowAction : l10n.postHideAction,
               style: TextStyle(
                 color: isVisible ? AppColors.primary : Colors.red,
                 fontWeight: FontWeight.bold,
@@ -62,14 +66,12 @@ class TagActionHelper {
       if (context.mounted) {
         showSuccessSnackBar(
           context,
-          isVisible
-              ? 'Đã hiển thị trên trang cá nhân'
-              : 'Đã ẩn khỏi trang cá nhân',
+          isVisible ? l10n.postShownOnProfile : l10n.postHiddenFromProfile,
         );
       }
     } else {
       if (context.mounted) {
-        showErrorSnackBar(context, 'Có lỗi xảy ra');
+        showErrorSnackBar(context, l10n.postGenericError);
       }
     }
   }
@@ -79,23 +81,27 @@ class TagActionHelper {
     required String postId,
     required Function() onSuccess,
   }) async {
+    final l10n = context.l10n;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: const Text('Gỡ gắn thẻ'),
-        content: const Text('Bạn có chắc muốn gỡ gắn thẻ khỏi bài viết này?'),
+        title: Text(l10n.postRemoveTagTitle),
+        content: Text(l10n.postRemoveTagConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Hủy',
+              l10n.commonCancel,
               style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Gỡ', style: TextStyle(color: Colors.red)),
+            child: Text(
+              l10n.postRemoveTagAction,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -108,11 +114,11 @@ class TagActionHelper {
     if (result is DataStateSuccess) {
       onSuccess();
       if (context.mounted) {
-        showSuccessSnackBar(context, 'Đã gỡ gắn thẻ');
+        showSuccessSnackBar(context, l10n.postRemovedTag);
       }
     } else {
       if (context.mounted) {
-        showErrorSnackBar(context, 'Có lỗi xảy ra');
+        showErrorSnackBar(context, l10n.postGenericError);
       }
     }
   }

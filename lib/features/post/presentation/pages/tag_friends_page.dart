@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class TagFriendsPage extends StatefulWidget {
   final List<String> initialSelectedFriends;
@@ -53,7 +54,8 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
               .map(
                 (f) => {
                   'id': f.userId,
-                  'name': f.fullName ?? f.username ?? 'Unknown',
+                  'name':
+                      f.fullName ?? f.username ?? context.l10n.commonUnknown,
                   'avatar':
                       f.avatarUrl ??
                       'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
@@ -86,7 +88,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
-              'Gắn thẻ người khác',
+              context.l10n.postTagPeople,
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 16.sp,
@@ -100,7 +102,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                   Navigator.pop(context, selectedFriends);
                 },
                 child: Text(
-                  'Xong',
+                  context.l10n.commonDone,
                   style: TextStyle(
                     color: AppColors.primary,
                     fontSize: 16.sp,
@@ -126,7 +128,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
     } else if (state is FriendError) {
       return Center(
         child: Text(
-          'Lỗi tải bạn bè: ${state.message}',
+          context.l10n.friendLoadError(state.message),
           style: TextStyle(color: AppColors.textPrimary, fontSize: 16.sp),
         ),
       );
@@ -159,7 +161,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                         fontSize: 16.sp,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Tìm kiếm bạn bè...',
+                        hintText: context.l10n.friendSearchHint,
                         hintStyle: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 16.sp,

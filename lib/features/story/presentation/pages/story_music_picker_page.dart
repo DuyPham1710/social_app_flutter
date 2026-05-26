@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/story/data/models/deezer_music_model.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/music_tile_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryMusicPickerPage extends StatefulWidget {
   const StoryMusicPickerPage({super.key});
@@ -125,7 +126,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _error = 'Không tải được danh sách nhạc. Vui lòng thử lại.';
+          _error = context.l10n.storyMusicLoadFailed;
           _isLoading = false;
         });
       }
@@ -216,7 +217,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     } catch (_) {
       if (mounted && _currentSearchQuery == query) {
         setState(() {
-          _searchError = 'Không tìm thấy kết quả. Vui lòng thử lại.';
+          _searchError = context.l10n.storyMusicSearchFailed;
           _isSearchLoading = false;
           if (!loadMore) {
             _searchResults = [];
@@ -276,11 +277,20 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                 child: Row(
                   children: [
                     Text(
-                      "Dành cho bạn",
+                      context.l10n.storyMusicForYou,
                       style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      context.l10n.commonViewAll,
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -327,7 +337,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                         fontSize: 14.sp,
                       ),
                       decoration: InputDecoration(
-                        hintText: "Tìm kiếm nhạc",
+                        hintText: context.l10n.storyMusicSearchHint,
                         hintStyle: TextStyle(color: AppColors.textSecondary),
                         border: InputBorder.none,
                         isCollapsed: true,
@@ -376,7 +386,10 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
-            TextButton(onPressed: _fetchTracks, child: const Text('Thử lại')),
+            TextButton(
+              onPressed: _fetchTracks,
+              child: Text(context.l10n.commonRetry),
+            ),
           ],
         ),
       );
@@ -401,7 +414,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
             SizedBox(height: 12.h),
             TextButton(
               onPressed: () => _searchTracks(_currentSearchQuery ?? ''),
-              child: const Text('Thử lại'),
+              child: Text(context.l10n.commonRetry),
             ),
           ],
         ),
@@ -413,8 +426,8 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       return Center(
         child: Text(
           _isSearching
-              ? 'Không tìm thấy bài hát phù hợp.'
-              : 'Không có bài hát nào.',
+              ? context.l10n.storyMusicNoSearchResults
+              : context.l10n.storyMusicEmpty,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );

@@ -6,6 +6,7 @@ import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice
 import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice_effect_event.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/voice_effect/voice_effect_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -25,6 +26,25 @@ class VoiceEffectBottomSheet extends StatefulWidget {
 
 class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
   String? _selectedChip;
+
+  String _voiceLabel(BuildContext context, String voicePreset) {
+    switch (voicePreset) {
+      case 'Gốc':
+        return context.l10n.voiceEffectOriginal;
+      case 'Con gái':
+        return context.l10n.voiceEffectFemale;
+      case 'Trầm':
+        return context.l10n.voiceEffectDeep;
+      case 'Em bé':
+        return context.l10n.voiceEffectBaby;
+      case 'Robot':
+        return context.l10n.voiceEffectRobot;
+      case 'Ác quỷ':
+        return context.l10n.voiceEffectDemon;
+      default:
+        return voicePreset;
+    }
+  }
 
   void _applyVoiceEffect(BuildContext context, String selectedVoice) {
     setState(() {
@@ -47,10 +67,14 @@ class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
     );
   }
 
-  Widget _buildVoiceChip(BuildContext context, String label, bool isLoading) {
-    final isSelected = _selectedChip == label;
+  Widget _buildVoiceChip(
+    BuildContext context,
+    String voicePreset,
+    bool isLoading,
+  ) {
+    final isSelected = _selectedChip == voicePreset;
     return GestureDetector(
-      onTap: isLoading ? null : () => _applyVoiceEffect(context, label),
+      onTap: isLoading ? null : () => _applyVoiceEffect(context, voicePreset),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
@@ -67,7 +91,7 @@ class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
           ),
         ),
         child: Text(
-          label,
+          _voiceLabel(context, voicePreset),
           style: TextStyle(
             color: AppColors.primary,
             fontSize: 13.sp,
@@ -89,7 +113,9 @@ class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
             widget.onVoiceChanged(state.newFilePath);
             showSuccessSnackBar(
               context,
-              'Đã áp dụng giọng: ${_selectedChip ?? ""}',
+              context.l10n.voiceEffectApplied(
+                _voiceLabel(context, _selectedChip ?? ''),
+              ),
             );
           } else if (state is VoiceEffectError) {
             showErrorSnackBar(context, state.message);
@@ -125,7 +151,7 @@ class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
                 ),
                 SizedBox(height: 20.h),
                 Text(
-                  'Chỉnh sửa giọng nói',
+                  context.l10n.voiceEffectTitle,
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
@@ -149,7 +175,7 @@ class _VoiceEffectBottomSheetState extends State<VoiceEffectBottomSheet> {
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          'Đang chuyển giọng, vui lòng đợi...',
+                          context.l10n.voiceEffectLoading,
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12.sp,

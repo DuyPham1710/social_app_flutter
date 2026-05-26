@@ -4,6 +4,7 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostReactInfo extends StatelessWidget {
   final List<ReactPostEntity>? reacts;
@@ -49,20 +50,25 @@ class PostReactInfo extends StatelessWidget {
             .toList();
 
         String displayText;
+        final l10n = context.l10n;
 
         if (hasCurrentUserReacted) {
           if (otherReacts.isEmpty) {
-            displayText = "Bạn";
+            displayText = l10n.chatYou;
           } else {
-            displayText = "Bạn và ${otherReacts.length} người khác";
+            displayText = l10n.postReactedYouAndOthers(otherReacts.length);
           }
         } else {
           // Nếu current user chưa react
           final firstUser =
-              reacts!.first.user.fullName?.trim().split(" ").last ?? "Someone";
+              reacts!.first.user.fullName?.trim().split(" ").last ??
+              l10n.chatSomeone;
           final othersCount = reacts!.length - 1;
           if (othersCount > 0) {
-            displayText = "$firstUser và $othersCount người khác";
+            displayText = l10n.postReactedFirstUserAndOthers(
+              firstUser,
+              othersCount,
+            );
           } else {
             displayText = firstUser;
           }

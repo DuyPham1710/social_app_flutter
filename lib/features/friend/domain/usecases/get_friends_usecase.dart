@@ -11,4 +11,3 @@ class GetFriendsUseCase {
     return await friendRepository.getFriends();
   }
 }
-

@@ -1,64 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/profile/presentation/utils/profile_localization.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/detail_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfileDetailInfoWidget extends StatelessWidget {
   final UserEntity? user;
 
-  const ProfileDetailInfoWidget({
-    super.key,
-    required this.user,
-  });
+  const ProfileDetailInfoWidget({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       children: [
         // Học vấn
         if (user?.school != null && user!.school!.isNotEmpty)
           DetailItem(
             icon: Icons.school_outlined,
-            text: "Đã học tại ${user?.school}",
+            text: l10n.profileStudiedAt(user!.school!),
           ),
-        
+
         // Nơi sống
         if (user?.currentCity != null && user!.currentCity!.isNotEmpty)
           DetailItem(
             icon: Icons.home,
-            text: "Sống tại ${user?.currentCity}",
+            text: l10n.profileLivesIn(user!.currentCity!),
           ),
 
         // Quê quán
         if (user?.hometown != null && user!.hometown!.isNotEmpty)
           DetailItem(
             icon: Icons.location_city,
-            text: "Đến từ ${user?.hometown}",
+            text: l10n.profileFrom(user!.hometown!),
           ),
 
         // Nơi làm việc
         if (user?.workplace != null && user!.workplace!.isNotEmpty)
-           DetailItem(
+          DetailItem(
             icon: Icons.work,
-            text: "Làm việc tại ${user?.workplace}",
+            text: l10n.profileWorksAt(user!.workplace!),
           )
         else
           // Hiển thị trạng thái chưa có (nếu muốn giống FB hiển thị mờ)
-          const DetailItem(
+          DetailItem(
             icon: Icons.work,
-            text: "Thêm nơi làm việc",
+            text: l10n.profileAddWorkplace,
             isDisabled: true,
           ),
 
         // Mối quan hệ
-        if (user!.relationshipStatus != null && user!.relationshipStatus!.isNotEmpty)
-           DetailItem(
+        if (user?.relationshipStatus != null &&
+            user!.relationshipStatus!.isNotEmpty)
+          DetailItem(
             icon: Icons.favorite,
-            text: user!.relationshipStatus!,
+            text: localizedRelationshipStatus(l10n, user!.relationshipStatus),
           )
         else
-          const DetailItem(
+          DetailItem(
             icon: Icons.favorite,
-            text: "Thêm tình trạng mối quan hệ",
+            text: l10n.profileAddRelationshipStatus,
             isDisabled: true,
           ),
       ],

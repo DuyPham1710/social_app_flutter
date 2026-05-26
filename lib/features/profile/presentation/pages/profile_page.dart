@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/restart_widget.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
@@ -25,6 +26,8 @@ import '../widgets/friend_list_widget.dart';
 import '../widgets/create_post_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/privacy_security_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/appearance_settings_page.dart';
+import 'package:social_app_fe/l10n/generated/app_localizations.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -62,6 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLogoutDialog() {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -71,21 +75,22 @@ class _ProfilePageState extends State<ProfilePage> {
             builder: (blocContext) => AlertDialog(
               backgroundColor: AppColors.background,
               title: Text(
-                'Đăng xuất khỏi tài khoản của bạn?',
+                l10n.menuLogoutDialogTitle,
                 style: TextStyle(color: AppColors.textPrimary, fontSize: 18.sp),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
                   child: Text(
-                    'Hủy',
+                    l10n.commonCancel,
                     style: TextStyle(color: AppColors.textPrimary),
                   ),
                 ),
                 TextButton(
                   onPressed: () async {
+                    final menuBloc = blocContext.read<MenuBloc>();
                     await FcmService().clearFcmToken();
-                    blocContext.read<MenuBloc>().add(LogoutEvent());
+                    menuBloc.add(LogoutEvent());
                     if (!mounted) return;
                     RestartWidget.restartApp(context);
                     Navigator.pushNamedAndRemoveUntil(
@@ -94,9 +99,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       (route) => false,
                     );
                   },
-                  child: const Text(
-                    'Đăng xuất',
-                    style: TextStyle(color: Colors.red),
+                  child: Text(
+                    l10n.menuLogout,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
               ],
@@ -114,9 +119,9 @@ class _ProfilePageState extends State<ProfilePage> {
       body: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('Lỗi tải bài viết')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(context.l10n.profileLoadPostsError)),
+            );
           }
         },
         builder: (context, state) {
@@ -126,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
             return _fadeContent(
               key: 'profile-error',
               child: _buildErrorProfile(
-                state.errorMessage ?? 'Không thể tải trang cá nhân',
+                state.errorMessage ?? context.l10n.profileLoadError,
               ),
             );
           }
@@ -158,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     backgroundColor: AppColors.background,
                     elevation: 0,
                     title: Text(
-                      'Trang cá nhân',
+                      context.l10n.profileTitle,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -178,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       Builder(
                         builder: (context) => IconButton(
-                          tooltip: 'Menu',
+                          tooltip: context.l10n.menuTitle,
                           icon: Icon(
                             Icons.menu_rounded,
                             color: AppColors.iconPrimary,
@@ -272,7 +277,7 @@ class _ProfilePageState extends State<ProfilePage> {
           backgroundColor: AppColors.background,
           elevation: 0,
           title: Text(
-            'Trang cá nhân',
+            context.l10n.profileTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -303,7 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
           backgroundColor: AppColors.background,
           elevation: 0,
           title: Text(
-            'Trang cá nhân',
+            context.l10n.profileTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -333,7 +338,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   OutlinedButton.icon(
                     onPressed: _loadData,
                     icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Thử lại'),
+                    label: Text(context.l10n.commonRetry),
                   ),
                 ],
               ),
@@ -353,7 +358,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: Text(
-                state.errorMessage ?? "Không thể tải bài viết",
+                state.errorMessage ?? context.l10n.profileLoadPostsError,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
@@ -377,7 +382,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.symmetric(vertical: 16.h),
             child: Center(
               child: Text(
-                "Đã hiển thị hết bài viết",
+                context.l10n.profileEndOfPosts,
                 style: TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
@@ -387,7 +392,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.symmetric(vertical: 24.h),
             child: Center(
               child: Text(
-                "Chưa có bài viết nào",
+                context.l10n.profileNoPosts,
                 style: TextStyle(color: Colors.grey, fontSize: 14.sp),
               ),
             ),
@@ -414,6 +419,8 @@ class ProfileMenuDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
+    final prefs = s1<AppPreferences>();
     final itemBgColor = isDark
         ? Colors.white.withOpacity(0.05)
         : Colors.black.withOpacity(0.02);
@@ -429,7 +436,7 @@ class ProfileMenuDrawer extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
               child: Text(
-                'Menu',
+                l10n.menuTitle,
                 style: TextStyle(
                   fontSize: 22.sp,
                   fontWeight: FontWeight.bold,
@@ -448,7 +455,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                     context,
                     icon: Icons.bookmark_rounded,
                     iconColor: const Color(0xFF8B5CF6), // Purple
-                    title: 'Đã lưu',
+                    title: l10n.menuSaved,
                     bgColor: itemBgColor,
                     onTap: () {
                       Navigator.pop(context);
@@ -464,7 +471,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                     context,
                     icon: Icons.groups_rounded,
                     iconColor: const Color(0xFF3B82F6), // Blue
-                    title: 'Cộng đồng',
+                    title: l10n.menuCommunity,
                     bgColor: itemBgColor,
                     onTap: () {
                       Navigator.pop(context);
@@ -480,7 +487,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                     context,
                     icon: Icons.brightness_medium_rounded,
                     iconColor: const Color(0xFFF59E0B),
-                    title: 'Giao diện',
+                    title: l10n.menuAppearance,
                     bgColor: itemBgColor,
                     onTap: () {
                       Navigator.pop(context);
@@ -496,7 +503,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                     context,
                     icon: Icons.security_rounded,
                     iconColor: const Color(0xFF10B981), // Green
-                    title: 'Quyền riêng tư & bảo mật',
+                    title: l10n.menuPrivacySecurity,
                     bgColor: itemBgColor,
                     onTap: () {
                       final profileBloc = context.read<ProfileBloc>();
@@ -514,9 +521,20 @@ class ProfileMenuDrawer extends StatelessWidget {
                   ),
                   _buildMenuButton(
                     context,
+                    icon: Icons.translate_rounded,
+                    iconColor: const Color(0xFF06B6D4),
+                    title: l10n.language,
+                    subtitle: l10n.languageCurrent(
+                      _languageName(l10n, prefs.localeCode),
+                    ),
+                    bgColor: itemBgColor,
+                    onTap: () => _showLanguageSheet(context),
+                  ),
+                  _buildMenuButton(
+                    context,
                     icon: Icons.logout_rounded,
                     iconColor: Colors.redAccent,
-                    title: 'Đăng xuất',
+                    title: l10n.menuLogout,
                     bgColor: itemBgColor,
                     onTap: () {
                       Navigator.pop(context);
@@ -537,6 +555,7 @@ class ProfileMenuDrawer extends StatelessWidget {
     required IconData icon,
     required Color iconColor,
     required String title,
+    String? subtitle,
     required Color bgColor,
     required VoidCallback onTap,
   }) {
@@ -565,14 +584,30 @@ class ProfileMenuDrawer extends StatelessWidget {
                 ),
                 SizedBox(width: 16.w),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14.sp,
-                      color: AppColors.textPrimary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14.sp,
+                          color: AppColors.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (subtitle != null) ...[
+                        SizedBox(height: 3.h),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppColors.textSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 Icon(
@@ -586,6 +621,106 @@ class ProfileMenuDrawer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showLanguageSheet(BuildContext context) {
+    final l10n = context.l10n;
+    final prefs = s1<AppPreferences>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.background,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: ListenableBuilder(
+            listenable: prefs,
+            builder: (context, _) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 6.h),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          l10n.languageSelectTitle,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    _buildLanguageTile(
+                      context,
+                      title: l10n.languageSystem,
+                      value: null,
+                      groupValue: prefs.localeCode,
+                      onChanged: (value) async {
+                        await prefs.setLocaleCode(value);
+                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                      },
+                    ),
+                    _buildLanguageTile(
+                      context,
+                      title: l10n.languageVietnamese,
+                      value: 'vi',
+                      groupValue: prefs.localeCode,
+                      onChanged: (value) async {
+                        await prefs.setLocaleCode(value);
+                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                      },
+                    ),
+                    _buildLanguageTile(
+                      context,
+                      title: l10n.languageEnglish,
+                      value: 'en',
+                      groupValue: prefs.localeCode,
+                      onChanged: (value) async {
+                        await prefs.setLocaleCode(value);
+                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLanguageTile(
+    BuildContext context, {
+    required String title,
+    required String? value,
+    required String? groupValue,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return RadioListTile<String?>(
+      value: value,
+      groupValue: groupValue,
+      activeColor: AppColors.primary,
+      title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
+      onChanged: onChanged,
+    );
+  }
+
+  String _languageName(AppLocalizations l10n, String? languageCode) {
+    switch (languageCode) {
+      case 'vi':
+        return l10n.languageVietnamese;
+      case 'en':
+        return l10n.languageEnglish;
+    }
+    return l10n.languageSystem;
   }
 }
 

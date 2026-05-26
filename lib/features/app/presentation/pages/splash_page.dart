@@ -16,10 +16,13 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  static const _logoVideoPath = 'assets/icons/logo.mp4';
+  static const _lightLogoVideoPath = 'assets/icons/logo.mp4';
+  static const _darkLogoVideoPath = 'assets/icons/dark_logo.mp4';
   static const _fallbackIntroDuration = Duration(milliseconds: 1800);
   static const _fadeDuration = Duration(milliseconds: 280);
 
+  late final bool _isDarkMode;
+  late final String _activeVideoPath;
   late final VideoPlayerController _videoController;
   _SessionResult? _sessionResult;
   bool _isVideoReady = false;
@@ -31,7 +34,9 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _videoController = VideoPlayerController.asset(_logoVideoPath);
+    _isDarkMode = s1<AppPreferences>().isDarkMode;
+    _activeVideoPath = _isDarkMode ? _darkLogoVideoPath : _lightLogoVideoPath;
+    _videoController = VideoPlayerController.asset(_activeVideoPath);
     _prepareIntroVideo();
     _checkSession();
   }
@@ -50,6 +55,11 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _prepareIntroVideo() async {
     try {
+      assert(() {
+        debugPrint('[Splash] Loading intro video: $_activeVideoPath');
+        return true;
+      }());
+
       await _videoController.initialize();
       await _videoController.setLooping(false);
       await _videoController.setVolume(0);
@@ -73,7 +83,9 @@ class _SplashPageState extends State<SplashPage> {
         _markIntroDone,
       );
     } catch (error) {
-      debugPrint('[Splash] Unable to play intro video: $error');
+      debugPrint(
+        '[Splash] Unable to play intro video ($_activeVideoPath): $error',
+      );
       Future.delayed(_fallbackIntroDuration, _markIntroDone);
     }
   }
@@ -138,7 +150,7 @@ class _SplashPageState extends State<SplashPage> {
               fit: StackFit.expand,
               children: [
                 Image.asset(
-                  s1<AppPreferences>().isDarkMode 
+                  _isDarkMode 
                       ? 'assets/icons/dark_logo.png' 
                       : 'assets/icons/logo.jpg', 
                   fit: BoxFit.cover,
@@ -158,20 +170,13 @@ class _SplashPageState extends State<SplashPage> {
                             child: SizedBox(
                               width: _videoController.value.size.width,
                               height: _videoController.value.size.height,
-                              child: ColorFiltered(
-                                colorFilter: ColorFilter.matrix(<double>[
-                                  1.1, 0, 0, 0, 10,
-                                  0, 1.1, 0, 0, 10,
-                                  0, 0, 1.1, 0, 10,
-                                  0, 0, 0, 1, 0,
-                                ]),
-                                child: VideoPlayer(_videoController),
-                              ),
+                              child: _buildIntroVideo(),
                             ),
                           ),
-                          Container(
-                            color: AppColors.background.withOpacity(0.08),
-                          ),
+                          if (!_isDarkMode)
+                            Container(
+                              color: AppColors.background.withOpacity(0.08),
+                            ),
                         ],
                       ),
                     ),
@@ -181,6 +186,24 @@ class _SplashPageState extends State<SplashPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildIntroVideo() {
+    final video = VideoPlayer(_videoController);
+
+    if (_isDarkMode) {
+      return video;
+    }
+
+    return ColorFiltered(
+      colorFilter: const ColorFilter.matrix(<double>[
+        1.1, 0, 0, 0, 10,
+        0, 1.1, 0, 0, 10,
+        0, 0, 1.1, 0, 10,
+        0, 0, 0, 1, 0,
+      ]),
+      child: video,
     );
   }
 }

@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
+import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendForUserPage extends StatefulWidget {
   final String userId;
@@ -59,7 +61,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'Bạn bè của ${widget.fullName.trim().split(" ").last}',
+            context.l10n.friendFriendsOf(
+              widget.fullName.trim().split(" ").last,
+            ),
             style: TextStyle(
               fontSize: 20.sp,
               fontWeight: FontWeight.w700,
@@ -108,7 +112,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                         });
                       },
                       decoration: InputDecoration(
-                        hintText: 'Tìm kiếm bạn bè',
+                        hintText: context.l10n.friendSearchHint,
                         hintStyle: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14.sp,
@@ -167,7 +171,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${filteredFriends.length} bạn bè',
+                              context.l10n.friendCount(filteredFriends.length),
                               style: TextStyle(
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w700,
@@ -177,7 +181,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                             GestureDetector(
                               onTap: _showSortOptions,
                               child: Text(
-                                'Sắp xếp',
+                                context.l10n.friendSort,
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w600,
@@ -189,7 +193,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          '$onlineFriendsCount người đang hoạt động',
+                          context.l10n.friendActiveCount(onlineFriendsCount),
                           style: TextStyle(
                             fontSize: 13.sp,
                             color: AppColors.textSecondary,
@@ -214,7 +218,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                                 ),
                                 SizedBox(height: 16.h),
                                 Text(
-                                  'Chưa có bạn bè nào',
+                                  context.l10n.friendNoFriends,
                                   style: TextStyle(
                                     fontSize: 16.sp,
                                     color: AppColors.textSecondary,
@@ -230,7 +234,8 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                               final friend = filteredFriends[index];
                               return FriendItem(
                                 friendId: friend.userId,
-                                name: friend.fullName ?? 'Người dùng',
+                                name:
+                                    friend.fullName ?? context.l10n.commonUser,
                                 mutualFriends: friend.mutualFriendsCount ?? 0,
                                 avatarUrl: friend.avatarUrl,
                                 mutualFriendAvatars: friend.mutualFriendAvatars,
@@ -281,7 +286,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      'Lỗi tải dữ liệu',
+                      context.l10n.friendLoadDataError,
                       style: TextStyle(
                         fontSize: 16.sp,
                         color: AppColors.textPrimary,
@@ -290,7 +295,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      state.message,
+                      localizedFriendActionMessage(context.l10n, state.message),
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.textSecondary,
@@ -310,7 +315,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
-                      child: const Text('Thử lại'),
+                      child: Text(context.l10n.commonRetry),
                     ),
                   ],
                 ),
@@ -327,9 +332,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
   void _showSearch() {
     // TODO: Implement search functionality
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Chức năng tìm kiếm đang được phát triển'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(context.l10n.commonFeatureInDevelopment),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -358,7 +363,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'Sắp xếp theo',
+                  context.l10n.friendSortBy,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
@@ -366,9 +371,9 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                _buildSortOption('Tên', 'name'),
-                _buildSortOption('Gần đây', 'recent'),
-                _buildSortOption('Đang hoạt động', 'online'),
+                _buildSortOption(context.l10n.friendSortName, 'name'),
+                _buildSortOption(context.l10n.friendSortRecent, 'recent'),
+                _buildSortOption(context.l10n.friendSortOnline, 'online'),
               ],
             ),
           ),
@@ -410,33 +415,24 @@ class _FriendsListPageState extends State<FriendForUserPage> {
 
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+      SnackBar(
+        content: Text(localizedFriendActionMessage(context.l10n, message)),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
-  String _formatFriendsSince(DateTime? friendsSince) {
-    if (friendsSince == null) return 'Là bạn bè từ lâu';
+  String _formatFriendsSince(BuildContext context, DateTime? friendsSince) {
+    if (friendsSince == null) return context.l10n.friendLongtimeFriend;
 
-    final months = [
-      'tháng 1',
-      'tháng 2',
-      'tháng 3',
-      'tháng 4',
-      'tháng 5',
-      'tháng 6',
-      'tháng 7',
-      'tháng 8',
-      'tháng 9',
-      'tháng 10',
-      'tháng 11',
-      'tháng 12',
-    ];
-
-    return 'Là bạn bè từ ${months[friendsSince.month - 1]} năm ${friendsSince.year}';
+    return context.l10n.friendFriendsSince(
+      context.l10n.monthName(friendsSince.month),
+      friendsSince.year,
+    );
   }
 
   void _showMoreOptions(BuildContext context, dynamic friend) {
-    final name = friend.fullName ?? 'Người dùng';
+    final name = friend.fullName ?? context.l10n.commonUser;
     final avatarUrl =
         friend.avatarUrl ??
         'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg';
@@ -489,7 +485,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              _formatFriendsSince(friendsSince),
+                              _formatFriendsSince(context, friendsSince),
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: AppColors.textSecondary,
@@ -507,16 +503,16 @@ class _FriendsListPageState extends State<FriendForUserPage> {
                 SizedBox(height: 8.h),
                 _buildOptionItem(
                   icon: CupertinoIcons.chat_bubble_fill,
-                  title: 'Nhắn tin cho $name',
+                  title: context.l10n.friendMessageUser(name),
                   onTap: () {
                     Navigator.pop(context);
-                    _showMessage(context, 'Nhắn tin cho $name');
+                    _showMessage(context, context.l10n.friendMessageUser(name));
                   },
                   iconColor: AppColors.primary,
                 ),
                 _buildOptionItem(
                   icon: CupertinoIcons.person_badge_minus,
-                  title: 'Hủy kết bạn với $name',
+                  title: context.l10n.friendUnfriendUser(name),
                   onTap: () {
                     Navigator.pop(context);
                     _showUnfriendDialog(friend);
@@ -567,7 +563,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
   }
 
   void _showUnfriendDialog(dynamic friend) {
-    final name = friend.fullName ?? 'Người dùng';
+    final name = friend.fullName ?? context.l10n.commonUser;
     final friendId = friend.userId;
 
     showDialog(
@@ -575,12 +571,12 @@ class _FriendsListPageState extends State<FriendForUserPage> {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
         surfaceTintColor: Colors.transparent,
-        title: const Text('Hủy kết bạn'),
-        content: Text('Bạn có chắc chắn muốn hủy kết bạn với $name?'),
+        title: Text(context.l10n.friendUnfriendTitle),
+        content: Text(context.l10n.friendUnfriendConfirm(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -591,7 +587,7 @@ class _FriendsListPageState extends State<FriendForUserPage> {
               );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Xác nhận'),
+            child: Text(context.l10n.commonConfirm),
           ),
         ],
       ),

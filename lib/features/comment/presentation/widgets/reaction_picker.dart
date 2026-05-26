@@ -200,7 +200,6 @@ class _ReactionPickerState extends State<ReactionPicker>
                                         transformAlignment: Alignment.center,
                                         transform: Matrix4.identity()
                                           ..scale(isHovered ? 1.2 : 1.0),
-                                        // THAY ĐỔI: Kích thước icon to hơn
                                         child: SizedBox(
                                           key: _emojiKeys[index],
                                           width: iconSize,

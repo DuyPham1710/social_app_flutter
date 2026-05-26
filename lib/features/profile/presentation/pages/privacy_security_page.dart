@@ -7,6 +7,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/face_registration
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
@@ -16,6 +17,7 @@ class PrivacySecurityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
     final itemBgColor = isDark
         ? Colors.white.withOpacity(0.05)
         : Colors.black.withOpacity(0.02);
@@ -31,7 +33,7 @@ class PrivacySecurityPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Quyền riêng tư & Bảo mật',
+          l10n.menuPrivacySecurity,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
@@ -47,7 +49,7 @@ class PrivacySecurityPage extends StatelessWidget {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               showDialogSuccess(
                 context,
-                'Xóa dữ liệu khuôn mặt thành công',
+                context.l10n.profileFaceDataSuccessDeleted,
                 isNavigateLogin: false,
               );
             } else if (state.deleteFaceError != null) {
@@ -66,7 +68,7 @@ class PrivacySecurityPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bảo mật tài khoản',
+                  l10n.profileAccountSecurity,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
@@ -87,10 +89,10 @@ class PrivacySecurityPage extends StatelessWidget {
                       _buildActionItem(
                         icon: CupertinoIcons.person_crop_circle_badge_checkmark,
                         iconColor: Colors.blue,
-                        title: 'Dữ liệu khuôn mặt',
+                        title: l10n.profileFaceData,
                         subtitle: isFaceRegistered
-                            ? 'Đã thiết lập'
-                            : 'Chưa thiết lập',
+                            ? l10n.profileFaceRegistered
+                            : l10n.profileFaceNotRegistered,
                         trailing: isFaceRegistered
                             ? Icon(
                                 Icons.check_circle,
@@ -162,7 +164,10 @@ class PrivacySecurityPage extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 13.sp, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -179,6 +184,7 @@ class PrivacySecurityPage extends StatelessWidget {
     bool isFaceRegistered,
     String? userId,
   ) {
+    final l10n = context.l10n;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.background,
@@ -209,8 +215,8 @@ class PrivacySecurityPage extends StatelessWidget {
                 SizedBox(height: 16.h),
                 Text(
                   isFaceRegistered
-                      ? 'Quản lý dữ liệu khuôn mặt'
-                      : 'Thêm dữ liệu khuôn mặt',
+                      ? l10n.profileManageFaceData
+                      : l10n.profileAddFaceData,
                   style: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
@@ -221,8 +227,8 @@ class PrivacySecurityPage extends StatelessWidget {
                 SizedBox(height: 12.h),
                 Text(
                   isFaceRegistered
-                      ? 'Dữ liệu khuôn mặt của bạn đang được sử dụng để nhận diện và bảo vệ tài khoản.'
-                      : 'Đăng ký khuôn mặt giúp AI nhận diện bạn trong ảnh và bảo vệ tài khoản tốt hơn.',
+                      ? l10n.profileFaceDataRegisteredDescription
+                      : l10n.profileFaceDataUnregisteredDescription,
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textSecondary,
@@ -233,7 +239,7 @@ class PrivacySecurityPage extends StatelessWidget {
                 SizedBox(height: 32.h),
                 if (!isFaceRegistered)
                   _buildBottomSheetButton(
-                    title: 'Thêm dữ liệu khuôn mặt',
+                    title: l10n.profileAddFaceData,
                     icon: Icons.add_a_photo,
                     color: Colors.blue,
                     onTap: () async {
@@ -260,7 +266,7 @@ class PrivacySecurityPage extends StatelessWidget {
                   )
                 else
                   _buildBottomSheetButton(
-                    title: 'Xóa dữ liệu khuôn mặt',
+                    title: l10n.profileDeleteFaceData,
                     icon: CupertinoIcons.trash_fill,
                     color: Colors.red,
                     onTap: () {
@@ -270,7 +276,7 @@ class PrivacySecurityPage extends StatelessWidget {
                   ),
                 SizedBox(height: 12.h),
                 _buildBottomSheetButton(
-                  title: 'Hủy',
+                  title: l10n.commonCancel,
                   color: AppColors.textSecondary,
                   isOutlined: true,
                   onTap: () => Navigator.pop(bottomSheetContext),
@@ -348,23 +354,26 @@ class PrivacySecurityPage extends StatelessWidget {
         return AlertDialog(
           backgroundColor: AppColors.background,
           title: Text(
-            'Xác nhận xóa',
+            context.l10n.profileDeleteConfirmTitle,
             style: TextStyle(color: AppColors.textPrimary),
           ),
           content: Text(
-            'Bạn có chắc chắn muốn xóa toàn bộ dữ liệu khuôn mặt? Hành động này không thể hoàn tác.',
+            context.l10n.profileDeleteFaceConfirmMessage,
             style: TextStyle(color: AppColors.textPrimary),
           ),
           actions: [
             TextButton(
               child: Text(
-                'Hủy',
+                context.l10n.commonCancel,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
               onPressed: () => Navigator.pop(dialogContext),
             ),
             TextButton(
-              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+              child: Text(
+                context.l10n.commonDelete,
+                style: const TextStyle(color: Colors.red),
+              ),
               onPressed: () {
                 Navigator.pop(dialogContext); // Đóng dialog
 
@@ -389,7 +398,7 @@ class PrivacySecurityPage extends StatelessWidget {
                         SizedBox(width: 12.w),
                         Expanded(
                           child: Text(
-                            'Đang xóa dữ liệu khuôn mặt...',
+                            context.l10n.profileDeletingFaceData,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14.sp,

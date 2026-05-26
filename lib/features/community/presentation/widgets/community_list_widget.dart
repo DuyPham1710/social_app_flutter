@@ -1,10 +1,12 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_item_card.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 enum _CommunityFilter { all, publicOnly, privateOnly }
 
@@ -83,12 +85,12 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             child: Container(
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE5EAF0)),
-                boxShadow: const [
+                border: Border.all(color: AppColors.divider),
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x0D0F172A),
+                    color: AppColors.textSecondary.withValues(alpha: 0.08),
                     blurRadius: 8,
                     offset: Offset(0, 3),
                   ),
@@ -96,13 +98,19 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
               ),
               child: TextField(
                 controller: _searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Tìm cộng đồng...',
-                  prefixIcon: Icon(Icons.search_rounded, size: 18),
+                decoration: InputDecoration(
+                  hintText: context.l10n.communitySearchHint,
+                  hintStyle: TextStyle(color: AppColors.textSecondary),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    size: 18,
+                    color: AppColors.textSecondary,
+                  ),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 10),
                 ),
+                style: TextStyle(color: AppColors.textPrimary),
                 onChanged: _onSearchChanged,
               ),
             ),
@@ -116,36 +124,48 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             ),
             child: PopupMenuButton<_CommunityFilter>(
               initialValue: _activeFilter,
-              color: Colors.white,
+              color: AppColors.background,
               padding: EdgeInsets.zero,
               onSelected: (value) {
                 setState(() {
                   _activeFilter = value;
                 });
               },
-              itemBuilder: (context) => const [
+              itemBuilder: (context) => [
                 PopupMenuItem(
                   value: _CommunityFilter.all,
                   height: 34,
                   child: Text(
-                    'Tất cả',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    context.l10n.commonAll,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _CommunityFilter.publicOnly,
                   height: 34,
                   child: Text(
-                    'Công khai',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    context.l10n.communityPublicOnly,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _CommunityFilter.privateOnly,
                   height: 34,
                   child: Text(
-                    'Riêng tư',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    context.l10n.communityPrivateOnly,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -156,12 +176,12 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE5EAF0)),
-                  boxShadow: const [
+                  border: Border.all(color: AppColors.divider),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x0D0F172A),
+                      color: AppColors.textSecondary.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: Offset(0, 3),
                     ),
@@ -174,7 +194,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                       Icons.tune_rounded,
                       size: 16,
                       color: _activeFilter == _CommunityFilter.all
-                          ? const Color(0xFF344054)
+                          ? AppColors.textSecondary
                           : AppColors.primary,
                     ),
                     if (_activeFilter != _CommunityFilter.all)
@@ -230,16 +250,18 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                           Icon(
                             Icons.groups_2_outlined,
                             size: 54,
-                            color: Colors.grey[400],
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.75,
+                            ),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             state.searchQuery != null
-                                ? 'Không tìm thấy cộng đồng phù hợp'
-                                : 'Chưa có cộng đồng nào',
+                                ? context.l10n.communityNoSearchResults
+                                : context.l10n.communityEmpty,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.grey[700],
+                              color: AppColors.textSecondary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -273,7 +295,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 28),
               child: Text(
-                state.message,
+                localizedCommunityMessage(context.l10n, state.message),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Color(0xFFB42318)),
               ),
@@ -354,9 +376,9 @@ class _SkeletonCommunityCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5EAF0)),
+          border: Border.all(color: AppColors.divider),
         ),
         child: const Row(
           children: [
@@ -412,7 +434,7 @@ class _SkeletonBlock extends StatelessWidget {
             height: height,
             width: width,
             decoration: BoxDecoration(
-              color: const Color(0xFFE4E7EC),
+              color: AppColors.textSecondary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(radius),
             ),
           ),

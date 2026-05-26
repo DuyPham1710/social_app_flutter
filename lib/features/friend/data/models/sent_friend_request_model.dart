@@ -4,17 +4,19 @@ import 'package:social_app_fe/features/friend/domain/entities/sent_friend_reques
 part 'sent_friend_request_model.freezed.dart';
 
 @freezed
-class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRequestModel {
+class SentFriendRequestModel extends SentFriendRequestEntity
+    with _$SentFriendRequestModel {
   SentFriendRequestModel._(); // Add private constructor for custom getters
-  
-   factory SentFriendRequestModel({
+
+  factory SentFriendRequestModel({
     @JsonKey(name: '_id') required String requestId,
     @JsonKey(name: 'sender_id') required dynamic senderId,
     @JsonKey(name: 'receiver_id') required dynamic receiverId,
     @JsonKey(name: 'createdAt', includeIfNull: false) DateTime? createdAt,
     @JsonKey(includeIfNull: false) int? mutualFriends,
     @JsonKey(name: 'receiver_name', includeIfNull: false) String? receiverName,
-    @JsonKey(name: 'receiver_avatar_url', includeIfNull: false) String? receiverAvatarUrl,
+    @JsonKey(name: 'receiver_avatar_url', includeIfNull: false)
+    String? receiverAvatarUrl,
     @JsonKey(includeIfNull: false) List<String>? mutualFriendAvatars,
   }) = _SentFriendRequestModel;
 
@@ -23,7 +25,7 @@ class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRe
     String? receiverName;
     String? receiverAvatarUrl;
     dynamic receiverId;
-    
+
     if (json['receiver_id'] is Map<String, dynamic>) {
       final receiverData = json['receiver_id'] as Map<String, dynamic>;
       receiverId = receiverData;
@@ -32,13 +34,13 @@ class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRe
     } else {
       receiverId = json['receiver_id'];
     }
-    
+
     // Xử lý sender_id
     dynamic senderId = json['sender_id'];
     if (json['sender_id'] is Map<String, dynamic>) {
       senderId = json['sender_id'];
     }
-    
+
     // Xử lý mutualFriends
     int? mutualFriends;
     if (json.containsKey('mutualFriendsCount')) {
@@ -46,7 +48,7 @@ class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRe
     } else if (json.containsKey('mutualFriends')) {
       mutualFriends = (json['mutualFriends'] as num?)?.toInt();
     }
-    
+
     return SentFriendRequestModel(
       requestId: json['_id'] as String,
       senderId: senderId,
@@ -58,11 +60,11 @@ class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRe
       mutualFriendAvatars: null, // Sẽ được load sau
     );
   }
-  
+
   /// Parse DateTime từ nhiều format khác nhau
   static DateTime? _parseDateTime(dynamic dateTimeValue) {
     if (dateTimeValue == null) return null;
-    
+
     try {
       if (dateTimeValue is String) {
         return DateTime.parse(dateTimeValue);
@@ -79,9 +81,3 @@ class SentFriendRequestModel extends SentFriendRequestEntity with _$SentFriendRe
     }
   }
 }
-
-
-
-
-
-

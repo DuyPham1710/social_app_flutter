@@ -8,10 +8,7 @@ class FriendOnlineStatus {
   final bool isOnline;
   final DateTime? lastSeen;
 
-  FriendOnlineStatus({
-    required this.isOnline,
-    this.lastSeen,
-  });
+  FriendOnlineStatus({required this.isOnline, this.lastSeen});
 }
 
 /// Service quản lý trạng thái online của bạn bè qua WebSocket
@@ -19,12 +16,13 @@ class FriendOnlineService {
   final SocketClient _socketClient;
   final StreamController<int> _onlineCountController =
       StreamController<int>.broadcast();
-  final StreamController<Map<String, FriendOnlineStatus>> _friendsStatusController =
+  final StreamController<Map<String, FriendOnlineStatus>>
+  _friendsStatusController =
       StreamController<Map<String, FriendOnlineStatus>>.broadcast();
 
   int _onlineCount = 0;
   bool _isConnected = false;
-  
+
   // Map để lưu trạng thái online của từng bạn bè: userId -> FriendOnlineStatus
   final Map<String, FriendOnlineStatus> _friendsStatus = {};
 
@@ -49,7 +47,8 @@ class FriendOnlineService {
   }
 
   /// Lấy tất cả trạng thái bạn bè
-  Map<String, FriendOnlineStatus> get allFriendsStatus => Map.unmodifiable(_friendsStatus);
+  Map<String, FriendOnlineStatus> get allFriendsStatus =>
+      Map.unmodifiable(_friendsStatus);
 
   /// Kết nối đến friend namespace và lắng nghe events
   void connect(String userId, String username) {
@@ -74,9 +73,12 @@ class FriendOnlineService {
   void _setupListeners() {
     // Lắng nghe khi kết nối thành công
     _socketClient.on('connected').listen((data) {
-      developer.log('Friend online service connected', name: 'FriendOnlineService');
+      developer.log(
+        'Friend online service connected',
+        name: 'FriendOnlineService',
+      );
       _isConnected = true;
-      
+
       // Yêu cầu số lượng bạn bè online khi kết nối
       _requestOnlineCount();
     });
@@ -104,7 +106,7 @@ class FriendOnlineService {
         if (data is Map && data['friends'] is List) {
           final friends = data['friends'] as List;
           final now = DateTime.now();
-          
+
           for (final friend in friends) {
             if (friend is Map) {
               final userId = friend['userId']?.toString() ?? '';
@@ -122,7 +124,7 @@ class FriendOnlineService {
                     );
                   }
                 }
-                
+
                 _friendsStatus[userId] = FriendOnlineStatus(
                   isOnline: true,
                   lastSeen: lastSeen ?? now,
@@ -130,10 +132,10 @@ class FriendOnlineService {
               }
             }
           }
-          
+
           // Emit update
           _friendsStatusController.add(Map.unmodifiable(_friendsStatus));
-          
+
           developer.log(
             'Received online friends list: ${friends.length} friends',
             name: 'FriendOnlineService',
@@ -152,26 +154,27 @@ class FriendOnlineService {
       try {
         final userId = data is Map ? (data['userId'] as String?) ?? '' : '';
         final username = data is Map ? (data['username'] as String?) : null;
-        
+
         if (userId.isNotEmpty) {
           developer.log(
             'Friend came online: $userId ($username)',
             name: 'FriendOnlineService',
           );
-          
+
           // Kiểm tra trạng thái trước đó
           final currentStatus = _friendsStatus[userId];
-          final wasOffline = currentStatus == null || currentStatus.isOnline == false;
-          
+          final wasOffline =
+              currentStatus == null || currentStatus.isOnline == false;
+
           // Cập nhật trạng thái
           _friendsStatus[userId] = FriendOnlineStatus(
             isOnline: true,
             lastSeen: DateTime.now(),
           );
-          
+
           // Emit update
           _friendsStatusController.add(Map.unmodifiable(_friendsStatus));
-          
+
           // Cập nhật số lượng online
           if (wasOffline) {
             _updateOnlineCount(_onlineCount + 1);
@@ -189,13 +192,13 @@ class FriendOnlineService {
     _socketClient.on('friendOffline').listen((data) {
       try {
         final userId = data is Map ? (data['userId'] as String?) ?? '' : '';
-        
+
         if (userId.isNotEmpty) {
           developer.log(
             'Friend went offline: $userId',
             name: 'FriendOnlineService',
           );
-          
+
           // Parse lastSeen từ event
           DateTime? lastSeen;
           if (data is Map && data['lastSeen'] != null) {
@@ -209,17 +212,17 @@ class FriendOnlineService {
               );
             }
           }
-          
+
           // Cập nhật trạng thái
           final currentStatus = _friendsStatus[userId];
           _friendsStatus[userId] = FriendOnlineStatus(
             isOnline: false,
             lastSeen: lastSeen ?? currentStatus?.lastSeen ?? DateTime.now(),
           );
-          
+
           // Emit update
           _friendsStatusController.add(Map.unmodifiable(_friendsStatus));
-          
+
           // Cập nhật số lượng online
           final wasOnline = currentStatus?.isOnline == true;
           if (wasOnline && _onlineCount > 0) {
@@ -236,7 +239,10 @@ class FriendOnlineService {
 
     // Lắng nghe khi disconnect
     _socketClient.on('disconnect').listen((_) {
-      developer.log('Friend online service disconnected', name: 'FriendOnlineService');
+      developer.log(
+        'Friend online service disconnected',
+        name: 'FriendOnlineService',
+      );
       _isConnected = false;
     });
   }
@@ -289,4 +295,3 @@ class FriendOnlineService {
     _friendsStatus.clear();
   }
 }
-

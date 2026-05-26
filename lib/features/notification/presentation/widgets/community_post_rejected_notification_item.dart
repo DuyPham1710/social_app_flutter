@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPostRejectedNotificationItem extends StatelessWidget {
   final String avatarUrl;
@@ -15,6 +16,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
   final VoidCallback? onUserTap;
   final VoidCallback? onViewDetails;
   final VoidCallback? onCommunityTap;
+  final String actionText;
 
   const CommunityPostRejectedNotificationItem({
     super.key,
@@ -28,6 +30,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
     this.onUserTap,
     this.onViewDetails,
     this.onCommunityTap,
+    required this.actionText,
   });
 
   @override
@@ -38,8 +41,8 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
         color: isRead
             ? AppColors.background
             : (s1<AppPreferences>().isDarkMode
-                ? AppColors.primary.withOpacity(0.12)
-                : const Color(0xFFEAF3FF)),
+                  ? AppColors.primary.withOpacity(0.12)
+                  : const Color(0xFFEAF3FF)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         margin: const EdgeInsets.only(bottom: 4),
         child: Row(
@@ -55,7 +58,10 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                         ? CircleAvatar(
                             radius: 29,
                             backgroundColor: AppColors.secondBackground,
-                            child: Icon(Icons.person, color: AppColors.iconPrimary),
+                            child: Icon(
+                              Icons.person,
+                              color: AppColors.iconPrimary,
+                            ),
                           )
                         : Image.network(
                             avatarUrl,
@@ -66,7 +72,10 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                               return CircleAvatar(
                                 radius: 29,
                                 backgroundColor: AppColors.secondBackground,
-                                child: Icon(Icons.person, color: AppColors.iconPrimary),
+                                child: Icon(
+                                  Icons.person,
+                                  color: AppColors.iconPrimary,
+                                ),
                               );
                             },
                           ),
@@ -98,7 +107,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                   Builder(
                     builder: (context) {
                       final msg =
-                          message ?? 'đã gửi yêu cầu đăng bài vào cộng đồng';
+                        actionText;
 
                       final List<TextSpan> spans = [];
 
@@ -131,7 +140,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                   const SizedBox(height: 6),
 
                   Text(
-                    time == "0 phút" ? "Vừa xong" : time,
+                    time == "0 phút" ? context.l10n.postJustNow : time,
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14,

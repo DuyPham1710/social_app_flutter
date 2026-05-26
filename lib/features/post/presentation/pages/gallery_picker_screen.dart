@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/bottom_bar_selected.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/grid_image_item.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class GalleryPickerScreen extends StatefulWidget {
   final List<AssetEntity> selectedAssets;
@@ -209,7 +210,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
-                "Chọn thư mục",
+                context.l10n.postChooseFolder,
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 18.sp,
@@ -255,7 +256,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
                       builder: (context, snapshot) {
                         final count = snapshot.data ?? 0;
                         return Text(
-                          "$count mục",
+                          context.l10n.postMediaItemCount(count),
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12.sp,
@@ -292,7 +293,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                _currentPath?.name ?? 'Thư viện ảnh',
+                _currentPath?.name ?? context.l10n.postPhotoLibrary,
                 style: TextStyle(color: AppColors.textPrimary),
               ),
               SizedBox(width: 4.w),
@@ -323,7 +324,7 @@ class _GalleryPickerScreenState extends State<GalleryPickerScreen> {
                   ),
 
                   child: Text(
-                    'Tiếp (${selectedAssets.length})',
+                    context.l10n.commonNextWithCount(selectedAssets.length),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.sp,

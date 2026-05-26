@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendSuggestionItem extends StatelessWidget {
   final String userId;
@@ -121,7 +122,7 @@ class FriendSuggestionItem extends StatelessWidget {
                       _buildMutualFriendAvatars(),
                       SizedBox(width: 6.w),
                       Text(
-                        '$mutualFriends bạn chung',
+                        context.l10n.friendMutualCount(mutualFriends),
                         style: TextStyle(
                           fontSize: 12.sp,
                           color: AppColors.textSecondary,
@@ -157,7 +158,7 @@ class FriendSuggestionItem extends StatelessWidget {
                         Icon(Icons.send, color: AppColors.primary, size: 16.r),
                         SizedBox(width: 8.w),
                         Text(
-                          'Đã gửi lời mời kết bạn',
+                          context.l10n.friendRequestSent,
                           style: TextStyle(
                             color: AppColors.primary,
                             fontSize: 12.sp,
@@ -173,7 +174,7 @@ class FriendSuggestionItem extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildActionButton(
-                          label: 'Thêm bạn bè',
+                          label: context.l10n.friendAdd,
                           background: AppColors.primary,
                           foreground: Colors.white,
                           onTap: onAddFriend ?? () {},
@@ -182,7 +183,7 @@ class FriendSuggestionItem extends StatelessWidget {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: _buildActionButton(
-                          label: 'Gỡ',
+                          label: context.l10n.friendRemove,
                           background: AppColors.secondBackground,
                           foreground: AppColors.textPrimary,
                           onTap: onRemove ?? () {},

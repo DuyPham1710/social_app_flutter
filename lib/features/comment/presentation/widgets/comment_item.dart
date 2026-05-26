@@ -19,6 +19,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:collection/collection.dart';
 
@@ -208,8 +209,8 @@ class _CommentItemState extends State<CommentItem> {
                           children: [
                             Text(
                               widget.comment.updatedAt != null
-                                  ? _timeAgo(widget.comment.updatedAt!)
-                                  : "Không rõ thời gian",
+                                  ? _timeAgo(context, widget.comment.updatedAt!)
+                                  : context.l10n.postUnknownTime,
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: AppColors.textSecondary,
@@ -234,7 +235,7 @@ class _CommentItemState extends State<CommentItem> {
                                 final userName =
                                     user.fullName ??
                                     user.username ??
-                                    'Người dùng';
+                                    context.l10n.commonUser;
                                 if (widget.comment.parentId != null) {
                                   widget.onReply!(
                                     user.userId,
@@ -254,7 +255,7 @@ class _CommentItemState extends State<CommentItem> {
                                 }
                               },
                               child: Text(
-                                'Trả lời',
+                                context.l10n.commentReply,
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.bold,
@@ -292,7 +293,9 @@ class _CommentItemState extends State<CommentItem> {
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Xem ${widget.replies!.length} phản hồi',
+                              context.l10n.commentViewReplies(
+                                widget.replies!.length,
+                              ),
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: AppColors.textSecondary,
@@ -449,11 +452,12 @@ class _CommentItemState extends State<CommentItem> {
     }
   }
 
-  String _timeAgo(DateTime time) {
+  String _timeAgo(BuildContext context, DateTime time) {
+    final l10n = context.l10n;
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    return '${diff.inDays} ngày trước';
+    if (diff.inMinutes == 0) return l10n.postJustNow;
+    if (diff.inMinutes < 60) return l10n.timeMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.timeHoursAgo(diff.inHours);
+    return l10n.timeDaysAgo(diff.inDays);
   }
 }

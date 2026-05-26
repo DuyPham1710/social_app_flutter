@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/story/presentation/pages/story_music_pick
 import 'package:social_app_fe/features/story/presentation/pages/story_editor_page.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/story_create_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryCreatePage extends StatefulWidget {
   const StoryCreatePage({super.key});
@@ -150,7 +151,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
           Expanded(
             child: Center(
               child: Text(
-                "Tạo tin",
+                context.l10n.chatCreateStory,
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 18.sp,
@@ -180,7 +181,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
         Expanded(
           child: _ActionCard(
             icon: Icons.text_fields_rounded,
-            label: "Văn bản",
+            label: context.l10n.storyText,
             onTap: () {},
           ),
         ),
@@ -188,7 +189,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
         Expanded(
           child: _ActionCard(
             icon: Icons.music_note_rounded,
-            label: "Nhạc",
+            label: context.l10n.storyMusic,
             onTap: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const StoryMusicPickerPage()),
@@ -200,7 +201,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
         Expanded(
           child: _ActionCard(
             icon: Icons.photo_library_rounded,
-            label: "Nhóm ảnh",
+            label: context.l10n.storyPhotoGroup,
             onTap: () {},
           ),
         ),
@@ -220,7 +221,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       ),
       onPressed: () {},
       icon: Icon(Icons.collections_rounded, color: AppColors.iconPrimary),
-      label: const Text("Chọn nhiều file"),
+      label: Text(context.l10n.storySelectMultipleFiles),
     );
   }
 
@@ -230,7 +231,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       child: Row(
         children: [
           Text(
-            _currentPath?.name ?? "Thư viện",
+            _currentPath?.name ?? context.l10n.storyLibrary,
             style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 16.sp,
@@ -270,7 +271,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
-                "Chọn thư mục",
+                context.l10n.storyChooseFolder,
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 18.sp,
@@ -313,7 +314,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                       builder: (context, snapshot) {
                         final count = snapshot.data ?? 0;
                         return Text(
-                          "$count mục",
+                          context.l10n.storyItemCount(count),
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 12.sp,
@@ -345,7 +346,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
     if (_permissionDenied) {
       return Center(
         child: Text(
-          "Cần quyền truy cập thư viện để hiển thị ảnh/video.",
+          context.l10n.storyLibraryPermissionRequired,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
           textAlign: TextAlign.center,
         ),
@@ -354,7 +355,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
     if (_assets.isEmpty) {
       return Center(
         child: Text(
-          "Chưa có ảnh/video trong thư viện.",
+          context.l10n.storyNoMediaInLibrary,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       );

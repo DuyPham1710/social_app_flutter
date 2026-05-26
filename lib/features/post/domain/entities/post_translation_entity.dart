@@ -13,4 +13,3 @@ class PostTranslationEntity {
     this.translationNotNeeded = false,
   });
 }
-

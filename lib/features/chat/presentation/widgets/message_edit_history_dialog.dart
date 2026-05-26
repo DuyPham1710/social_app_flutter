@@ -5,6 +5,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class MessageEditHistoryDialog {
   static void show({
@@ -81,7 +82,7 @@ class _MessageEditHistoryDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Lịch sử chỉnh sửa',
+                      context.l10n.messageEditHistoryTitle,
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
@@ -92,7 +93,7 @@ class _MessageEditHistoryDialog extends StatelessWidget {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      'Ẩn lịch sử chỉnh sửa',
+                      context.l10n.messageHideEditHistory,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.primary,
@@ -146,7 +147,7 @@ class _MessageEditHistoryDialog extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(4.r),
                                 ),
                                 child: Text(
-                                  'Hiện tại',
+                                  context.l10n.messageCurrentVersion,
                                   style: TextStyle(
                                     fontSize: 10.sp,
                                     fontWeight: FontWeight.bold,

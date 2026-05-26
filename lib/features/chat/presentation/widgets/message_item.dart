@@ -14,6 +14,7 @@ import 'package:social_app_fe/shared/helpers/full_screen_image_viewer.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/pdf_viewer_page.dart';
@@ -96,7 +97,7 @@ class MessageItem extends StatelessWidget {
     String fileName,
   ) async {
     try {
-      showInfoSnackBar(context, 'Đang tải file...');
+      showInfoSnackBar(context, context.l10n.chatDownloadingFile);
 
       final tempDir = await getTemporaryDirectory();
       // Ensure fileName is safe
@@ -111,11 +112,14 @@ class MessageItem extends StatelessWidget {
 
       final result = await OpenFilex.open(savePath);
       if (result.type != ResultType.done && context.mounted) {
-        showErrorSnackBar(context, 'Không tìm thấy ứng dụng để mở file này');
+        showErrorSnackBar(context, context.l10n.chatNoAppToOpenFile);
       }
     } catch (e) {
       if (context.mounted) {
-        showErrorSnackBar(context, 'Không thể mở file: ${e.toString()}');
+        showErrorSnackBar(
+          context,
+          context.l10n.chatOpenFileFailed(e.toString()),
+        );
       }
     }
   }
@@ -151,10 +155,10 @@ class MessageItem extends StatelessWidget {
       children: [
         // Show unread indicator if this is the first unread message
         if (isFirstUnreadMessage && unreadCount != null && unreadCount! > 0)
-          _buildUnreadIndicator(),
+          _buildUnreadIndicator(context),
 
         // Show "Đã chỉnh sửa" nếu tin nhắn đã được chỉnh sửa
-        if (isEdited) _buildEditedText(),
+        if (isEdited) _buildEditedText(context),
 
         Container(
           margin: EdgeInsets.only(
@@ -192,7 +196,7 @@ class MessageItem extends StatelessWidget {
                     fit: StackFit.loose,
                     children: [
                       isDeleteforEveryone
-                          ? _buildDeletedMessage(lastName, fromMe)
+                          ? _buildDeletedMessage(context, lastName, fromMe)
                           : isReplying
                           ? _buildReplyMessage(context)
                           : isStoryReply
@@ -235,14 +239,18 @@ class MessageItem extends StatelessWidget {
         hasReactions ? SizedBox(height: 20.h) : SizedBox.shrink(),
 
         // Hiển thị trạng thái tin nhắn
-        _buildMessageStatus(),
+        _buildMessageStatus(context),
 
         if (showAvatar) SizedBox(height: 16.h),
       ],
     );
   }
 
-  Widget _buildDeletedMessage(String lastName, bool fromMe) {
+  Widget _buildDeletedMessage(
+    BuildContext context,
+    String lastName,
+    bool fromMe,
+  ) {
     return Container(
       constraints: BoxConstraints(maxWidth: 0.7.sw),
       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
@@ -257,7 +265,9 @@ class MessageItem extends StatelessWidget {
         ),
       ),
       child: Text(
-        fromMe ? 'Bạn đã xóa tin nhắn này' : '$lastName đã xóa tin nhắn này',
+        fromMe
+            ? context.l10n.chatYouDeletedMessage
+            : context.l10n.chatUserDeletedMessage(lastName),
         style: TextStyle(
           fontSize: 14.sp,
           fontStyle: FontStyle.italic,
@@ -267,7 +277,7 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildUnreadIndicator() {
+  Widget _buildUnreadIndicator(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 12.h),
       child: Row(
@@ -276,7 +286,7 @@ class MessageItem extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Text(
-              '$unreadCount tin nhắn chưa đọc',
+              context.l10n.chatUnreadMessages(unreadCount!),
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
@@ -290,7 +300,7 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildEditedText() {
+  Widget _buildEditedText(BuildContext context) {
     return GestureDetector(
       onTap: onEditHistoryTap,
       child: Padding(
@@ -306,7 +316,7 @@ class MessageItem extends StatelessWidget {
               : MainAxisAlignment.start,
           children: [
             Text(
-              'Đã chỉnh sửa',
+              context.l10n.chatEdited,
               style: TextStyle(
                 fontSize: 11.sp,
                 fontStyle: FontStyle.italic,
@@ -362,7 +372,7 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageStatus() {
+  Widget _buildMessageStatus(BuildContext context) {
     if (!fromMe || !isLastMessage) return const SizedBox.shrink();
 
     final seenByUsers = _getSeenByUsers();
@@ -402,7 +412,7 @@ class MessageItem extends StatelessWidget {
           ] else
             // Hiển thị text "Đã gửi"
             Text(
-              'Đã gửi ${message.createdAt.formatRelativeTime()}',
+              context.l10n.chatSentAt(message.createdAt.formatRelativeTime()),
               style: TextStyle(
                 fontSize: 11.sp,
                 color: AppColors.textSecondary,
@@ -494,7 +504,7 @@ class MessageItem extends StatelessWidget {
                       Text(
                         message.replyTo!.sender.fullName ??
                             message.replyTo!.sender.username ??
-                            'Unknown',
+                            context.l10n.commonUnknown,
                         style: TextStyle(
                           color: fromMe ? Colors.white : AppColors.primary,
                           fontSize: 12.sp,
@@ -507,6 +517,7 @@ class MessageItem extends StatelessWidget {
                       Text(
                         message.replyTo!.attachments.isNotEmpty
                             ? _getAttachmentTypeString(
+                                context,
                                 message.replyTo!.attachments.first.type,
                               )
                             : message.replyTo!.text,
@@ -814,7 +825,7 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildLocationMessage(BuildContext context) {
-    final label = message.metadata?.label ?? 'Vị trí';
+    final label = message.metadata?.label ?? context.l10n.messageLocation;
     final lat = message.metadata?.latitude;
     final lng = message.metadata?.longitude;
     final mapUrl = message.metadata?.mapUrl;
@@ -1044,11 +1055,11 @@ class MessageItem extends StatelessWidget {
     return SizedBox.shrink();
   }
 
-  String _getAttachmentTypeString(String type) {
-    if (type == AttachmentType.audio.name) return '[Tin nhắn thoại]';
-    if (type == AttachmentType.image.name) return '[Ảnh]';
-    if (type == AttachmentType.video.name) return '[Video]';
-    if (type == AttachmentType.file.name) return '[Tệp tin]';
-    return '[Đính kèm]';
+  String _getAttachmentTypeString(BuildContext context, String type) {
+    if (type == AttachmentType.audio.name) return context.l10n.chatAudioMessage;
+    if (type == AttachmentType.image.name) return context.l10n.chatPhoto;
+    if (type == AttachmentType.video.name) return context.l10n.postVideo;
+    if (type == AttachmentType.file.name) return context.l10n.chatFile;
+    return context.l10n.chatAttachment;
   }
 }

@@ -7,11 +7,18 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/react_list_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ReactionDetailsPage extends StatefulWidget {
   final List<ReactPostEntity> reacts;
   final String postId;
-  final Function(String userId, String userAvatar, String? parentId, String userDisplayName)? onMention;
+  final Function(
+    String userId,
+    String userAvatar,
+    String? parentId,
+    String userDisplayName,
+  )?
+  onMention;
   const ReactionDetailsPage({
     super.key,
     required this.reacts,
@@ -107,7 +114,7 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Người đã bày tỏ cảm xúc',
+          context.l10n.postPeopleReactedTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 16.sp,
@@ -143,7 +150,10 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Tất cả', style: TextStyle(fontSize: 14.sp)),
+                  Text(
+                    context.l10n.commonAll,
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
 
                   SizedBox(width: 8.w),
 

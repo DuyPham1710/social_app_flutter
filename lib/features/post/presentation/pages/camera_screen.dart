@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
@@ -61,11 +62,11 @@ class _CameraScreenState extends State<CameraScreen> {
         showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-            title: const Text('Lỗi Camera'),
-            content: Text('Không thể khởi tạo camera: $e'),
+            title: Text(context.l10n.postCameraErrorTitle),
+            content: Text(context.l10n.postCameraInitFailed(e.toString())),
             actions: [
               CupertinoDialogAction(
-                child: const Text('OK'),
+                child: Text(context.l10n.commonOk),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -121,7 +122,10 @@ class _CameraScreenState extends State<CameraScreen> {
         });
 
         // Show error to user
-        showErrorSnackBar(context, 'Lỗi khởi tạo camera: $e');
+        showErrorSnackBar(
+          context,
+          context.l10n.postCameraInitFailed(e.toString()),
+        );
       }
     }
   }
@@ -335,7 +339,7 @@ class _CameraScreenState extends State<CameraScreen> {
                             borderRadius: BorderRadius.circular(20.r),
                           ),
                           child: Text(
-                            'Ảnh',
+                            context.l10n.postPhoto,
                             style: TextStyle(
                               color: _isPhoto ? Colors.black : Colors.white,
                               fontSize: 16.sp,
@@ -367,7 +371,7 @@ class _CameraScreenState extends State<CameraScreen> {
                             borderRadius: BorderRadius.circular(20.r),
                           ),
                           child: Text(
-                            'Video',
+                            context.l10n.postVideo,
                             style: TextStyle(
                               color: !_isPhoto ? Colors.black : Colors.white,
                               fontSize: 16.sp,
@@ -480,7 +484,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        'Đang quay',
+                        context.l10n.postRecording,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14.sp,

@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/pages/reaction_details_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommentHeaderWidget extends StatelessWidget {
   final String postId;
@@ -144,7 +145,7 @@ class CommentHeaderWidget extends StatelessWidget {
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  '0 lượt chia sẻ',
+                  context.l10n.postShareCount(0),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textPrimary,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
@@ -31,9 +33,15 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
       child: BlocListener<CommunityInvitesBloc, CommunityInvitesState>(
         listener: (context, state) {
           if (state is CommunityInvitesError) {
-            showErrorSnackBar(context, state.message);
+            showErrorSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           } else if (state is CommunityInvitesSuccess) {
-            showSuccessSnackBar(context, state.message);
+            showSuccessSnackBar(
+              context,
+              localizedCommunityMessage(context.l10n, state.message),
+            );
           }
         },
         child: BlocBuilder<CommunityInvitesBloc, CommunityInvitesState>(
@@ -47,11 +55,18 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.mail_outline, size: 64, color: Colors.grey[400]),
+                    Icon(
+                      Icons.mail_outline,
+                      size: 64,
+                      color: AppColors.textSecondary.withValues(alpha: 0.75),
+                    ),
                     const SizedBox(height: 16),
                     Text(
-                      'Không có lời mời tham gia cộng đồng',
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      context.l10n.communityNoCommunityInvites,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ],
                 ),
@@ -66,7 +81,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                     Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
                     const SizedBox(height: 16),
                     Text(
-                      state.message,
+                      localizedCommunityMessage(context.l10n, state.message),
                       style: const TextStyle(color: Colors.red),
                       textAlign: TextAlign.center,
                     ),
@@ -75,7 +90,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                       onPressed: () {
                         _bloc.add(RefreshInvitesEvent());
                       },
-                      child: const Text('Tải lại'),
+                      child: Text(context.l10n.commonRefresh),
                     ),
                   ],
                 ),
@@ -111,7 +126,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                       : '';
                   final communityName = communityData is Map
                       ? _extractString(communityData, ['name'])
-                      : 'Cộng đồng';
+                      : context.l10n.menuCommunity;
                   final communityAvatar = communityData is Map
                       ? _extractString(communityData, ['avatar'])
                       : null;
@@ -129,8 +144,11 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                       vertical: 8,
                     ),
                     child: Material(
-                      color: Colors.white,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(12),
+                      shadowColor: AppColors.textSecondary.withValues(
+                        alpha: 0.08,
+                      ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         child: Padding(
@@ -155,7 +173,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                         ? Icon(
                                             Icons.groups,
                                             size: 28,
-                                            color: Colors.grey[600],
+                                            color: AppColors.textSecondary,
                                           )
                                         : null,
                                   ),
@@ -168,9 +186,10 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                       children: [
                                         Text(
                                           communityName,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
+                                            color: AppColors.textPrimary,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -181,19 +200,19 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                             communityDescription!,
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Colors.grey[600],
+                                              color: AppColors.textSecondary,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         Text(
-                                          timeago.format(
+                                          localizedCommunityTimeAgo(
+                                            context.l10n,
                                             createdAt,
-                                            locale: 'vi',
                                           ),
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey[500],
+                                            color: AppColors.textSecondary,
                                           ),
                                         ),
                                       ],
@@ -220,7 +239,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                               );
                                             },
                                       icon: const Icon(Icons.clear, size: 18),
-                                      label: const Text('Từ chối'),
+                                      label: Text(context.l10n.friendReject),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -239,7 +258,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                               );
                                             },
                                       icon: const Icon(Icons.check, size: 18),
-                                      label: const Text('Chấp nhận'),
+                                      label: Text(context.l10n.friendAccept),
                                     ),
                                   ),
                                 ],

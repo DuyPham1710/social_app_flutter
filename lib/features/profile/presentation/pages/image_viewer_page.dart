@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ImageViewerPage extends StatefulWidget {
   final String imageUrl;
@@ -34,7 +35,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
-          widget.title ?? 'Hình ảnh',
+          widget.title ?? context.l10n.profileImage,
           style: const TextStyle(color: Colors.white),
         ),
       ),

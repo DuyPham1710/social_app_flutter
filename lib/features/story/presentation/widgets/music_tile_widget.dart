@@ -58,10 +58,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
       ),
       subtitle: Text(
         widget.item.artist.name,
-        style: TextStyle(
-          color: AppColors.textSecondary,
-          fontSize: 13.sp,
-        ),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),

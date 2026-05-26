@@ -8,4 +8,3 @@ abstract class FriendSuggestionEntity {
   String? get reason;
   List<String>? get mutualFriendAvatars;
 }
-

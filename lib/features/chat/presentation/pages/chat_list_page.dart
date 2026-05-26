@@ -31,6 +31,7 @@ import 'package:social_app_fe/features/story/presentation/pages/story_create_pag
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/chat/data/services/chat_presence_service.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -53,18 +54,6 @@ class _ChatListPageState extends State<ChatListPage> {
   StreamSubscription<Map<String, ChatPresenceStatus>>? _presenceSub;
   Map<String, ChatPresenceStatus> _presenceByUserId = {};
   final Set<String> _presenceRequestedUserIds = {};
-
-  String _formatPresenceText(ChatPresenceStatus status) {
-    if (status.isOnline) return 'Online';
-    final lastSeenAt = status.lastSeenAt?.toLocal();
-    if (lastSeenAt == null) return 'Offline';
-
-    final diff = DateTime.now().difference(lastSeenAt);
-    if (diff.inMinutes < 1) return 'Vừa hoạt động';
-    if (diff.inMinutes < 60) return 'Hoạt động ${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return 'Hoạt động ${diff.inHours} giờ trước';
-    return 'Hoạt động ${diff.inDays} ngày trước';
-  }
 
   @override
   void didChangeDependencies() {
@@ -201,7 +190,7 @@ class _ChatListPageState extends State<ChatListPage> {
     List<UserEntity>? participants,
   }) async {
     if (userId == null) {
-      showErrorSnackBar(context, 'User not found. Please login again.');
+      showErrorSnackBar(context, context.l10n.chatUserNotFound);
 
       return;
     }
@@ -282,7 +271,7 @@ class _ChatListPageState extends State<ChatListPage> {
   /// Check if conversation exists, if yes join it, if no create new one
   Future<void> _handleFriendTap(FriendEntity friend) async {
     if (userId == null) {
-      showErrorSnackBar(context, 'User not found. Please login again.');
+      showErrorSnackBar(context, context.l10n.chatUserNotFound);
 
       return;
     }
@@ -350,7 +339,7 @@ class _ChatListPageState extends State<ChatListPage> {
       // Hide loading indicator if error
       Navigator.of(context).pop();
 
-      showErrorSnackBar(context, 'Error finding conversation: $e');
+      showErrorSnackBar(context, context.l10n.chatFindConversationFailed('$e'));
     }
   }
 
@@ -375,7 +364,10 @@ class _ChatListPageState extends State<ChatListPage> {
     return BlocListener<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationError) {
-          showErrorSnackBar(context, 'Conversation error: ${state.message}');
+          showErrorSnackBar(
+            context,
+            context.l10n.chatConversationError(state.message),
+          );
         } else if (state is CreateConversationSuccess) {
           // Khi tạo conversation thành công, reload conversations để hiển thị conversation mới
           if (userId != null) {
@@ -384,7 +376,9 @@ class _ChatListPageState extends State<ChatListPage> {
         } else if (state is ConversationsError) {
           showErrorSnackBar(
             context,
-            'Conversations Error: ${state.message ?? "Unknown error"}',
+            context.l10n.chatConversationsError(
+              state.message ?? context.l10n.commonUnknown,
+            ),
           );
           // Reset loading flag khi có lỗi
           if (_isLoadingMore) {
@@ -407,7 +401,7 @@ class _ChatListPageState extends State<ChatListPage> {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is MenuErrorState) {
-            return Text('Lỗi: ${state.message}');
+            return Text(context.l10n.commonErrorWithMessage(state.message));
           }
 
           if (state is MenuLoadedState) {
@@ -432,7 +426,7 @@ class _ChatListPageState extends State<ChatListPage> {
                   ],
                 ),
                 title: Text(
-                  state.user.fullName ?? "Chats",
+                  state.user.fullName ?? context.l10n.chatTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -518,7 +512,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                 ),
                                 SizedBox(width: 10.w),
                                 Text(
-                                  "Tìm kiếm",
+                                  context.l10n.chatSearchHint,
                                   style: TextStyle(
                                     color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w400,
@@ -546,7 +540,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                   padding: EdgeInsets.only(right: 12.w),
                                   child: StoryChatItemWidget(
                                     imageUrl: "https://i.pravatar.cc/200",
-                                    name: "Tin của bạn",
+                                    name: context.l10n.chatYourStory,
                                     showAddButton: true,
                                     onTap: () {
                                       // Handle add story tap
@@ -569,7 +563,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                         imageUrl:
                                             state.user.avatarUrl ??
                                             "https://i.pravatar.cc/200",
-                                        name: "Tạo tin",
+                                        name: context.l10n.chatCreateStory,
                                         showAddButton: true,
                                         onTap: () {
                                           Navigator.push(
@@ -693,7 +687,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                 // Lấy tên người gửi
                                 String senderName;
                                 if (fromMe) {
-                                  senderName = "Bạn";
+                                  senderName = context.l10n.chatYou;
                                 } else if (conversation.isGroup) {
                                   // Trong group, hiển thị tên người gửi
                                   final sender = conversation.participants
@@ -708,7 +702,7 @@ class _ChatListPageState extends State<ChatListPage> {
                                   senderName =
                                       sender.fullName?.trim().split(' ').last ??
                                       sender.username ??
-                                      'User';
+                                      context.l10n.commonUser;
                                 } else {
                                   senderName = "";
                                 }
@@ -717,15 +711,28 @@ class _ChatListPageState extends State<ChatListPage> {
                                     .lastMessage!
                                     .attachments
                                     .isNotEmpty) {
-                                  previewText =
-                                      "$senderName${senderName.isNotEmpty ? ' ' : ''}đã gửi ${conversation.lastMessage!.attachments.first.type}   •   ${conversation.lastMessage!.createdAt.formatChatTime()}";
+                                  previewText = context.l10n
+                                      .chatSentAttachmentPreview(
+                                        senderName.isNotEmpty
+                                            ? '$senderName '
+                                            : '',
+                                        conversation
+                                            .lastMessage!
+                                            .attachments
+                                            .first
+                                            .type,
+                                        conversation.lastMessage!.createdAt
+                                            .formatChatTime(),
+                                      );
                                 } else {
-                                  previewText =
-                                      "$senderName${senderName.isNotEmpty && !fromMe
-                                          ? ': '
-                                          : fromMe
-                                          ? ': '
-                                          : ''}${conversation.lastMessage!.text}   •   ${conversation.lastMessage!.createdAt.formatChatTime()}";
+                                  previewText = context.l10n.chatTextPreview(
+                                    senderName.isNotEmpty || fromMe
+                                        ? '$senderName: '
+                                        : '',
+                                    conversation.lastMessage!.text ?? '',
+                                    conversation.lastMessage!.createdAt
+                                        .formatChatTime(),
+                                  );
                                 }
                               } else {
                                 // Không có lastMessage
@@ -733,17 +740,18 @@ class _ChatListPageState extends State<ChatListPage> {
                                   // Group mới tạo - hiển thị người tạo
                                   final creator = conversation.createdBy!;
                                   final creatorName = creator.userId == userId
-                                      ? "Bạn"
+                                      ? context.l10n.chatYou
                                       : creator.fullName
                                                 ?.trim()
                                                 .split(' ')
                                                 .last ??
                                             creator.username ??
-                                            'Ai đó';
-                                  previewText = "$creatorName vừa tạo nhóm";
+                                            context.l10n.chatSomeone;
+                                  previewText = context.l10n
+                                      .chatGroupCreatedPreview(creatorName);
                                 } else {
                                   // 1-1 chat chưa có tin nhắn
-                                  previewText = "Đã kết nối";
+                                  previewText = context.l10n.chatConnected;
                                 }
                               }
 
@@ -827,12 +835,15 @@ class _ChatListPageState extends State<ChatListPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    'Error: ${state.message ?? "Unknown error"}',
+                                    context.l10n.commonErrorWithMessage(
+                                      state.message ??
+                                          context.l10n.commonUnknown,
+                                    ),
                                   ),
                                   SizedBox(height: 16.h),
                                   ElevatedButton(
                                     onPressed: _loadConversations,
-                                    child: const Text('Retry'),
+                                    child: Text(context.l10n.commonRetry),
                                   ),
                                 ],
                               ),
@@ -863,10 +874,10 @@ class _ChatListPageState extends State<ChatListPage> {
         if (friendState is FriendLoaded) {
           final friends = friendState.friends;
           if (friends.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(16.0),
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Text(
-                'No friends found. Add some friends to start chatting!',
+                context.l10n.chatNoFriendsToStart,
                 textAlign: TextAlign.center,
               ),
             );
@@ -878,7 +889,7 @@ class _ChatListPageState extends State<ChatListPage> {
               Padding(
                 padding: EdgeInsets.all(16.w),
                 child: Text(
-                  'Bạn bè gợi ý để nhắn tin',
+                  context.l10n.chatSuggestedFriends,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -891,7 +902,10 @@ class _ChatListPageState extends State<ChatListPage> {
                   avatar:
                       friend.avatarUrl ??
                       "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
-                  name: friend.fullName ?? friend.username ?? "Người dùng",
+                  name:
+                      friend.fullName ??
+                      friend.username ??
+                      context.l10n.commonUser,
                   onTap: () {
                     // Check if conversation exists with this friend
                     _handleFriendTap(friend);
@@ -908,9 +922,9 @@ class _ChatListPageState extends State<ChatListPage> {
             ),
           );
         }
-        return const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Center(child: Text('No conversations found')),
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(child: Text(context.l10n.chatNoConversations)),
         );
       },
     );

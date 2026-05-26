@@ -12,9 +12,11 @@ import 'package:social_app_fe/features/community/presentation/widgets/community_
 import 'package:social_app_fe/features/community/presentation/widgets/community_posts_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/invite_friends_bottom_sheet.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_create_post_page.dart';
+import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/features/community/presentation/pages/edit_community_page.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityDetailPage extends StatefulWidget {
   final String communityId;
@@ -48,7 +50,6 @@ class CommunityDetailPage extends StatefulWidget {
 class _CommunityDetailPageState extends State<CommunityDetailPage> {
   int _refreshSeed = 0;
 
-  static const Color _pageBackground = Color(0xFFF0F2F5);
   static const Duration _pageFadeDuration =
       CommunityDetailPage.fadeTransitionDuration;
 
@@ -84,7 +85,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       builder: (bottomSheetContext) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: DraggableScrollableSheet(
@@ -117,7 +118,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       builder: (context) =>
           InviteFriendsBottomSheet(communityId: widget.communityId),
     );
@@ -133,18 +134,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
     // View members
     items.add(
-      const PopupMenuItem<String>(
+      PopupMenuItem<String>(
         value: 'view_members',
-        child: Text('Thành viên'),
+        child: Text(context.l10n.communityMembers),
       ),
     );
 
     // Invite friends (only for members)
     if (isMember) {
       items.add(
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'invite_friends',
-          child: Text('Mời bạn bè'),
+          child: Text(context.l10n.communityInviteFriends),
         ),
       );
     }
@@ -152,32 +153,35 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     // Review members (admin only)
     if (state.userRole == 'admin') {
       items.add(
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'review_members',
-          child: Text('Duyệt thành viên'),
+          child: Text(context.l10n.communityReviewMembers),
         ),
       );
 
       items.add(
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'review_posts',
-          child: Text('Duyệt bài viết'),
+          child: Text(context.l10n.communityReviewPosts),
         ),
       );
 
       items.add(const PopupMenuDivider(height: 8));
 
       items.add(
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'edit_community',
-          child: Text('Chỉnh sửa nhóm'),
+          child: Text(context.l10n.communityEditGroup),
         ),
       );
 
       items.add(
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'delete_community',
-          child: Text('Xóa nhóm', style: TextStyle(color: Color(0xFFB91C1C))),
+          child: Text(
+            context.l10n.communityDeleteGroup,
+            style: const TextStyle(color: Color(0xFFB91C1C)),
+          ),
         ),
       );
     }
@@ -186,9 +190,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     if (isMember && state.userRole != 'admin') {
       items.add(const PopupMenuDivider(height: 8));
       items.add(
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'leave_community',
-          child: Text('Rời nhóm'),
+          child: Text(context.l10n.communityLeaveGroup),
         ),
       );
     }
@@ -241,14 +245,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: const Text('Xóa cộng đồng'),
-        content: const Text(
-          'Bạn có chắc chắn muốn xóa cộng đồng này? Hành động này không thể hoàn tác.',
-        ),
+        title: Text(context.l10n.communityDeleteTitle),
+        content: Text(context.l10n.communityDeleteConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Hủy'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () {
@@ -260,7 +262,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFB91C1C),
             ),
-            child: const Text('Xóa'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
@@ -272,7 +274,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: _buildMembersReviewSheet(context),
@@ -285,7 +287,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: const Color(0xFFF8FAFF),
+      backgroundColor: AppColors.background,
       builder: (_) => BlocProvider.value(
         value: context.read<CommunityAdminBloc>(),
         child: _buildPostsReviewSheet(context),
@@ -297,9 +299,15 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
       listener: (context, state) {
         if (state is CommunityAdminActionSuccess) {
-          showSuccessSnackBar(context, state.message);
+          showSuccessSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         } else if (state is CommunityAdminError) {
-          showErrorSnackBar(context, state.message);
+          showErrorSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         }
       },
       builder: (context, state) {
@@ -307,22 +315,22 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
         if (state is PendingRequestsLoaded) {
           if (state.requests.isEmpty) {
-            content = const Center(
+            content = Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.group_add_rounded,
                     size: 46,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textSecondary,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
-                    'Không có yêu cầu tham gia đang chờ duyệt',
+                    context.l10n.communityNoPendingRequests,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -350,8 +358,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             children: [
               _buildReviewSheetHeader(
                 icon: Icons.how_to_reg_rounded,
-                title: 'Duyệt thành viên',
-                subtitle: 'Xác nhận yêu cầu tham gia cộng đồng',
+                title: context.l10n.communityReviewMembers,
+                subtitle: context.l10n.communityReviewMembersSubtitle,
               ),
               Expanded(child: content),
             ],
@@ -365,9 +373,15 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return BlocConsumer<CommunityAdminBloc, CommunityAdminState>(
       listener: (context, state) {
         if (state is CommunityAdminActionSuccess) {
-          showSuccessSnackBar(context, state.message);
+          showSuccessSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         } else if (state is CommunityAdminError) {
-          showErrorSnackBar(context, state.message);
+          showErrorSnackBar(
+            context,
+            localizedCommunityMessage(context.l10n, state.message),
+          );
         }
       },
       builder: (context, state) {
@@ -375,22 +389,22 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
         if (state is PendingPostsLoaded) {
           if (state.posts.isEmpty) {
-            content = const Center(
+            content = Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.fact_check_outlined,
                     size: 46,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textSecondary,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
-                    'Không có bài viết nào đang chờ duyệt',
+                    context.l10n.communityNoPendingReviewPosts,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -418,8 +432,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             children: [
               _buildReviewSheetHeader(
                 icon: Icons.fact_check_rounded,
-                title: 'Duyệt bài viết',
-                subtitle: 'Kiểm tra nội dung trước khi bài được công khai',
+                title: context.l10n.communityReviewPosts,
+                subtitle: context.l10n.communityReviewPostsSubtitle,
               ),
               Expanded(child: content),
             ],
@@ -438,10 +452,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-        ),
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: Row(
         children: [
@@ -449,10 +461,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFE7F0FF),
+              color: AppColors.secondBackground,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF1D4ED8)),
+            child: Icon(icon, color: AppColors.primary),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -461,18 +473,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF111827),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -490,9 +502,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,12 +513,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: request.user.avatarUrl != null
                     ? NetworkImage(request.user.avatarUrl!)
                     : null,
                 child: request.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -515,21 +527,21 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      request.user.fullName ?? 'Người dùng',
+                      request.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _formatTimeAgo(request.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -553,7 +565,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     );
                   },
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text('Từ chối'),
+                  label: Text(context.l10n.friendReject),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFB91C1C),
                     side: const BorderSide(color: Color(0xFFFCA5A5)),
@@ -576,7 +588,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     );
                   },
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('Chấp nhận'),
+                  label: Text(context.l10n.friendAccept),
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF16A34A),
                     foregroundColor: Colors.white,
@@ -600,9 +612,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,12 +624,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundColor: AppColors.secondBackground,
                 backgroundImage: post.user.avatarUrl != null
                     ? NetworkImage(post.user.avatarUrl!)
                     : null,
                 child: post.user.avatarUrl == null
-                    ? const Icon(Icons.person, color: Color(0xFF6B7280))
+                    ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
               const SizedBox(width: 10),
@@ -626,21 +638,21 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post.user.fullName ?? 'Người dùng',
+                      post.user.fullName ?? context.l10n.commonUser,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _formatTimeAgo(post.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -651,17 +663,15 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           ),
           const SizedBox(height: 12),
           Text(
-            caption.isNotEmpty
-                ? caption
-                : 'Bài viết không có nội dung văn bản.',
+            caption.isNotEmpty ? caption : context.l10n.communityPostNoText,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
               height: 1.35,
               color: caption.isNotEmpty
-                  ? const Color(0xFF111827)
-                  : const Color(0xFF6B7280),
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -675,11 +685,11 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                   post.urls.first.url,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFFF3F4F6),
+                    color: AppColors.secondBackground,
                     alignment: Alignment.center,
-                    child: const Icon(
+                    child: Icon(
                       Icons.broken_image_rounded,
-                      color: Color(0xFF9CA3AF),
+                      color: AppColors.textSecondary,
                       size: 26,
                     ),
                   ),
@@ -702,7 +712,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     );
                   },
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text('Từ chối'),
+                  label: Text(context.l10n.friendReject),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFB91C1C),
                     side: const BorderSide(color: Color(0xFFFCA5A5)),
@@ -725,7 +735,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     );
                   },
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('Duyệt bài'),
+                  label: Text(context.l10n.notificationApprovePostAction),
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF16A34A),
                     foregroundColor: Colors.white,
@@ -747,14 +757,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: const Text('Rời nhóm'),
-        content: const Text(
-          'Bạn có chắc chắn muốn rời khỏi cộng đồng này? Bạn có thể tham gia lại sau nếu muốn.',
-        ),
+        title: Text(context.l10n.communityLeaveGroup),
+        content: Text(context.l10n.communityLeaveConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Hủy'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () {
@@ -766,7 +774,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFB91C1C),
             ),
-            child: const Text('Rời nhóm'),
+            child: Text(context.l10n.communityLeaveGroup),
           ),
         ],
       ),
@@ -774,16 +782,16 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   }
 
   String _formatTimeAgo(DateTime? value) {
-    if (value == null) return 'Không rõ thời gian';
+    if (value == null) return context.l10n.postUnknownTime;
 
     final now = DateTime.now();
     final date = value.toLocal();
     final diff = now.difference(date);
 
-    if (diff.inSeconds < 60) return 'Vừa xong';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
-    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
-    if (diff.inDays < 7) return '${diff.inDays} ngày trước';
+    if (diff.inSeconds < 60) return context.l10n.postJustNow;
+    if (diff.inMinutes < 60) return context.l10n.timeMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return context.l10n.timeHoursAgo(diff.inHours);
+    if (diff.inDays < 7) return context.l10n.timeDaysAgo(diff.inDays);
 
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -804,75 +812,82 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   }
 
   Widget _buildLoadingPage() {
-    return CustomScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      slivers: [
-        SliverAppBar(
-          titleSpacing: 0,
-          title: Container(
-            width: 150,
-            height: 16,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE4E7EC),
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            color: const Color(0xFF1C1E21),
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-          expandedHeight: 240,
-          pinned: true,
-          backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF1C1E21),
-          surfaceTintColor: Colors.transparent,
-          scrolledUnderElevation: 0,
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFE8EEF5), Color(0xFFD8E1EA)],
-                ),
+    return ColoredBox(
+      color: AppColors.secondBackground,
+      child: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            titleSpacing: 0,
+            title: Container(
+              width: 150,
+              height: 16,
+              decoration: BoxDecoration(
+                color: AppColors.textSecondary.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(999),
               ),
-              child: Center(
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    shape: BoxShape.circle,
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              color: AppColors.iconPrimary,
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+            expandedHeight: 240,
+            pinned: true,
+            backgroundColor: AppColors.background,
+            foregroundColor: AppColors.iconPrimary,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.textSecondary.withValues(alpha: 0.08),
+                      AppColors.textSecondary.withValues(alpha: 0.16),
+                    ],
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      color: AppColors.primary,
+                ),
+                child: Center(
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: AppColors.background.withValues(alpha: 0.85),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildLoadingCard(height: 118),
-                const SizedBox(height: 12),
-                _buildLoadingCard(height: 92, compact: true),
-                const SizedBox(height: 12),
-                _buildLoadingCard(height: 210),
-              ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildLoadingCard(height: 118),
+                  const SizedBox(height: 12),
+                  _buildLoadingCard(height: 92, compact: true),
+                  const SizedBox(height: 12),
+                  _buildLoadingCard(height: 210),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -881,12 +896,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       height: height,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE4E7EC)),
-        boxShadow: const [
+        border: Border.all(
+          color: AppColors.textSecondary.withValues(alpha: 0.12),
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0F0F172A),
+            color: AppColors.textSecondary.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -917,7 +934,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         width: width == double.infinity ? null : width,
         height: 14,
         decoration: BoxDecoration(
-          color: const Color(0xFFE9EEF5),
+          color: AppColors.textSecondary.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(999),
         ),
       ),
@@ -938,12 +955,16 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         ),
       ],
       child: Scaffold(
-        backgroundColor: _pageBackground,
+        backgroundColor: AppColors.secondBackground,
         body: BlocConsumer<CommunityDetailBloc, CommunityDetailState>(
           listener: (context, state) {
             if (state is CommunityActionSuccess) {
-              showSuccessSnackBar(context, state.message);
-              if (state.message == 'Đã xóa cộng đồng thành công') {
+              final message = localizedCommunityMessage(
+                context.l10n,
+                state.message,
+              );
+              showSuccessSnackBar(context, message);
+              if (message == context.l10n.communityDeleteSuccess) {
                 Future.delayed(const Duration(milliseconds: 300), () {
                   if (mounted) Navigator.of(context).pop(true);
                 });
@@ -951,7 +972,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 _refreshContent(context);
               }
             } else if (state is CommunityDetailError) {
-              showErrorSnackBar(context, state.message);
+              showErrorSnackBar(
+                context,
+                localizedCommunityMessage(context.l10n, state.message),
+              );
             }
           },
           builder: (context, state) {
@@ -975,14 +999,21 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Text(state.message, textAlign: TextAlign.center),
+                        child: Text(
+                          localizedCommunityMessage(
+                            context.l10n,
+                            state.message,
+                          ),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: AppColors.textPrimary),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () => context
                             .read<CommunityDetailBloc>()
                             .add(CommunityDetailFetched(widget.communityId)),
-                        child: const Text('Thử lại'),
+                        child: Text(context.l10n.commonRetry),
                       ),
                     ],
                   ),
@@ -1007,14 +1038,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                           state.community.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF1C1E21),
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         leading: IconButton(
                           icon: const Icon(Icons.arrow_back_rounded),
-                          color: const Color(0xFF1C1E21),
+                          color: AppColors.iconPrimary,
                           onPressed: () => Navigator.of(context).maybePop(),
                         ),
                         actions: [
@@ -1032,8 +1063,8 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                         ],
                         expandedHeight: 240,
                         pinned: true,
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF1C1E21),
+                        backgroundColor: AppColors.background,
+                        foregroundColor: AppColors.iconPrimary,
                         surfaceTintColor: Colors.transparent,
                         scrolledUnderElevation: 0,
                         flexibleSpace: FlexibleSpaceBar(
@@ -1044,11 +1075,11 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
-                                      color: const Color(0xFFBCC0C4),
-                                      child: const Center(
+                                      color: AppColors.secondBackground,
+                                      child: Center(
                                         child: Icon(
                                           Icons.image_not_supported,
-                                          color: Color(0xFF65676B),
+                                          color: AppColors.textSecondary,
                                           size: 36,
                                         ),
                                       ),
@@ -1096,9 +1127,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                     ),
                                   ),
                               onLeave: () =>
-                                  context.read<CommunityDetailBloc>().add(
-                                    LeaveCommunityRequested(widget.communityId),
-                                  ),
+                                  _showLeaveConfirmation(context),
                               onManage: null,
                             ),
                             const SizedBox(height: 8),

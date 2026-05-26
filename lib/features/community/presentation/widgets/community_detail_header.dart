@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityDetailHeader extends StatelessWidget {
   final CommunityModel community;
@@ -24,23 +25,28 @@ class CommunityDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final roleLabel = userRole == 'admin' ? 'Quản trị viên' : 'Thành viên';
+    final roleLabel = userRole == 'admin'
+        ? context.l10n.communityAdmin
+        : context.l10n.communityMember;
     final roleColor = userRole == 'admin'
         ? const Color(0xFFB54708)
         : const Color(0xFF0F766E);
     final isPrivate = (community.status ?? '').toLowerCase() == 'private';
-    final privacyLabel = isPrivate ? 'Nhóm riêng tư' : 'Nhóm công khai';
+    final privacyLabel = isPrivate
+        ? context.l10n.communityPrivateGroup
+        : context.l10n.communityPublicGroup;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
+          border: Border.all(color: AppColors.divider),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
+              color: AppColors.textSecondary.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: Offset(0, 3),
             ),
@@ -53,15 +59,15 @@ class CommunityDetailHeader extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: const Color(0xFFE4E6EB),
+                  backgroundColor: AppColors.secondBackground,
                   backgroundImage: community.avatar != null
                       ? NetworkImage(community.avatar!)
                       : null,
                   child: community.avatar == null
-                      ? const Icon(
+                      ? Icon(
                           Icons.groups,
                           size: 30,
-                          color: Color(0xFF65676B),
+                          color: AppColors.textSecondary,
                         )
                       : null,
                 ),
@@ -73,18 +79,21 @@ class CommunityDetailHeader extends StatelessWidget {
                       Text(
                         community.name,
                         softWrap: true,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF1C1E21),
+                          color: AppColors.textPrimary,
                           height: 1.1,
                         ),
                       ),
                       const SizedBox(height: 7),
                       Text(
-                        '$privacyLabel · ${community.memberCount ?? 0} thành viên',
-                        style: const TextStyle(
-                          color: Color(0xFF65676B),
+                        context.l10n.communityPrivacyMembers(
+                          privacyLabel,
+                          community.memberCount ?? 0,
+                        ),
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -125,7 +134,7 @@ class CommunityDetailHeader extends StatelessWidget {
               Text(
                 community.description!,
                 style: TextStyle(
-                  color: const Color(0xFF1C1E21),
+                  color: AppColors.textPrimary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   height: 1.35,
@@ -138,17 +147,17 @@ class CommunityDetailHeader extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0F2F5),
+                  color: AppColors.secondBackground,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'Cộng đồng này chưa có mô tả.',
-                  style: TextStyle(color: Colors.grey[700]),
+                  context.l10n.communityNoDescription,
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ),
 
             const SizedBox(height: 14),
-            const Divider(height: 1, color: Color(0xFFE4E6EB)),
+            Divider(height: 1, color: AppColors.divider),
             const SizedBox(height: 14),
 
             if (memberStatus == 'none')
@@ -160,15 +169,15 @@ class CommunityDetailHeader extends StatelessWidget {
                     Icons.group_add_rounded,
                     color: Colors.white,
                   ),
-                  label: const Text(
-                    'Tham gia cộng đồng',
-                    style: TextStyle(
+                  label: Text(
+                    context.l10n.communityJoin,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1877F2),
+                    backgroundColor: AppColors.primary,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
@@ -184,11 +193,11 @@ class CommunityDetailHeader extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: onCancelRequest,
                       icon: const Icon(Icons.cancel_outlined),
-                      label: const Text('Hủy yêu cầu'),
+                      label: Text(context.l10n.friendCancelRequest),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: const BorderSide(color: Color(0xFFCCD0D5)),
-                        foregroundColor: const Color(0xFF1C1E21),
+                        side: BorderSide(color: AppColors.divider),
+                        foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -205,9 +214,9 @@ class CommunityDetailHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFFDE68A)),
                       ),
-                      child: const Text(
-                        'Đang chờ duyệt',
-                        style: TextStyle(
+                      child: Text(
+                        context.l10n.communityPendingApproval,
+                        style: const TextStyle(
                           color: Color(0xFFB45309),
                           fontWeight: FontWeight.w700,
                         ),
@@ -233,9 +242,9 @@ class CommunityDetailHeader extends StatelessWidget {
                           ),
                         ),
                         icon: const Icon(Icons.logout_rounded),
-                        label: const Text(
-                          'Rời nhóm',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                        label: Text(
+                          context.l10n.communityLeaveGroup,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
                     ),
@@ -253,9 +262,9 @@ class CommunityDetailHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0xFFC7D2FE)),
                   ),
-                  child: const Text(
-                    'Bạn đang có lời mời tham gia. Hãy phản hồi trong tab Lời mời.',
-                    style: TextStyle(
+                  child: Text(
+                    context.l10n.communityInvitePendingNotice,
+                    style: const TextStyle(
                       color: Color(0xFF3730A3),
                       fontWeight: FontWeight.w600,
                     ),
@@ -283,12 +292,12 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipTextColor = textColor ?? const Color(0xFF475467);
+    final chipTextColor = textColor ?? AppColors.textSecondary;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: backgroundColor ?? const Color(0xFFF0F2F5),
+        color: backgroundColor ?? AppColors.secondBackground,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

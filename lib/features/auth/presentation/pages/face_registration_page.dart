@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
-
+import 'package:social_app_fe/l10n/l10n.dart';
 class FaceRegistrationPage extends StatelessWidget {
   final bool isPrivacyTab;
 
@@ -32,7 +32,7 @@ class FaceRegistrationPage extends StatelessWidget {
                 SizedBox(height: 32.h),
 
                 Text(
-                  "Thiết lập nhận diện khuôn mặt",
+                  context.l10n.faceRecognitionSetup,
                   style: TextStyle(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class FaceRegistrationPage extends StatelessWidget {
                 SizedBox(height: 16.h),
 
                 Text(
-                  "Sử dụng dữ liệu khuôn mặt của bạn để bật các tính năng AI thông minh và bảo vệ tài khoản an toàn hơn.",
+                  context.l10n.faceRecognitionDescription,
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textSecondary,
@@ -56,23 +56,23 @@ class FaceRegistrationPage extends StatelessWidget {
                 // Feature list
                 _buildFeatureItem(
                   icon: CupertinoIcons.person_3_fill,
-                  title: "Gợi ý bạn bè thông minh",
+                  title: context.l10n.faceRecognitionSmartSuggestions,
                   description:
-                      "AI tự động nhận diện khuôn mặt bạn trong ảnh và đề xuất gắn thẻ chính xác.",
+                      context.l10n.faceRecognitionAutoTagDescription,
                 ),
                 SizedBox(height: 20.h),
                 _buildFeatureItem(
                   icon: CupertinoIcons.shield_fill,
-                  title: "Chống giả mạo tài khoản",
+                  title: context.l10n.faceRecognitionAntiSpoofing,
                   description:
-                      "Ngăn chặn người khác sử dụng hình ảnh của bạn để tạo tài khoản giả mạo.",
+                      context.l10n.faceRecognitionAntiSpoofingDescription,
                 ),
                 SizedBox(height: 20.h),
                 _buildFeatureItem(
                   icon: CupertinoIcons.lock_shield_fill,
-                  title: "Bảo mật tuyệt đối",
+                  title: context.l10n.faceRecognitionHighSecurity,
                   description:
-                      "Dữ liệu khuôn mặt được mã hóa an toàn và không chia sẻ cho bên thứ ba.",
+                      context.l10n.faceRecognitionSecurityDescription,
                 ),
                 SizedBox(height: 20.h),
 
@@ -96,7 +96,7 @@ class FaceRegistrationPage extends StatelessWidget {
                             },
                           );
                         },
-                        text: "Bắt đầu quét khuôn mặt",
+                        text: context.l10n.faceRecognitionStartScan,
                       ),
                       SizedBox(height: 16.h),
                       GestureDetector(
@@ -115,7 +115,7 @@ class FaceRegistrationPage extends StatelessWidget {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.h),
                           child: Text(
-                            "Để sau",
+                            context.l10n.commonMaybeLater,
                             style: TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 16.sp,
