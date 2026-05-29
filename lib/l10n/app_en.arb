@@ -1480,5 +1480,8 @@
   "reactionHaha": "Haha",
   "reactionWow": "Wow",
   "reactionSad": "Sad",
-  "reactionAngry": "Angry"
+  "reactionAngry": "Angry",
+  "chatGiphySticker": "GIPHY Sticker",
+  "chatGiphySearch": "Search GIPHY stickers...",
+  "chatGiphyError": "Error loading GIPHY stickers: {error}"
 }

@@ -9,12 +9,14 @@ class AttachmentMenuWidget extends StatelessWidget {
   final VoidCallback onClose;
   final Future<void> Function()? onShareLocation;
   final Future<void> Function()? onShareFile;
+  final VoidCallback? onPickGiphy;
 
   const AttachmentMenuWidget({
     super.key,
     required this.onClose,
     this.onShareLocation,
     this.onShareFile,
+    this.onPickGiphy,
   });
 
   @override
@@ -70,20 +72,6 @@ class AttachmentMenuWidget extends StatelessWidget {
             child: Divider(color: AppColors.divider, height: 1, thickness: 1),
           ),
 
-          // _buildAttachmentMenuItem(
-          //   context: context,
-          //   title: 'Chơi game',
-          //   icon: CupertinoIcons.gamecontroller_fill,
-          //   color: Colors.blueAccent,
-          //   onTap: () {
-          //     onClose();
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //       const SnackBar(
-          //         content: Text('Tính năng chơi game đang phát triển'),
-          //       ),
-          //     );
-          //   },
-          // ),
           _buildAttachmentMenuItem(
             context: context,
             title: context.l10n.chatAiImages,
@@ -95,6 +83,22 @@ class AttachmentMenuWidget extends StatelessWidget {
                 context,
                 context.l10n.chatAiImagesInDevelopmentMessage,
               );
+            },
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.h),
+            child: Divider(color: AppColors.divider, height: 1, thickness: 1),
+          ),
+
+          _buildAttachmentMenuItem(
+            context: context,
+            title: context.l10n.chatGiphySticker,
+            icon: CupertinoIcons.smiley,
+            color: AppColors.primary,
+            onTap: () {
+              onClose();
+              onPickGiphy?.call();
             },
           ),
           SizedBox(height: 8.h),

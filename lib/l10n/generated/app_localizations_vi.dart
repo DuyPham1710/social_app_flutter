@@ -3250,4 +3250,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reactionAngry => 'Phẫn nộ';
+
+  @override
+  String get chatGiphySticker => 'Nhãn dán GIPHY';
+
+  @override
+  String get chatGiphySearch => 'Tìm kiếm sticker GIPHY...';
+
+  @override
+  String chatGiphyError(Object error) {
+    return 'Lỗi tải sticker GIPHY: $error';
+  }
 }

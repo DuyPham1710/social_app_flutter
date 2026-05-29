@@ -46,6 +46,8 @@ import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
+import 'package:giphy_get/giphy_get.dart';
+import 'package:giphy_get/l10n.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -515,7 +517,10 @@ class _MyAppState extends State<MyApp> {
                 darkTheme: darkTheme(),
                 themeMode: s1<AppPreferences>().themeMode,
                 locale: s1<AppPreferences>().locale,
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                localizationsDelegates: [
+                  ...AppLocalizations.localizationsDelegates,
+                  GiphyGetUILocalizations.delegate,
+                ],
                 supportedLocales: AppLocalizations.supportedLocales,
                 initialRoute: '/splash',
                 onGenerateRoute: _onGenerateRoute,

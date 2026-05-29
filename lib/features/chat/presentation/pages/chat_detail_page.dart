@@ -44,6 +44,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:social_app_fe/core/enums/attachment_type.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
+import 'package:giphy_get/giphy_get.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ChatDetailPage extends StatefulWidget {
   final String userId;
@@ -978,6 +980,67 @@ class _ChatDetailPageState extends State<ChatDetailPage>
     }
   }
 
+  Future<void> _pickGiphySticker() async {
+    try {
+      final apiKey = dotenv.env['GIPHY_API_KEY'] ?? 'dc6zaTOxFJmzC';
+
+      final gif = await GiphyGet.getGif(
+        context: context,
+        apiKey: apiKey,
+        lang: GiphyLanguage.english,
+        showGIFs: true,
+        showStickers: true,
+        showEmojis: false,
+        tabColor: AppColors.primary,
+      );
+
+      if (gif != null && gif.images?.original?.url != null) {
+        final gifUrl = gif.images!.original!.url;
+        await _sendGiphySticker(gifUrl);
+      }
+    } catch (e) {
+      print('Error picking Giphy sticker: $e');
+      if (mounted) {
+        showErrorSnackBar(context, context.l10n.chatGiphyError('$e'));
+      }
+    }
+  }
+
+  Future<void> _sendGiphySticker(String gifUrl) async {
+    final conversationId = _currentConversationId ?? widget.conversationId;
+    if (conversationId == null) {
+      showErrorSnackBar(context, context.l10n.chatMissingConversationForPhoto);
+      return;
+    }
+
+    _typingDebounceTimer?.cancel();
+    final messageBloc = context.read<MessageBloc>();
+    messageBloc.emitTypingStop(widget.userId, conversationId);
+
+    messageBloc.add(
+      SendMessageEvent(
+        userId: widget.userId,
+        conversationId: conversationId,
+        text: '',
+        attachments: [
+          {
+            'url': gifUrl,
+            'type': AttachmentType.image.name,
+            'size': 0,
+            'name': 'giphy_sticker.gif',
+          },
+        ],
+        replyTo: _replyingMessage?.id,
+      ),
+    );
+
+    _scrollToBottom();
+
+    setState(() {
+      _replyingMessage = null;
+    });
+  }
+
   void _startRecording() {
     setState(() {
       _isRecording = true;
@@ -1333,7 +1396,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                           ),
                                           Center(
                                             child: Text(
-                                              context.l10n
+                                              context
+                                                  .l10n
                                                   .messageNoMessagesStartConversation,
                                               style: TextStyle(
                                                 color: AppColors.textSecondary,
@@ -1756,6 +1820,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                             },
                             onShareLocation: _shareCurrentLocation,
                             onShareFile: _shareFile,
+                            onPickGiphy: _pickGiphySticker,
                           ),
                         ),
                     ],

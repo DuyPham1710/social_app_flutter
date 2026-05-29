@@ -5663,6 +5663,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Phẫn nộ'**
   String get reactionAngry;
+
+  /// No description provided for @chatGiphySticker.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhãn dán GIPHY'**
+  String get chatGiphySticker;
+
+  /// No description provided for @chatGiphySearch.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tìm kiếm sticker GIPHY...'**
+  String get chatGiphySearch;
+
+  /// No description provided for @chatGiphyError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lỗi tải sticker GIPHY: {error}'**
+  String chatGiphyError(Object error);
 }
 
 class _AppLocalizationsDelegate

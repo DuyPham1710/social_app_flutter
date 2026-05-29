@@ -3240,4 +3240,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reactionAngry => 'Angry';
+
+  @override
+  String get chatGiphySticker => 'GIPHY Sticker';
+
+  @override
+  String get chatGiphySearch => 'Search GIPHY stickers...';
+
+  @override
+  String chatGiphyError(Object error) {
+    return 'Error loading GIPHY stickers: $error';
+  }
 }
