@@ -2,6 +2,7 @@
   "@@locale": "vi",
   "appTitle": "commonhub",
   "commonCancel": "Hủy",
+  "commonClose": "Đóng",
   "commonReport": "Báo cáo",
   "commonBlock": "Chặn",
   "commonPrivacySupport": "Quyền riêng tư & Hỗ trợ",
@@ -90,6 +91,12 @@
       }
     }
   },
+  "chatAiSummaryTitle": "Tóm tắt tin nhắn bằng AI",
+  "chatCannotIdentifyConversation": "Không thể xác định cuộc hội thoại.",
+  "chatSummaryButton": "Tóm tắt",
+  "chatAiAnalyzingUnread": "Đang phân tích tin nhắn chưa đọc...",
+  "chatNoSummaryAvailable": "Không có bản tóm tắt nào.",
+  "chatFailedToLoadSummary": "Không thể tải bản tóm tắt",
   "messageNoMessagesStartConversation": "Không có tin nhắn nào. Bắt đầu cuộc trò chuyện ngay!",
   "messageDownloadingFile": "Đang tải file...",
   "messageFileOpenAppNotFound": "Không tìm thấy ứng dụng để mở file này",

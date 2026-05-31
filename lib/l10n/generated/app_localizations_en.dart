@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonCancel => 'Cancel';
 
   @override
+  String get commonClose => 'Close';
+
+  @override
   String get commonReport => 'Report';
 
   @override
@@ -151,6 +154,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String chatGroupCreatedPreview(String creatorName) {
     return '$creatorName created the group';
   }
+
+  @override
+  String get chatAiSummaryTitle => 'AI Message Summary';
+
+  @override
+  String get chatCannotIdentifyConversation => 'Cannot identify conversation.';
+
+  @override
+  String get chatSummaryButton => 'Summary';
+
+  @override
+  String get chatAiAnalyzingUnread => 'Analyzing unread messages...';
+
+  @override
+  String get chatNoSummaryAvailable => 'No summary available.';
+
+  @override
+  String get chatFailedToLoadSummary => 'Failed to load summary';
 
   @override
   String get messageNoMessagesStartConversation =>

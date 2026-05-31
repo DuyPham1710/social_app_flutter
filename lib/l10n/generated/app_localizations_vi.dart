@@ -15,6 +15,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commonCancel => 'Hủy';
 
   @override
+  String get commonClose => 'Đóng';
+
+  @override
   String get commonReport => 'Báo cáo';
 
   @override
@@ -151,6 +154,25 @@ class AppLocalizationsVi extends AppLocalizations {
   String chatGroupCreatedPreview(String creatorName) {
     return '$creatorName vừa tạo nhóm';
   }
+
+  @override
+  String get chatAiSummaryTitle => 'Tóm tắt tin nhắn bằng AI';
+
+  @override
+  String get chatCannotIdentifyConversation =>
+      'Không thể xác định cuộc hội thoại.';
+
+  @override
+  String get chatSummaryButton => 'Tóm tắt';
+
+  @override
+  String get chatAiAnalyzingUnread => 'Đang phân tích tin nhắn chưa đọc...';
+
+  @override
+  String get chatNoSummaryAvailable => 'Không có bản tóm tắt nào.';
+
+  @override
+  String get chatFailedToLoadSummary => 'Không thể tải bản tóm tắt';
 
   @override
   String get messageNoMessagesStartConversation =>

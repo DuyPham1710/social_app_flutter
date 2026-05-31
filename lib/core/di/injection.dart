@@ -509,6 +509,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<ApplyVoiceEffectUseCase>(
     () => ApplyVoiceEffectUseCase(s1()),
   );
+  s1.registerLazySingleton<GetSummaryUnreadUseCase>(
+    () => GetSummaryUnreadUseCase(s1()),
+  );
 
   // Video Call UseCases
   s1.registerLazySingleton<ConnectVideoCallUseCase>(

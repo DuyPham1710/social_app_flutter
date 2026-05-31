@@ -352,6 +352,26 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<String>> getSummaryUnread({
+    required String conversationId,
+    required List<String> messages,
+    required String lang,
+  }) async {
+    try {
+      final summary = await _remoteDataSource.getSummaryUnread(
+        conversationId: conversationId,
+        messages: messages,
+        lang: lang,
+      );
+      return DataStateSuccess(summary);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Stream<MessageEntity> get onMessageUpdated =>
       _remoteDataSource.onMessageUpdated;
 

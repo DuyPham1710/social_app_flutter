@@ -127,6 +127,13 @@ abstract class ChatRepository {
     required String messageId,
   });
 
+  // Get AI summary of unread messages
+  Future<DataState<String>> getSummaryUnread({
+    required String conversationId,
+    required List<String> messages,
+    required String lang,
+  });
+
   // // Real-time events
   Stream<ConversationResponseEntity> get onConversationsLoaded;
   Stream<MessageResponseEntity> get onMessagesLoaded;

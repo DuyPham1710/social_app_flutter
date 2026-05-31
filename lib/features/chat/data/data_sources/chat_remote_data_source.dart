@@ -126,6 +126,13 @@ abstract class ChatRemoteDataSource {
     required String messageId,
   });
 
+  // Get AI summary of unread messages
+  Future<String> getSummaryUnread({
+    required String conversationId,
+    required List<String> messages,
+    required String lang,
+  });
+
   // // Real-time events
   Stream<ConversationsResponseModel> get onConversationsLoaded;
   Stream<MessageReponseModel> get onMessagesLoaded;

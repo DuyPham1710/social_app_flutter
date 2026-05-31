@@ -25,8 +25,13 @@ import 'package:social_app_fe/features/chat/presentation/widgets/message_edit_hi
 import 'package:social_app_fe/features/chat/presentation/widgets/delete_message_bottom_sheet.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/chat_appbar.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/get_message_edit_logs_usecase.dart';
+import 'package:social_app_fe/features/chat/domain/usecases/get_summary_unread_usecase.dart';
+
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/core/helpers/device_translation_locale.dart';
+
 import 'package:social_app_fe/features/chat/presentation/widgets/profile_header.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/scroll_to_bottom_button.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -126,6 +131,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   // Track unread count
   int? _unreadCount;
   int? _firstUnreadMessageIndex;
+  bool _showSummaryBanner = true;
+  List<String> _unreadMessageTexts = [];
 
   // Track input expansion state
   bool _isInputExpanded = false;
@@ -1122,6 +1129,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             },
             child: Column(
               children: [
+                if (_unreadCount != null &&
+                    _unreadCount! > 0 &&
+                    _showSummaryBanner &&
+                    _unreadMessageTexts.isNotEmpty)
+                  _buildAiSummaryBanner(),
                 Expanded(
                   child: Stack(
                     children: [
@@ -1163,6 +1175,43 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                               // Listen để detect khi message được update và reload edit logs
                               if (state is MessagesLoaded) {
                                 final currentMessages = state.messages.data;
+
+                                if (_previousMessages == null) {
+                                  if (_firstUnreadMessageIndex != null &&
+                                      _firstUnreadMessageIndex! >= 0) {
+                                    final List<String> unreadTexts = [];
+                                    final limit = _firstUnreadMessageIndex! + 1;
+                                    final messagesToProcess = currentMessages
+                                        .take(limit);
+                                    for (final msg in messagesToProcess) {
+                                      if (msg.sender.userId != widget.userId) {
+                                        final senderName =
+                                            msg.sender.fullName ??
+                                            msg.sender.username ??
+                                            'Người dùng';
+                                        final text = msg.text ?? '';
+                                        final attachmentsCount =
+                                            msg.attachments.length;
+                                        final attachmentsText =
+                                            attachmentsCount > 0
+                                            ? '[Đính kèm $attachmentsCount file/hình ảnh]'
+                                            : '';
+                                        final formatted =
+                                            "$senderName: $text $attachmentsText"
+                                                .trim();
+                                        if (formatted.isNotEmpty) {
+                                          unreadTexts.add(formatted);
+                                        }
+                                      }
+                                    }
+                                    setState(() {
+                                      _unreadMessageTexts = unreadTexts;
+                                    });
+                                    debugPrint(
+                                      '[ChatDetail] Initialized unread messages for AI: ${_unreadMessageTexts.length}',
+                                    );
+                                  }
+                                }
 
                                 // Check if new messages were added
                                 if (_previousMessages != null &&
@@ -2965,6 +3014,332 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAiSummaryBanner() {
+    final primaryColor = AppColors.primary;
+    final isDark = s1<AppPreferences>().isDarkMode;
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            primaryColor.withOpacity(isDark ? 0.15 : 0.08),
+            primaryColor.withOpacity(isDark ? 0.08 : 0.03),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: primaryColor.withOpacity(0.2), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // AI Icon
+          Container(
+            padding: EdgeInsets.all(8.r),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.auto_awesome, color: primaryColor, size: 20.r),
+          ),
+          SizedBox(width: 12.w),
+          // Text content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.chatAiSummaryTitle,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.sp,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  context.l10n.messageUnreadCount(_unreadCount ?? 0),
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 8.w),
+          // Action Buttons
+          TextButton(
+            onPressed: () {
+              final conversationId =
+                  _currentConversationId ?? widget.conversationId;
+              if (conversationId != null) {
+                _showAiSummaryBottomSheet(context, conversationId);
+              } else {
+                showInfoSnackBar(
+                  context,
+                  context.l10n.chatCannotIdentifyConversation,
+                );
+              }
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: primaryColor,
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+            ),
+            child: Text(
+              context.l10n.chatSummaryButton,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12.sp,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.close, size: 18.r, color: AppColors.textSecondary),
+            onPressed: () {
+              setState(() {
+                _showSummaryBanner = false;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAiSummaryBottomSheet(BuildContext context, String conversationId) {
+    final primaryColor = AppColors.primary;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.only(
+            top: 12.h,
+            left: 20.w,
+            right: 20.w,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Pull bar
+              Center(
+                child: Container(
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              // Header
+              Row(
+                children: [
+                  ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                    ).createShader(bounds),
+                    child: Icon(
+                      Icons.auto_awesome,
+                      color: Colors.white,
+                      size: 24.r,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    context.l10n.chatAiSummaryTitle,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(),
+              SizedBox(height: 16.h),
+
+              // Future Builder to fetch summary
+              FutureBuilder<DataState<String>>(
+                future: s1<GetSummaryUnreadUseCase>().call(
+                  params: GetSummaryUnreadParams(
+                    conversationId: conversationId,
+                    messages: _unreadMessageTexts,
+                    lang: appTranslationTargetLang(context),
+                  ),
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40.h),
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              primaryColor,
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            context.l10n.chatAiAnalyzingUnread,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: AppColors.textSecondary,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return _buildErrorState(
+                      snapshot.error.toString(),
+                      conversationId,
+                    );
+                  }
+
+                  final dataState = snapshot.data;
+                  if (dataState is DataStateError) {
+                    return _buildErrorState(
+                      dataState?.error?.message ??
+                          context.l10n.commonServerErrorRetryLater,
+                      conversationId,
+                    );
+                  }
+
+                  final summary =
+                      dataState?.data ?? context.l10n.chatNoSummaryAvailable;
+
+                  return Container(
+                    padding: EdgeInsets.all(16.r),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondBackground,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: AppColors.divider),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          summary,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textPrimary,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              SizedBox(height: 16.h),
+
+              // Bottom Action Button
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  context.l10n.commonClose,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildErrorState(String errorMsg, String conversationId) {
+    return Container(
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.red.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.error_outline, color: Colors.red[400], size: 32.r),
+          SizedBox(height: 8.h),
+          Text(
+            context.l10n.chatFailedToLoadSummary,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14.sp,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            errorMsg,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
+          ),
+          SizedBox(height: 12.h),
+          TextButton.icon(
+            onPressed: () {
+              setState(() {});
+            },
+            icon: Icon(Icons.refresh, size: 16.r, color: AppColors.primary),
+            label: Text(
+              context.l10n.commonRetry,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

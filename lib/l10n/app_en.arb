@@ -2,6 +2,7 @@
   "@@locale": "en",
   "appTitle": "commonhub",
   "commonCancel": "Cancel",
+  "commonClose": "Close",
   "commonReport": "Report",
   "commonBlock": "Block",
   "commonPrivacySupport": "Privacy & support",
@@ -90,6 +91,12 @@
       }
     }
   },
+  "chatAiSummaryTitle": "AI Message Summary",
+  "chatCannotIdentifyConversation": "Cannot identify conversation.",
+  "chatSummaryButton": "Summary",
+  "chatAiAnalyzingUnread": "Analyzing unread messages...",
+  "chatNoSummaryAvailable": "No summary available.",
+  "chatFailedToLoadSummary": "Failed to load summary",
   "messageNoMessagesStartConversation": "No messages yet. Start the conversation now!",
   "messageDownloadingFile": "Downloading file...",
   "messageFileOpenAppNotFound": "No app found to open this file",

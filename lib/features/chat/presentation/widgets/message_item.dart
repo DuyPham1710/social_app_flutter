@@ -759,10 +759,14 @@ class MessageItem extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: 0.7.sw),
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
             decoration: BoxDecoration(
-              color: fromMe ? AppColors.primary : AppColors.textSecondary,
+              color: fromMe
+                  ? AppColors.primary
+                  : AppColors.textSecondary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: fromMe ? Colors.transparent : AppColors.textSecondary,
+                color: fromMe
+                    ? Colors.transparent
+                    : AppColors.textSecondary.withOpacity(0.15),
               ),
             ),
             child: Row(
@@ -852,12 +856,19 @@ class MessageItem extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: 0.7.sw),
         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
         decoration: BoxDecoration(
-          color: fromMe ? AppColors.primary : AppColors.textSecondary,
+          color: fromMe
+              ? AppColors.primary
+              : AppColors.textSecondary.withOpacity(0.1),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(14.r),
             topRight: Radius.circular(14.r),
             bottomLeft: Radius.circular(fromMe ? 14.r : 0),
             bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+          ),
+          border: Border.all(
+            color: fromMe
+                ? Colors.transparent
+                : AppColors.textSecondary.withOpacity(0.15),
           ),
         ),
         child: Row(

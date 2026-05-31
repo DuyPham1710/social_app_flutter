@@ -1133,6 +1133,26 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     _socketClient.emit('message:read', readData);
   }
 
+  @override
+  Future<String> getSummaryUnread({
+    required String conversationId,
+    required List<String> messages,
+    required String lang,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/chat/conversation/$conversationId/summary-unread',
+        data: {'messages': messages, 'lang': lang},
+      );
+      if (response.data != null && response.data['summary'] != null) {
+        return response.data['summary'] as String;
+      }
+      return 'Không thể tải bản tóm tắt.';
+    } catch (e) {
+      throw Exception('Failed to get unread summary: $e');
+    }
+  }
+
   /// Disconnect
   @override
   void disconnect() {

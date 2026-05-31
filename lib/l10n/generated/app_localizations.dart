@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'Hủy'**
   String get commonCancel;
 
+  /// No description provided for @commonClose.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đóng'**
+  String get commonClose;
+
   /// No description provided for @commonReport.
   ///
   /// In vi, this message translates to:
@@ -359,6 +365,42 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'{creatorName} vừa tạo nhóm'**
   String chatGroupCreatedPreview(String creatorName);
+
+  /// No description provided for @chatAiSummaryTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tóm tắt tin nhắn bằng AI'**
+  String get chatAiSummaryTitle;
+
+  /// No description provided for @chatCannotIdentifyConversation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể xác định cuộc hội thoại.'**
+  String get chatCannotIdentifyConversation;
+
+  /// No description provided for @chatSummaryButton.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tóm tắt'**
+  String get chatSummaryButton;
+
+  /// No description provided for @chatAiAnalyzingUnread.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang phân tích tin nhắn chưa đọc...'**
+  String get chatAiAnalyzingUnread;
+
+  /// No description provided for @chatNoSummaryAvailable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có bản tóm tắt nào.'**
+  String get chatNoSummaryAvailable;
+
+  /// No description provided for @chatFailedToLoadSummary.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể tải bản tóm tắt'**
+  String get chatFailedToLoadSummary;
 
   /// No description provided for @messageNoMessagesStartConversation.
   ///
