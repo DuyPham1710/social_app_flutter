@@ -448,48 +448,62 @@ class _MyAppState extends State<MyApp> {
         debugPrint('[App] Already navigating to VideoCallScreen, ignoring...');
         return;
       }
+
+      final navigator = _navigatorKey.currentState;
+      if (navigator == null) {
+        debugPrint('[App] Navigator state is null, cannot navigate');
+        _isNavigatingToCall = false;
+        return;
+      }
+
       _isNavigatingToCall = true;
 
       final tokenEntity = state.tokenEntity!;
       final incomingCall = state.incomingCall;
-      final l10n = context.l10n;
+
+      // Note: Do NOT use context.l10n here — this BlocListener is placed
+      // above MaterialApp in the widget tree, so AppLocalizations is not
+      // available in this context. Use hardcoded fallback strings instead.
 
       debugPrint('[App] Navigating to VideoCallScreen...');
       debugPrint('[App] - channelId: ${tokenEntity.channelId}');
       debugPrint('[App] - callId: ${tokenEntity.callId}');
       debugPrint('[App] - isCaller: false (accepting call)');
 
-      _navigatorKey.currentState
-          ?.push(
+      navigator
+          .push(
             MaterialPageRoute(
               builder: (_) => VideoCallScreen(
                 channelId: tokenEntity.channelId,
                 token: tokenEntity.token,
                 appId: tokenEntity.appId,
                 callId: tokenEntity.callId,
-                userId: userData?['id'] ?? '', // Current user (receiver)
+                userId: userData?['id'] ?? '',
                 isVideo: incomingCall?.callType == 'video',
-                isCaller: false, // Always false when accepting
+                isCaller: false,
                 callerName:
                     incomingCall?.callerInfo?.fullName ??
                     incomingCall?.callerInfo?.username ??
-                    l10n.commonUnknown,
+                    'Unknown',
                 callerAvatar: incomingCall?.callerInfo?.avatarUrl,
                 receiverName:
-                    userData?['fullName'] ??
-                    userData?['username'] ??
-                    l10n.chatYou,
+                    userData?['fullName'] ?? userData?['username'] ?? 'Bạn',
                 receiverAvatar: userData?['avatarUrl'],
               ),
             ),
           )
           .then((_) {
             _isNavigatingToCall = false;
-            // Disconnect socket after call ends (for receiver)
-            // context.read<VideoCallBloc>().add(const DisconnectVideoCall());
           });
     } else if (state.status == VideoCallStatus.error) {
       debugPrint('[App] Video call error occurred: ${state.errorMessage}');
+      _isNavigatingToCall = false;
+    } else if (state.status == VideoCallStatus.callEnded ||
+        state.status == VideoCallStatus.callRejected ||
+        state.status == VideoCallStatus.disconnected ||
+        state.status == VideoCallStatus.initial ||
+        state.status == VideoCallStatus.connected) {
+      _isNavigatingToCall = false;
     }
   }
 
