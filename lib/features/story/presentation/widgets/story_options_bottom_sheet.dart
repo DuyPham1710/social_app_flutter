@@ -49,6 +49,167 @@ class StoryOptionsBottomSheet extends StatefulWidget {
 class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
   final StoryRepository _storyRepository = s1<StoryRepository>();
   bool _isDeleting = false;
+  bool _isArchiving = false;
+
+  Future<void> _archiveStory(BuildContext context) async {
+    final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
+
+    // Hiển thị dialog xác nhận
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.r),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.archive_outlined,
+                    size: 32.r,
+                    color: AppColors.primary,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  context.l10n.storyArchiveTitle,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  context.l10n.storyArchiveConfirm,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14.sp,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 24.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(false),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                            side: BorderSide(color: AppColors.divider),
+                          ),
+                          backgroundColor: AppColors.secondBackground,
+                        ),
+                        child: Text(
+                          context.l10n.commonCancel,
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                        child: Text(
+                          context.l10n.commonConfirm,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    setState(() {
+      _isArchiving = true;
+    });
+
+    try {
+      final result = await _storyRepository.archiveStory(storyId: storyId);
+
+      if (mounted) {
+        Navigator.pop(context); // Đóng bottom sheet
+
+        if (result is DataStateSuccess) {
+          // Reload danh sách story trước khi đóng story viewer
+          try {
+            final navigator = Navigator.of(context, rootNavigator: false);
+            final rootContext = navigator.context;
+            final homeStoriesBloc = rootContext.read<HomeStoriesBloc>();
+            homeStoriesBloc.add(const LoadHomeStoriesEvent(page: 1, limit: 10));
+          } catch (e) {
+            try {
+              final homeStoriesBloc = context.read<HomeStoriesBloc>();
+              homeStoriesBloc.add(
+                const LoadHomeStoriesEvent(page: 1, limit: 10),
+              );
+            } catch (_) {}
+          }
+
+          // Đóng story viewer và quay về màn hình trước
+          Navigator.of(context).pop();
+
+          // Hiển thị thông báo thành công
+          showSuccessSnackBar(context, context.l10n.storyArchived);
+        } else if (result is DataStateError) {
+          showErrorSnackBar(
+            context,
+            context.l10n.commonErrorWithMessage(
+              result.error?.message ?? context.l10n.storyArchiveFailed,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        showErrorSnackBar(context, context.l10n.commonErrorWithMessage('$e'));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isArchiving = false;
+        });
+      }
+    }
+  }
 
   Future<void> _deleteStory(BuildContext context) async {
     final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
@@ -191,10 +352,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
               icon: Icons.archive_outlined,
               title: context.l10n.storyArchivePhoto,
               subtitle: context.l10n.storyArchivePhotoDescription,
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Implement archive photo
-              },
+              onTap: _isArchiving ? null : () => _archiveStory(context),
             ),
             StoryOptionItemWidget(
               icon: Icons.delete_outline,

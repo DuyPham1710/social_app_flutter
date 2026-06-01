@@ -2646,6 +2646,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Remove the photo from your story and save it to archive.';
 
   @override
+  String get storyArchiveTitle => 'Archive story';
+
+  @override
+  String get storyArchiveConfirm =>
+      'Are you sure you want to archive this story? It will be saved in your archive and no longer be visible to others.';
+
+  @override
+  String get storyArchived => 'Story archived';
+
+  @override
+  String get storyArchiveFailed => 'Could not archive story';
+
+  @override
   String get storyDeletePhoto => 'Delete photo';
 
   @override
@@ -2654,6 +2667,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String storyLinkVisibility(String user) {
     return 'The story will be visible to $user\'s audience for 24 hours.';
+  }
+
+  @override
+  String get storyArchivePageTitle => 'Archived stories';
+
+  @override
+  String get storyNoArchivedStories => 'No archived stories yet';
+
+  @override
+  String storyDefaultName(String number) {
+    return 'Story $number';
+  }
+
+  @override
+  String get storySendReplyHint => 'Send message...';
+
+  @override
+  String get storyReplySent => 'Reply sent';
+
+  @override
+  String storyReplyErrorPrefix(String error) {
+    return 'Error: $error';
   }
 
   @override

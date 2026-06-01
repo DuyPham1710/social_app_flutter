@@ -8,6 +8,8 @@ import 'package:social_app_fe/core/enums/media_type.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/domain/usecases/get_my_archived_stories_usecase.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/video_thumbnail_widget.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SavedArchivedStoriesPage extends StatelessWidget {
   const SavedArchivedStoriesPage({super.key});
@@ -27,7 +29,7 @@ class SavedArchivedStoriesPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Tin lưu trữ',
+          context.l10n.storyArchivePageTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
@@ -55,7 +57,7 @@ class SavedArchivedStoriesPage extends StatelessWidget {
           if (data.users.isEmpty || data.users.first.stories.isEmpty) {
             return Center(
               child: Text(
-                'Chưa có tin lưu trữ nào',
+                context.l10n.storyNoArchivedStories,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
@@ -77,29 +79,39 @@ class SavedArchivedStoriesPage extends StatelessWidget {
 
                 Widget mediaChild;
                 if (mediaUrl != null && mediaUrl.isNotEmpty) {
-                  mediaChild = Image.network(
-                    mediaUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      final total = loadingProgress.expectedTotalBytes;
-                      final loaded = loadingProgress.cumulativeBytesLoaded;
-                      final value = total == null ? null : loaded / total;
-                      return Center(
-                        child: SizedBox(
-                          width: 18.w,
-                          height: 18.w,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            value: value,
+                  if (story.mediaType == MediaType.video) {
+                    mediaChild = VideoThumbnailWidget(
+                      videoUrl: mediaUrl,
+                      width: double.infinity,
+                      height: double.infinity,
+                    );
+                  } else {
+                    mediaChild = Image.network(
+                      mediaUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        final total = loadingProgress.expectedTotalBytes;
+                        final loaded = loadingProgress.cumulativeBytesLoaded;
+                        final value = total == null ? null : loaded / total;
+                        return Center(
+                          child: SizedBox(
+                            width: 18.w,
+                            height: 18.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              value: value,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _StoryMediaPlaceholder(mediaType: story.mediaType);
-                    },
-                  );
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return _StoryMediaPlaceholder(
+                          mediaType: story.mediaType,
+                        );
+                      },
+                    );
+                  }
                 } else {
                   mediaChild = _StoryMediaPlaceholder(
                     mediaType: story.mediaType,
@@ -170,7 +182,9 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                             child: Text(
                               (story.title == null ||
                                       story.title!.trim().isEmpty)
-                                  ? 'Tin ${index + 1}'
+                                  ? context.l10n.storyDefaultName(
+                                      (index + 1).toString(),
+                                    )
                                   : story.title!,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

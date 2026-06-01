@@ -52,6 +52,10 @@ abstract class StoryRemoteDataSource {
   @DELETE('/story/{storyId}')
   Future<void> deleteStory(@Path('storyId') String storyId);
 
+  /// Lưu trữ story
+  @PATCH('/story/{storyId}/archive')
+  Future<void> archiveStory(@Path('storyId') String storyId);
+
   /// Tạo hoặc cập nhật react cho story (trả về null nếu xóa react)
   @POST('/react-story')
   Future<ReactStoryModel?> createOrUpdateReactStory(

@@ -134,7 +134,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white),
                   SizedBox(width: 8.w),
-                  const Text('Đã gửi phản hồi tin'),
+                  Text(context.l10n.storyReplySent),
                 ],
               ),
               backgroundColor: AppColors.primary,
@@ -148,14 +148,18 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
         }
       } else {
         throw Exception(
-          result.error?.message ?? 'Không thể tạo cuộc hội thoại',
+          result.error?.message ?? 'Could not create conversation',
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi: ${e.toString()}'),
+            content: Text(
+              context.l10n.storyReplyErrorPrefix(
+                e.toString().replaceAll('Exception: ', ''),
+              ),
+            ),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
           ),
@@ -238,8 +242,12 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.black.withOpacity(0.35),
                     borderRadius: BorderRadius.circular(24.r),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1.w,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -249,16 +257,20 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                           focusNode: _focusNode,
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: AppColors.textPrimary,
+                            color: Colors.white,
                           ),
                           textInputAction: TextInputAction.send,
                           onSubmitted: (value) => _sendStoryReply(context),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Gửi tin nhắn...',
+                            hintText: context.l10n.storySendReplyHint,
                             hintStyle: TextStyle(
-                              color: AppColors.textSecondary,
-                            ), // Màu xám nhạt
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10.h,
+                            ),
                           ),
                         ),
                       ),
@@ -273,16 +285,16 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                                 ? SizedBox(
                                     width: 16.w,
                                     height: 16.w,
-                                    child: CircularProgressIndicator(
+                                    child: const CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.primary,
+                                        Colors.white,
                                       ),
                                     ),
                                   )
                                 : Icon(
                                     Icons.send_rounded,
-                                    color: AppColors.primary,
+                                    color: Colors.white,
                                     size: 20.sp,
                                   ),
                           ),

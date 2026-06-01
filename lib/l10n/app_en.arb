@@ -1260,10 +1260,34 @@
   "storySavePhoto": "Save photo",
   "storyArchivePhoto": "Archive photo",
   "storyArchivePhotoDescription": "Remove the photo from your story and save it to archive.",
+  "storyArchiveTitle": "Archive story",
+  "storyArchiveConfirm": "Are you sure you want to archive this story? It will be saved in your archive and no longer be visible to others.",
+  "storyArchived": "Story archived",
+  "storyArchiveFailed": "Could not archive story",
   "storyDeletePhoto": "Delete photo",
   "storyCopyShareLink": "Copy link to share this story",
   "storyLinkVisibility": "The story will be visible to {user}'s audience for 24 hours.",
   "@storyLinkVisibility": {"placeholders": {"user": {"type": "String"}}},
+  "storyArchivePageTitle": "Archived stories",
+  "storyNoArchivedStories": "No archived stories yet",
+  "storyDefaultName": "Story {number}",
+  "@storyDefaultName": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "storySendReplyHint": "Send message...",
+  "storyReplySent": "Reply sent",
+  "storyReplyErrorPrefix": "Error: {error}",
+  "@storyReplyErrorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "storyMusic": "Music",
   "storyMusicLoadFailed": "Could not load music. Please try again.",
   "storyMusicSearchFailed": "No results found. Please try again.",

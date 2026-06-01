@@ -2650,6 +2650,19 @@ class AppLocalizationsVi extends AppLocalizations {
       'Gỡ ảnh khỏi tin và lưu vào kho lưu trữ.';
 
   @override
+  String get storyArchiveTitle => 'Lưu trữ tin';
+
+  @override
+  String get storyArchiveConfirm =>
+      'Bạn có chắc chắn muốn lưu trữ tin này không? Tin sẽ được lưu vào kho lưu trữ và không còn hiển thị với người khác.';
+
+  @override
+  String get storyArchived => 'Đã lưu trữ tin';
+
+  @override
+  String get storyArchiveFailed => 'Không thể lưu trữ tin';
+
+  @override
   String get storyDeletePhoto => 'Xóa ảnh';
 
   @override
@@ -2658,6 +2671,28 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String storyLinkVisibility(String user) {
     return 'Tin sẽ hiển thị với đối tượng của $user trong 24 giờ.';
+  }
+
+  @override
+  String get storyArchivePageTitle => 'Tin lưu trữ';
+
+  @override
+  String get storyNoArchivedStories => 'Chưa có tin lưu trữ nào';
+
+  @override
+  String storyDefaultName(String number) {
+    return 'Tin $number';
+  }
+
+  @override
+  String get storySendReplyHint => 'Gửi tin nhắn...';
+
+  @override
+  String get storyReplySent => 'Đã gửi phản hồi tin';
+
+  @override
+  String storyReplyErrorPrefix(String error) {
+    return 'Lỗi: $error';
   }
 
   @override

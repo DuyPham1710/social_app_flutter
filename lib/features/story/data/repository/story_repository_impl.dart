@@ -180,6 +180,16 @@ class StoryRepositoryImpl implements StoryRepository {
   }
 
   @override
+  Future<DataState<void>> archiveStory({required String storyId}) async {
+    try {
+      await remoteDataSource.archiveStory(storyId);
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
   Future<DataState<ReactStoryModel?>> createOrUpdateReactStory({
     required String storyId,
     required String emojiId,

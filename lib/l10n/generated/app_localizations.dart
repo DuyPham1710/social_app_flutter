@@ -4638,6 +4638,30 @@ abstract class AppLocalizations {
   /// **'Gỡ ảnh khỏi tin và lưu vào kho lưu trữ.'**
   String get storyArchivePhotoDescription;
 
+  /// No description provided for @storyArchiveTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu trữ tin'**
+  String get storyArchiveTitle;
+
+  /// No description provided for @storyArchiveConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có chắc chắn muốn lưu trữ tin này không? Tin sẽ được lưu vào kho lưu trữ và không còn hiển thị với người khác.'**
+  String get storyArchiveConfirm;
+
+  /// No description provided for @storyArchived.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu trữ tin'**
+  String get storyArchived;
+
+  /// No description provided for @storyArchiveFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể lưu trữ tin'**
+  String get storyArchiveFailed;
+
   /// No description provided for @storyDeletePhoto.
   ///
   /// In vi, this message translates to:
@@ -4655,6 +4679,42 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tin sẽ hiển thị với đối tượng của {user} trong 24 giờ.'**
   String storyLinkVisibility(String user);
+
+  /// No description provided for @storyArchivePageTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tin lưu trữ'**
+  String get storyArchivePageTitle;
+
+  /// No description provided for @storyNoArchivedStories.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có tin lưu trữ nào'**
+  String get storyNoArchivedStories;
+
+  /// No description provided for @storyDefaultName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tin {number}'**
+  String storyDefaultName(String number);
+
+  /// No description provided for @storySendReplyHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi tin nhắn...'**
+  String get storySendReplyHint;
+
+  /// No description provided for @storyReplySent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi phản hồi tin'**
+  String get storyReplySent;
+
+  /// No description provided for @storyReplyErrorPrefix.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lỗi: {error}'**
+  String storyReplyErrorPrefix(String error);
 
   /// No description provided for @storyMusic.
   ///

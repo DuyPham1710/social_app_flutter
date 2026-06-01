@@ -1260,10 +1260,34 @@
   "storySavePhoto": "Lưu ảnh",
   "storyArchivePhoto": "Lưu trữ ảnh",
   "storyArchivePhotoDescription": "Gỡ ảnh khỏi tin và lưu vào kho lưu trữ.",
+  "storyArchiveTitle": "Lưu trữ tin",
+  "storyArchiveConfirm": "Bạn có chắc chắn muốn lưu trữ tin này không? Tin sẽ được lưu vào kho lưu trữ và không còn hiển thị với người khác.",
+  "storyArchived": "Đã lưu trữ tin",
+  "storyArchiveFailed": "Không thể lưu trữ tin",
   "storyDeletePhoto": "Xóa ảnh",
   "storyCopyShareLink": "Sao chép liên kết để chia sẻ tin này",
   "storyLinkVisibility": "Tin sẽ hiển thị với đối tượng của {user} trong 24 giờ.",
   "@storyLinkVisibility": {"placeholders": {"user": {"type": "String"}}},
+  "storyArchivePageTitle": "Tin lưu trữ",
+  "storyNoArchivedStories": "Chưa có tin lưu trữ nào",
+  "storyDefaultName": "Tin {number}",
+  "@storyDefaultName": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "storySendReplyHint": "Gửi tin nhắn...",
+  "storyReplySent": "Đã gửi phản hồi tin",
+  "storyReplyErrorPrefix": "Lỗi: {error}",
+  "@storyReplyErrorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "storyMusic": "Nhạc",
   "storyMusicLoadFailed": "Không tải được danh sách nhạc. Vui lòng thử lại.",
   "storyMusicSearchFailed": "Không tìm thấy kết quả. Vui lòng thử lại.",

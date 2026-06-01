@@ -29,6 +29,9 @@ abstract class StoryRepository {
   /// Xóa story
   Future<DataState<void>> deleteStory({required String storyId});
 
+  /// Lưu trữ story
+  Future<DataState<void>> archiveStory({required String storyId});
+
   /// Tạo hoặc cập nhật react cho story (trả về null nếu xóa react)
   Future<DataState<ReactStoryEntity?>> createOrUpdateReactStory({
     required String storyId,
