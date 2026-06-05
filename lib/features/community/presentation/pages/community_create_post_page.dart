@@ -17,9 +17,11 @@ import 'package:social_app_fe/features/post/domain/entities/create_post_entity.d
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_event.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_state.dart';
+import 'package:social_app_fe/features/post/presentation/helpers/tag_helper.dart';
 import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dart';
 import 'package:social_app_fe/features/post/presentation/pages/edit_selected_image_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/gallery_picker_screen.dart';
+import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
@@ -53,6 +55,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     PrivacyType.public,
   );
   bool _isCreatingPost = false;
+  List<Map<String, String>> _taggedUsers = [];
 
   @override
   void initState() {
@@ -100,6 +103,9 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         titles: null,
         friendsExcept: null,
         friendsDetail: null,
+        taggedUserIds: _taggedUsers.isNotEmpty
+            ? _taggedUsers.map((e) => e['id']!).toList()
+            : null,
         communityId: widget.communityId,
       );
 
@@ -245,6 +251,30 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     }
   }
 
+  Future<void> _openTagFriends() async {
+    final result = await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => TagFriendsPage(
+          initialSelectedFriends: _taggedUsers.map((e) => e['id']!).toList(),
+        ),
+      ),
+    );
+    if (result != null && result is List<Map<String, String>>) {
+      setState(() {
+        _taggedUsers = result;
+      });
+    }
+  }
+
+  Widget _buildTaggedText() {
+    final taggedNames = _taggedUsers.map((e) => e['name']!).toList();
+    return TagHelper.buildTagsOnly(
+      l10n: context.l10n,
+      taggedNames: taggedNames,
+    );
+  }
+
   void _showMoreOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -376,256 +406,308 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
           }
         }
       },
-      child: SafeArea(
-        child: Scaffold(
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            automaticallyImplyLeading: false,
-            toolbarHeight: 72.h,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          toolbarHeight: 72.h,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            color: AppColors.textPrimary,
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          title: Text(
+            context.l10n.communityCreatePostTitle,
+            softWrap: true,
+            maxLines: 2,
+            overflow: TextOverflow.visible,
+            style: TextStyle(
               color: AppColors.textPrimary,
-              onPressed: () => Navigator.of(context).maybePop(),
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              height: 1.1,
             ),
-            title: Text(
-              context.l10n.communityCreatePostTitle,
-              softWrap: true,
-              maxLines: 2,
-              overflow: TextOverflow.visible,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                height: 1.1,
-              ),
-            ),
-            centerTitle: false,
-            actions: [
-              Row(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 10.h,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      elevation: 0,
+          ),
+          centerTitle: false,
+          actions: [
+            Row(
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 10.h,
                     ),
-                    onPressed: _isCreatingPost ? null : _createPost,
-                    child: _isCreatingPost
-                        ? SizedBox(
-                            width: 14.sp,
-                            height: 14.sp,
-                            child:  CircularProgressIndicator(
-                              color: AppColors.background,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            context.l10n.postSubmit,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: _isCreatingPost ? null : _createPost,
+                  child: _isCreatingPost
+                      ? SizedBox(
+                          width: 14.sp,
+                          height: 14.sp,
+                          child: CircularProgressIndicator(
+                            color: AppColors.background,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          context.l10n.postSubmit,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+                SizedBox(width: 12.w),
+              ],
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
+            child: Column(
+              children: [
+                BlocBuilder<MenuBloc, MenuState>(
+                  builder: (context, state) {
+                    if (state is MenuLoadingState) {
+                      return const Center(child: CupertinoActivityIndicator());
+                    }
+
+                    if (state is MenuLoadedState) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 20.r,
+                            backgroundImage: NetworkImage(
+                              state.user.avatarUrl ??
+                                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
                             ),
                           ),
-                  ),
-                  SizedBox(width: 12.w),
-                ],
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Container(
-              padding: EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
-              child: Column(
-                children: [
-                  BlocBuilder<MenuBloc, MenuState>(
-                    builder: (context, state) {
-                      if (state is MenuLoadingState) {
-                        return const Center(
-                          child: CupertinoActivityIndicator(),
-                        );
-                      }
 
-                      if (state is MenuLoadedState) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 20.r,
-                              backgroundImage: NetworkImage(
-                                state.user.avatarUrl ??
-                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: GestureDetector(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 8.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.background,
-                                        borderRadius: BorderRadius.circular(
-                                          14.r,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            state.user.fullName ??
-                                                context.l10n.commonUnknown,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13.sp,
-                                              color: AppColors.textPrimary,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 10.h,
-                                              vertical: 4.w,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.primary.withOpacity(0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  getIcon(
-                                                    _selectedPrivacyLabel,
-                                                  ),
-                                                  color: AppColors.primary,
-                                                  size: 14.sp,
-                                                ),
-                                                SizedBox(width: 4.w),
-                                                Text(
-                                                  _selectedPrivacyLabel,
-                                                  style: TextStyle(
-                                                    color: AppColors.primary,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 13.sp,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                          SizedBox(width: 12.w),
+
+                          Expanded(
+                            child: GestureDetector(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w,
+                                      vertical: 8.h,
                                     ),
-                                  ],
-                                ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.background,
+                                      borderRadius: BorderRadius.circular(14.r),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Wrap(
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          children: [
+                                            Text(
+                                              state.user.fullName ??
+                                                  context.l10n.commonUnknown,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14.sp,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                            ),
+                                            if (_taggedUsers.isNotEmpty) ...[
+                                              Text(
+                                                context.l10n.postWith,
+                                                style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color:
+                                                      AppColors.textSecondary,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: _openTagFriends,
+                                                child: _buildTaggedText(),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+
+                                        SizedBox(height: 8.h),
+
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.h,
+                                            vertical: 4.w,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primary
+                                                .withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                getIcon(_selectedPrivacyLabel),
+                                                color: AppColors.primary,
+                                                size: 14.sp,
+                                              ),
+                                              SizedBox(width: 4.w),
+                                              Text(
+                                                _selectedPrivacyLabel,
+                                                style: TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 13.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
+                          ),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+                SizedBox(height: 14.h),
+                TextField(
+                  controller: _captionController,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18.sp,
                   ),
-                  SizedBox(height: 14.h),
-                  TextField(
-                    controller: _captionController,
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    hintText: context.l10n.postWriteSomethingHint,
+                    hintStyle: TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 18.sp,
                     ),
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.postWriteSomethingHint,
-                      hintStyle: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 18.sp,
-                      ),
-                      border: InputBorder.none,
-                    ),
+                    border: InputBorder.none,
                   ),
-                  if (_selectedAssets.isNotEmpty) ...[
-                    SelectedImagesDisplay(
-                      selectedAssets: _selectedAssets,
-                      onChangedLayout: (layout) {
-                        setState(() {
-                          _selectedLayout = layout;
-                        });
-                      },
-                      onEdit: () => _onSelectImage(context),
-                      onRemove: (assets) {
-                        setState(() {
-                          _selectedAssets.clear();
-                        });
-                      },
-                      onRemoveAtIndex: (index) {
-                        setState(() {
-                          _selectedAssets.removeAt(index);
-                        });
-                      },
-                    ),
-                  ],
+                ),
+                if (_selectedAssets.isNotEmpty) ...[
+                  SelectedImagesDisplay(
+                    selectedAssets: _selectedAssets,
+                    onChangedLayout: (layout) {
+                      setState(() {
+                        _selectedLayout = layout;
+                      });
+                    },
+                    onEdit: () => _onSelectImage(context),
+                    onRemove: (assets) {
+                      setState(() {
+                        _selectedAssets.clear();
+                      });
+                    },
+                    onRemoveAtIndex: (index) {
+                      setState(() {
+                        _selectedAssets.removeAt(index);
+                      });
+                    },
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
-          bottomNavigationBar: Container(
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
-            color: AppColors.background,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Divider(height: 1.h, color: AppColors.divider),
-                SizedBox(height: 10.h),
-                Row(
+        ),
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+          color: AppColors.background,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Divider(height: 1.h, color: AppColors.divider),
+              SizedBox(height: 10.h),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _bottomIcon(
-                      Icons.image,
-                      color: Colors.green,
+                      Icons.image_outlined,
+                      context.l10n.postLibrary,
                       onTap: () => _onSelectImage(context),
                     ),
                     _bottomIcon(
                       Icons.person_add_alt_1,
-                      color: Colors.blueAccent,
+                      context.l10n.postTag,
+                      onTap: _openTagFriends,
                     ),
-                    _bottomIcon(Icons.emoji_emotions, color: Colors.amber),
-                    _bottomIcon(Icons.location_on, color: Colors.redAccent),
                     _bottomIcon(
-                      CupertinoIcons.ellipsis_circle,
-                      color: Colors.grey,
+                      Icons.emoji_emotions_outlined,
+                      context.l10n.postFeeling,
+                    ),
+                    _bottomIcon(
+                      Icons.location_on_outlined,
+                      context.l10n.postLocation,
+                    ),
+                    _bottomIcon(
+                      CupertinoIcons.ellipsis,
+                      context.l10n.postMore,
                       onTap: () => _showMoreOptions(context),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _bottomIcon(IconData icon, {Color? color, VoidCallback? onTap}) {
+  Widget _bottomIcon(IconData icon, String text, {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Icon(icon, color: color, size: 28.sp),
+      child: Container(
+        constraints: BoxConstraints(minWidth: 90.w),
+        margin: EdgeInsets.only(right: 8.w),
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: AppColors.textSecondary.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.textPrimary, size: 24.sp),
+            SizedBox(height: 4.h),
+            Text(
+              text,
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

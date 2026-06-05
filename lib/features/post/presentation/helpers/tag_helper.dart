@@ -39,7 +39,9 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: ownerName, style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postWith, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[0], style: bStyle),
           ],
         ),
@@ -51,9 +53,13 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: ownerName, style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postWith, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[0], style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postAnd, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[1], style: bStyle),
           ],
         ),
@@ -64,9 +70,13 @@ class TagHelper {
       text: TextSpan(
         children: [
           TextSpan(text: ownerName, style: bStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postWith, style: nStyle),
+          TextSpan(text: ' '),
           TextSpan(text: taggedNames[0], style: bStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postAnd, style: nStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
         ],
       ),
@@ -108,7 +118,9 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: taggedNames[0], style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postAnd, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[1], style: bStyle),
           ],
         ),
@@ -119,7 +131,9 @@ class TagHelper {
       text: TextSpan(
         children: [
           TextSpan(text: taggedNames[0], style: bStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postAnd, style: nStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
         ],
       ),

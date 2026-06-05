@@ -6,11 +6,12 @@ import 'package:social_app_fe/core/services/fcm_service.dart';
 import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/features/auth/presentation/widgets/auth_responsive_wrapper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
@@ -80,200 +81,204 @@ class _LoginPageState extends State<LoginPage> {
         },
 
         builder: (context, state) {
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    SizedBox(height: 40.h),
+          return AuthResponsiveWrapper(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 40.rsh(context)),
 
-                    // Logo
-                    Image.asset(
-                      s1<AppPreferences>().isDarkMode
-                          ? 'assets/icons/dark_logo.png'
-                          : 'assets/icons/logo.jpg',
-                      height: 120.h,
-                      width: 120.w,
-                    ),
-
-                    SizedBox(height: 40.h),
-
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        context.l10n.authLogin,
-                        style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                      // Logo
+                      Image.asset(
+                        s1<AppPreferences>().isDarkMode
+                            ? 'assets/icons/dark_logo.png'
+                            : 'assets/icons/logo.jpg',
+                        height: 120.rsh(context),
+                        width: 120.rs(context),
                       ),
-                    ),
 
-                    SizedBox(height: 20.h),
+                      SizedBox(height: 40.rsh(context)),
 
-                    TextformfieldCustom(
-                      label: context.l10n.authEmail,
-                      isPassword: false,
-                      controller: _emailController,
-                      focusNode: emailFocusNode,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.l10n.authEnterEmail;
-                        }
-                        return null;
-                      },
-                    ),
-
-                    SizedBox(height: 20.h),
-
-                    TextformfieldCustom(
-                      label: context.l10n.authPassword,
-                      isPassword: _isPasswordVisible,
-                      controller: _passwordController,
-                      focusNode: passwordFocusNode,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.l10n.authEnterPassword;
-                        }
-                        return null;
-                      },
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                        child: Icon(
-                          _isPasswordVisible
-                              ? CupertinoIcons.eye_slash_fill
-                              : CupertinoIcons.eye_fill,
-                          size: 22.sp,
-                          color: AppColors.unselectedIcon,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: 14.h),
-
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/forgot-password');
-                        },
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          context.l10n.authForgotPasswordQuestion,
+                          context.l10n.authLogin,
                           style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 24.rsp(context),
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
-                    ),
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 1,
-                            color: AppColors.divider,
+                      SizedBox(height: 20.rsh(context)),
+
+                      TextformfieldCustom(
+                        label: context.l10n.authEmail,
+                        isPassword: false,
+                        controller: _emailController,
+                        focusNode: emailFocusNode,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return context.l10n.authEnterEmail;
+                          }
+                          return null;
+                        },
+                      ),
+
+                      SizedBox(height: 20.rsh(context)),
+
+                      TextformfieldCustom(
+                        label: context.l10n.authPassword,
+                        isPassword: _isPasswordVisible,
+                        controller: _passwordController,
+                        focusNode: passwordFocusNode,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return context.l10n.authEnterPassword;
+                          }
+                          return null;
+                        },
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                          child: Icon(
+                            _isPasswordVisible
+                                ? CupertinoIcons.eye_slash_fill
+                                : CupertinoIcons.eye_fill,
+                            size: 22.rsp(context),
+                            color: AppColors.unselectedIcon,
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.h),
+                      ),
+
+                      SizedBox(height: 14.rsh(context)),
+
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/forgot-password');
+                          },
                           child: Text(
-                            context.l10n.authOr,
+                            context.l10n.authForgotPasswordQuestion,
                             style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14.rsp(context),
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Divider(
-                            thickness: 1,
-                            color: AppColors.divider,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 30.h),
-
-                    Container(
-                      width: double.infinity,
-                      height: 60.h,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: AppColors.divider),
                       ),
 
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Row(
                         children: [
-                          Image.asset(
-                            'assets/icons/google.png',
-                            height: 24.h,
-                            width: 24.w,
+                          Expanded(
+                            child: Divider(
+                              thickness: 1,
+                              color: AppColors.divider,
+                            ),
                           ),
-                          SizedBox(width: 12.w),
-                          Text(
-                            context.l10n.authLoginWithGoogle,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary,
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.rsh(context),
+                            ),
+                            child: Text(
+                              context.l10n.authOr,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              thickness: 1,
+                              color: AppColors.divider,
                             ),
                           ),
                         ],
                       ),
-                    ),
 
-                    SizedBox(height: 60.h),
+                      SizedBox(height: 30.rsh(context)),
 
-                    state is AuthLoading
-                        ? CircularProgressIndicator(color: AppColors.primary)
-                        : ButtonCustom(
-                            onPressed: () => _onLoginPressed(context),
-                            text: context.l10n.authLogin,
-                          ),
-
-                    SizedBox(height: 24.h),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          context.l10n.authNoAccount,
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      Container(
+                        width: double.infinity,
+                        height: 60.rsh(context),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12.rsr(context)),
+                          border: Border.all(color: AppColors.divider),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/signup');
-                          },
-                          child: Text(
-                            context.l10n.authRegister,
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/icons/google.png',
+                              height: 24.rsh(context),
+                              width: 24.rs(context),
+                            ),
+                            SizedBox(width: 12.rs(context)),
+                            Text(
+                              context.l10n.authLoginWithGoogle,
+                              style: TextStyle(
+                                fontSize: 16.rsp(context),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 60.rsh(context)),
+
+                      state is AuthLoading
+                          ? CircularProgressIndicator(color: AppColors.primary)
+                          : ButtonCustom(
+                              onPressed: () => _onLoginPressed(context),
+                              text: context.l10n.authLogin,
+                            ),
+
+                      SizedBox(height: 24.rsh(context)),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            context.l10n.authNoAccount,
                             style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                              fontSize: 14.rsp(context),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/signup');
+                            },
+                            child: Text(
+                              context.l10n.authRegister,
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14.rsp(context),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
 
-                    SizedBox(height: 20.h),
-                  ],
+                      SizedBox(height: 20.rsh(context)),
+                    ],
+                  ),
                 ),
               ),
             ),

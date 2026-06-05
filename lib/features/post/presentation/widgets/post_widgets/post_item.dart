@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/utils/react_post_util.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
@@ -285,26 +285,29 @@ class _PostItemState extends State<PostItem> {
     final urls = widget.post.urls;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      padding: EdgeInsets.symmetric(vertical: 8.h),
+      margin: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 8.rsh(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border.all(
           color: AppColors.divider.withValues(alpha: 0.85),
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 10,
-            offset: Offset(0, 3.h),
+            offset: Offset(0, 3.rsh(context)),
             spreadRadius: 0,
           ),
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 4,
-            offset: Offset(0, 1.h),
+            offset: Offset(0, 1.rsh(context)),
             spreadRadius: 0,
           ),
         ],
@@ -430,19 +433,19 @@ class _PostItemState extends State<PostItem> {
             GestureDetector(
               onTap: widget.post.urls.isEmpty ? _openPostDetail : null,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
                 child: PostTranslatableCaption(
                   postId: widget.post.id,
                   caption: widget.post.caption!,
                   textStyle: TextStyle(
-                    fontSize: 13.sp,
+                    fontSize: 13.rsp(context),
                     color: AppColors.textPrimary,
                   ),
                 ),
               ),
             ),
 
-          SizedBox(height: 8.h),
+          SizedBox(height: 8.rsh(context)),
 
           // Media (images)
           if (urls.isNotEmpty)
@@ -451,10 +454,10 @@ class _PostItemState extends State<PostItem> {
             GestureDetector(
               onTap: _openPostDetail,
               behavior: HitTestBehavior.opaque,
-              child: SizedBox(height: 8.h),
+              child: SizedBox(height: 8.rsh(context)),
             ),
 
-          SizedBox(height: 8.h),
+          SizedBox(height: 8.rsh(context)),
 
           // Likes info - ẩn nếu bài viết đang chờ duyệt
           if (widget.post.communityStatus != 'pending')
@@ -474,7 +477,7 @@ class _PostItemState extends State<PostItem> {
               child: PostReactInfo(reacts: _localReacts),
             ),
 
-          SizedBox(height: 20.h),
+          SizedBox(height: 20.rsh(context)),
 
           // Post actions - ẩn nếu bài viết đang chờ duyệt
           if (widget.post.communityStatus != 'pending')

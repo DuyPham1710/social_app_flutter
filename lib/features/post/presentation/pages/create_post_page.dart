@@ -586,6 +586,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                 ),
                                               ),
                                               if (_taggedUsers.isNotEmpty) ...[
+                                                SizedBox(width: 6.w),
                                                 Text(
                                                   context.l10n.postWith,
                                                   style: TextStyle(
@@ -594,6 +595,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                         AppColors.textSecondary,
                                                   ),
                                                 ),
+                                                SizedBox(width: 6.w),
                                                 GestureDetector(
                                                   onTap: _openTagFriends,
                                                   child: _buildTaggedText(),

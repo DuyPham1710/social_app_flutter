@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/shared/component/video_player_widget.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
@@ -102,26 +102,6 @@ class LayoutPostFrame extends StatelessWidget {
       );
     }
 
-    // If it's a video, add play icon overlay
-    // if (VideoUtil.isVideo(imageData)) {
-    //   return Stack(
-    //     fit: StackFit.expand,
-    //     children: [
-    //       mediaWidget,
-    //       Container(
-    //         color: Colors.black.withOpacity(0.3),
-    //         child: Center(
-    //           child: Icon(
-    //             Icons.play_circle_filled,
-    //             color: Colors.white,
-    //             size: 48.sp,
-    //           ),
-    //         ),
-    //       ),
-    //     ],
-    //   );
-    // }
-
     return mediaWidget;
   }
 
@@ -131,16 +111,16 @@ class LayoutPostFrame extends StatelessWidget {
 
   // Bộ màu pastel dễ nhìn cho background
   static final List<Color> _frameColors = [
-    Color(0xFFFFE5E5), // Pastel Pink
-    Color(0xFFE5F3FF), // Pastel Blue
-    Color(0xFFE5FFE5), // Pastel Green
-    Color(0xFFFFF5E5), // Pastel Orange
-    Color(0xFFF5E5FF), // Pastel Purple
-    Color(0xFFFFFFE5), // Pastel Yellow
-    Color(0xFFFFE5F5), // Pastel Rose
-    Color(0xFFE5FFFF), // Pastel Cyan
-    Color(0xFFFFF0E5), // Pastel Peach
-    Color(0xFFE5F0FF), // Pastel Sky
+    const Color(0xFFFFE5E5), // Pastel Pink
+    const Color(0xFFE5F3FF), // Pastel Blue
+    const Color(0xFFE5FFE5), // Pastel Green
+    const Color(0xFFFFF5E5), // Pastel Orange
+    const Color(0xFFF5E5FF), // Pastel Purple
+    const Color(0xFFFFFFE5), // Pastel Yellow
+    const Color(0xFFFFE5F5), // Pastel Rose
+    const Color(0xFFE5FFFF), // Pastel Cyan
+    const Color(0xFFFFF0E5), // Pastel Peach
+    const Color(0xFFE5F0FF), // Pastel Sky
   ];
 
   Color get randomFrameColor {
@@ -157,28 +137,26 @@ class LayoutPostFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     if (urls.isEmpty) return const SizedBox.shrink();
 
-    // Không cần sort cho local files vì chúng đã được sắp xếp
-    // final orderedUrls = sortedUrls;
     final orderedUrls = urls;
 
-    return _buildFrameLayout(orderedUrls);
+    return _buildFrameLayout(context, orderedUrls);
   }
 
-  Widget _buildFrameLayout(List<dynamic> orderedUrls) {
+  Widget _buildFrameLayout(BuildContext context, List<dynamic> orderedUrls) {
     final frameColor = randomFrameColor;
 
     if (orderedUrls.length == 1) {
       // 1 ảnh: hiển thị đơn giản với frame
       return Container(
         color: frameColor,
-        padding: EdgeInsets.all(12.w),
+        padding: EdgeInsets.all(12.rs(context)),
         child: GestureDetector(
           onTap: () => onImageTap(0),
           child: AspectRatio(
             aspectRatio: 1.0,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-                child: _buildImageWidget(orderedUrls[0], 0),
+              borderRadius: BorderRadius.circular(8.rsr(context)),
+              child: _buildImageWidget(orderedUrls[0], 0),
             ),
           ),
         ),
@@ -186,35 +164,34 @@ class LayoutPostFrame extends StatelessWidget {
     } else if (orderedUrls.length == 2) {
       // 2 ảnh: layout dọc như column
       return SizedBox(
-        height: 280.h,
+        height: 280.rsh(context),
         child: Container(
           color: frameColor,
-
-          padding: EdgeInsets.all(12.w),
+          padding: EdgeInsets.all(12.rs(context)),
           child: Row(
             children: [
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(0),
                   child: SizedBox(
-                    height: 250.h,
+                    height: 250.rsh(context),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: BorderRadius.circular(8.rsr(context)),
                       child: _buildImageWidget(orderedUrls[0], 0),
                     ),
                   ),
                 ),
               ),
 
-              SizedBox(width: 10.h),
+              SizedBox(width: 10.rs(context)),
 
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(1),
                   child: SizedBox(
-                    height: 250.h,
+                    height: 250.rsh(context),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: BorderRadius.circular(8.rsr(context)),
                       child: _buildImageWidget(orderedUrls[1], 1),
                     ),
                   ),
@@ -228,25 +205,24 @@ class LayoutPostFrame extends StatelessWidget {
       // 3+ ảnh: 2 cột với hiệu ứng dịch chuyển
       return Container(
         color: frameColor,
-
-        padding: EdgeInsets.all(12.w),
+        padding: EdgeInsets.all(12.rs(context)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Cột 1: dịch lên trên
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(top: 0),
-                child: _buildColumn1(orderedUrls),
+                padding: const EdgeInsets.only(top: 0),
+                child: _buildColumn1(context, orderedUrls),
               ),
             ),
 
-            SizedBox(width: 10.w),
+            SizedBox(width: 10.rs(context)),
             // Cột 2: dịch xuống dưới
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(top: 40.h),
-                child: _buildColumn2(orderedUrls),
+                padding: EdgeInsets.only(top: 40.rsh(context)),
+                child: _buildColumn2(context, orderedUrls),
               ),
             ),
           ],
@@ -255,29 +231,29 @@ class LayoutPostFrame extends StatelessWidget {
     }
   }
 
-  Widget _buildColumn1(List<dynamic> orderedUrls) {
+  Widget _buildColumn1(BuildContext context, List<dynamic> orderedUrls) {
     return Column(
       children: [
         GestureDetector(
           onTap: () => onImageTap(0),
           child: SizedBox(
-            height: 250.h,
+            height: 250.rsh(context),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-                  child: _buildImageWidget(orderedUrls[0], 0),
+              borderRadius: BorderRadius.circular(8.rsr(context)),
+              child: _buildImageWidget(orderedUrls[0], 0),
             ),
           ),
         ),
 
-        SizedBox(height: 10.h),
+        SizedBox(height: 10.rsh(context)),
 
         GestureDetector(
           onTap: () => onImageTap(1),
           child: SizedBox(
-            height: 250.h,
+            height: 250.rsh(context),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-                  child: _buildImageWidget(orderedUrls[1], 1),
+              borderRadius: BorderRadius.circular(8.rsr(context)),
+              child: _buildImageWidget(orderedUrls[1], 1),
             ),
           ),
         ),
@@ -285,7 +261,7 @@ class LayoutPostFrame extends StatelessWidget {
     );
   }
 
-  Widget _buildColumn2(List<dynamic> orderedUrls) {
+  Widget _buildColumn2(BuildContext context, List<dynamic> orderedUrls) {
     final maxImages = orderedUrls.length > 5 ? 5 : orderedUrls.length;
 
     return Column(
@@ -294,10 +270,10 @@ class LayoutPostFrame extends StatelessWidget {
           GestureDetector(
             onTap: () => onImageTap(2),
             child: SizedBox(
-              height: 300.h,
+              height: 300.rsh(context),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
-                      child: _buildImageWidget(orderedUrls[2], 2),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
+                child: _buildImageWidget(orderedUrls[2], 2),
               ),
             ),
           )
@@ -305,36 +281,40 @@ class LayoutPostFrame extends StatelessWidget {
           GestureDetector(
             onTap: () => onImageTap(2),
             child: SizedBox(
-              height: 180.h,
+              height: 180.rsh(context),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
                 child: _buildImageWidget(orderedUrls[2], 2),
               ),
             ),
           ),
         if (maxImages >= 4) ...[
-          SizedBox(height: 10.h),
+          SizedBox(height: 10.rsh(context)),
           GestureDetector(
             onTap: () => onImageTap(3),
             child: SizedBox(
-              height: 180.h,
+              height: 180.rsh(context),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
-                      child: _buildImageWidget(orderedUrls[3], 3),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
+                child: _buildImageWidget(orderedUrls[3], 3),
               ),
             ),
           ),
         ],
         if (maxImages >= 5) ...[
-          SizedBox(height: 10.h),
+          SizedBox(height: 10.rsh(context)),
           orderedUrls.length > 5
-              ? _buildOverlayImage(orderedUrls[4], orderedUrls.length - 5)
+              ? _buildOverlayImage(
+                  context,
+                  orderedUrls[4],
+                  orderedUrls.length - 5,
+                )
               : GestureDetector(
                   onTap: () => onImageTap(4),
                   child: SizedBox(
-                    height: 180.h,
+                    height: 180.rsh(context),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: BorderRadius.circular(8.rsr(context)),
                       child: _buildImageWidget(orderedUrls[4], 4),
                     ),
                   ),
@@ -344,33 +324,37 @@ class LayoutPostFrame extends StatelessWidget {
     );
   }
 
-  Widget _buildOverlayImage(dynamic imageData, int remaining) {
+  Widget _buildOverlayImage(
+    BuildContext context,
+    dynamic imageData,
+    int remaining,
+  ) {
     return GestureDetector(
       onTap: () => onImageTap(4),
       child: SizedBox(
-        height: 180.h,
+        height: 180.rsh(context),
         child: Stack(
           fit: StackFit.expand,
           children: [
             SizedBox(
-              height: 180.h,
+              height: 180.rsh(context),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
                 child: _buildImageWidget(imageData, 4),
               ),
             ),
 
             Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(8.r),
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
               alignment: Alignment.center,
               child: Text(
                 '+$remaining',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24.sp,
+                  fontSize: 24.rsp(context),
                   fontWeight: FontWeight.bold,
                 ),
               ),

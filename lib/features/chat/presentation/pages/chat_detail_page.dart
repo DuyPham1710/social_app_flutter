@@ -1333,7 +1333,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                           ),
                                           Center(
                                             child: Text(
-                                              context.l10n
+                                              context
+                                                  .l10n
                                                   .messageNoMessagesStartConversation,
                                               style: TextStyle(
                                                 color: AppColors.textSecondary,
@@ -1932,6 +1933,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                   child: TextField(
                     controller: _messageController,
                     focusNode: _focusNode,
+                    cursorColor: AppColors.primary,
                     onChanged: _onTextChanged,
                     onTap: () {
                       // Toggle expansion khi ấn vào TextField

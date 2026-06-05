@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/features/auth/presentation/widgets/auth_responsive_wrapper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -28,13 +29,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
 
-  final FaceDetector _faceDetector = FaceDetector(
-    options: FaceDetectorOptions(
-      enableContours: false,
-      enableClassification: false,
-      enableTracking: true,
-    ),
-  );
+  FaceDetector? _faceDetector;
 
   bool _isDetecting = false;
   bool _isCapturing = false;
@@ -59,18 +54,107 @@ class _FaceScanPageState extends State<FaceScanPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      _userId = args?['userId'] as String? ?? '';
-      _isPrivacyTab = args?['isPrivacyTab'] as bool? ?? false;
-      debugPrint('[FaceScan] userId: $_userId');
-      debugPrint('[FaceScan] isPrivacyTab: $_isPrivacyTab');
+      if (!ResponsiveHelper.isMobile(context)) {
+        _showMobileOnlyDialog();
+      } else {
+        final args =
+            ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        _userId = args?['userId'] as String? ?? '';
+        _isPrivacyTab = args?['isPrivacyTab'] as bool? ?? false;
+        debugPrint('[FaceScan] userId: $_userId');
+        debugPrint('[FaceScan] isPrivacyTab: $_isPrivacyTab');
+        _initCamera();
+      }
     });
-    _initCamera();
+  }
+
+  void _showMobileOnlyDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Align(
+          alignment: Alignment.center,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Dialog(
+              backgroundColor: AppColors.secondBackground,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.device_phone_portrait,
+                      size: 64,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Tính năng không hỗ trợ",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Tính năng quét khuôn mặt chỉ hỗ trợ thực hiện trên thiết bị điện thoại di động.",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close dialog
+                          Navigator.of(this.context).pop(); // Go back
+                        },
+                        child: const Text(
+                          "Đồng ý",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _initCamera() async {
     try {
+      _faceDetector = FaceDetector(
+        options: FaceDetectorOptions(
+          enableContours: false,
+          enableClassification: false,
+          enableTracking: true,
+        ),
+      );
       final cameras = await availableCameras();
       if (cameras.isEmpty) return;
 
@@ -111,8 +195,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
   String _instructionText(BuildContext context) {
     if (_isUploading) return context.l10n.faceScanUploading;
     if (_isFinished) return context.l10n.faceScanStoredSafely;
-    if (_isTooDark)
-      return context.l10n.faceScanTooDarkMessage;
+    if (_isTooDark) return context.l10n.faceScanTooDarkMessage;
 
     switch (_poses[_currentPoseIndex]) {
       case FacePose.center:
@@ -159,10 +242,10 @@ class _FaceScanPageState extends State<FaceScanPage> {
       }
 
       // Nếu đủ sáng mới tiến hành nhận diện AI
-      if (isBright) {
+      if (isBright && _faceDetector != null) {
         final inputImage = _inputImageFromCameraImage(image);
         if (inputImage != null) {
-          final faces = await _faceDetector.processImage(inputImage);
+          final faces = await _faceDetector!.processImage(inputImage);
 
           // Cần đúng 1 khuôn mặt trong khung hình
           if (faces.length == 1) {
@@ -394,7 +477,11 @@ class _FaceScanPageState extends State<FaceScanPage> {
   @override
   void dispose() {
     _cameraController?.dispose();
-    _faceDetector.close();
+    if (_faceDetector != null) {
+      _faceDetector!.close().catchError((e) {
+        debugPrint("Lỗi đóng face detector: $e");
+      });
+    }
     super.dispose();
   }
 
@@ -421,199 +508,206 @@ class _FaceScanPageState extends State<FaceScanPage> {
       child: Scaffold(
         backgroundColor: Colors.black,
         body: SafeArea(
-          child: Column(
-            children: [
-              // Top Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 16.0,
-                ),
+          child: AuthResponsiveWrapper(
+            child: Column(
+              children: [
+                // Top Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 16.0,
+                  ),
 
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: Colors.white,
-                          size: 24.sp,
-                        ),
-                      ),
-                    ),
-
-                    Expanded(
-                      child: Text(
-                        context.l10n.faceScanTitle,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 40.w),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 40.h),
-
-              // Tiến trình (Progress dots)
-              if (!_isFinished)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: EdgeInsets.symmetric(horizontal: 6.w),
-                      width: index == _currentPoseIndex ? 24.w : 12.w,
-                      height: 12.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6.w),
-                        color: index <= _currentPoseIndex
-                            ? AppColors.primary
-                            : Colors.grey[800],
-                      ),
-                    );
-                  }),
-                ),
-
-              SizedBox(height: 40.h),
-
-              // Camera View
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Camera Preview inside a circle
-                    Container(
-                      width: 300.w,
-                      height: 300.w,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: _isFinished
-                              ? Colors.green
-                              : (_isCapturing
-                                    ? Colors.white
-                                    : AppColors.primary),
-                          width: _isCapturing ? 6.w : 4.w,
-                        ),
-                      ),
-                      child: ClipOval(
-                        child: _isCameraInitialized
-                            ? Builder(
-                                builder: (context) {
-                                  // Camera ratio thường trả về landscape (VD: 16/9 = 1.77) trên Android
-                                  // Nhưng màn hình đang dọc, nên ảnh thực tế là 9/16. Ta phải nghịch đảo.
-                                  double ratio =
-                                      _cameraController!.value.aspectRatio;
-                                  if (ratio > 1.0) {
-                                    ratio = 1.0 / ratio;
-                                  }
-
-                                  return SizedBox(
-                                    width: 300.w,
-                                    height: 300.w,
-                                    child: FittedBox(
-                                      fit: BoxFit.cover,
-                                      child: SizedBox(
-                                        width: 1000,
-                                        height: 1000 / ratio,
-                                        child: CameraPreview(
-                                          _cameraController!,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )
-                            : Container(
-                                color: Colors.grey[900],
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                      ),
-                    ),
-
-                    // Flash effect when capturing
-                    if (_isCapturing && !_isFinished)
-                      Container(
-                        width: 300.w,
-                        height: 300.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-
-                    // Success overlay
-                    if (_isFinished)
-                      Container(
-                        width: 300.w,
-                        height: 300.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.green.withOpacity(0.6),
-                        ),
-                        child: Center(
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                           child: Icon(
-                            CupertinoIcons.checkmark_alt,
+                            CupertinoIcons.back,
                             color: Colors.white,
-                            size: 100.w,
+                            size: 24.rsp(context),
                           ),
                         ),
                       ),
-                  ],
-                ),
-              ),
 
-              // Instructions
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 40.h),
-                child: Column(
-                  children: [
-                    Icon(
-                      _poseIcon,
-                      color: _isFinished ? Colors.green : AppColors.primary,
-                      size: 40.sp,
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      _instructionTitle(context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: _isFinished ? Colors.green : Colors.white,
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          context.l10n.faceScanTitle,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.rsp(context),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      _instructionText(context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 16.sp,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
+                      SizedBox(width: 40.rs(context)),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: 40.h),
-            ],
+
+                SizedBox(height: 40.rsh(context)),
+
+                // Tiến trình (Progress dots)
+                if (!_isFinished)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: EdgeInsets.symmetric(horizontal: 6.rs(context)),
+                        width: index == _currentPoseIndex
+                            ? 24.rs(context)
+                            : 12.rs(context),
+                        height: 12.rs(context),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6.rs(context)),
+                          color: index <= _currentPoseIndex
+                              ? AppColors.primary
+                              : Colors.grey[800],
+                        ),
+                      );
+                    }),
+                  ),
+
+                SizedBox(height: 40.rsh(context)),
+
+                // Camera View
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Camera Preview inside a circle
+                      Container(
+                        width: 300.rs(context),
+                        height: 300.rs(context),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: _isFinished
+                                ? Colors.green
+                                : (_isCapturing
+                                      ? Colors.white
+                                      : AppColors.primary),
+                            width: _isCapturing ? 6.rs(context) : 4.rs(context),
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: _isCameraInitialized
+                              ? Builder(
+                                  builder: (context) {
+                                    // Camera ratio thường trả về landscape (VD: 16/9 = 1.77) trên Android
+                                    // Nhưng màn hình đang dọc, nên ảnh thực tế là 9/16. Ta phải nghịch đảo.
+                                    double ratio =
+                                        _cameraController!.value.aspectRatio;
+                                    if (ratio > 1.0) {
+                                      ratio = 1.0 / ratio;
+                                    }
+
+                                    return SizedBox(
+                                      width: 300.rs(context),
+                                      height: 300.rs(context),
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: SizedBox(
+                                          width: 1000,
+                                          height: 1000 / ratio,
+                                          child: CameraPreview(
+                                            _cameraController!,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  color: Colors.grey[900],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+
+                      // Flash effect when capturing
+                      if (_isCapturing && !_isFinished)
+                        Container(
+                          width: 300.rs(context),
+                          height: 300.rs(context),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                        ),
+
+                      // Success overlay
+                      if (_isFinished)
+                        Container(
+                          width: 300.rs(context),
+                          height: 300.rs(context),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.green.withOpacity(0.6),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              CupertinoIcons.checkmark_alt,
+                              color: Colors.white,
+                              size: 100.rs(context),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                // Instructions
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 32.rs(context),
+                    vertical: 40.rsh(context),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        _poseIcon,
+                        color: _isFinished ? Colors.green : AppColors.primary,
+                        size: 40.rsp(context),
+                      ),
+                      SizedBox(height: 16.rsh(context)),
+                      Text(
+                        _instructionTitle(context),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _isFinished ? Colors.green : Colors.white,
+                          fontSize: 20.rsp(context),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 12.rsh(context)),
+                      Text(
+                        _instructionText(context),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 16.rsp(context),
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 40.rsh(context)),
+              ],
+            ),
           ),
         ),
       ), // Close BlocListener child

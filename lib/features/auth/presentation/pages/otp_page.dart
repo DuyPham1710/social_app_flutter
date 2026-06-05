@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:pinput/pinput.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/features/auth/presentation/widgets/auth_responsive_wrapper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -54,16 +55,16 @@ class _OtpPageState extends State<OtpPage> {
     }
   }
 
-  PinTheme get defaultPinTheme => PinTheme(
-    width: 50.w,
-    height: 50.h,
+  PinTheme _defaultPinTheme(BuildContext context) => PinTheme(
+    width: 50.rs(context),
+    height: 50.rsh(context),
     textStyle: TextStyle(
-      fontSize: 20.sp,
+      fontSize: 20.rsp(context),
       fontWeight: FontWeight.bold,
       color: AppColors.textPrimary,
     ),
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8.r),
+      borderRadius: BorderRadius.circular(8.rsr(context)),
       border: Border.all(color: AppColors.divider),
     ),
   );
@@ -104,6 +105,8 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final defaultPinTheme = _defaultPinTheme(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -143,147 +146,149 @@ class _OtpPageState extends State<OtpPage> {
         },
 
         builder: (context, state) {
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 20.h),
+          return AuthResponsiveWrapper(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.rsh(context)),
 
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(
-                      CupertinoIcons.back,
-                      color: AppColors.unselectedIcon,
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(
+                        CupertinoIcons.back,
+                        color: AppColors.unselectedIcon,
+                      ),
                     ),
-                  ),
 
-                  SizedBox(height: 50.h),
+                    SizedBox(height: 50.rsh(context)),
 
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      context.l10n.authOtpTitle,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        context.l10n.authOtpTitle,
+                        style: TextStyle(
+                          fontSize: 24.rsp(context),
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 10.rsh(context)),
+
+                    Text(
+                      context.l10n.authOtpSentTo(_email ?? ''),
                       style: TextStyle(
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        fontSize: 16.rsp(context),
+                        color: AppColors.textSecondary,
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: 10.h),
+                    SizedBox(height: 40.rsh(context)),
 
-                  Text(
-                    context.l10n.authOtpSentTo(_email ?? ''),
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-
-                  SizedBox(height: 40.h),
-
-                  Pinput(
-                    length: 6,
-                    defaultPinTheme: defaultPinTheme,
-                    focusedPinTheme: defaultPinTheme.copyWith(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(
-                          color: AppColors.textPrimary,
-                          width: 2.w,
+                    Pinput(
+                      length: 6,
+                      defaultPinTheme: defaultPinTheme,
+                      focusedPinTheme: defaultPinTheme.copyWith(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.rsr(context)),
+                          border: Border.all(
+                            color: AppColors.textPrimary,
+                            width: 2.rs(context),
+                          ),
                         ),
                       ),
+                      onChanged: (value) {
+                        setState(() {
+                          otpCode = value;
+                        });
+                      },
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        otpCode = value;
-                      });
-                    },
-                  ),
 
-                  SizedBox(height: 30.h),
+                    SizedBox(height: 30.rsh(context)),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.l10n.authDidNotReceiveCode,
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-                      GestureDetector(
-                        onTap: _secondsRemaining > 0
-                            ? null
-                            : () => _resendOtp(context),
-                        child: Text(
-                          state is OtpResendLoading
-                              ? context.l10n.authResendingOtp
-                              : _secondsRemaining > 0
-                              ? context.l10n.authResendInSeconds(
-                                  _secondsRemaining,
-                                )
-                              : context.l10n.authResendCode,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.l10n.authDidNotReceiveCode,
                           style: TextStyle(
-                            color: _secondsRemaining > 0
-                                ? AppColors.primary
-                                : Colors.red,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                            fontSize: 14.rsp(context),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
 
-                  SizedBox(height: 280.h),
-
-                  state is AuthLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
-                          ),
-                        )
-                      : ButtonCustom(
-                          onPressed: () => _verifyOtp(context),
-                          text: context.l10n.authVerify,
-                        ),
-
-                  SizedBox(height: 24.h),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        context.l10n.authHasAccount,
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/login');
-                        },
-                        child: Text(
-                          context.l10n.authLogin,
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
+                        GestureDetector(
+                          onTap: _secondsRemaining > 0
+                              ? null
+                              : () => _resendOtp(context),
+                          child: Text(
+                            state is OtpResendLoading
+                                ? context.l10n.authResendingOtp
+                                : _secondsRemaining > 0
+                                ? context.l10n.authResendInSeconds(
+                                    _secondsRemaining,
+                                  )
+                                : context.l10n.authResendCode,
+                            style: TextStyle(
+                              color: _secondsRemaining > 0
+                                  ? AppColors.primary
+                                  : Colors.red,
+                              fontSize: 14.rsp(context),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+
+                    SizedBox(height: 280.rsh(context)),
+
+                    state is AuthLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          )
+                        : ButtonCustom(
+                            onPressed: () => _verifyOtp(context),
+                            text: context.l10n.authVerify,
+                          ),
+
+                      SizedBox(height: 24.rsh(context)),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            context.l10n.authHasAccount,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 14.rsp(context),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/login');
+                            },
+                            child: Text(
+                              context.l10n.authLogin,
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14.rsp(context),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/utils/ui_utils.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_event.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_state.dart';
+import 'package:social_app_fe/features/auth/presentation/widgets/auth_responsive_wrapper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
@@ -63,104 +64,106 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         },
 
         builder: (context, state) {
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20.h),
+          return AuthResponsiveWrapper(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20.rsh(context)),
 
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        CupertinoIcons.back,
-                        color: AppColors.unselectedIcon,
-                      ),
-                    ),
-
-                    SizedBox(height: 50.h),
-
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        context.l10n.authForgotPassword,
-                        style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(
+                          CupertinoIcons.back,
+                          color: AppColors.unselectedIcon,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10.h),
 
-                    Text(
-                      context.l10n.authForgotPasswordDescription,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
+                      SizedBox(height: 50.rsh(context)),
 
-                    SizedBox(height: 50.h),
-
-                    TextformfieldCustom(
-                      label: context.l10n.authEmail,
-                      isPassword: false,
-                      controller: _emailController,
-                      focusNode: emailFocusNode,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.l10n.authEnterEmail;
-                        }
-                        return null;
-                      },
-                    ),
-
-                    SizedBox(height: 320.h),
-
-                    state is OtpResendLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          )
-                        : ButtonCustom(
-                            onPressed: () => _onForgotPasswordPressed(context),
-                            text: context.l10n.authContinue,
-                          ),
-
-                    SizedBox(height: 24.h),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          context.l10n.authNoAccount,
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          context.l10n.authForgotPassword,
                           style: TextStyle(
+                            fontSize: 24.rsp(context),
+                            fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/signup');
-                          },
-                          child: Text(
-                            context.l10n.authRegister,
+                      ),
+                      SizedBox(height: 10.rsh(context)),
+
+                      Text(
+                        context.l10n.authForgotPasswordDescription,
+                        style: TextStyle(
+                          fontSize: 16.rsp(context),
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+
+                      SizedBox(height: 50.rsh(context)),
+
+                      TextformfieldCustom(
+                        label: context.l10n.authEmail,
+                        isPassword: false,
+                        controller: _emailController,
+                        focusNode: emailFocusNode,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return context.l10n.authEnterEmail;
+                          }
+                          return null;
+                        },
+                      ),
+
+                      SizedBox(height: 320.rsh(context)),
+
+                      state is OtpResendLoading
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            )
+                          : ButtonCustom(
+                              onPressed: () => _onForgotPasswordPressed(context),
+                              text: context.l10n.authContinue,
+                            ),
+
+                      SizedBox(height: 24.rsh(context)),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            context.l10n.authNoAccount,
                             style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                              fontSize: 14.rsp(context),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/signup');
+                            },
+                            child: Text(
+                              context.l10n.authRegister,
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14.rsp(context),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
