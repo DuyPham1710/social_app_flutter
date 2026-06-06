@@ -463,15 +463,10 @@ class _PostItemState extends State<PostItem> {
           if (widget.post.communityStatus != 'pending')
             GestureDetector(
               onTap: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return ModalComment(
-                      postId: widget.post.id,
-                      reacts: _localReacts,
-                    );
-                  },
+                ModalComment.show(
+                  context,
+                  postId: widget.post.id,
+                  reacts: _localReacts,
                 );
               },
               child: PostReactInfo(reacts: _localReacts),

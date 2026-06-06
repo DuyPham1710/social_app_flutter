@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
@@ -61,7 +61,7 @@ class CommentHeaderWidget extends StatelessWidget {
         final topEmojis = sortedEmojis.take(2).toList();
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -86,8 +86,8 @@ class CommentHeaderWidget extends StatelessWidget {
                     // Hiển thị emoji icons
                     if (topEmojis.isNotEmpty)
                       SizedBox(
-                        width: topEmojis.length > 1 ? 40.w : 24.w,
-                        height: 24.h,
+                        width: topEmojis.length > 1 ? 40.rs(context) : 24.rs(context),
+                        height: 24.rsh(context),
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
@@ -109,33 +109,33 @@ class CommentHeaderWidget extends StatelessWidget {
                     else
                       // Placeholder khi không có react
                       SizedBox(
-                        width: 24.w,
-                        height: 24.h,
+                        width: 24.rs(context),
+                        height: 24.rsh(context),
                         child: Icon(
                           CupertinoIcons.hand_thumbsup,
                           color: AppColors.unselectedIcon,
-                          size: 20.sp,
+                          size: 20.rsp(context),
                         ),
                       ),
 
                     Container(
-                      width: 10.w,
-                      height: 24.h,
+                      width: 10.rs(context),
+                      height: 24.rsh(context),
                       color: AppColors.background,
                     ),
 
                     Text(
                       reactCount.toString(),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
                     Container(
-                      width: 30.w,
-                      height: 24.h,
+                      width: 30.rs(context),
+                      height: 24.rsh(context),
                       color: AppColors.background,
                     ),
                   ],
@@ -147,7 +147,7 @@ class CommentHeaderWidget extends StatelessWidget {
                 child: Text(
                   context.l10n.postShareCount(0),
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),

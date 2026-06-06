@@ -147,15 +147,10 @@ class _PostActionState extends State<PostAction> {
 
               GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ModalComment(
-                        postId: postId,
-                        reacts: widget.reacts,
-                      );
-                    },
+                  ModalComment.show(
+                    context,
+                    postId: postId,
+                    reacts: widget.reacts,
                   );
                 },
                 child: Text(
@@ -169,16 +164,11 @@ class _PostActionState extends State<PostAction> {
               SizedBox(width: 20.rs(context)),
               GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ModalComment(
-                        postId: postId,
-                        reacts: widget.reacts,
-                        isPressComment: true,
-                      );
-                    },
+                  ModalComment.show(
+                    context,
+                    postId: postId,
+                    reacts: widget.reacts,
+                    isPressComment: true,
                   );
                 },
                 child: Row(
@@ -204,16 +194,11 @@ class _PostActionState extends State<PostAction> {
 
           GestureDetector(
             onTap: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return ModalComment(
-                    postId: postId,
-                    reacts: widget.reacts,
-                    isPressComment: true,
-                  );
-                },
+              ModalComment.show(
+                context,
+                postId: postId,
+                reacts: widget.reacts,
+                isPressComment: true,
               );
             },
             child: Padding(

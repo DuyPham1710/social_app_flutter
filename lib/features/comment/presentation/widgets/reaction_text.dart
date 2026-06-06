@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/comment/presentation/widgets/reaction_picker.dart';
@@ -103,7 +103,7 @@ class _ReactionTextState extends State<ReactionText> {
           child: Text(
             localizedReactionLabel(context.l10n, _currentReaction?.label ?? 'Thích'),
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 12.rsp(context),
               fontWeight: FontWeight.bold,
               color: _currentReaction != null
                   ? _getReactionColor(_currentReaction!)

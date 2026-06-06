@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -7,6 +9,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ResponsiveHelper {
   static const double mobileBreakpoint = 768;
   static const double desktopBreakpoint = 1200;
+
+  static bool get isWebOrDesktop {
+    if (kIsWeb) return true;
+    return Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+  }
 
   static bool isMobile(BuildContext context) {
     return MediaQuery.of(context).size.width < mobileBreakpoint;
@@ -38,6 +45,9 @@ class ResponsiveHelper {
 extension ResponsiveNum on num {
   /// Responsive size (width/general scaling)
   double rs(BuildContext context) {
+    if (ResponsiveHelper.isWebOrDesktop) {
+      return toDouble();
+    }
     if (ResponsiveHelper.isMobile(context)) {
       return w;
     }
@@ -46,6 +56,9 @@ extension ResponsiveNum on num {
 
   /// Responsive height
   double rsh(BuildContext context) {
+    if (ResponsiveHelper.isWebOrDesktop) {
+      return toDouble();
+    }
     if (ResponsiveHelper.isMobile(context)) {
       return h;
     }
@@ -54,6 +67,9 @@ extension ResponsiveNum on num {
 
   /// Responsive font size (sp)
   double rsp(BuildContext context) {
+    if (ResponsiveHelper.isWebOrDesktop) {
+      return toDouble();
+    }
     if (ResponsiveHelper.isMobile(context)) {
       return sp;
     }
@@ -62,6 +78,9 @@ extension ResponsiveNum on num {
 
   /// Responsive radius (r)
   double rsr(BuildContext context) {
+    if (ResponsiveHelper.isWebOrDesktop) {
+      return toDouble();
+    }
     if (ResponsiveHelper.isMobile(context)) {
       return r;
     }

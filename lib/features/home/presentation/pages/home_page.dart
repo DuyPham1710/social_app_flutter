@@ -216,7 +216,7 @@ class HomePageState extends State<HomePage> {
                                 context.l10n.homeEndOfPosts,
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
-                                  fontSize: 14.sp,
+                                  fontSize: 14.rsp(context),
                                 ),
                               ),
                             ),
