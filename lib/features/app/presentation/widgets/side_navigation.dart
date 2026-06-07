@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_list_page.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class SideNavigation extends StatefulWidget {
   final int currentIndex;
@@ -89,27 +90,27 @@ class _SideNavigationState extends State<SideNavigation>
                     index: 0,
                     icon: CupertinoIcons.house_fill,
                     activeIcon: CupertinoIcons.house_fill,
-                    label: 'Trang chủ',
+                    label: context.l10n.navHome,
                   ),
                   _buildNavItem(
                     index: 1,
                     icon: CupertinoIcons.person_2,
                     activeIcon: CupertinoIcons.person_2_fill,
-                    label: 'Bạn bè',
+                    label: context.l10n.menuFriends,
                   ),
                   _buildNavItem(
                     index: 2,
                     icon: CupertinoIcons.plus_app,
                     activeIcon: CupertinoIcons.plus_app_fill,
-                    label: 'Tạo bài viết',
+                    label: context.l10n.postCreateTitle,
                   ),
                   _buildNotificationNavItem(
                     index: 3,
                     icon: CupertinoIcons.bell,
                     activeIcon: CupertinoIcons.bell_fill,
-                    label: 'Thông báo',
+                    label: context.l10n.notificationTitle,
                   ),
-                  _buildProfileNavItem(index: 4, label: 'Trang cá nhân'),
+                  _buildProfileNavItem(index: 4, label: context.l10n.profileTitle),
 
                   const Spacer(),
 
@@ -118,7 +119,7 @@ class _SideNavigationState extends State<SideNavigation>
                     index: -1,
                     icon: CupertinoIcons.search,
                     activeIcon: CupertinoIcons.search,
-                    label: 'Tìm kiếm',
+                    label: context.l10n.searchHint,
                     onTap: () {
                       Navigator.pushNamed(context, '/search');
                     },
@@ -128,7 +129,7 @@ class _SideNavigationState extends State<SideNavigation>
                     index: -2,
                     icon: CupertinoIcons.chat_bubble_2,
                     activeIcon: CupertinoIcons.chat_bubble_2_fill,
-                    label: 'Tin nhắn',
+                    label: context.l10n.chatTitle,
                     onTap: () {
                       Navigator.push(
                         context,

@@ -1,6 +1,7 @@
 {
   "@@locale": "vi",
   "appTitle": "commonhub",
+  "navHome": "Trang chủ",
   "commonCancel": "Hủy",
   "commonReport": "Báo cáo",
   "commonBlock": "Chặn",

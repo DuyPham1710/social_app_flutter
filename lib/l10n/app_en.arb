@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "appTitle": "commonhub",
+  "navHome": "Home",
   "commonCancel": "Cancel",
   "commonReport": "Report",
   "commonBlock": "Block",

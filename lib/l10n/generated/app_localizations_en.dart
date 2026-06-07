@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'commonhub';
 
   @override
+  String get navHome => 'Home';
+
+  @override
   String get commonCancel => 'Cancel';
 
   @override

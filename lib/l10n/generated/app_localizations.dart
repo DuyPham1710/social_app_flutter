@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'commonhub'**
   String get appTitle;
 
+  /// No description provided for @navHome.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trang chủ'**
+  String get navHome;
+
   /// No description provided for @commonCancel.
   ///
   /// In vi, this message translates to:

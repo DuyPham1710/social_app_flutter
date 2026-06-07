@@ -53,7 +53,7 @@ class PostHeader extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) =>
                 di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            child: ProfilePage(),
           ),
         ),
       );

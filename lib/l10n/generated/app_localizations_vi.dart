@@ -12,6 +12,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appTitle => 'commonhub';
 
   @override
+  String get navHome => 'Trang chủ';
+
+  @override
   String get commonCancel => 'Hủy';
 
   @override

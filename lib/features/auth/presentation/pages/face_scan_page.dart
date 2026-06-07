@@ -54,7 +54,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!ResponsiveHelper.isMobile(context)) {
+      if (ResponsiveHelper.isWebOrDesktop) {
         _showMobileOnlyDialog();
       } else {
         final args =

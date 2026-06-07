@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
@@ -10,6 +9,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendSuggestionItem extends StatelessWidget {
@@ -36,6 +36,7 @@ class FriendSuggestionItem extends StatelessWidget {
 
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
+    if (!context.mounted) return;
     final currentUserId = userData?['id'];
 
     // Nếu là user hiện tại → My Profile
@@ -69,32 +70,31 @@ class FriendSuggestionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 6.h),
-      padding: EdgeInsets.all(12.w),
+      margin: EdgeInsets.symmetric(vertical: 6.rsh(context)),
+      padding: EdgeInsets.all(12.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8.r,
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8.rsr(context),
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        // Quan trọng: căn chỉnh lên đầu
         children: [
           // Avatar
           GestureDetector(
             onTap: () => _navigateToProfile(context),
             child: CircleAvatar(
-              radius: 32.r,
+              radius: 32.rsr(context),
               backgroundImage: NetworkImage(avatarUrl),
             ),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12.rs(context)),
 
           // Phần Tên, Bạn chung và Nút
           Expanded(
@@ -107,61 +107,65 @@ class FriendSuggestionItem extends StatelessWidget {
                   child: Text(
                     name,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
                   ),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 4.rsh(context)),
 
                 // Bạn chung - chỉ hiển thị khi có bạn chung
                 if (mutualFriends > 0) ...[
                   Row(
                     children: [
-                      _buildMutualFriendAvatars(),
-                      SizedBox(width: 6.w),
+                      _buildMutualFriendAvatars(context),
+                      SizedBox(width: 6.rs(context)),
                       Text(
                         context.l10n.friendMutualCount(mutualFriends),
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 12.rsp(context),
                           color: AppColors.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 12.h), // Khoảng cách giữa thông tin và nút
+                  SizedBox(height: 12.rsh(context)), // Khoảng cách giữa thông tin và nút
                 ],
 
                 // Nếu không có bạn chung, thêm space nhỏ hơn
-                if (mutualFriends == 0) SizedBox(height: 4.h),
+                if (mutualFriends == 0) SizedBox(height: 4.rsh(context)),
 
                 // Các Nút hoặc thông báo
                 if (isSent)
                   Container(
                     padding: EdgeInsets.symmetric(
-                      vertical: 10.h,
-                      horizontal: 16.w,
+                      vertical: 10.rsh(context),
+                      horizontal: 16.rs(context),
                     ),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8.r),
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8.rsr(context)),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.send, color: AppColors.primary, size: 16.r),
-                        SizedBox(width: 8.w),
+                        Icon(
+                          Icons.send,
+                          color: AppColors.primary,
+                          size: 16.rsr(context),
+                        ),
+                        SizedBox(width: 8.rs(context)),
                         Text(
                           context.l10n.friendRequestSent,
                           style: TextStyle(
                             color: AppColors.primary,
-                            fontSize: 12.sp,
+                            fontSize: 12.rsp(context),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -174,15 +178,17 @@ class FriendSuggestionItem extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildActionButton(
+                          context: context,
                           label: context.l10n.friendAdd,
                           background: AppColors.primary,
                           foreground: Colors.white,
                           onTap: onAddFriend ?? () {},
                         ),
                       ),
-                      SizedBox(width: 8.w),
+                      SizedBox(width: 8.rs(context)),
                       Expanded(
                         child: _buildActionButton(
+                          context: context,
                           label: context.l10n.friendRemove,
                           background: AppColors.secondBackground,
                           foreground: AppColors.textPrimary,
@@ -199,7 +205,7 @@ class FriendSuggestionItem extends StatelessWidget {
     );
   }
 
-  Widget _buildMutualFriendAvatars() {
+  Widget _buildMutualFriendAvatars(BuildContext context) {
     // Nếu không có avatars hoặc không có bạn chung, return empty widget
     if (mutualFriends == 0 ||
         mutualFriendAvatars == null ||
@@ -208,16 +214,16 @@ class FriendSuggestionItem extends StatelessWidget {
     }
 
     return SizedBox(
-      width: 48.w,
-      height: 20.h,
+      width: 48.rs(context),
+      height: 20.rsh(context),
       child: Stack(
         children: List.generate(
           mutualFriendAvatars!.length.clamp(0, 3),
           (index) => Positioned(
-            left: index * 16.w,
+            left: index * 16.rs(context),
             child: Container(
-              width: 20.r,
-              height: 20.r,
+              width: 20.rsr(context),
+              height: 20.rsr(context),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.background, width: 2),
                 shape: BoxShape.circle,
@@ -233,22 +239,8 @@ class FriendSuggestionItem extends StatelessWidget {
     );
   }
 
-  // Widget _smallAvatar(String url, {required double left}) {
-  //   return Positioned(
-  //     left: left,
-  //     child: Container(
-  //       width: 20.r,
-  //       height: 20.r,
-  //       decoration: BoxDecoration(
-  //         border: Border.all(color: Colors.white, width: 2),
-  //         shape: BoxShape.circle,
-  //         image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildActionButton({
+    required BuildContext context,
     required String label,
     required Color background,
     required Color foreground,
@@ -257,17 +249,17 @@ class FriendSuggestionItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.h),
+        padding: EdgeInsets.symmetric(vertical: 10.rsh(context)),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(8.rsr(context)),
         ),
         child: Text(
           label,
           style: TextStyle(
             color: foreground,
-            fontSize: 12.sp,
+            fontSize: 12.rsp(context),
             fontWeight: FontWeight.w700,
           ),
         ),

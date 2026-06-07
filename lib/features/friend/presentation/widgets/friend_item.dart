@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
@@ -11,6 +10,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendItem extends StatelessWidget {
@@ -41,6 +41,7 @@ class FriendItem extends StatelessWidget {
 
   Future<void> _navigateToProfile(BuildContext context) async {
     final userData = await TokenStorage.getUserData();
+    if (!context.mounted) return;
     final currentUserId = userData?['id'];
 
     // Nếu là user hiện tại → My Profile
@@ -74,7 +75,10 @@ class FriendItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 12.rsh(context),
+      ),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.divider, width: 1)),
       ),
@@ -86,25 +90,29 @@ class FriendItem extends StatelessWidget {
               GestureDetector(
                 onTap: () => _navigateToProfile(context),
                 child: CircleAvatar(
-                  radius: 30.r,
+                  radius: 30.rsr(context),
                   backgroundImage: avatarUrl != null
                       ? NetworkImage(avatarUrl!)
                       : null,
                   child: avatarUrl == null
                       ? Icon(
                           CupertinoIcons.person_fill,
-                          size: 30.r,
+                          size: 30.rsr(context),
                           color: AppColors.unselectedIcon,
                         )
                       : null,
                 ),
               ),
               // Online indicator hoặc last seen
-              if (_shouldShowIndicator())
-                Positioned(right: 2, bottom: 2, child: _buildStatusIndicator()),
+              if (_shouldShowIndicator(context))
+                Positioned(
+                  right: 2,
+                  bottom: 2,
+                  child: _buildStatusIndicator(context),
+                ),
             ],
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12.rs(context)),
           // Name and mutual friends
           Expanded(
             child: Column(
@@ -115,7 +123,7 @@ class FriendItem extends StatelessWidget {
                   child: Text(
                     name,
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 16.rsp(context),
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -123,13 +131,13 @@ class FriendItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 4.rsh(context)),
                 // Hiển thị trạng thái online hoặc last seen
-                if (_shouldShowIndicator() && !_isOnline())
+                if (_shouldShowIndicator(context) && !_isOnline())
                   Text(
                     _getLastSeenText(context),
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 12.rsp(context),
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w400,
                     ),
@@ -141,26 +149,26 @@ class FriendItem extends StatelessWidget {
                       // Hiển thị avatars bạn chung hoặc icon mặc định
                       if (mutualFriendAvatars != null &&
                           mutualFriendAvatars!.isNotEmpty)
-                        _buildMutualFriendAvatars()
+                        _buildMutualFriendAvatars(context)
                       else
                         Container(
-                          width: 16.r,
-                          height: 16.r,
+                          width: 16.rsr(context),
+                          height: 16.rsr(context),
                           decoration: BoxDecoration(
                             color: AppColors.divider,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             CupertinoIcons.person_2_fill,
-                            size: 10.r,
+                            size: 10.rsr(context),
                             color: AppColors.textSecondary,
                           ),
                         ),
-                      SizedBox(width: 6.w),
+                      SizedBox(width: 6.rs(context)),
                       Text(
                         context.l10n.friendMutualCount(mutualFriends),
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 13.rsp(context),
                           color: AppColors.textSecondary,
                           fontWeight: FontWeight.w400,
                         ),
@@ -178,33 +186,33 @@ class FriendItem extends StatelessWidget {
                     GestureDetector(
                       onTap: onMessage,
                       child: Container(
-                        width: 36.r,
-                        height: 36.r,
+                        width: 36.rsr(context),
+                        height: 36.rsr(context),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           CupertinoIcons.chat_bubble_fill,
-                          size: 18.r,
+                          size: 18.rsr(context),
                           color: AppColors.primary,
                         ),
                       ),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 8.rs(context)),
                     // More options button
                     GestureDetector(
                       onTap: onMoreOptions,
                       child: Container(
-                        width: 36.r,
-                        height: 36.r,
+                        width: 36.rsr(context),
+                        height: 36.rsr(context),
                         decoration: BoxDecoration(
                           color: AppColors.secondBackground,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.more_horiz,
-                          size: 20.r,
+                          size: 20.rsr(context),
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -217,7 +225,7 @@ class FriendItem extends StatelessWidget {
     );
   }
 
-  Widget _buildMutualFriendAvatars() {
+  Widget _buildMutualFriendAvatars(BuildContext context) {
     // Nếu không có avatars hoặc không có bạn chung, return empty widget
     if (mutualFriends == 0 ||
         mutualFriendAvatars == null ||
@@ -226,16 +234,16 @@ class FriendItem extends StatelessWidget {
     }
 
     return SizedBox(
-      width: 48.w,
-      height: 20.h,
+      width: 48.rs(context),
+      height: 20.rsh(context),
       child: Stack(
         children: List.generate(
           mutualFriendAvatars!.length.clamp(0, 3),
           (index) => Positioned(
-            left: index * 16.w,
+            left: index * 16.rs(context),
             child: Container(
-              width: 20.r,
-              height: 20.r,
+              width: 20.rsr(context),
+              height: 20.rsr(context),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.background, width: 2),
                 shape: BoxShape.circle,
@@ -252,7 +260,7 @@ class FriendItem extends StatelessWidget {
   }
 
   /// Kiểm tra xem có nên hiển thị indicator không
-  bool _shouldShowIndicator() {
+  bool _shouldShowIndicator(BuildContext context) {
     // Hiển thị nếu online
     if (_isOnline()) return true;
 
@@ -272,12 +280,12 @@ class FriendItem extends StatelessWidget {
   }
 
   /// Build indicator (chấm xanh hoặc xám)
-  Widget _buildStatusIndicator() {
+  Widget _buildStatusIndicator(BuildContext context) {
     if (_isOnline()) {
       // Chấm xanh cho online
       return Container(
-        width: 14.r,
-        height: 14.r,
+        width: 14.rsr(context),
+        height: 14.rsr(context),
         decoration: BoxDecoration(
           color: const Color(0xFF2CD45C),
           shape: BoxShape.circle,
@@ -287,8 +295,8 @@ class FriendItem extends StatelessWidget {
     } else if (lastSeen != null) {
       // Chấm xám cho offline nhưng có last seen
       return Container(
-        width: 14.r,
-        height: 14.r,
+        width: 14.rsr(context),
+        height: 14.rsr(context),
         decoration: BoxDecoration(
           color: AppColors.unselectedIcon,
           shape: BoxShape.circle,
