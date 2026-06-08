@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -73,46 +73,57 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
             .where((f) => _selectedIds.contains(f['id']))
             .toList();
 
-        return Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: AppColors.textPrimary,
-                size: 20.sp,
+        return Container(
+          color: AppColors.background,
+
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveHelper.feedMaxWidth,
               ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              context.l10n.postTagPeople,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            centerTitle: true,
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context, selectedFriends);
-                },
-                child: Text(
-                  context.l10n.commonDone,
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
+              child: Scaffold(
+                backgroundColor: AppColors.background,
+                appBar: AppBar(
+                  backgroundColor: AppColors.background,
+                  elevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  leading: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: AppColors.textPrimary,
+                      size: 20.rsp(context),
+                    ),
+                    onPressed: () => Navigator.pop(context),
                   ),
+                  title: Text(
+                    context.l10n.postTagPeople,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 16.rsp(context),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  centerTitle: true,
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, selectedFriends);
+                      },
+                      child: Text(
+                        context.l10n.commonDone,
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 16.rsp(context),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                body: _buildBody(state, filteredFriends, selectedFriends),
               ),
-            ],
+            ),
           ),
-          body: _buildBody(state, filteredFriends, selectedFriends),
         );
       },
     );
@@ -129,7 +140,10 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
       return Center(
         child: Text(
           context.l10n.friendLoadError(state.message),
-          style: TextStyle(color: AppColors.textPrimary, fontSize: 16.sp),
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 16.rsp(context),
+          ),
         ),
       );
     } else if (state is FriendLoaded) {
@@ -137,38 +151,43 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
         children: [
           // Search bar
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.rs(context),
+              vertical: 8.rsh(context),
+            ),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.textSecondary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12.r),
+                color: AppColors.textSecondary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
               child: Row(
                 children: [
                   Icon(
                     Icons.search,
                     color: AppColors.textSecondary,
-                    size: 20.sp,
+                    size: 20.rsp(context),
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
                   Expanded(
                     child: TextField(
                       cursorColor: AppColors.primary,
                       controller: _searchController,
                       style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 16.sp,
+                        fontSize: 16.rsp(context),
                       ),
                       decoration: InputDecoration(
                         hintText: context.l10n.friendSearchHint,
                         hintStyle: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 16.sp,
+                          fontSize: 16.rsp(context),
                         ),
                         border: InputBorder.none,
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 12.rsh(context),
+                        ),
                       ),
                     ),
                   ),
@@ -181,7 +200,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                       child: Icon(
                         Icons.close,
                         color: AppColors.textSecondary,
-                        size: 18.sp,
+                        size: 18.rsp(context),
                       ),
                     ),
                 ],
@@ -192,17 +211,20 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
           // Selected Chips
           if (selectedFriends.isNotEmpty)
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.rs(context),
+                vertical: 8.rsh(context),
+              ),
               width: double.infinity,
               child: Wrap(
-                spacing: 8.w,
-                runSpacing: 8.h,
+                spacing: 8.rs(context),
+                runSpacing: 8.rsh(context),
                 children: selectedFriends.map((friend) {
                   return Chip(
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                     side: BorderSide.none,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
+                      borderRadius: BorderRadius.circular(20.rsr(context)),
                     ),
                     avatar: CircleAvatar(
                       backgroundImage: NetworkImage(friend['avatar']!),
@@ -212,13 +234,13 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                       style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
-                        fontSize: 13.sp,
+                        fontSize: 13.rsp(context),
                       ),
                     ),
                     deleteIcon: Icon(
                       Icons.close,
                       color: AppColors.primary,
-                      size: 16.sp,
+                      size: 16.rsp(context),
                     ),
                     onDeleted: () => _toggleSelection(friend['id']!),
                   );
@@ -226,7 +248,7 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
               ),
             ),
 
-          Divider(height: 1.h, color: AppColors.divider),
+          Divider(height: 1.rsh(context), color: AppColors.divider),
 
           // Friends List
           Expanded(
@@ -238,30 +260,30 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
 
                 return ListTile(
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 4.h,
+                    horizontal: 16.rs(context),
+                    vertical: 4.rsh(context),
                   ),
                   leading: CircleAvatar(
-                    radius: 22.r,
+                    radius: 22.rsr(context),
                     backgroundImage: NetworkImage(friend['avatar']!),
                   ),
                   title: Text(
                     friend['name']!,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 16.sp,
+                      fontSize: 16.rsp(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   trailing: Container(
-                    width: 24.w,
-                    height: 24.w,
+                    width: 24.rs(context),
+                    height: 24.rs(context),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondary.withOpacity(0.5),
+                            : AppColors.textSecondary.withValues(alpha: 0.5),
                         width: isSelected ? 0 : 1.5,
                       ),
                       color: isSelected
@@ -269,7 +291,11 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
                           : Colors.transparent,
                     ),
                     child: isSelected
-                        ? Icon(Icons.check, color: Colors.white, size: 16.sp)
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 16.rsp(context),
+                          )
                         : null,
                   ),
                   onTap: () => _toggleSelection(friend['id']!),

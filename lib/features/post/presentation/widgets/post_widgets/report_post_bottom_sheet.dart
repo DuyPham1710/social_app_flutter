@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
@@ -40,28 +40,54 @@ class ReportPostBottomSheet extends StatefulWidget {
       return;
     }
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16.w,
-            right: 16.w,
-            top: 16.h,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16.h,
-          ),
-          child: ReportPostBottomSheet(
-            postId: postId,
-            ownerUserId: ownerUserId,
-          ),
-        );
-      },
-    );
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          return Dialog(
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.rsr(ctx)),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 480.rs(ctx)),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(24.rs(ctx)),
+                  child: ReportPostBottomSheet(
+                    postId: postId,
+                    ownerUserId: ownerUserId,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.background,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16.rs(context),
+              right: 16.rs(context),
+              top: 16.rsh(context),
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 16.rsh(context),
+            ),
+            child: ReportPostBottomSheet(
+              postId: postId,
+              ownerUserId: ownerUserId,
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -141,15 +167,15 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
         Row(
           children: [
             Container(
-              width: 36.w,
-              height: 36.w,
+              width: 36.rs(context),
+              height: 36.rs(context),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.flag_outlined, color: Colors.red),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 12.rs(context)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,16 +183,16 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                   Text(
                     l10n.postReportTitle,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18.rsp(context),
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 4.rsh(context)),
                   Text(
                     l10n.postReportIntro,
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 12.rsp(context),
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -175,28 +201,28 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
             ),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         Text(
           l10n.postReportQuickReason,
           style: TextStyle(
-            fontSize: 13.sp,
+            fontSize: 13.rsp(context),
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
 
-        SizedBox(height: 8.h),
+        SizedBox(height: 8.rsh(context)),
 
         Wrap(
-          spacing: 8.w,
-          runSpacing: 8.h,
+          spacing: 8.rs(context),
+          runSpacing: 8.rsh(context),
           children: quickReasons.map((reason) {
             final isSelected = _selectedReason == reason;
             return ChoiceChip(
               label: Text(
                 reason,
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 12.rsp(context),
                   color: isSelected
                       ? AppColors.background
                       : AppColors.textPrimary,
@@ -221,88 +247,94 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
             );
           }).toList(),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         Text(
           l10n.postReportDetailReason,
           style: TextStyle(
-            fontSize: 13.sp,
+            fontSize: 13.rsp(context),
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8.rsh(context)),
         TextField(
           controller: _reasonController,
-          style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+          style: TextStyle(
+            fontSize: 14.rsp(context),
+            color: AppColors.textPrimary,
+          ),
           cursorColor: AppColors.primary,
           decoration: InputDecoration(
             hintText: l10n.postReportReasonHint,
             hintStyle: TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 14.sp,
+              fontSize: 14.rsp(context),
             ),
             contentPadding: EdgeInsets.symmetric(
-              horizontal: 12.w,
-              vertical: 10.h,
+              horizontal: 12.rs(context),
+              vertical: 10.rsh(context),
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               borderSide: BorderSide(color: AppColors.divider),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               borderSide: BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               borderSide: BorderSide(color: AppColors.primary),
             ),
             fillColor: AppColors.secondBackground,
             filled: true,
           ),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 12.rsh(context)),
         Text(
           l10n.postReportDescriptionLabel,
           style: TextStyle(
-            fontSize: 13.sp,
+            fontSize: 13.rsp(context),
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8.rsh(context)),
         TextField(
           controller: _descriptionController,
           maxLines: 3,
-          style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+          style: TextStyle(
+            fontSize: 14.rsp(context),
+            color: AppColors.textPrimary,
+          ),
           cursorColor: AppColors.primary,
           decoration: InputDecoration(
             hintText: l10n.postReportDescriptionHint,
             hintStyle: TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 14.sp,
+              fontSize: 14.rsp(context),
             ),
             contentPadding: EdgeInsets.symmetric(
-              horizontal: 12.w,
-              vertical: 10.h,
+              horizontal: 12.rs(context),
+              vertical: 10.rsh(context),
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               borderSide: BorderSide(color: AppColors.divider),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               borderSide: BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               borderSide: BorderSide(color: AppColors.primary),
             ),
             fillColor: AppColors.secondBackground,
             filled: true,
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         Row(
           children: [
             Expanded(
@@ -313,7 +345,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                   ),
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(12.rsr(context)),
                     ),
                   ),
                 ),
@@ -326,27 +358,27 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                   l10n.commonCancel,
                   style: TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 12.rs(context)),
             Expanded(
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(AppColors.primary),
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(12.rsr(context)),
                     ),
                   ),
                 ),
                 onPressed: _isSubmitting ? null : _handleSubmit,
                 child: _isSubmitting
                     ? SizedBox(
-                        width: 18.w,
-                        height: 18.w,
+                        width: 18.rs(context),
+                        height: 18.rs(context),
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
@@ -357,7 +389,7 @@ class _ReportPostBottomSheetState extends State<ReportPostBottomSheet> {
                     : Text(
                         l10n.postSendReport,
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14.rsp(context),
                           color: AppColors.background,
                         ),
                       ),

@@ -11,7 +11,7 @@ abstract class NotificationRepository {
 
   void markRead(String notificationId);
   void markAllRead();
-  void loadPage({int page = 1, int limit = 10});
+  void loadPage({int page = 1, int limit = 15});
   void deleteNotification(String notificationId);
   void clearCache();
   void dispose();

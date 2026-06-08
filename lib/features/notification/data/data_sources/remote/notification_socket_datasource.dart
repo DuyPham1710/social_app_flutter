@@ -48,7 +48,7 @@ class NotificationSocketDataSource {
         '[NotificationSocketDataSource] Socket registered, requesting first page',
       );
       // request first page on register
-      loadPage(page: 1, limit: 10);
+      loadPage(page: 1, limit: 15);
     });
 
     socket.on('notifications:list').listen((data) {
@@ -75,7 +75,7 @@ class NotificationSocketDataSource {
       );
 
       // Determine if more pages available: items < limit means no more data
-      final limit = data['limit'] ?? 10;
+      final limit = data['limit'] ?? 15;
       _hasMore = items.length >= limit;
       _hasMoreController.add(_hasMore);
 
@@ -180,7 +180,7 @@ class NotificationSocketDataSource {
     socket.emit('markAllRead', {});
   }
 
-  void loadPage({int page = 1, int limit = 10}) {
+  void loadPage({int page = 1, int limit = 15}) {
     _lastRequestedPage = page;
     socket.emit('getNotifications', {'page': page, 'limit': limit});
   }

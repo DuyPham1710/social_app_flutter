@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -16,181 +16,204 @@ class SavedArchivedStoriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final usecase = s1<GetMyArchivedStoriesUsecase>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: AppColors.iconPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Tin lưu trữ',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: FutureBuilder<DataState<GroupedStoryListEntity>>(
-        future: usecase(page: 1, limit: 50),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final state = snapshot.data!;
-          if (state is DataStateError) {
-            return Center(
-              child: Text(
-                state.error.toString(),
-                style: TextStyle(color: AppColors.textSecondary),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_rounded,
+                  color: AppColors.iconPrimary,
+                ),
+                onPressed: () => Navigator.pop(context),
               ),
-            );
-          }
-          final data =
-              (state as DataStateSuccess<GroupedStoryListEntity>).data!;
-          if (data.users.isEmpty || data.users.first.stories.isEmpty) {
-            return Center(
-              child: Text(
-                'Chưa có tin lưu trữ nào',
-                style: TextStyle(color: AppColors.textSecondary),
+              title: Text(
+                'Tin lưu trữ',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            );
-          }
+              centerTitle: true,
+            ),
+            body: FutureBuilder<DataState<GroupedStoryListEntity>>(
+              future: usecase(page: 1, limit: 50),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
+                }
+                final state = snapshot.data!;
+                if (state is DataStateError) {
+                  return Center(
+                    child: Text(
+                      state.error.toString(),
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  );
+                }
+                final data =
+                    (state as DataStateSuccess<GroupedStoryListEntity>).data!;
+                if (data.users.isEmpty || data.users.first.stories.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Chưa có tin lưu trữ nào',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  );
+                }
 
-          final group = data.users.first; // user hiện tại
-          final stories = group.stories;
+                final group = data.users.first; // user hiện tại
+                final stories = group.stories;
 
-          return Padding(
-            padding: EdgeInsets.all(12.w),
-            child: MasonryGridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10.w,
-              crossAxisSpacing: 10.w,
-              itemCount: stories.length,
-              itemBuilder: (context, index) {
-                final story = stories[index];
-                final mediaUrl = story.mediaUrl;
+                return Padding(
+                  padding: EdgeInsets.all(12.rs(context)),
+                  child: MasonryGridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10.rs(context),
+                    crossAxisSpacing: 10.rs(context),
+                    itemCount: stories.length,
+                    itemBuilder: (context, index) {
+                      final story = stories[index];
+                      final mediaUrl = story.mediaUrl;
 
-                Widget mediaChild;
-                if (mediaUrl != null && mediaUrl.isNotEmpty) {
-                  mediaChild = Image.network(
-                    mediaUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      final total = loadingProgress.expectedTotalBytes;
-                      final loaded = loadingProgress.cumulativeBytesLoaded;
-                      final value = total == null ? null : loaded / total;
-                      return Center(
-                        child: SizedBox(
-                          width: 18.w,
-                          height: 18.w,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            value: value,
+                      Widget mediaChild;
+                      if (mediaUrl != null && mediaUrl.isNotEmpty) {
+                        mediaChild = Image.network(
+                          mediaUrl,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            final total = loadingProgress.expectedTotalBytes;
+                            final loaded =
+                                loadingProgress.cumulativeBytesLoaded;
+                            final value = total == null ? null : loaded / total;
+                            return Center(
+                              child: SizedBox(
+                                width: 18.rs(context),
+                                height: 18.rs(context),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  value: value,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return _StoryMediaPlaceholder(
+                              mediaType: story.mediaType,
+                            );
+                          },
+                        );
+                      } else {
+                        mediaChild = _StoryMediaPlaceholder(
+                          mediaType: story.mediaType,
+                        );
+                      }
+
+                      final overlayIcon = story.mediaType == MediaType.video
+                          ? Icons.play_circle_fill_rounded
+                          : story.mediaType == MediaType.text
+                          ? Icons.text_fields_rounded
+                          : null;
+
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(14.rsr(context)),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => StoryViewerPage(
+                                groups: [group],
+                                initialGroupIndex: 0,
+                                initialStoryIndex: index,
+                              ),
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14.rsr(context)),
+                          child: Stack(
+                            children: [
+                              AspectRatio(
+                                aspectRatio: 9 / 16,
+                                child: ColoredBox(
+                                  color: AppColors.secondBackground,
+                                  child: mediaChild,
+                                ),
+                              ),
+                              if (overlayIcon != null)
+                                Positioned(
+                                  right: 8.rs(context),
+                                  top: 8.rs(context),
+                                  child: Container(
+                                    padding: EdgeInsets.all(6.rs(context)),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.45,
+                                      ),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Icon(
+                                      overlayIcon,
+                                      color: Colors.white,
+                                      size: 18.rsp(context),
+                                    ),
+                                  ),
+                                ),
+                              Positioned(
+                                left: 8.rs(context),
+                                right: 8.rs(context),
+                                bottom: 8.rs(context),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.rs(context),
+                                    vertical: 8.rsh(context),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.45),
+                                    borderRadius: BorderRadius.circular(
+                                      12.rsr(context),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    (story.title == null ||
+                                            story.title!.trim().isEmpty)
+                                        ? 'Tin ${index + 1}'
+                                        : story.title!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.rsp(context),
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _StoryMediaPlaceholder(mediaType: story.mediaType);
-                    },
-                  );
-                } else {
-                  mediaChild = _StoryMediaPlaceholder(
-                    mediaType: story.mediaType,
-                  );
-                }
-
-                final overlayIcon = story.mediaType == MediaType.video
-                    ? Icons.play_circle_fill_rounded
-                    : story.mediaType == MediaType.text
-                    ? Icons.text_fields_rounded
-                    : null;
-
-                return InkWell(
-                  borderRadius: BorderRadius.circular(14.r),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => StoryViewerPage(
-                          groups: [group],
-                          initialGroupIndex: 0,
-                          initialStoryIndex: index,
-                        ),
-                      ),
-                    );
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14.r),
-                    child: Stack(
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 9 / 16,
-                          child: ColoredBox(
-                            color: AppColors.secondBackground,
-                            child: mediaChild,
-                          ),
-                        ),
-                        if (overlayIcon != null)
-                          Positioned(
-                            right: 8.w,
-                            top: 8.w,
-                            child: Container(
-                              padding: EdgeInsets.all(6.w),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.45),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Icon(
-                                overlayIcon,
-                                color: Colors.white,
-                                size: 18.sp,
-                              ),
-                            ),
-                          ),
-                        Positioned(
-                          left: 8.w,
-                          right: 8.w,
-                          bottom: 8.w,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 8.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.45),
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Text(
-                              (story.title == null ||
-                                      story.title!.trim().isEmpty)
-                                  ? 'Tin ${index + 1}'
-                                  : story.title!,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 );
               },
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -211,7 +234,7 @@ class _StoryMediaPlaceholder extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       color: AppColors.secondBackground,
-      child: Icon(icon, size: 34.sp, color: AppColors.textSecondary),
+      child: Icon(icon, size: 34.rsp(context), color: AppColors.textSecondary),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostReportDetailModal extends StatelessWidget {
@@ -24,30 +24,60 @@ class PostReportDetailModal extends StatelessWidget {
     required String status,
     String? note,
   }) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.background,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16.w,
-            right: 16.w,
-            top: 16.h,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16.h,
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          return Dialog(
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.rsr(ctx)),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 480.rs(ctx)),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(24.rs(ctx)),
+                  child: PostReportDetailModal(
+                    postId: postId,
+                    postTitle: postTitle,
+                    status: status,
+                    note: note,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(20.rsr(context)),
           ),
-          child: PostReportDetailModal(
-            postId: postId,
-            postTitle: postTitle,
-            status: status,
-            note: note,
-          ),
-        );
-      },
-    );
+        ),
+        builder: (ctx) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16.rs(ctx),
+              right: 16.rs(ctx),
+              top: 16.rsh(ctx),
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 16.rsh(ctx),
+            ),
+            child: PostReportDetailModal(
+              postId: postId,
+              postTitle: postTitle,
+              status: status,
+              note: note,
+            ),
+          );
+        },
+      );
+    }
   }
 
   String _getStatusText(BuildContext context) {
@@ -81,32 +111,36 @@ class PostReportDetailModal extends StatelessWidget {
         // Header
         Row(
           children: [
-            Icon(Icons.info_outline, color: AppColors.primary, size: 24.sp),
-            SizedBox(width: 8.w),
+            Icon(
+              Icons.info_outline,
+              color: AppColors.primary,
+              size: 24.rsp(context),
+            ),
+            SizedBox(width: 8.rs(context)),
             Text(
               context.l10n.notificationPostReportTitle,
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 18.rsp(context),
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
             ),
             const Spacer(),
             IconButton(
-              icon: Icon(Icons.close, size: 24.sp),
+              icon: Icon(Icons.close, size: 24.rsp(context)),
               onPressed: () => Navigator.pop(context),
               color: AppColors.textSecondary,
             ),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
 
         // Post Title
         Container(
-          padding: EdgeInsets.all(12.w),
+          padding: EdgeInsets.all(12.rs(context)),
           decoration: BoxDecoration(
             color: AppColors.secondBackground,
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: BorderRadius.circular(8.rsr(context)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,9 +148,9 @@ class PostReportDetailModal extends StatelessWidget {
               Icon(
                 Icons.article_outlined,
                 color: AppColors.textSecondary,
-                size: 20.sp,
+                size: 20.rsp(context),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: 8.rs(context)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,17 +158,17 @@ class PostReportDetailModal extends StatelessWidget {
                     Text(
                       context.l10n.postLabel,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12.rsp(context),
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 4.rsh(context)),
                     Text(
                       postTitle.isNotEmpty
                           ? postTitle
                           : context.l10n.postYourPost,
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                         fontWeight: FontWeight.w500,
                         color: AppColors.textPrimary,
                       ),
@@ -145,30 +179,34 @@ class PostReportDetailModal extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
 
         // Status
         Container(
-          padding: EdgeInsets.all(12.w),
+          padding: EdgeInsets.all(12.rs(context)),
           decoration: BoxDecoration(
-            color: _getStatusColor().withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8.r),
+            color: _getStatusColor().withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8.rsr(context)),
             border: Border.all(
-              color: _getStatusColor().withOpacity(0.3),
+              color: _getStatusColor().withValues(alpha: 0.3),
               width: 1,
             ),
           ),
           child: Row(
             children: [
-              Icon(_getStatusIcon(), color: _getStatusColor(), size: 20.sp),
-              SizedBox(width: 8.w),
+              Icon(
+                _getStatusIcon(),
+                color: _getStatusColor(),
+                size: 20.rsp(context),
+              ),
+              SizedBox(width: 8.rs(context)),
               Expanded(
                 child: Text(
                   context.l10n.notificationReportStatus(
                     _getStatusText(context),
                   ),
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                     fontWeight: FontWeight.w500,
                     color: _getStatusColor(),
                   ),
@@ -177,14 +215,14 @@ class PostReportDetailModal extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
 
         // Reason explanation
         Container(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(16.rs(context)),
           decoration: BoxDecoration(
             color: AppColors.secondBackground,
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: BorderRadius.circular(8.rsr(context)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,36 +232,36 @@ class PostReportDetailModal extends StatelessWidget {
                   Icon(
                     Icons.info_outline,
                     color: AppColors.textSecondary,
-                    size: 20.sp,
+                    size: 20.rsp(context),
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
                   Text(
                     context.l10n.notificationExplanation,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12.rsh(context)),
               Text(
                 _getReasonText(context),
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14.rsp(context),
                   color: AppColors.textPrimary,
                   height: 1.5,
                 ),
               ),
               // Show note if exists
               if (note != null && note!.isNotEmpty) ...[
-                SizedBox(height: 12.h),
+                SizedBox(height: 12.rsh(context)),
                 Container(
-                  padding: EdgeInsets.all(12.w),
+                  padding: EdgeInsets.all(12.rs(context)),
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.circular(6.r),
+                    borderRadius: BorderRadius.circular(6.rsr(context)),
                     border: Border.all(color: AppColors.divider, width: 1),
                   ),
                   child: Row(
@@ -232,9 +270,9 @@ class PostReportDetailModal extends StatelessWidget {
                       Icon(
                         Icons.note_outlined,
                         color: AppColors.textSecondary,
-                        size: 18.sp,
+                        size: 18.rsp(context),
                       ),
-                      SizedBox(width: 8.w),
+                      SizedBox(width: 8.rs(context)),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,16 +280,16 @@ class PostReportDetailModal extends StatelessWidget {
                             Text(
                               context.l10n.notificationAdminNote,
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 12.rsp(context),
                                 color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            SizedBox(height: 4.h),
+                            SizedBox(height: 4.rsh(context)),
                             Text(
                               note!,
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 13.rsp(context),
                                 color: AppColors.textPrimary,
                                 height: 1.4,
                               ),
@@ -266,7 +304,7 @@ class PostReportDetailModal extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
 
         // Close button
         SizedBox(
@@ -275,19 +313,19 @@ class PostReportDetailModal extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              padding: EdgeInsets.symmetric(vertical: 14.h),
+              padding: EdgeInsets.symmetric(vertical: 14.rsh(context)),
             ),
             child: Text(
               context.l10n.commonUnderstood,
               style: TextStyle(
-                fontSize: 15.sp,
+                fontSize: 15.rsp(context),
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8.rsh(context)),
       ],
     );
   }

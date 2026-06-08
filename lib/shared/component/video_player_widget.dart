@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
@@ -152,7 +152,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(12.rsr(context)),
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: GestureDetector(
@@ -190,18 +190,26 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       ),
               ),
               if (_isInitialized) VideoPlayer(_controller),
+              if (_isInitialized)
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _handleSurfaceTap,
+                    child: const SizedBox.expand(),
+                  ),
+                ),
               if (!_isInitialized)
                 Container(
                   color: Colors.black.withValues(alpha: 0.4),
                   child: Center(
                     child: SizedBox(
-                      width: 40.w,
-                      height: 40.w,
+                      width: 40.rs(context),
+                      height: 40.rs(context),
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
                           Colors.white.withValues(alpha: 0.8),
                         ),
-                        strokeWidth: 2.w,
+                        strokeWidth: 2.rs(context),
                       ),
                     ),
                   ),
@@ -230,16 +238,18 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                           ),
                         ),
                         Positioned(
-                          top: 12.w,
-                          left: 12.w,
+                          top: 12.rs(context),
+                          left: 12.rs(context),
                           child: Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 7.h,
+                              horizontal: 10.rs(context),
+                              vertical: 7.rsh(context),
                             ),
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(999.r),
+                              borderRadius: BorderRadius.circular(
+                                999.rsr(context),
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -247,14 +257,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 Icon(
                                   Icons.videocam_rounded,
                                   color: Colors.white,
-                                  size: 14.sp,
+                                  size: 14.rsp(context),
                                 ),
-                                SizedBox(width: 6.w),
+                                SizedBox(width: 6.rs(context)),
                                 Text(
                                   'Video',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 11.sp,
+                                    fontSize: 11.rsp(context),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -267,8 +277,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             behavior: HitTestBehavior.opaque,
                             onTap: _togglePlayPause,
                             child: Container(
-                              width: 76.w,
-                              height: 76.w,
+                              width: 76.rs(context),
+                              height: 76.rs(context),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.black.withValues(alpha: 0.38),
@@ -279,7 +289,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.25),
-                                    blurRadius: 16.r,
+                                    blurRadius: 16.rsr(context),
                                     offset: const Offset(0, 6),
                                   ),
                                 ],
@@ -289,28 +299,30 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                     ? Icons.pause_rounded
                                     : Icons.play_arrow_rounded,
                                 color: Colors.white,
-                                size: 38.sp,
+                                size: 38.rsp(context),
                               ),
                             ),
                           ),
                         ),
                         Positioned(
-                          left: 10.w,
-                          right: 10.w,
-                          bottom: 10.h,
+                          left: 10.rs(context),
+                          right: 10.rs(context),
+                          bottom: 10.rsh(context),
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: _toggleControlsVisibility,
                             child: Container(
                               padding: EdgeInsets.fromLTRB(
-                                12.w,
-                                10.h,
-                                12.w,
-                                10.h,
+                                12.rs(context),
+                                10.rsh(context),
+                                12.rs(context),
+                                10.rsh(context),
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.72),
-                                borderRadius: BorderRadius.circular(16.r),
+                                borderRadius: BorderRadius.circular(
+                                  16.rsr(context),
+                                ),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.08),
                                   width: 1,
@@ -321,12 +333,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 children: [
                                   SliderTheme(
                                     data: SliderThemeData(
-                                      trackHeight: 2.8.h,
+                                      trackHeight: 2.8.rsh(context),
                                       thumbShape: RoundSliderThumbShape(
-                                        enabledThumbRadius: 6.5.w,
+                                        enabledThumbRadius: 6.5.rs(context),
                                       ),
                                       overlayShape: RoundSliderOverlayShape(
-                                        overlayRadius: 12.w,
+                                        overlayRadius: 12.rs(context),
                                       ),
                                       activeTrackColor: AppColors.primary,
                                       inactiveTrackColor: Colors.white24,
@@ -377,7 +389,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                         ),
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 11.sp,
+                                          fontSize: 11.rsp(context),
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -387,7 +399,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                         ),
                                         style: TextStyle(
                                           color: Colors.white70,
-                                          fontSize: 11.sp,
+                                          fontSize: 11.rsp(context),
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -400,27 +412,29 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                         ),
                         // Fullscreen button
                         Positioned(
-                          top: 12.w,
-                          right: 12.w,
+                          top: 12.rs(context),
+                          right: 12.rs(context),
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: _openFullscreenVideo,
                             child: Container(
-                              padding: EdgeInsets.all(10.w),
+                              padding: EdgeInsets.all(10.rs(context)),
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.7),
-                                borderRadius: BorderRadius.circular(999.r),
+                                borderRadius: BorderRadius.circular(
+                                  999.rsr(context),
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.3),
-                                    blurRadius: 8.r,
+                                    blurRadius: 8.rsr(context),
                                   ),
                                 ],
                               ),
                               child: Icon(
                                 Icons.fullscreen_rounded,
                                 color: Colors.white,
-                                size: 20.sp,
+                                size: 20.rsp(context),
                               ),
                             ),
                           ),

@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
@@ -334,27 +334,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
       context: context,
       backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16.rsr(context)),
+        ),
       ),
 
       builder: (_) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
+          padding: EdgeInsets.symmetric(vertical: 12.rsh(context)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(height: 8.h),
+              SizedBox(height: 8.rsh(context)),
 
               Container(
-                width: 40.w,
-                height: 4.h,
+                width: 40.rs(context),
+                height: 4.rsh(context),
                 decoration: BoxDecoration(
                   color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(10.rsr(context)),
                 ),
               ),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 10.rsh(context)),
 
               _optionRow(
                 Icons.image,
@@ -415,21 +417,24 @@ class _CreatePostPageState extends State<CreatePostPage> {
       onTap: onTap,
       child: Column(
         children: [
-          Divider(height: 1.h, color: AppColors.divider),
+          Divider(height: 1.rsh(context), color: AppColors.divider),
 
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+            padding: EdgeInsets.symmetric(
+              vertical: 10.rsh(context),
+              horizontal: 20.rs(context),
+            ),
             child: Row(
               children: [
-                Icon(icon, color: color, size: 26.sp),
+                Icon(icon, color: color, size: 26.rsp(context)),
 
-                SizedBox(width: 18.w),
+                SizedBox(width: 18.rs(context)),
 
                 Text(
                   text,
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 16.sp,
+                    fontSize: 16.rsp(context),
                   ),
                 ),
               ],
@@ -462,177 +467,203 @@ class _CreatePostPageState extends State<CreatePostPage> {
       },
 
       child: SafeArea(
-        child: Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            automaticallyImplyLeading: false,
-
-            title: Text(
-              context.l10n.postCreateTitle,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
-              ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
             ),
-            centerTitle: false,
+            child: Scaffold(
+              backgroundColor: AppColors.background,
+              appBar: AppBar(
+                backgroundColor: AppColors.background,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                automaticallyImplyLeading: false,
 
-            actions: [
-              Row(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 10.h,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      elevation: 0,
-                    ),
-                    onPressed: _isCreatingPost ? null : _createPost,
+                title: Text(
+                  context.l10n.postCreateTitle,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 20.rsp(context),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                centerTitle: false,
 
-                    child: _isCreatingPost
-                        ? SizedBox(
-                            width: 14.sp,
-                            height: 14.sp,
-                            child: const CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            context.l10n.postSubmit,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
+                actions: [
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.rs(context),
+                            vertical: 10.rsh(context),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              12.rsr(context),
                             ),
                           ),
-                  ),
+                          elevation: 0,
+                        ),
+                        onPressed: _isCreatingPost ? null : _createPost,
 
-                  SizedBox(width: 12.w),
+                        child: _isCreatingPost
+                            ? SizedBox(
+                                width: 14.rsp(context),
+                                height: 14.rsp(context),
+                                child: const CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                context.l10n.postSubmit,
+                                style: TextStyle(
+                                  fontSize: 14.rsp(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+
+                      SizedBox(width: 12.rs(context)),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
 
-          body: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Container(
-              padding: EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
+              body: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(
+                    12.rs(context),
+                    8.rsh(context),
+                    4.rs(context),
+                    16.rsh(context),
+                  ),
 
-              child: Column(
-                children: [
-                  BlocBuilder<MenuBloc, MenuState>(
-                    builder: (context, state) {
-                      if (state is MenuLoadingState) {
-                        return const Center(
-                          child: CupertinoActivityIndicator(),
-                        );
-                      }
+                  child: Column(
+                    children: [
+                      BlocBuilder<MenuBloc, MenuState>(
+                        builder: (context, state) {
+                          if (state is MenuLoadingState) {
+                            return const Center(
+                              child: CupertinoActivityIndicator(),
+                            );
+                          }
 
-                      if (state is MenuLoadedState) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 20.r,
-                              backgroundImage: NetworkImage(
-                                state.user.avatarUrl ??
-                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
-                              ),
-                            ),
+                          if (state is MenuLoadedState) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 20.rsr(context),
+                                  backgroundImage: NetworkImage(
+                                    state.user.avatarUrl ??
+                                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+                                  ),
+                                ),
 
-                            SizedBox(width: 12.w),
+                                SizedBox(width: 12.rs(context)),
 
-                            Expanded(
-                              child: GestureDetector(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 8.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.background,
-                                        borderRadius: BorderRadius.circular(
-                                          14.r,
-                                        ),
-                                      ),
-
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Wrap(
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            children: [
-                                              Text(
-                                                state.user.fullName ??
-                                                    context.l10n.commonUnknown,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14.sp,
-                                                  color: AppColors.textPrimary,
-                                                ),
-                                              ),
-                                              if (_taggedUsers.isNotEmpty) ...[
-                                                SizedBox(width: 6.w),
-                                                Text(
-                                                  context.l10n.postWith,
-                                                  style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    color:
-                                                        AppColors.textSecondary,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 6.w),
-                                                GestureDetector(
-                                                  onTap: _openTagFriends,
-                                                  child: _buildTaggedText(),
-                                                ),
-                                              ],
-                                            ],
+                                Expanded(
+                                  child: GestureDetector(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.rs(context),
+                                            vertical: 8.rsh(context),
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.background,
+                                            borderRadius: BorderRadius.circular(
+                                              14.rsr(context),
+                                            ),
                                           ),
 
-                                          SizedBox(height: 8.h),
-
-                                          BlocProvider(
-                                            create: (_) => s1<PrivacyBloc>()
-                                              ..add(
-                                                GetDefaultPrivacyRequested(),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Wrap(
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    state.user.fullName ??
+                                                        context
+                                                            .l10n
+                                                            .commonUnknown,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.rsp(context),
+                                                      color:
+                                                          AppColors.textPrimary,
+                                                    ),
+                                                  ),
+                                                  if (_taggedUsers
+                                                      .isNotEmpty) ...[
+                                                    SizedBox(
+                                                      width: 6.rs(context),
+                                                    ),
+                                                    Text(
+                                                      context.l10n.postWith,
+                                                      style: TextStyle(
+                                                        fontSize: 14.rsp(
+                                                          context,
+                                                        ),
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 6.rs(context),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: _openTagFriends,
+                                                      child: _buildTaggedText(),
+                                                    ),
+                                                  ],
+                                                ],
                                               ),
-                                            child: BlocBuilder<PrivacyBloc, PrivacyState>(
-                                              builder: (context, state) {
-                                                if (state is PrivacyLoading) {
-                                                  return const CupertinoActivityIndicator();
-                                                }
 
-                                                if (state is PrivacyLoaded) {
-                                                  _selectedPrivacyLabel =
-                                                      state.selectedPrivacy;
-                                                  _selectedPrivacy =
-                                                      PrivacyUtil.labelToPrivacyType(
-                                                        state.selectedPrivacy,
-                                                      );
-                                                }
+                                              SizedBox(height: 8.rsh(context)),
 
-                                                return GestureDetector(
-                                                  onTap: () async {
-                                                    final result = await Navigator.push(
-                                                      context,
-                                                      CupertinoPageRoute(
-                                                        builder: (_) =>
-                                                            BlocProvider.value(
+                                              BlocProvider(
+                                                create: (_) => s1<PrivacyBloc>()
+                                                  ..add(
+                                                    GetDefaultPrivacyRequested(),
+                                                  ),
+                                                child: BlocBuilder<PrivacyBloc, PrivacyState>(
+                                                  builder: (context, state) {
+                                                    if (state
+                                                        is PrivacyLoading) {
+                                                      return const CupertinoActivityIndicator();
+                                                    }
+
+                                                    if (state
+                                                        is PrivacyLoaded) {
+                                                      _selectedPrivacyLabel =
+                                                          state.selectedPrivacy;
+                                                      _selectedPrivacy =
+                                                          PrivacyUtil.labelToPrivacyType(
+                                                            state
+                                                                .selectedPrivacy,
+                                                          );
+                                                    }
+
+                                                    return GestureDetector(
+                                                      onTap: () async {
+                                                        final result = await Navigator.push(
+                                                          context,
+                                                          CupertinoPageRoute(
+                                                            builder: (_) => BlocProvider.value(
                                                               value: context
                                                                   .read<
                                                                     PrivacyBloc
@@ -642,236 +673,260 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                                     _selectedPrivacyLabel,
                                                               ),
                                                             ),
+                                                          ),
+                                                        );
+
+                                                        if (result != null) {
+                                                          setState(() {
+                                                            // result có thể là String (cũ) hoặc Map (mới)
+                                                            if (result is Map) {
+                                                              _selectedPrivacyLabel =
+                                                                  result['label']
+                                                                      as String;
+                                                              _friendsExceptIds =
+                                                                  (result['friendsExcept']
+                                                                          as List<
+                                                                            dynamic
+                                                                          >?)
+                                                                      ?.map(
+                                                                        (e) => e
+                                                                            .toString(),
+                                                                      )
+                                                                      .toList() ??
+                                                                  [];
+                                                              _friendsDetailIds =
+                                                                  (result['friendsDetail']
+                                                                          as List<
+                                                                            dynamic
+                                                                          >?)
+                                                                      ?.map(
+                                                                        (e) => e
+                                                                            .toString(),
+                                                                      )
+                                                                      .toList() ??
+                                                                  [];
+                                                            } else if (result
+                                                                is String) {
+                                                              // Backward compatibility
+                                                              _selectedPrivacyLabel =
+                                                                  result;
+                                                              _friendsExceptIds =
+                                                                  [];
+                                                              _friendsDetailIds =
+                                                                  [];
+                                                            }
+
+                                                            _selectedPrivacy =
+                                                                PrivacyUtil.labelToPrivacyType(
+                                                                  _selectedPrivacyLabel,
+                                                                );
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 10
+                                                                  .rsh(context),
+                                                              vertical: 4.rs(
+                                                                context,
+                                                              ),
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: AppColors
+                                                              .primary
+                                                              .withValues(
+                                                                alpha: 0.1,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8.rsr(context),
+                                                              ),
+                                                        ),
+
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Icon(
+                                                              getIcon(
+                                                                _selectedPrivacyLabel,
+                                                              ),
+                                                              color: AppColors
+                                                                  .primary,
+                                                              size: 14.rsp(
+                                                                context,
+                                                              ),
+                                                            ),
+
+                                                            SizedBox(
+                                                              width: 4.rs(
+                                                                context,
+                                                              ),
+                                                            ),
+
+                                                            Text(
+                                                              _selectedPrivacyLabel,
+                                                              style: TextStyle(
+                                                                color: AppColors
+                                                                    .primary,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize: 13
+                                                                    .rsp(
+                                                                      context,
+                                                                    ),
+                                                              ),
+                                                            ),
+
+                                                            SizedBox(
+                                                              width: 2.rs(
+                                                                context,
+                                                              ),
+                                                            ),
+
+                                                            Icon(
+                                                              Icons
+                                                                  .arrow_drop_down,
+                                                              color: AppColors
+                                                                  .primary,
+                                                              size: 18.rsp(
+                                                                context,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     );
-
-                                                    if (result != null) {
-                                                      setState(() {
-                                                        // result có thể là String (cũ) hoặc Map (mới)
-                                                        if (result is Map) {
-                                                          _selectedPrivacyLabel =
-                                                              result['label']
-                                                                  as String;
-                                                          _friendsExceptIds =
-                                                              (result['friendsExcept']
-                                                                      as List<
-                                                                        dynamic
-                                                                      >?)
-                                                                  ?.map(
-                                                                    (e) => e
-                                                                        .toString(),
-                                                                  )
-                                                                  .toList() ??
-                                                              [];
-                                                          _friendsDetailIds =
-                                                              (result['friendsDetail']
-                                                                      as List<
-                                                                        dynamic
-                                                                      >?)
-                                                                  ?.map(
-                                                                    (e) => e
-                                                                        .toString(),
-                                                                  )
-                                                                  .toList() ??
-                                                              [];
-                                                        } else if (result
-                                                            is String) {
-                                                          // Backward compatibility
-                                                          _selectedPrivacyLabel =
-                                                              result;
-                                                          _friendsExceptIds =
-                                                              [];
-                                                          _friendsDetailIds =
-                                                              [];
-                                                        }
-
-                                                        _selectedPrivacy =
-                                                            PrivacyUtil.labelToPrivacyType(
-                                                              _selectedPrivacyLabel,
-                                                            );
-                                                      });
-                                                    }
                                                   },
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                          horizontal: 10.h,
-                                                          vertical: 4.w,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors.primary
-                                                          .withOpacity(0.1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            8.r,
-                                                          ),
-                                                    ),
-
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Icon(
-                                                          getIcon(
-                                                            _selectedPrivacyLabel,
-                                                          ),
-                                                          color:
-                                                              AppColors.primary,
-                                                          size: 14.sp,
-                                                        ),
-
-                                                        SizedBox(width: 4.w),
-
-                                                        Text(
-                                                          _selectedPrivacyLabel,
-                                                          style: TextStyle(
-                                                            color: AppColors
-                                                                .primary,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize: 13.sp,
-                                                          ),
-                                                        ),
-
-                                                        SizedBox(width: 2.w),
-
-                                                        Icon(
-                                                          Icons.arrow_drop_down,
-                                                          color:
-                                                              AppColors.primary,
-                                                          size: 18.sp,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-
-                  SizedBox(height: 14.h),
-
-                  /// Ô nhập "Bạn đang nghĩ gì?"
-                  TextField(
-                    controller: _captionController,
-                    cursorColor: AppColors.primary,
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 18.sp,
-                    ),
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.postWriteSomethingHint,
-                      hintStyle: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 18.sp,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-
-                  /// Selected images display
-                  if (_selectedAssets.isNotEmpty) ...[
-                    SelectedImagesDisplay(
-                      selectedAssets: _selectedAssets,
-                      onChangedLayout: (layout) {
-                        setState(() {
-                          _selectedLayout = layout;
-                        });
-                      },
-                      onEdit: () => _onSelectImage(context),
-                      onRemove: (assets) {
-                        setState(() {
-                          _selectedAssets.clear();
-                        });
-                      },
-                      onRemoveAtIndex: (index) {
-                        setState(() {
-                          _selectedAssets.removeAt(index);
-                        });
-                      },
-                      onImageEdited: (index, newFile) async {
-                        try {
-                          final AssetEntity? asset = await _createAssetFromFile(
-                            newFile,
-                          );
-                          if (asset != null && mounted) {
-                            setState(() {
-                              _selectedAssets[index] = asset;
-                            });
+                              ],
+                            );
                           }
-                        } catch (e) {
-                          print('Error updating edited asset: $e');
-                        }
-                      },
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
+                          return const SizedBox.shrink();
+                        },
+                      ),
 
-          bottomNavigationBar: Container(
-            padding: EdgeInsets.only(
-              top: 10.h,
-              bottom: 90.h,
-              left: 8.w,
-              right: 8.w,
-            ),
-            color: AppColors.background,
+                      SizedBox(height: 14.rsh(context)),
 
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Divider(height: 1.h, color: AppColors.divider),
+                      /// Ô nhập "Bạn đang nghĩ gì?"
+                      TextField(
+                        controller: _captionController,
+                        cursorColor: AppColors.primary,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 18.rsp(context),
+                        ),
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: context.l10n.postWriteSomethingHint,
+                          hintStyle: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 18.rsp(context),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
 
-                SizedBox(height: 10.h),
-
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Row(
-                    children: [
-                      _bottomIcon(
-                        Icons.image_outlined,
-                        context.l10n.postLibrary,
-                        onTap: () => _onSelectImage(context),
-                      ),
-                      _bottomIcon(
-                        Icons.person_add_alt_1,
-                        context.l10n.postTag,
-                        onTap: _openTagFriends,
-                      ),
-                      _bottomIcon(
-                        Icons.emoji_emotions_outlined,
-                        context.l10n.postFeeling,
-                      ),
-                      _bottomIcon(
-                        Icons.location_on_outlined,
-                        context.l10n.postLocation,
-                      ),
-                      _bottomIcon(
-                        CupertinoIcons.ellipsis,
-                        context.l10n.postMore,
-                        onTap: () => _showMoreOptions(context),
-                      ),
+                      /// Selected images display
+                      if (_selectedAssets.isNotEmpty) ...[
+                        SelectedImagesDisplay(
+                          selectedAssets: _selectedAssets,
+                          onChangedLayout: (layout) {
+                            setState(() {
+                              _selectedLayout = layout;
+                            });
+                          },
+                          onEdit: () => _onSelectImage(context),
+                          onRemove: (assets) {
+                            setState(() {
+                              _selectedAssets.clear();
+                            });
+                          },
+                          onRemoveAtIndex: (index) {
+                            setState(() {
+                              _selectedAssets.removeAt(index);
+                            });
+                          },
+                          onImageEdited: (index, newFile) async {
+                            try {
+                              final AssetEntity? asset =
+                                  await _createAssetFromFile(newFile);
+                              if (asset != null && mounted) {
+                                setState(() {
+                                  _selectedAssets[index] = asset;
+                                });
+                              }
+                            } catch (e) {
+                              print('Error updating edited asset: $e');
+                            }
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),
-              ],
+              ),
+
+              bottomNavigationBar: Container(
+                padding: EdgeInsets.only(
+                  top: 10.rsh(context),
+                  bottom: 90.rsh(context),
+                  left: 8.rs(context),
+                  right: 8.rs(context),
+                ),
+                color: AppColors.background,
+
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Divider(height: 1.rsh(context), color: AppColors.divider),
+
+                    SizedBox(height: 10.rsh(context)),
+
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: [
+                          _bottomIcon(
+                            Icons.image_outlined,
+                            context.l10n.postLibrary,
+                            onTap: () => _onSelectImage(context),
+                          ),
+                          _bottomIcon(
+                            Icons.person_add_alt_1,
+                            context.l10n.postTag,
+                            onTap: _openTagFriends,
+                          ),
+                          _bottomIcon(
+                            Icons.emoji_emotions_outlined,
+                            context.l10n.postFeeling,
+                          ),
+                          _bottomIcon(
+                            Icons.location_on_outlined,
+                            context.l10n.postLocation,
+                          ),
+                          _bottomIcon(
+                            CupertinoIcons.ellipsis,
+                            context.l10n.postMore,
+                            onTap: () => _showMoreOptions(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -883,23 +938,26 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        constraints: BoxConstraints(minWidth: 90.w),
-        margin: EdgeInsets.only(right: 8.w),
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        constraints: BoxConstraints(minWidth: 90.rs(context)),
+        margin: EdgeInsets.only(right: 8.rs(context)),
+        padding: EdgeInsets.symmetric(
+          vertical: 8.rsh(context),
+          horizontal: 12.rs(context),
+        ),
         decoration: BoxDecoration(
-          color: AppColors.textSecondary.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12.r),
+          color: AppColors.textSecondary.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AppColors.textPrimary, size: 24.sp),
-            SizedBox(height: 4.h),
+            Icon(icon, color: AppColors.textPrimary, size: 24.rsp(context)),
+            SizedBox(height: 4.rsh(context)),
             Text(
               text,
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 12.sp,
+                fontSize: 12.rsp(context),
                 fontWeight: FontWeight.w500,
               ),
             ),

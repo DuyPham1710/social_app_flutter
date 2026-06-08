@@ -36,7 +36,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   void markAllRead() => datasource.markAllRead();
 
   @override
-  void loadPage({int page = 1, int limit = 10}) =>
+  void loadPage({int page = 1, int limit = 15}) =>
       datasource.loadPage(page: page, limit: limit);
 
   @override

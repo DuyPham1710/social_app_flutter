@@ -292,6 +292,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       ),
     );
 
-    repository.loadPage(page: 1, limit: 10);
+    repository.loadPage(page: 1, limit: 15);
   }
 }

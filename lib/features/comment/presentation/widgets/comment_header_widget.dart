@@ -67,18 +67,43 @@ class CommentHeaderWidget extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  // Chỉ điều hướng nếu có reacts
+                  // Chỉ điều hướng hoặc mở Dialog nếu có reacts
                   if (displayReacts != null && displayReacts.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (_) => ReactionDetailsPage(
-                          reacts: displayReacts!,
-                          postId: postId,
-                          onMention: onMention,
+                    if (ResponsiveHelper.isWebOrDesktop) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => Dialog(
+                          backgroundColor: Colors.transparent,
+                          surfaceTintColor: Colors.transparent,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 550,
+                              maxHeight: 700,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: ReactionDetailsPage(
+                                reacts: displayReacts!,
+                                postId: postId,
+                                onMention: onMention,
+                                isDialog: true,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (_) => ReactionDetailsPage(
+                            reacts: displayReacts!,
+                            postId: postId,
+                            onMention: onMention,
+                          ),
+                        ),
+                      );
+                    }
                   }
                 },
                 child: Row(
@@ -86,7 +111,9 @@ class CommentHeaderWidget extends StatelessWidget {
                     // Hiển thị emoji icons
                     if (topEmojis.isNotEmpty)
                       SizedBox(
-                        width: topEmojis.length > 1 ? 40.rs(context) : 24.rs(context),
+                        width: topEmojis.length > 1
+                            ? 40.rs(context)
+                            : 24.rs(context),
                         height: 24.rsh(context),
                         child: Stack(
                           clipBehavior: Clip.none,

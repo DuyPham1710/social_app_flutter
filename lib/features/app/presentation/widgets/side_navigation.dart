@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_list_page.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -110,7 +112,10 @@ class _SideNavigationState extends State<SideNavigation>
                     activeIcon: CupertinoIcons.bell_fill,
                     label: context.l10n.notificationTitle,
                   ),
-                  _buildProfileNavItem(index: 4, label: context.l10n.profileTitle),
+                  _buildProfileNavItem(
+                    index: 4,
+                    label: context.l10n.profileTitle,
+                  ),
 
                   const Spacer(),
 
@@ -171,11 +176,17 @@ class _SideNavigationState extends State<SideNavigation>
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               )
-            : Icon(
-                CupertinoIcons.circle_grid_hex,
-                key: const ValueKey('logo-icon'),
-                size: 28,
-                color: AppColors.primary,
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  s1<AppPreferences>().isDarkMode
+                      ? 'assets/icons/dark_logo.png'
+                      : 'assets/icons/logo.jpg',
+                  key: const ValueKey('logo-image'),
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.cover,
+                ),
               ),
       ),
     );
