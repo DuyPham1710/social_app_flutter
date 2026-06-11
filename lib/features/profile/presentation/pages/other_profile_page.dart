@@ -13,6 +13,7 @@ import '../widgets/other_profile_actions.dart';
 import '../bloc/other_profile_bloc.dart';
 import '../bloc/other_profile_state.dart';
 import '../bloc/other_profile_event.dart';
+import '../widgets/report_user_bottom_sheet.dart';
 
 class OtherProfilePage extends StatefulWidget {
   final String userId;
@@ -126,6 +127,70 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                         color: AppColors.textPrimary,
                       ),
                     ),
+                    actions: [
+                      PopupMenuButton<String>(
+                        tooltip: '',
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        color: Colors.white,
+                        surfaceTintColor: Colors.white,
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          color: AppColors.textPrimary,
+                        ),
+                        onSelected: (value) {
+                          if (value == 'report') {
+                            ReportUserBottomSheet.show(
+                              context,
+                              reportedUserId: user.userId,
+                            );
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem<String>(
+                            value: 'report',
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(
+                                      Icons.report_gmailerrorred_rounded,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      context.l10n.profileReportUser,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
 
                   /// Content

@@ -15,6 +15,12 @@ abstract class UserRemoteDataSource {
   @GET('/user/{id}')
   Future<UserModel> getUserProfileById(@Path('id') String id);
 
+  @POST('/user/{id}/report')
+  Future<void> reportUser(
+    @Path('id') String id,
+    @Body() Map<String, dynamic> body,
+  );
+
   @MultiPart()
   @PATCH('/user')
   Future<UserModel> updateUserProfile({

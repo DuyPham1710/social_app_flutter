@@ -6,5 +6,9 @@ abstract class UserRepository {
   Future<DataState<UserEntity>> getUserProfile();
   Future<DataState<UserEntity>> getUserProfileById(String userId);
   Future<DataState<UserEntity>> updateUserProfile(UpdateUserEntity params);
-
+  Future<DataState<void>> reportUser({
+    required String reportedUserId,
+    required String reason,
+    String? description,
+  });
 }

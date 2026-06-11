@@ -849,6 +849,26 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profileDeletingFaceData => 'Đang xóa dữ liệu khuôn mặt...';
 
   @override
+  String get profileReportUser => 'Báo cáo người dùng';
+
+  @override
+  String get profileReportUserIntro =>
+      'Hãy chọn lý do phù hợp để chúng tôi xem xét tài khoản này.';
+
+  @override
+  String get profileReportUserSelfNotAllowed =>
+      'Bạn không thể báo cáo trang cá nhân của chính mình';
+
+  @override
+  String get profileReportUserSuccess => 'Đã gửi báo cáo người dùng';
+
+  @override
+  String get profileReportUserFailed => 'Không thể gửi báo cáo người dùng';
+
+  @override
+  String get profileReportReasonFakeAccount => 'Tài khoản giả mạo';
+
+  @override
   String get appearanceDisplayModeSection => 'CHẾ ĐỘ HIỂN THỊ';
 
   @override

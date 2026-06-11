@@ -1584,6 +1584,42 @@ abstract class AppLocalizations {
   /// **'Đang xóa dữ liệu khuôn mặt...'**
   String get profileDeletingFaceData;
 
+  /// No description provided for @profileReportUser.
+  ///
+  /// In vi, this message translates to:
+  /// **'Báo cáo người dùng'**
+  String get profileReportUser;
+
+  /// No description provided for @profileReportUserIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hãy chọn lý do phù hợp để chúng tôi xem xét tài khoản này.'**
+  String get profileReportUserIntro;
+
+  /// No description provided for @profileReportUserSelfNotAllowed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn không thể báo cáo trang cá nhân của chính mình'**
+  String get profileReportUserSelfNotAllowed;
+
+  /// No description provided for @profileReportUserSuccess.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi báo cáo người dùng'**
+  String get profileReportUserSuccess;
+
+  /// No description provided for @profileReportUserFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể gửi báo cáo người dùng'**
+  String get profileReportUserFailed;
+
+  /// No description provided for @profileReportReasonFakeAccount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản giả mạo'**
+  String get profileReportReasonFakeAccount;
+
   /// No description provided for @appearanceDisplayModeSection.
   ///
   /// In vi, this message translates to:

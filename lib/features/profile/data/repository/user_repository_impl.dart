@@ -68,4 +68,24 @@ class UserRepositoryImpl implements UserRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> reportUser({
+    required String reportedUserId,
+    required String reason,
+    String? description,
+  }) async {
+    try {
+      await _remoteDataSource.reportUser(
+        reportedUserId,
+        {
+          'reason': reason,
+          if (description != null) 'description': description,
+        },
+      );
+      return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }
