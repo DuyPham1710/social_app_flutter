@@ -1481,5 +1481,9 @@
   "reactionHaha": "Haha",
   "reactionWow": "Wow",
   "reactionSad": "Buồn",
-  "reactionAngry": "Phẫn nộ"
+  "reactionAngry": "Phẫn nộ",
+  "storyAddMediaFromComputer": "Thêm ảnh/video từ máy tính",
+  "storySelectFile": "Chọn tệp",
+  "storyWebImageEditNotSupported": "Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web",
+  "commonImageOnlySupport": "Chỉ hỗ trợ file ảnh"
 }

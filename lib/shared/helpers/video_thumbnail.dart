@@ -52,6 +52,7 @@ Future<Uint8List?> generateVideoThumbnail(String videoUrl) async {
 
 Widget buildVideoThumbnail(
   String videoUrl, {
+  Uint8List? videoBytes,
   BoxFit fit = BoxFit.cover,
   BorderRadius? borderRadius,
   double? height,
@@ -66,7 +67,11 @@ Widget buildVideoThumbnail(
           final thumbnailBytes = snapshot.data;
 
           final preview = kIsWeb
-              ? WebVideoPreview(videoUrl: videoUrl, fit: fit)
+              ? WebVideoPreview(
+                  videoUrl: videoUrl,
+                  videoBytes: videoBytes,
+                  fit: fit,
+                )
               : (thumbnailBytes != null
                     ? Image.memory(
                         thumbnailBytes,

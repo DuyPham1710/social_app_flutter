@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
 
@@ -13,6 +14,8 @@ class CreatePostEntity {
   final List<String>? friendsDetail;
   final List<String>? taggedUserIds;
   final String? communityId;
+  final List<Uint8List>? fileBytesList;
+  final List<String>? fileNames;
 
   const CreatePostEntity({
     this.caption,
@@ -25,5 +28,7 @@ class CreatePostEntity {
     this.friendsDetail,
     this.taggedUserIds,
     this.communityId,
+    this.fileBytesList,
+    this.fileNames,
   });
 }

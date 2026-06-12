@@ -5,6 +5,7 @@ import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:video_player/video_player.dart';
+import 'package:social_app_fe/core/utils/web_video_url_helper.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final dynamic videoData; // File hoặc String (URL)
@@ -26,6 +27,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool _hasError = false;
   String _errorMessage = '';
   bool _showControls = true;
+  String? _blobUrl;
   late Timer _hideControlsTimer;
   static const Duration _controlsAutoHideDuration = Duration(seconds: 3);
 
@@ -64,6 +66,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _controller = VideoPlayerController.networkUrl(
           Uri.parse(widget.videoData),
         );
+      } else if (widget.videoData.runtimeType.toString() == 'PlatformFile') {
+        if (widget.videoData.bytes != null) {
+          _blobUrl = createObjectUrlFromBytes(widget.videoData.bytes!);
+          _controller = VideoPlayerController.networkUrl(
+            Uri.parse(_blobUrl!),
+          );
+        } else {
+           throw Exception('PlatformFile missing bytes for web video playback');
+        }
       } else {
         throw Exception(context.l10n.postUnsupportedVideoType);
       }
@@ -112,6 +123,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   void dispose() {
     _controller.dispose();
     _hideControlsTimer.cancel();
+    if (_blobUrl != null) {
+      revokeObjectUrl(_blobUrl!);
+    }
     super.dispose();
   }
 

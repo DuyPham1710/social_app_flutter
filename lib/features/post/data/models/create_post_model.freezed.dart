@@ -32,6 +32,10 @@ mixin _$CreatePostModel {
   List<String>? get friendsDetail => throw _privateConstructorUsedError;
   List<String>? get taggedUserIds => throw _privateConstructorUsedError;
   String? get communityId => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  List<Uint8List>? get fileBytesList => throw _privateConstructorUsedError;
+  @JsonKey(ignore: true)
+  List<String>? get fileNames => throw _privateConstructorUsedError;
 
   /// Serializes this CreatePostModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -61,6 +65,8 @@ abstract class $CreatePostModelCopyWith<$Res> {
     List<String>? friendsDetail,
     List<String>? taggedUserIds,
     String? communityId,
+    @JsonKey(ignore: true) List<Uint8List>? fileBytesList,
+    @JsonKey(ignore: true) List<String>? fileNames,
   });
 }
 
@@ -89,6 +95,8 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
     Object? friendsDetail = freezed,
     Object? taggedUserIds = freezed,
     Object? communityId = freezed,
+    Object? fileBytesList = freezed,
+    Object? fileNames = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -132,6 +140,14 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
                 ? _value.communityId
                 : communityId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            fileBytesList: freezed == fileBytesList
+                ? _value.fileBytesList
+                : fileBytesList // ignore: cast_nullable_to_non_nullable
+                      as List<Uint8List>?,
+            fileNames: freezed == fileNames
+                ? _value.fileNames
+                : fileNames // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
           )
           as $Val,
     );
@@ -158,6 +174,8 @@ abstract class _$$CreatePostModelImplCopyWith<$Res>
     List<String>? friendsDetail,
     List<String>? taggedUserIds,
     String? communityId,
+    @JsonKey(ignore: true) List<Uint8List>? fileBytesList,
+    @JsonKey(ignore: true) List<String>? fileNames,
   });
 }
 
@@ -185,6 +203,8 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
     Object? friendsDetail = freezed,
     Object? taggedUserIds = freezed,
     Object? communityId = freezed,
+    Object? fileBytesList = freezed,
+    Object? fileNames = freezed,
   }) {
     return _then(
       _$CreatePostModelImpl(
@@ -228,6 +248,14 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
             ? _value.communityId
             : communityId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        fileBytesList: freezed == fileBytesList
+            ? _value._fileBytesList
+            : fileBytesList // ignore: cast_nullable_to_non_nullable
+                  as List<Uint8List>?,
+        fileNames: freezed == fileNames
+            ? _value._fileNames
+            : fileNames // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
       ),
     );
   }
@@ -247,12 +275,16 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     final List<String>? friendsDetail,
     final List<String>? taggedUserIds,
     this.communityId,
+    @JsonKey(ignore: true) final List<Uint8List>? fileBytesList,
+    @JsonKey(ignore: true) final List<String>? fileNames,
   }) : _files = files,
        _titles = titles,
        _orders = orders,
        _friendsExcept = friendsExcept,
        _friendsDetail = friendsDetail,
-       _taggedUserIds = taggedUserIds;
+       _taggedUserIds = taggedUserIds,
+       _fileBytesList = fileBytesList,
+       _fileNames = fileNames;
 
   factory _$CreatePostModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreatePostModelImplFromJson(json);
@@ -326,10 +358,31 @@ class _$CreatePostModelImpl implements _CreatePostModel {
 
   @override
   final String? communityId;
+  final List<Uint8List>? _fileBytesList;
+  @override
+  @JsonKey(ignore: true)
+  List<Uint8List>? get fileBytesList {
+    final value = _fileBytesList;
+    if (value == null) return null;
+    if (_fileBytesList is EqualUnmodifiableListView) return _fileBytesList;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<String>? _fileNames;
+  @override
+  @JsonKey(ignore: true)
+  List<String>? get fileNames {
+    final value = _fileNames;
+    if (value == null) return null;
+    if (_fileNames is EqualUnmodifiableListView) return _fileNames;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail, taggedUserIds: $taggedUserIds, communityId: $communityId)';
+    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail, taggedUserIds: $taggedUserIds, communityId: $communityId, fileBytesList: $fileBytesList, fileNames: $fileNames)';
   }
 
   @override
@@ -357,7 +410,15 @@ class _$CreatePostModelImpl implements _CreatePostModel {
               _taggedUserIds,
             ) &&
             (identical(other.communityId, communityId) ||
-                other.communityId == communityId));
+                other.communityId == communityId) &&
+            const DeepCollectionEquality().equals(
+              other._fileBytesList,
+              _fileBytesList,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._fileNames,
+              _fileNames,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -374,6 +435,8 @@ class _$CreatePostModelImpl implements _CreatePostModel {
     const DeepCollectionEquality().hash(_friendsDetail),
     const DeepCollectionEquality().hash(_taggedUserIds),
     communityId,
+    const DeepCollectionEquality().hash(_fileBytesList),
+    const DeepCollectionEquality().hash(_fileNames),
   );
 
   /// Create a copy of CreatePostModel
@@ -405,6 +468,8 @@ abstract class _CreatePostModel implements CreatePostModel {
     final List<String>? friendsDetail,
     final List<String>? taggedUserIds,
     final String? communityId,
+    @JsonKey(ignore: true) final List<Uint8List>? fileBytesList,
+    @JsonKey(ignore: true) final List<String>? fileNames,
   }) = _$CreatePostModelImpl;
 
   factory _CreatePostModel.fromJson(Map<String, dynamic> json) =
@@ -431,6 +496,12 @@ abstract class _CreatePostModel implements CreatePostModel {
   List<String>? get taggedUserIds;
   @override
   String? get communityId;
+  @override
+  @JsonKey(ignore: true)
+  List<Uint8List>? get fileBytesList;
+  @override
+  @JsonKey(ignore: true)
+  List<String>? get fileNames;
 
   /// Create a copy of CreatePostModel
   /// with the given fields replaced by the non-null parameter values.

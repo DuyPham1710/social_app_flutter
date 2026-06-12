@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
@@ -44,7 +47,7 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
-  List<AssetEntity> _selectedAssets = [];
+  List<dynamic> _selectedAssets = [];
   final TextEditingController _captionController = TextEditingController();
   LayoutType _selectedLayout = LayoutType.classic;
   late PrivacyType _selectedPrivacy;
@@ -96,12 +99,22 @@ class _CreatePostPageState extends State<CreatePostPage> {
     });
 
     try {
-      // Convert AssetEntity to File
+      // Convert AssetEntity to File or extract PlatformFile bytes
       List<File> files = [];
+      List<Uint8List> fileBytesList = [];
+      List<String> fileNames = [];
+
       for (var asset in _selectedAssets) {
-        final file = await asset.file;
-        if (file != null) {
-          files.add(file);
+        if (asset is AssetEntity) {
+          final file = await asset.file;
+          if (file != null) {
+            files.add(file);
+          }
+        } else if (asset is PlatformFile) {
+          if (asset.bytes != null) {
+            fileBytesList.add(asset.bytes!);
+            fileNames.add(asset.name);
+          }
         }
       }
 
@@ -124,12 +137,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ? _captionController.text.trim()
             : null,
         files: files.isNotEmpty ? files : null,
+        fileBytesList: fileBytesList.isNotEmpty ? fileBytesList : null,
+        fileNames: fileNames.isNotEmpty ? fileNames : null,
         layout: _selectedLayout,
         privacyType: _selectedPrivacy,
         // orders and titles can be added later if needed
         orders: files.isNotEmpty
             ? List.generate(files.length, (index) => index)
-            : null,
+            : (fileBytesList.isNotEmpty
+                  ? List.generate(fileBytesList.length, (index) => index)
+                  : null),
         titles: null, // Can be added if needed
         friendsExcept: friendsExcept,
         friendsDetail: friendsDetail,
@@ -155,6 +172,23 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   void _onSelectImage(BuildContext context) async {
+    if (kIsWeb) {
+      final result = await FilePicker.pickFiles(
+        type: FileType.media,
+        allowMultiple: true,
+        withData: true,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        if (!mounted) return;
+
+        setState(() {
+          _selectedAssets.addAll(result.files);
+        });
+      }
+      return;
+    }
+
     PermissionStatus status;
 
     if (Platform.isIOS) {
@@ -181,7 +215,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         context,
         CupertinoPageRoute(
           builder: (_) => GalleryPickerScreen(
-            selectedAssets: _selectedAssets,
+            selectedAssets: _selectedAssets.whereType<AssetEntity>().toList(),
             openCamera: () => _openCamera(),
           ),
         ),
@@ -189,6 +223,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       if (result != null && result is List<AssetEntity>) {
         setState(() {
+          // Xóa hết ảnh cũ nếu là dùng gallery picker (vì result trả về danh sách chọn mới)
           _selectedAssets = result;
         });
       }

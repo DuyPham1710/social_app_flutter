@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -184,7 +186,33 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   // Điều hướng sang trang chọn ảnh
-  void _navigateToImagePicker(bool isAvatar) {
+  void _navigateToImagePicker(bool isAvatar) async {
+    if (kIsWeb) {
+      final result = await FilePicker.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+        withData: true,
+      );
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        if (!mounted) return;
+
+        // Kiểm tra extension có phải ảnh không
+        final ext = file.extension?.toLowerCase();
+        final imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic'];
+        if (ext == null || !imageExts.contains(ext)) {
+          showErrorSnackBar(context, context.l10n.commonImageOnlySupport);
+          return;
+        }
+
+        final updateEntity = isAvatar
+            ? UpdateUserEntity(avatarBytes: file.bytes, avatarName: file.name)
+            : UpdateUserEntity(coverBytes: file.bytes, coverName: file.name);
+        context.read<ProfileBloc>().add(UpdateUserProfileEvent(updateEntity));
+      }
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -230,7 +258,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         }
       },
       child: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: AppColors.background,
 
         child: Center(
           child: ConstrainedBox(

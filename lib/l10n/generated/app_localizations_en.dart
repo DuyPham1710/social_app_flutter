@@ -3243,4 +3243,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reactionAngry => 'Angry';
+
+  @override
+  String get storyAddMediaFromComputer => 'Add photo/video from computer';
+
+  @override
+  String get storySelectFile => 'Choose file';
+
+  @override
+  String get storyWebImageEditNotSupported =>
+      'Image editing is not supported on Web';
+
+  @override
+  String get commonImageOnlySupport => 'Only image files are supported';
 }

@@ -148,6 +148,17 @@ class PostRepositoryImpl implements PostRepository {
           );
           multipartFiles.add(multipartFile);
         }
+      } else if (model.fileBytesList != null &&
+          model.fileBytesList!.isNotEmpty &&
+          model.fileNames != null) {
+        multipartFiles = [];
+        for (int i = 0; i < model.fileBytesList!.length; i++) {
+          final multipartFile = MultipartFile.fromBytes(
+            model.fileBytesList![i],
+            filename: model.fileNames![i],
+          );
+          multipartFiles.add(multipartFile);
+        }
       }
 
       String? layoutString = post.layout!.name;
@@ -218,19 +229,14 @@ class PostRepositoryImpl implements PostRepository {
       switch (privacyType) {
         case PrivacyType.public:
           privacyTypeString = 'public';
-          break;
         case PrivacyType.friends:
           privacyTypeString = 'friends';
-          break;
         case PrivacyType.friendsExcept:
           privacyTypeString = 'friends_except';
-          break;
         case PrivacyType.friendsDetail:
           privacyTypeString = 'friends_detail';
-          break;
         case PrivacyType.private:
           privacyTypeString = 'private';
-          break;
       }
 
       // Build request body - luôn gửi cả hai field để backend có thể clear đúng

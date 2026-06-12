@@ -1,6 +1,6 @@
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
@@ -10,11 +10,13 @@ import 'package:social_app_fe/shared/component/layout/layout_post_column.dart';
 import 'package:social_app_fe/shared/component/layout/layout_post_frame.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:file_picker/file_picker.dart';
 
 class SelectedImagesDisplay extends StatefulWidget {
-  final List<AssetEntity> selectedAssets;
+  final List<dynamic> selectedAssets;
   final VoidCallback? onEdit;
-  final Function(List<AssetEntity>)? onRemove;
+  final Function(List<dynamic>)? onRemove;
   final Function(int index)? onRemoveAtIndex;
   final Function(LayoutType layout)? onChangedLayout;
   final Function(int index, File newFile)? onImageEdited;
@@ -35,7 +37,7 @@ class SelectedImagesDisplay extends StatefulWidget {
 
 class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
   LayoutType _currentLayout = LayoutType.classic;
-  List<File> _imageFiles = [];
+  List<dynamic> _imageFiles = [];
   bool _isLoading = true;
 
   @override
@@ -57,12 +59,23 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
       _isLoading = true;
     });
 
-    List<File> files = [];
-    for (int i = 0; i < widget.selectedAssets.length; i++) {
-      final asset = widget.selectedAssets[i];
-      final file = await asset.file;
-      if (file != null) {
-        files.add(file);
+    List<dynamic> files = [];
+    if (kIsWeb) {
+      for (int i = 0; i < widget.selectedAssets.length; i++) {
+        final asset = widget.selectedAssets[i];
+        if (asset is PlatformFile && asset.bytes != null) {
+          files.add(asset);
+        }
+      }
+    } else {
+      for (int i = 0; i < widget.selectedAssets.length; i++) {
+        final asset = widget.selectedAssets[i];
+        if (asset is AssetEntity) {
+          final file = await asset.file;
+          if (file != null) {
+            files.add(file);
+          }
+        }
       }
     }
 
@@ -78,7 +91,10 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
       builder: (context) => CupertinoActionSheet(
         title: Text(
           context.l10n.postChooseLayout,
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 16.rsp(context),
+            fontWeight: FontWeight.w600,
+          ),
         ),
 
         actions: [
@@ -101,7 +117,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                       : AppColors.textPrimary,
                 ),
 
-                SizedBox(width: 8.w),
+                SizedBox(width: 8.rs(context)),
 
                 Text(
                   context.l10n.postLayoutClassic,
@@ -134,7 +150,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                       : AppColors.textPrimary,
                 ),
 
-                SizedBox(width: 8.w),
+                SizedBox(width: 8.rs(context)),
 
                 Text(
                   context.l10n.postLayoutColumn,
@@ -167,7 +183,7 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                       : AppColors.textPrimary,
                 ),
 
-                SizedBox(width: 8.w),
+                SizedBox(width: 8.rs(context)),
 
                 Text(
                   context.l10n.postLayoutFrame,
@@ -199,15 +215,20 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
   }
 
   void _openEditSelectedPage(int index) {
+    if (_imageFiles.isEmpty) return;
+
     Navigator.push(
       context,
-      CupertinoPageRoute(
+      MaterialPageRoute(
         builder: (_) => EditSelectedImagePage(
-          imageFiles: _imageFiles,
+          imageFiles: kIsWeb ? _imageFiles : _imageFiles.whereType<File>().toList(),
           initialIndex: index,
           onAdd: widget.onEdit,
           onRemoveAtIndex: (removeIndex) {
             widget.onRemoveAtIndex?.call(removeIndex);
+            if (_imageFiles.isEmpty) {
+              Navigator.pop(context);
+            }
           },
           onImageEdited: (editedIndex, newFile) {
             widget.onImageEdited?.call(editedIndex, newFile);
@@ -244,19 +265,24 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Column(
         children: [
           // Header với số ảnh và options
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                context.l10n.postSelectedPhotos(widget.selectedAssets.length),
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+              Expanded(
+                child: Text(
+                  context.l10n.postSelectedPhotos(widget.selectedAssets.length),
+                  style: TextStyle(
+                    fontSize: 14.rsp(context),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
 
@@ -267,12 +293,12 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                     onTap: _showLayoutOptions,
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
+                        horizontal: 8.rs(context),
+                        vertical: 4.rsh(context),
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(12.rsr(context)),
                         border: Border.all(
                           color: AppColors.primary.withOpacity(0.3),
                         ),
@@ -283,26 +309,26 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                         children: [
                           Icon(
                             _getLayoutIcon(),
-                            size: 16.sp,
+                            size: 16.rsp(context),
                             color: AppColors.primary,
                           ),
 
-                          SizedBox(width: 4.w),
+                          SizedBox(width: 4.rs(context)),
 
                           Text(
                             _getLayoutName(context),
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 12.rsp(context),
                               color: AppColors.primary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
 
-                          SizedBox(width: 2.w),
+                          SizedBox(width: 2.rs(context)),
 
                           Icon(
                             CupertinoIcons.chevron_down,
-                            size: 12.sp,
+                            size: 12.rsp(context),
                             color: AppColors.primary,
                           ),
                         ],
@@ -310,39 +336,40 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
                     ),
                   ),
 
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
 
                   // Edit button
-                  GestureDetector(
-                    onTap: widget.onEdit,
-                    child: Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.textSecondary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Icon(
-                        Icons.swap_horiz,
-                        size: 16.sp,
-                        color: AppColors.textSecondary,
+                  if (!kIsWeb) ...[
+                    GestureDetector(
+                      onTap: widget.onEdit,
+                      child: Container(
+                        padding: EdgeInsets.all(6.rs(context)),
+                        decoration: BoxDecoration(
+                          color: AppColors.textSecondary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8.rsr(context)),
+                        ),
+                        child: Icon(
+                          Icons.swap_horiz,
+                          size: 16.rsp(context),
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
-                  ),
-
-                  SizedBox(width: 8.w),
+                    SizedBox(width: 8.rs(context)),
+                  ],
 
                   // Remove button
                   GestureDetector(
                     onTap: () => widget.onRemove?.call(widget.selectedAssets),
                     child: Container(
-                      padding: EdgeInsets.all(6.w),
+                      padding: EdgeInsets.all(6.rs(context)),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(8.rsr(context)),
                       ),
                       child: Icon(
                         CupertinoIcons.xmark,
-                        size: 16.sp,
+                        size: 16.rsp(context),
                         color: Colors.red,
                       ),
                     ),
@@ -352,62 +379,65 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
             ],
           ),
 
-          SizedBox(height: 12.h),
+          SizedBox(height: 12.rsh(context)),
 
           // Images display
           if (_isLoading)
             Container(
-              height: 200.h,
+              height: 200.rsh(context),
               alignment: Alignment.center,
               child: const CupertinoActivityIndicator(),
             )
           else
             ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               child: Stack(
                 children: [
                   _buildLayoutWidget(),
 
-                  Positioned(
-                    top: 10.h,
-                    left: 10.w,
-                    child: GestureDetector(
-                      onTap: () {
-                        _openEditSelectedPage(0);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.background.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
+                  if (!kIsWeb)
+                    Positioned(
+                      top: 10.rsh(context),
+                      left: 10.rs(context),
+                      child: GestureDetector(
+                        onTap: () {
+                          _openEditSelectedPage(0);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.rs(context),
+                            vertical: 6.rsh(context),
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.background.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(
+                              12.rsr(context),
+                            ),
+                          ),
 
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.edit,
-                              color: AppColors.textPrimary,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              context.l10n.postEditCount(
-                                widget.selectedAssets.length,
-                              ),
-                              style: TextStyle(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.edit,
                                 color: AppColors.textPrimary,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
+                                size: 16.rsp(context),
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 4.rs(context)),
+                              Text(
+                                context.l10n.postEditCount(
+                                  widget.selectedAssets.length,
+                                ),
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 14.rsp(context),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

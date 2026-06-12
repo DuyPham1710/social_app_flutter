@@ -1,18 +1,18 @@
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_editor_plus/image_editor_plus.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/post/presentation/pages/video_player_screen.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
 
 class EditSelectedImagePage extends StatefulWidget {
-  final List<File> imageFiles;
+  final List<dynamic> imageFiles;
   final int initialIndex;
   final VoidCallback? onAdd;
   final Function(int index)? onRemoveAtIndex;
@@ -52,8 +52,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
     super.dispose();
   }
 
-  // Method to show full screen video player
-  void _showVideoPlayer(File videoFile) {
+  void _showVideoPlayer(dynamic videoFile) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => VideoPlayerScreen(videoData: videoFile),
@@ -61,313 +60,387 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
     );
   }
 
+  Widget _buildMediaWidget(dynamic file) {
+    if (VideoUtil.isVideo(file)) {
+      if (file is File) {
+        return buildVideoThumbnail(file.path);
+      } else if (file.runtimeType.toString() == 'PlatformFile') {
+        try {
+          return buildVideoThumbnail(file.name, videoBytes: file.bytes);
+        } catch (e) {
+          return buildVideoThumbnail(file.name);
+        }
+      }
+    } else {
+      if (file is File) {
+        return Image.file(
+          file,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          key: ValueKey('_'),
+        );
+      } else if (file.runtimeType.toString() == 'PlatformFile') {
+        try {
+          return Image.memory(
+            file.bytes!,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                width: double.infinity,
+                height: 300,
+                color: Colors.grey[300],
+                child: Center(
+                  child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                ),
+              );
+            },
+          );
+        } catch (e) {
+          // Ignore
+        }
+      }
+    }
+    return const SizedBox();
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialIndex = widget.initialIndex;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
+    return Container(
+      color: AppColors.background,
 
-        leading: IconButton(
-          icon: Icon(
-            CupertinoIcons.back,
-            color: AppColors.textPrimary,
-            size: 24.sp,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
 
-        title: Text(
-          context.l10n.postEdit,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
-
-        actions: [
-          Row(
-            children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.w,
-                    vertical: 10.h,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  elevation: 0,
+              leading: IconButton(
+                icon: Icon(
+                  CupertinoIcons.back,
+                  color: AppColors.textPrimary,
+                  size: 24.rsp(context),
                 ),
                 onPressed: () {
-                  // Return danh sách files đã được edit
-                  Navigator.pop(context, widget.imageFiles);
+                  Navigator.pop(context);
                 },
-                child: Text(
-                  context.l10n.commonDone,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
 
-              SizedBox(width: 12.w),
-            ],
-          ),
-        ],
-      ),
+              title: Text(
+                context.l10n.postEdit,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              centerTitle: false,
 
-      body: ScrollablePositionedList.builder(
-        itemScrollController: _scrollController,
-        initialScrollIndex: initialIndex,
-        itemCount: widget.imageFiles.length + 1,
-        itemBuilder: (context, index) {
-          if (index == widget.imageFiles.length) {
-            return _buildButtonAddImage();
-          }
-
-          return Column(
-            children: [
-              Divider(color: AppColors.divider),
-
-              Padding(
-                padding: EdgeInsets.only(bottom: 6.h),
-                child: GestureDetector(
-                  onTap: () {
-                    // Check if it's a video or image and handle accordingly
-                    if (VideoUtil.isVideo(widget.imageFiles[index])) {
-                      _showVideoPlayer(widget.imageFiles[index]);
-                    } else {
-                      // mở ảnh toàn màn hình khi nhấn
-                      //    _showFullScreenImage(context, imageIndex);
-                    }
-                  },
-                  child: Stack(
-                    children: [
-                      Stack(
-                        children: [
-                          // Check if it's video or image and display accordingly
-                          VideoUtil.isVideo(widget.imageFiles[index])
-                              ? buildVideoThumbnail(
-                                  widget.imageFiles[index].path,
-                                )
-                              : Image.file(
-                                  widget.imageFiles[index],
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  key: ValueKey(
-                                    '${widget.imageFiles[index].path}_${widget.imageFiles[index].lastModifiedSync().millisecondsSinceEpoch}',
-                                  ),
-                                ),
-                        ],
+              actions: [
+                Row(
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.rs(context),
+                          vertical: 10.rsh(context),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.rsr(context)),
+                        ),
+                        elevation: 0,
                       ),
+                      onPressed: () {
+                        // Return danh sách files đã được edit
+                        Navigator.pop(context, widget.imageFiles);
+                      },
+                      child: Text(
+                        context.l10n.commonDone,
+                        style: TextStyle(
+                          fontSize: 14.rsp(context),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
 
-                      Positioned(
-                        top: 10.h,
-                        left: 10.w,
-                        child: VideoUtil.isVideo(widget.imageFiles[index])
-                            ? Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
-                                  vertical: 6.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background.withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.videocam,
-                                      color: AppColors.textSecondary,
-                                      size: 16.sp,
-                                    ),
-                                    SizedBox(width: 4.w),
-                                    Text(
-                                      context.l10n.postVideo,
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
+                    SizedBox(width: 12.rs(context)),
+                  ],
+                ),
+              ],
+            ),
+
+            body: ScrollablePositionedList.builder(
+              itemScrollController: _scrollController,
+              initialScrollIndex: initialIndex,
+              itemCount: widget.imageFiles.length + 1,
+              itemBuilder: (context, index) {
+                if (index == widget.imageFiles.length) {
+                  return _buildButtonAddImage();
+                }
+
+                return Column(
+                  children: [
+                    Divider(color: AppColors.divider),
+
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 6.rsh(context)),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Check if it's a video or image and handle accordingly
+                          if (VideoUtil.isVideo(widget.imageFiles[index])) {
+                            _showVideoPlayer(widget.imageFiles[index]);
+                          } else {
+                            // mở ảnh toàn màn hình khi nhấn
+                            //    _showFullScreenImage(context, imageIndex);
+                          }
+                        },
+                        child: Stack(
+                          children: [
+                            Stack(
+                              children: [
+                                // Check if it's video or image and display accordingly
+                                _buildMediaWidget(widget.imageFiles[index]),
+                              ],
+                            ),
+
+                            Positioned(
+                              top: 10.rsh(context),
+                              left: 10.rs(context),
+                              child: VideoUtil.isVideo(widget.imageFiles[index])
+                                  ? Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.rs(context),
+                                        vertical: 6.rsh(context),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : GestureDetector(
-                                onTap: () async {
-                                  try {
-                                    // Đọc dữ liệu byte từ ảnh gốc
-                                    final imageBytes = await widget
-                                        .imageFiles[index]
-                                        .readAsBytes();
-
-                                    // Mở trình chỉnh sửa ảnh
-                                    final editedImage = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ImageEditor(image: imageBytes),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.background.withOpacity(
+                                          0.8,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          12.rsr(context),
+                                        ),
                                       ),
-                                    );
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.videocam,
+                                            color: AppColors.textSecondary,
+                                            size: 16.rsp(context),
+                                          ),
+                                          SizedBox(width: 4.rs(context)),
+                                          Text(
+                                            context.l10n.postVideo,
+                                            style: TextStyle(
+                                              color: AppColors.textSecondary,
+                                              fontSize: 14.rsp(context),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : (kIsWeb
+                                        ? const SizedBox.shrink()
+                                        : GestureDetector(
+                                            onTap: () async {
+                                              try {
+                                                // Đọc dữ liệu byte từ ảnh gốc
+                                                final imageBytes = await widget
+                                                    .imageFiles[index]
+                                                    .readAsBytes();
 
-                                    // Nếu người dùng đã chỉnh sửa xong và quay lại
-                                    if (editedImage != null &&
-                                        editedImage is Uint8List) {
-                                      // Tạo tên file mới với timestamp để tránh cache
-                                      final timestamp =
-                                          DateTime.now().millisecondsSinceEpoch;
-                                      final directory =
-                                          widget.imageFiles[index].parent;
-                                      final fileName = widget
-                                          .imageFiles[index]
-                                          .path
-                                          .split('/')
-                                          .last;
-                                      final nameWithoutExt = fileName
-                                          .split('.')
-                                          .first;
-                                      final extension = fileName
-                                          .split('.')
-                                          .last;
-                                      final newPath =
-                                          '${directory.path}/${nameWithoutExt}_edited_$timestamp.$extension';
+                                                // Mở trình chỉnh sửa ảnh
+                                                final editedImage =
+                                                    await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ImageEditor(
+                                                              image: imageBytes,
+                                                            ),
+                                                      ),
+                                                    );
 
-                                      final newFile = File(newPath);
+                                                // Nếu người dùng đã chỉnh sửa xong và quay lại
+                                                if (editedImage != null &&
+                                                    editedImage is Uint8List) {
+                                                  // Tạo tên file mới với timestamp để tránh cache
+                                                  final timestamp = DateTime.now()
+                                                      .millisecondsSinceEpoch;
+                                                  final directory = widget
+                                                      .imageFiles[index]
+                                                      .parent;
+                                                  final fileName = widget
+                                                      .imageFiles[index]
+                                                      .path
+                                                      .split('/')
+                                                      .last;
+                                                  final nameWithoutExt =
+                                                      fileName.split('.').first;
+                                                  final extension = fileName
+                                                      .split('.')
+                                                      .last;
+                                                  final newPath =
+                                                      '${directory.path}/${nameWithoutExt}_edited_$timestamp.$extension';
 
-                                      // Ghi ảnh đã chỉnh sửa vào file mới
-                                      await newFile.writeAsBytes(editedImage);
+                                                  final newFile = File(newPath);
 
-                                      // Clear image cache để force reload
-                                      imageCache.clear();
-                                      imageCache.clearLiveImages();
+                                                  // Ghi ảnh đã chỉnh sửa vào file mới
+                                                  await newFile.writeAsBytes(
+                                                    editedImage,
+                                                  );
 
-                                      setState(() {
-                                        // Cập nhật với file mới
-                                        widget.imageFiles[index] = newFile;
-                                      });
-                                      widget.onImageEdited?.call(
-                                        index,
-                                        newFile,
-                                      );
-                                    }
-                                  } catch (e) {
-                                    print("Lỗi khi chỉnh sửa ảnh: $e");
-                                  }
+                                                  // Clear image cache để force reload
+                                                  imageCache.clear();
+                                                  imageCache.clearLiveImages();
+
+                                                  setState(() {
+                                                    // Cập nhật với file mới
+                                                    widget.imageFiles[index] =
+                                                        newFile;
+                                                  });
+                                                  widget.onImageEdited?.call(
+                                                    index,
+                                                    newFile,
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                print(
+                                                  "Lỗi khi chỉnh sửa ảnh: $e",
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 10.rs(context),
+                                                vertical: 6.rsh(context),
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.background
+                                                    .withOpacity(0.8),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      12.rsr(context),
+                                                    ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.edit,
+                                                    color:
+                                                        AppColors.textPrimary,
+                                                    size: 16.rsp(context),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 4.rs(context),
+                                                  ),
+                                                  Text(
+                                                    context.l10n.postEdit,
+                                                    style: TextStyle(
+                                                      color:
+                                                          AppColors.textPrimary,
+                                                      fontSize: 14.rsp(context),
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )),
+                            ),
+
+                            Positioned(
+                              top: 10.rsh(context),
+                              right: 10.rs(context),
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    widget.imageFiles.removeAt(index);
+                                  });
+                                  widget.onRemoveAtIndex?.call(index);
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 6.h,
-                                  ),
+                                  padding: EdgeInsets.all(6.rs(context)),
                                   decoration: BoxDecoration(
                                     color: AppColors.background.withOpacity(
                                       0.8,
                                     ),
-                                    borderRadius: BorderRadius.circular(12.r),
+                                    shape: BoxShape.circle,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit,
-                                        color: AppColors.textPrimary,
-                                        size: 16.sp,
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        context.l10n.postEdit,
-                                        style: TextStyle(
-                                          color: AppColors.textPrimary,
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
+                                  child: Icon(
+                                    Icons.close,
+                                    color: AppColors.textPrimary,
+                                    size: 18.rsp(context),
                                   ),
                                 ),
                               ),
-                      ),
+                            ),
 
-                      Positioned(
-                        top: 10.h,
-                        right: 10.w,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              widget.imageFiles.removeAt(index);
-                            });
-                            widget.onRemoveAtIndex?.call(index);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(6.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.background.withOpacity(0.8),
-                              shape: BoxShape.circle,
+                            /// Số thứ tự ảnh
+                            Positioned(
+                              right: 8.rs(context),
+                              bottom: 8.rsh(context),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.rs(context),
+                                  vertical: 4.rsh(context),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.background.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(
+                                    12.rsr(context),
+                                  ),
+                                ),
+                                child: Text(
+                                  '${index + 1}/${widget.imageFiles.length}',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 12.rsp(context),
+                                  ),
+                                ),
+                              ),
                             ),
-                            child: Icon(
-                              Icons.close,
-                              color: AppColors.textPrimary,
-                              size: 18.sp,
-                            ),
-                          ),
+                          ],
                         ),
                       ),
+                    ),
 
-                      /// Số thứ tự ảnh
-                      Positioned(
-                        right: 8.w,
-                        bottom: 8.h,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 4.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.background.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Text(
-                            '${index + 1}/${widget.imageFiles.length}',
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 12.sp,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              _buildCaptionInput(index),
-            ],
-          );
-        },
+                    _buildCaptionInput(index),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Padding _buildButtonAddImage() {
     return Padding(
-      padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 24.h),
+      padding: EdgeInsets.fromLTRB(
+        12.rs(context),
+        8.rsh(context),
+        12.rs(context),
+        24.rsh(context),
+      ),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.background,
-          padding: EdgeInsets.symmetric(vertical: 14.h),
+          padding: EdgeInsets.symmetric(vertical: 14.rsh(context)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(12.rsr(context)),
             side: BorderSide(color: AppColors.primary, width: 2),
           ),
           elevation: 0,
@@ -376,13 +449,13 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
         icon: Icon(
           CupertinoIcons.photo_on_rectangle,
           color: AppColors.primary,
-          size: 22.sp,
+          size: 22.rsp(context),
         ),
         label: Text(
           context.l10n.postAddPhotoVideo,
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 16.sp,
+            fontSize: 16.rsp(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -392,21 +465,30 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
 
   Widget _buildCaptionInput(int index) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 2.rsh(context),
+      ),
       child: TextField(
         controller: _captionControllers[index],
-        style: TextStyle(color: AppColors.textPrimary, fontSize: 15.sp),
+        style: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 15.rsp(context),
+        ),
         decoration: InputDecoration(
           hintText: context.l10n.postAddCaptionHint,
-          hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
+          hintStyle: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 13.rsp(context),
+          ),
           filled: true,
           fillColor: AppColors.background.withOpacity(0.5),
           contentPadding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-            vertical: 10.h,
+            horizontal: 12.rs(context),
+            vertical: 10.rsh(context),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: BorderRadius.circular(8.rsr(context)),
             borderSide: BorderSide.none,
           ),
         ),

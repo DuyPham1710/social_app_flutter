@@ -117,154 +117,162 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      endDrawer: ProfileMenuDrawer(onLogout: _showLogoutDialog),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: ResponsiveHelper.feedMaxWidth,
-          ),
-          child: BlocConsumer<ProfileBloc, ProfileState>(
-            listener: (context, state) {
-              if (state is ProfileError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(context.l10n.profileLoadPostsError)),
-                );
-              }
-            },
-            builder: (context, state) {
-              final posts = state.posts ?? [];
-              final UserEntity? user = state.user;
-              if (state is ProfileError && user == null) {
-                return _fadeContent(
-                  key: 'profile-error',
-                  child: _buildErrorProfile(
-                    state.errorMessage ?? context.l10n.profileLoadError,
-                  ),
-                );
-              }
+    return Container(
+      color: AppColors.background,
+      child: Center(
+        child: ClipRect(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
+            ),
+            child: Scaffold(
+              backgroundColor: AppColors.background,
+              endDrawer: ProfileMenuDrawer(onLogout: _showLogoutDialog),
+              body: BlocConsumer<ProfileBloc, ProfileState>(
+                listener: (context, state) {
+                  if (state is ProfileError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(context.l10n.profileLoadPostsError),
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  final posts = state.posts ?? [];
+                  final UserEntity? user = state.user;
+                  if (state is ProfileError && user == null) {
+                    return _fadeContent(
+                      key: 'profile-error',
+                      child: _buildErrorProfile(
+                        state.errorMessage ?? context.l10n.profileLoadError,
+                      ),
+                    );
+                  }
 
-              if (user == null) {
-                return _fadeContent(
-                  key: 'profile-loading',
-                  child: _buildLoadingProfile(),
-                );
-              }
-              return _fadeContent(
-                key: 'profile-loaded-${user.userId}',
-                child: RefreshIndicator(
-                  color: AppColors.primary,
-                  backgroundColor: AppColors.background,
-                  onRefresh: () async {
-                    _loadData();
-                    // Cho animation refresh mượt hơn
-                    await Future.delayed(const Duration(milliseconds: 300));
-                  },
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      // Header
-                      SliverAppBar(
-                        surfaceTintColor: Colors.transparent,
-                        pinned: true,
-                        backgroundColor: AppColors.background,
-                        elevation: 0,
-                        title: Text(
-                          context.l10n.profileTitle,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        actions: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.search,
-                              color: AppColors.iconPrimary,
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SearchPage(),
-                                ),
-                              );
-                            },
-                          ),
-                          Builder(
-                            builder: (context) => IconButton(
-                              tooltip: context.l10n.menuTitle,
-                              icon: Icon(
-                                Icons.menu_rounded,
-                                color: AppColors.iconPrimary,
+                  if (user == null) {
+                    return _fadeContent(
+                      key: 'profile-loading',
+                      child: _buildLoadingProfile(),
+                    );
+                  }
+                  return _fadeContent(
+                    key: 'profile-loaded-${user.userId}',
+                    child: RefreshIndicator(
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.background,
+                      onRefresh: () async {
+                        _loadData();
+                        await Future.delayed(const Duration(milliseconds: 300));
+                      },
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        slivers: [
+                          // Header
+                          SliverAppBar(
+                            surfaceTintColor: Colors.transparent,
+                            pinned: true,
+                            backgroundColor: AppColors.background,
+                            elevation: 0,
+                            title: Text(
+                              context.l10n.profileTitle,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
                               ),
-                              onPressed: () {
-                                Scaffold.of(context).openEndDrawer();
-                              },
                             ),
+                            actions: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.search,
+                                  color: AppColors.iconPrimary,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SearchPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Builder(
+                                builder: (context) => IconButton(
+                                  tooltip: context.l10n.menuTitle,
+                                  icon: Icon(
+                                    Icons.menu_rounded,
+                                    color: AppColors.iconPrimary,
+                                  ),
+                                  onPressed: () {
+                                    Scaffold.of(context).openEndDrawer();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
                           ),
-                          const SizedBox(width: 8),
+
+                          // Nội dung
+                          SliverList(
+                            delegate: SliverChildListDelegate([
+                              ProfileHeader(
+                                user: user,
+                                isLoading: state.isUserLoading,
+                              ),
+                              ProfileActions(
+                                onTapEdit: () async {
+                                  final profileBloc = context
+                                      .read<ProfileBloc>();
+
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider.value(
+                                        value: profileBloc,
+                                        child: ProfileEditPage(user: user),
+                                      ),
+                                    ),
+                                  );
+                                  if (context.mounted) {
+                                    context.read<ProfileBloc>().add(
+                                      const LoadUserProfileEvent(),
+                                    );
+                                  }
+                                },
+                              ),
+                              ProfileInfo(user: user),
+                              const Divider(),
+                              FriendListWidget(
+                                onViewAll: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const FriendsListPage(),
+                                    ),
+                                  );
+                                  _loadData();
+                                },
+                              ),
+                              const Divider(),
+                              const SizedBox(height: 12),
+
+                              CreatePostWidget(
+                                avatarUrl: user.avatarUrl,
+                                onCreatePost: () => _handleOpenCreatePost(),
+                              ),
+                              const Divider(),
+                              _buildPostsSection(state, posts),
+                            ]),
+                          ),
                         ],
                       ),
-
-                      // Nội dung
-                      SliverList(
-                        delegate: SliverChildListDelegate([
-                          ProfileHeader(
-                            user: user,
-                            isLoading: state.isUserLoading,
-                          ),
-                          ProfileActions(
-                            onTapEdit: () async {
-                              // 1. Lấy instance của ProfileBloc hiện tại TRƯỚC khi chuyển trang
-                              final profileBloc = context.read<ProfileBloc>();
-
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => BlocProvider.value(
-                                    value: profileBloc,
-                                    child: ProfileEditPage(user: user),
-                                  ),
-                                ),
-                              );
-                              if (context.mounted) {
-                                context.read<ProfileBloc>().add(
-                                  const LoadUserProfileEvent(),
-                                );
-                              }
-                            },
-                          ),
-                          ProfileInfo(user: user),
-                          const Divider(),
-                          FriendListWidget(
-                            onViewAll: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const FriendsListPage(),
-                                ),
-                              );
-                              _loadData();
-                            },
-                          ),
-                          const Divider(),
-                          const SizedBox(height: 12),
-
-                          CreatePostWidget(
-                            avatarUrl: user.avatarUrl,
-                            onCreatePost: () => _handleOpenCreatePost(),
-                          ),
-                          const Divider(),
-                          _buildPostsSection(state, posts),
-                        ]),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),

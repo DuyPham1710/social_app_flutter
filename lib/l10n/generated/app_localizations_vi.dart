@@ -3253,4 +3253,17 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reactionAngry => 'Phẫn nộ';
+
+  @override
+  String get storyAddMediaFromComputer => 'Thêm ảnh/video từ máy tính';
+
+  @override
+  String get storySelectFile => 'Chọn tệp';
+
+  @override
+  String get storyWebImageEditNotSupported =>
+      'Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web';
+
+  @override
+  String get commonImageOnlySupport => 'Chỉ hỗ trợ file ảnh';
 }

@@ -1,13 +1,13 @@
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:lottie/lottie.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
-import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/create_conversation_usecase.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/send_message_usecase.dart';
@@ -133,7 +133,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
               content: Row(
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
                   const Text('Đã gửi phản hồi tin'),
                 ],
               ),
@@ -141,7 +141,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 2),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(10.rsr(context)),
               ),
             ),
           );
@@ -218,76 +218,80 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: 16.h,
-      child: Listener(
-        // Sử dụng Listener để bắt pointer events và ngăn propagation
-        onPointerDown: (_) {
-          // Ngăn event propagation lên parent
-        },
+      bottom: 16.rsh(context),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {}, // Blocks taps from propagating to the parent
         child: SizedBox(
-          height: 44.h, // Chiều cao cố định cho cả thanh cuộn
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(
-              horizontal: 12.w,
-            ), // Padding cho 2 đầu
-            children: [
-              SizedBox(
-                width: 230.w,
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(24.r),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: widget.textController,
-                          focusNode: _focusNode,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.textPrimary,
-                          ),
-                          textInputAction: TextInputAction.send,
-                          onSubmitted: (value) => _sendStoryReply(context),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Gửi tin nhắn...',
-                            hintStyle: TextStyle(
-                              color: AppColors.textSecondary,
-                            ), // Màu xám nhạt
+          height: 44.rs(context), // Set height to match the reaction emojis
+          child: ScrollConfiguration(
+            behavior: MouseDragScrollBehavior(),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(
+                horizontal: 12.rs(context),
+              ), // Padding cho 2 đầu
+              children: [
+              Center(
+                child: SizedBox(
+                  width: 230.rs(context),
+                  height: 40.rsh(context), // Keep text field height neat
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(24.rsr(context)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: widget.textController,
+                            focusNode: _focusNode,
+                            cursorColor: AppColors.primary,
+                            style: TextStyle(
+                              fontSize: 14.rsp(context),
+                              color: AppColors.textPrimary,
+                            ),
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (value) => _sendStoryReply(context),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Gửi tin nhắn...',
+                              hintStyle: TextStyle(
+                                color: AppColors.textSecondary,
+                              ), // Màu xám nhạt
+                            ),
                           ),
                         ),
-                      ),
-                      if (_showSendButton)
-                        GestureDetector(
-                          onTap: _isSending
-                              ? null
-                              : () => _sendStoryReply(context),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 4.w),
-                            child: _isSending
-                                ? SizedBox(
-                                    width: 16.w,
-                                    height: 16.w,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.primary,
+                        if (_showSendButton)
+                          GestureDetector(
+                            onTap: _isSending
+                                ? null
+                                : () => _sendStoryReply(context),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 4.rs(context)),
+                              child: _isSending
+                                  ? SizedBox(
+                                      width: 16.rs(context),
+                                      height: 16.rs(context),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          AppColors.primary,
+                                        ),
                                       ),
+                                    )
+                                  : Icon(
+                                      Icons.send_rounded,
+                                      color: AppColors.primary,
+                                      size: 20.rsp(context),
                                     ),
-                                  )
-                                : Icon(
-                                    Icons.send_rounded,
-                                    color: AppColors.primary,
-                                    size: 20.sp,
-                                  ),
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -296,36 +300,38 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                 final isReacted = _selectedReact == emoji;
                 return Padding(
                   // Thêm padding bên trái cho mỗi icon để tạo khoảng cách
-                  padding: EdgeInsets.only(left: 8.w),
-                  child: _IconReaction(
-                    emoji: emoji,
-                    storyId: widget.story.id,
-                    isReacted: isReacted,
-                    onTap: (details) {
-                      setState(() {
-                        if (isReacted) {
-                          _selectedReact = null;
-                        } else {
-                          _selectedReact = emoji;
+                  padding: EdgeInsets.only(left: 8.rs(context)),
+                  child: Center(
+                    child: _IconReaction(
+                      emoji: emoji,
+                      storyId: widget.story.id,
+                      isReacted: isReacted,
+                      onTap: (details) {
+                        setState(() {
+                          if (isReacted) {
+                            _selectedReact = null;
+                          } else {
+                            _selectedReact = emoji;
+                          }
+                        });
+
+                        if (_selectedReact == emoji) {
+                          _spawnFloatingEmojiBurst(
+                            context,
+                            details.globalPosition,
+                            emoji.icon,
+                          );
                         }
-                      });
 
-                      if (_selectedReact == emoji) {
-                        _spawnFloatingEmojiBurst(
-                          context,
-                          details.globalPosition,
-                          emoji.icon,
+                        // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
+                        context.read<HomeStoriesBloc>().add(
+                          ReactStoryEvent(
+                            storyId: widget.story.id,
+                            emojiId: emoji.id,
+                          ),
                         );
-                      }
-
-                      // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
-                      context.read<HomeStoriesBloc>().add(
-                        ReactStoryEvent(
-                          storyId: widget.story.id,
-                          emojiId: emoji.id,
-                        ),
-                      );
-                    },
+                      },
+                    ),
                   ),
                 );
               }),
@@ -333,8 +339,18 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
           ),
         ),
       ),
+    ),
     );
   }
+}
+
+class MouseDragScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+      };
 }
 
 // Widget phụ trợ cho icon, chỉ dùng trong file này
@@ -361,12 +377,12 @@ class _IconReaction extends StatelessWidget {
         alignment: Alignment.topRight,
         children: [
           Container(
-            width: 65.w,
-            height: 65.w,
-            padding: EdgeInsets.all(1.w),
+            width: 65.rs(context),
+            height: 65.rs(context),
+            padding: EdgeInsets.all(1.rs(context)),
             decoration: BoxDecoration(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
             ),
             child: Lottie.asset(
               emoji.lottieAsset,
@@ -376,15 +392,18 @@ class _IconReaction extends StatelessWidget {
           ),
           if (isReacted)
             Positioned(
-              top: 2.w,
-              right: 2.w,
+              top: 2.rs(context),
+              right: 2.rs(context),
               child: Container(
-                width: 10.w,
-                height: 10.w,
+                width: 10.rs(context),
+                height: 10.rs(context),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5.w),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 1.5.rs(context),
+                  ),
                 ),
               ),
             ),

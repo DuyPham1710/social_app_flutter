@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/react_story_entity.dart';
@@ -104,15 +103,15 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
+          topLeft: Radius.circular(20.rsr(context)),
+          topRight: Radius.circular(20.rsr(context)),
         ),
       ),
       child: Column(
         children: [
           // Header
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(horizontal: 16.rs(context), vertical: 12.rsh(context)),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: AppColors.divider, width: 1),
@@ -132,7 +131,7 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
                     context.l10n.storyReactedPeople,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 16.sp,
+                      fontSize: 16.rsp(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -149,9 +148,9 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
             indicatorColor: AppColors.primary,
             labelColor: AppColors.primary,
             unselectedLabelColor: AppColors.textSecondary,
-            labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+            labelStyle: TextStyle(fontSize: 14.rsp(context), fontWeight: FontWeight.w600),
             unselectedLabelStyle: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14.rsp(context),
               fontWeight: FontWeight.normal,
             ),
             dividerColor: AppColors.divider,
@@ -164,13 +163,13 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
                   children: [
                     Text(
                       context.l10n.commonAll,
-                      style: TextStyle(fontSize: 14.sp),
+                      style: TextStyle(fontSize: 14.rsp(context)),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 8.rs(context)),
                     Text(
                       totalCount.toString(),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -185,12 +184,12 @@ class _StoryReactsBottomSheetState extends State<StoryReactsBottomSheet>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(emoji.icon, style: TextStyle(fontSize: 16.sp)),
-                      SizedBox(width: 8.w),
+                      Text(emoji.icon, style: TextStyle(fontSize: 16.rsp(context))),
+                      SizedBox(width: 8.rs(context)),
                       Text(
                         count.toString(),
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14.rsp(context),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

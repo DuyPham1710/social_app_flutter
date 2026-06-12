@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
@@ -20,6 +21,8 @@ class CreatePostModel with _$CreatePostModel {
     List<String>? friendsDetail,
     List<String>? taggedUserIds,
     String? communityId,
+    @JsonKey(ignore: true) List<Uint8List>? fileBytesList,
+    @JsonKey(ignore: true) List<String>? fileNames,
   }) = _CreatePostModel;
 
   factory CreatePostModel.fromJson(Map<String, dynamic> json) =>
@@ -38,6 +41,8 @@ class CreatePostModel with _$CreatePostModel {
       friendsDetail: entity.friendsDetail,
       taggedUserIds: entity.taggedUserIds,
       communityId: entity.communityId,
+      fileBytesList: entity.fileBytesList,
+      fileNames: entity.fileNames,
     );
   }
 }

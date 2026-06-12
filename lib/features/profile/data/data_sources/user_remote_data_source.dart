@@ -28,7 +28,7 @@ abstract class UserRemoteDataSource {
     @Part(name: 'hometown') String? hometown,
     @Part(name: 'workplace') String? workplace,
     @Part(name: 'relationshipStatus') String? relationshipStatus,
-    @Part(name: 'file') File? avatarFile,
-    @Part(name: 'cover') File? coverFile,
+    @Part(name: 'file') List<MultipartFile>? avatarFile,
+    @Part(name: 'cover') List<MultipartFile>? coverFile,
   });
 }

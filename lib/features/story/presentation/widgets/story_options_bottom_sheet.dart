@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -50,7 +49,7 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
   final StoryRepository _storyRepository = s1<StoryRepository>();
   bool _isDeleting = false;
 
-  Future<void> _deleteStory(BuildContext context) async {
+  Future<void> _deleteStory() async {
     final storyId = widget.currentGroup.stories[widget.currentStoryIndex].id;
 
     // Hiển thị dialog xác nhận
@@ -96,49 +95,50 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
     try {
       final result = await _storyRepository.deleteStory(storyId: storyId);
 
-      if (mounted) {
-        Navigator.pop(context); // Đóng bottom sheet
+      if (!mounted) return;
 
-        if (result is DataStateSuccess) {
-          // Reload danh sách story trước khi đóng story viewer
-          // HomeStoriesBloc được provide ở main.dart nên có thể truy cập từ bất kỳ context nào
-          try {
-            // Sử dụng rootNavigator để tìm context có HomeStoriesBloc
-            final navigator = Navigator.of(context, rootNavigator: false);
-            final rootContext = navigator.context;
-            final homeStoriesBloc = rootContext.read<HomeStoriesBloc>();
-            homeStoriesBloc.add(const LoadHomeStoriesEvent(page: 1, limit: 10));
-          } catch (e) {
-            // Nếu không tìm thấy, thử tìm trong context hiện tại
-            try {
-              final homeStoriesBloc = context.read<HomeStoriesBloc>();
-              homeStoriesBloc.add(
-                const LoadHomeStoriesEvent(page: 1, limit: 10),
-              );
-            } catch (_) {
-              // Nếu vẫn không tìm thấy, không sao - story đã được xóa trên server
-              // Khi user quay lại trang home, story sẽ tự động không còn trong danh sách
-            }
-          }
+      final navigator = Navigator.of(context);
+      final l10n = context.l10n;
 
-          // Đóng story viewer và quay về màn hình trước
-          Navigator.of(context).pop();
+      HomeStoriesBloc? homeStoriesBloc;
+      try {
+        homeStoriesBloc = context.read<HomeStoriesBloc>();
+      } catch (_) {}
 
-          // Hiển thị thông báo thành công
-          showSuccessSnackBar(context, context.l10n.storyDeleted);
-        } else if (result is DataStateError) {
+      if (result is DataStateSuccess) {
+        navigator.pop(); // Đóng bottom sheet
+
+        if (homeStoriesBloc != null) {
+          homeStoriesBloc.add(const LoadHomeStoriesEvent(page: 1, limit: 10));
+        }
+
+        navigator.pop(); // Đóng story viewer
+
+        if (navigator.mounted) {
+          showSuccessSnackBar(navigator.context, l10n.storyDeleted);
+        }
+      } else if (result is DataStateError) {
+        navigator.pop(); // Đóng bottom sheet
+        if (navigator.mounted) {
           showErrorSnackBar(
-            context,
-            context.l10n.commonErrorWithMessage(
-              result.error?.message ?? context.l10n.storyDeleteFailed,
+            navigator.context,
+            l10n.commonErrorWithMessage(
+              result.error?.message ?? l10n.storyDeleteFailed,
             ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        Navigator.pop(context);
-        showErrorSnackBar(context, context.l10n.commonErrorWithMessage('$e'));
+        final navigator = Navigator.of(context);
+        final l10n = context.l10n;
+        navigator.pop(); // Đóng bottom sheet
+        if (navigator.mounted) {
+          showErrorSnackBar(
+            navigator.context,
+            l10n.commonErrorWithMessage('$e'),
+          );
+        }
       }
     } finally {
       if (mounted) {
@@ -155,24 +155,24 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
+          topLeft: Radius.circular(20.rsr(context)),
+          topRight: Radius.circular(20.rsr(context)),
         ),
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 12.h),
+            SizedBox(height: 12.rsh(context)),
             Container(
-              width: 40.w,
-              height: 4.h,
+              width: 40.rs(context),
+              height: 4.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2.r),
+                borderRadius: BorderRadius.circular(2.rsr(context)),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 20.rsh(context)),
             StoryOptionItemWidget(
               icon: Icons.lock_outline,
               title: context.l10n.storyEditPrivacy,
@@ -199,9 +199,9 @@ class _StoryOptionsBottomSheetState extends State<StoryOptionsBottomSheet> {
             StoryOptionItemWidget(
               icon: Icons.delete_outline,
               title: context.l10n.storyDeletePhoto,
-              onTap: _isDeleting ? null : () => _deleteStory(context),
+              onTap: _isDeleting ? null : _deleteStory,
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 20.rsh(context)),
           ],
         ),
       ),

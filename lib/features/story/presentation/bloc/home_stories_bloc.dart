@@ -120,7 +120,7 @@ class HomeStoriesBloc extends Bloc<HomeStoriesEvent, HomeStoriesState> {
     final dataState = await deleteReactStoryUsecase(
       params: DeleteReactStoryParams(storyId: event.storyId),
     );
-    if (dataState != null) {
+    if (dataState.error == null) {
       emit(ReactStorySuccess(event.storyId));
       // Reload stories để cập nhật react count
       add(const LoadHomeStoriesEvent(page: 1, limit: 10));

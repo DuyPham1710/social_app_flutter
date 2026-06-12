@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/story/data/models/grouped_story_list_model.dart';
 import 'package:social_app_fe/features/story/data/models/react_story_model.dart';
-import 'package:retrofit/http.dart';
 
 part 'story_remote_data_source.g.dart';
 

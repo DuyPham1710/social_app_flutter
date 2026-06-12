@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:social_app_fe/core/enums/media_type.dart';
@@ -7,6 +8,7 @@ import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_
 import 'package:social_app_fe/features/story/presentation/widgets/story_background_widget.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_footer_widget.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_header_widget.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/story_nav_arrow_button.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_react_count_widget.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_reacts_bottom_sheet.dart';
 
@@ -270,10 +272,13 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   }
 
   void _onTapDown(TapDownDetails details) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-    final dx = details.globalPosition.dx;
-    final dy = details.globalPosition.dy;
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    final localPos = renderBox.globalToLocal(details.globalPosition);
+    final width = renderBox.size.width;
+    final height = renderBox.size.height;
+    final dx = localPos.dx;
+    final dy = localPos.dy;
 
     final isOwnStory = _currentStory.user.userId == _currentUserId;
     final footerHeight = 80.0; // Chiều cao ước tính của footer area
@@ -293,184 +298,240 @@ class _StoryViewerPageState extends State<StoryViewerPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapDown: _onTapDown,
-          onLongPressStart: (_) {
-            _controller.stop();
-            _audioPlayer.pause();
-          },
-          onLongPressEnd: (_) {
-            _controller.forward();
-            _audioPlayer.resume();
-          },
-          onVerticalDragStart: (_) {
-            _controller.stop();
-            _audioPlayer.pause();
-          },
-          onHorizontalDragStart: (_) {
-            _controller.stop();
-            _audioPlayer.pause();
-          },
-          onVerticalDragUpdate: (details) {
-            setState(() {
-              //  _dragOffset sẽ theo dõi cả kéo lên (dy < 0) và kéo xuống (dy > 0)
-              _dragOffset = Offset(0, _dragOffset.dy + details.delta.dy);
-            });
-          },
-          onHorizontalDragUpdate: (details) {
-            setState(() {
-              _horizontalOffset += details.delta.dx;
-            });
-          },
-          onVerticalDragEnd: (details) {
-            final screenSize = MediaQuery.of(context).size;
+    final canGoPrev = _currentStoryIndex > 0 || _currentGroupIndex > 0;
+    final canGoNext =
+        _currentStoryIndex < _currentGroup.stories.length - 1 ||
+        _currentGroupIndex < widget.groups.length - 1;
 
-            // Thoát nếu kéo đủ xa (lên hoặc xuống) HOẶC vuốt đủ nhanh (lên hoặc xuống)
-            if (_dragOffset.dy.abs() > screenSize.height / 4 ||
-                (details.primaryVelocity ?? 0).abs() > 300) {
-              _close();
-            } else {
-              // Nếu không, trả về vị trí cũ và chạy lại story
-              setState(() {
-                _dragOffset = Offset.zero;
-              });
-              _controller.forward();
-              _audioPlayer.resume();
-            }
-          },
-          onHorizontalDragEnd: (details) {
-            final screenSize = MediaQuery.of(context).size;
-            final dx = _horizontalOffset;
-            final vx = details.primaryVelocity ?? 0;
-            // threshold: swipe more than 20% width or velocity
-            final threshold = screenSize.width * 0.2;
-            if (dx.abs() > threshold || vx.abs() > 300) {
-              if (dx < 0 || vx < 0) {
-                // swiped left -> go to next group
-                if (_currentGroupIndex < widget.groups.length - 1) {
-                  setState(() {
-                    _slideDirection = 1.0;
-                    _currentGroupIndex++;
-                    _currentStoryIndex = 0;
-                  });
-                  _resetAndPlay();
-                } else {
-                  _close();
-                }
-              } else if (dx > 0 || vx > 0) {
-                // swiped right -> previous group
-                if (_currentGroupIndex > 0) {
-                  setState(() {
-                    _slideDirection = -1.0;
-                    _currentGroupIndex--;
-                    _currentStoryIndex =
-                        widget.groups[_currentGroupIndex].stories.length - 1;
-                  });
-                  _resetAndPlay();
-                } else {
-                  // at first group, reset
-                  _resetAndPlay();
-                }
-              }
-            } else {
-              // not a full swipe - reset offset
-              setState(() {
-                _horizontalOffset = 0.0;
-              });
-              _controller.forward();
-              _audioPlayer.resume();
-            }
-            // reset offset after handling
-            setState(() {
-              _horizontalOffset = 0.0;
-            });
-          },
-          child: Transform.translate(
-            offset: Offset(_horizontalOffset, _dragOffset.dy),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                // Hiệu ứng cho widget mới đi vào
-                final inAnimation = Tween<Offset>(
-                  begin: Offset(_slideDirection, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        children: [
+          // Story content chính
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 450),
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                body: SafeArea(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapDown: _onTapDown,
+                    onLongPressStart: (_) {
+                      _controller.stop();
+                      _audioPlayer.pause();
+                    },
+                    onLongPressEnd: (_) {
+                      _controller.forward();
+                      _audioPlayer.resume();
+                    },
+                    onVerticalDragStart: (_) {
+                      _controller.stop();
+                      _audioPlayer.pause();
+                    },
+                    onHorizontalDragStart: (_) {
+                      _controller.stop();
+                      _audioPlayer.pause();
+                    },
+                    onVerticalDragUpdate: (details) {
+                      setState(() {
+                        _dragOffset = Offset(
+                          0,
+                          _dragOffset.dy + details.delta.dy,
+                        );
+                      });
+                    },
+                    onHorizontalDragUpdate: (details) {
+                      setState(() {
+                        _horizontalOffset += details.delta.dx;
+                      });
+                    },
+                    onVerticalDragEnd: (details) {
+                      final renderBox =
+                          context.findRenderObject() as RenderBox?;
+                      final height =
+                          renderBox?.size.height ??
+                          MediaQuery.of(context).size.height;
 
-                // Hiệu ứng cho widget cũ đi ra
-                final outAnimation = Tween<Offset>(
-                  begin: Offset(-_slideDirection, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
-
-                // Áp dụng hiệu ứng dựa trên key
-                if (child.key == ValueKey<int>(_currentGroupIndex)) {
-                  return SlideTransition(position: inAnimation, child: child);
-                } else {
-                  return SlideTransition(position: outAnimation, child: child);
-                }
-              },
-
-              child: Stack(
-                key: ValueKey<int>(_currentGroupIndex),
-                children: [
-                  // Media
-                  StoryBackgroundWidget(
-                    key: ValueKey(
-                      '${_currentGroupIndex}_${_currentStoryIndex}_${_currentStory.mediaUrl}',
-                    ),
-                    mediaUrl: _currentStory.mediaUrl,
-                    mediaType: _currentStory.mediaType,
-                    dragOffset: _dragOffset,
-                    shouldPlay: true,
-                    onVideoDurationChanged: _onVideoDurationChanged,
-                  ),
-
-                  // Header
-                  StoryHeaderWidget(
-                    animationController: _controller,
-                    currentGroup: _currentGroup,
-                    currentStoryIndex: _currentStoryIndex,
-                    onClose: _close,
-                    currentUserId: _currentUserId,
-                  ),
-
-                  // Bottom: comment input + reactions (chỉ hiển thị khi không phải story của chính mình)
-                  StoryFooterWidget(
-                    textController: _textController,
-                    story: _currentStory,
-                    currentUserId: _currentUserId,
-                    isOwnStory: _currentStory.user.userId == _currentUserId,
-                    onFocusChanged: (hasFocus) {
-                      if (hasFocus) {
-                        _controller.stop();
-                        _audioPlayer.pause();
+                      if (_dragOffset.dy.abs() > height / 4 ||
+                          (details.primaryVelocity ?? 0).abs() > 300) {
+                        _close();
                       } else {
+                        setState(() {
+                          _dragOffset = Offset.zero;
+                        });
                         _controller.forward();
                         _audioPlayer.resume();
                       }
                     },
-                  ),
+                    onHorizontalDragEnd: (details) {
+                      final renderBox =
+                          context.findRenderObject() as RenderBox?;
+                      final width =
+                          renderBox?.size.width ??
+                          MediaQuery.of(context).size.width;
+                      final dx = _horizontalOffset;
+                      final vx = details.primaryVelocity ?? 0;
+                      final threshold = width * 0.2;
+                      if (dx.abs() > threshold || vx.abs() > 300) {
+                        if (dx < 0 || vx < 0) {
+                          if (_currentGroupIndex < widget.groups.length - 1) {
+                            setState(() {
+                              _slideDirection = 1.0;
+                              _currentGroupIndex++;
+                              _currentStoryIndex = 0;
+                            });
+                            _resetAndPlay();
+                          } else {
+                            _close();
+                          }
+                        } else if (dx > 0 || vx > 0) {
+                          if (_currentGroupIndex > 0) {
+                            setState(() {
+                              _slideDirection = -1.0;
+                              _currentGroupIndex--;
+                              _currentStoryIndex =
+                                  widget
+                                      .groups[_currentGroupIndex]
+                                      .stories
+                                      .length -
+                                  1;
+                            });
+                            _resetAndPlay();
+                          } else {
+                            _resetAndPlay();
+                          }
+                        }
+                      } else {
+                        setState(() {
+                          _horizontalOffset = 0.0;
+                        });
+                        _controller.forward();
+                        _audioPlayer.resume();
+                      }
+                      setState(() {
+                        _horizontalOffset = 0.0;
+                      });
+                    },
+                    child: Transform.translate(
+                      offset: Offset(_horizontalOffset, _dragOffset.dy),
+                      child: ClipRect(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder: (child, animation) {
+                            final inAnimation = Tween<Offset>(
+                              begin: Offset(_slideDirection, 0.0),
+                              end: Offset.zero,
+                            ).animate(animation);
 
-                  // Hiển thị số lượng react ở góc trái dưới cho story của chính mình
-                  if (_currentStory.user.userId == _currentUserId)
-                    StoryReactCountWidget(
-                      story: _currentStory,
-                      onTap: () {
-                        StoryReactsBottomSheet.show(
-                          context,
-                          story: _currentStory,
-                        );
-                      },
+                            final outAnimation = Tween<Offset>(
+                              begin: Offset(-_slideDirection, 0.0),
+                              end: Offset.zero,
+                            ).animate(animation);
+
+                            if (child.key ==
+                                ValueKey<int>(_currentGroupIndex)) {
+                              return SlideTransition(
+                                position: inAnimation,
+                                child: child,
+                              );
+                            } else {
+                              return SlideTransition(
+                                position: outAnimation,
+                                child: child,
+                              );
+                            }
+                          },
+                          child: Stack(
+                            key: ValueKey<int>(_currentGroupIndex),
+                            children: [
+                              // Media
+                              StoryBackgroundWidget(
+                                key: ValueKey(
+                                  '${_currentGroupIndex}_${_currentStoryIndex}_${_currentStory.mediaUrl}',
+                                ),
+                                mediaUrl: _currentStory.mediaUrl,
+                                mediaType: _currentStory.mediaType,
+                                dragOffset: _dragOffset,
+                                shouldPlay: true,
+                                onVideoDurationChanged: _onVideoDurationChanged,
+                              ),
+
+                              // Header
+                              StoryHeaderWidget(
+                                animationController: _controller,
+                                currentGroup: _currentGroup,
+                                currentStoryIndex: _currentStoryIndex,
+                                onClose: _close,
+                                currentUserId: _currentUserId,
+                              ),
+
+                              // Footer
+                              StoryFooterWidget(
+                                textController: _textController,
+                                story: _currentStory,
+                                currentUserId: _currentUserId,
+                                isOwnStory:
+                                    _currentStory.user.userId == _currentUserId,
+                                onFocusChanged: (hasFocus) {
+                                  if (hasFocus) {
+                                    _controller.stop();
+                                    _audioPlayer.pause();
+                                  } else {
+                                    _controller.forward();
+                                    _audioPlayer.resume();
+                                  }
+                                },
+                              ),
+
+                              // React count cho story của chính mình
+                              if (_currentStory.user.userId == _currentUserId)
+                                StoryReactCountWidget(
+                                  story: _currentStory,
+                                  onTap: () {
+                                    StoryReactsBottomSheet.show(
+                                      context,
+                                      story: _currentStory,
+                                    );
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+
+          // Nút mũi tên Previous/Next chỉ hiện trên Web
+          if (kIsWeb && canGoPrev)
+            Positioned(
+              left: MediaQuery.of(context).size.width / 2 - 225 - 56,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: StoryNavArrowButton(
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  onTap: _onPrev,
+                ),
+              ),
+            ),
+          if (kIsWeb && canGoNext)
+            Positioned(
+              right: MediaQuery.of(context).size.width / 2 - 225 - 56,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: StoryNavArrowButton(
+                  icon: Icons.arrow_forward_ios_rounded,
+                  onTap: _onNext,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

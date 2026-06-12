@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
@@ -187,7 +186,10 @@ class OtherProfileHeader extends StatelessWidget {
             user?.bio?.isNotEmpty == true
                 ? user!.bio!
                 : context.l10n.profileNoBio,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13.rsp(context)),
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13.rsp(context),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
