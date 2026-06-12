@@ -16,6 +16,8 @@ class MessageMoreOptionsDialog {
     VoidCallback? onForward,
     VoidCallback? onReport,
     VoidCallback? onCreateAIImage,
+    VoidCallback? onTranslate,
+    String? translateLabel,
   }) {
     showDialog(
       context: context,
@@ -32,6 +34,8 @@ class MessageMoreOptionsDialog {
           onForward: onForward,
           onReport: onReport,
           onCreateAIImage: onCreateAIImage,
+          onTranslate: onTranslate,
+          translateLabel: translateLabel,
         ),
       ),
     );
@@ -47,6 +51,8 @@ class _MessageMoreOptionsContent extends StatelessWidget {
   final VoidCallback? onForward;
   final VoidCallback? onReport;
   final VoidCallback? onCreateAIImage;
+  final VoidCallback? onTranslate;
+  final String? translateLabel;
 
   const _MessageMoreOptionsContent({
     required this.fromMe,
@@ -57,6 +63,8 @@ class _MessageMoreOptionsContent extends StatelessWidget {
     this.onForward,
     this.onReport,
     this.onCreateAIImage,
+    this.onTranslate,
+    this.translateLabel,
   });
 
   @override
@@ -144,6 +152,16 @@ class _MessageMoreOptionsContent extends StatelessWidget {
               if (onCreateAIImage != null) onCreateAIImage!();
             },
           ),
+
+          if (onTranslate != null)
+            _buildOption(
+              icon: CupertinoIcons.bubble_left_bubble_right,
+              label: translateLabel ?? context.l10n.postSeeTranslation,
+              onTap: () {
+                Navigator.of(context).pop();
+                onTranslate!();
+              },
+            ),
 
           SizedBox(height: 8.h),
         ],

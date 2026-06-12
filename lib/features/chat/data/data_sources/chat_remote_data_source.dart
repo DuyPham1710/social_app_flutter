@@ -126,6 +126,12 @@ abstract class ChatRemoteDataSource {
     required String messageId,
   });
 
+  // Translate a message
+  Future<MessageTranslationEntity> translateMessage({
+    required String messageId,
+    required String targetLang,
+  });
+
   // Get AI summary of unread messages
   Future<String> getSummaryUnread({
     required String conversationId,

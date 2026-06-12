@@ -806,6 +806,33 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       onCreateAIImage: () {
         showInfoSnackBar(context, context.l10n.chatAiImageInDevelopment);
       },
+      onTranslate: message.text != null &&
+              message.text!.trim().isNotEmpty &&
+              message.translationNotNeeded != true
+          ? () {
+              if (message.translatedText != null) {
+                context.read<MessageBloc>().add(
+                      ToggleMessageTranslationEvent(
+                        messageId: message.id,
+                        showTranslation: !(message.showTranslation ?? false),
+                      ),
+                    );
+              } else {
+                final targetLang = appTranslationTargetLang(context);
+                context.read<MessageBloc>().add(
+                      TranslateMessageEvent(
+                        messageId: message.id,
+                        targetLang: targetLang,
+                      ),
+                    );
+              }
+            }
+          : null,
+      translateLabel: message.translatedText != null
+          ? (message.showTranslation == true
+              ? context.l10n.postSeeOriginal
+              : context.l10n.postSeeTranslation)
+          : context.l10n.postSeeTranslation,
     );
   }
 

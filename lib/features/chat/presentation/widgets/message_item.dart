@@ -544,15 +544,19 @@ class MessageItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-                if (message.text != null && message.text!.isNotEmpty)
+                if (message.text != null && message.text!.isNotEmpty) ...[
                   Text(
-                    message.text!,
+                    message.showTranslation == true &&
+                            message.translatedText != null &&
+                            message.translatedText!.isNotEmpty
+                        ? message.translatedText!
+                        : message.text!,
                     style: TextStyle(
                       color: fromMe ? Colors.white : AppColors.textPrimary,
                       fontSize: 14.sp,
                     ),
                   ),
-
+                ],
                 // Show file attachments if any
                 if (message.attachments.any((att) => att.type == 'file'))
                   _buildFileList(
@@ -643,12 +647,24 @@ class MessageItem extends StatelessWidget {
           if (message.text != null && message.text!.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(left: 14.w, right: 14.w, bottom: 8.h),
-              child: Text(
-                message.text!,
-                style: TextStyle(
-                  color: fromMe ? AppColors.background : AppColors.textPrimary,
-                  fontSize: 14.sp,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message.showTranslation == true &&
+                            message.translatedText != null &&
+                            message.translatedText!.isNotEmpty
+                        ? message.translatedText!
+                        : message.text!,
+                    style: TextStyle(
+                      color: fromMe
+                          ? AppColors.background
+                          : AppColors.textPrimary,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ],
               ),
             )
           else
@@ -659,6 +675,12 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildNormalMessage() {
+    final showTranslated =
+        message.showTranslation == true &&
+        message.translatedText != null &&
+        message.translatedText!.isNotEmpty;
+    final textToShow = showTranslated ? message.translatedText! : message.text!;
+
     return Container(
       // Giới hạn chiều rộng tối đa của tin nhắn (khoảng 70% màn hình)
       constraints: BoxConstraints(maxWidth: 0.7.sw),
@@ -674,12 +696,18 @@ class MessageItem extends StatelessWidget {
           bottomRight: Radius.circular(fromMe ? 0 : 14.r),
         ),
       ),
-      child: Text(
-        message.text!,
-        style: TextStyle(
-          color: fromMe ? Colors.white : AppColors.textPrimary,
-          fontSize: 14.sp,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            textToShow,
+            style: TextStyle(
+              color: fromMe ? Colors.white : AppColors.textPrimary,
+              fontSize: 14.sp,
+            ),
+          ),
+        ],
       ),
     );
   }

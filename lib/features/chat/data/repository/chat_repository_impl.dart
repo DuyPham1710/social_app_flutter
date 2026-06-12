@@ -352,6 +352,24 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<MessageTranslationEntity>> translateMessage({
+    required String messageId,
+    required String targetLang,
+  }) async {
+    try {
+      final translation = await _remoteDataSource.translateMessage(
+        messageId: messageId,
+        targetLang: targetLang,
+      );
+      return DataStateSuccess(translation);
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Future<DataState<String>> getSummaryUnread({
     required String conversationId,
     required List<String> messages,

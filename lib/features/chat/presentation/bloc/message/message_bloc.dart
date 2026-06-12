@@ -26,6 +26,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
   final ListenMessageUpdatedUseCase _listenMessageUpdatedUseCase;
   final ListenMessageReadUseCase _listenMessageReadUseCase;
   final MarkAsReadUseCase _markAsReadUseCase;
+  final TranslateMessageUseCase _translateMessageUseCase;
 
   StreamSubscription<Map<String, dynamic>>? _typingStartSubscription;
   StreamSubscription<Map<String, dynamic>>? _typingStopSubscription;
@@ -52,6 +53,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     required ListenMessageUpdatedUseCase listenMessageUpdatedUseCase,
     required ListenMessageReadUseCase listenMessageReadUseCase,
     required MarkAsReadUseCase markAsReadUseCase,
+    required TranslateMessageUseCase translateMessageUseCase,
   }) : _getMessagesUseCase = getMessagesUseCase,
        _getMessagesAroundIdUseCase = getMessagesAroundIdUseCase,
        _typingStartUseCase = typingStartUseCase,
@@ -67,11 +69,14 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
        _listenMessageUpdatedUseCase = listenMessageUpdatedUseCase,
        _listenMessageReadUseCase = listenMessageReadUseCase,
        _markAsReadUseCase = markAsReadUseCase,
+       _translateMessageUseCase = translateMessageUseCase,
        super(const MessageInitial()) {
     on<LoadMessagesEvent>(_onLoadMessages);
     on<LoadMoreOldMessagesEvent>(_onLoadMoreOldMessages);
     on<LoadMoreNewMessagesEvent>(_onLoadMoreNewMessages);
     on<LoadMessagesAroundIdEvent>(_onLoadMessagesAroundId);
+    on<TranslateMessageEvent>(_onTranslateMessage);
+    on<ToggleMessageTranslationEvent>(_onToggleMessageTranslation);
     on<TypingStartEvent>(_onTypingStart);
     on<TypingStopEvent>(_onTypingStop);
     on<NewMessageReceivedEvent>(_onNewMessageReceived);
@@ -812,6 +817,89 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
 
     print(
       'Marked messages as read for conversation: ${event.conversationId}${event.messageId != null ? ', messageId: ${event.messageId}' : ''}',
+    );
+  }
+
+  Future<void> _onTranslateMessage(
+    TranslateMessageEvent event,
+    Emitter<MessageState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! MessagesLoaded) return;
+
+    try {
+      final result = await _translateMessageUseCase(
+        params: TranslateMessageParams(
+          messageId: event.messageId,
+          targetLang: event.targetLang,
+        ),
+      );
+
+      if (result is DataStateSuccess) {
+        final translation = result.data!;
+
+        final updatedMessages = currentState.messages.data.map((msg) {
+          if (msg.id == event.messageId) {
+            return msg.copyWith(
+              translatedText: translation.translatedText,
+              sourceLang: translation.sourceLang,
+              targetLang: translation.targetLang,
+              translationNotNeeded: translation.translationNotNeeded,
+              showTranslation: !translation.translationNotNeeded,
+            );
+          }
+          return msg;
+        }).toList();
+
+        final updatedResponse = MessageResponseEntity(
+          data: updatedMessages,
+          pagination: currentState.messages.pagination,
+        );
+
+        _currentMessages = updatedResponse;
+        emit(
+          MessagesLoaded(
+            updatedResponse,
+            typingUserId: currentState.typingUserId,
+            isTyping: currentState.isTyping,
+            isUploadingFiles: currentState.isUploadingFiles,
+          ),
+        );
+      } else if (result is DataStateError) {
+        print('Error translating message: ${result.error}');
+      }
+    } catch (e) {
+      print('Exception translating message: $e');
+    }
+  }
+
+  void _onToggleMessageTranslation(
+    ToggleMessageTranslationEvent event,
+    Emitter<MessageState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is! MessagesLoaded) return;
+
+    final updatedMessages = currentState.messages.data.map((msg) {
+      if (msg.id == event.messageId) {
+        return msg.copyWith(showTranslation: event.showTranslation);
+      }
+      return msg;
+    }).toList();
+
+    final updatedResponse = MessageResponseEntity(
+      data: updatedMessages,
+      pagination: currentState.messages.pagination,
+    );
+
+    _currentMessages = updatedResponse;
+    emit(
+      MessagesLoaded(
+        updatedResponse,
+        typingUserId: currentState.typingUserId,
+        isTyping: currentState.isTyping,
+        isUploadingFiles: currentState.isUploadingFiles,
+      ),
     );
   }
 

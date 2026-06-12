@@ -272,3 +272,29 @@ class MessageReadReceivedEvent extends MessageEvent {
   @override
   List<Object?> get props => [messageId, userId, userInfo, readAt];
 }
+
+class TranslateMessageEvent extends MessageEvent {
+  final String messageId;
+  final String targetLang;
+
+  const TranslateMessageEvent({
+    required this.messageId,
+    required this.targetLang,
+  });
+
+  @override
+  List<Object?> get props => [messageId, targetLang];
+}
+
+class ToggleMessageTranslationEvent extends MessageEvent {
+  final String messageId;
+  final bool showTranslation;
+
+  const ToggleMessageTranslationEvent({
+    required this.messageId,
+    required this.showTranslation,
+  });
+
+  @override
+  List<Object?> get props => [messageId, showTranslation];
+}
