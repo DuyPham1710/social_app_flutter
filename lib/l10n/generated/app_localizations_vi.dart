@@ -3309,9 +3309,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reactionSad => 'Buồn';
 
   @override
-  String get reactionAngry => 'Phẫn nộ';
-
-  @override
   String get storyAddMediaFromComputer => 'Thêm ảnh/video từ máy tính';
 
   @override
@@ -3323,6 +3320,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get commonImageOnlySupport => 'Chỉ hỗ trợ file ảnh';
+
+  @override
+  String get reactionAngry => 'Phẫn nộ';
 
   @override
   String get chatGiphySticker => 'Nhãn dán GIPHY';

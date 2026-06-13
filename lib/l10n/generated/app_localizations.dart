@@ -5766,12 +5766,6 @@ abstract class AppLocalizations {
   /// **'Buồn'**
   String get reactionSad;
 
-  /// No description provided for @reactionAngry.
-  ///
-  /// In vi, this message translates to:
-  /// **'Phẫn nộ'**
-  String get reactionAngry;
-
   /// No description provided for @storyAddMediaFromComputer.
   ///
   /// In vi, this message translates to:
@@ -5795,6 +5789,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chỉ hỗ trợ file ảnh'**
   String get commonImageOnlySupport;
+
+  /// No description provided for @reactionAngry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phẫn nộ'**
+  String get reactionAngry;
 
   /// No description provided for @chatGiphySticker.
   ///

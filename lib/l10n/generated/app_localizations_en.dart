@@ -3298,9 +3298,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reactionSad => 'Sad';
 
   @override
-  String get reactionAngry => 'Angry';
-
-  @override
   String get storyAddMediaFromComputer => 'Add photo/video from computer';
 
   @override
@@ -3312,6 +3309,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonImageOnlySupport => 'Only image files are supported';
+
+  @override
+  String get reactionAngry => 'Angry';
 
   @override
   String get chatGiphySticker => 'GIPHY Sticker';

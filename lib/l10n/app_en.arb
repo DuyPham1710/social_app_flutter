@@ -1512,11 +1512,10 @@
   "reactionHaha": "Haha",
   "reactionWow": "Wow",
   "reactionSad": "Sad",
-  "reactionAngry": "Angry",
   "storyAddMediaFromComputer": "Add photo/video from computer",
   "storySelectFile": "Choose file",
   "storyWebImageEditNotSupported": "Image editing is not supported on Web",
-  "commonImageOnlySupport": "Only image files are supported"
+  "commonImageOnlySupport": "Only image files are supported",
   "reactionAngry": "Angry",
   "chatGiphySticker": "GIPHY Sticker",
   "chatGiphySearch": "Search GIPHY stickers...",
