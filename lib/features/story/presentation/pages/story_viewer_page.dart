@@ -271,23 +271,12 @@ class _StoryViewerPageState extends State<StoryViewerPage>
     }
   }
 
-  void _onTapDown(TapDownDetails details) {
+  void _onTapUp(TapUpDetails details) {
     final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
     final localPos = renderBox.globalToLocal(details.globalPosition);
     final width = renderBox.size.width;
-    final height = renderBox.size.height;
     final dx = localPos.dx;
-    final dy = localPos.dy;
-
-    final isOwnStory = _currentStory.user.userId == _currentUserId;
-    final footerHeight = 80.0; // Chiều cao ước tính của footer area
-    final isInFooterArea = dy > (height - footerHeight);
-
-    // Nếu tap vào footer area và không phải story của chính mình, không xử lý
-    if (!isOwnStory && isInFooterArea) {
-      return;
-    }
 
     if (dx < width / 2) {
       _onPrev();
@@ -316,7 +305,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                 body: SafeArea(
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTapDown: _onTapDown,
+                    onTapUp: _onTapUp,
                     onLongPressStart: (_) {
                       _controller.stop();
                       _audioPlayer.pause();

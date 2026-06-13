@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
@@ -93,11 +94,16 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       _error = null;
     });
     try {
+      final baseApiUrl =
+          dotenv.env['BASE_URL'] ?? 'https://api.commonshub.io.vn/';
       final url = kIsWeb
-          ? 'https://corsproxy.io/?https://api.deezer.com/chart'
+          ? '${baseApiUrl}deezer/chart'
           : 'https://api.deezer.com/chart';
       final res = await Dio().get(url);
-      final data = res.data['tracks']?['data'] as List<dynamic>? ?? [];
+      final responseData = (kIsWeb && res.data['data'] != null && res.data['statusCode'] != null)
+          ? res.data['data']
+          : res.data;
+      final data = responseData['tracks']?['data'] as List<dynamic>? ?? [];
       final parsed = data
           .map(
             (e) => DeezerMusicModel.fromJson({
@@ -173,16 +179,22 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
 
     try {
       final index = page * 10;
+      final baseApiUrl =
+          dotenv.env['BASE_URL'] ?? 'https://api.commonshub.io.vn/';
       final baseUrl = kIsWeb
-          ? 'https://corsproxy.io/?https://api.deezer.com/search'
+          ? '${baseApiUrl}deezer/search'
           : 'https://api.deezer.com/search';
       final res = await Dio().get(
         baseUrl,
         queryParameters: {'q': query, 'limit': 10, 'index': index},
       );
 
-      final data = res.data['data'] as List<dynamic>? ?? [];
-      final total = res.data['total'] as int? ?? 0;
+      final responseData = (kIsWeb && res.data['data'] != null && res.data['statusCode'] != null)
+          ? res.data['data']
+          : res.data;
+
+      final data = responseData['data'] as List<dynamic>? ?? [];
+      final total = responseData['total'] as int? ?? 0;
 
       final parsed = data
           .map(

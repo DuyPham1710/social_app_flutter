@@ -267,7 +267,7 @@ class _SideNavigationState extends State<SideNavigation>
               clipBehavior: Clip.none,
               children: [
                 Icon(isActive ? activeIcon : icon, size: 26, color: color),
-                if (widget.unreadCount > 0)
+                if (!isExpanded && widget.unreadCount > 0)
                   Positioned(
                     right: -8,
                     top: -5,

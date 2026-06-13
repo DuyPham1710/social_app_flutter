@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
@@ -66,7 +67,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _controller = VideoPlayerController.networkUrl(
           Uri.parse(widget.videoData),
         );
-      } else if (widget.videoData.runtimeType.toString() == 'PlatformFile') {
+      } else if (widget.videoData is PlatformFile) {
         if (widget.videoData.bytes != null) {
           _blobUrl = createObjectUrlFromBytes(widget.videoData.bytes!);
           _controller = VideoPlayerController.networkUrl(

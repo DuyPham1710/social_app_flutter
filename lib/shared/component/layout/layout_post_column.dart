@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/shared/component/video_player_widget.dart';
@@ -81,7 +82,7 @@ class LayoutPostColumn extends StatelessWidget {
           );
         },
       );
-    } else if (imageData.runtimeType.toString() == 'PlatformFile') {
+    } else if (imageData is PlatformFile) {
       if (VideoUtil.isVideo(imageData)) {
         if (urls.length != 1) {
           return _buildVideoPreviewPlaceholder(imageData);
@@ -140,7 +141,7 @@ class LayoutPostColumn extends StatelessWidget {
   }
 
   Widget _buildVideoPreviewPlaceholder(dynamic videoSource) {
-    if (videoSource.runtimeType.toString() == 'PlatformFile') {
+    if (videoSource is PlatformFile) {
       try {
         return buildVideoThumbnail(videoSource.name, videoBytes: videoSource.bytes);
       } catch (e) {
