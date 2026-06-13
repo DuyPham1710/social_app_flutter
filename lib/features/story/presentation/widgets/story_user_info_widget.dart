@@ -101,7 +101,7 @@ class StoryUserInfoWidget extends StatelessWidget {
                       child: Icon(
                         Icons.more_vert,
                         color: Colors.white,
-                        size: 20.rsp(context),
+                        size: 25.rsp(context),
                       ),
                     ),
                   ))

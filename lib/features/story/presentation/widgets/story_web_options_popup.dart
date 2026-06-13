@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/core/di/injection.dart';
-import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
-import 'package:social_app_fe/features/story/domain/repository/story_repository.dart';
-import 'package:social_app_fe/features/story/presentation/bloc/home_stories_bloc.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_privacy_settings_page.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
-import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
-import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
+import 'package:social_app_fe/features/story/presentation/helpers/story_action_helper.dart';
 
 class StoryWebOptionsPopup extends StatelessWidget {
   final GroupedUserStoryEntity currentGroup;
@@ -33,85 +27,26 @@ class StoryWebOptionsPopup extends StatelessWidget {
         ),
       );
     } else if (value == 'archive') {
-      // TODO: Implement archive photo
+      StoryActionHelper.archiveStory(
+        context: context,
+        storyId: storyId,
+        onSuccess: () {
+          Navigator.of(context).pop();
+        },
+      );
     } else if (value == 'delete') {
       _deleteStoryWeb(context, storyId);
     }
   }
 
   Future<void> _deleteStoryWeb(BuildContext context, String storyId) async {
-    final confirmed = await showDialog<bool>(
+    await StoryActionHelper.deleteStory(
       context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.background,
-          title: Text(
-            context.l10n.storyDeleteTitle,
-            style: TextStyle(color: AppColors.textPrimary),
-          ),
-          content: Text(
-            context.l10n.storyDeleteConfirm,
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(
-                context.l10n.commonCancel,
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(
-                context.l10n.commonDelete,
-                style: const TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
+      storyId: storyId,
+      onSuccess: () {
+        Navigator.of(context).pop(); // Pop story viewer
       },
     );
-
-    if (confirmed != true) return;
-    if (!context.mounted) return;
-
-    try {
-      final storyRepository = s1<StoryRepository>();
-      final result = await storyRepository.deleteStory(storyId: storyId);
-
-      if (!context.mounted) return;
-
-      final navigator = Navigator.of(context);
-      final l10n = context.l10n;
-
-      HomeStoriesBloc? homeStoriesBloc;
-      try {
-        homeStoriesBloc = context.read<HomeStoriesBloc>();
-      } catch (_) {}
-
-      if (result is DataStateSuccess) {
-        if (homeStoriesBloc != null) {
-          homeStoriesBloc.add(const LoadHomeStoriesEvent(page: 1, limit: 10));
-        }
-        navigator.pop(); // Pop story viewer
-
-        if (navigator.mounted) {
-          showSuccessSnackBar(navigator.context, l10n.storyDeleted);
-        }
-      } else if (result is DataStateError) {
-        showErrorSnackBar(
-          context,
-          l10n.commonErrorWithMessage(
-            result.error?.message ?? l10n.storyDeleteFailed,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        showErrorSnackBar(context, context.l10n.commonErrorWithMessage('$e'));
-      }
-    }
   }
 
   @override

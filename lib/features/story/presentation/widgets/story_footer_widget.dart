@@ -12,6 +12,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/create_conversation_usecase.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryFooterWidget extends StatefulWidget {
   final TextEditingController textController;
@@ -134,7 +135,7 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                 children: [
                   const Icon(Icons.check_circle, color: Colors.white),
                   SizedBox(width: 8.rs(context)),
-                  const Text('Đã gửi phản hồi tin'),
+                  Text(context.l10n.storyReplySent),
                 ],
               ),
               backgroundColor: AppColors.primary,
@@ -155,7 +156,11 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi: ${e.toString()}'),
+            content: Text(
+              context.l10n.storyReplyErrorPrefix(
+                e.toString().replaceAll('Exception: ', ''),
+              ),
+            ),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
           ),
@@ -232,114 +237,123 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
                 horizontal: 12.rs(context),
               ), // Padding cho 2 đầu
               children: [
-              Center(
-                child: SizedBox(
-                  width: 230.rs(context),
-                  height: 40.rsh(context), // Keep text field height neat
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(24.rsr(context)),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: widget.textController,
-                            focusNode: _focusNode,
-                            cursorColor: AppColors.primary,
-                            style: TextStyle(
-                              fontSize: 14.rsp(context),
-                              color: AppColors.textPrimary,
-                            ),
-                            textInputAction: TextInputAction.send,
-                            onSubmitted: (value) => _sendStoryReply(context),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Gửi tin nhắn...',
-                              hintStyle: TextStyle(
-                                color: AppColors.textSecondary,
-                              ), // Màu xám nhạt
-                            ),
-                          ),
+                Center(
+                  child: SizedBox(
+                    width: 230.rs(context),
+                    height: 40.rsh(context), // Keep text field height neat
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(24.rsr(context)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1.rs(context),
                         ),
-                        if (_showSendButton)
-                          GestureDetector(
-                            onTap: _isSending
-                                ? null
-                                : () => _sendStoryReply(context),
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 4.rs(context)),
-                              child: _isSending
-                                  ? SizedBox(
-                                      width: 16.rs(context),
-                                      height: 16.rs(context),
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          AppColors.primary,
-                                        ),
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.send_rounded,
-                                      color: AppColors.primary,
-                                      size: 20.rsp(context),
-                                    ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: widget.textController,
+                              focusNode: _focusNode,
+                              cursorColor: AppColors.primary,
+                              style: TextStyle(
+                                fontSize: 14.rsp(context),
+                                color: Colors.white,
+                              ),
+                              textInputAction: TextInputAction.send,
+                              onSubmitted: (value) => _sendStoryReply(context),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: context.l10n.storySendReplyHint,
+                                hintStyle: TextStyle(
+                                  color: Colors.white.withOpacity(0.5),
+                                ),
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 10.rsh(context),
+                                ),
+                              ),
                             ),
                           ),
-                      ],
+                          if (_showSendButton)
+                            GestureDetector(
+                              onTap: _isSending
+                                  ? null
+                                  : () => _sendStoryReply(context),
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 4.rs(context)),
+                                child: _isSending
+                                    ? SizedBox(
+                                        width: 16.rs(context),
+                                        height: 16.rs(context),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.send_rounded,
+                                        color: Colors.white,
+                                        size: 20.rsp(context),
+                                      ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              ...EmojiType.values.map((emoji) {
-                final isReacted = _selectedReact == emoji;
-                return Padding(
-                  // Thêm padding bên trái cho mỗi icon để tạo khoảng cách
-                  padding: EdgeInsets.only(left: 8.rs(context)),
-                  child: Center(
-                    child: _IconReaction(
-                      emoji: emoji,
-                      storyId: widget.story.id,
-                      isReacted: isReacted,
-                      onTap: (details) {
-                        setState(() {
-                          if (isReacted) {
-                            _selectedReact = null;
-                          } else {
-                            _selectedReact = emoji;
+                ...EmojiType.values.map((emoji) {
+                  final isReacted = _selectedReact == emoji;
+                  return Padding(
+                    // Thêm padding bên trái cho mỗi icon để tạo khoảng cách
+                    padding: EdgeInsets.only(left: 8.rs(context)),
+                    child: Center(
+                      child: _IconReaction(
+                        emoji: emoji,
+                        storyId: widget.story.id,
+                        isReacted: isReacted,
+                        onTap: (details) {
+                          setState(() {
+                            if (isReacted) {
+                              _selectedReact = null;
+                            } else {
+                              _selectedReact = emoji;
+                            }
+                          });
+
+                          if (_selectedReact == emoji) {
+                            _spawnFloatingEmojiBurst(
+                              context,
+                              details.globalPosition,
+                              emoji.icon,
+                            );
                           }
-                        });
 
-                        if (_selectedReact == emoji) {
-                          _spawnFloatingEmojiBurst(
-                            context,
-                            details.globalPosition,
-                            emoji.icon,
+                          // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
+                          context.read<HomeStoriesBloc>().add(
+                            ReactStoryEvent(
+                              storyId: widget.story.id,
+                              emojiId: emoji.id,
+                            ),
                           );
-                        }
-
-                        // Gọi bloc để react story (nếu đã react sẽ xóa, nếu chưa sẽ tạo)
-                        context.read<HomeStoriesBloc>().add(
-                          ReactStoryEvent(
-                            storyId: widget.story.id,
-                            emojiId: emoji.id,
-                          ),
-                        );
-                      },
+                        },
+                      ),
                     ),
-                  ),
-                );
-              }),
-            ],
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
@@ -347,10 +361,10 @@ class _StoryFooterWidgetState extends State<StoryFooterWidget> {
 class MouseDragScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }
 
 // Widget phụ trợ cho icon, chỉ dùng trong file này

@@ -26,12 +26,10 @@ import 'package:social_app_fe/features/chat/presentation/widgets/delete_message_
 import 'package:social_app_fe/features/chat/presentation/widgets/chat_appbar.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/get_message_edit_logs_usecase.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/get_summary_unread_usecase.dart';
-
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/helpers/device_translation_locale.dart';
-
 import 'package:social_app_fe/features/chat/presentation/widgets/profile_header.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/scroll_to_bottom_button.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -3128,179 +3126,202 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   void _showAiSummaryBottomSheet(BuildContext context, String conversationId) {
     final primaryColor = AppColors.primary;
 
+    Future<DataState<String>> fetchSummary(BuildContext ctx) {
+      return s1<GetSummaryUnreadUseCase>().call(
+        params: GetSummaryUnreadParams(
+          conversationId: conversationId,
+          messages: _unreadMessageTexts,
+          lang: appTranslationTargetLang(ctx),
+        ),
+      );
+    }
+
+    Future<DataState<String>>? summaryFuture;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.only(
-            top: 12.h,
-            left: 20.w,
-            right: 20.w,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Pull bar
-              Center(
-                child: Container(
-                  width: 40.w,
-                  height: 4.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(2.r),
+        summaryFuture ??= fetchSummary(context);
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, -5),
                   ),
-                ),
+                ],
               ),
-              SizedBox(height: 16.h),
-              // Header
-              Row(
+              padding: EdgeInsets.only(
+                top: 12.h,
+                left: 20.w,
+                right: 20.w,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24.h,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [primaryColor, primaryColor.withOpacity(0.7)],
-                    ).createShader(bounds),
-                    child: Icon(
-                      Icons.auto_awesome,
-                      color: Colors.white,
-                      size: 24.r,
+                  // Pull bar
+                  Center(
+                    child: Container(
+                      width: 40.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.divider,
+                        borderRadius: BorderRadius.circular(2.r),
+                      ),
                     ),
                   ),
-                  SizedBox(width: 8.w),
-                  Text(
-                    context.l10n.chatAiSummaryTitle,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                  SizedBox(height: 16.h),
+                  // Header
+                  Row(
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                        ).createShader(bounds),
+                        child: Icon(
+                          Icons.auto_awesome,
+                          color: Colors.white,
+                          size: 24.r,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Text(
+                        context.l10n.chatAiSummaryTitle,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  SizedBox(height: 16.h),
+
+                  // Future Builder to fetch summary
+                  FutureBuilder<DataState<String>>(
+                    future: summaryFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 40.h),
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  primaryColor,
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                context.l10n.chatAiAnalyzingUnread,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: AppColors.textSecondary,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return _buildErrorState(
+                          snapshot.error.toString(),
+                          conversationId,
+                          onRetry: () => setModalState(() {
+                            summaryFuture = fetchSummary(context);
+                          }),
+                        );
+                      }
+
+                      final dataState = snapshot.data;
+                      if (dataState is DataStateError) {
+                        return _buildErrorState(
+                          dataState?.error?.message ??
+                              context.l10n.commonServerErrorRetryLater,
+                          conversationId,
+                          onRetry: () => setModalState(() {
+                            summaryFuture = fetchSummary(context);
+                          }),
+                        );
+                      }
+
+                      final summary =
+                          dataState?.data ??
+                          context.l10n.chatNoSummaryAvailable;
+
+                      return Container(
+                        padding: EdgeInsets.all(16.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondBackground,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(color: AppColors.divider),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              summary,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: AppColors.textPrimary,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: 16.h),
+
+                  // Bottom Action Button
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      context.l10n.commonClose,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const Divider(),
-              SizedBox(height: 16.h),
-
-              // Future Builder to fetch summary
-              FutureBuilder<DataState<String>>(
-                future: s1<GetSummaryUnreadUseCase>().call(
-                  params: GetSummaryUnreadParams(
-                    conversationId: conversationId,
-                    messages: _unreadMessageTexts,
-                    lang: appTranslationTargetLang(context),
-                  ),
-                ),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40.h),
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              primaryColor,
-                            ),
-                          ),
-                          SizedBox(height: 16.h),
-                          Text(
-                            context.l10n.chatAiAnalyzingUnread,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: AppColors.textSecondary,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    return _buildErrorState(
-                      snapshot.error.toString(),
-                      conversationId,
-                    );
-                  }
-
-                  final dataState = snapshot.data;
-                  if (dataState is DataStateError) {
-                    return _buildErrorState(
-                      dataState?.error?.message ??
-                          context.l10n.commonServerErrorRetryLater,
-                      conversationId,
-                    );
-                  }
-
-                  final summary =
-                      dataState?.data ?? context.l10n.chatNoSummaryAvailable;
-
-                  return Container(
-                    padding: EdgeInsets.all(16.r),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondBackground,
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: AppColors.divider),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          summary,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.textPrimary,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-
-              SizedBox(height: 16.h),
-
-              // Bottom Action Button
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  context.l10n.commonClose,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _buildErrorState(String errorMsg, String conversationId) {
+  Widget _buildErrorState(
+    String errorMsg,
+    String conversationId, {
+    VoidCallback? onRetry,
+  }) {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
@@ -3329,7 +3350,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
           SizedBox(height: 12.h),
           TextButton.icon(
             onPressed: () {
-              setState(() {});
+              if (onRetry != null) {
+                onRetry();
+              } else {
+                setState(() {});
+              }
             },
             icon: Icon(Icons.refresh, size: 16.r, color: AppColors.primary),
             label: Text(

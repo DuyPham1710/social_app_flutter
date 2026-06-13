@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/enums/media_type.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/stories_loading_widget.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/video_thumbnail_widget.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 import '../bloc/home_stories_bloc.dart';
@@ -262,16 +264,43 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                 height: 120.rs(context),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.rsr(context)),
-                  image: story.mediaUrl != null
-                      ? DecorationImage(
-                          image: NetworkImage(story.mediaUrl!),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                  color: story.mediaUrl == null
-                      ? AppColors.secondBackground
-                      : null,
+                  color: AppColors.secondBackground,
                 ),
+                clipBehavior: Clip.antiAlias,
+                child: story.mediaUrl != null
+                    ? (story.mediaType == MediaType.video
+                          ? VideoThumbnailWidget(
+                              videoUrl: story.mediaUrl!,
+                              width: 80.rs(context),
+                              height: 120.rs(context),
+                            )
+                          : Image.network(
+                              story.mediaUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    color: AppColors.secondBackground,
+                                    child: const Icon(Icons.error_outline),
+                                  ),
+                            ))
+                    : (story.title != null && story.title!.isNotEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(4.rs(context)),
+                                child: Text(
+                                  story.title!,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 10.rsp(context),
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : null),
               ),
 
               // Avatar dưới chính giữa
@@ -296,7 +325,7 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
 
           Text(
             (_currentUserId != null && story.user.userId == _currentUserId)
-                ? "Tin của bạn"
+                ? context.l10n.chatYourStory
                 : (story.user.fullName ?? "Unknown"),
             style: TextStyle(
               fontSize: 12.rsp(context),
