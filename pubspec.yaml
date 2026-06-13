@@ -63,7 +63,8 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^31.1.19
   open_filex: ^4.7.0
   flutter_colorpicker: ^1.1.0
-  giphy_get: ^3.7.0
+  giphy_get: ^3.6.1+1
+  font_awesome_flutter: ^10.7.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
