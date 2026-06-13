@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class StoryProgressBarWidget extends StatelessWidget {
@@ -17,12 +17,15 @@ class StoryProgressBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 8.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Row(
         children: List.generate(totalStories, (i) {
           return Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.w),
+              padding: EdgeInsets.symmetric(horizontal: 2.rs(context)),
               child: AnimatedBuilder(
                 animation: animationController,
                 builder: (context, child) {
@@ -38,7 +41,7 @@ class StoryProgressBarWidget extends StatelessWidget {
                     value: value,
                     backgroundColor: Colors.white24,
                     valueColor: AlwaysStoppedAnimation(AppColors.primary),
-                    minHeight: 4.h,
+                    minHeight: 4.rsh(context),
                   );
                 },
               ),

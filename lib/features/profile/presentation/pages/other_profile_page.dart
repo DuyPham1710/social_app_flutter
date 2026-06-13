@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_for_user_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_item.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
@@ -78,129 +78,140 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<OtherProfileBloc, OtherProfileState>(
-        builder: (context, state) {
-          if (state is OtherProfileError && state.user == null) {
-            return _fadeContent(
-              key: 'other-profile-error',
-              child: _buildErrorProfile(
-                state.error ?? context.l10n.profileLoadError,
-              ),
-            );
-          }
-
-          if (state is OtherProfileLoading || state.user == null) {
-            return _fadeContent(
-              key: 'other-profile-loading',
-              child: _buildLoadingProfile(),
-            );
-          }
-
-          final user = state.user!;
-          final posts = state.posts ?? [];
-          final commentCounts = state.commentCounts ?? {};
-
-          return _fadeContent(
-            key: 'other-profile-loaded-${user.userId}',
-            child: RefreshIndicator(
-              color: AppColors.primary,
-              backgroundColor: AppColors.background,
-              onRefresh: () async {
-                _loadData();
-                // Cho animation refresh mượt hơn
-                await Future.delayed(const Duration(milliseconds: 300));
-              },
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverAppBar(
-                    surfaceTintColor: Colors.transparent,
-                    pinned: true,
-                    backgroundColor: AppColors.background,
-                    elevation: 0,
-                    title: Text(
-                      user.fullName ?? context.l10n.profileTitle,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: BlocBuilder<OtherProfileBloc, OtherProfileState>(
+            builder: (context, state) {
+              if (state is OtherProfileError && state.user == null) {
+                return _fadeContent(
+                  key: 'other-profile-error',
+                  child: _buildErrorProfile(
+                    state.error ?? context.l10n.profileLoadError,
                   ),
+                );
+              }
 
-                  /// Content
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      OtherProfileHeader(user: user),
+              if (state is OtherProfileLoading || state.user == null) {
+                return _fadeContent(
+                  key: 'other-profile-loading',
+                  child: _buildLoadingProfile(),
+                );
+              }
 
-                      /// Friend actions
-                      OtherProfileActions(
-                        relationship: state.relationship,
-                        onSendRequest: () {
-                          context.read<FriendProfileBloc>().add(
-                            SendFriendRequest(receiverId: user.userId),
-                          );
-                        },
-                        onCancelRequest: () {
-                          context.read<FriendProfileBloc>().add(
-                            CancelSentFriendRequest(
-                              requestId: state.relationship?.requestId ?? '',
-                            ),
-                          );
-                        },
-                        onAcceptRequest: () {
-                          context.read<FriendProfileBloc>().add(
-                            AcceptFriendRequest(
-                              requestId: state.relationship?.requestId ?? '',
-                              userId: user.userId,
-                            ),
-                          );
-                        },
-                        onRejectRequest: () {
-                          context.read<FriendProfileBloc>().add(
-                            RejectFriendRequest(
-                              requestId: state.relationship?.requestId ?? '',
-                            ),
-                          );
-                        },
-                        onUnfriend: () {
-                          context.read<FriendProfileBloc>().add(
-                            RemoveFriend(friendId: user.userId),
-                          );
-                        },
-                        onMessage: () {
-                          // TODO: open chat
-                        },
+              final user = state.user!;
+              final posts = state.posts ?? [];
+              final commentCounts = state.commentCounts ?? {};
+
+              return _fadeContent(
+                key: 'other-profile-loaded-${user.userId}',
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  backgroundColor: AppColors.background,
+                  onRefresh: () async {
+                    _loadData();
+                    // Cho animation refresh mượt hơn
+                    await Future.delayed(const Duration(milliseconds: 300));
+                  },
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverAppBar(
+                        surfaceTintColor: Colors.transparent,
+                        pinned: true,
+                        backgroundColor: AppColors.background,
+                        elevation: 0,
+                        title: Text(
+                          user.fullName ?? context.l10n.profileTitle,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                       ),
 
-                      ProfileInfo(user: user),
-                      const Divider(),
-                      FriendListWidget(
-                        onViewAll: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FriendForUserPage(
-                                userId: user.userId,
-                                username: user.username ?? "user",
-                                fullName:
-                                    user.fullName ?? context.l10n.commonUser,
-                              ),
-                            ),
-                          );
-                          _loadData();
-                        },
+                      /// Content
+                      SliverList(
+                        delegate: SliverChildListDelegate([
+                          OtherProfileHeader(user: user),
+
+                          /// Friend actions
+                          OtherProfileActions(
+                            relationship: state.relationship,
+                            onSendRequest: () {
+                              context.read<FriendProfileBloc>().add(
+                                SendFriendRequest(receiverId: user.userId),
+                              );
+                            },
+                            onCancelRequest: () {
+                              context.read<FriendProfileBloc>().add(
+                                CancelSentFriendRequest(
+                                  requestId:
+                                      state.relationship?.requestId ?? '',
+                                ),
+                              );
+                            },
+                            onAcceptRequest: () {
+                              context.read<FriendProfileBloc>().add(
+                                AcceptFriendRequest(
+                                  requestId:
+                                      state.relationship?.requestId ?? '',
+                                  userId: user.userId,
+                                ),
+                              );
+                            },
+                            onRejectRequest: () {
+                              context.read<FriendProfileBloc>().add(
+                                RejectFriendRequest(
+                                  requestId:
+                                      state.relationship?.requestId ?? '',
+                                ),
+                              );
+                            },
+                            onUnfriend: () {
+                              context.read<FriendProfileBloc>().add(
+                                RemoveFriend(friendId: user.userId),
+                              );
+                            },
+                            onMessage: () {
+                              // TODO: open chat
+                            },
+                          ),
+
+                          ProfileInfo(user: user),
+                          const Divider(),
+                          FriendListWidget(
+                            onViewAll: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FriendForUserPage(
+                                    userId: user.userId,
+                                    username: user.username ?? "user",
+                                    fullName:
+                                        user.fullName ??
+                                        context.l10n.commonUser,
+                                  ),
+                                ),
+                              );
+                              _loadData();
+                            },
+                          ),
+                          const Divider(),
+                          const SizedBox(height: 12),
+                          _buildPostsSection(state, posts, commentCounts),
+                        ]),
                       ),
-                      const Divider(),
-                      const SizedBox(height: 12),
-                      _buildPostsSection(state, posts, commentCounts),
-                    ]),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -269,7 +280,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           hasScrollBody: false,
           child: Center(
             child: Padding(
-              padding: EdgeInsets.all(24.w),
+              padding: EdgeInsets.all(24.rs(context)),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -278,13 +289,13 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     color: Color(0xFFE11D48),
                     size: 42,
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     message,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
-                  SizedBox(height: 14.h),
+                  SizedBox(height: 14.rsh(context)),
                   OutlinedButton.icon(
                     onPressed: _loadData,
                     icon: const Icon(Icons.refresh_rounded),
@@ -324,10 +335,10 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             state is! OtherProfileError &&
             !(state is OtherProfileLoaded && state.currentPage == null))
           Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(16.rs(context)),
             child: Text(
               context.l10n.profileNoPosts,
-              style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+              style: TextStyle(color: Colors.grey, fontSize: 14.rsp(context)),
             ),
           ),
         ...posts.map((post) {
@@ -345,11 +356,11 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             state.hasNext == false &&
             posts.isNotEmpty)
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
+            padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
             child: Center(
               child: Text(
                 context.l10n.profileEndOfPosts,
-                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                style: TextStyle(color: Colors.grey, fontSize: 14.rsp(context)),
               ),
             ),
           ),
@@ -364,7 +375,10 @@ class _ProfileActionSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.rs(context),
+        vertical: 10.rsh(context),
+      ),
       child: Row(
         children: const [
           Expanded(child: _SkeletonBox(height: 38, radius: 10)),
@@ -384,7 +398,12 @@ class _ProfileInfoSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        12.rsh(context),
+        16.rs(context),
+        12.rsh(context),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
@@ -405,16 +424,19 @@ class _PostSkeletonList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Column(
         children: List.generate(
           2,
           (index) => Container(
-            margin: EdgeInsets.only(bottom: 12.h),
-            padding: EdgeInsets.all(14.w),
+            margin: EdgeInsets.only(bottom: 12.rsh(context)),
+            padding: EdgeInsets.all(14.rs(context)),
             decoration: BoxDecoration(
               color: AppColors.secondBackground,
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(14.rsr(context)),
               border: Border.all(color: AppColors.divider),
             ),
             child: Column(
@@ -436,13 +458,13 @@ class _PostSkeletonList extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 14.h),
+                SizedBox(height: 14.rsh(context)),
                 const _SkeletonBox(
                   width: double.infinity,
                   height: 13,
                   radius: 7,
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 8.rsh(context)),
                 const _SkeletonBox(width: 230, height: 13, radius: 7),
               ],
             ),

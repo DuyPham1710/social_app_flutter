@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'commonhub';
 
   @override
+  String get navHome => 'Home';
+
+  @override
   String get commonCancel => 'Cancel';
 
   @override
@@ -3296,6 +3299,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reactionAngry => 'Angry';
+
+  @override
+  String get storyAddMediaFromComputer => 'Add photo/video from computer';
+
+  @override
+  String get storySelectFile => 'Choose file';
+
+  @override
+  String get storyWebImageEditNotSupported =>
+      'Image editing is not supported on Web';
+
+  @override
+  String get commonImageOnlySupport => 'Only image files are supported';
 
   @override
   String get chatGiphySticker => 'GIPHY Sticker';

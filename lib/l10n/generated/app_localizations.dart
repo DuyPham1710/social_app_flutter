@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'commonhub'**
   String get appTitle;
 
+  /// No description provided for @navHome.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trang chủ'**
+  String get navHome;
+
   /// No description provided for @commonCancel.
   ///
   /// In vi, this message translates to:
@@ -5765,6 +5771,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Phẫn nộ'**
   String get reactionAngry;
+
+  /// No description provided for @storyAddMediaFromComputer.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm ảnh/video từ máy tính'**
+  String get storyAddMediaFromComputer;
+
+  /// No description provided for @storySelectFile.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn tệp'**
+  String get storySelectFile;
+
+  /// No description provided for @storyWebImageEditNotSupported.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web'**
+  String get storyWebImageEditNotSupported;
+
+  /// No description provided for @commonImageOnlySupport.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ hỗ trợ file ảnh'**
+  String get commonImageOnlySupport;
 
   /// No description provided for @chatGiphySticker.
   ///

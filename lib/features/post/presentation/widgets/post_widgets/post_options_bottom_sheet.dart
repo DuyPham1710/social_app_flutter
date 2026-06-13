@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/post/domain/usecases/delete_post_usecase.dart';
 import 'package:social_app_fe/features/post/domain/usecases/update_post_tags_usecase.dart';
@@ -39,17 +40,34 @@ class PostOptionsBottomSheet extends StatefulWidget {
     bool showOwnerActions = true,
     VoidCallback? onDeleted,
   }) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return PostOptionsBottomSheet(
-          post: post,
-          showOwnerActions: showOwnerActions,
-          onDeleted: onDeleted,
-        );
-      },
-    );
+    if (ResponsiveHelper.isMobile(context)) {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return PostOptionsBottomSheet(
+            post: post,
+            showOwnerActions: showOwnerActions,
+            onDeleted: onDeleted,
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: PostOptionsBottomSheet(
+              post: post,
+              showOwnerActions: showOwnerActions,
+              onDeleted: onDeleted,
+            ),
+          );
+        },
+      );
+    }
   }
 }
 
@@ -174,6 +192,133 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveHelper.isMobile(context);
+
+    // Nếu là web
+    if (!isMobile) {
+      final isVietnamese = Localizations.localeOf(context).languageCode == 'vi';
+      final titleText = isVietnamese ? 'Tùy chọn bài viết' : 'Post options';
+
+      return Center(
+        child: Container(
+          width: 360,
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      titleText,
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: AppColors.iconPrimary,
+                        size: 20,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      splashRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 1, thickness: 1),
+
+              if (widget.showOwnerActions) ...[
+                ListTile(
+                  leading: Icon(
+                    Icons.lock_outline,
+                    color: AppColors.iconPrimary,
+                    size: 22,
+                  ),
+                  title: Text(
+                    context.l10n.postEditPrivacy,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    final privacyLabel = PrivacyUtil.privacyTypeToLabel(
+                      widget.post.privacyType,
+                    );
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) =>
+                              s1<PrivacyBloc>()
+                                ..add(GetDefaultPrivacyRequested()),
+                          child: PrivacyPage(
+                            selectedOption: privacyLabel,
+                            postId: widget.post.id,
+                            initialPrivacyType: widget.post.privacyType,
+                            initialFriendsExcept: widget.post.friendsExcept,
+                            initialFriendsDetail: widget.post.friendsDetail,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                ListTile(
+                  leading: Icon(
+                    Icons.person_add_alt_1_outlined,
+                    color: AppColors.iconPrimary,
+                    size: 22,
+                  ),
+                  title: Text(
+                    context.l10n.postTagFriends,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                    ),
+                  ),
+                  onTap: () => _updatePostTags(context),
+                ),
+              ],
+
+              ListTile(
+                leading: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: 22,
+                ),
+                title: Text(
+                  context.l10n.postDeleteTitle,
+                  style: const TextStyle(color: Colors.red, fontSize: 14),
+                ),
+                onTap: _isDeleting ? null : () => _deletePost(context),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,

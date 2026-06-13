@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -13,7 +15,7 @@ import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class CreateCommunityPage extends StatefulWidget {
-  const CreateCommunityPage({super.key});
+  CreateCommunityPage({super.key});
 
   @override
   State<CreateCommunityPage> createState() => _CreateCommunityPageState();
@@ -62,11 +64,16 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
   }
 
   void _showImageSourceMenu({required bool isAvatar}) {
+    if (kIsWeb) {
+      _pickImage(ImageSource.gallery, isAvatar: isAvatar);
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.background,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.rs(context)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -103,7 +110,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
               context,
               localizedCommunityMessage(context.l10n, state.message),
             );
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(Duration(seconds: 1), () {
               if (mounted) {
                 Navigator.of(context).pop(state.community);
               }
@@ -115,339 +122,419 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
             );
           }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.secondBackground,
-          appBar: AppBar(
-            title: Text(
-              context.l10n.communityCreateTitle,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w700,
+        child: Container(
+          color: AppColors.background,
+
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveHelper.feedMaxWidth,
+              ),
+              child: Scaffold(
+                backgroundColor: AppColors.secondBackground,
+                appBar: AppBar(
+                  title: Text(
+                    context.l10n.communityCreateTitle,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  backgroundColor: AppColors.secondBackground,
+                  foregroundColor: AppColors.iconPrimary,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                ),
+                body: BlocBuilder<CommunityCreateBloc, CommunityCreateState>(
+                  builder: (context, state) {
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                        16.rs(context),
+                        8.rsh(context),
+                        16.rs(context),
+                        20.rsh(context),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Avatar Section
+                          Text(
+                            context.l10n.communityAvatar,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          GestureDetector(
+                            onTap: () => _showImageSourceMenu(isAvatar: true),
+                            child: Container(
+                              width: double.infinity,
+                              height: 180.rsh(context),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(
+                                  18.rsr(context),
+                                ),
+                                border: Border.all(color: AppColors.divider),
+                              ),
+                              child: _avatarPath != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        18.rsr(context),
+                                      ),
+                                      child: kIsWeb
+                                          ? Image.network(
+                                              _avatarPath!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.file(
+                                              File(_avatarPath!),
+                                              fit: BoxFit.cover,
+                                            ),
+                                    )
+                                  : Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.all(
+                                              10.rs(context),
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.12),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              Icons.add_photo_alternate_rounded,
+                                              size: 28.rsp(context),
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.rsh(context)),
+                                          Text(
+                                            context.l10n.communityChooseAvatar,
+                                            style: TextStyle(
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          SizedBox(height: 24.rsh(context)),
+
+                          // Cover Image Section
+                          Text(
+                            context.l10n.communityCoverImage,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          GestureDetector(
+                            onTap: () => _showImageSourceMenu(isAvatar: false),
+                            child: Container(
+                              width: double.infinity,
+                              height: 150.rsh(context),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(
+                                  18.rsr(context),
+                                ),
+                                border: Border.all(color: AppColors.divider),
+                              ),
+                              child: _coverImagePath != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        18.rsr(context),
+                                      ),
+                                      child: kIsWeb
+                                          ? Image.network(
+                                              _coverImagePath!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.file(
+                                              File(_coverImagePath!),
+                                              fit: BoxFit.cover,
+                                            ),
+                                    )
+                                  : Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.all(
+                                              10.rs(context),
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.12),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              Icons.wallpaper_rounded,
+                                              size: 28.rsp(context),
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.rsh(context)),
+                                          Text(
+                                            context.l10n.communityChooseCover,
+                                            style: TextStyle(
+                                              color: AppColors.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          SizedBox(height: 24.rsh(context)),
+
+                          // Name Field
+                          Text(
+                            context.l10n.communityName,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          TextField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              hintText: context.l10n.communityNameHint,
+                              hintStyle: TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.divider,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                            style: TextStyle(color: AppColors.textPrimary),
+                          ),
+                          SizedBox(height: 16.rsh(context)),
+
+                          // Description Field
+                          Text(
+                            context.l10n.communityDescription,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          TextField(
+                            controller: _descriptionController,
+                            maxLines: 4,
+                            decoration: InputDecoration(
+                              hintText: context.l10n.communityDescriptionHint,
+                              hintStyle: TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.divider,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                            style: TextStyle(color: AppColors.textPrimary),
+                          ),
+                          SizedBox(height: 16.rsh(context)),
+
+                          // Privacy Dropdown
+                          Text(
+                            context.l10n.communityType,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          DropdownButtonFormField<String>(
+                            value: _selectedPrivacy,
+                            dropdownColor: AppColors.background,
+                            iconEnabledColor: AppColors.iconPrimary,
+                            style: TextStyle(color: AppColors.textPrimary),
+                            items: [
+                              DropdownMenuItem(
+                                value: 'public',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.public,
+                                      size: 20.rsp(context),
+                                      color: AppColors.iconPrimary,
+                                    ),
+                                    SizedBox(width: 8.rs(context)),
+                                    Text(context.l10n.communityPublic),
+                                  ],
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'private',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.lock,
+                                      size: 20.rsp(context),
+                                      color: AppColors.iconPrimary,
+                                    ),
+                                    SizedBox(width: 8.rs(context)),
+                                    Text(context.l10n.communityPrivate),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _selectedPrivacy = value);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.divider,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 32.rsh(context)),
+
+                          // Submit Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: state is CommunityCreateLoading
+                                  ? null
+                                  : () {
+                                      if (_nameController.text.isEmpty) {
+                                        showErrorSnackBar(
+                                          context,
+                                          context.l10n.communityNameRequired,
+                                        );
+                                        return;
+                                      }
+
+                                      context.read<CommunityCreateBloc>().add(
+                                        CreateCommunityRequested(
+                                          name: _nameController.text,
+                                          description:
+                                              _descriptionController
+                                                  .text
+                                                  .isNotEmpty
+                                              ? _descriptionController.text
+                                              : null,
+                                          privacy: _selectedPrivacy,
+                                          avatarPath: _avatarPath,
+                                          coverImagePath: _coverImagePath,
+                                        ),
+                                      );
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 16.rsh(context),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    14.rsr(context),
+                                  ),
+                                ),
+                              ),
+                              child: state is CommunityCreateLoading
+                                  ? SizedBox(
+                                      height: 20.rsh(context),
+                                      width: 20.rs(context),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : Text(
+                                      context.l10n.communityCreateTitle,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16.rsp(context),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-            backgroundColor: AppColors.secondBackground,
-            foregroundColor: AppColors.iconPrimary,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            surfaceTintColor: Colors.transparent,
-          ),
-          body: BlocBuilder<CommunityCreateBloc, CommunityCreateState>(
-            builder: (context, state) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [                    // Avatar Section
-                    Text(
-                      context.l10n.communityAvatar,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () => _showImageSourceMenu(isAvatar: true),
-                      child: Container(
-                        width: double.infinity,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppColors.divider),
-                        ),
-                        child: _avatarPath != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: Image.file(
-                                  File(_avatarPath!),
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withValues(
-                                          alpha: 0.12,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.add_photo_alternate_rounded,
-                                        size: 28,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      context.l10n.communityChooseAvatar,
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Cover Image Section
-                    Text(
-                      context.l10n.communityCoverImage,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () => _showImageSourceMenu(isAvatar: false),
-                      child: Container(
-                        width: double.infinity,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppColors.divider),
-                        ),
-                        child: _coverImagePath != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: Image.file(
-                                  File(_coverImagePath!),
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withValues(
-                                          alpha: 0.12,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.wallpaper_rounded,
-                                        size: 28,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      context.l10n.communityChooseCover,
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Name Field
-                    Text(
-                      context.l10n.communityName,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        hintText: context.l10n.communityNameHint,
-                        hintStyle: TextStyle(color: AppColors.textSecondary),
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                      ),
-                      style: TextStyle(color: AppColors.textPrimary),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Description Field
-                    Text(
-                      context.l10n.communityDescription,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _descriptionController,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: context.l10n.communityDescriptionHint,
-                        hintStyle: TextStyle(color: AppColors.textSecondary),
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                      ),
-                      style: TextStyle(color: AppColors.textPrimary),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Privacy Dropdown
-                    Text(
-                      context.l10n.communityType,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      value: _selectedPrivacy,
-                      dropdownColor: AppColors.background,
-                      iconEnabledColor: AppColors.iconPrimary,
-                      style: TextStyle(color: AppColors.textPrimary),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'public',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.public,
-                                size: 20,
-                                color: AppColors.iconPrimary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(context.l10n.communityPublic),
-                            ],
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'private',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.lock,
-                                size: 20,
-                                color: AppColors.iconPrimary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(context.l10n.communityPrivate),
-                            ],
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _selectedPrivacy = value);
-                        }
-                      },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: AppColors.background,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Submit Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: state is CommunityCreateLoading
-                            ? null
-                            : () {
-                                if (_nameController.text.isEmpty) {
-                                  showErrorSnackBar(
-                                    context,
-                                    context.l10n.communityNameRequired,
-                                  );
-                                  return;
-                                }
-
-                                context.read<CommunityCreateBloc>().add(
-                                  CreateCommunityRequested(
-                                    name: _nameController.text,
-                                    description:
-                                        _descriptionController.text.isNotEmpty
-                                        ? _descriptionController.text
-                                        : null,
-                                    privacy: _selectedPrivacy,
-                                    avatarPath: _avatarPath,
-                                    coverImagePath: _coverImagePath,
-                                  ),
-                                );
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: state is CommunityCreateLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                context.l10n.communityCreateTitle,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
           ),
         ),
       ),

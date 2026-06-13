@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -35,7 +34,7 @@ class NotificationBaseItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-                ? AppColors.primary.withOpacity(0.12)
+                ? AppColors.primary.withValues(alpha: 0.12)
                 : const Color(0xFFEAF3FF)), // chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       // ignore: sort_child_properties_last

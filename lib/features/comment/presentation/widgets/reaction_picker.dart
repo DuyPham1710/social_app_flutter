@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:lottie/lottie.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -88,9 +88,9 @@ class _ReactionPickerState extends State<ReactionPicker>
     final position = renderBox.localToGlobal(Offset.zero);
 
     // --- BẮT ĐẦU TÍNH TOÁN KÍCH THƯỚC VÀ VỊ TRÍ ---
-    final double iconSize = 50.w; // Kích thước Lottie icon
-    final double horizontalMargin = 2.w; // Khoảng cách ngang giữa các icon
-    final double containerPadding = 8.w; // Đệm bên trong khung trắng
+    final double iconSize = 50; // Kích thước Lottie icon
+    final double horizontalMargin = 2; // Khoảng cách ngang giữa các icon
+    final double containerPadding = 8; // Đệm bên trong khung trắng
 
     // Tự động tính toán tổng chiều rộng của picker
     final totalWidth =
@@ -102,7 +102,7 @@ class _ReactionPickerState extends State<ReactionPicker>
     // - Ngược lại: canh giữa như hành vi hiện tại
     final pickerLeftPosition = widget.alignLeftToChild
         ? position.dx
-        : (position.dx + renderBox.size.width / 2) - (totalWidth / 2) + 30.sp;
+        : (position.dx + renderBox.size.width / 2) - (totalWidth / 2) + 30;
     // --- KẾT THÚC TÍNH TOÁN ---
 
     _overlayEntry = OverlayEntry(
@@ -116,7 +116,7 @@ class _ReactionPickerState extends State<ReactionPicker>
           ),
           Positioned(
             left: pickerLeftPosition,
-            top: position.dy - 95.h, // Đẩy picker lên vị trí phù hợp
+            top: position.dy - 95, // Đẩy picker lên vị trí phù hợp
             child: Material(
               color: Colors.transparent,
               child: AnimatedBuilder(
@@ -131,7 +131,7 @@ class _ReactionPickerState extends State<ReactionPicker>
                         padding: EdgeInsets.all(containerPadding),
                         decoration: BoxDecoration(
                           color: AppColors.background,
-                          borderRadius: BorderRadius.circular(30.r),
+                          borderRadius: BorderRadius.circular(30),
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.black12,
@@ -146,32 +146,32 @@ class _ReactionPickerState extends State<ReactionPicker>
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               height: _hoveredIndex >= 0
-                                  ? 24.h
+                                  ? 24
                                   : 0, // Giảm chiều cao label
                               child: _hoveredIndex >= 0
                                   ? Container(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: 8.w,
-                                        vertical: 4.h,
+                                        horizontal: 8,
+                                        vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
                                         color: AppColors.textPrimary,
                                         borderRadius: BorderRadius.circular(
-                                          8.r,
+                                          8,
                                         ),
                                       ),
                                       child: Text(
                                         EmojiType.values[_hoveredIndex].label,
                                         style: TextStyle(
                                           color: AppColors.background,
-                                          fontSize: 10.sp, // Chữ nhỏ hơn
+                                          fontSize: 10, // Chữ nhỏ hơn
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                     )
                                   : const SizedBox.shrink(),
                             ),
-                            SizedBox(height: _hoveredIndex >= 0 ? 4.h : 0),
+                            SizedBox(height: _hoveredIndex >= 0 ? 4 : 0),
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: EmojiType.values.asMap().entries.map((

@@ -35,7 +35,7 @@ class _MenuView extends StatelessWidget {
       case 'groups':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const CommunityPage()),
+          MaterialPageRoute(builder: (context) => CommunityPage()),
         );
       case 'reels':
         // Navigate to stories/reels page

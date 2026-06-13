@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -28,14 +28,27 @@ class SavePostBottomSheet extends StatefulWidget {
     required PostEntity post,
     required Function(String savedId) onSaved,
   }) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return SavePostBottomSheet(post: post, onSaved: onSaved);
-      },
-    );
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: SavePostBottomSheet(post: post, onSaved: onSaved),
+          );
+        },
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return SavePostBottomSheet(post: post, onSaved: onSaved);
+        },
+      );
+    }
   }
 }
 
@@ -160,28 +173,31 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
           ),
           content: TextField(
             controller: controller,
-            style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+            style: TextStyle(
+              fontSize: 14.rsp(context),
+              color: AppColors.textPrimary,
+            ),
             cursorColor: AppColors.primary,
             decoration: InputDecoration(
               hintText: l10n.postCollectionNameHint,
               hintStyle: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 14.sp,
+                fontSize: 14.rsp(context),
               ),
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 12.w,
-                vertical: 10.h,
+                horizontal: 12.rs(context),
+                vertical: 10.rsh(context),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
                 borderSide: BorderSide(color: AppColors.divider),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
                 borderSide: BorderSide(color: AppColors.divider),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
                 borderSide: BorderSide(color: AppColors.primary),
               ),
               fillColor: AppColors.secondBackground,
@@ -220,6 +236,219 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isWeb = ResponsiveHelper.isWebOrDesktop;
+
+    final childWidget = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (!isWeb) ...[
+          SizedBox(height: 12.rsh(context)),
+          Center(
+            child: Container(
+              width: 40.rs(context),
+              height: 4.rsh(context),
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(2.rsr(context)),
+              ),
+            ),
+          ),
+        ] else ...[
+          // For web dialog, show a close button / title at the top
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              16.rs(context),
+              16.rsh(context),
+              16.rs(context),
+              8.rsh(context),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  context.l10n.postAddToCollection,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16.rsp(context),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.iconPrimary,
+                    size: 20.rsp(context),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  splashRadius: 20.rsr(context),
+                ),
+              ],
+            ),
+          ),
+
+          Divider(height: 1.rsh(context), color: AppColors.divider),
+        ],
+
+        SizedBox(height: 16.rsh(context)),
+
+        InkWell(
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SavedItemsPage()),
+            );
+          },
+
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.rs(context),
+              vertical: 8.rsh(context),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40.rs(context),
+                  height: 40.rs(context),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondBackground,
+                    shape: BoxShape.circle,
+                  ),
+
+                  child: Icon(Icons.bookmark, color: AppColors.textPrimary),
+                ),
+
+                SizedBox(width: 12.rs(context)),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.l10n.postSaved,
+                        style: TextStyle(
+                          fontSize: 16.rsp(context),
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+
+                      SizedBox(height: 2.rsh(context)),
+
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.lock,
+                            size: 12.rsp(context),
+                            color: AppColors.textSecondary,
+                          ),
+                          SizedBox(width: 4.rs(context)),
+                          Text(
+                            context.l10n.postOnlyMe,
+                            style: TextStyle(
+                              fontSize: 12.rsp(context),
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: AppColors.textSecondary),
+              ],
+            ),
+          ),
+        ),
+
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
+          child: Divider(height: 1.rsh(context), color: AppColors.divider),
+        ),
+
+        // Collection list header
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.rs(context),
+            vertical: 8.rsh(context),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.l10n.postAddToCollection,
+                style: TextStyle(
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              GestureDetector(
+                onTap: _showCreateCollectionDialog,
+                child: Text(
+                  context.l10n.commonCreate,
+                  style: TextStyle(
+                    fontSize: 16.rsp(context),
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Collection List
+        if (_isLoading)
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          )
+        else if (_isSaving)
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          )
+        else
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(vertical: 8.rsh(context)),
+              itemCount: _collections.length,
+              itemBuilder: (context, index) {
+                final item = _collections[index];
+                return _buildCollectionItem(
+                  context,
+                  item['name'],
+                  item['image'],
+                );
+              },
+            ),
+          ),
+      ],
+    );
+
+    if (isWeb) {
+      return Center(
+        child: Container(
+          width: 480,
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Material(color: Colors.transparent, child: childWidget),
+        ),
+      );
+    }
+
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.8,
@@ -227,159 +456,11 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
+          topLeft: Radius.circular(20.rsr(context)),
+          topRight: Radius.circular(20.rsr(context)),
         ),
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 12.h),
-            Center(
-              child: Container(
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-
-            InkWell(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SavedItemsPage(),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40.w,
-                      height: 40.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.secondBackground,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.bookmark, color: AppColors.textPrimary),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.postSaved,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.lock,
-                                size: 12.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                context.l10n.postOnlyMe,
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.chevron_right, color: AppColors.textSecondary),
-                  ],
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Divider(height: 1, color: AppColors.divider),
-            ),
-
-            // Collection list header
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.l10n.postAddToCollection,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _showCreateCollectionDialog,
-                    child: Text(
-                      context.l10n.commonCreate,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Collection List
-            if (_isLoading)
-              Padding(
-                padding: EdgeInsets.all(32.0),
-                child: Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              )
-            else if (_isSaving)
-              Padding(
-                padding: EdgeInsets.all(32.0),
-                child: Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              )
-            else
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
-                  itemCount: _collections.length,
-                  itemBuilder: (context, index) {
-                    final item = _collections[index];
-                    return _buildCollectionItem(
-                      context,
-                      item['name'],
-                      item['image'],
-                    );
-                  },
-                ),
-              ),
-          ],
-        ),
-      ),
+      child: SafeArea(child: childWidget),
     );
   }
 
@@ -391,16 +472,19 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
     return InkWell(
       onTap: () => _saveToCollection(title),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.rs(context),
+          vertical: 8.rsh(context),
+        ),
         child: Row(
           children: [
             // Thumbnail
             Container(
-              width: 50.w,
-              height: 50.w,
+              width: 50.rs(context),
+              height: 50.rs(context),
               decoration: BoxDecoration(
                 color: AppColors.secondBackground,
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
                 image: imageUrl != null && imageUrl.isNotEmpty
                     ? DecorationImage(
                         image: NetworkImage(imageUrl),
@@ -412,7 +496,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                   ? Icon(Icons.bookmark_border, color: AppColors.unselectedIcon)
                   : null,
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 12.rs(context)),
 
             // Info
             Expanded(
@@ -422,24 +506,24 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 16.rsp(context),
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 4.rsh(context)),
                   Row(
                     children: [
                       Icon(
                         Icons.lock,
-                        size: 12.sp,
+                        size: 12.rsp(context),
                         color: AppColors.textSecondary,
                       ),
-                      SizedBox(width: 4.w),
+                      SizedBox(width: 4.rs(context)),
                       Text(
                         context.l10n.postOnlyMe,
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 12.rsp(context),
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -451,8 +535,8 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
 
             // Add icon
             Container(
-              width: 30.w,
-              height: 30.w,
+              width: 30.rs(context),
+              height: 30.rs(context),
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 shape: BoxShape.circle,
@@ -460,7 +544,7 @@ class _SavePostBottomSheetState extends State<SavePostBottomSheet> {
               ),
               child: Icon(
                 Icons.add,
-                size: 20.sp,
+                size: 20.rsp(context),
                 color: AppColors.textSecondary,
               ),
             ),

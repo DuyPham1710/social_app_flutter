@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_event.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_state.dart';
@@ -89,6 +90,8 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktopLayout = ResponsiveHelper.shouldShowSidebar(context);
+
     return SafeArea(
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
@@ -100,17 +103,33 @@ class HomePageState extends State<HomePage> {
               controller: _scrollController,
               physics: const ClampingScrollPhysics(),
               slivers: [
-                SliverAppBar(
-                  floating: true,
-                  snap: true,
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                  surfaceTintColor: Colors.transparent,
-                  automaticallyImplyLeading: false,
-                  toolbarHeight: 64.h,
-                  titleSpacing: 0,
-                  title: HomeHeaderWidget(),
-                ),
+                // On mobile: show SliverAppBar with header
+                // On desktop: show a simpler header (search + chat are in sidebar)
+                if (!isDesktopLayout)
+                  SliverAppBar(
+                    floating: true,
+                    snap: true,
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    surfaceTintColor: Colors.transparent,
+                    automaticallyImplyLeading: false,
+                    toolbarHeight: 64.h,
+                    titleSpacing: 0,
+                    title: HomeHeaderWidget(),
+                  )
+                else
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom: 8,
+                      ),
+                      child: HomeHeaderWidget(isDesktop: true),
+                    ),
+                  ),
+
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
@@ -197,7 +216,7 @@ class HomePageState extends State<HomePage> {
                                 context.l10n.homeEndOfPosts,
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
-                                  fontSize: 14.sp,
+                                  fontSize: 14.rsp(context),
                                 ),
                               ),
                             ),

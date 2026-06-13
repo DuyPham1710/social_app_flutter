@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/media_type.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_viewer_page.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
@@ -100,9 +100,12 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
           // Nếu không có user nào có story, chỉ hiển thị nút Add Story
           if (groupsWithStories.isEmpty) {
             return SizedBox(
-              height: 200.w,
+              height: 200.rs(context),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.rs(context),
+                  vertical: 8.rsh(context),
+                ),
                 child: Row(children: [_buildAddStory()]),
               ),
             );
@@ -113,10 +116,13 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
               .map((group) => group.stories.first)
               .toList();
           return SizedBox(
-            height: 200.w,
+            height: 200.rs(context),
             child: ListView.separated(
               controller: _scrollController,
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12.rs(context),
+                vertical: 8.rsh(context),
+              ),
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 if (index == 0) {
@@ -126,26 +132,26 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                 final groupIndex = index - 1;
                 return _buildStoryCard(story, groupIndex, groupsWithStories);
               },
-              separatorBuilder: (_, __) => SizedBox(width: 12.w),
+              separatorBuilder: (_, __) => SizedBox(width: 12.rs(context)),
               itemCount: stories.length + 1,
             ),
           );
         }
         if (state is HomeStoriesError) {
           return SizedBox(
-            height: 200.w,
+            height: 200.rs(context),
             child: Center(
               child: Text(
                 state.message,
                 style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 14.sp,
+                  fontSize: 14.rsp(context),
                 ),
               ),
             ),
           );
         }
-        return SizedBox(height: 200.w);
+        return SizedBox(height: 200.rs(context));
       },
     );
   }
@@ -164,15 +170,15 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
             alignment: Alignment.bottomCenter,
             children: [
               Container(
-                width: 80.w,
-                height: 120.w,
+                width: 80.rs(context),
+                height: 120.rs(context),
                 decoration: BoxDecoration(
                   color: AppColors.secondBackground,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(12.rsr(context)),
                   border: Border.all(color: AppColors.divider, width: 1),
                   image:
                       _currentUserAvatar != null &&
-                          _currentUserAvatar!.isNotEmpty
+                           _currentUserAvatar!.isNotEmpty
                       ? DecorationImage(
                           image: NetworkImage(_currentUserAvatar!),
                           fit: BoxFit.cover,
@@ -181,20 +187,24 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                 ),
               ),
               Positioned(
-                bottom: -18.h,
+                bottom: -18.rsh(context),
                 child: CircleAvatar(
-                  radius: 20.r,
+                  radius: 20.rsr(context),
                   backgroundColor: AppColors.primary,
-                  child: Icon(Icons.add, size: 24.sp, color: Colors.white),
+                  child: Icon(
+                    Icons.add,
+                    size: 24.rsp(context),
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 30.h),
+          SizedBox(height: 30.rsh(context)),
           Text(
             context.l10n.homeAddStory,
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 12.rsp(context),
               fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),
@@ -250,10 +260,10 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
             alignment: Alignment.bottomCenter,
             children: [
               Container(
-                width: 80.w,
-                height: 120.w,
+                width: 80.rs(context),
+                height: 120.rs(context),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(12.rsr(context)),
                   color: AppColors.secondBackground,
                 ),
                 clipBehavior: Clip.antiAlias,
@@ -293,40 +303,14 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                           : null),
               ),
 
-              // Badge LIVE
-              // Positioned(
-              //   top: 8,
-              //   right: 8,
-              //   child: story.isLive
-              //       ? Container(
-              //           padding: EdgeInsets.symmetric(
-              //             horizontal: 6.w,
-              //             vertical: 2.h,
-              //           ),
-              //           decoration: BoxDecoration(
-              //             color: Colors.black87,
-              //             borderRadius: BorderRadius.circular(6.r),
-              //           ),
-              //           child: Text(
-              //             "LIVE",
-              //             style: TextStyle(
-              //               color: Colors.white,
-              //               fontSize: 10.sp,
-              //               fontWeight: FontWeight.bold,
-              //             ),
-              //           ),
-              //         )
-              //       : const SizedBox(),
-              // ),
-
               // Avatar dưới chính giữa
               Positioned(
-                bottom: -18.h,
+                bottom: -18.rsh(context),
                 child: CircleAvatar(
-                  radius: 18.r,
+                  radius: 18.rsr(context),
                   backgroundColor: AppColors.background,
                   child: CircleAvatar(
-                    radius: 16.r,
+                    radius: 16.rsr(context),
                     backgroundImage: NetworkImage(
                       story.user.avatarUrl ??
                           "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
@@ -337,14 +321,14 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
             ],
           ),
 
-          SizedBox(height: 30.h),
+          SizedBox(height: 30.rsh(context)),
 
           Text(
             (_currentUserId != null && story.user.userId == _currentUserId)
                 ? "Tin của bạn"
                 : (story.user.fullName ?? "Unknown"),
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 12.rsp(context),
               fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),

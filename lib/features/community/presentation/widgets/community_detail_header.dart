@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -12,7 +13,7 @@ class CommunityDetailHeader extends StatelessWidget {
   final VoidCallback? onCancelRequest;
   final VoidCallback? onManage;
 
-  const CommunityDetailHeader({
+  CommunityDetailHeader({
     super.key,
     required this.community,
     required this.memberStatus,
@@ -29,20 +30,25 @@ class CommunityDetailHeader extends StatelessWidget {
         ? context.l10n.communityAdmin
         : context.l10n.communityMember;
     final roleColor = userRole == 'admin'
-        ? const Color(0xFFB54708)
-        : const Color(0xFF0F766E);
+        ? Color(0xFFB54708)
+        : Color(0xFF0F766E);
     final isPrivate = (community.status ?? '').toLowerCase() == 'private';
     final privacyLabel = isPrivate
         ? context.l10n.communityPrivateGroup
         : context.l10n.communityPublicGroup;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: EdgeInsets.fromLTRB(
+        12.rs(context),
+        0,
+        12.rs(context),
+        8.rsh(context),
+      ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.rs(context)),
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.rsr(context)),
           border: Border.all(color: AppColors.divider),
           boxShadow: [
             BoxShadow(
@@ -58,7 +64,7 @@ class CommunityDetailHeader extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  radius: 30,
+                  radius: 30.rsr(context),
                   backgroundColor: AppColors.secondBackground,
                   backgroundImage: community.avatar != null
                       ? NetworkImage(community.avatar!)
@@ -66,12 +72,12 @@ class CommunityDetailHeader extends StatelessWidget {
                   child: community.avatar == null
                       ? Icon(
                           Icons.groups,
-                          size: 30,
+                          size: 30.rsp(context),
                           color: AppColors.textSecondary,
                         )
                       : null,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.rs(context)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,13 +86,13 @@ class CommunityDetailHeader extends StatelessWidget {
                         community.name,
                         softWrap: true,
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 22.rsp(context),
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
-                          height: 1.1,
+                          height: 1.1.rsh(context),
                         ),
                       ),
-                      const SizedBox(height: 7),
+                      SizedBox(height: 7.rsh(context)),
                       Text(
                         context.l10n.communityPrivacyMembers(
                           privacyLabel,
@@ -94,11 +100,11 @@ class CommunityDetailHeader extends StatelessWidget {
                         ),
                         style: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 13,
+                          fontSize: 13.rsp(context),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.rsh(context)),
                       Wrap(
                         spacing: 8,
                         runSpacing: 6,
@@ -127,7 +133,7 @@ class CommunityDetailHeader extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14.rsh(context)),
 
             if (community.description != null &&
                 community.description!.isNotEmpty)
@@ -135,20 +141,20 @@ class CommunityDetailHeader extends StatelessWidget {
                 community.description!,
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 14,
+                  fontSize: 14.rsp(context),
                   fontWeight: FontWeight.w500,
-                  height: 1.35,
+                  height: 1.35.rsh(context),
                 ),
               )
             else
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.rs(context),
+                  vertical: 10.rsh(context),
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.secondBackground,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.rsr(context)),
                 ),
                 child: Text(
                   context.l10n.communityNoDescription,
@@ -156,22 +162,19 @@ class CommunityDetailHeader extends StatelessWidget {
                 ),
               ),
 
-            const SizedBox(height: 14),
+            SizedBox(height: 14.rsh(context)),
             Divider(height: 1, color: AppColors.divider),
-            const SizedBox(height: 14),
+            SizedBox(height: 14.rsh(context)),
 
             if (memberStatus == 'none')
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: onJoin,
-                  icon: const Icon(
-                    Icons.group_add_rounded,
-                    color: Colors.white,
-                  ),
+                  icon: Icon(Icons.group_add_rounded, color: Colors.white),
                   label: Text(
                     context.l10n.communityJoin,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
@@ -179,9 +182,9 @@ class CommunityDetailHeader extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    padding: EdgeInsets.symmetric(vertical: 13.rsh(context)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.rsr(context)),
                     ),
                   ),
                 ),
@@ -192,31 +195,33 @@ class CommunityDetailHeader extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: onCancelRequest,
-                      icon: const Icon(Icons.cancel_outlined),
+                      icon: Icon(Icons.cancel_outlined),
                       label: Text(context.l10n.friendCancelRequest),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12.rsh(context),
+                        ),
                         side: BorderSide(color: AppColors.divider),
                         foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10.rsr(context)),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.rs(context)),
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: EdgeInsets.symmetric(vertical: 13.rsh(context)),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF8E1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFFDE68A)),
+                        color: Color(0xFFFFF8E1),
+                        borderRadius: BorderRadius.circular(12.rsr(context)),
+                        border: Border.all(color: Color(0xFFFDE68A)),
                       ),
                       child: Text(
                         context.l10n.communityPendingApproval,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Color(0xFFB45309),
                           fontWeight: FontWeight.w700,
                         ),
@@ -233,18 +238,22 @@ class CommunityDetailHeader extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: onLeave,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFE4E6),
+                          backgroundColor: Color(0xFFFFE4E6),
                           elevation: 0,
-                          foregroundColor: const Color(0xFFB91C1C),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          foregroundColor: Color(0xFFB91C1C),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12.rsh(context),
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(
+                              10.rsr(context),
+                            ),
                           ),
                         ),
-                        icon: const Icon(Icons.logout_rounded),
+                        icon: Icon(Icons.logout_rounded),
                         label: Text(
                           context.l10n.communityLeaveGroup,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ),
                     ),
@@ -253,18 +262,18 @@ class CommunityDetailHeader extends StatelessWidget {
               else if (memberStatus == 'invited')
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.rs(context),
+                    vertical: 12.rsh(context),
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEF2FF),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFC7D2FE)),
+                    color: Color(0xFFEEF2FF),
+                    borderRadius: BorderRadius.circular(12.rsr(context)),
+                    border: Border.all(color: Color(0xFFC7D2FE)),
                   ),
                   child: Text(
                     context.l10n.communityInvitePendingNotice,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Color(0xFF3730A3),
                       fontWeight: FontWeight.w600,
                     ),
@@ -295,21 +304,24 @@ class _InfoChip extends StatelessWidget {
     final chipTextColor = textColor ?? AppColors.textSecondary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10.rs(context),
+        vertical: 6.rsh(context),
+      ),
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColors.secondBackground,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(999.rsr(context)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: chipTextColor),
-          const SizedBox(width: 5),
+          Icon(icon, size: 14.rsp(context), color: chipTextColor),
+          SizedBox(width: 5.rs(context)),
           Text(
             label,
             style: TextStyle(
               color: chipTextColor,
-              fontSize: 12,
+              fontSize: 12.rsp(context),
               fontWeight: FontWeight.w700,
             ),
           ),

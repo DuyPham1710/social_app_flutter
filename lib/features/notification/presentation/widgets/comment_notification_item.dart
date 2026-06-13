@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/comment/utils/comment_l10n_helper.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
@@ -75,7 +74,6 @@ class CommentNotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolvedActionText =
         actionText ?? context.l10n.notificationCommentedOnYourPost;
-    final messageSpans = localizedReactionLabel(context.l10n, this.content);
     return NotificationBaseItem(
       isRead: isRead,
       avatarUrl: avatarUrl,

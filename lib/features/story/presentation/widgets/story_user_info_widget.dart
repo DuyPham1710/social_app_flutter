@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/story/domain/entities/grouped_story_list_entity.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/story_options_bottom_sheet.dart';
+import 'package:social_app_fe/features/story/presentation/widgets/story_web_options_popup.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class StoryUserInfoWidget extends StatelessWidget {
@@ -32,17 +33,20 @@ class StoryUserInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 18.r,
+            radius: 18.rsr(context),
             backgroundImage: NetworkImage(
               currentGroup.user.avatarUrl ??
                   'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
             ),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 8.rs(context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,11 +57,11 @@ class StoryUserInfoWidget extends StatelessWidget {
                       : (currentGroup.user.fullName ?? context.l10n.commonUser),
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: 2.rsh(context)),
                 Text(
                   currentGroup.stories[currentStoryIndex].createdAt != null
                       ? _timeAgo(
@@ -65,36 +69,58 @@ class StoryUserInfoWidget extends StatelessWidget {
                           currentGroup.stories[currentStoryIndex].createdAt!,
                         )
                       : context.l10n.postUnknownTime,
-                  style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12.rsp(context),
+                  ),
                 ),
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              if (_isMyStory) {
-                StoryOptionsBottomSheet.show(
-                  context,
-                  currentGroup: currentGroup,
-                  currentStoryIndex: currentStoryIndex,
-                );
-              } else {
-                onClose();
-              }
-            },
-            child: Container(
-              padding: EdgeInsets.all(6.w),
-              decoration: const BoxDecoration(
-                color: Colors.black45,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                _isMyStory ? Icons.more_vert : Icons.close,
-                color: Colors.white,
-                size: 25.sp,
+          if (_isMyStory)
+            (ResponsiveHelper.isWebOrDesktop
+                ? StoryWebOptionsPopup(
+                    currentGroup: currentGroup,
+                    currentStoryIndex: currentStoryIndex,
+                    currentUserId: currentUserId,
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      StoryOptionsBottomSheet.show(
+                        context,
+                        currentGroup: currentGroup,
+                        currentStoryIndex: currentStoryIndex,
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(6.rs(context)),
+                      decoration: const BoxDecoration(
+                        color: Colors.black45,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.more_vert,
+                        color: Colors.white,
+                        size: 20.rsp(context),
+                      ),
+                    ),
+                  ))
+          else
+            GestureDetector(
+              onTap: onClose,
+              child: Container(
+                padding: EdgeInsets.all(6.rs(context)),
+                decoration: const BoxDecoration(
+                  color: Colors.black45,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 20.rsp(context),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

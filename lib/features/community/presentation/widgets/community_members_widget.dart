@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -25,7 +26,7 @@ class CommunityMembersWidget extends StatefulWidget {
   final bool isInBottomSheet;
   final String? userRole;
 
-  const CommunityMembersWidget({
+  CommunityMembersWidget({
     super.key,
     required this.communityId,
     this.refreshSeed = 0,
@@ -77,14 +78,14 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     );
 
     if (dataState is DataStateSuccess<List<MemberModel>>) {
-      return dataState.data ?? const [];
+      return dataState.data ?? [];
     }
 
     if (dataState is DataStateError) {
       throw dataState.error ?? Exception('Failed to load members');
     }
 
-    return const [];
+    return [];
   }
 
   void _refreshMembers() {
@@ -97,15 +98,25 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
   Widget build(BuildContext context) {
     final content = widget.isInBottomSheet
         ? Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            padding: EdgeInsets.fromLTRB(
+              16.rs(context),
+              0,
+              16.rs(context),
+              20.rsh(context),
+            ),
             child: _buildMembersContent(),
           )
         : Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            padding: EdgeInsets.fromLTRB(
+              16.rs(context),
+              16.rsh(context),
+              16.rs(context),
+              16.rsh(context),
+            ),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: _surface,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18.rsr(context)),
                 border: Border.all(color: _border),
                 boxShadow: [
                   BoxShadow(
@@ -116,7 +127,12 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                padding: EdgeInsets.fromLTRB(
+                  14.rs(context),
+                  14.rsh(context),
+                  14.rs(context),
+                  12.rsh(context),
+                ),
                 child: _buildMembersContent(),
               ),
             ),
@@ -179,12 +195,12 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
               isLoading: isLoading,
             ),
             if (!isLoading && members.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: 12.rsh(context)),
               _buildSearchField(),
             ],
-            const SizedBox(height: 14),
+            SizedBox(height: 14.rsh(context)),
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 240),
+              duration: Duration(milliseconds: 240),
               switchInCurve: Curves.easeOutCubic,
               switchOutCurve: Curves.easeInCubic,
               child: body,
@@ -212,15 +228,15 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     return Row(
       children: [
         Container(
-          width: 42,
-          height: 42,
+          width: 42.rs(context),
+          height: 42.rsh(context),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(14.rsr(context)),
           ),
           child: Icon(Icons.groups_rounded, color: AppColors.primary),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10.rs(context)),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,17 +248,17 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 17.rsp(context),
                   fontWeight: FontWeight.w800,
                   color: _text,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: 2.rsh(context)),
               Text(
                 countLabel,
                 style: TextStyle(
                   color: _mutedText,
-                  fontSize: 12,
+                  fontSize: 12.rsp(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -253,7 +269,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
           message: context.l10n.commonRefresh,
           child: IconButton.filledTonal(
             onPressed: isLoading ? null : _refreshMembers,
-            icon: const Icon(Icons.refresh_rounded),
+            icon: Icon(Icons.refresh_rounded),
             style: IconButton.styleFrom(
               backgroundColor: AppColors.secondBackground,
               foregroundColor: _text,
@@ -278,7 +294,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         hintStyle: TextStyle(color: AppColors.textSecondary),
         prefixIcon: Icon(
           Icons.search_rounded,
-          size: 21,
+          size: 21.rsp(context),
           color: AppColors.textSecondary,
         ),
         suffixIcon: _searchController.text.isEmpty
@@ -291,28 +307,31 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
                 },
                 icon: Icon(
                   Icons.close_rounded,
-                  size: 20,
+                  size: 20.rsp(context),
                   color: AppColors.textSecondary,
                 ),
               ),
         isDense: true,
         filled: true,
         fillColor: _pageTint,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 14.rs(context),
+          vertical: 12.rsh(context),
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.rsr(context)),
           borderSide: BorderSide(color: _border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.rsr(context)),
           borderSide: BorderSide(color: _border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.3),
+          borderRadius: BorderRadius.circular(14.rsr(context)),
+          borderSide: BorderSide(
+            color: AppColors.primary,
+            width: 1.3.rs(context),
+          ),
         ),
       ),
       style: TextStyle(color: AppColors.textPrimary),
@@ -345,41 +364,39 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
 
   Widget _buildErrorState(Object? error) {
     return Container(
-      key: const ValueKey('error'),
+      key: ValueKey('error'),
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14.rs(context)),
       decoration: BoxDecoration(
-        color: const Color(0xFFE11D48).withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFE11D48).withValues(alpha: 0.28),
-        ),
+        color: Color(0xFFE11D48).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
+        border: Border.all(color: Color(0xFFE11D48).withValues(alpha: 0.28)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48)),
-          const SizedBox(width: 10),
+          Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48)),
+          SizedBox(width: 10.rs(context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   context.l10n.communityLoadMembersFailed,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFF9F1239),
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.rsh(context)),
                 Text(
                   '$error',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFBE123C),
-                    fontSize: 12,
-                    height: 1.35,
+                    fontSize: 12.rsp(context),
+                    height: 1.35.rsh(context),
                   ),
                 ),
               ],
@@ -402,38 +419,49 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
     return Container(
       key: ValueKey(title),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 18),
+      padding: EdgeInsets.symmetric(
+        vertical: 28.rsh(context),
+        horizontal: 18.rs(context),
+      ),
       decoration: BoxDecoration(
         color: _pageTint,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
         border: Border.all(color: _border),
       ),
       child: Column(
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: 52.rs(context),
+            height: 52.rsh(context),
             decoration: BoxDecoration(
               color: AppColors.background,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 28, color: AppColors.textSecondary),
+            child: Icon(
+              icon,
+              size: 28.rsp(context),
+              color: AppColors.textSecondary,
+            ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.rsh(context)),
           Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _text,
-              fontSize: 15,
+              fontSize: 15.rsp(context),
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4.rsh(context)),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(color: _mutedText, fontSize: 13, height: 1.35),
+            style: TextStyle(
+              color: _mutedText,
+              fontSize: 13.rsp(context),
+              height: 1.35.rsh(context),
+            ),
           ),
         ],
       ),
@@ -442,26 +470,42 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
 
   Widget _buildSkeletonLoading() {
     return Column(
-      key: const ValueKey('loading'),
+      key: ValueKey('loading'),
       children: List.generate(
         4,
         (index) => Padding(
           padding: EdgeInsets.only(bottom: index == 3 ? 0 : 14),
           child: Row(
-            children: const [
-              _SkeletonBox(width: 48, height: 48, radius: 24),
-              SizedBox(width: 12),
+            children: [
+              _SkeletonBox(
+                width: 48.rs(context),
+                height: 48.rsh(context),
+                radius: 24.rsr(context),
+              ),
+              SizedBox(width: 12.rs(context)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SkeletonBox(width: 160, height: 14, radius: 7),
-                    SizedBox(height: 9),
-                    _SkeletonBox(width: 108, height: 12, radius: 6),
+                    _SkeletonBox(
+                      width: 160.rs(context),
+                      height: 14.rsh(context),
+                      radius: 7.rsr(context),
+                    ),
+                    SizedBox(height: 9.rsh(context)),
+                    _SkeletonBox(
+                      width: 108.rs(context),
+                      height: 12.rsh(context),
+                      radius: 6.rsr(context),
+                    ),
                   ],
                 ),
               ),
-              _SkeletonBox(width: 34, height: 34, radius: 17),
+              _SkeletonBox(
+                width: 34.rs(context),
+                height: 34.rsh(context),
+                radius: 17.rsr(context),
+              ),
             ],
           ),
         ),
@@ -492,8 +536,8 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
-            child: const ProfilePage(),
+            create: (_) => s1<ProfileBloc>()..add(LoadUserProfileEvent()),
+            child: ProfilePage(),
           ),
         ),
       );
@@ -521,7 +565,9 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18.rsr(context)),
+        ),
         title: Row(
           children: [
             Expanded(child: Text(context.l10n.communityRemoveMemberTitle)),
@@ -529,9 +575,14 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
         ),
         content: Text(
           context.l10n.communityRemoveMemberConfirm(userName),
-          style: const TextStyle(height: 1.35),
+          style: TextStyle(height: 1.35.rsh(context)),
         ),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        actionsPadding: EdgeInsets.fromLTRB(
+          16.rs(context),
+          0,
+          16.rs(context),
+          14.rsh(context),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -549,7 +600,7 @@ class _CommunityMembersWidgetState extends State<CommunityMembersWidget> {
             },
             label: Text(context.l10n.commonDelete),
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFDC2626),
+              backgroundColor: Color(0xFFDC2626),
               foregroundColor: Colors.white,
             ),
           ),
@@ -565,7 +616,7 @@ class _MemberTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onRemove;
 
-  const _MemberTile({
+  _MemberTile({
     required this.member,
     required this.canManage,
     required this.onTap,
@@ -582,16 +633,16 @@ class _MemberTile extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.rsr(context)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: EdgeInsets.symmetric(vertical: 10.rsh(context)),
           child: Row(
             children: [
               _MemberAvatar(
                 avatarUrl: user.avatarUrl,
                 fallbackName: user.fullName ?? username ?? '',
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12.rs(context)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -604,23 +655,23 @@ class _MemberTile extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 15.rsp(context),
                               fontWeight: FontWeight.w800,
                               color: AppColors.textPrimary,
                             ),
                           ),
                         ),
-                        if (isAdmin) const SizedBox(width: 8),
-                        if (isAdmin) const _RolePill(isAdmin: true),
+                        if (isAdmin) SizedBox(width: 8.rs(context)),
+                        if (isAdmin) _RolePill(isAdmin: true),
                       ],
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: 5.rsh(context)),
                     Wrap(
                       spacing: 8,
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        if (!isAdmin) const _RolePill(isAdmin: false),
+                        if (!isAdmin) _RolePill(isAdmin: false),
                         if (member.createdAt != null)
                           _JoinedDate(date: member.createdAt!),
                       ],
@@ -628,7 +679,7 @@ class _MemberTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8.rs(context)),
               if (canManage)
                 PopupMenuButton<String>(
                   color: AppColors.background,
@@ -637,29 +688,29 @@ class _MemberTile extends StatelessWidget {
                     if (value == 'remove') onRemove();
                   },
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.rsr(context)),
                   ),
                   itemBuilder: (_) => [
                     PopupMenuItem(
                       value: 'remove',
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.person_remove_rounded,
                             color: Color(0xFFDC2626),
-                            size: 20,
+                            size: 20.rsp(context),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10.rs(context)),
                           Text(
                             context.l10n.communityRemoveFromGroup,
-                            style: const TextStyle(color: Color(0xFFDC2626)),
+                            style: TextStyle(color: Color(0xFFDC2626)),
                           ),
                         ],
                       ),
                     ),
                   ],
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8.rs(context)),
                     child: Icon(
                       Icons.more_horiz_rounded,
                       color: AppColors.textSecondary,
@@ -683,7 +734,7 @@ class _MemberAvatar extends StatelessWidget {
   final String? avatarUrl;
   final String fallbackName;
 
-  const _MemberAvatar({required this.avatarUrl, required this.fallbackName});
+  _MemberAvatar({required this.avatarUrl, required this.fallbackName});
 
   @override
   Widget build(BuildContext context) {
@@ -693,11 +744,11 @@ class _MemberAvatar extends StatelessWidget {
     final hasAvatar = avatarUrl != null && avatarUrl!.isNotEmpty;
 
     return Container(
-      width: 52,
-      height: 52,
+      width: 52.rs(context),
+      height: 52.rsh(context),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.divider, width: 2),
+        border: Border.all(color: AppColors.divider, width: 2.rs(context)),
       ),
       child: ClipOval(
         child: hasAvatar
@@ -715,7 +766,7 @@ class _MemberAvatar extends StatelessWidget {
 class _AvatarFallback extends StatelessWidget {
   final String initial;
 
-  const _AvatarFallback({required this.initial});
+  _AvatarFallback({required this.initial});
 
   @override
   Widget build(BuildContext context) {
@@ -727,7 +778,7 @@ class _AvatarFallback extends StatelessWidget {
         style: TextStyle(
           color: AppColors.primary,
           fontWeight: FontWeight.w800,
-          fontSize: 18,
+          fontSize: 18.rsp(context),
         ),
       ),
     );
@@ -737,17 +788,20 @@ class _AvatarFallback extends StatelessWidget {
 class _RolePill extends StatelessWidget {
   final bool isAdmin;
 
-  const _RolePill({required this.isAdmin});
+  _RolePill({required this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: 8.rs(context),
+        vertical: 4.rsh(context),
+      ),
       decoration: BoxDecoration(
         color: isAdmin
             ? AppColors.primary.withValues(alpha: 0.12)
             : AppColors.primary.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(999.rsr(context)),
         border: Border.all(
           color: isAdmin
               ? AppColors.primary.withValues(alpha: 0.24)
@@ -759,17 +813,17 @@ class _RolePill extends StatelessWidget {
         children: [
           Icon(
             isAdmin ? Icons.verified_user_rounded : Icons.person_rounded,
-            size: 12,
+            size: 12.rsp(context),
             color: AppColors.primary,
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: 4.rs(context)),
           Text(
             isAdmin
                 ? context.l10n.communityAdmin
                 : context.l10n.communityMember,
             style: TextStyle(
               color: AppColors.primary,
-              fontSize: 11,
+              fontSize: 11.rsp(context),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -782,7 +836,7 @@ class _RolePill extends StatelessWidget {
 class _JoinedDate extends StatelessWidget {
   final DateTime date;
 
-  const _JoinedDate({required this.date});
+  _JoinedDate({required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -791,15 +845,15 @@ class _JoinedDate extends StatelessWidget {
       children: [
         Icon(
           Icons.calendar_today_rounded,
-          size: 12,
+          size: 12.rsp(context),
           color: AppColors.textSecondary,
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 4.rs(context)),
         Text(
           DateFormat('dd/MM/yyyy').format(date.toLocal()),
           style: TextStyle(
             color: AppColors.textSecondary,
-            fontSize: 12,
+            fontSize: 12.rsp(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -813,7 +867,7 @@ class _SkeletonBox extends StatelessWidget {
   final double height;
   final double radius;
 
-  const _SkeletonBox({this.width, required this.height, required this.radius});
+  _SkeletonBox({this.width, required this.height, required this.radius});
 
   @override
   Widget build(BuildContext context) {

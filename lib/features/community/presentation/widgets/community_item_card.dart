@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
@@ -11,7 +12,7 @@ import 'package:social_app_fe/l10n/l10n.dart';
 class CommunityItem extends StatefulWidget {
   final dynamic community;
 
-  const CommunityItem({super.key, required this.community});
+  CommunityItem({super.key, required this.community});
 
   @override
   State<CommunityItem> createState() => _CommunityItemState();
@@ -97,7 +98,7 @@ class _CommunityItemState extends State<CommunityItem> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
           onTap: () {
             Navigator.of(
               context,
@@ -106,7 +107,7 @@ class _CommunityItemState extends State<CommunityItem> {
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               border: Border.all(color: AppColors.divider, width: 1),
               boxShadow: [
                 BoxShadow(
@@ -117,7 +118,12 @@ class _CommunityItemState extends State<CommunityItem> {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              padding: EdgeInsets.fromLTRB(
+                12.rs(context),
+                12.rsh(context),
+                12.rs(context),
+                12.rsh(context),
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -133,12 +139,12 @@ class _CommunityItemState extends State<CommunityItem> {
                                 alpha: 0.08,
                               ),
                               blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
                         child: CircleAvatar(
-                          radius: 30,
+                          radius: 30.rsr(context),
                           backgroundColor: AppColors.secondBackground,
                           backgroundImage: avatarUrl != null
                               ? NetworkImage(avatarUrl)
@@ -147,7 +153,7 @@ class _CommunityItemState extends State<CommunityItem> {
                               ? Icon(
                                   Icons.groups_rounded,
                                   color: AppColors.primary,
-                                  size: 30,
+                                  size: 30.rsp(context),
                                 )
                               : null,
                         ),
@@ -156,8 +162,8 @@ class _CommunityItemState extends State<CommunityItem> {
                         top: -4,
                         left: -4,
                         child: Container(
-                          width: 24,
-                          height: 24,
+                          width: 24.rs(context),
+                          height: 24.rsh(context),
                           decoration: BoxDecoration(
                             color: AppColors.background,
                             shape: BoxShape.circle,
@@ -171,7 +177,7 @@ class _CommunityItemState extends State<CommunityItem> {
                                   alpha: 0.08,
                                 ),
                                 blurRadius: 4,
-                                offset: const Offset(0, 1),
+                                offset: Offset(0, 1),
                               ),
                             ],
                           ),
@@ -179,16 +185,16 @@ class _CommunityItemState extends State<CommunityItem> {
                             isPrivate
                                 ? Icons.lock_rounded
                                 : Icons.public_rounded,
-                            size: 12,
+                            size: 12.rsp(context),
                             color: isPrivate
                                 ? AppColors.textSecondary
-                                : const Color(0xFF0F766E),
+                                : Color(0xFF0F766E),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.rs(context)),
                   // Info
                   Expanded(
                     child: Column(
@@ -201,29 +207,35 @@ class _CommunityItemState extends State<CommunityItem> {
                             Text(
                               widget.community.name,
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 15.rsp(context),
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             if (_myRole == 'admin')
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.rs(context),
+                                  vertical: 3.rsh(context),
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(5),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    5.rsr(context),
+                                  ),
                                   border: Border.all(
-                                    color: AppColors.primary.withValues(alpha: 0.3),
-                                    width: 0.8,
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    width: 0.8.rs(context),
                                   ),
                                 ),
                                 child: Text(
                                   context.l10n.communityAdmin,
                                   style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 10.rsp(context),
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primary,
                                   ),
@@ -231,7 +243,7 @@ class _CommunityItemState extends State<CommunityItem> {
                               ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.rsh(context)),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -243,16 +255,16 @@ class _CommunityItemState extends State<CommunityItem> {
                                     children: [
                                       Icon(
                                         Icons.people_outline_rounded,
-                                        size: 13,
+                                        size: 13.rsp(context),
                                         color: AppColors.textSecondary,
                                       ),
-                                      const SizedBox(width: 4),
+                                      SizedBox(width: 4.rs(context)),
                                       Text(
                                         context.l10n.communityMembersCount(
                                           widget.community.memberCount ?? 0,
                                         ),
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 12.rsp(context),
                                           color: AppColors.textSecondary,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -261,13 +273,15 @@ class _CommunityItemState extends State<CommunityItem> {
                                   ),
                                   if (description.isNotEmpty)
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 4),
+                                      padding: EdgeInsets.only(
+                                        top: 4.rsh(context),
+                                      ),
                                       child: Text(
                                         description,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 11.rsp(context),
                                           color: AppColors.textSecondary,
                                           fontWeight: FontWeight.w400,
                                         ),
@@ -276,7 +290,7 @@ class _CommunityItemState extends State<CommunityItem> {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12.rs(context)),
                             _buildActionButton(context),
                           ],
                         ),
@@ -298,27 +312,45 @@ class _CommunityItemState extends State<CommunityItem> {
     final myRole = _myRole;
 
     final buttonStyle = FilledButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 5.rsh(context),
+      ),
+      textStyle: TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: 11.rsp(context),
+      ),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       elevation: 0,
     );
     final tonalStyle = FilledButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 5.rsh(context),
+      ),
+      textStyle: TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: 11.rsp(context),
+      ),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       backgroundColor: AppColors.primary.withValues(alpha: 0.12),
       foregroundColor: AppColors.primary,
       elevation: 0,
     );
     final outlineStyle = OutlinedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 5.rsh(context),
+      ),
+      textStyle: TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: 11.rsp(context),
+      ),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       foregroundColor: AppColors.textSecondary,
-      side: BorderSide(color: AppColors.divider, width: 0.8),
+      side: BorderSide(color: AppColors.divider, width: 0.8.rs(context)),
       backgroundColor: AppColors.secondBackground,
     );
 

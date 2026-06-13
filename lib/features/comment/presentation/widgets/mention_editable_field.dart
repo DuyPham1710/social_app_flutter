@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class MentionEditableField extends StatefulWidget {
@@ -45,17 +45,17 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
               widget.mentionKey.currentState!.addMention(data);
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.rs(context), vertical: 10.rsh(context)),
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 18.r,
+                    radius: 18.rsr(context),
                     backgroundColor: AppColors.secondBackground,
                     backgroundImage: NetworkImage(
                       data['photo'] ?? 'https://via.placeholder.com/150',
                     ),
                   ),
-                  SizedBox(width: 12.w),
+                  SizedBox(width: 12.rs(context)),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,13 +64,13 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
                           data['display'],
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 14.sp,
+                            fontSize: 14.rsp(context),
                           ),
                         ),
                         Text(
                           '@${data['full_name']}',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12.rsp(context),
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -148,7 +148,7 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: BorderRadius.circular(8.rsr(context)),
         border: Border.all(color: AppColors.divider),
       ),
       child: FlutterMentions(
@@ -156,13 +156,13 @@ class _MentionEditableFieldState extends State<MentionEditableField> {
         suggestionPosition: SuggestionPosition.Bottom,
         maxLines: 10,
         minLines: 1,
-        style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+        style: TextStyle(fontSize: 14.rsp(context), color: AppColors.textPrimary),
         cursorColor: AppColors.primary,
         decoration: InputDecoration(
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.rsp(context)),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.all(12.w),
+          contentPadding: EdgeInsets.all(12.rs(context)),
         ),
         mentions: [_mentionConfig],
       ),

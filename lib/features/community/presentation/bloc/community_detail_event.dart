@@ -1,37 +1,37 @@
 part of 'community_detail_bloc.dart';
 
 abstract class CommunityDetailEvent {
-  const CommunityDetailEvent();
+  CommunityDetailEvent();
 }
 
 class CommunityDetailFetched extends CommunityDetailEvent {
   final String communityId;
 
-  const CommunityDetailFetched(this.communityId);
+  CommunityDetailFetched(this.communityId);
 }
 
 class JoinCommunityRequested extends CommunityDetailEvent {
   final String communityId;
 
-  const JoinCommunityRequested(this.communityId);
+  JoinCommunityRequested(this.communityId);
 }
 
 class LeaveCommunityRequested extends CommunityDetailEvent {
   final String communityId;
 
-  const LeaveCommunityRequested(this.communityId);
+  LeaveCommunityRequested(this.communityId);
 }
 
 class CancelJoinRequestRequested extends CommunityDetailEvent {
   final String communityId;
 
-  const CancelJoinRequestRequested(this.communityId);
+  CancelJoinRequestRequested(this.communityId);
 }
 
 class MemberStatusFetched extends CommunityDetailEvent {
   final String communityId;
 
-  const MemberStatusFetched(this.communityId);
+  MemberStatusFetched(this.communityId);
 }
 
 class RespondToInviteRequested extends CommunityDetailEvent {
@@ -39,7 +39,7 @@ class RespondToInviteRequested extends CommunityDetailEvent {
   final String requestId;
   final String action;
 
-  const RespondToInviteRequested({
+  RespondToInviteRequested({
     required this.communityId,
     required this.requestId,
     required this.action,
@@ -49,5 +49,5 @@ class RespondToInviteRequested extends CommunityDetailEvent {
 class DeleteCommunityRequested extends CommunityDetailEvent {
   final String communityId;
 
-  const DeleteCommunityRequested(this.communityId);
+  DeleteCommunityRequested(this.communityId);
 }

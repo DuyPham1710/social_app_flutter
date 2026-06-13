@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_state.dart';
@@ -28,18 +28,18 @@ class TypingIndicator extends StatelessWidget {
           }
 
           return Container(
-            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 0),
+            padding: EdgeInsets.fromLTRB(16.rs(context), 8.rsh(context), 16.rs(context), 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 //_buildTypingDots(),
                 SizedBox(
-                  width: 36.w,
-                  height: 26.h,
+                  width: 36.rs(context),
+                  height: 26.rsh(context),
                   child: ClipRect(
                     child: OverflowBox(
-                      maxWidth: 100.w,
-                      maxHeight: 80.h,
+                      maxWidth: 100.rs(context),
+                      maxHeight: 80.rsh(context),
                       child: ColorFiltered(
                         colorFilter: ColorFilter.mode(
                           AppColors.textSecondary, // Màu giống với text
@@ -54,13 +54,13 @@ class TypingIndicator extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 8.w),
+                SizedBox(width: 8.rs(context)),
 
                 Expanded(
                   child: Text(
                     typingText,
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 12.rsp(context),
                       color: AppColors.textSecondary,
                       fontStyle: FontStyle.italic,
                     ),

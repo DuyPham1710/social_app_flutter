@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
@@ -7,7 +8,7 @@ import 'package:social_app_fe/features/community/presentation/widgets/my_invites
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class MyInvitesWidget extends StatefulWidget {
-  const MyInvitesWidget({super.key});
+  MyInvitesWidget({super.key});
 
   @override
   State<MyInvitesWidget> createState() => _MyInvitesWidgetState();
@@ -18,7 +19,7 @@ class _MyInvitesWidgetState extends State<MyInvitesWidget> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        context.read<CommunityListBloc>().add(const MyInvitesFetched());
+        context.read<CommunityListBloc>().add(MyInvitesFetched());
       },
       child: BlocBuilder<CommunityListBloc, CommunityListState>(
         builder: (context, state) {
@@ -30,16 +31,16 @@ class _MyInvitesWidgetState extends State<MyInvitesWidget> {
             if (state.invites.isEmpty) {
               return Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: EdgeInsets.symmetric(horizontal: 30.rs(context)),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.mark_email_unread_outlined,
-                        size: 54,
+                        size: 54.rsp(context),
                         color: AppColors.textSecondary.withValues(alpha: 0.75),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.rsh(context)),
                       Text(
                         context.l10n.communityNoInvites,
                         style: TextStyle(
@@ -54,7 +55,12 @@ class _MyInvitesWidgetState extends State<MyInvitesWidget> {
             }
 
             return ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              padding: EdgeInsets.fromLTRB(
+                16.rs(context),
+                12.rsh(context),
+                16.rs(context),
+                24.rsh(context),
+              ),
               itemCount: state.invites.length,
               itemBuilder: (context, index) {
                 final invite = state.invites[index];
@@ -63,24 +69,24 @@ class _MyInvitesWidgetState extends State<MyInvitesWidget> {
                   child: MyInvitesItem(invite: invite),
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => SizedBox(height: 12.rsh(context)),
             );
           }
 
           if (state is CommunityListError) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
+                padding: EdgeInsets.symmetric(horizontal: 28.rs(context)),
                 child: Text(
                   localizedCommunityMessage(context.l10n, state.message),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFFB42318)),
+                  style: TextStyle(color: Color(0xFFB42318)),
                 ),
               ),
             );
           }
 
-          return const Center(child: Text(''));
+          return Center(child: Text(''));
         },
       ),
     );
@@ -120,9 +126,14 @@ class _MyInvitesSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        12.rsh(context),
+        16.rs(context),
+        24.rsh(context),
+      ),
       itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => SizedBox(height: 12.rsh(context)),
       itemBuilder: (_, __) => const _InviteSkeletonCard(),
     );
   }
@@ -134,29 +145,43 @@ class _InviteSkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18.rsr(context)),
         border: Border.all(color: AppColors.divider),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          _SkeletonBlock(height: 48, width: 48, radius: 999),
-          SizedBox(width: 12),
+          _SkeletonBlock(
+            height: 48.rsh(context),
+            width: 48.rs(context),
+            radius: 999.rsr(context),
+          ),
+          SizedBox(width: 12.rs(context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SkeletonBlock(height: 14, width: 150),
-                SizedBox(height: 8),
-                _SkeletonBlock(height: 12, width: 170),
-                SizedBox(height: 10),
+                _SkeletonBlock(height: 14.rsh(context), width: 150.rs(context)),
+                SizedBox(height: 8.rsh(context)),
+                _SkeletonBlock(height: 12.rsh(context), width: 170.rs(context)),
+                SizedBox(height: 10.rsh(context)),
                 Row(
                   children: [
-                    Expanded(child: _SkeletonBlock(height: 34, radius: 10)),
-                    SizedBox(width: 8),
-                    Expanded(child: _SkeletonBlock(height: 34, radius: 10)),
+                    Expanded(
+                      child: _SkeletonBlock(
+                        height: 34.rsh(context),
+                        radius: 10.rsr(context),
+                      ),
+                    ),
+                    SizedBox(width: 8.rs(context)),
+                    Expanded(
+                      child: _SkeletonBlock(
+                        height: 34.rsh(context),
+                        radius: 10.rsr(context),
+                      ),
+                    ),
                   ],
                 ),
               ],

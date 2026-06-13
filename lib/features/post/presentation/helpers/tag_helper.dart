@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 
 class TagHelper {
@@ -16,7 +17,7 @@ class TagHelper {
         boldStyle ??
         TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 14.sp,
+          fontSize: ResponsiveHelper.isWebOrDesktop ? 14 : 14.sp,
           color: AppColors.textPrimary,
         );
 
@@ -24,7 +25,7 @@ class TagHelper {
         normalStyle ??
         TextStyle(
           fontWeight: FontWeight.normal,
-          fontSize: 14.sp,
+          fontSize: ResponsiveHelper.isWebOrDesktop ? 14 : 14.sp,
           color: AppColors.textSecondary,
         );
 
@@ -39,7 +40,9 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: ownerName, style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postWith, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[0], style: bStyle),
           ],
         ),
@@ -51,9 +54,13 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: ownerName, style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postWith, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[0], style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postAnd, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[1], style: bStyle),
           ],
         ),
@@ -64,9 +71,13 @@ class TagHelper {
       text: TextSpan(
         children: [
           TextSpan(text: ownerName, style: bStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postWith, style: nStyle),
+          TextSpan(text: ' '),
           TextSpan(text: taggedNames[0], style: bStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postAnd, style: nStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
         ],
       ),
@@ -87,7 +98,7 @@ class TagHelper {
         boldStyle ??
         TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 14.sp,
+          fontSize: ResponsiveHelper.isWebOrDesktop ? 14 : 14.sp,
           color: AppColors.textPrimary,
         );
 
@@ -95,7 +106,7 @@ class TagHelper {
         normalStyle ??
         TextStyle(
           fontWeight: FontWeight.normal,
-          fontSize: 14.sp,
+          fontSize: ResponsiveHelper.isWebOrDesktop ? 14 : 14.sp,
           color: AppColors.textSecondary,
         );
 
@@ -108,7 +119,9 @@ class TagHelper {
         text: TextSpan(
           children: [
             TextSpan(text: taggedNames[0], style: bStyle),
+            TextSpan(text: ' '),
             TextSpan(text: l10n.postAnd, style: nStyle),
+            TextSpan(text: ' '),
             TextSpan(text: taggedNames[1], style: bStyle),
           ],
         ),
@@ -119,7 +132,9 @@ class TagHelper {
       text: TextSpan(
         children: [
           TextSpan(text: taggedNames[0], style: bStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postAnd, style: nStyle),
+          TextSpan(text: ' '),
           TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
         ],
       ),

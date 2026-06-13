@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/profile/domain/entities/update_user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -88,45 +89,62 @@ class _ProfileDetailEditPageState extends State<ProfileDetailEditPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.profileEditDetailsTitle),
-        actions: [
-          TextButton(
-            onPressed: _onSave,
-            child: Text(
-              l10n.commonSave,
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.profileEditDetailsTitle),
+              actions: [
+                TextButton(
+                  onPressed: _onSave,
+                  child: Text(
+                    l10n.commonSave,
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            body: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildTextField(
+                  l10n.profileSchool,
+                  _schoolController,
+                  Icons.school,
+                ),
+                _buildTextField(
+                  l10n.profileCurrentCity,
+                  _currentCityController,
+                  Icons.location_city,
+                ),
+                _buildTextField(
+                  l10n.profileHometown,
+                  _hometownController,
+                  Icons.home,
+                ),
+                _buildTextField(
+                  l10n.profileWorkplace,
+                  _workplaceController,
+                  Icons.work,
+                ),
+                _buildRelationshipDropdown(),
+                const SizedBox(height: 30),
+              ],
             ),
           ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildTextField(l10n.profileSchool, _schoolController, Icons.school),
-          _buildTextField(
-            l10n.profileCurrentCity,
-            _currentCityController,
-            Icons.location_city,
-          ),
-          _buildTextField(
-            l10n.profileHometown,
-            _hometownController,
-            Icons.home,
-          ),
-          _buildTextField(
-            l10n.profileWorkplace,
-            _workplaceController,
-            Icons.work,
-          ),
-          _buildRelationshipDropdown(),
-          const SizedBox(height: 30),
-        ],
+        ),
       ),
     );
   }

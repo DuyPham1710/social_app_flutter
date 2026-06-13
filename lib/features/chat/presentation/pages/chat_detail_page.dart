@@ -2046,6 +2046,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                   child: TextField(
                     controller: _messageController,
                     focusNode: _focusNode,
+                    cursorColor: AppColors.primary,
                     onChanged: _onTextChanged,
                     onTap: () {
                       // Toggle expansion khi ấn vào TextField

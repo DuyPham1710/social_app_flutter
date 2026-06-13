@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/save/domain/entities/saved_entity.dart';
 
@@ -27,19 +27,19 @@ class SavedItemCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: AppColors.secondBackground,
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(12.rsr(context)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(12.rsr(context)),
             border: Border.all(color: AppColors.divider),
             boxShadow: isDark
                 ? null
                 : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -79,20 +79,20 @@ class SavedItemCard extends StatelessWidget {
                     )
                   else if (item.content.isNotEmpty)
                     Padding(
-                      padding: EdgeInsets.all(12.w),
+                      padding: EdgeInsets.all(12.rs(context)),
                       child: Text(
                         item.content,
                         maxLines: 4,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14.rsp(context),
                           color: AppColors.textPrimary,
                         ),
                       ),
                     )
                   else
                     Padding(
-                      padding: EdgeInsets.all(12.w),
+                      padding: EdgeInsets.all(12.rs(context)),
                       child: Text(
                         'Không có nội dung',
                         style: TextStyle(
@@ -105,13 +105,13 @@ class SavedItemCard extends StatelessWidget {
                     Divider(height: 1, thickness: 1, color: AppColors.divider),
                     Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 8.h,
+                        horizontal: 12.rs(context),
+                        vertical: 8.rsh(context),
                       ),
                       child: Row(
                         children: [
                           CircleAvatar(
-                            radius: 12.r,
+                            radius: 12.rsr(context),
                             backgroundImage:
                                 item.authorAvatar != null &&
                                     item.authorAvatar!.isNotEmpty
@@ -121,14 +121,14 @@ class SavedItemCard extends StatelessWidget {
                                       )
                                       as ImageProvider,
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8.rs(context)),
                           Expanded(
                             child: Text(
                               item.authorName ?? 'Không xác định',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 12.rsp(context),
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
@@ -141,8 +141,8 @@ class SavedItemCard extends StatelessWidget {
                 ],
               ),
               Positioned(
-                top: 6.h,
-                right: 6.w,
+                top: 6.rsh(context),
+                right: 6.rs(context),
                 child: PopupMenuButton<String>(
                   tooltip: 'Tùy chọn',
                   color: AppColors.background,
@@ -187,14 +187,14 @@ class SavedItemCard extends StatelessWidget {
                     ),
                   ],
                   child: Container(
-                    padding: EdgeInsets.all(5.w),
+                    padding: EdgeInsets.all(5.rs(context)),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.42),
+                      color: Colors.black.withValues(alpha: 0.42),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.more_horiz_rounded,
-                      size: 18.sp,
+                      size: 18.rsp(context),
                       color: Colors.white,
                     ),
                   ),

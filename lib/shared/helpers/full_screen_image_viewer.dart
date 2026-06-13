@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
@@ -31,6 +32,7 @@ class FullScreenImageViewer extends StatefulWidget {
 
 class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   late PageController _pageController;
+  final FocusNode _focusNode = FocusNode();
   int currentIndex = 0;
   double dragStartX = 0;
   double dragStartY = 0;
@@ -67,11 +69,13 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       context: context,
       backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16.rsr(context)),
+        ),
       ),
       builder: (context) {
         return Container(
-          padding: EdgeInsets.symmetric(vertical: 20.h),
+          padding: EdgeInsets.symmetric(vertical: 20.rsh(context)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -81,7 +85,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   context.l10n.storySavePhoto,
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 16.sp,
+                    fontSize: 16.rsp(context),
                   ),
                 ),
                 onTap: () {
@@ -89,7 +93,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   _saveImageToGallery(imageUrl);
                 },
               ),
-              SizedBox(height: 10.h),
+              SizedBox(height: 10.rsh(context)),
             ],
           ),
         );
@@ -118,7 +122,10 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
 
       if (!status.isGranted) {
         if (mounted) {
-          showInfoSnackBar(context, context.l10n.commonSavePhotoPermissionMessage);
+          showInfoSnackBar(
+            context,
+            context.l10n.commonSavePhotoPermissionMessage,
+          );
         }
         return;
       }
@@ -137,7 +144,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       await dio.download(imageUrl, filePath);
 
       // Lưu vào gallery
-      final savedAsset = await PhotoManager.editor.saveImageWithPath(
+      await PhotoManager.editor.saveImageWithPath(
         filePath,
         title: 'image_${DateTime.now().millisecondsSinceEpoch}',
       );
@@ -159,7 +166,176 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _goToPreviousImage() {
+    if (currentIndex > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToNextImage() {
+    if (currentIndex < widget.imageUrls.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final bool showArrows =
+        ResponsiveHelper.isWebOrDesktop && widget.imageUrls.length > 1;
+    final bool showCloseButton = ResponsiveHelper.isWebOrDesktop;
+
+    Widget body = Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        PhotoViewGallery.builder(
+          itemCount: widget.imageUrls.length,
+          pageController: _pageController,
+          backgroundDecoration: const BoxDecoration(color: Colors.black),
+          builder: (context, index) {
+            return PhotoViewGalleryPageOptions(
+              imageProvider: NetworkImage(widget.imageUrls[index]),
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered * 2.5,
+              heroAttributes: PhotoViewHeroAttributes(
+                tag: widget.imageUrls[index],
+              ),
+            );
+          },
+          onPageChanged: (index) {
+            setState(() => currentIndex = index);
+            widget.onImageChanged?.call(index);
+          },
+          scrollPhysics: const BouncingScrollPhysics(),
+        ),
+
+        // Page indicator
+        if (widget.imageUrls.length > 1)
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${currentIndex + 1} / ${widget.imageUrls.length}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+        // Close button (Web/Desktop)
+        if (showCloseButton)
+          Positioned(
+            top: 20,
+            right: 20,
+            child: Material(
+              color: Colors.black.withValues(alpha: 0.5),
+              shape: const CircleBorder(),
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                onPressed: () => Navigator.of(context).pop(),
+                tooltip: 'Đóng',
+                hoverColor: Colors.transparent,
+              ),
+            ),
+          ),
+
+        // Left arrow (Web/Desktop)
+        if (showArrows && currentIndex > 0)
+          Positioned(
+            left: 20,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Material(
+                color: Colors.black.withValues(alpha: 0.5),
+                shape: const CircleBorder(),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: _goToPreviousImage,
+                  tooltip: 'Ảnh trước',
+                ),
+              ),
+            ),
+          ),
+
+        // Right arrow (Web/Desktop)
+        if (showArrows && currentIndex < widget.imageUrls.length - 1)
+          Positioned(
+            right: 20,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Material(
+                color: Colors.black.withValues(alpha: 0.5),
+                shape: const CircleBorder(),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: _goToNextImage,
+                  tooltip: 'Ảnh tiếp theo',
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+
+    if (ResponsiveHelper.isWebOrDesktop) {
+      body = Focus(
+        autofocus: true,
+        focusNode: _focusNode,
+        onKeyEvent: (FocusNode node, KeyEvent event) {
+          if (event is KeyDownEvent) {
+            if (event.logicalKey == LogicalKeyboardKey.escape) {
+              Navigator.of(context).pop();
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              _goToPreviousImage();
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              _goToNextImage();
+              return KeyEventResult.handled;
+            }
+          }
+          return KeyEventResult.ignored;
+        },
+        child: Scaffold(backgroundColor: Colors.black, body: body),
+      );
+    }
+
     return GestureDetector(
       onPanStart: _handlePanStart,
       onPanUpdate: _handlePanUpdate,
@@ -168,44 +344,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
         _showSaveImageOptions(widget.imageUrls[currentIndex]);
       },
       behavior: HitTestBehavior.opaque,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          PhotoViewGallery.builder(
-            itemCount: widget.imageUrls.length,
-            pageController: _pageController,
-            backgroundDecoration: const BoxDecoration(color: Colors.black),
-            builder: (context, index) {
-              return PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage(widget.imageUrls[index]),
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered * 2.5,
-                heroAttributes: PhotoViewHeroAttributes(
-                  tag: widget.imageUrls[index],
-                ),
-              );
-            },
-            onPageChanged: (index) {
-              setState(() => currentIndex = index);
-              widget.onImageChanged?.call(index);
-            },
-            scrollPhysics: const BouncingScrollPhysics(),
-          ),
-          // Page indicator
-          if (widget.imageUrls.length > 1)
-            Positioned(
-              bottom: 30,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  '${currentIndex + 1} / ${widget.imageUrls.length}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ),
-            ),
-        ],
-      ),
+      child: body,
     );
   }
 }

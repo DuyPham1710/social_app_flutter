@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_app_fe/features/save/domain/entities/saved_entity.dart';
-import 'package:social_app_fe/features/auth/data/models/user_model.dart';
 
 part 'saved_model.freezed.dart';
 part 'saved_model.g.dart';

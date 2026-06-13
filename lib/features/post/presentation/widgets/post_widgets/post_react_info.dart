@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
@@ -75,12 +75,12 @@ class PostReactInfo extends StatelessWidget {
         }
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
           child: Row(
             children: [
               SizedBox(
-                width: 20.w,
-                height: 20.h,
+                width: 20.rs(context),
+                height: 20.rsh(context),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -88,11 +88,11 @@ class PostReactInfo extends StatelessWidget {
                       Positioned(
                         left: (i * 18),
                         child: CircleAvatar(
-                          radius: 12,
+                          radius: 12.rsr(context),
                           backgroundColor: AppColors.background,
                           child: Text(
                             topEmojis[i].key.icon,
-                            style: const TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 18.rsp(context)),
                           ),
                         ),
                       ),
@@ -100,13 +100,13 @@ class PostReactInfo extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(width: 30.w),
+              SizedBox(width: 30.rs(context)),
 
               Expanded(
                 child: Text(
                   displayText,
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 12.rsp(context),
                     color: AppColors.textSecondary,
                   ),
                 ),

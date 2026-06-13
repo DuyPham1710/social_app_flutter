@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
@@ -10,6 +9,7 @@ import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/friend/data/data_sources/friend_online_service.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_suggestions_page.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friends_list_page.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendHeaderChips extends StatefulWidget {
@@ -127,7 +127,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
                 : context.l10n.friendOnlineCount(_onlineCount),
             leading: _buildOnlineDot(),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 8.rs(context)),
           _buildChip(
             label: context.l10n.friendTitle,
             onTap: () async {
@@ -139,7 +139,7 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
               widget.onNeedRefresh?.call();
             },
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 8.rs(context)),
           _buildChip(
             label: context.l10n.friendSuggestionsTitle,
             onTap: () async {
@@ -160,8 +160,8 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
 
   Widget _buildOnlineDot() {
     return Container(
-      width: 8.r,
-      height: 8.r,
+      width: 8.rsr(context),
+      height: 8.rsr(context),
       decoration: const BoxDecoration(
         color: Color(0xFF2CD45C),
         shape: BoxShape.circle,
@@ -177,25 +177,28 @@ class _FriendHeaderChipsState extends State<FriendHeaderChips> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.rs(context),
+          vertical: 8.rsh(context),
+        ),
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(20.rsr(context)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.05),
-              blurRadius: 6.r,
+              color: AppColors.textPrimary.withValues(alpha: 0.05),
+              blurRadius: 6.rsr(context),
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            if (leading != null) ...[leading, SizedBox(width: 6.w)],
+            if (leading != null) ...[leading, SizedBox(width: 6.rs(context))],
             Text(
               label,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 12.rsp(context),
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),

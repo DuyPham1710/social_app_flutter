@@ -12,6 +12,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appTitle => 'commonhub';
 
   @override
+  String get navHome => 'Trang chủ';
+
+  @override
   String get commonCancel => 'Hủy';
 
   @override
@@ -3307,6 +3310,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reactionAngry => 'Phẫn nộ';
+
+  @override
+  String get storyAddMediaFromComputer => 'Thêm ảnh/video từ máy tính';
+
+  @override
+  String get storySelectFile => 'Chọn tệp';
+
+  @override
+  String get storyWebImageEditNotSupported =>
+      'Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web';
+
+  @override
+  String get commonImageOnlySupport => 'Chỉ hỗ trợ file ảnh';
 
   @override
   String get chatGiphySticker => 'Nhãn dán GIPHY';

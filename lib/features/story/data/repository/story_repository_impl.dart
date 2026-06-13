@@ -47,7 +47,14 @@ class StoryRepositoryImpl implements StoryRepository {
     try {
       // Convert file to List<MultipartFile> nếu có
       List<MultipartFile>? multipartFiles;
-      if (story.file != null) {
+      if (story.fileBytes != null && story.fileName != null) {
+        multipartFiles = [
+          MultipartFile.fromBytes(
+            story.fileBytes!,
+            filename: story.fileName,
+          ),
+        ];
+      } else if (story.file != null) {
         multipartFiles = [
           await MultipartFile.fromFile(
             story.file!.path,
@@ -88,24 +95,13 @@ class StoryRepositoryImpl implements StoryRepository {
       }
 
       // Map privacy type to string
-      String privacyTypeString;
-      switch (story.privacyType) {
-        case PrivacyType.public:
-          privacyTypeString = 'public';
-          break;
-        case PrivacyType.friends:
-          privacyTypeString = 'friends';
-          break;
-        case PrivacyType.friendsExcept:
-          privacyTypeString = 'friends_except';
-          break;
-        case PrivacyType.friendsDetail:
-          privacyTypeString = 'friends_detail';
-          break;
-        case PrivacyType.private:
-          privacyTypeString = 'private';
-          break;
-      }
+      final privacyTypeString = switch (story.privacyType) {
+        PrivacyType.public => 'public',
+        PrivacyType.friends => 'friends',
+        PrivacyType.friendsExcept => 'friends_except',
+        PrivacyType.friendsDetail => 'friends_detail',
+        PrivacyType.private => 'private',
+      };
 
       await remoteDataSource.createStory(
         story.title,
@@ -132,24 +128,13 @@ class StoryRepositoryImpl implements StoryRepository {
   }) async {
     try {
       // Map privacy type to string
-      String privacyTypeString;
-      switch (privacyType) {
-        case PrivacyType.public:
-          privacyTypeString = 'public';
-          break;
-        case PrivacyType.friends:
-          privacyTypeString = 'friends';
-          break;
-        case PrivacyType.friendsExcept:
-          privacyTypeString = 'friends_except';
-          break;
-        case PrivacyType.friendsDetail:
-          privacyTypeString = 'friends_detail';
-          break;
-        case PrivacyType.private:
-          privacyTypeString = 'private';
-          break;
-      }
+      final privacyTypeString = switch (privacyType) {
+        PrivacyType.public => 'public',
+        PrivacyType.friends => 'friends',
+        PrivacyType.friendsExcept => 'friends_except',
+        PrivacyType.friendsDetail => 'friends_detail',
+        PrivacyType.private => 'private',
+      };
 
       // Build request body
       final Map<String, dynamic> body = {'privacy_type': privacyTypeString};

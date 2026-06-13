@@ -4,16 +4,11 @@ import 'package:social_app_fe/features/community/data/data_sources/remote/commun
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
-import 'package:social_app_fe/features/community/data/models/member_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_status_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_list_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
 import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
-import 'package:social_app_fe/shared/models/api_response.dart';
 import 'package:dio/dio.dart';
-import 'dart:io';
 
 class CommunityRepositoryImpl implements CommunityRepository {
   final CommunityRemoteDataSource _remoteDataSource;
@@ -33,17 +28,39 @@ class CommunityRepositoryImpl implements CommunityRepository {
       MultipartFile? coverImageFile;
 
       if (avatar != null && avatar.isNotEmpty) {
-        avatarFile = await MultipartFile.fromFile(
-          avatar,
-          filename: avatar.split('/').last,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            avatar,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          avatarFile = MultipartFile.fromBytes(
+            response.data!,
+            filename: 'avatar.jpg',
+          );
+        } else {
+          avatarFile = await MultipartFile.fromFile(
+            avatar,
+            filename: avatar.split('/').last,
+          );
+        }
       }
 
       if (coverImage != null && coverImage.isNotEmpty) {
-        coverImageFile = await MultipartFile.fromFile(
-          coverImage,
-          filename: coverImage.split('/').last,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            coverImage,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          coverImageFile = MultipartFile.fromBytes(
+            response.data!,
+            filename: 'cover.jpg',
+          );
+        } else {
+          coverImageFile = await MultipartFile.fromFile(
+            coverImage,
+            filename: coverImage.split('/').last,
+          );
+        }
       }
 
       final response = await _remoteDataSource.createCommunity(
@@ -73,19 +90,41 @@ class CommunityRepositoryImpl implements CommunityRepository {
       MultipartFile? coverImageFile;
 
       if (avatar != null && avatar.isNotEmpty && !avatar.startsWith('http')) {
-        avatarFile = await MultipartFile.fromFile(
-          avatar,
-          filename: avatar.split('/').last,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            avatar,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          avatarFile = MultipartFile.fromBytes(
+            response.data!,
+            filename: 'avatar.jpg',
+          );
+        } else {
+          avatarFile = await MultipartFile.fromFile(
+            avatar,
+            filename: avatar.split('/').last,
+          );
+        }
       }
 
       if (coverImage != null &&
           coverImage.isNotEmpty &&
           !coverImage.startsWith('http')) {
-        coverImageFile = await MultipartFile.fromFile(
-          coverImage,
-          filename: coverImage.split('/').last,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            coverImage,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          coverImageFile = MultipartFile.fromBytes(
+            response.data!,
+            filename: 'cover.jpg',
+          );
+        } else {
+          coverImageFile = await MultipartFile.fromFile(
+            coverImage,
+            filename: coverImage.split('/').last,
+          );
+        }
       }
 
       final response = await _remoteDataSource.updateCommunity(

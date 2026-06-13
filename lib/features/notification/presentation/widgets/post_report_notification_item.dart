@@ -26,10 +26,10 @@ class PostReportNotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotificationBaseItem(
       isRead: isRead,
-      avatarUrl:
-          'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg', // System/Admin avatar
+      avatarUrl: 'assets/icons/logo.jpg',
       userId: null,
       onAvatarTap: null, // Không có action cho avatar
+      isImageAsset: true,
       title: RichText(
         maxLines: 3,
         overflow: TextOverflow.ellipsis,

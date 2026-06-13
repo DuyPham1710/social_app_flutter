@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/sent_friend_request_item.dart';
 import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class SentFriendRequestsPage extends StatefulWidget {
@@ -25,44 +25,58 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
-        ),
-        title: Text(
-          context.l10n.friendSentRequestsTitle,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
-            icon: Icon(CupertinoIcons.search, color: AppColors.textPrimary),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header section
-            _buildHeaderSection(),
+    return Container(
+      color: AppColors.background,
 
-            // Danh sách lời mời đã gửi
-            Expanded(child: _buildSentRequestsList()),
-          ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
+              ),
+              title: Text(
+                context.l10n.friendSentRequestsTitle,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/search');
+                  },
+                  icon: Icon(
+                    CupertinoIcons.search,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header section
+                  _buildHeaderSection(),
+
+                  // Danh sách lời mời đã gửi
+                  Expanded(child: _buildSentRequestsList()),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -78,11 +92,14 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         }
 
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.rs(context),
+            vertical: 12.rsh(context),
+          ),
           child: Text(
             context.l10n.friendSentRequestsCount(requestCount),
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
@@ -113,7 +130,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
             ),
           );
@@ -139,7 +156,7 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
               duration: const Duration(seconds: 4),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
             ),
           );
@@ -162,9 +179,13 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
                 await Future.delayed(const Duration(seconds: 1));
               },
               child: ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.rs(context),
+                  vertical: 8.rsh(context),
+                ),
                 itemCount: state.sentRequests.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                separatorBuilder: (context, index) =>
+                    SizedBox(height: 12.rsh(context)),
                 itemBuilder: (context, index) {
                   final request = state.sentRequests[index];
                   return _buildSentRequestCard(
@@ -190,18 +211,18 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: 40.w,
-            height: 40.w,
+            width: 40.rs(context),
+            height: 40.rs(context),
             child: CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16.rsh(context)),
           Text(
             context.l10n.friendLoadingSentRequests,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14.rsp(context),
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -214,39 +235,49 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        padding: EdgeInsets.symmetric(horizontal: 32.rs(context)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
-            SizedBox(height: 16.h),
+            Icon(
+              Icons.error_outline,
+              size: 64.rsr(context),
+              color: Colors.red[300],
+            ),
+            SizedBox(height: 16.rsh(context)),
             Text(
               context.l10n.commonErrorOccurred,
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 18.rsp(context),
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8.rsh(context)),
             Text(
               localizedFriendActionMessage(context.l10n, message),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+              style: TextStyle(
+                fontSize: 14.rsp(context),
+                color: AppColors.textSecondary,
+              ),
             ),
-            SizedBox(height: 24.h),
+            SizedBox(height: 24.rsh(context)),
             ElevatedButton.icon(
               onPressed: () {
                 context.read<FriendBloc>().add(const LoadSentFriendRequests());
               },
-              icon: const Icon(Icons.refresh, size: 18),
+              icon: Icon(Icons.refresh, size: 18.rsr(context)),
               label: Text(context.l10n.commonRetry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24.rs(context),
+                  vertical: 12.rsh(context),
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(8.rsr(context)),
                 ),
               ),
             ),
@@ -265,11 +296,11 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12.r,
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12.rsr(context),
             offset: const Offset(0, 4),
           ),
         ],
@@ -305,38 +336,38 @@ class _SentFriendRequestsPageState extends State<SentFriendRequestsPage> {
           height: MediaQuery.of(context).size.height * 0.6,
           child: Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              padding: EdgeInsets.symmetric(horizontal: 32.rs(context)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 120.w,
-                    height: 120.w,
+                    width: 120.rs(context),
+                    height: 120.rs(context),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.send_outlined,
-                      size: 64.r,
+                      size: 64.rsr(context),
                       color: AppColors.primary,
                     ),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 24.rsh(context)),
                   Text(
                     context.l10n.friendNoSentRequests,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18.rsp(context),
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     context.l10n.friendNoSentRequestsDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
                       color: AppColors.textSecondary,
                       height: 1.4,
                     ),

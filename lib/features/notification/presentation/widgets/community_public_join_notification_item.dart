@@ -37,7 +37,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-                ? AppColors.primary.withOpacity(0.12)
+                ? AppColors.primary.withValues(alpha: 0.12)
                 : const Color(0xFFEAF3FF)),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       margin: const EdgeInsets.only(bottom: 4),
@@ -114,8 +114,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
                       TextSpan(
-                        text:
-                          ' ${actionText} ',
+                        text: ' $actionText ',
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,

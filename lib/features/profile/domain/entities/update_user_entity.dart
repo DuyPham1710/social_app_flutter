@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 
 class UpdateUserEntity extends Equatable {
@@ -11,6 +12,10 @@ class UpdateUserEntity extends Equatable {
   final String? relationshipStatus;
   final File? avatarFile; // File ảnh đại diện mới (nếu có)
   final File? coverFile; // File ảnh bìa mới (nếu có)
+  final Uint8List? avatarBytes;
+  final String? avatarName;
+  final Uint8List? coverBytes;
+  final String? coverName;
 
   const UpdateUserEntity({
     this.fullName,
@@ -22,6 +27,10 @@ class UpdateUserEntity extends Equatable {
     this.relationshipStatus,
     this.avatarFile,
     this.coverFile,
+    this.avatarBytes,
+    this.avatarName,
+    this.coverBytes,
+    this.coverName,
   });
 
   // Utility copyWith method
@@ -35,6 +44,10 @@ class UpdateUserEntity extends Equatable {
     String? relationshipStatus,
     File? avatarFile,
     File? coverFile,
+    Uint8List? avatarBytes,
+    String? avatarName,
+    Uint8List? coverBytes,
+    String? coverName,
   }) {
     return UpdateUserEntity(
       fullName: fullName ?? this.fullName,
@@ -46,6 +59,10 @@ class UpdateUserEntity extends Equatable {
       relationshipStatus: relationshipStatus ?? this.relationshipStatus,
       avatarFile: avatarFile ?? this.avatarFile,
       coverFile: coverFile ?? this.coverFile,
+      avatarBytes: avatarBytes ?? this.avatarBytes,
+      avatarName: avatarName ?? this.avatarName,
+      coverBytes: coverBytes ?? this.coverBytes,
+      coverName: coverName ?? this.coverName,
     );
   }
 
@@ -60,5 +77,9 @@ class UpdateUserEntity extends Equatable {
     relationshipStatus,
     avatarFile,
     coverFile,
+    avatarBytes,
+    avatarName,
+    coverBytes,
+    coverName,
   ];
 }
