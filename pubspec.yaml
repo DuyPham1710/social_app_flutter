@@ -64,8 +64,6 @@ dependencies:
   open_filex: ^4.7.0
   flutter_colorpicker: ^1.1.0
   giphy_get: ^3.6.1+1
-dependency_overrides:
-  font_awesome_flutter: ^11.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
