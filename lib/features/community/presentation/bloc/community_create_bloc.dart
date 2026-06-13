@@ -13,7 +13,7 @@ class CommunityCreateBloc
   CommunityCreateBloc(
     this._createCommunityUseCase,
     this._updateCommunityUseCase,
-  ) : super(const CommunityCreateInitial()) {
+  ) : super(CommunityCreateInitial()) {
     on<CreateCommunityRequested>(_onCreateCommunityRequested);
     on<UpdateCommunityRequested>(_onUpdateCommunityRequested);
   }
@@ -22,7 +22,7 @@ class CommunityCreateBloc
     CreateCommunityRequested event,
     Emitter<CommunityCreateState> emit,
   ) async {
-    emit(const CommunityCreateLoading());
+    emit(CommunityCreateLoading());
 
     try {
       final dataState = await _createCommunityUseCase(
@@ -56,7 +56,7 @@ class CommunityCreateBloc
     UpdateCommunityRequested event,
     Emitter<CommunityCreateState> emit,
   ) async {
-    emit(const CommunityCreateLoading());
+    emit(CommunityCreateLoading());
 
     try {
       final dataState = await _updateCommunityUseCase(

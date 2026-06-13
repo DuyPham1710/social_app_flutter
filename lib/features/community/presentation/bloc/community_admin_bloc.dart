@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
@@ -20,7 +19,7 @@ class CommunityAdminBloc
     this._getPendingRequestsUseCase,
     this._respondToJoinRequestUseCase,
     this._communityRepository,
-  ) : super(const CommunityAdminInitial()) {
+  ) : super(CommunityAdminInitial()) {
     on<GetPendingRequestsRequested>(_onGetPendingRequestsRequested);
     on<RespondToJoinRequestRequested>(_onRespondToJoinRequestRequested);
     on<GetPendingPostsRequested>(_onGetPendingPostsRequested);
@@ -34,7 +33,7 @@ class CommunityAdminBloc
     GetPendingRequestsRequested event,
     Emitter<CommunityAdminState> emit,
   ) async {
-    emit(const CommunityAdminLoading());
+    emit(CommunityAdminLoading());
 
     try {
       final dataState = await _getPendingRequestsUseCase(
@@ -90,7 +89,7 @@ class CommunityAdminBloc
     GetPendingPostsRequested event,
     Emitter<CommunityAdminState> emit,
   ) async {
-    emit(const CommunityAdminLoading());
+    emit(CommunityAdminLoading());
 
     try {
       final dataState = await _communityRepository.getPendingPosts(
@@ -165,7 +164,7 @@ class CommunityAdminBloc
       );
 
       if (dataState is DataStateSuccess) {
-        emit(const CommunityAdminActionSuccess('Đã xóa thành viên'));
+        emit(CommunityAdminActionSuccess('Đã xóa thành viên'));
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
@@ -187,7 +186,7 @@ class CommunityAdminBloc
       );
 
       if (dataState is DataStateSuccess) {
-        emit(const CommunityAdminActionSuccess('Đã nâng quyền thành viên'));
+        emit(CommunityAdminActionSuccess('Đã nâng quyền thành viên'));
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';
@@ -209,7 +208,7 @@ class CommunityAdminBloc
       );
 
       if (dataState is DataStateSuccess) {
-        emit(const CommunityAdminActionSuccess('Đã hạ quyền admin'));
+        emit(CommunityAdminActionSuccess('Đã hạ quyền admin'));
       } else if (dataState is DataStateError) {
         final errorMessage =
             '${dataState.error?.response?.data?['message'] ?? dataState.error?.message ?? 'Đã xảy ra lỗi'}';

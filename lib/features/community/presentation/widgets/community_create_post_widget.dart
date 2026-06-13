@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
@@ -9,20 +10,19 @@ class CommunityCreatePostWidget extends StatelessWidget {
   final String? avatarUrl;
   final VoidCallback? onCreatePost;
 
-  const CommunityCreatePostWidget({
-    super.key,
-    this.avatarUrl,
-    this.onCreatePost,
-  });
+  CommunityCreatePostWidget({super.key, this.avatarUrl, this.onCreatePost});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      padding: const EdgeInsets.all(8),
+      margin: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
+      padding: EdgeInsets.all(8.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.rsr(context)),
         boxShadow: [
           BoxShadow(
             color: AppColors.textSecondary.withValues(alpha: 0.08),
@@ -40,7 +40,7 @@ class CommunityCreatePostWidget extends StatelessWidget {
                   : avatarUrl;
 
               return CircleAvatar(
-                radius: 22,
+                radius: 22.rsr(context),
                 backgroundColor: AppColors.secondBackground,
                 backgroundImage: currentAvatarUrl != null
                     ? NetworkImage(currentAvatarUrl)
@@ -51,18 +51,18 @@ class CommunityCreatePostWidget extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.rs(context)),
           Expanded(
             child: GestureDetector(
               onTap: onCreatePost,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 14.rs(context),
+                  vertical: 10.rsh(context),
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.secondBackground,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(999.rsr(context)),
                   border: Border.all(color: AppColors.divider),
                 ),
                 child: FittedBox(
@@ -73,7 +73,7 @@ class CommunityCreatePostWidget extends StatelessWidget {
                     maxLines: 1,
                     style: TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 14,
+                      fontSize: 14.rsp(context),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -81,7 +81,7 @@ class CommunityCreatePostWidget extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.rs(context)),
           IconButton(
             icon: Icon(Icons.photo_library_outlined, color: AppColors.primary),
             onPressed: onCreatePost,

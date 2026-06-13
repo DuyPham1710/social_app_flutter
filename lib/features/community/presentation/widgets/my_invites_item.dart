@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
@@ -13,7 +14,7 @@ enum _InviteResponseStatus { pending, approved, rejected }
 class MyInvitesItem extends StatefulWidget {
   final CommunityInviteModel invite;
 
-  const MyInvitesItem({super.key, required this.invite});
+  MyInvitesItem({super.key, required this.invite});
 
   @override
   State<MyInvitesItem> createState() => _MyInvitesItemState();
@@ -108,16 +109,19 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.rs(context),
+          vertical: 12.rsh(context),
+        ),
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.rsr(context)),
           border: Border.all(color: AppColors.divider, width: 1),
           boxShadow: [
             BoxShadow(
               color: AppColors.textSecondary.withValues(alpha: 0.08),
               blurRadius: 12,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 4),
               spreadRadius: 0,
             ),
           ],
@@ -130,7 +134,7 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                 Stack(
                   children: [
                     CircleAvatar(
-                      radius: 28,
+                      radius: 28.rsr(context),
                       backgroundColor: AppColors.secondBackground,
                       backgroundImage: avatarUrl.isNotEmpty
                           ? NetworkImage(avatarUrl)
@@ -138,7 +142,7 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                       child: avatarUrl.isEmpty
                           ? Icon(
                               Icons.group,
-                              size: 28,
+                              size: 28.rsp(context),
                               color: AppColors.textSecondary,
                             )
                           : null,
@@ -147,33 +151,33 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                       bottom: 0,
                       right: 0,
                       child: Container(
-                        width: 24,
-                        height: 24,
+                        width: 24.rs(context),
+                        height: 24.rsh(context),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: AppColors.background,
-                            width: 2,
+                            width: 2.rs(context),
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.3),
                               blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.mail_outline,
                           color: Colors.white,
-                          size: 12,
+                          size: 12.rsp(context),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14.rs(context)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,18 +188,18 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 15,
+                          fontSize: 15.rsp(context),
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6.rsh(context)),
                       Text(
                         _getStatusMessage(context),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: _getStatusColor(),
-                          fontSize: 13,
+                          fontSize: 13.rsp(context),
                           fontWeight: _status != _InviteResponseStatus.pending
                               ? FontWeight.w600
                               : FontWeight.w400,
@@ -206,7 +210,7 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.rsh(context)),
             if (_status == _InviteResponseStatus.pending)
               Row(
                 children: [
@@ -216,18 +220,20 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                           ? null
                           : () => _onApprovePressed(communityId),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 11.rsh(context),
+                        ),
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10.rsr(context)),
                         ),
                         elevation: 0,
                       ),
                       child: _isLoading
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
+                          ? SizedBox(
+                              height: 18.rsh(context),
+                              width: 18.rs(context),
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -238,16 +244,16 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.check_circle_outline,
-                                  size: 16,
+                                  size: 16.rsp(context),
                                   color: Colors.white,
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6.rs(context)),
                                 Text(
                                   context.l10n.friendAccept,
-                                  style: const TextStyle(
-                                    fontSize: 13,
+                                  style: TextStyle(
+                                    fontSize: 13.rsp(context),
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
@@ -256,24 +262,29 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                             ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.rs(context)),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _isLoading
                           ? null
                           : () => _onRejectPressed(communityId),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 11.rsh(context),
+                        ),
                         foregroundColor: AppColors.textSecondary,
-                        side: BorderSide(color: AppColors.divider, width: 1.5),
+                        side: BorderSide(
+                          color: AppColors.divider,
+                          width: 1.5.rs(context),
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10.rsr(context)),
                         ),
                       ),
                       child: _isLoading
                           ? SizedBox(
-                              height: 18,
-                              width: 18,
+                              height: 18.rsh(context),
+                              width: 18.rs(context),
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -286,14 +297,14 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                               children: [
                                 Icon(
                                   Icons.close,
-                                  size: 16,
+                                  size: 16.rsp(context),
                                   color: AppColors.textSecondary,
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6.rs(context)),
                                 Text(
                                   context.l10n.friendReject,
                                   style: TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 13.rsp(context),
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.textSecondary,
                                   ),
@@ -307,17 +318,17 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
             else
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 11),
+                padding: EdgeInsets.symmetric(vertical: 11.rsh(context)),
                 decoration: BoxDecoration(
                   color: _status == _InviteResponseStatus.approved
-                      ? const Color(0xFFECFDF5)
-                      : const Color(0xFFFEECEB),
-                  borderRadius: BorderRadius.circular(10),
+                      ? Color(0xFFECFDF5)
+                      : Color(0xFFFEECEB),
+                  borderRadius: BorderRadius.circular(10.rsr(context)),
                   border: Border.all(
                     color: _status == _InviteResponseStatus.approved
-                        ? const Color(0xFFA6F4C5)
-                        : const Color(0xFFFECDCA),
-                    width: 1.5,
+                        ? Color(0xFFA6F4C5)
+                        : Color(0xFFFECDCA),
+                    width: 1.5.rs(context),
                   ),
                 ),
                 child: Center(
@@ -328,22 +339,22 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
                         _status == _InviteResponseStatus.approved
                             ? Icons.check_circle
                             : Icons.cancel,
-                        size: 16,
+                        size: 16.rsp(context),
                         color: _status == _InviteResponseStatus.approved
-                            ? const Color(0xFF059669)
-                            : const Color(0xFFDC2626),
+                            ? Color(0xFF059669)
+                            : Color(0xFFDC2626),
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6.rs(context)),
                       Text(
                         _status == _InviteResponseStatus.approved
                             ? context.l10n.notificationInviteAccepted
                             : context.l10n.notificationInviteRejected,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 13.rsp(context),
                           fontWeight: FontWeight.w600,
                           color: _status == _InviteResponseStatus.approved
-                              ? const Color(0xFF059669)
-                              : const Color(0xFFDC2626),
+                              ? Color(0xFF059669)
+                              : Color(0xFFDC2626),
                         ),
                       ),
                     ],
@@ -372,9 +383,9 @@ class _MyInvitesItemState extends State<MyInvitesItem> {
       case _InviteResponseStatus.pending:
         return AppColors.textSecondary;
       case _InviteResponseStatus.approved:
-        return const Color(0xFF059669);
+        return Color(0xFF059669);
       case _InviteResponseStatus.rejected:
-        return const Color(0xFFDC2626);
+        return Color(0xFFDC2626);
     }
   }
 }

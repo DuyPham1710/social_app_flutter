@@ -1,18 +1,18 @@
 part of 'community_posts_tab_bloc.dart';
 
 abstract class CommunityPostsTabState extends Equatable {
-  const CommunityPostsTabState();
+  CommunityPostsTabState();
 
   @override
   List<Object?> get props => [];
 }
 
 class CommunityPostsTabInitial extends CommunityPostsTabState {
-  const CommunityPostsTabInitial();
+  CommunityPostsTabInitial();
 }
 
 class CommunityPostsTabLoading extends CommunityPostsTabState {
-  const CommunityPostsTabLoading();
+  CommunityPostsTabLoading();
 }
 
 class CommunityPostsTabLoaded extends CommunityPostsTabState {
@@ -24,7 +24,7 @@ class CommunityPostsTabLoaded extends CommunityPostsTabState {
   final String status;
   final Map<String, int> commentCounts;
 
-  const CommunityPostsTabLoaded({
+  CommunityPostsTabLoaded({
     required this.posts,
     required this.page,
     required this.limit,
@@ -49,7 +49,7 @@ class CommunityPostsTabLoaded extends CommunityPostsTabState {
 class CommunityPostsTabError extends CommunityPostsTabState {
   final String message;
 
-  const CommunityPostsTabError({required this.message});
+  CommunityPostsTabError({required this.message});
 
   @override
   List<Object?> get props => [message];

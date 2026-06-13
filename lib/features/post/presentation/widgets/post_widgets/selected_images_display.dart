@@ -86,6 +86,60 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
   }
 
   void _showLayoutOptions() {
+    if (kIsWeb) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: AppColors.background,
+          title: Text(
+            context.l10n.postChooseLayout,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18.rsp(context),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildLayoutOptionWeb(
+                context,
+                title: context.l10n.postLayoutClassic,
+                icon: CupertinoIcons.grid,
+                layoutType: LayoutType.classic,
+              ),
+              _buildLayoutOptionWeb(
+                context,
+                title: context.l10n.postLayoutColumn,
+                icon: CupertinoIcons.rectangle_3_offgrid,
+                layoutType: LayoutType.column,
+              ),
+              _buildLayoutOptionWeb(
+                context,
+                title: context.l10n.postLayoutFrame,
+                icon: CupertinoIcons.square_stack_3d_down_right,
+                layoutType: LayoutType.frame,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                context.l10n.commonCancel,
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 16.rsp(context),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
@@ -207,6 +261,35 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLayoutOptionWeb(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required LayoutType layoutType,
+  }) {
+    final isSelected = _currentLayout == layoutType;
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isSelected ? AppColors.primary : AppColors.textPrimary,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isSelected ? AppColors.primary : AppColors.textPrimary,
+          fontSize: 16.rsp(context),
+        ),
+      ),
+      onTap: () {
+        setState(() {
+          _currentLayout = layoutType;
+          widget.onChangedLayout?.call(layoutType);
+        });
+        Navigator.pop(context);
+      },
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -17,7 +18,7 @@ class CommunityPostsWidget extends StatefulWidget {
   final int refreshSeed;
   final String? userRole; // 'admin', 'member', null
 
-  const CommunityPostsWidget({
+  CommunityPostsWidget({
     super.key,
     required this.communityId,
     this.canViewPosts = true,
@@ -90,7 +91,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
     );
 
     if (dataState is DataStateSuccess<PostListEntity>) {
-      final posts = dataState.data?.data ?? const [];
+      final posts = dataState.data?.data ?? [];
       // Join post rooms để lắng nghe comment count updates
       for (final post in posts) {
         _commentRepository.joinPost(post.id);
@@ -103,7 +104,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
       throw dataState.error ?? Exception('Failed to load community posts');
     }
 
-    return const [];
+    return [];
   }
 
   @override
@@ -112,11 +113,16 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          padding: EdgeInsets.fromLTRB(
+            16.rs(context),
+            0,
+            16.rs(context),
+            8.rsh(context),
+          ),
           child: Text(
             context.l10n.communityPostsInGroup,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.rsp(context),
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
             ),
@@ -149,7 +155,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 return _fadeContent(key: 'error', child: _buildErrorState());
               }
 
-              final posts = snapshot.data ?? const [];
+              final posts = snapshot.data ?? [];
               if (posts.isEmpty) {
                 return _fadeContent(
                   key: 'empty',
@@ -173,7 +179,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                     return _AnimatedPostItem(
                       index: index,
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.only(bottom: 10.rsh(context)),
                         child: PostItem(
                           post: post,
                           commentCount: _commentCounts[post.id] ?? 0,
@@ -193,7 +199,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
 
   Widget _fadeContent({required String key, required Widget child}) {
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 260),
+      duration: Duration(milliseconds: 260),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (child, animation) {
@@ -205,18 +211,18 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
 
   Widget _buildPostsLoadingState() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
       child: Column(
         children: List.generate(
           3,
           (index) => _AnimatedPostItem(
             index: index,
             child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
+              margin: EdgeInsets.only(bottom: 10.rsh(context)),
+              padding: EdgeInsets.all(14.rs(context)),
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(14.rsr(context)),
                 border: Border.all(color: AppColors.divider),
                 boxShadow: [
                   BoxShadow(
@@ -229,38 +235,54 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      _SkeletonBox(width: 42, height: 42, radius: 21),
-                      SizedBox(width: 10),
+                      _SkeletonBox(
+                        width: 42.rs(context),
+                        height: 42.rsh(context),
+                        radius: 21.rsr(context),
+                      ),
+                      SizedBox(width: 10.rs(context)),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _SkeletonBox(width: 150, height: 14, radius: 7),
-                            SizedBox(height: 8),
-                            _SkeletonBox(width: 90, height: 12, radius: 6),
+                            _SkeletonBox(
+                              width: 150.rs(context),
+                              height: 14.rsh(context),
+                              radius: 7.rsr(context),
+                            ),
+                            SizedBox(height: 8.rsh(context)),
+                            _SkeletonBox(
+                              width: 90.rs(context),
+                              height: 12.rsh(context),
+                              radius: 6.rsr(context),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  const _SkeletonBox(
+                  SizedBox(height: 14.rsh(context)),
+                  _SkeletonBox(
                     width: double.infinity,
-                    height: 13,
-                    radius: 7,
+                    height: 13.rsh(context),
+                    radius: 7.rsr(context),
                   ),
-                  const SizedBox(height: 8),
-                  const _SkeletonBox(width: 230, height: 13, radius: 7),
+                  SizedBox(height: 8.rsh(context)),
+                  _SkeletonBox(
+                    width: 230.rs(context),
+                    height: 13.rsh(context),
+                    radius: 7.rsr(context),
+                  ),
                   if (index == 0) ...[
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.rsh(context)),
                     AspectRatio(
                       aspectRatio: 16 / 9,
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.textSecondary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.rsr(context)),
                         ),
                       ),
                     ),
@@ -276,28 +298,26 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
 
   Widget _buildErrorState() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.rs(context)),
         decoration: BoxDecoration(
-          color: const Color(0xFFE11D48).withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFE11D48).withValues(alpha: 0.28),
-          ),
+          color: Color(0xFFE11D48).withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14.rsr(context)),
+          border: Border.all(color: Color(0xFFE11D48).withValues(alpha: 0.28)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.error_outline_rounded,
                   color: Color(0xFFE11D48),
-                  size: 22,
+                  size: 22.rsp(context),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 8.rs(context)),
                 Expanded(
                   child: Text(
                     context.l10n.homeLoadPostsFailed,
@@ -309,14 +329,14 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.rsh(context)),
             OutlinedButton.icon(
               onPressed: () {
                 setState(() {
                   _postsFuture = _loadPosts();
                 });
               },
-              icon: const Icon(Icons.refresh_rounded),
+              icon: Icon(Icons.refresh_rounded),
               label: Text(context.l10n.commonRetry),
             ),
           ],
@@ -334,27 +354,27 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
     required String message,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.rs(context)),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.rsr(context)),
           border: Border.all(color: borderColor),
         ),
         child: Row(
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: 42.rs(context),
+              height: 42.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.secondBackground.withValues(alpha: 0.74),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
               ),
-              child: Icon(icon, color: iconColor, size: 22),
+              child: Icon(icon, color: iconColor, size: 22.rsp(context)),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.rs(context)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,13 +386,13 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  SizedBox(height: 3.rsh(context)),
                   Text(
                     message,
                     style: TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 13,
-                      height: 1.25,
+                      fontSize: 13.rsp(context),
+                      height: 1.25.rsh(context),
                     ),
                   ),
                 ],
@@ -389,7 +409,7 @@ class _AnimatedPostItem extends StatelessWidget {
   final int index;
   final Widget child;
 
-  const _AnimatedPostItem({required this.index, required this.child});
+  _AnimatedPostItem({required this.index, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -417,7 +437,7 @@ class _SkeletonBox extends StatelessWidget {
   final double height;
   final double radius;
 
-  const _SkeletonBox({
+  _SkeletonBox({
     required this.width,
     required this.height,
     required this.radius,

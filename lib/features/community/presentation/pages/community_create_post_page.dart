@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
@@ -34,7 +37,7 @@ class CommunityCreatePostPage extends StatefulWidget {
   final String? userRole;
   final VoidCallback? onPostCreated;
 
-  const CommunityCreatePostPage({
+  CommunityCreatePostPage({
     super.key,
     required this.communityId,
     this.userRole,
@@ -47,7 +50,7 @@ class CommunityCreatePostPage extends StatefulWidget {
 }
 
 class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
-  List<AssetEntity> _selectedAssets = [];
+  List<dynamic> _selectedAssets = [];
   final TextEditingController _captionController = TextEditingController();
   LayoutType _selectedLayout = LayoutType.classic;
   final PrivacyType _selectedPrivacy = PrivacyType.public;
@@ -82,11 +85,21 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     });
 
     try {
-      final files = <File>[];
+      List<File> files = [];
+      List<Uint8List> fileBytesList = [];
+      List<String> fileNames = [];
+
       for (final asset in _selectedAssets) {
-        final file = await asset.file;
-        if (file != null) {
-          files.add(file);
+        if (asset is AssetEntity) {
+          final file = await asset.file;
+          if (file != null) {
+            files.add(file);
+          }
+        } else if (asset is PlatformFile) {
+          if (asset.bytes != null) {
+            fileBytesList.add(asset.bytes!);
+            fileNames.add(asset.name);
+          }
         }
       }
 
@@ -95,6 +108,8 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
             ? _captionController.text.trim()
             : null,
         files: files.isNotEmpty ? files : null,
+        fileBytesList: fileBytesList.isNotEmpty ? fileBytesList : null,
+        fileNames: fileNames.isNotEmpty ? fileNames : null,
         layout: _selectedLayout,
         privacyType: _selectedPrivacy,
         orders: files.isNotEmpty
@@ -123,6 +138,23 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
   }
 
   void _onSelectImage(BuildContext context) async {
+    if (kIsWeb) {
+      final result = await FilePicker.pickFiles(
+        type: FileType.media,
+        allowMultiple: true,
+        withData: true,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        if (!mounted) return;
+
+        setState(() {
+          _selectedAssets.addAll(result.files);
+        });
+      }
+      return;
+    }
+
     PermissionStatus status;
 
     if (Platform.isIOS) {
@@ -145,7 +177,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         context,
         CupertinoPageRoute(
           builder: (_) => GalleryPickerScreen(
-            selectedAssets: _selectedAssets,
+            selectedAssets: _selectedAssets.whereType<AssetEntity>().toList(),
             openCamera: () => _openCamera(),
           ),
         ),
@@ -188,7 +220,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
 
       final result = await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const CameraScreen()),
+        MaterialPageRoute(builder: (context) => CameraScreen()),
       );
 
       if (result != null && result is Map<String, dynamic>) {
@@ -280,24 +312,26 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
       context: context,
       backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16.rsr(context)),
+        ),
       ),
       builder: (_) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
+          padding: EdgeInsets.symmetric(vertical: 12.rsh(context)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(height: 8.h),
+              SizedBox(height: 8.rsh(context)),
               Container(
-                width: 40.w,
-                height: 4.h,
+                width: 40.rs(context),
+                height: 4.rsh(context),
                 decoration: BoxDecoration(
                   color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(10.rsr(context)),
                 ),
               ),
-              SizedBox(height: 10.h),
+              SizedBox(height: 10.rsh(context)),
               _optionRow(
                 Icons.image,
                 context.l10n.postPhotoVideo,
@@ -357,18 +391,21 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
       onTap: onTap,
       child: Column(
         children: [
-          Divider(height: 1.h, color: AppColors.divider),
+          Divider(height: 1.rsh(context), color: AppColors.divider),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+            padding: EdgeInsets.symmetric(
+              vertical: 10.rsh(context),
+              horizontal: 20.rs(context),
+            ),
             child: Row(
               children: [
-                Icon(icon, color: color, size: 26.sp),
-                SizedBox(width: 18.w),
+                Icon(icon, color: color, size: 26.rsp(context)),
+                SizedBox(width: 18.rs(context)),
                 Text(
                   text,
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 16.sp,
+                    fontSize: 16.rsp(context),
                   ),
                 ),
               ],
@@ -406,174 +443,212 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
           }
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: AppColors.background,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          automaticallyImplyLeading: false,
-          toolbarHeight: 72.h,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            color: AppColors.textPrimary,
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-          title: Text(
-            context.l10n.communityCreatePostTitle,
-            softWrap: true,
-            maxLines: 2,
-            overflow: TextOverflow.visible,
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              height: 1.1,
-            ),
-          ),
-          centerTitle: false,
-          actions: [
-            Row(
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: _isCreatingPost ? null : _createPost,
-                  child: _isCreatingPost
-                      ? SizedBox(
-                          width: 14.sp,
-                          height: 14.sp,
-                          child: CircularProgressIndicator(
-                            color: AppColors.background,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          context.l10n.postSubmit,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-                SizedBox(width: 12.w),
-              ],
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Container(
-            padding: EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
-            child: Column(
-              children: [
-                BlocBuilder<MenuBloc, MenuState>(
-                  builder: (context, state) {
-                    if (state is MenuLoadingState) {
-                      return const Center(child: CupertinoActivityIndicator());
-                    }
+      child: Container(
+        color: AppColors.background,
 
-                    if (state is MenuLoadedState) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 20.r,
-                            backgroundImage: NetworkImage(
-                              state.user.avatarUrl ??
-                                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
+            ),
+            child: Scaffold(
+              backgroundColor: AppColors.background,
+              appBar: AppBar(
+                backgroundColor: AppColors.background,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                automaticallyImplyLeading: false,
+                toolbarHeight: 72.rsh(context),
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back_rounded),
+                  color: AppColors.textPrimary,
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+                title: Text(
+                  context.l10n.communityCreatePostTitle,
+                  softWrap: true,
+                  maxLines: 2,
+                  overflow: TextOverflow.visible,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18.rsp(context),
+                    fontWeight: FontWeight.w600,
+                    height: 1.1.rsh(context),
+                  ),
+                ),
+                centerTitle: false,
+                actions: [
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.rs(context),
+                            vertical: 10.rsh(context),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              12.rsr(context),
                             ),
                           ),
+                          elevation: 0,
+                        ),
+                        onPressed: _isCreatingPost ? null : _createPost,
+                        child: _isCreatingPost
+                            ? SizedBox(
+                                width: 14.rs(context),
+                                height: 14.rsh(context),
+                                child: CircularProgressIndicator(
+                                  color: AppColors.background,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                context.l10n.postSubmit,
+                                style: TextStyle(
+                                  fontSize: 14.rsp(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                      SizedBox(width: 12.rs(context)),
+                    ],
+                  ),
+                ],
+              ),
+              body: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(
+                    12.rs(context),
+                    8.rsh(context),
+                    4.rs(context),
+                    16.rsh(context),
+                  ),
+                  child: Column(
+                    children: [
+                      BlocBuilder<MenuBloc, MenuState>(
+                        builder: (context, state) {
+                          if (state is MenuLoadingState) {
+                            return Center(child: CupertinoActivityIndicator());
+                          }
 
-                          SizedBox(width: 12.w),
+                          if (state is MenuLoadedState) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 20.rsr(context),
+                                  backgroundImage: NetworkImage(
+                                    state.user.avatarUrl ??
+                                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
+                                  ),
+                                ),
 
-                          Expanded(
-                            child: GestureDetector(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 10.w,
-                                      vertical: 8.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.background,
-                                      borderRadius: BorderRadius.circular(14.r),
-                                    ),
+                                SizedBox(width: 12.rs(context)),
+
+                                Expanded(
+                                  child: GestureDetector(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Wrap(
-                                          crossAxisAlignment:
-                                              WrapCrossAlignment.center,
-                                          children: [
-                                            Text(
-                                              state.user.fullName ??
-                                                  context.l10n.commonUnknown,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14.sp,
-                                                color: AppColors.textPrimary,
-                                              ),
-                                            ),
-                                            if (_taggedUsers.isNotEmpty) ...[
-                                              Text(
-                                                context.l10n.postWith,
-                                                style: TextStyle(
-                                                  fontSize: 14.sp,
-                                                  color:
-                                                      AppColors.textSecondary,
-                                                ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: _openTagFriends,
-                                                child: _buildTaggedText(),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-
-                                        SizedBox(height: 8.h),
-
                                         Container(
                                           padding: EdgeInsets.symmetric(
-                                            horizontal: 10.h,
-                                            vertical: 4.w,
+                                            horizontal: 10.rs(context),
+                                            vertical: 8.rsh(context),
                                           ),
                                           decoration: BoxDecoration(
-                                            color: AppColors.primary
-                                                .withOpacity(0.1),
+                                            color: AppColors.background,
                                             borderRadius: BorderRadius.circular(
-                                              8.r,
+                                              14.rsr(context),
                                             ),
                                           ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Icon(
-                                                getIcon(_selectedPrivacyLabel),
-                                                color: AppColors.primary,
-                                                size: 14.sp,
+                                              Wrap(
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    state.user.fullName ??
+                                                        context
+                                                            .l10n
+                                                            .commonUnknown,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14.rsp(context),
+                                                      color:
+                                                          AppColors.textPrimary,
+                                                    ),
+                                                  ),
+                                                  if (_taggedUsers
+                                                      .isNotEmpty) ...[
+                                                    Text(
+                                                      context.l10n.postWith,
+                                                      style: TextStyle(
+                                                        fontSize: 14.rsp(
+                                                          context,
+                                                        ),
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: _openTagFriends,
+                                                      child: _buildTaggedText(),
+                                                    ),
+                                                  ],
+                                                ],
                                               ),
-                                              SizedBox(width: 4.w),
-                                              Text(
-                                                _selectedPrivacyLabel,
-                                                style: TextStyle(
-                                                  color: AppColors.primary,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 13.sp,
+
+                                              SizedBox(height: 8.rsh(context)),
+
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 10.rsh(context),
+                                                  vertical: 4.rs(context),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.primary
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        8.rsr(context),
+                                                      ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      getIcon(
+                                                        _selectedPrivacyLabel,
+                                                      ),
+                                                      color: AppColors.primary,
+                                                      size: 14.rsp(context),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 4.rs(context),
+                                                    ),
+                                                    Text(
+                                                      _selectedPrivacyLabel,
+                                                      style: TextStyle(
+                                                        color:
+                                                            AppColors.primary,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 13.rsp(
+                                                          context,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -582,99 +657,102 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              ],
+                            );
+                          }
+                          return SizedBox.shrink();
+                        },
+                      ),
+                      SizedBox(height: 14.rsh(context)),
+                      TextField(
+                        controller: _captionController,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 18.rsp(context),
+                        ),
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: context.l10n.postWriteSomethingHint,
+                          hintStyle: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 18.rsp(context),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                      if (_selectedAssets.isNotEmpty) ...[
+                        SelectedImagesDisplay(
+                          selectedAssets: _selectedAssets,
+                          onChangedLayout: (layout) {
+                            setState(() {
+                              _selectedLayout = layout;
+                            });
+                          },
+                          onEdit: () => _onSelectImage(context),
+                          onRemove: (assets) {
+                            setState(() {
+                              _selectedAssets.clear();
+                            });
+                          },
+                          onRemoveAtIndex: (index) {
+                            setState(() {
+                              _selectedAssets.removeAt(index);
+                            });
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              bottomNavigationBar: Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: 10.rsh(context),
+                  horizontal: 8.rs(context),
+                ),
+                color: AppColors.background,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Divider(height: 1.rsh(context), color: AppColors.divider),
+                    SizedBox(height: 10.rsh(context)),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: BouncingScrollPhysics(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _bottomIcon(
+                            Icons.image_outlined,
+                            context.l10n.postLibrary,
+                            onTap: () => _onSelectImage(context),
+                          ),
+                          _bottomIcon(
+                            Icons.person_add_alt_1,
+                            context.l10n.postTag,
+                            onTap: _openTagFriends,
+                          ),
+                          _bottomIcon(
+                            Icons.emoji_emotions_outlined,
+                            context.l10n.postFeeling,
+                          ),
+                          _bottomIcon(
+                            Icons.location_on_outlined,
+                            context.l10n.postLocation,
+                          ),
+                          _bottomIcon(
+                            CupertinoIcons.ellipsis,
+                            context.l10n.postMore,
+                            onTap: () => _showMoreOptions(context),
                           ),
                         ],
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-                SizedBox(height: 14.h),
-                TextField(
-                  controller: _captionController,
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 18.sp,
-                  ),
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    hintText: context.l10n.postWriteSomethingHint,
-                    hintStyle: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 18.sp,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-                if (_selectedAssets.isNotEmpty) ...[
-                  SelectedImagesDisplay(
-                    selectedAssets: _selectedAssets,
-                    onChangedLayout: (layout) {
-                      setState(() {
-                        _selectedLayout = layout;
-                      });
-                    },
-                    onEdit: () => _onSelectImage(context),
-                    onRemove: (assets) {
-                      setState(() {
-                        _selectedAssets.clear();
-                      });
-                    },
-                    onRemoveAtIndex: (index) {
-                      setState(() {
-                        _selectedAssets.removeAt(index);
-                      });
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-        bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
-          color: AppColors.background,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Divider(height: 1.h, color: AppColors.divider),
-              SizedBox(height: 10.h),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _bottomIcon(
-                      Icons.image_outlined,
-                      context.l10n.postLibrary,
-                      onTap: () => _onSelectImage(context),
-                    ),
-                    _bottomIcon(
-                      Icons.person_add_alt_1,
-                      context.l10n.postTag,
-                      onTap: _openTagFriends,
-                    ),
-                    _bottomIcon(
-                      Icons.emoji_emotions_outlined,
-                      context.l10n.postFeeling,
-                    ),
-                    _bottomIcon(
-                      Icons.location_on_outlined,
-                      context.l10n.postLocation,
-                    ),
-                    _bottomIcon(
-                      CupertinoIcons.ellipsis,
-                      context.l10n.postMore,
-                      onTap: () => _showMoreOptions(context),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -685,23 +763,26 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        constraints: BoxConstraints(minWidth: 90.w),
-        margin: EdgeInsets.only(right: 8.w),
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        constraints: BoxConstraints(minWidth: 90.rs(context)),
+        margin: EdgeInsets.only(right: 8.rs(context)),
+        padding: EdgeInsets.symmetric(
+          vertical: 8.rsh(context),
+          horizontal: 12.rs(context),
+        ),
         decoration: BoxDecoration(
           color: AppColors.textSecondary.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AppColors.textPrimary, size: 24.sp),
-            SizedBox(height: 4.h),
+            Icon(icon, color: AppColors.textPrimary, size: 24.rsp(context)),
+            SizedBox(height: 4.rsh(context)),
             Text(
               text,
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 12.sp,
+                fontSize: 12.rsp(context),
                 fontWeight: FontWeight.w500,
               ),
             ),
