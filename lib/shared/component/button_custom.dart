@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 
 class ButtonCustom extends StatelessWidget {
@@ -16,7 +16,7 @@ class ButtonCustom extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(12.rsr(context)),
           ),
           backgroundColor: AppColors.primary,
         ),
@@ -27,7 +27,7 @@ class ButtonCustom extends StatelessWidget {
           text,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 18.sp,
+            fontSize: 18.rsp(context),
             fontWeight: FontWeight.bold,
           ),
         ),

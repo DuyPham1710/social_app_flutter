@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
@@ -72,7 +72,10 @@ class CommunityPostHeaderBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 6.rsh(context),
+      ),
       child: Row(
         children: [
           GestureDetector(
@@ -85,7 +88,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: 10.rs(context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,14 +99,15 @@ class CommunityPostHeaderBase extends StatelessWidget {
                     user.fullName ?? context.l10n.commonUser,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
                 Text(
                   localizedPostTime(context.l10n, createdAt),
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 12.rsp(context),
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -128,7 +132,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
               }
 
               return PopupMenuButton<String>(
-                icon: Icon(Icons.more_horiz, size: 20.sp),
+                icon: Icon(Icons.more_horiz, size: 20.rsp(context)),
                 color: AppColors.background,
                 onSelected: (value) {
                   if (value == 'report') {
@@ -149,10 +153,10 @@ class CommunityPostHeaderBase extends StatelessWidget {
                             isSaved
                                 ? Icons.bookmark_remove_outlined
                                 : Icons.bookmark_border_rounded,
-                            size: 18.sp,
+                            size: 18.rsp(context),
                             color: AppColors.textSecondary,
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8.rs(context)),
                           Text(
                             isSaved
                                 ? context.l10n.postUnsave
@@ -168,10 +172,10 @@ class CommunityPostHeaderBase extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.flag_outlined,
-                            size: 18.sp,
+                            size: 18.rsp(context),
                             color: AppColors.textSecondary,
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8.rs(context)),
                           Text(context.l10n.postReport),
                         ],
                       ),
@@ -183,10 +187,10 @@ class CommunityPostHeaderBase extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.delete_outline,
-                            size: 18.sp,
+                            size: 18.rsp(context),
                             color: Colors.red,
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 8.rs(context)),
                           Text(
                             context.l10n.postDeleteTitle,
                             style: const TextStyle(color: Colors.red),

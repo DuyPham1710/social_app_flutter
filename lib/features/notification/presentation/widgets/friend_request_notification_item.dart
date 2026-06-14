@@ -35,7 +35,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
-                ? AppColors.primary.withOpacity(0.12)
+                ? AppColors.primary.withValues(alpha: 0.12)
                 : const Color(0xFFEAF3FF)), // màu nền khi chưa đọc
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       // ignore: sort_child_properties_last

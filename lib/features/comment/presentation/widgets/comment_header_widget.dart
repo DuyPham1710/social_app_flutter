@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/home/presentation/bloc/home_bloc.dart';
@@ -61,24 +61,49 @@ class CommentHeaderWidget extends StatelessWidget {
         final topEmojis = sortedEmojis.take(2).toList();
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
                 onTap: () {
-                  // Chỉ điều hướng nếu có reacts
+                  // Chỉ điều hướng hoặc mở Dialog nếu có reacts
                   if (displayReacts != null && displayReacts.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (_) => ReactionDetailsPage(
-                          reacts: displayReacts!,
-                          postId: postId,
-                          onMention: onMention,
+                    if (ResponsiveHelper.isWebOrDesktop) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => Dialog(
+                          backgroundColor: Colors.transparent,
+                          surfaceTintColor: Colors.transparent,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 550,
+                              maxHeight: 700,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: ReactionDetailsPage(
+                                reacts: displayReacts!,
+                                postId: postId,
+                                onMention: onMention,
+                                isDialog: true,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (_) => ReactionDetailsPage(
+                            reacts: displayReacts!,
+                            postId: postId,
+                            onMention: onMention,
+                          ),
+                        ),
+                      );
+                    }
                   }
                 },
                 child: Row(
@@ -86,8 +111,10 @@ class CommentHeaderWidget extends StatelessWidget {
                     // Hiển thị emoji icons
                     if (topEmojis.isNotEmpty)
                       SizedBox(
-                        width: topEmojis.length > 1 ? 40.w : 24.w,
-                        height: 24.h,
+                        width: topEmojis.length > 1
+                            ? 40.rs(context)
+                            : 24.rs(context),
+                        height: 24.rsh(context),
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
@@ -109,33 +136,33 @@ class CommentHeaderWidget extends StatelessWidget {
                     else
                       // Placeholder khi không có react
                       SizedBox(
-                        width: 24.w,
-                        height: 24.h,
+                        width: 24.rs(context),
+                        height: 24.rsh(context),
                         child: Icon(
                           CupertinoIcons.hand_thumbsup,
                           color: AppColors.unselectedIcon,
-                          size: 20.sp,
+                          size: 20.rsp(context),
                         ),
                       ),
 
                     Container(
-                      width: 10.w,
-                      height: 24.h,
+                      width: 10.rs(context),
+                      height: 24.rsh(context),
                       color: AppColors.background,
                     ),
 
                     Text(
                       reactCount.toString(),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
                     Container(
-                      width: 30.w,
-                      height: 24.h,
+                      width: 30.rs(context),
+                      height: 24.rsh(context),
                       color: AppColors.background,
                     ),
                   ],
@@ -147,7 +174,7 @@ class CommentHeaderWidget extends StatelessWidget {
                 child: Text(
                   context.l10n.postShareCount(0),
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),

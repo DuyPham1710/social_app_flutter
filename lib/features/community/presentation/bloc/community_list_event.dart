@@ -1,7 +1,7 @@
 part of 'community_list_bloc.dart';
 
 abstract class CommunityListEvent {
-  const CommunityListEvent();
+  CommunityListEvent();
 }
 
 class CommunityListFetched extends CommunityListEvent {
@@ -9,7 +9,7 @@ class CommunityListFetched extends CommunityListEvent {
   final int limit;
   final String? search;
 
-  const CommunityListFetched({
+  CommunityListFetched({
     required this.page,
     required this.limit,
     this.search,
@@ -19,23 +19,23 @@ class CommunityListFetched extends CommunityListEvent {
 class CommunityListSearched extends CommunityListEvent {
   final String query;
 
-  const CommunityListSearched(this.query);
+  CommunityListSearched(this.query);
 }
 
 class MyCommunitiesFetched extends CommunityListEvent {
-  const MyCommunitiesFetched();
+  MyCommunitiesFetched();
 }
 
 class MyInvitesFetched extends CommunityListEvent {
-  const MyInvitesFetched();
+  MyInvitesFetched();
 }
 
 class PendingCommunitiesFetched extends CommunityListEvent {
-  const PendingCommunitiesFetched();
+  PendingCommunitiesFetched();
 }
 
 class CancelPendingCommunityRequested extends CommunityListEvent {
   final String communityId;
 
-  const CancelPendingCommunityRequested(this.communityId);
+  CancelPendingCommunityRequested(this.communityId);
 }

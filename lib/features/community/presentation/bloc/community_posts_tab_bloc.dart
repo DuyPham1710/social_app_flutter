@@ -31,7 +31,7 @@ class CommunityPostsTabBloc
   CommunityPostsTabBloc.withDeps(
     this._getUserCommunityPostsUseCase,
     this._commentRepository,
-  ) : super(const CommunityPostsTabInitial()) {
+  ) : super(CommunityPostsTabInitial()) {
     on<CommunityPostsTabFetched>(_onFetched);
     on<CommunityPostsTabPageChanged>(_onPageChanged);
     on<CommunityPostsTabStatusChanged>(_onStatusChanged);
@@ -62,7 +62,7 @@ class CommunityPostsTabBloc
     CommunityPostsTabFetched event,
     Emitter<CommunityPostsTabState> emit,
   ) async {
-    emit(const CommunityPostsTabLoading());
+    emit(CommunityPostsTabLoading());
     currentStatus = event.status;
     currentPage = 1;
 

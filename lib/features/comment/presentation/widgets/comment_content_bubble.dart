@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_parsed_text/flutter_parsed_text.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -25,10 +25,10 @@ class CommentContentBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.rs(context), vertical: 8.rsh(context)),
       decoration: BoxDecoration(
         color: AppColors.backgroundCommentItem,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(14.rsr(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,18 +40,18 @@ class CommentContentBubble extends StatelessWidget {
               user.fullName ?? context.l10n.commonUnknown,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 13.sp,
+                fontSize: 13.rsp(context),
                 color: AppColors.textPrimary,
               ),
             ),
           ),
 
-          SizedBox(height: 4.h),
+          SizedBox(height: 4.rsh(context)),
 
           /// ===== COMMENT CONTENT =====
           ParsedText(
             text: content,
-            style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+            style: TextStyle(fontSize: 14.rsp(context), color: AppColors.textPrimary),
             parse: [
               MatchText(
                 pattern: _mentionRegex.pattern,

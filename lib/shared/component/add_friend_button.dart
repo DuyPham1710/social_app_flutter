@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 
 class AddFriendButton extends StatelessWidget {
   final String userId;
@@ -33,10 +34,13 @@ class AddFriendButton extends StatelessWidget {
       },
 
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.rs(context),
+          vertical: 8.rsh(context),
+        ),
         decoration: BoxDecoration(
           color: isSend ? Colors.grey[200] : AppColors.primary,
-          borderRadius: BorderRadius.circular(6.r),
+          borderRadius: BorderRadius.circular(6.rsr(context)),
         ),
         child: isSend
             ? Row(
@@ -45,25 +49,25 @@ class AddFriendButton extends StatelessWidget {
                 children: [
                   Icon(
                     CupertinoIcons.person_badge_minus,
-                    color: AppColors.textSecondary,
-                    size: 16.r,
+                    color: Colors.grey[600],
+                    size: 16.rsr(context),
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
                   Text(
-                    'Hủy lời mời',
+                    context.l10n.friendCancelRequest,
                     style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12.sp,
+                      color: Colors.grey[600],
+                      fontSize: 12.rsp(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               )
             : Text(
-                'Thêm bạn bè',
+                context.l10n.friendAdd,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 12.sp,
+                  fontSize: 12.rsp(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),

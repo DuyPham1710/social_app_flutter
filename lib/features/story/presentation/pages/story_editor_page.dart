@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:audioplayers/audioplayers.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:image_editor_plus/image_editor_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -24,9 +24,18 @@ import 'package:video_player/video_player.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 
 class StoryEditorPage extends StatefulWidget {
-  final AssetEntity asset;
+  final AssetEntity? asset;
+  final Uint8List? webFileBytes;
+  final String? webFileName;
+  final bool isVideo;
 
-  const StoryEditorPage({super.key, required this.asset});
+  const StoryEditorPage({
+    super.key,
+    this.asset,
+    this.webFileBytes,
+    this.webFileName,
+    this.isVideo = false,
+  }) : assert(asset != null || webFileBytes != null);
 
   @override
   State<StoryEditorPage> createState() => _StoryEditorPageState();
@@ -39,8 +48,6 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
 
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
-  bool _isVideoPlaying = false;
-  bool _isPrivacyOff = false;
 
   // Music state
   DeezerMusicModel? _selectedMusic;
@@ -66,8 +73,9 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   }
 
   Future<void> _initializeMedia() async {
-    if (widget.asset.type == AssetType.video) {
-      final file = await widget.asset.file;
+    final isVideo = widget.isVideo || widget.asset?.type == AssetType.video;
+    if (isVideo && widget.asset != null) {
+      final file = await widget.asset!.file;
       if (file != null && mounted) {
         _videoController = VideoPlayerController.file(file);
         await _videoController!.initialize();
@@ -77,10 +85,24 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
           });
           _videoController!.setLooping(true);
           _videoController!.play();
-          setState(() {
-            _isVideoPlaying = true;
-          });
         }
+      }
+    } else if (isVideo && widget.webFileBytes != null && kIsWeb) {
+      // Dùng XFile từ cross_file để tạo blob URL trên Web
+      final xfile = XFile.fromData(
+        widget.webFileBytes!,
+        name: widget.webFileName ?? 'video.mp4',
+      );
+      _videoController = VideoPlayerController.networkUrl(
+        Uri.parse(xfile.path),
+      );
+      await _videoController!.initialize();
+      if (mounted) {
+        setState(() {
+          _isVideoInitialized = true;
+        });
+        _videoController!.setLooping(true);
+        _videoController!.play();
       }
     }
   }
@@ -94,45 +116,62 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isVideo = widget.asset.type == AssetType.video;
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: BlocListener<StoryCreateBloc, StoryCreateState>(
-          listener: (context, state) {
-            if (state is StoryCreated) {
-              showSuccessSnackBar(context, context.l10n.storyCreateSuccess);
-              Navigator.of(context).maybePop();
-            } else if (state is StoryCreateError) {
-              showErrorSnackBar(context, state.message);
-            }
-          },
-          child: Stack(
-            children: [
-              // Main content - Image/Video
-              Center(child: _buildMediaContent(isVideo)),
-              // Top bar - Close button
-              Positioned(
-                top: 0,
-                left: 0,
-                child: Padding(
-                  padding: EdgeInsets.all(12.w),
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
+    final isVideo = widget.isVideo || widget.asset?.type == AssetType.video;
+    return Container(
+      color: Colors.black,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 450),
+          child: Scaffold(
+            backgroundColor: Colors.black,
+            body: SafeArea(
+              child: BlocListener<StoryCreateBloc, StoryCreateState>(
+                listener: (context, state) {
+                  if (state is StoryCreated) {
+                    showSuccessSnackBar(
+                      context,
+                      context.l10n.storyCreateSuccess,
+                    );
+                    Navigator.of(context).maybePop();
+                  } else if (state is StoryCreateError) {
+                    showErrorSnackBar(context, state.message);
+                  }
+                },
+                child: Stack(
+                  children: [
+                    // Main content - Image/Video
+                    Center(child: _buildMediaContent(isVideo)),
+                    // Top bar - Close button
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Padding(
+                        padding: EdgeInsets.all(12.rs(context)),
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.of(context).maybePop(),
+                        ),
+                      ),
+                    ),
+                    // Right side menu - Editing tools
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: _buildRightMenu(),
+                    ),
+                    // Bottom bar
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: _buildBottomBar(),
+                    ),
+                  ],
                 ),
               ),
-              // Right side menu - Editing tools
-              Positioned(right: 0, top: 0, bottom: 0, child: _buildRightMenu()),
-              // Bottom bar
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: _buildBottomBar(),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -149,9 +188,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
             } else {
               _videoController!.play();
             }
-            setState(() {
-              _isVideoPlaying = _videoController!.value.isPlaying;
-            });
+            setState(() {});
           },
           child: Center(
             child: AspectRatio(
@@ -173,29 +210,39 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         );
       }
 
-      return FutureBuilder<File?>(
-        future: widget.asset.file,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.data != null) {
-            return Center(
-              child: Image.file(snapshot.data!, fit: BoxFit.contain),
+      if (widget.webFileBytes != null) {
+        return Center(
+          child: Image.memory(widget.webFileBytes!, fit: BoxFit.contain),
+        );
+      }
+
+      if (widget.asset != null) {
+        return FutureBuilder<File?>(
+          future: widget.asset!.file,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.data != null) {
+              return Center(
+                child: Image.file(snapshot.data!, fit: BoxFit.contain),
+              );
+            }
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white),
             );
-          }
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
-          );
-        },
-      );
+          },
+        );
+      }
+
+      return const SizedBox.shrink();
     }
   }
 
   Widget _buildRightMenu() {
-    final isVideo = widget.asset.type == AssetType.video;
+    final isVideo = widget.isVideo || widget.asset?.type == AssetType.video;
 
     return Container(
-      width: 80.w,
-      padding: EdgeInsets.symmetric(vertical: 20.h),
+      width: 80.rs(context),
+      padding: EdgeInsets.symmetric(vertical: 20.rsh(context)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -204,9 +251,12 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
             label: context.l10n.commonEdit,
             onTap: () => _openImageEditor(),
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 20.rsh(context)),
           // Chỉ hiển thị option Nhạc nếu không phải video
-          if (!isVideo) ...[SizedBox(height: 20.h), _buildMusicButton()],
+          if (!isVideo) ...[
+            SizedBox(height: 20.rsh(context)),
+            _buildMusicButton(),
+          ],
         ],
       ),
     );
@@ -236,10 +286,10 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 50.w,
-            height: 50.w,
+            width: 50.rs(context),
+            height: 50.rs(context),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               shape: BoxShape.circle,
               border: _selectedMusic != null
                   ? Border.all(color: AppColors.primary, width: 2)
@@ -248,15 +298,17 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
             child: _selectedMusic != null
                 ? ClipOval(
                     child: Image.network(
-                      _selectedMusic!.album.cover,
-                      width: 50.w,
-                      height: 50.w,
+                      kIsWeb
+                          ? 'https://images.weserv.nl/?url=${Uri.encodeComponent(_selectedMusic!.album.cover)}'
+                          : _selectedMusic!.album.cover,
+                      width: 50.rs(context),
+                      height: 50.rs(context),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Icon(
                           Icons.music_note,
                           color: Colors.white,
-                          size: 24.sp,
+                          size: 24.rsp(context),
                         );
                       },
                       loadingBuilder: (context, child, loadingProgress) {
@@ -264,20 +316,24 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                         return Icon(
                           Icons.music_note,
                           color: Colors.white,
-                          size: 24.sp,
+                          size: 24.rsp(context),
                         );
                       },
                     ),
                   )
-                : Icon(Icons.music_note, color: Colors.white, size: 24.sp),
+                : Icon(
+                    Icons.music_note,
+                    color: Colors.white,
+                    size: 24.rsp(context),
+                  ),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 4.rsh(context)),
           Text(
             context.l10n.storyMusic,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 11.sp,
+              fontSize: 11.rsp(context),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -297,21 +353,21 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 50.w,
-            height: 50.w,
+            width: 50.rs(context),
+            height: 50.rs(context),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.white, size: 24.sp),
+            child: Icon(icon, color: Colors.white, size: 24.rsp(context)),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 4.rsh(context)),
           Text(
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 11.sp,
+              fontSize: 11.rsp(context),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -322,8 +378,11 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
 
   Widget _buildBottomBar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.rs(context),
+        vertical: 12.rsh(context),
+      ),
+      decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.3)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -341,7 +400,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                   );
                 },
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: 8.rs(context)),
               const Spacer(),
               // Share button
               BlocBuilder<StoryCreateBloc, StoryCreateState>(
@@ -352,17 +411,17 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       padding: EdgeInsets.symmetric(
-                        horizontal: 24.w,
-                        vertical: 12.h,
+                        horizontal: 24.rs(context),
+                        vertical: 12.rsh(context),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(8.rsr(context)),
                       ),
                     ),
                     child: isLoading
                         ? SizedBox(
-                            width: 20.w,
-                            height: 20.w,
+                            width: 20.rs(context),
+                            height: 20.rs(context),
                             child: const CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor: AlwaysStoppedAnimation<Color>(
@@ -374,7 +433,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
                             context.l10n.postShare,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 15.sp,
+                              fontSize: 15.rsp(context),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -390,7 +449,8 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
 
   Future<void> _openImageEditor() async {
     // Chỉ cho phép chỉnh sửa ảnh, không phải video
-    if (widget.asset.type == AssetType.video) {
+    final isVideo = widget.isVideo || widget.asset?.type == AssetType.video;
+    if (isVideo) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(context.l10n.storyImageOnlyEdit)));
@@ -398,46 +458,69 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     }
 
     try {
-      // Lấy file gốc hoặc file đã chỉnh sửa
-      final originalFile = _editedImageFile ?? await widget.asset.file;
-      if (originalFile == null) {
+      // Đọc dữ liệu byte từ ảnh
+      Uint8List? imageBytes;
+      if (_editedImageFile != null) {
+        imageBytes = await _editedImageFile!.readAsBytes();
+      } else if (widget.webFileBytes != null) {
+        imageBytes = widget.webFileBytes;
+      } else if (widget.asset != null) {
+        final originalFile = await widget.asset!.file;
+        if (originalFile != null) {
+          imageBytes = await originalFile.readAsBytes();
+        }
+      }
+
+      if (!mounted) return;
+      if (imageBytes == null) {
         showErrorSnackBar(context, context.l10n.storyCannotReadDeviceFile);
         return;
       }
 
-      // Đọc dữ liệu byte từ ảnh
-      final imageBytes = await originalFile.readAsBytes();
-
       // Mở trình chỉnh sửa ảnh
       final editedImage = await Navigator.push<Uint8List?>(
         context,
-        MaterialPageRoute(builder: (context) => ImageEditor(image: imageBytes)),
+        MaterialPageRoute(
+          builder: (context) => ImageEditor(image: imageBytes!),
+        ),
       );
 
       // Nếu người dùng đã chỉnh sửa xong và quay lại
       if (editedImage != null) {
+        if (kIsWeb) {
+          if (!mounted) return;
+          showErrorSnackBar(
+            context,
+            context.l10n.storyWebImageEditNotSupported,
+          );
+          return;
+        }
+
         // Tạo tên file mới với timestamp để tránh cache
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final directory = originalFile.parent;
-        final fileName = originalFile.path.split('/').last;
-        final nameWithoutExt = fileName.split('.').first;
-        final extension = fileName.split('.').last;
-        final newPath =
-            '${directory.path}/${nameWithoutExt}_edited_$timestamp.$extension';
+        final originalFile = await widget.asset?.file;
+        if (originalFile != null) {
+          final timestamp = DateTime.now().millisecondsSinceEpoch;
+          final directory = originalFile.parent;
+          final fileName = originalFile.path.split('/').last;
+          final nameWithoutExt = fileName.split('.').first;
+          final extension = fileName.split('.').last;
+          final newPath =
+              '${directory.path}/${nameWithoutExt}_edited_$timestamp.$extension';
 
-        final newFile = File(newPath);
+          final newFile = File(newPath);
 
-        // Ghi ảnh đã chỉnh sửa vào file mới
-        await newFile.writeAsBytes(editedImage);
+          // Ghi ảnh đã chỉnh sửa vào file mới
+          await newFile.writeAsBytes(editedImage);
 
-        // Clear image cache để force reload
-        imageCache.clear();
-        imageCache.clearLiveImages();
+          // Clear image cache để force reload
+          imageCache.clear();
+          imageCache.clearLiveImages();
 
-        setState(() {
-          // Cập nhật với file mới
-          _editedImageFile = newFile;
-        });
+          setState(() {
+            // Cập nhật với file mới
+            _editedImageFile = newFile;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -453,19 +536,26 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
   Future<void> _onSharePressed() async {
     // Sử dụng file đã chỉnh sửa nếu có, không thì lấy file gốc từ AssetEntity
     File? file;
+    Uint8List? fileBytes;
+    String? fileName;
+
     if (_editedImageFile != null) {
       file = _editedImageFile;
-    } else {
-      file = await widget.asset.file;
+    } else if (widget.webFileBytes != null) {
+      fileBytes = widget.webFileBytes;
+      fileName = widget.webFileName;
+    } else if (widget.asset != null) {
+      file = await widget.asset!.file;
     }
 
-    if (file == null) {
+    if (!mounted) return;
+    if (file == null && fileBytes == null) {
       showErrorSnackBar(context, context.l10n.storyCannotReadDeviceFile);
       return;
     }
 
     // Xác định loại media
-    final isVideo = widget.asset.type == AssetType.video;
+    final isVideo = widget.isVideo || widget.asset?.type == AssetType.video;
     final mediaType = isVideo
         ? core_media.MediaType.video
         : core_media.MediaType.image;
@@ -474,6 +564,7 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
     final privacyLabel = await StoryPrivacyStorage.getPrivacy();
     final hiddenFriendIds = await StoryPrivacyStorage.getHiddenFriendIds();
     final allowedFriendIds = await StoryPrivacyStorage.getAllowedFriendIds();
+    if (!mounted) return;
 
     // Mặc định: bạn bè nếu chưa cấu hình
     core_privacy.PrivacyType privacyType = core_privacy.PrivacyType.friends;
@@ -510,6 +601,8 @@ class _StoryEditorPageState extends State<StoryEditorPage> {
       friendsExcept: friendsExcept,
       friendsDetail: friendsDetail,
       file: file,
+      fileBytes: fileBytes,
+      fileName: fileName,
     );
 
     context.read<StoryCreateBloc>().add(

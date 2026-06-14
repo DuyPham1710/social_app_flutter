@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
 class TextformfieldCustom extends StatelessWidget {
   final String label;
@@ -47,15 +45,23 @@ class TextformfieldCustom extends StatelessWidget {
             }
             return TextStyle(color: AppColors.textSecondary); // khi không focus
           }),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.rsr(context)),
+          ),
           suffixIcon: suffixIcon,
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.r),
-            borderSide: BorderSide(width: 1.w, color: AppColors.divider),
+            borderRadius: BorderRadius.circular(5.rsr(context)),
+            borderSide: BorderSide(
+              width: 1.rs(context),
+              color: AppColors.divider,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.r),
-            borderSide: BorderSide(width: 2.w, color: AppColors.primary),
+            borderRadius: BorderRadius.circular(5.rsr(context)),
+            borderSide: BorderSide(
+              width: 2.rs(context),
+              color: AppColors.primary,
+            ),
           ),
         ),
         validator: validator,

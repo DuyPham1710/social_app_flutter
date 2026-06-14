@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/listen_comment_count_usecase.dart';
 import 'package:social_app_fe/features/comment/domain/usecases/load_comment_usecase.dart';
 import 'package:social_app_fe/features/friend/domain/usecases/get_friend_relationship_usecase.dart';
@@ -15,7 +16,6 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.da
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/features/search/domain/entities/search_history_entity.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -30,6 +30,111 @@ class SearchHistoryItem extends StatelessWidget {
     this.showDeleteIcon = false,
   });
 
+  Widget _buildHeader(
+    BuildContext context, {
+    required bool hasViewedUser,
+    required String displayName,
+    required String? avatarUrl,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.rs(context),
+        vertical: 16.rsh(context),
+      ),
+      child: Row(
+        children: [
+          hasViewedUser
+              ? CircleAvatar(
+                  radius: 24.rsr(context),
+                  backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                      ? NetworkImage(avatarUrl)
+                      : null,
+                  child: avatarUrl == null || avatarUrl.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 24.rsr(context),
+                          color: AppColors.textSecondary,
+                        )
+                      : null,
+                )
+              : Container(
+                  width: 48.rsr(context),
+                  height: 48.rsr(context),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondBackground,
+                    borderRadius: BorderRadius.circular(24.rsr(context)),
+                  ),
+                  child: Icon(
+                    CupertinoIcons.search,
+                    size: 20.rsr(context),
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+          SizedBox(width: 12.rs(context)),
+          Expanded(
+            child: Text(
+              displayName,
+              style: TextStyle(
+                fontSize: 16.rsp(context),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.rs(context),
+          vertical: 16.rsh(context),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 22.rsr(context), color: AppColors.textPrimary),
+            SizedBox(width: 16.rs(context)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15.rsp(context),
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 2.rsh(context)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13.rsp(context),
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showBottomSheet(BuildContext context) {
     final hasViewedUser = history.viewedUser != null;
     final displayName = hasViewedUser
@@ -42,172 +147,120 @@ class SearchHistoryItem extends StatelessWidget {
     // Lưu SearchBloc từ context cha trước khi show bottom sheet
     final searchBloc = context.read<SearchBloc>();
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (bottomSheetContext) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.r),
-            topRight: Radius.circular(20.r),
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: AppColors.background,
+          clipBehavior: Clip.antiAlias,
+          contentPadding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.rsr(context)),
+          ),
+          content: SizedBox(
+            width: 320.rs(context),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header với avatar và tên
+                _buildHeader(
+                  context,
+                  hasViewedUser: hasViewedUser,
+                  displayName: displayName,
+                  avatarUrl: avatarUrl,
+                ),
+                // Đường phân cách
+                Divider(color: AppColors.divider, height: 1, thickness: 1),
+                // Action: Xóa
+                _buildActionItem(
+                  context,
+                  icon: CupertinoIcons.delete,
+                  title: context.l10n.commonDelete,
+                  subtitle: context.l10n.searchRemoveFromHistory,
+                  onTap: () {
+                    Navigator.pop(dialogContext);
+                    searchBloc.add(DeleteSearchHistory(historyId: history.id));
+                  },
+                ),
+                // Action: Ghim
+                _buildActionItem(
+                  context,
+                  icon: CupertinoIcons.pin,
+                  title: context.l10n.searchPinThis,
+                  subtitle: context.l10n.searchPinLimit,
+                  onTap: () {
+                    Navigator.pop(dialogContext);
+                    // TODO: Implement pin functionality
+                  },
+                ),
+                SizedBox(height: 8.rsh(context)),
+              ],
+            ),
           ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              margin: EdgeInsets.only(top: 12.h),
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: AppColors.textSecondary,
-                borderRadius: BorderRadius.circular(2.r),
-              ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (bottomSheetContext) => Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.rsr(context)),
+              topRight: Radius.circular(20.rsr(context)),
             ),
-            // Header với avatar và tên
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-              child: Row(
-                children: [
-                  hasViewedUser
-                      ? CircleAvatar(
-                          radius: 24.r,
-                          backgroundImage:
-                              avatarUrl != null && avatarUrl.isNotEmpty
-                              ? NetworkImage(avatarUrl)
-                              : null,
-                          child: avatarUrl == null || avatarUrl.isEmpty
-                              ? Icon(
-                                  Icons.person,
-                                  size: 24.r,
-                                  color: AppColors.textSecondary,
-                                )
-                              : null,
-                        )
-                      : Container(
-                          width: 48.r,
-                          height: 48.r,
-                          decoration: BoxDecoration(
-                            color: AppColors.secondBackground,
-                            borderRadius: BorderRadius.circular(24.r),
-                          ),
-                          child: Icon(
-                            CupertinoIcons.search,
-                            size: 20.r,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      displayName,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Đường phân cách
-            Divider(color: AppColors.divider, height: 1, thickness: 1),
-            // Action: Xóa
-            InkWell(
-              onTap: () {
-                Navigator.pop(bottomSheetContext);
-                searchBloc.add(DeleteSearchHistory(historyId: history.id));
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                child: Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.delete,
-                      size: 22.r,
-                      color: AppColors.textPrimary,
-                    ),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.commonDelete,
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            context.l10n.searchRemoveFromHistory,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: EdgeInsets.only(top: 12.rsh(context)),
+                width: 40.rs(context),
+                height: 4.rsh(context),
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondary,
+                  borderRadius: BorderRadius.circular(2.rsr(context)),
                 ),
               ),
-            ),
-            // Action: Ghim
-            InkWell(
-              onTap: () {
-                Navigator.pop(bottomSheetContext);
-                // TODO: Implement pin functionality
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                child: Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.pin,
-                      size: 22.r,
-                      color: AppColors.textPrimary,
-                    ),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.searchPinThis,
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            context.l10n.searchPinLimit,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              // Header với avatar và tên
+              _buildHeader(
+                context,
+                hasViewedUser: hasViewedUser,
+                displayName: displayName,
+                avatarUrl: avatarUrl,
               ),
-            ),
-            SizedBox(height: 8.h),
-          ],
+              // Đường phân cách
+              Divider(color: AppColors.divider, height: 1, thickness: 1),
+              // Action: Xóa
+              _buildActionItem(
+                context,
+                icon: CupertinoIcons.delete,
+                title: context.l10n.commonDelete,
+                subtitle: context.l10n.searchRemoveFromHistory,
+                onTap: () {
+                  Navigator.pop(bottomSheetContext);
+                  searchBloc.add(DeleteSearchHistory(historyId: history.id));
+                },
+              ),
+              // Action: Ghim
+              _buildActionItem(
+                context,
+                icon: CupertinoIcons.pin,
+                title: context.l10n.searchPinThis,
+                subtitle: context.l10n.searchPinLimit,
+                onTap: () {
+                  Navigator.pop(bottomSheetContext);
+                  // TODO: Implement pin functionality
+                },
+              ),
+              SizedBox(height: 8.rsh(context)),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Future<void> _handleTap(BuildContext context) async {
@@ -281,41 +334,44 @@ class SearchHistoryItem extends StatelessWidget {
 
     return InkWell(
       onTap: () => _handleTap(context),
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(12.rsr(context)),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        padding: EdgeInsets.symmetric(
+          vertical: 8.rsh(context),
+          horizontal: 12.rs(context),
+        ),
         child: Row(
           children: [
             // Avatar hoặc icon
             if (hasViewedUser)
               CircleAvatar(
-                radius: 24.r,
+                radius: 24.rsr(context),
                 backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
                     ? NetworkImage(avatarUrl)
                     : null,
                 child: avatarUrl == null || avatarUrl.isEmpty
                     ? Icon(
                         Icons.person,
-                        size: 24.r,
+                        size: 24.rsr(context),
                         color: AppColors.textSecondary,
                       )
                     : null,
               )
             else
               Container(
-                width: 48.r,
-                height: 48.r,
+                width: 48.rsr(context),
+                height: 48.rsr(context),
                 decoration: BoxDecoration(
                   color: AppColors.secondBackground,
-                  borderRadius: BorderRadius.circular(24.r),
+                  borderRadius: BorderRadius.circular(24.rsr(context)),
                 ),
                 child: Icon(
                   CupertinoIcons.search,
-                  size: 20.r,
+                  size: 20.rsr(context),
                   color: AppColors.textSecondary,
                 ),
               ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 12.rs(context)),
             // Thông tin
             Expanded(
               child: Column(
@@ -324,7 +380,7 @@ class SearchHistoryItem extends StatelessWidget {
                   Text(
                     displayName,
                     style: TextStyle(
-                      fontSize: 15.sp,
+                      fontSize: 15.rsp(context),
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -332,11 +388,11 @@ class SearchHistoryItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (subtitle != null) ...[
-                    SizedBox(height: 2.h),
+                    SizedBox(height: 2.rsh(context)),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 13.rsp(context),
                         color: AppColors.textSecondary,
                       ),
                       maxLines: 1,
@@ -351,7 +407,7 @@ class SearchHistoryItem extends StatelessWidget {
                 ? IconButton(
                     icon: Icon(
                       CupertinoIcons.xmark,
-                      size: 20.r,
+                      size: 20.rsr(context),
                       color: AppColors.iconPrimary,
                     ),
                     padding: EdgeInsets.zero,
@@ -365,7 +421,7 @@ class SearchHistoryItem extends StatelessWidget {
                 : IconButton(
                     icon: Icon(
                       CupertinoIcons.ellipsis,
-                      size: 20.r,
+                      size: 20.rsr(context),
                       color: AppColors.iconPrimary,
                     ),
                     padding: EdgeInsets.zero,

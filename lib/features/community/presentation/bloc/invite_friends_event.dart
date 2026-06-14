@@ -1,18 +1,18 @@
 part of 'invite_friends_bloc.dart';
 
 abstract class InviteFriendsEvent {
-  const InviteFriendsEvent();
+  InviteFriendsEvent();
 }
 
 class GetAvailableFriendsEvent extends InviteFriendsEvent {
   final String communityId;
 
-  const GetAvailableFriendsEvent({required this.communityId});
+  GetAvailableFriendsEvent({required this.communityId});
 }
 
 class InviteFriendEvent extends InviteFriendsEvent {
   final String communityId;
   final String userId;
 
-  const InviteFriendEvent({required this.communityId, required this.userId});
+  InviteFriendEvent({required this.communityId, required this.userId});
 }

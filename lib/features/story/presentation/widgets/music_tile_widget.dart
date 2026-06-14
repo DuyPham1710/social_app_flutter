@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/story/data/models/deezer_music_model.dart';
 
@@ -30,17 +31,19 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: widget.onTap,
-      contentPadding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
+      contentPadding: EdgeInsets.symmetric(vertical: 4.rsh(context), horizontal: 4.rs(context)),
       leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: BorderRadius.circular(8.rsr(context)),
         child: Image.network(
-          widget.item.album.cover,
-          width: 54.w,
-          height: 54.w,
+          kIsWeb
+              ? 'https://images.weserv.nl/?url=${Uri.encodeComponent(widget.item.album.cover)}'
+              : widget.item.album.cover,
+          width: 54.rs(context),
+          height: 54.rs(context),
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Container(
-            width: 54.w,
-            height: 54.w,
+            width: 54.rs(context),
+            height: 54.rs(context),
             color: AppColors.secondBackground,
             child: Icon(Icons.music_note, color: AppColors.iconPrimary),
           ),
@@ -50,7 +53,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
         widget.item.title,
         style: TextStyle(
           color: AppColors.textPrimary,
-          fontSize: 15.sp,
+          fontSize: 15.rsp(context),
           fontWeight: FontWeight.w700,
         ),
         maxLines: 1,
@@ -58,7 +61,7 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
       ),
       subtitle: Text(
         widget.item.artist.name,
-        style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 13.rsp(context)),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -69,25 +72,25 @@ class _MusicTileWidgetState extends State<MusicTileWidget> {
             icon: Icon(Icons.more_horiz, color: AppColors.iconPrimary),
             onPressed: () {},
           ),
-          SizedBox(width: 4.w),
+          SizedBox(width: 4.rs(context)),
           GestureDetector(
             onTap: widget.onPlay,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 CircleAvatar(
-                  radius: 18.r,
+                  radius: 18.rsr(context),
                   backgroundColor: AppColors.secondBackground,
                   child: Icon(
                     widget.isPlaying ? Icons.pause : Icons.play_arrow,
                     color: AppColors.iconPrimary,
-                    size: 22.sp,
+                    size: 22.rsp(context),
                   ),
                 ),
                 if (widget.isPlaying && widget.progress != null)
                   SizedBox(
-                    width: 40.r,
-                    height: 40.r,
+                    width: 40.rsr(context),
+                    height: 40.rsr(context),
                     child: CustomPaint(
                       painter: _RotatingDotPainter(progress: widget.progress!),
                     ),

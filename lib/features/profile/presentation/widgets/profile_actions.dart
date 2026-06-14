@@ -45,6 +45,7 @@ class ProfileActions extends StatelessWidget {
           Expanded(
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
+                overlayColor: AppColors.primary.withValues(alpha: 0.1),
                 side: BorderSide(color: AppColors.divider),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

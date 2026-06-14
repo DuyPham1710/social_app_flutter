@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
@@ -19,11 +19,14 @@ class ReactionDetailsPage extends StatefulWidget {
     String userDisplayName,
   )?
   onMention;
+  final bool isDialog;
+
   const ReactionDetailsPage({
     super.key,
     required this.reacts,
     required this.postId,
     this.onMention,
+    this.isDialog = false,
   });
 
   @override
@@ -110,26 +113,29 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
+          icon: Icon(
+            widget.isDialog ? CupertinoIcons.clear : CupertinoIcons.back,
+            color: AppColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           context.l10n.postPeopleReactedTitle,
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 16.sp,
+            fontSize: 16.rsp(context),
             fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: false,
-        actions: [
-          IconButton(
-            icon: Icon(CupertinoIcons.search, color: AppColors.textPrimary),
-            onPressed: () {
-              // TODO: Implement search
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(CupertinoIcons.search, color: AppColors.textPrimary),
+        //     onPressed: () {
+        //       // TODO: Implement search
+        //     },
+        //   ),
+        // ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -137,9 +143,12 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
           indicatorColor: AppColors.primary,
           labelColor: AppColors.primary,
           unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+          labelStyle: TextStyle(
+            fontSize: 14.rsp(context),
+            fontWeight: FontWeight.w600,
+          ),
           unselectedLabelStyle: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 14.rsp(context),
             fontWeight: FontWeight.normal,
           ),
           dividerColor: AppColors.divider,
@@ -152,15 +161,15 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
                 children: [
                   Text(
                     context.l10n.commonAll,
-                    style: TextStyle(fontSize: 14.sp),
+                    style: TextStyle(fontSize: 14.rsp(context)),
                   ),
 
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
 
                   Text(
                     totalCount.toString(),
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -175,12 +184,15 @@ class _ReactionDetailsPageState extends State<ReactionDetailsPage>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(emoji.icon, style: TextStyle(fontSize: 16.sp)),
-                    SizedBox(width: 8.w),
+                    Text(
+                      emoji.icon,
+                      style: TextStyle(fontSize: 16.rsp(context)),
+                    ),
+                    SizedBox(width: 8.rs(context)),
                     Text(
                       count.toString(),
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),

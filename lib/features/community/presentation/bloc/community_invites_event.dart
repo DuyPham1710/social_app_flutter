@@ -1,11 +1,11 @@
 part of 'community_invites_bloc.dart';
 
 abstract class CommunityInvitesEvent {
-  const CommunityInvitesEvent();
+  CommunityInvitesEvent();
 }
 
 class FetchCommunityInvitesEvent extends CommunityInvitesEvent {
-  const FetchCommunityInvitesEvent();
+  FetchCommunityInvitesEvent();
 }
 
 class RespondToInviteEvent extends CommunityInvitesEvent {
@@ -13,7 +13,7 @@ class RespondToInviteEvent extends CommunityInvitesEvent {
   final String requestId;
   final String action; // 'approve' or 'reject'
 
-  const RespondToInviteEvent({
+  RespondToInviteEvent({
     required this.communityId,
     required this.requestId,
     required this.action,
@@ -21,5 +21,5 @@ class RespondToInviteEvent extends CommunityInvitesEvent {
 }
 
 class RefreshInvitesEvent extends CommunityInvitesEvent {
-  const RefreshInvitesEvent();
+  RefreshInvitesEvent();
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_header_chips.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_request_item.dart';
@@ -37,71 +37,83 @@ class _FriendPageState extends State<FriendPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        title: Text(
-          context.l10n.friendTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: ResponsiveHelper.feedMaxWidth,
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
-            icon: const Icon(CupertinoIcons.search),
+        child: Scaffold(
+          appBar: AppBar(
+            surfaceTintColor: Colors.transparent,
+            automaticallyImplyLeading: false,
+            title: Text(
+              context.l10n.friendTitle,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/search');
+                },
+                icon: const Icon(CupertinoIcons.search),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: RefreshIndicator(
-          backgroundColor: AppColors.background,
-          color: AppColors.primary,
-          onRefresh: () async {
-            _loadData();
-            // Đợi một chút để animation hoàn thành
-            await Future.delayed(const Duration(milliseconds: 500));
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FriendHeaderChips(onNeedRefresh: _loadData),
-                SizedBox(height: 16.h),
-
-                // Lời mời kết bạn
-                _buildSectionHeader(
-                  title: context.l10n.friendRequestsTitle,
-                  trailing: context.l10n.friendSeeAll,
-                  onTapTrailing: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FriendRequestsPage(),
-                      ),
-                    );
-                    // Reload data khi quay lại từ trang chi tiết
-                    if (mounted) {
-                      _loadData();
-                    }
-                  },
+          body: SafeArea(
+            child: RefreshIndicator(
+              backgroundColor: AppColors.background,
+              color: AppColors.primary,
+              onRefresh: () async {
+                _loadData();
+                // Đợi một chút để animation hoàn thành
+                await Future.delayed(const Duration(milliseconds: 500));
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.rs(context),
+                  vertical: 8.rsh(context),
                 ),
-                SizedBox(height: 8.h),
-                _buildFriendRequestsSection(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FriendHeaderChips(onNeedRefresh: _loadData),
+                    SizedBox(height: 16.rsh(context)),
 
-                SizedBox(height: 20.h),
+                    // Lời mời kết bạn
+                    _buildSectionHeader(
+                      title: context.l10n.friendRequestsTitle,
+                      trailing: context.l10n.friendSeeAll,
+                      onTapTrailing: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FriendRequestsPage(),
+                          ),
+                        );
+                        // Reload data khi quay lại từ trang chi tiết
+                        if (mounted) {
+                          _loadData();
+                        }
+                      },
+                    ),
+                    SizedBox(height: 8.rsh(context)),
+                    _buildFriendRequestsSection(),
 
-                // Những người bạn có thể biết
-                _buildSectionHeader(title: context.l10n.friendPeopleYouMayKnow),
-                SizedBox(height: 8.h),
-                _buildFriendSuggestionsSection(),
-              ],
+                    SizedBox(height: 20.rsh(context)),
+
+                    // Những người bạn có thể biết
+                    _buildSectionHeader(
+                      title: context.l10n.friendPeopleYouMayKnow,
+                    ),
+                    SizedBox(height: 8.rsh(context)),
+                    _buildFriendSuggestionsSection(),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -130,7 +142,7 @@ class _FriendPageState extends State<FriendPage>
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
             ),
           );
@@ -156,7 +168,7 @@ class _FriendPageState extends State<FriendPage>
               duration: const Duration(seconds: 4),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
             ),
           );
@@ -174,14 +186,14 @@ class _FriendPageState extends State<FriendPage>
           if (state is FriendRequestsLoading ||
               (state is FriendPageLoaded && state.isLoadingRequests)) {
             return Container(
-              height: 120.h,
+              height: 120.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 8.r,
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8.rsr(context),
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -204,14 +216,14 @@ class _FriendPageState extends State<FriendPage>
 
             if (friendRequests.isEmpty) {
               return Container(
-                height: 100.h,
+                height: 100.rsh(context),
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(12.rsr(context)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 8.r,
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 8.rsr(context),
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -222,15 +234,15 @@ class _FriendPageState extends State<FriendPage>
                     children: [
                       Icon(
                         CupertinoIcons.person_2,
-                        size: 32.r,
+                        size: 32.rsr(context),
                         color: AppColors.unselectedIcon,
                       ),
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 8.rsh(context)),
                       Text(
                         context.l10n.friendNoRequests,
                         style: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 14.sp,
+                          fontSize: 14.rsp(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -244,11 +256,11 @@ class _FriendPageState extends State<FriendPage>
             return Container(
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 8.r,
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8.rsr(context),
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -289,14 +301,14 @@ class _FriendPageState extends State<FriendPage>
             );
           } else if (state is FriendError) {
             return Container(
-              height: 100.h,
+              height: 100.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 8.r,
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8.rsr(context),
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -307,19 +319,19 @@ class _FriendPageState extends State<FriendPage>
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 32.r,
+                      size: 32.rsr(context),
                       color: Colors.red[300],
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 8.rsh(context)),
                     Text(
                       context.l10n.friendLoadDataError,
                       style: TextStyle(
                         color: AppColors.textSecondary,
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 4.rsh(context)),
                     TextButton(
                       onPressed: () {
                         context.read<FriendBloc>().add(const LoadFriendPage());
@@ -327,7 +339,7 @@ class _FriendPageState extends State<FriendPage>
                       child: Text(
                         context.l10n.commonRetry,
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 12.rsp(context),
                           color: AppColors.primary,
                         ),
                       ),
@@ -458,7 +470,7 @@ class _FriendPageState extends State<FriendPage>
         Text(
           title,
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: 18.rsp(context),
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
           ),
@@ -470,7 +482,7 @@ class _FriendPageState extends State<FriendPage>
               trailing,
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: 12.sp,
+                fontSize: 12.rsp(context),
                 fontWeight: FontWeight.w600,
               ),
             ),

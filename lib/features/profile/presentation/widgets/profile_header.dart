@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/image_viewer_page.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -28,11 +28,11 @@ class ProfileHeader extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  height: 200.h,
+                  height: 200.rsh(context),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: BorderRadius.circular(8.rsr(context)),
                   ),
                 ),
                 Positioned(
@@ -51,8 +51,8 @@ class ProfileHeader extends StatelessWidget {
                   bottom: -60,
                   left: 16,
                   child: Container(
-                    width: 128.r,
-                    height: 128.r,
+                    width: 128.rsr(context),
+                    height: 128.rsr(context),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
@@ -62,29 +62,29 @@ class ProfileHeader extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 65.h),
+            SizedBox(height: 65.rsh(context)),
             Center(
               child: Container(
-                height: 22.h,
-                width: 150.w,
+                height: 22.rsh(context),
+                width: 150.rs(context),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8.rsh(context)),
             Center(
               child: Container(
-                height: 14.h,
-                width: 210.w,
+                height: 14.rsh(context),
+                width: 210.rs(context),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
             ),
-            SizedBox(height: 10.h),
+            SizedBox(height: 10.rsh(context)),
           ],
         ),
       );
@@ -115,10 +115,10 @@ class ProfileHeader extends StatelessWidget {
                 );
               },
               child: Container(
-                height: 200.h,
+                height: 200.rsh(context),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(8.rsr(context)),
                   image: DecorationImage(
                     image: NetworkImage(
                       user?.coverUrl ??
@@ -209,14 +209,14 @@ class ProfileHeader extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 65.h),
+        SizedBox(height: 65.rsh(context)),
 
         // User name
         Center(
           child: Text(
             user?.fullName ?? context.l10n.profileUserNameFallback,
             style: TextStyle(
-              fontSize: 22.sp,
+              fontSize: 22.rsp(context),
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
@@ -224,21 +224,24 @@ class ProfileHeader extends StatelessWidget {
           ),
         ),
 
-        SizedBox(height: 6.h),
+        SizedBox(height: 6.rsh(context)),
 
         // Bio
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40.w),
+          padding: EdgeInsets.symmetric(horizontal: 40.rs(context)),
           child: Text(
             user?.bio?.isNotEmpty == true
                 ? user!.bio!
                 : context.l10n.profileNoBio,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13.rsp(context),
+            ),
             textAlign: TextAlign.center,
           ),
         ),
 
-        SizedBox(height: 10.h),
+        SizedBox(height: 10.rsh(context)),
       ],
     );
   }

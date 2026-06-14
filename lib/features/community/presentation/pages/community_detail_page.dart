@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -20,9 +22,9 @@ import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityDetailPage extends StatefulWidget {
   final String communityId;
-  static const Duration fadeTransitionDuration = Duration(milliseconds: 280);
+  static Duration fadeTransitionDuration = Duration(milliseconds: 280);
 
-  const CommunityDetailPage({super.key, required this.communityId});
+  CommunityDetailPage({super.key, required this.communityId});
 
   static Route<void> route({required String communityId}) {
     return PageRouteBuilder<void>(
@@ -50,7 +52,7 @@ class CommunityDetailPage extends StatefulWidget {
 class _CommunityDetailPageState extends State<CommunityDetailPage> {
   int _refreshSeed = 0;
 
-  static const Duration _pageFadeDuration =
+  static Duration _pageFadeDuration =
       CommunityDetailPage.fadeTransitionDuration;
 
   void _refreshContent(BuildContext context) {
@@ -81,47 +83,98 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       currentRole = state.userRole;
     }
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: AppColors.background,
-      builder: (bottomSheetContext) => BlocProvider.value(
-        value: context.read<CommunityAdminBloc>(),
-        child: DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          maxChildSize: 0.95,
-          minChildSize: 0.4,
-          builder: (context, scrollController) => Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: CommunityMembersWidget(
-                    communityId: widget.communityId,
-                    refreshSeed: _refreshSeed,
-                    isInBottomSheet: true,
-                    userRole: currentRole,
-                  ),
+    if (kIsWeb) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => Dialog(
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.rsr(context)),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: BlocProvider.value(
+              value: context.read<CommunityAdminBloc>(),
+              child: Padding(
+                padding: EdgeInsets.all(16.rs(context)),
+                child: CommunityMembersWidget(
+                  communityId: widget.communityId,
+                  refreshSeed: _refreshSeed,
+                  isInBottomSheet: true,
+                  userRole: currentRole,
                 ),
               ),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        backgroundColor: AppColors.background,
+        builder: (bottomSheetContext) => BlocProvider.value(
+          value: context.read<CommunityAdminBloc>(),
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.6,
+            maxChildSize: 0.95,
+            minChildSize: 0.4,
+            builder: (context, scrollController) => Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: CommunityMembersWidget(
+                      communityId: widget.communityId,
+                      refreshSeed: _refreshSeed,
+                      isInBottomSheet: true,
+                      userRole: currentRole,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   void _showInviteFriendsBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: AppColors.background,
-      builder: (context) =>
-          InviteFriendsBottomSheet(communityId: widget.communityId),
-    );
+    if (kIsWeb) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => Dialog(
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.rsr(context)),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: InviteFriendsBottomSheet(communityId: widget.communityId),
+          ),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        backgroundColor: AppColors.background,
+        builder: (context) =>
+            InviteFriendsBottomSheet(communityId: widget.communityId),
+      );
+    }
   }
 
   List<PopupMenuEntry<String>> _buildMenuItems(
@@ -136,7 +189,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     items.add(
       PopupMenuItem<String>(
         value: 'view_members',
-        child: Text(context.l10n.communityMembers),
+        child: Text(
+          context.l10n.communityMembers,
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
       ),
     );
 
@@ -145,7 +201,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       items.add(
         PopupMenuItem<String>(
           value: 'invite_friends',
-          child: Text(context.l10n.communityInviteFriends),
+          child: Text(
+            context.l10n.communityInviteFriends,
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
         ),
       );
     }
@@ -155,23 +214,32 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       items.add(
         PopupMenuItem<String>(
           value: 'review_members',
-          child: Text(context.l10n.communityReviewMembers),
+          child: Text(
+            context.l10n.communityReviewMembers,
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
         ),
       );
 
       items.add(
         PopupMenuItem<String>(
           value: 'review_posts',
-          child: Text(context.l10n.communityReviewPosts),
+          child: Text(
+            context.l10n.communityReviewPosts,
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
         ),
       );
 
-      items.add(const PopupMenuDivider(height: 8));
+      items.add(PopupMenuDivider(height: 8.rsh(context)));
 
       items.add(
         PopupMenuItem<String>(
           value: 'edit_community',
-          child: Text(context.l10n.communityEditGroup),
+          child: Text(
+            context.l10n.communityEditGroup,
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
         ),
       );
 
@@ -180,7 +248,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           value: 'delete_community',
           child: Text(
             context.l10n.communityDeleteGroup,
-            style: const TextStyle(color: Color(0xFFB91C1C)),
+            style: TextStyle(color: Color(0xFFB91C1C)),
           ),
         ),
       );
@@ -188,7 +256,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
 
     // Leave community (for members)
     if (isMember && state.userRole != 'admin') {
-      items.add(const PopupMenuDivider(height: 8));
+      items.add(PopupMenuDivider(height: 8.rsh(context)));
       items.add(
         PopupMenuItem<String>(
           value: 'leave_community',
@@ -245,12 +313,21 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: Text(context.l10n.communityDeleteTitle),
-        content: Text(context.l10n.communityDeleteConfirm),
+        title: Text(
+          context.l10n.communityDeleteTitle,
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
+        content: Text(
+          context.l10n.communityDeleteConfirm,
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.commonCancel),
+            child: Text(
+              context.l10n.commonCancel,
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           FilledButton(
             onPressed: () {
@@ -259,10 +336,11 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 DeleteCommunityRequested(widget.communityId),
               );
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFB91C1C),
+            style: FilledButton.styleFrom(backgroundColor: Color(0xFFB91C1C)),
+            child: Text(
+              context.l10n.commonDelete,
+              style: TextStyle(color: Colors.white),
             ),
-            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
@@ -270,29 +348,75 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   }
 
   void _showPendingMembersReview(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: AppColors.background,
-      builder: (_) => BlocProvider.value(
-        value: context.read<CommunityAdminBloc>(),
-        child: _buildMembersReviewSheet(context),
-      ),
-    );
+    if (kIsWeb) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => Dialog(
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.rsr(context)),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: BlocProvider.value(
+              value: context.read<CommunityAdminBloc>(),
+              child: _buildMembersReviewSheet(context),
+            ),
+          ),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        backgroundColor: AppColors.background,
+        builder: (_) => BlocProvider.value(
+          value: context.read<CommunityAdminBloc>(),
+          child: _buildMembersReviewSheet(context),
+        ),
+      );
+    }
   }
 
   void _showPendingPostsReview(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: AppColors.background,
-      builder: (_) => BlocProvider.value(
-        value: context.read<CommunityAdminBloc>(),
-        child: _buildPostsReviewSheet(context),
-      ),
-    );
+    if (kIsWeb) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => Dialog(
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.rsr(context)),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: BlocProvider.value(
+              value: context.read<CommunityAdminBloc>(),
+              child: _buildPostsReviewSheet(context),
+            ),
+          ),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        backgroundColor: AppColors.background,
+        builder: (_) => BlocProvider.value(
+          value: context.read<CommunityAdminBloc>(),
+          child: _buildPostsReviewSheet(context),
+        ),
+      );
+    }
   }
 
   Widget _buildMembersReviewSheet(BuildContext context) {
@@ -321,14 +445,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 children: [
                   Icon(
                     Icons.group_add_rounded,
-                    size: 46,
+                    size: 46.rsp(context),
                     color: AppColors.textSecondary,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     context.l10n.communityNoPendingRequests,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 15.rsp(context),
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
@@ -338,9 +462,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             );
           } else {
             content = ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+              padding: EdgeInsets.fromLTRB(
+                16.rs(context),
+                6.rsh(context),
+                16.rs(context),
+                20.rsh(context),
+              ),
               itemCount: state.requests.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, __) => SizedBox(height: 10.rsh(context)),
               itemBuilder: (context, index) {
                 final request = state.requests[index];
                 return _buildReviewMemberCard(context, request);
@@ -348,9 +477,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             );
           }
         } else if (state is CommunityAdminLoading) {
-          content = const Center(child: CircularProgressIndicator());
+          content = Center(child: CircularProgressIndicator());
         } else {
-          content = const Center(child: CircularProgressIndicator());
+          content = Center(child: CircularProgressIndicator());
         }
 
         return SafeArea(
@@ -395,14 +524,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 children: [
                   Icon(
                     Icons.fact_check_outlined,
-                    size: 46,
+                    size: 46.rsp(context),
                     color: AppColors.textSecondary,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     context.l10n.communityNoPendingReviewPosts,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 15.rsp(context),
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                     ),
@@ -412,9 +541,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             );
           } else {
             content = ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+              padding: EdgeInsets.fromLTRB(
+                16.rs(context),
+                6.rsh(context),
+                16.rs(context),
+                20.rsh(context),
+              ),
               itemCount: state.posts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => SizedBox(height: 12.rsh(context)),
               itemBuilder: (context, index) {
                 final post = state.posts[index];
                 return _buildReviewPostCard(context, post);
@@ -422,9 +556,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             );
           }
         } else if (state is CommunityAdminLoading) {
-          content = const Center(child: CircularProgressIndicator());
+          content = Center(child: CircularProgressIndicator());
         } else {
-          content = const Center(child: CircularProgressIndicator());
+          content = Center(child: CircularProgressIndicator());
         }
 
         return SafeArea(
@@ -450,7 +584,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        8.rsh(context),
+        16.rs(context),
+        12.rsh(context),
+      ),
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(bottom: BorderSide(color: AppColors.divider)),
@@ -458,15 +597,15 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 42.rs(context),
+            height: 42.rsh(context),
             decoration: BoxDecoration(
               color: AppColors.secondBackground,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
             ),
             child: Icon(icon, color: AppColors.primary),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.rs(context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -474,7 +613,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.rsp(context),
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
                   ),
@@ -482,7 +621,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.rsp(context),
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
                   ),
@@ -500,10 +639,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     CommunityRequestModel request,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.rsr(context)),
         border: Border.all(color: AppColors.divider),
       ),
       child: Column(
@@ -512,7 +651,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           Row(
             children: [
               CircleAvatar(
-                radius: 22,
+                radius: 22.rsr(context),
                 backgroundColor: AppColors.secondBackground,
                 backgroundImage: request.user.avatarUrl != null
                     ? NetworkImage(request.user.avatarUrl!)
@@ -521,7 +660,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10.rs(context)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,16 +670,16 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.rsp(context),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2.rsh(context)),
                     Text(
                       _formatTimeAgo(request.createdAt),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.rsp(context),
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -550,7 +689,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.rsh(context)),
           Row(
             children: [
               Expanded(
@@ -564,18 +703,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(Icons.close_rounded),
                   label: Text(context.l10n.friendReject),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFB91C1C),
-                    side: const BorderSide(color: Color(0xFFFCA5A5)),
+                    foregroundColor: Color(0xFFB91C1C),
+                    side: BorderSide(color: Color(0xFFFCA5A5)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.rsr(context)),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8.rs(context)),
               Expanded(
                 child: FilledButton.icon(
                   onPressed: () {
@@ -587,13 +726,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.check_rounded),
+                  icon: Icon(Icons.check_rounded),
                   label: Text(context.l10n.friendAccept),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF16A34A),
+                    backgroundColor: Color(0xFF16A34A),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.rsr(context)),
                     ),
                   ),
                 ),
@@ -610,10 +749,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     final hasImage = post.urls.isNotEmpty && post.urls.first.url.isNotEmpty;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.rsr(context)),
         border: Border.all(color: AppColors.divider),
       ),
       child: Column(
@@ -623,7 +762,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: 20.rsr(context),
                 backgroundColor: AppColors.secondBackground,
                 backgroundImage: post.user.avatarUrl != null
                     ? NetworkImage(post.user.avatarUrl!)
@@ -632,7 +771,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     ? Icon(Icons.person, color: AppColors.textSecondary)
                     : null,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10.rs(context)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -642,16 +781,16 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.rsp(context),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2.rsh(context)),
                     Text(
                       _formatTimeAgo(post.createdAt),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.rsp(context),
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -661,14 +800,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.rsh(context)),
           Text(
             caption.isNotEmpty ? caption : context.l10n.communityPostNoText,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 13,
-              height: 1.35,
+              fontSize: 13.rsp(context),
+              height: 1.35.rsh(context),
               color: caption.isNotEmpty
                   ? AppColors.textPrimary
                   : AppColors.textSecondary,
@@ -676,9 +815,9 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
             ),
           ),
           if (hasImage) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10.rsh(context)),
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10.rsr(context)),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: Image.network(
@@ -690,14 +829,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     child: Icon(
                       Icons.broken_image_rounded,
                       color: AppColors.textSecondary,
-                      size: 26,
+                      size: 26.rsp(context),
                     ),
                   ),
                 ),
               ),
             ),
           ],
-          const SizedBox(height: 12),
+          SizedBox(height: 12.rsh(context)),
           Row(
             children: [
               Expanded(
@@ -711,18 +850,18 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(Icons.close_rounded),
                   label: Text(context.l10n.friendReject),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFB91C1C),
-                    side: const BorderSide(color: Color(0xFFFCA5A5)),
+                    foregroundColor: Color(0xFFB91C1C),
+                    side: BorderSide(color: Color(0xFFFCA5A5)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.rsr(context)),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8.rs(context)),
               Expanded(
                 child: FilledButton.icon(
                   onPressed: () {
@@ -734,13 +873,13 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.check_rounded),
+                  icon: Icon(Icons.check_rounded),
                   label: Text(context.l10n.notificationApprovePostAction),
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF16A34A),
+                    backgroundColor: Color(0xFF16A34A),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.rsr(context)),
                     ),
                   ),
                 ),
@@ -771,9 +910,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 LeaveCommunityRequested(widget.communityId),
               );
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFB91C1C),
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Color(0xFFB91C1C)),
             child: Text(context.l10n.communityLeaveGroup),
           ),
         ],
@@ -815,20 +952,20 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     return ColoredBox(
       color: AppColors.secondBackground,
       child: CustomScrollView(
-        physics: const NeverScrollableScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
             titleSpacing: 0,
             title: Container(
-              width: 150,
-              height: 16,
+              width: 150.rs(context),
+              height: 16.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.textSecondary.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(999.rsr(context)),
               ),
             ),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
+              icon: Icon(Icons.arrow_back_rounded),
               color: AppColors.iconPrimary,
               onPressed: () => Navigator.of(context).maybePop(),
             ),
@@ -853,14 +990,14 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                 ),
                 child: Center(
                   child: Container(
-                    width: 72,
-                    height: 72,
+                    width: 72.rs(context),
+                    height: 72.rsh(context),
                     decoration: BoxDecoration(
                       color: AppColors.background.withValues(alpha: 0.85),
                       shape: BoxShape.circle,
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.all(20.rs(context)),
                       child: CircularProgressIndicator(
                         strokeWidth: 3,
                         color: AppColors.primary,
@@ -873,15 +1010,20 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              padding: EdgeInsets.fromLTRB(
+                16.rs(context),
+                16.rsh(context),
+                16.rs(context),
+                24.rsh(context),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLoadingCard(height: 118),
-                  const SizedBox(height: 12),
-                  _buildLoadingCard(height: 92, compact: true),
-                  const SizedBox(height: 12),
-                  _buildLoadingCard(height: 210),
+                  _buildLoadingCard(height: 118.rsh(context)),
+                  SizedBox(height: 12.rsh(context)),
+                  _buildLoadingCard(height: 92.rsh(context), compact: true),
+                  SizedBox(height: 12.rsh(context)),
+                  _buildLoadingCard(height: 210.rsh(context)),
                 ],
               ),
             ),
@@ -897,7 +1039,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
         border: Border.all(
           color: AppColors.textSecondary.withValues(alpha: 0.12),
         ),
@@ -910,16 +1052,16 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(14.rs(context)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLoadingLine(width: 170),
-            const SizedBox(height: 10),
+            _buildLoadingLine(width: 170.rs(context)),
+            SizedBox(height: 10.rsh(context)),
             _buildLoadingLine(width: double.infinity),
             if (!compact) ...[
-              const SizedBox(height: 8),
-              _buildLoadingLine(width: 230),
+              SizedBox(height: 8.rsh(context)),
+              _buildLoadingLine(width: 230.rs(context)),
             ],
           ],
         ),
@@ -932,10 +1074,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
       widthFactor: width == double.infinity ? 1 : null,
       child: Container(
         width: width == double.infinity ? null : width,
-        height: 14,
+        height: 14.rsh(context),
         decoration: BoxDecoration(
           color: AppColors.textSecondary.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(999.rsr(context)),
         ),
       ),
     );
@@ -954,208 +1096,232 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
           create: (_) => s1<CommunityAdminBloc>(),
         ),
       ],
-      child: Scaffold(
-        backgroundColor: AppColors.secondBackground,
-        body: BlocConsumer<CommunityDetailBloc, CommunityDetailState>(
-          listener: (context, state) {
-            if (state is CommunityActionSuccess) {
-              final message = localizedCommunityMessage(
-                context.l10n,
-                state.message,
-              );
-              showSuccessSnackBar(context, message);
-              if (message == context.l10n.communityDeleteSuccess) {
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  if (mounted) Navigator.of(context).pop(true);
-                });
-              } else {
-                _refreshContent(context);
-              }
-            } else if (state is CommunityDetailError) {
-              showErrorSnackBar(
-                context,
-                localizedCommunityMessage(context.l10n, state.message),
-              );
-            }
-          },
-          builder: (context, state) {
-            if (state is CommunityDetailLoading ||
-                state is CommunityDetailInitial) {
-              return _fadePage('loading', _buildLoadingPage());
-            }
+      child: Container(
+        color: AppColors.background,
 
-            if (state is CommunityDetailError) {
-              return _fadePage(
-                'error',
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.wifi_tethering_error_rounded,
-                        color: Colors.red[300],
-                        size: 42,
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Text(
-                          localizedCommunityMessage(
-                            context.l10n,
-                            state.message,
-                          ),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: AppColors.textPrimary),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => context
-                            .read<CommunityDetailBloc>()
-                            .add(CommunityDetailFetched(widget.communityId)),
-                        child: Text(context.l10n.commonRetry),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
+            ),
+            child: Scaffold(
+              backgroundColor: AppColors.secondBackground,
+              body: BlocConsumer<CommunityDetailBloc, CommunityDetailState>(
+                listener: (context, state) {
+                  if (state is CommunityActionSuccess) {
+                    final message = localizedCommunityMessage(
+                      context.l10n,
+                      state.message,
+                    );
+                    showSuccessSnackBar(context, message);
+                    if (message == context.l10n.communityDeleteSuccess) {
+                      Future.delayed(Duration(milliseconds: 300), () {
+                        if (mounted) Navigator.of(context).pop(true);
+                      });
+                    } else {
+                      _refreshContent(context);
+                    }
+                  } else if (state is CommunityDetailError) {
+                    showErrorSnackBar(
+                      context,
+                      localizedCommunityMessage(context.l10n, state.message),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is CommunityDetailLoading ||
+                      state is CommunityDetailInitial) {
+                    return _fadePage('loading', _buildLoadingPage());
+                  }
 
-            if (state is CommunityDetailLoaded) {
-              final isMember =
-                  state.memberStatus == 'member' || state.userRole == 'admin';
-
-              return _fadePage(
-                'loaded-${state.community.id}',
-                RefreshIndicator(
-                  onRefresh: () async => _refreshContent(context),
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      SliverAppBar(
-                        titleSpacing: 0,
-                        title: Text(
-                          state.community.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        leading: IconButton(
-                          icon: const Icon(Icons.arrow_back_rounded),
-                          color: AppColors.iconPrimary,
-                          onPressed: () => Navigator.of(context).maybePop(),
-                        ),
-                        actions: [
-                          PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_horiz_rounded),
-                            iconSize: 24,
-                            color: AppColors.background,
-                            onSelected: (value) {
-                              _handleMenuAction(context, value, state);
-                            },
-                            itemBuilder: (BuildContext context) {
-                              return _buildMenuItems(context, state);
-                            },
-                          ),
-                        ],
-                        expandedHeight: 240,
-                        pinned: true,
-                        backgroundColor: AppColors.background,
-                        foregroundColor: AppColors.iconPrimary,
-                        surfaceTintColor: Colors.transparent,
-                        scrolledUnderElevation: 0,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background:
-                              (state.community.coverImage?.isNotEmpty ?? false)
-                              ? Image.network(
-                                  state.community.coverImage!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: AppColors.secondBackground,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          color: AppColors.textSecondary,
-                                          size: 36,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                )
-                              : Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Color(0xFF3A3B3C),
-                                        Color(0xFF242526),
-                                      ],
-                                    ),
-                                  ),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.groups_rounded,
-                                      size: 52,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      ),
-                      SliverToBoxAdapter(
+                  if (state is CommunityDetailError) {
+                    return _fadePage(
+                      'error',
+                      Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(height: 8),
-                            CommunityDetailHeader(
-                              community: state.community,
-                              memberStatus: state.memberStatus,
-                              userRole: state.userRole,
-                              onJoin: () =>
-                                  context.read<CommunityDetailBloc>().add(
-                                    JoinCommunityRequested(widget.communityId),
-                                  ),
-                              onCancelRequest: () =>
-                                  context.read<CommunityDetailBloc>().add(
-                                    CancelJoinRequestRequested(
-                                      widget.communityId,
-                                    ),
-                                  ),
-                              onLeave: () =>
-                                  _showLeaveConfirmation(context),
-                              onManage: null,
+                            Icon(
+                              Icons.wifi_tethering_error_rounded,
+                              color: Colors.red[300],
+                              size: 42.rsp(context),
                             ),
-                            const SizedBox(height: 8),
-                            if (isMember)
-                              CommunityCreatePostWidget(
-                                avatarUrl: state.community.avatar,
-                                onCreatePost: () =>
-                                    _openCreatePost(context, state.userRole),
+                            SizedBox(height: 10.rsh(context)),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24.rs(context),
                               ),
-                            const SizedBox(height: 8),
-                            CommunityPostsWidget(
-                              communityId: widget.communityId,
-                              refreshSeed: _refreshSeed,
-                              canViewPosts: isMember,
-                              userRole: state.userRole,
+                              child: Text(
+                                localizedCommunityMessage(
+                                  context.l10n,
+                                  state.message,
+                                ),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: AppColors.textPrimary),
+                              ),
                             ),
-                            const SizedBox(height: 22),
+                            SizedBox(height: 16.rsh(context)),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  context.read<CommunityDetailBloc>().add(
+                                    CommunityDetailFetched(widget.communityId),
+                                  ),
+                              child: Text(context.l10n.commonRetry),
+                            ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }
+                    );
+                  }
 
-            return _fadePage('empty', const Center(child: Text('')));
-          },
+                  if (state is CommunityDetailLoaded) {
+                    final isMember =
+                        state.memberStatus == 'member' ||
+                        state.userRole == 'admin';
+
+                    return _fadePage(
+                      'loaded-${state.community.id}',
+                      RefreshIndicator(
+                        onRefresh: () async => _refreshContent(context),
+                        child: CustomScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          slivers: [
+                            SliverAppBar(
+                              titleSpacing: 0,
+                              title: Text(
+                                state.community.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              leading: IconButton(
+                                icon: Icon(Icons.arrow_back_rounded),
+                                color: AppColors.iconPrimary,
+                                onPressed: () =>
+                                    Navigator.of(context).maybePop(),
+                              ),
+                              actions: [
+                                PopupMenuButton<String>(
+                                  icon: Icon(Icons.more_horiz_rounded),
+                                  iconSize: 24.rsp(context),
+                                  color: AppColors.background,
+                                  onSelected: (value) {
+                                    _handleMenuAction(context, value, state);
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return _buildMenuItems(context, state);
+                                  },
+                                ),
+                              ],
+                              expandedHeight: 240,
+                              pinned: true,
+                              backgroundColor: AppColors.background,
+                              foregroundColor: AppColors.iconPrimary,
+                              surfaceTintColor: Colors.transparent,
+                              scrolledUnderElevation: 0,
+                              flexibleSpace: FlexibleSpaceBar(
+                                background:
+                                    (state.community.coverImage?.isNotEmpty ??
+                                        false)
+                                    ? Image.network(
+                                        state.community.coverImage!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return Container(
+                                                color:
+                                                    AppColors.secondBackground,
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.image_not_supported,
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                    size: 36.rsp(context),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                      )
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Color(0xFF3A3B3C),
+                                              Color(0xFF242526),
+                                            ],
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.groups_rounded,
+                                            size: 52.rsp(context),
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            SliverToBoxAdapter(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 8.rsh(context)),
+                                  CommunityDetailHeader(
+                                    community: state.community,
+                                    memberStatus: state.memberStatus,
+                                    userRole: state.userRole,
+                                    onJoin: () =>
+                                        context.read<CommunityDetailBloc>().add(
+                                          JoinCommunityRequested(
+                                            widget.communityId,
+                                          ),
+                                        ),
+                                    onCancelRequest: () =>
+                                        context.read<CommunityDetailBloc>().add(
+                                          CancelJoinRequestRequested(
+                                            widget.communityId,
+                                          ),
+                                        ),
+                                    onLeave: () =>
+                                        _showLeaveConfirmation(context),
+                                    onManage: null,
+                                  ),
+                                  SizedBox(height: 8.rsh(context)),
+                                  if (isMember)
+                                    CommunityCreatePostWidget(
+                                      avatarUrl: state.community.avatar,
+                                      onCreatePost: () => _openCreatePost(
+                                        context,
+                                        state.userRole,
+                                      ),
+                                    ),
+                                  SizedBox(height: 8.rsh(context)),
+                                  CommunityPostsWidget(
+                                    communityId: widget.communityId,
+                                    refreshSeed: _refreshSeed,
+                                    canViewPosts: isMember,
+                                    userRole: state.userRole,
+                                  ),
+                                  SizedBox(height: 22.rsh(context)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return _fadePage('empty', Center(child: Text('')));
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -37,7 +37,6 @@ import 'package:social_app_fe/features/friend/domain/usecases/reject_friend_requ
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/notification/domain/usecases/delete_notification_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_join_request_usecase.dart';
-import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import '../widgets/comment_notification_item.dart';
 import '../widgets/friend_request_notification_item.dart';
 import '../services/notification_fcm_service.dart';
@@ -46,6 +45,7 @@ import '../widgets/post_report_notification_item.dart';
 import '../widgets/face_detected_notification_item.dart';
 import '../widgets/tag_notification_item.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -57,7 +57,7 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 1;
-  final int _pageSize = 10;
+  final int _pageSize = 15;
   double _lastScrollPosition =
       0; // Track last scroll position to detect scroll down
 
@@ -722,73 +722,86 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          context.l10n.notificationTitle,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: Scaffold(
+            appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
+              title: Text(
+                context.l10n.notificationTitle,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.refresh, color: AppColors.iconPrimary),
+                  onPressed: () {
+                    // Trigger reload
+                    _currentPage = 1; // Reset page counter
+                    context.read<NotificationBloc>().add(ReloadNotifications());
+                  },
+                  tooltip: context.l10n.notificationRefreshTooltip,
+                ),
+              ],
+            ),
+            body: BlocBuilder<NotificationBloc, NotificationState>(
+              builder: (context, state) {
+                print(
+                  '[NotificationPage] BlocBuilder rebuilding with ${state.notifications.length} notifications',
+                );
+
+                // Show loading page on initial load
+                if (state.isInitialLoading) {
+                  return const NotificationLoadingPage();
+                }
+
+                // Show loading page during reload (regardless of whether there's data)
+                if (state.isReloading) {
+                  return const NotificationLoadingPage();
+                }
+
+                if (state.notifications.isEmpty) {
+                  print('[NotificationPage] No notifications to display');
+                  return RefreshIndicator(
+                    color: AppColors.primary,
+                    backgroundColor: AppColors.background,
+                    onRefresh: () async {
+                      _currentPage = 1;
+                      context.read<NotificationBloc>().add(
+                        ReloadNotifications(),
+                      );
+                      await Future.delayed(const Duration(milliseconds: 800));
+                    },
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(
+                          height: 400,
+                          child: Center(
+                            child: Text(
+                              context.l10n.notificationEmpty,
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return _buildNotificationList(context, state);
+              },
+            ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: AppColors.iconPrimary),
-            onPressed: () {
-              // Trigger reload
-              _currentPage = 1; // Reset page counter
-              context.read<NotificationBloc>().add(ReloadNotifications());
-            },
-            tooltip: context.l10n.notificationRefreshTooltip,
-          ),
-        ],
-      ),
-      body: BlocBuilder<NotificationBloc, NotificationState>(
-        builder: (context, state) {
-          print(
-            '[NotificationPage] BlocBuilder rebuilding with ${state.notifications.length} notifications',
-          );
-
-          // Show loading page on initial load
-          if (state.isInitialLoading) {
-            return const NotificationLoadingPage();
-          }
-
-          // Show loading page during reload (regardless of whether there's data)
-          if (state.isReloading) {
-            return const NotificationLoadingPage();
-          }
-
-          if (state.notifications.isEmpty) {
-            print('[NotificationPage] No notifications to display');
-            return RefreshIndicator(
-              color: AppColors.primary,
-              backgroundColor: AppColors.background,
-              onRefresh: () async {
-                _currentPage = 1;
-                context.read<NotificationBloc>().add(ReloadNotifications());
-                await Future.delayed(const Duration(milliseconds: 800));
-              },
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: 400,
-                    child: Center(
-                      child: Text(
-                        context.l10n.notificationEmpty,
-                        style: TextStyle(color: AppColors.textSecondary),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return _buildNotificationList(context, state);
-        },
       ),
     );
   }

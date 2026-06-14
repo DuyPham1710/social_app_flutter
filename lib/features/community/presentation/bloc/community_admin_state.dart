@@ -1,21 +1,21 @@
 part of 'community_admin_bloc.dart';
 
 abstract class CommunityAdminState {
-  const CommunityAdminState();
+  CommunityAdminState();
 }
 
 class CommunityAdminInitial extends CommunityAdminState {
-  const CommunityAdminInitial();
+  CommunityAdminInitial();
 }
 
 class CommunityAdminLoading extends CommunityAdminState {
-  const CommunityAdminLoading();
+  CommunityAdminLoading();
 }
 
 class PendingRequestsLoaded extends CommunityAdminState {
   final List<CommunityRequestModel> requests;
 
-  const PendingRequestsLoaded(this.requests);
+  PendingRequestsLoaded(this.requests);
 }
 
 class PendingPostsLoaded extends CommunityAdminState {
@@ -23,7 +23,7 @@ class PendingPostsLoaded extends CommunityAdminState {
   final int page;
   final int limit;
 
-  const PendingPostsLoaded({
+  PendingPostsLoaded({
     required this.posts,
     required this.page,
     required this.limit,
@@ -33,11 +33,11 @@ class PendingPostsLoaded extends CommunityAdminState {
 class CommunityAdminActionSuccess extends CommunityAdminState {
   final String message;
 
-  const CommunityAdminActionSuccess(this.message);
+  CommunityAdminActionSuccess(this.message);
 }
 
 class CommunityAdminError extends CommunityAdminState {
   final String message;
 
-  const CommunityAdminError(this.message);
+  CommunityAdminError(this.message);
 }

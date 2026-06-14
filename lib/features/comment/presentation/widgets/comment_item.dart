@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/core/enums/emoji.dart';
@@ -134,8 +134,18 @@ class _CommentItemState extends State<CommentItem> {
 
     return Container(
       padding: widget.isReply
-          ? EdgeInsets.fromLTRB(0.w, 8.h, 4.w, 8.h)
-          : EdgeInsets.fromLTRB(12.w, 8.h, 4.w, 16.h),
+          ? EdgeInsets.fromLTRB(
+              0.rs(context),
+              8.rsh(context),
+              4.rs(context),
+              8.rsh(context),
+            )
+          : EdgeInsets.fromLTRB(
+              12.rs(context),
+              8.rsh(context),
+              4.rs(context),
+              16.rsh(context),
+            ),
       color: widget.isHighlighted
           ? const Color.fromARGB(255, 113, 170, 255).withOpacity(0.15)
           : null,
@@ -145,7 +155,7 @@ class _CommentItemState extends State<CommentItem> {
           GestureDetector(
             onTap: () => _navigateToProfile(context),
             child: CircleAvatar(
-              radius: widget.isReply ? 14.r : 18.r,
+              radius: widget.isReply ? 14.rsr(context) : 18.rsr(context),
               backgroundImage: NetworkImage(
                 widget.comment.user.avatarUrl ??
                     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
@@ -153,188 +163,394 @@ class _CommentItemState extends State<CommentItem> {
             ),
           ),
 
-          SizedBox(width: 10.w),
+          SizedBox(width: 10.rs(context)),
 
           // Comment content
           Expanded(
-            child: GestureDetector(
-              key: _commentKey,
-              onLongPressStart: (details) {
-                FocusScope.of(context).unfocus();
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final renderBox =
-                      _commentKey.currentContext?.findRenderObject()
-                          as RenderBox?;
-                  if (renderBox == null) return;
+            child: ResponsiveHelper.isWebOrDesktop
+                ? _buildWebCommentContent(context)
+                : _buildMobileCommentContent(context),
+          ),
+        ],
+      ),
+    );
+  }
 
-                  final position = renderBox.localToGlobal(Offset.zero);
+  /// Mobile: giữ nguyên long-press để hiển overlay menu
+  Widget _buildMobileCommentContent(BuildContext context) {
+    return GestureDetector(
+      key: _commentKey,
+      onLongPressStart: (details) {
+        FocusScope.of(context).unfocus();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final renderBox =
+              _commentKey.currentContext?.findRenderObject() as RenderBox?;
+          if (renderBox == null) return;
 
-                  CommentReactionMenu.show(
-                    context,
-                    Offset(position.dx, position.dy - 66.h),
-                    widget.comment,
-                    onReply: widget.onReply,
-                    onReactionChanged: (commentId, emoji) =>
-                        _onReactionChanged(context, commentId, emoji),
-                    currentUserId: widget.currentUserId,
-                    onUpdateComment: widget.onUpdateComment,
-                    onDeleteComment: widget.onDeleteComment,
-                    onViewHistory: widget.onViewHistory,
-                  );
-                });
+          final position = renderBox.localToGlobal(Offset.zero);
+
+          CommentReactionMenu.show(
+            context,
+            Offset(position.dx, position.dy - 66.rsh(context)),
+            widget.comment,
+            onReply: widget.onReply,
+            onReactionChanged: (commentId, emoji) =>
+                _onReactionChanged(context, commentId, emoji),
+            currentUserId: widget.currentUserId,
+            onUpdateComment: widget.onUpdateComment,
+            onDeleteComment: widget.onDeleteComment,
+            onViewHistory: widget.onViewHistory,
+          );
+        });
+      },
+      child: _buildCommentColumn(context),
+    );
+  }
+
+  /// Web/Desktop: hiển nút 3 chấm cạnh comment bubble
+  Widget _buildWebCommentContent(BuildContext context) {
+    final GlobalKey moreButtonKey = GlobalKey();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(
+              child: CommentContentBubble(
+                user: widget.comment.user,
+                content: widget.comment.content,
+                onTapProfile: () =>
+                    _navigateToUserProfile(context, widget.comment.user.userId),
+                onMentionTap: (userId) =>
+                    _navigateToUserProfile(context, userId),
+              ),
+            ),
+            const SizedBox(width: 4),
+            GestureDetector(
+              key: moreButtonKey,
+              onTap: () {
+                final RenderBox renderBox =
+                    moreButtonKey.currentContext!.findRenderObject()
+                        as RenderBox;
+                final Offset offset = renderBox.localToGlobal(Offset.zero);
+                final Size size = renderBox.size;
+
+                final RelativeRect position = RelativeRect.fromLTRB(
+                  offset.dx,
+                  offset.dy + size.height,
+                  offset.dx + size.width,
+                  0,
+                );
+
+                CommentReactionMenu.showWebPopupMenu(
+                  context,
+                  position,
+                  widget.comment,
+                  onReply: widget.onReply,
+                  onReactionChanged: (commentId, emoji) =>
+                      _onReactionChanged(context, commentId, emoji),
+                  currentUserId: widget.currentUserId,
+                  onUpdateComment: widget.onUpdateComment,
+                  onDeleteComment: widget.onDeleteComment,
+                  onViewHistory: widget.onViewHistory,
+                );
               },
+              child: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Icon(
+                  Icons.more_horiz,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        // Bottom actions: date, like, reply
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                top: 4.rsh(context),
+                left: 6.rs(context),
+              ),
+              child: Row(
                 children: [
-                  // Comment container
-                  CommentContentBubble(
-                    user: widget.comment.user,
-                    content: widget.comment.content,
-                    onTapProfile: () => _navigateToUserProfile(
-                      context,
-                      widget.comment.user.userId,
+                  Text(
+                    widget.comment.updatedAt != null
+                        ? _timeAgo(context, widget.comment.updatedAt!)
+                        : context.l10n.postUnknownTime,
+                    style: TextStyle(
+                      fontSize: 12.rsp(context),
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
                     ),
-                    onMentionTap: (userId) =>
-                        _navigateToUserProfile(context, userId),
                   ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Bottom actions: date, like, reply
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.h, left: 6.w),
-                        child: Row(
-                          children: [
-                            Text(
-                              widget.comment.updatedAt != null
-                                  ? _timeAgo(context, widget.comment.updatedAt!)
-                                  : context.l10n.postUnknownTime,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-
-                            // ReactionText giờ dùng logic từ entity
-                            ReactionText(
-                              commentId: widget.comment.id,
-                              initialReaction: _getCurrentUserReaction(),
-                              // Truyền context để gọi hàm _onReactionChanged
-                              onReactionChanged: (id, emoji) =>
-                                  _onReactionChanged(context, id, emoji),
-                            ),
-
-                            SizedBox(width: 10.w),
-                            GestureDetector(
-                              onTap: () {
-                                final user = widget.comment.user;
-                                final userName =
-                                    user.fullName ??
-                                    user.username ??
-                                    context.l10n.commonUser;
-                                if (widget.comment.parentId != null) {
-                                  widget.onReply!(
-                                    user.userId,
-                                    user.avatarUrl ??
-                                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                                    widget.comment.parentId!.id,
-                                    userName,
-                                  );
-                                } else {
-                                  widget.onReply!(
-                                    user.userId,
-                                    user.avatarUrl ??
-                                        'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                                    widget.comment.id,
-                                    userName,
-                                  );
-                                }
-                              },
-                              child: Text(
-                                context.l10n.commentReply,
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Reaction badge
-                      _buildReactionBadge(),
-                    ],
+                  SizedBox(width: 10.rs(context)),
+                  ReactionText(
+                    commentId: widget.comment.id,
+                    initialReaction: _getCurrentUserReaction(),
+                    onReactionChanged: (id, emoji) =>
+                        _onReactionChanged(context, id, emoji),
                   ),
-
-                  // Show reply count and toggle
-                  if (widget.replies != null && widget.replies!.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.h, left: 6.w),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showReplies = !_showReplies;
-                          });
-                          widget.onToggleReplies?.call();
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              _showReplies
-                                  ? Icons.keyboard_arrow_up
-                                  : Icons.keyboard_arrow_down,
-                              size: 16.sp,
-                              color: AppColors.textSecondary,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              context.l10n.commentViewReplies(
-                                widget.replies!.length,
-                              ),
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  // Show replies
-                  if (_showReplies &&
-                      widget.replies != null &&
-                      widget.replies!.isNotEmpty)
-                    Column(
-                      children: widget.replies!.map((reply) {
-                        return Container(
-                          margin: EdgeInsets.only(left: 10.w, top: 8.h),
-                          child: CommentItem(
-                            comment: reply,
-                            onReply: widget.onReply,
-                            isReply: true,
-                            currentUserId: widget.currentUserId,
-                            onUpdateComment: widget.onUpdateComment,
-                            onDeleteComment: widget.onDeleteComment,
-                            onViewHistory: widget.onViewHistory,
-                            targetCommentId: widget.targetCommentId,
-                            isHighlighted: reply.id == widget.targetCommentId,
-                          ),
+                  SizedBox(width: 10.rs(context)),
+                  GestureDetector(
+                    onTap: () {
+                      final user = widget.comment.user;
+                      final userName =
+                          user.fullName ??
+                          user.username ??
+                          context.l10n.commonUser;
+                      if (widget.comment.parentId != null) {
+                        widget.onReply!(
+                          user.userId,
+                          user.avatarUrl ??
+                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                          widget.comment.parentId!.id,
+                          userName,
                         );
-                      }).toList(),
+                      } else {
+                        widget.onReply!(
+                          user.userId,
+                          user.avatarUrl ??
+                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                          widget.comment.id,
+                          userName,
+                        );
+                      }
+                    },
+                    child: Text(
+                      context.l10n.commentReply,
+                      style: TextStyle(
+                        fontSize: 12.rsp(context),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
+                  ),
+                ],
+              ),
+            ),
+            _buildReactionBadge(),
+          ],
+        ),
+
+        // Show reply count and toggle
+        if (widget.replies != null && widget.replies!.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(top: 8.rsh(context), left: 6.rs(context)),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showReplies = !_showReplies;
+                });
+                widget.onToggleReplies?.call();
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    _showReplies
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 16.rsp(context),
+                    color: AppColors.textSecondary,
+                  ),
+                  SizedBox(width: 4.rs(context)),
+                  Text(
+                    context.l10n.commentViewReplies(widget.replies!.length),
+                    style: TextStyle(
+                      fontSize: 12.rsp(context),
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-        ],
-      ),
+
+        // Show replies
+        if (_showReplies &&
+            widget.replies != null &&
+            widget.replies!.isNotEmpty)
+          Column(
+            children: widget.replies!.map((reply) {
+              return Container(
+                margin: EdgeInsets.only(
+                  left: 10.rs(context),
+                  top: 8.rsh(context),
+                ),
+                child: CommentItem(
+                  comment: reply,
+                  onReply: widget.onReply,
+                  isReply: true,
+                  currentUserId: widget.currentUserId,
+                  onUpdateComment: widget.onUpdateComment,
+                  onDeleteComment: widget.onDeleteComment,
+                  onViewHistory: widget.onViewHistory,
+                  targetCommentId: widget.targetCommentId,
+                  isHighlighted: reply.id == widget.targetCommentId,
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  /// Column chung chứa comment bubble + bottom actions (dùng cho mobile)
+  Widget _buildCommentColumn(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Comment container
+        CommentContentBubble(
+          user: widget.comment.user,
+          content: widget.comment.content,
+          onTapProfile: () =>
+              _navigateToUserProfile(context, widget.comment.user.userId),
+          onMentionTap: (userId) => _navigateToUserProfile(context, userId),
+        ),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Bottom actions: date, like, reply
+            Padding(
+              padding: EdgeInsets.only(
+                top: 4.rsh(context),
+                left: 6.rs(context),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    widget.comment.updatedAt != null
+                        ? _timeAgo(context, widget.comment.updatedAt!)
+                        : context.l10n.postUnknownTime,
+                    style: TextStyle(
+                      fontSize: 12.rsp(context),
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(width: 10.rs(context)),
+
+                  // ReactionText giờ dùng logic từ entity
+                  ReactionText(
+                    commentId: widget.comment.id,
+                    initialReaction: _getCurrentUserReaction(),
+                    // Truyền context để gọi hàm _onReactionChanged
+                    onReactionChanged: (id, emoji) =>
+                        _onReactionChanged(context, id, emoji),
+                  ),
+
+                  SizedBox(width: 10.rs(context)),
+                  GestureDetector(
+                    onTap: () {
+                      final user = widget.comment.user;
+                      final userName =
+                          user.fullName ??
+                          user.username ??
+                          context.l10n.commonUser;
+                      if (widget.comment.parentId != null) {
+                        widget.onReply!(
+                          user.userId,
+                          user.avatarUrl ??
+                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                          widget.comment.parentId!.id,
+                          userName,
+                        );
+                      } else {
+                        widget.onReply!(
+                          user.userId,
+                          user.avatarUrl ??
+                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                          widget.comment.id,
+                          userName,
+                        );
+                      }
+                    },
+                    child: Text(
+                      context.l10n.commentReply,
+                      style: TextStyle(
+                        fontSize: 12.rsp(context),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Reaction badge
+            _buildReactionBadge(),
+          ],
+        ),
+
+        // Show reply count and toggle
+        if (widget.replies != null && widget.replies!.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(top: 8.rsh(context), left: 6.rs(context)),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showReplies = !_showReplies;
+                });
+                widget.onToggleReplies?.call();
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    _showReplies
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 16.rsp(context),
+                    color: AppColors.textSecondary,
+                  ),
+                  SizedBox(width: 4.rs(context)),
+                  Text(
+                    context.l10n.commentViewReplies(widget.replies!.length),
+                    style: TextStyle(
+                      fontSize: 12.rsp(context),
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+        // Show replies
+        if (_showReplies &&
+            widget.replies != null &&
+            widget.replies!.isNotEmpty)
+          Column(
+            children: widget.replies!.map((reply) {
+              return Container(
+                margin: EdgeInsets.only(
+                  left: 10.rs(context),
+                  top: 8.rsh(context),
+                ),
+                child: CommentItem(
+                  comment: reply,
+                  onReply: widget.onReply,
+                  isReply: true,
+                  currentUserId: widget.currentUserId,
+                  onUpdateComment: widget.onUpdateComment,
+                  onDeleteComment: widget.onDeleteComment,
+                  onViewHistory: widget.onViewHistory,
+                  targetCommentId: widget.targetCommentId,
+                  isHighlighted: reply.id == widget.targetCommentId,
+                ),
+              );
+            }).toList(),
+          ),
+      ],
     );
   }
 
@@ -357,15 +573,18 @@ class _CommentItemState extends State<CommentItem> {
     return GestureDetector(
       onTap: () => _showReactListModal(context),
       child: Padding(
-        padding: EdgeInsets.only(top: 4.h, left: 8.w),
+        padding: EdgeInsets.only(top: 4.rsh(context), left: 8.rs(context)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 4.rs(context),
+                vertical: 2.rsh(context),
+              ),
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(10.rsr(context)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -378,8 +597,8 @@ class _CommentItemState extends State<CommentItem> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 26.w,
-                    height: 18.h,
+                    width: 26.rs(context),
+                    height: 18.rsh(context),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -388,17 +607,17 @@ class _CommentItemState extends State<CommentItem> {
                             left: (i * 14),
                             child: Text(
                               topEmojis[i].key.icon,
-                              style: TextStyle(fontSize: 12.sp),
+                              style: TextStyle(fontSize: 12.rsp(context)),
                             ),
                           ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 4.w),
+                  SizedBox(width: 4.rs(context)),
                   Text(
                     '$totalCount',
                     style: TextStyle(
-                      fontSize: 11.sp,
+                      fontSize: 11.rsp(context),
                       color: AppColors.textSecondary,
                     ),
                   ),

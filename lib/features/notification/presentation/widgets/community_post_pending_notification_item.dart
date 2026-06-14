@@ -43,7 +43,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
         color: isRead
             ? AppColors.background
             : (s1<AppPreferences>().isDarkMode
-                  ? const Color(0xFFE6A23C).withOpacity(0.15)
+                  ? const Color(0xFFE6A23C).withValues(alpha: 0.15)
                   : const Color(0xFFFFF7E8)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         margin: const EdgeInsets.only(bottom: 4),

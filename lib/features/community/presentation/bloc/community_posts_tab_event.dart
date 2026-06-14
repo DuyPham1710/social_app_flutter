@@ -1,7 +1,7 @@
 part of 'community_posts_tab_bloc.dart';
 
 abstract class CommunityPostsTabEvent extends Equatable {
-  const CommunityPostsTabEvent();
+  CommunityPostsTabEvent();
 
   @override
   List<Object?> get props => [];
@@ -10,7 +10,7 @@ abstract class CommunityPostsTabEvent extends Equatable {
 class CommunityPostsTabFetched extends CommunityPostsTabEvent {
   final String status; // 'all', 'pending', 'approved'
 
-  const CommunityPostsTabFetched({this.status = 'all'});
+  CommunityPostsTabFetched({this.status = 'all'});
 
   @override
   List<Object?> get props => [status];
@@ -20,7 +20,7 @@ class CommunityPostsTabPageChanged extends CommunityPostsTabEvent {
   final int page;
   final String status;
 
-  const CommunityPostsTabPageChanged({
+  CommunityPostsTabPageChanged({
     required this.page,
     required this.status,
   });
@@ -32,7 +32,7 @@ class CommunityPostsTabPageChanged extends CommunityPostsTabEvent {
 class CommunityPostsTabStatusChanged extends CommunityPostsTabEvent {
   final String status; // 'all', 'pending', 'approved'
 
-  const CommunityPostsTabStatusChanged({required this.status});
+  CommunityPostsTabStatusChanged({required this.status});
 
   @override
   List<Object?> get props => [status];

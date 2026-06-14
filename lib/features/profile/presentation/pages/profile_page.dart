@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
@@ -76,7 +76,10 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: AppColors.background,
               title: Text(
                 l10n.menuLogoutDialogTitle,
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 18.sp),
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                ),
               ),
               actions: [
                 TextButton(
@@ -114,143 +117,164 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      endDrawer: ProfileMenuDrawer(onLogout: _showLogoutDialog),
-      body: BlocConsumer<ProfileBloc, ProfileState>(
-        listener: (context, state) {
-          if (state is ProfileError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(context.l10n.profileLoadPostsError)),
-            );
-          }
-        },
-        builder: (context, state) {
-          final posts = state.posts ?? [];
-          final UserEntity? user = state.user;
-          if (state is ProfileError && user == null) {
-            return _fadeContent(
-              key: 'profile-error',
-              child: _buildErrorProfile(
-                state.errorMessage ?? context.l10n.profileLoadError,
-              ),
-            );
-          }
-
-          if (user == null) {
-            return _fadeContent(
-              key: 'profile-loading',
-              child: _buildLoadingProfile(),
-            );
-          }
-          return _fadeContent(
-            key: 'profile-loaded-${user.userId}',
-            child: RefreshIndicator(
-              color: AppColors.primary,
+    return Container(
+      color: AppColors.background,
+      child: Center(
+        child: ClipRect(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
+            ),
+            child: Scaffold(
               backgroundColor: AppColors.background,
-              onRefresh: () async {
-                _loadData();
-                // Cho animation refresh mượt hơn
-                await Future.delayed(const Duration(milliseconds: 300));
-              },
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  // Header
-                  SliverAppBar(
-                    surfaceTintColor: Colors.transparent,
-                    pinned: true,
-                    backgroundColor: AppColors.background,
-                    elevation: 0,
-                    title: Text(
-                      context.l10n.profileTitle,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+              endDrawer: ProfileMenuDrawer(onLogout: _showLogoutDialog),
+              body: BlocConsumer<ProfileBloc, ProfileState>(
+                listener: (context, state) {
+                  if (state is ProfileError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(context.l10n.profileLoadPostsError),
                       ),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: Icon(Icons.search, color: AppColors.iconPrimary),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SearchPage(),
-                            ),
-                          );
-                        },
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  final posts = state.posts ?? [];
+                  final UserEntity? user = state.user;
+                  if (state is ProfileError && user == null) {
+                    return _fadeContent(
+                      key: 'profile-error',
+                      child: _buildErrorProfile(
+                        state.errorMessage ?? context.l10n.profileLoadError,
                       ),
-                      Builder(
-                        builder: (context) => IconButton(
-                          tooltip: context.l10n.menuTitle,
-                          icon: Icon(
-                            Icons.menu_rounded,
-                            color: AppColors.iconPrimary,
-                          ),
-                          onPressed: () {
-                            Scaffold.of(context).openEndDrawer();
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                  ),
+                    );
+                  }
 
-                  // Nội dung
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      ProfileHeader(user: user, isLoading: state.isUserLoading),
-                      ProfileActions(
-                        onTapEdit: () async {
-                          // 1. Lấy instance của ProfileBloc hiện tại TRƯỚC khi chuyển trang
-                          final profileBloc = context.read<ProfileBloc>();
-
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BlocProvider.value(
-                                value: profileBloc,
-                                child: ProfileEditPage(user: user),
+                  if (user == null) {
+                    return _fadeContent(
+                      key: 'profile-loading',
+                      child: _buildLoadingProfile(),
+                    );
+                  }
+                  return _fadeContent(
+                    key: 'profile-loaded-${user.userId}',
+                    child: RefreshIndicator(
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.background,
+                      onRefresh: () async {
+                        _loadData();
+                        await Future.delayed(const Duration(milliseconds: 300));
+                      },
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        slivers: [
+                          // Header
+                          SliverAppBar(
+                            surfaceTintColor: Colors.transparent,
+                            pinned: true,
+                            backgroundColor: AppColors.background,
+                            elevation: 0,
+                            title: Text(
+                              context.l10n.profileTitle,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
                               ),
                             ),
-                          );
-                          if (context.mounted) {
-                            context.read<ProfileBloc>().add(
-                              const LoadUserProfileEvent(),
-                            );
-                          }
-                        },
-                      ),
-                      ProfileInfo(user: user),
-                      const Divider(),
-                      FriendListWidget(
-                        onViewAll: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const FriendsListPage(),
-                            ),
-                          );
-                          _loadData();
-                        },
-                      ),
-                      const Divider(),
-                      const SizedBox(height: 12),
+                            actions: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.search,
+                                  color: AppColors.iconPrimary,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SearchPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Builder(
+                                builder: (context) => IconButton(
+                                  tooltip: context.l10n.menuTitle,
+                                  icon: Icon(
+                                    Icons.menu_rounded,
+                                    color: AppColors.iconPrimary,
+                                  ),
+                                  onPressed: () {
+                                    Scaffold.of(context).openEndDrawer();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                          ),
 
-                      CreatePostWidget(
-                        avatarUrl: user.avatarUrl,
-                        onCreatePost: () => _handleOpenCreatePost(),
+                          // Nội dung
+                          SliverList(
+                            delegate: SliverChildListDelegate([
+                              ProfileHeader(
+                                user: user,
+                                isLoading: state.isUserLoading,
+                              ),
+                              ProfileActions(
+                                onTapEdit: () async {
+                                  final profileBloc = context
+                                      .read<ProfileBloc>();
+
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider.value(
+                                        value: profileBloc,
+                                        child: ProfileEditPage(user: user),
+                                      ),
+                                    ),
+                                  );
+                                  if (context.mounted) {
+                                    context.read<ProfileBloc>().add(
+                                      const LoadUserProfileEvent(),
+                                    );
+                                  }
+                                },
+                              ),
+                              ProfileInfo(user: user),
+                              const Divider(),
+                              FriendListWidget(
+                                onViewAll: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const FriendsListPage(),
+                                    ),
+                                  );
+                                  _loadData();
+                                },
+                              ),
+                              const Divider(),
+                              const SizedBox(height: 12),
+
+                              CreatePostWidget(
+                                avatarUrl: user.avatarUrl,
+                                onCreatePost: () => _handleOpenCreatePost(),
+                              ),
+                              const Divider(),
+                              _buildPostsSection(state, posts),
+                            ]),
+                          ),
+                        ],
                       ),
-                      const Divider(),
-                      _buildPostsSection(state, posts),
-                    ]),
-                  ),
-                ],
+                    ),
+                  );
+                },
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -319,7 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
           hasScrollBody: false,
           child: Center(
             child: Padding(
-              padding: EdgeInsets.all(24.w),
+              padding: EdgeInsets.all(24.rs(context)),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -328,13 +352,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Color(0xFFE11D48),
                     size: 42,
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     message,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
-                  SizedBox(height: 14.h),
+                  SizedBox(height: 14.rsh(context)),
                   OutlinedButton.icon(
                     onPressed: _loadData,
                     icon: const Icon(Icons.refresh_rounded),
@@ -379,21 +403,21 @@ class _ProfilePageState extends State<ProfilePage> {
             state.hasNext == false &&
             posts.isNotEmpty)
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
+            padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
             child: Center(
               child: Text(
                 context.l10n.profileEndOfPosts,
-                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                style: TextStyle(color: Colors.grey, fontSize: 14.rsp(context)),
               ),
             ),
           ),
         if (state is ProfileLoaded && posts.isEmpty)
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 24.h),
+            padding: EdgeInsets.symmetric(vertical: 24.rsh(context)),
             child: Center(
               child: Text(
                 context.l10n.profileNoPosts,
-                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+                style: TextStyle(color: Colors.grey, fontSize: 14.rsp(context)),
               ),
             ),
           ),
@@ -426,7 +450,9 @@ class ProfileMenuDrawer extends StatelessWidget {
         : Colors.black.withOpacity(0.02);
 
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.85,
+      width: ResponsiveHelper.isWebOrDesktop
+          ? 350.0
+          : MediaQuery.of(context).size.width * 0.85,
       backgroundColor: AppColors.background,
       surfaceTintColor: Colors.transparent,
       child: SafeArea(
@@ -434,14 +460,29 @@ class ProfileMenuDrawer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
-              child: Text(
-                l10n.menuTitle,
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
+              padding: EdgeInsets.fromLTRB(
+                16.rs(context),
+                16.rsh(context),
+                16.rs(context),
+                8.rsh(context),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.menuTitle,
+                    style: TextStyle(
+                      fontSize: 22.rsp(context),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    color: AppColors.iconPrimary,
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
               ),
             ),
 
@@ -449,7 +490,10 @@ class ProfileMenuDrawer extends StatelessWidget {
 
             Expanded(
               child: ListView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.rs(context),
+                  vertical: 8.rsh(context),
+                ),
                 children: [
                   _buildMenuButton(
                     context,
@@ -478,7 +522,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const CommunityPage(),
+                          builder: (context) => CommunityPage(),
                         ),
                       );
                     },
@@ -560,29 +604,32 @@ class ProfileMenuDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 12.rsh(context)),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
           onTap: onTap,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.rs(context),
+              vertical: 16.rsh(context),
+            ),
             child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(8.w),
+                  padding: EdgeInsets.all(8.rs(context)),
                   decoration: BoxDecoration(
                     color: iconColor.withOpacity(0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: iconColor, size: 22.sp),
+                  child: Icon(icon, color: iconColor, size: 22.rsp(context)),
                 ),
-                SizedBox(width: 16.w),
+                SizedBox(width: 16.rs(context)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,17 +638,17 @@ class ProfileMenuDrawer extends StatelessWidget {
                         title,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 14.sp,
+                          fontSize: 14.rsp(context),
                           color: AppColors.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (subtitle != null) ...[
-                        SizedBox(height: 3.h),
+                        SizedBox(height: 3.rsh(context)),
                         Text(
                           subtitle,
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12.rsp(context),
                             color: AppColors.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -613,7 +660,7 @@ class ProfileMenuDrawer extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: AppColors.textSecondary.withOpacity(0.5),
-                  size: 16.sp,
+                  size: 16.rsp(context),
                 ),
               ],
             ),
@@ -627,74 +674,149 @@ class ProfileMenuDrawer extends StatelessWidget {
     final l10n = context.l10n;
     final prefs = s1<AppPreferences>();
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.background,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
-      ),
-      builder: (sheetContext) {
-        return SafeArea(
-          child: ListenableBuilder(
-            listenable: prefs,
-            builder: (context, _) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 6.h),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          l10n.languageSelectTitle,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              l10n.languageSelectTitle,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            content: SizedBox(
+              width: 320,
+              child: ListenableBuilder(
+                listenable: prefs,
+                builder: (context, _) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildLanguageTile(
+                        context,
+                        title: l10n.languageSystem,
+                        value: null,
+                        groupValue: prefs.localeCode,
+                        onChanged: (value) async {
+                          await prefs.setLocaleCode(value);
+                          if (dialogContext.mounted)
+                            Navigator.pop(dialogContext);
+                        },
+                      ),
+                      _buildLanguageTile(
+                        context,
+                        title: l10n.languageVietnamese,
+                        value: 'vi',
+                        groupValue: prefs.localeCode,
+                        onChanged: (value) async {
+                          await prefs.setLocaleCode(value);
+                          if (dialogContext.mounted)
+                            Navigator.pop(dialogContext);
+                        },
+                      ),
+                      _buildLanguageTile(
+                        context,
+                        title: l10n.languageEnglish,
+                        value: 'en',
+                        groupValue: prefs.localeCode,
+                        onChanged: (value) async {
+                          await prefs.setLocaleCode(value);
+                          if (dialogContext.mounted)
+                            Navigator.pop(dialogContext);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(18.rsr(context)),
+          ),
+        ),
+        builder: (sheetContext) {
+          return SafeArea(
+            child: ListenableBuilder(
+              listenable: prefs,
+              builder: (context, _) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.rsh(context)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          20.rs(context),
+                          10.rsh(context),
+                          20.rs(context),
+                          6.rsh(context),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            l10n.languageSelectTitle,
+                            style: TextStyle(
+                              fontSize: 18.rsp(context),
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    _buildLanguageTile(
-                      context,
-                      title: l10n.languageSystem,
-                      value: null,
-                      groupValue: prefs.localeCode,
-                      onChanged: (value) async {
-                        await prefs.setLocaleCode(value);
-                        if (sheetContext.mounted) Navigator.pop(sheetContext);
-                      },
-                    ),
-                    _buildLanguageTile(
-                      context,
-                      title: l10n.languageVietnamese,
-                      value: 'vi',
-                      groupValue: prefs.localeCode,
-                      onChanged: (value) async {
-                        await prefs.setLocaleCode(value);
-                        if (sheetContext.mounted) Navigator.pop(sheetContext);
-                      },
-                    ),
-                    _buildLanguageTile(
-                      context,
-                      title: l10n.languageEnglish,
-                      value: 'en',
-                      groupValue: prefs.localeCode,
-                      onChanged: (value) async {
-                        await prefs.setLocaleCode(value);
-                        if (sheetContext.mounted) Navigator.pop(sheetContext);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
+                      _buildLanguageTile(
+                        context,
+                        title: l10n.languageSystem,
+                        value: null,
+                        groupValue: prefs.localeCode,
+                        onChanged: (value) async {
+                          await prefs.setLocaleCode(value);
+                          if (sheetContext.mounted) Navigator.pop(sheetContext);
+                        },
+                      ),
+                      _buildLanguageTile(
+                        context,
+                        title: l10n.languageVietnamese,
+                        value: 'vi',
+                        groupValue: prefs.localeCode,
+                        onChanged: (value) async {
+                          await prefs.setLocaleCode(value);
+                          if (sheetContext.mounted) Navigator.pop(sheetContext);
+                        },
+                      ),
+                      _buildLanguageTile(
+                        context,
+                        title: l10n.languageEnglish,
+                        value: 'en',
+                        groupValue: prefs.localeCode,
+                        onChanged: (value) async {
+                          await prefs.setLocaleCode(value);
+                          if (sheetContext.mounted) Navigator.pop(sheetContext);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+    }
   }
 
   Widget _buildLanguageTile(
@@ -704,12 +826,27 @@ class ProfileMenuDrawer extends StatelessWidget {
     required String? groupValue,
     required ValueChanged<String?> onChanged,
   }) {
-    return RadioListTile<String?>(
-      value: value,
-      groupValue: groupValue,
-      activeColor: AppColors.primary,
-      title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
-      onChanged: onChanged,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: Theme.of(context).colorScheme.copyWith(
+          primary: AppColors.primary,
+          onSurfaceVariant: AppColors.textSecondary,
+          outline: AppColors.textSecondary,
+        ),
+      ),
+      child: RadioListTile<String?>(
+        value: value,
+        groupValue: groupValue,
+        activeColor: AppColors.primary,
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primary;
+          }
+          return AppColors.textSecondary;
+        }),
+        title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
+        onChanged: onChanged,
+      ),
     );
   }
 
@@ -730,7 +867,10 @@ class _ProfileActionSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.rs(context),
+        vertical: 10.rsh(context),
+      ),
       child: Row(
         children: const [
           Expanded(child: _SkeletonBox(height: 38, radius: 10)),
@@ -748,7 +888,12 @@ class _ProfileInfoSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        12.rsh(context),
+        16.rs(context),
+        12.rsh(context),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
@@ -769,16 +914,19 @@ class _PostSkeletonList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Column(
         children: List.generate(
           2,
           (index) => Container(
-            margin: EdgeInsets.only(bottom: 12.h),
-            padding: EdgeInsets.all(14.w),
+            margin: EdgeInsets.only(bottom: 12.rsh(context)),
+            padding: EdgeInsets.all(14.rs(context)),
             decoration: BoxDecoration(
               color: AppColors.secondBackground,
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(14.rsr(context)),
               border: Border.all(color: AppColors.divider),
             ),
             child: Column(
@@ -800,13 +948,13 @@ class _PostSkeletonList extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 14.h),
+                SizedBox(height: 14.rsh(context)),
                 const _SkeletonBox(
                   width: double.infinity,
                   height: 13,
                   radius: 7,
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 8.rsh(context)),
                 const _SkeletonBox(width: 230, height: 13, radius: 7),
               ],
             ),

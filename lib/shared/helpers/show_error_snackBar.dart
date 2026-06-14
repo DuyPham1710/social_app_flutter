@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
 void showErrorSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(16),
+      margin: ResponsiveHelper.isWebOrDesktop ? null : const EdgeInsets.all(16),
+      width: ResponsiveHelper.isWebOrDesktop ? 400.0 : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       backgroundColor: const Color.fromARGB(255, 247, 37, 72),
       content: Row(

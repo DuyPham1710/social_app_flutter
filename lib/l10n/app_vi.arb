@@ -1,6 +1,7 @@
 {
   "@@locale": "vi",
   "appTitle": "commonhub",
+  "navHome": "Trang chủ",
   "commonCancel": "Hủy",
   "commonClose": "Đóng",
   "commonReport": "Báo cáo",
@@ -1517,6 +1518,10 @@
   "reactionHaha": "Haha",
   "reactionWow": "Wow",
   "reactionSad": "Buồn",
+  "storyAddMediaFromComputer": "Thêm ảnh/video từ máy tính",
+  "storySelectFile": "Chọn tệp",
+  "storyWebImageEditNotSupported": "Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web",
+  "commonImageOnlySupport": "Chỉ hỗ trợ file ảnh",
   "reactionAngry": "Phẫn nộ",
   "chatGiphySticker": "Nhãn dán GIPHY",
   "chatGiphySearch": "Tìm kiếm sticker GIPHY...",

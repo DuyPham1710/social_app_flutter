@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -25,13 +25,20 @@ class TagActionHelper {
           isVisible
               ? l10n.postShowOnProfileTitle
               : l10n.postHideFromProfileTitle,
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18.rsp(context),
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           isVisible
               ? l10n.postShowOnProfileMessage
               : l10n.postHideFromProfileMessage,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
         ),
         actions: [
           TextButton(
@@ -86,8 +93,21 @@ class TagActionHelper {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.background,
-        title: Text(l10n.postRemoveTagTitle),
-        content: Text(l10n.postRemoveTagConfirmMessage),
+        title: Text(
+          l10n.postRemoveTagTitle,
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18.rsp(context),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          l10n.postRemoveTagConfirmMessage,
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

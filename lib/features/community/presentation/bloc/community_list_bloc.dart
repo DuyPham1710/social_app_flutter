@@ -21,7 +21,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     this._getMyCommunitiesUseCase,
     this._getMyInvitesUseCase,
     this._cancelJoinRequestUseCase,
-  ) : super(const CommunityListInitial()) {
+  ) : super(CommunityListInitial()) {
     on<CommunityListFetched>(_onCommunityListFetched);
     on<CommunityListSearched>(_onCommunityListSearched);
     on<MyCommunitiesFetched>(_onMyCommunitiesFetched);
@@ -34,7 +34,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     CommunityListFetched event,
     Emitter<CommunityListState> emit,
   ) async {
-    emit(const CommunityListLoading());
+    emit(CommunityListLoading());
 
     try {
       final dataState = await _getAllCommunitiesUseCase(
@@ -70,7 +70,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     CommunityListSearched event,
     Emitter<CommunityListState> emit,
   ) async {
-    emit(const CommunityListLoading());
+    emit(CommunityListLoading());
 
     try {
       final dataState = await _getAllCommunitiesUseCase(
@@ -106,7 +106,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     MyCommunitiesFetched event,
     Emitter<CommunityListState> emit,
   ) async {
-    emit(const CommunityListLoading());
+    emit(CommunityListLoading());
 
     try {
       final dataState = await _getMyCommunitiesUseCase(params: null);
@@ -127,7 +127,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     MyInvitesFetched event,
     Emitter<CommunityListState> emit,
   ) async {
-    emit(const CommunityListLoading());
+    emit(CommunityListLoading());
 
     try {
       final dataState = await _getMyInvitesUseCase(params: null);
@@ -150,7 +150,7 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
     PendingCommunitiesFetched event,
     Emitter<CommunityListState> emit,
   ) async {
-    emit(const CommunityListLoading());
+    emit(CommunityListLoading());
 
     try {
       // Get all communities and filter for pending join requests
@@ -197,11 +197,11 @@ class CommunityListBloc extends Bloc<CommunityListEvent, CommunityListState> {
               )
               .toList();
 
-          emit(const CommunityListActionSuccess('Đã hủy yêu cầu tham gia'));
+          emit(CommunityListActionSuccess('Đã hủy yêu cầu tham gia'));
           emit(PendingCommunitiesLoaded(updatedCommunities));
         } else {
-          emit(const CommunityListActionSuccess('Đã hủy yêu cầu tham gia'));
-          add(const PendingCommunitiesFetched());
+          emit(CommunityListActionSuccess('Đã hủy yêu cầu tham gia'));
+          add(PendingCommunitiesFetched());
         }
       } else if (dataState is DataStateError) {
         final errorMessage =

@@ -13,7 +13,7 @@ import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.da
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_detail_event.dart';
@@ -143,19 +143,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
       print('[PostDetail] Opening modal after 800ms delay');
       if (mounted) {
         // Auto-open comment modal
-        showModalBottomSheet(
-          isScrollControlled: true,
-          context: context,
-          builder: (BuildContext context) {
-            print(
-              '[PostDetail] ModalComment builder called with initialCommentId: $commentId',
-            );
-            return ModalComment(
-              postId: widget.post.id,
-              reacts: _localReacts,
-              initialCommentId: commentId,
-            );
-          },
+        ModalComment.show(
+          context,
+          postId: widget.post.id,
+          reacts: _localReacts,
+          initialCommentId: commentId,
         );
       }
     });
@@ -373,254 +365,259 @@ class _PostDetailPageState extends State<PostDetailPage> {
         ),
         child: Scaffold(
           backgroundColor: AppColors.background,
-          body: ScrollablePositionedList.builder(
-            itemScrollController: _scrollController,
-            initialScrollIndex: widget.initialImageIndex > 0
-                ? widget.initialImageIndex + 1
-                : 0,
-            itemCount: mediaUrls.length + 1, // +1 cho header item
-            itemBuilder: (context, index) {
-              // Index 0 là header
-              if (index == 0) {
-                return Column(
-                  children: [
-                    // AppBar
-                    Container(
-                      color: AppColors.background,
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top,
-                        left: 8.w,
-                        right: 8.w,
-                        bottom: 12.h,
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              CupertinoIcons.back,
-                              color: AppColors.iconPrimary,
-                            ),
-                            onPressed: () => Navigator.pop(context),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveHelper.feedMaxWidth,
+              ),
+              child: ScrollablePositionedList.builder(
+                itemScrollController: _scrollController,
+                initialScrollIndex: widget.initialImageIndex > 0
+                    ? widget.initialImageIndex + 1
+                    : 0,
+                itemCount: mediaUrls.length + 1, // +1 cho header item
+                itemBuilder: (context, index) {
+                  // Index 0 là header
+                  if (index == 0) {
+                    return Column(
+                      children: [
+                        // AppBar
+                        Container(
+                          color: AppColors.background,
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top,
+                            left: 8.rs(context),
+                            right: 8.rs(context),
+                            bottom: 12.rsh(context),
                           ),
-                          Expanded(
-                            child: Text(
-                              post.user.fullName ?? context.l10n.commonUnknown,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  CupertinoIcons.back,
+                                  color: AppColors.iconPrimary,
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  post.user.fullName ??
+                                      context.l10n.commonUnknown,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 16.rsp(context),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 48.rs(context)),
+                            ],
+                          ),
+                        ),
+
+                        // Content header
+                        if (post.communityStatus != null)
+                          // Post trong community: dùng CommunityPostHeader
+                          CommunityPostHeader(
+                            community: post.community,
+                            user: post.user,
+                            createdAt: post.createdAt,
+                            showCommunityInfo: true,
+                            isSaved: _isSaved,
+                            onOptionsTap: () {
+                              PostOptionsBottomSheet.show(
+                                context,
+                                post: widget.post,
+                                showOwnerActions: false,
+                                onDeleted: () {
+                                  if (mounted) {
+                                    Navigator.of(context).maybePop(true);
+                                  }
+                                },
+                              );
+                            },
+                            onReportTap: () {
+                              ReportPostBottomSheet.show(
+                                context,
+                                postId: widget.post.id,
+                                ownerUserId: post.user.userId,
+                              );
+                            },
+                            onSaveTap: () {
+                              if (_isSaved) {
+                                _handleUnsave();
+                              } else {
+                                SavePostBottomSheet.show(
+                                  context,
+                                  post: widget.post,
+                                  onSaved: (savedId) {
+                                    setState(() {
+                                      _isSaved = true;
+                                      _savedId = savedId;
+                                    });
+                                  },
+                                );
+                              }
+                            },
+                          )
+                        else
+                          PostHeader(
+                            user: post.user,
+                            createdAt: post.createdAt,
+                            taggedUsers: _isRemoved
+                                ? post.taggedUsers
+                                      ?.where((u) => u.userId != _currentUserId)
+                                      .toList()
+                                : post.taggedUsers,
+                            visibleOnProfileUserIds: _visibleOnProfileUserIds,
+                            onTagVisibilityTap: _handleTagVisibility,
+                            onRemoveTagTap: _handleRemoveTag,
+                            onOptionsTap: () {
+                              PostOptionsBottomSheet.show(
+                                context,
+                                post: widget.post,
+                              );
+                            },
+                            isSaved: _isSaved,
+                            onReportTap: () {
+                              ReportPostBottomSheet.show(
+                                context,
+                                postId: widget.post.id,
+                                ownerUserId: post.user.userId,
+                              );
+                            },
+                            onSaveTap: () {
+                              if (_isSaved) {
+                                _handleUnsave();
+                              } else {
+                                SavePostBottomSheet.show(
+                                  context,
+                                  post: widget.post,
+                                  onSaved: (savedId) {
+                                    setState(() {
+                                      _isSaved = true;
+                                      _savedId = savedId;
+                                    });
+                                  },
+                                );
+                              }
+                            },
+                          ),
+                        SizedBox(height: 10.rsh(context)),
+
+                        // Caption + dịch
+                        if (post.caption != null && post.caption!.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.rs(context),
+                            ),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: PostTranslatableCaption(
+                                postId: post.id,
+                                caption: post.caption!,
+                                textStyle: TextStyle(
+                                  fontSize: 14.rsp(context),
+                                  height: 1.4,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 48.w),
-                        ],
-                      ),
-                    ),
 
-                    // Content header
-                    if (post.communityStatus != null)
-                      // Post trong community: dùng CommunityPostHeader
-                      CommunityPostHeader(
-                        community: post.community,
-                        user: post.user,
-                        createdAt: post.createdAt,
-                        showCommunityInfo: true,
-                        isSaved: _isSaved,
-                        onOptionsTap: () {
-                          PostOptionsBottomSheet.show(
-                            context,
-                            post: widget.post,
-                            showOwnerActions: false,
-                            onDeleted: () {
-                              if (mounted) {
-                                Navigator.of(context).maybePop(true);
-                              }
-                            },
-                          );
-                        },
-                        onReportTap: () {
-                          ReportPostBottomSheet.show(
-                            context,
-                            postId: widget.post.id,
-                            ownerUserId: post.user.userId,
-                          );
-                        },
-                        onSaveTap: () {
-                          if (_isSaved) {
-                            _handleUnsave();
-                          } else {
-                            SavePostBottomSheet.show(
-                              context,
-                              post: widget.post,
-                              onSaved: (savedId) {
-                                setState(() {
-                                  _isSaved = true;
-                                  _savedId = savedId;
-                                });
-                              },
-                            );
-                          }
-                        },
-                      )
-                    else
-                      PostHeader(
-                        user: post.user,
-                        createdAt: post.createdAt,
-                        taggedUsers: _isRemoved
-                            ? post.taggedUsers
-                                  ?.where((u) => u.userId != _currentUserId)
-                                  .toList()
-                            : post.taggedUsers,
-                        visibleOnProfileUserIds: _visibleOnProfileUserIds,
-                        onTagVisibilityTap: _handleTagVisibility,
-                        onRemoveTagTap: _handleRemoveTag,
-                        onOptionsTap: () {
-                          PostOptionsBottomSheet.show(
-                            context,
-                            post: widget.post,
-                          );
-                        },
-                        isSaved: _isSaved,
-                        onReportTap: () {
-                          ReportPostBottomSheet.show(
-                            context,
-                            postId: widget.post.id,
-                            ownerUserId: post.user.userId,
-                          );
-                        },
-                        onSaveTap: () {
-                          if (_isSaved) {
-                            _handleUnsave();
-                          } else {
-                            SavePostBottomSheet.show(
-                              context,
-                              post: widget.post,
-                              onSaved: (savedId) {
-                                setState(() {
-                                  _isSaved = true;
-                                  _savedId = savedId;
-                                });
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    SizedBox(height: 10.h),
+                        SizedBox(height: 20.rsh(context)),
 
-                    // Caption + dịch
-                    if (post.caption != null && post.caption!.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: PostTranslatableCaption(
-                            postId: post.id,
-                            caption: post.caption!,
-                            textStyle: TextStyle(
-                              fontSize: 14.sp,
-                              height: 1.4,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    SizedBox(height: 20.h),
-
-                    // Likes info - ẩn nếu bài viết đang chờ duyệt
-                    if (post.communityStatus != 'pending')
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return ModalComment(
+                        // Likes info - ẩn nếu bài viết đang chờ duyệt
+                        if (post.communityStatus != 'pending')
+                          GestureDetector(
+                            onTap: () {
+                              ModalComment.show(
+                                context,
                                 postId: widget.post.id,
                                 reacts: _localReacts,
                               );
                             },
-                          );
-                        },
-                        child: PostReactInfo(reacts: _localReacts),
-                      ),
+                            child: PostReactInfo(reacts: _localReacts),
+                          ),
 
-                    // Reaction Buttons - ẩn nếu bài viết đang chờ duyệt
-                    if (post.communityStatus != 'pending') ...[
-                      SizedBox(height: 20.h),
-                      BlocBuilder<PostDetailBloc, PostDetailState>(
-                        builder: (context, state) {
-                          final commentCount = state is PostDetailLoaded
-                              ? state.commentCount
-                              : 0;
-                          return PostAction(
-                            postId: post.id,
-                            reactCount: _localReacts
-                                .length, // ← Sử dụng _localReacts thay vì post.reacts
-                            isReact: _currentUserReaction,
-                            reacts: _localReacts,
-                            commentCount: commentCount,
-                            onReactionChanged: _onReactionChanged,
-                          );
-                        },
-                      ),
-                    ],
-                  ],
-                );
-              }
+                        // Reaction Buttons - ẩn nếu bài viết đang chờ duyệt
+                        if (post.communityStatus != 'pending') ...[
+                          SizedBox(height: 20.rsh(context)),
+                          BlocBuilder<PostDetailBloc, PostDetailState>(
+                            builder: (context, state) {
+                              final commentCount = state is PostDetailLoaded
+                                  ? state.commentCount
+                                  : 0;
+                              return PostAction(
+                                postId: post.id,
+                                reactCount: _localReacts
+                                    .length, // ← Sử dụng _localReacts thay vì post.reacts
+                                isReact: _currentUserReaction,
+                                reacts: _localReacts,
+                                commentCount: commentCount,
+                                onReactionChanged: _onReactionChanged,
+                              );
+                            },
+                          ),
+                        ],
+                      ],
+                    );
+                  }
 
-              // Index 1+ là các ảnh
-              final imageIndex = index - 1;
+                  // Index 1+ là các ảnh
+                  final imageIndex = index - 1;
 
-              return Column(
-                children: [
-                  Divider(),
+                  return Column(
+                    children: [
+                      Divider(),
 
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 6.h),
-                    child: GestureDetector(
-                      onTap: () {
-                        // mở ảnh toàn màn hình khi nhấn
-                        if (VideoUtil.isVideo(mediaUrls[imageIndex].url)) {
-                          _showVideoPlayer(mediaUrls[imageIndex].url);
-                        } else {
-                          _showFullScreenImage(context, imageIndex);
-                        }
-                      },
-                      child: VideoUtil.isVideo(mediaUrls[imageIndex].url)
-                          ? buildVideoThumbnail(mediaUrls[imageIndex].url)
-                          : Image.network(
-                              mediaUrls[imageIndex].url,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 6.h,
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        mediaUrls[imageIndex].title ?? '',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w400,
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 6.rsh(context)),
+                        child: GestureDetector(
+                          onTap: () {
+                            // mở ảnh toàn màn hình khi nhấn
+                            if (VideoUtil.isVideo(mediaUrls[imageIndex].url)) {
+                              _showVideoPlayer(mediaUrls[imageIndex].url);
+                            } else {
+                              _showFullScreenImage(context, imageIndex);
+                            }
+                          },
+                          child: VideoUtil.isVideo(mediaUrls[imageIndex].url)
+                              ? buildVideoThumbnail(mediaUrls[imageIndex].url)
+                              : Image.network(
+                                  mediaUrls[imageIndex].url,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
                         ),
                       ),
-                    ),
-                  ),
 
-                  SizedBox(height: 14.h),
-                ],
-              );
-            },
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.rs(context),
+                          vertical: 6.rsh(context),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            mediaUrls[imageIndex].title ?? '',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 13.rsp(context),
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 14.rsh(context)),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),

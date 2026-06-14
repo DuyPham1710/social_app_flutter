@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/helpers/device_translation_locale.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -141,7 +141,7 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
         ? _translation!.translatedCaption
         : widget.caption;
 
-    final style = widget.textStyle ?? TextStyle(fontSize: 13.sp);
+    final style = widget.textStyle ?? TextStyle(fontSize: 13.rsp(context));
 
     final showTranslateRow =
         _eligibilityChecked && _hideTranslateAction == false;
@@ -151,19 +151,19 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
       children: [
         Text(captionToShow, style: style),
         if (showTranslateRow) ...[
-          SizedBox(height: 4.h),
+          SizedBox(height: 4.rsh(context)),
           Row(
             children: [
               if (_isLoading)
                 SizedBox(
-                  width: 14.w,
-                  height: 14.w,
+                  width: 14.rs(context),
+                  height: 14.rs(context),
                   child: CircularProgressIndicator(
                     strokeWidth: 1.5,
                     color: AppColors.primary,
                   ),
                 ),
-              if (_isLoading) SizedBox(width: 6.w),
+              if (_isLoading) SizedBox(width: 6.rs(context)),
               TextButton(
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -177,7 +177,10 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
                       : (_showTranslated
                             ? context.l10n.postSeeOriginal
                             : context.l10n.postSeeTranslation),
-                  style: TextStyle(fontSize: 12.sp, color: AppColors.primary),
+                  style: TextStyle(
+                    fontSize: 12.rsp(context),
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -185,10 +188,13 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
         ],
         if (_error != null)
           Padding(
-            padding: EdgeInsets.only(top: 2.h),
+            padding: EdgeInsets.only(top: 2.rsh(context)),
             child: Text(
               _error!,
-              style: TextStyle(fontSize: 11.sp, color: Colors.red[400]),
+              style: TextStyle(
+                fontSize: 11.rsp(context),
+                color: Colors.red[400],
+              ),
             ),
           ),
       ],
