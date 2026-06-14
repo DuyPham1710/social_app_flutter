@@ -122,6 +122,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get chatTitle => 'Tin nhắn';
 
   @override
+  String get chatChooseConversation =>
+      'Chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới';
+
+  @override
   String get chatSearchHint => 'Tìm kiếm';
 
   @override
@@ -995,6 +999,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get commonUnknownError => 'Lỗi không xác định';
+
+  @override
+  String get commonFeatureNotSupported => 'Tính năng không hỗ trợ';
+
+  @override
+  String commonMobileOnlyFeature(String featureName) {
+    return 'Tính năng $featureName chỉ hỗ trợ thực hiện trên thiết bị điện thoại di động.';
+  }
 
   @override
   String get communityAdmin => 'Admin';

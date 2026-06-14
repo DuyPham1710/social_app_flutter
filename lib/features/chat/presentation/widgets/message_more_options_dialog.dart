@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class MessageMoreOptionsDialog {
@@ -12,6 +13,7 @@ class MessageMoreOptionsDialog {
     required bool isFifteenMinutes,
     VoidCallback? onDelete,
     VoidCallback? onEdit,
+    VoidCallback? onCopy,
     VoidCallback? onPin,
     VoidCallback? onForward,
     VoidCallback? onReport,
@@ -23,15 +25,20 @@ class MessageMoreOptionsDialog {
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: _MessageMoreOptionsContent(
-          fromMe: fromMe,
-          isFifteenMinutes: isFifteenMinutes,
-          onDelete: onDelete,
-          onEdit: onEdit,
-          onPin: onPin,
-          onForward: onForward,
-          onReport: onReport,
-          onCreateAIImage: onCreateAIImage,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 400),
+
+          child: _MessageMoreOptionsContent(
+            fromMe: fromMe,
+            isFifteenMinutes: isFifteenMinutes,
+            onDelete: onDelete,
+            onEdit: onEdit,
+            onCopy: onCopy,
+            onPin: onPin,
+            onForward: onForward,
+            onReport: onReport,
+            onCreateAIImage: onCreateAIImage,
+          ),
         ),
       ),
     );
@@ -46,6 +53,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
   final VoidCallback? onPin;
   final VoidCallback? onForward;
   final VoidCallback? onReport;
+  final VoidCallback? onCopy;
   final VoidCallback? onCreateAIImage;
 
   const _MessageMoreOptionsContent({
@@ -56,6 +64,7 @@ class _MessageMoreOptionsContent extends StatelessWidget {
     this.onPin,
     this.onForward,
     this.onReport,
+    this.onCopy,
     this.onCreateAIImage,
   });
 
@@ -106,6 +115,16 @@ class _MessageMoreOptionsContent extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).pop();
                 if (onEdit != null) onEdit!();
+              },
+            ),
+
+          if (ResponsiveHelper.isWebOrDesktop)
+            _buildOption(
+              icon: CupertinoIcons.doc_on_doc_fill,
+              label: context.l10n.commonCopy,
+              onTap: () {
+                Navigator.of(context).pop();
+                if (onCopy != null) onCopy!();
               },
             ),
 

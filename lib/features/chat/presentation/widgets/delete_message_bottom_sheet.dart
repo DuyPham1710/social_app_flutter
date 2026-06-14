@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
+
 class DeleteMessageBottomSheet {
   static void show({
     required BuildContext context,
@@ -11,16 +13,38 @@ class DeleteMessageBottomSheet {
     required VoidCallback onDeleteForEveryone,
     required VoidCallback onDeleteForMe,
   }) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => _DeleteMessageContent(
-        isMyMessage: isMyMessage,
-        onDeleteForEveryone: onDeleteForEveryone,
-        onDeleteForMe: onDeleteForMe,
-      ),
-    );
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        builder: (context) => Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 400),
+
+            child: _DeleteMessageContent(
+              isMyMessage: isMyMessage,
+              onDeleteForEveryone: onDeleteForEveryone,
+              onDeleteForMe: onDeleteForMe,
+              isDialog: true,
+            ),
+          ),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (context) => _DeleteMessageContent(
+          isMyMessage: isMyMessage,
+          onDeleteForEveryone: onDeleteForEveryone,
+          onDeleteForMe: onDeleteForMe,
+          isDialog: false,
+        ),
+      );
+    }
   }
 }
 
@@ -28,11 +52,13 @@ class _DeleteMessageContent extends StatelessWidget {
   final bool isMyMessage;
   final VoidCallback onDeleteForEveryone;
   final VoidCallback onDeleteForMe;
+  final bool isDialog;
 
   const _DeleteMessageContent({
     required this.isMyMessage,
     required this.onDeleteForEveryone,
     required this.onDeleteForMe,
+    required this.isDialog,
   });
 
   @override
@@ -40,25 +66,28 @@ class _DeleteMessageContent extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
-        ),
+        borderRadius: isDialog
+            ? BorderRadius.circular(20.r)
+            : BorderRadius.only(
+                topLeft: Radius.circular(20.r),
+                topRight: Radius.circular(20.r),
+              ),
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Handle indicator
-            Container(
-              margin: EdgeInsets.only(top: 8.h),
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: AppColors.textSecondary.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(2.r),
+            if (!isDialog)
+              Container(
+                margin: EdgeInsets.only(top: 8.h),
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondary.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
               ),
-            ),
             // Title
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),

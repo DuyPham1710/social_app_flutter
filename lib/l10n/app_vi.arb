@@ -50,6 +50,7 @@
     }
   },
   "chatTitle": "Tin nhắn",
+  "chatChooseConversation": "Chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới",
   "chatSearchHint": "Tìm kiếm",
   "chatYourStory": "Tin của bạn",
   "chatCreateStory": "Tạo tin",
@@ -484,6 +485,15 @@
   "commonUnderstood": "Đã hiểu",
   "commonUnexpectedErrorRetry": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
   "commonUnknownError": "Lỗi không xác định",
+  "commonFeatureNotSupported": "Tính năng không hỗ trợ",
+  "commonMobileOnlyFeature": "Tính năng {featureName} chỉ hỗ trợ thực hiện trên thiết bị điện thoại di động.",
+  "@commonMobileOnlyFeature": {
+    "placeholders": {
+      "featureName": {
+        "type": "String"
+      }
+    }
+  },
   "communityAdmin": "Admin",
   "communityAdminDemoted": "Đã hạ quyền admin",
   "communityAdminPanelSubtitle": "Duyệt thành viên mới và kiểm duyệt bài viết trước khi hiển thị.",

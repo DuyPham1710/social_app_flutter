@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/features/chat/presentation/widgets/message_hover_wrapper.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/reaction_detail_dialog.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/call_message_item.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/audio_message_bubble.dart';
@@ -22,6 +23,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
 class MessageItem extends StatelessWidget {
   final MessageEntity message;
@@ -37,6 +39,8 @@ class MessageItem extends StatelessWidget {
   final VoidCallback? onCallAgain;
   final bool isFirstUnreadMessage;
   final int? unreadCount;
+  final VoidCallback? onReplyAction;
+  final VoidCallback? onReactAction;
 
   const MessageItem({
     super.key,
@@ -53,6 +57,8 @@ class MessageItem extends StatelessWidget {
     this.onCallAgain,
     this.isFirstUnreadMessage = false,
     this.unreadCount,
+    this.onReplyAction,
+    this.onReactAction,
   });
 
   // Kiểm tra xem tin nhắn đã được xem bởi người khác chưa (không tính mình)
@@ -187,51 +193,34 @@ class MessageItem extends StatelessWidget {
                 SizedBox(width: 8.w),
               ],
 
-              Flexible(
-                child: GestureDetector(
-                  onLongPress: onLongPress,
-                  onDoubleTap: onDoubleTap,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    fit: StackFit.loose,
-                    children: [
-                      isDeleteforEveryone
-                          ? _buildDeletedMessage(context, lastName, fromMe)
-                          : isReplying
-                          ? _buildReplyMessage(context)
-                          : isStoryReply
-                          ? _buildStoryReplyMessage(context)
-                          : isLocationMessage
-                          ? _buildLocationMessage(context)
-                          : isHasMetaData
-                          ? VideoCallMessageItem(
-                              fromMe: fromMe,
-                              callType: message.metadata!.type == 'video_call'
-                                  ? 'video'
-                                  : 'audio',
-                              callStatus:
-                                  message.metadata!.callStatus ?? 'completed',
-                              duration: message.metadata!.duration,
-                              timestamp: message.createdAt,
-                              onCallAgain: onCallAgain,
-                            )
-                          :
-                            // Kiểm tra xem có phải là emoji không
-                            message.text != null && _isOnlyEmoji(message.text!)
-                          ? _buildEmojiMessage()
-                          : isAudioAttachment
-                          ? AudioMessageBubble(
-                              fromMe: fromMe,
-                              attachment: message.attachments.first,
-                            )
-                          : _buildMessageContent(context),
-
-                      // Show reactions if any
-                      if (hasReactions) _buildReactionBubble(context),
-                    ],
+              if (ResponsiveHelper.isWebOrDesktop)
+                Expanded(
+                  child: _buildMessageWrapper(
+                    isDeleteforEveryone,
+                    context,
+                    lastName,
+                    isReplying,
+                    isStoryReply,
+                    isLocationMessage,
+                    isHasMetaData,
+                    isAudioAttachment,
+                    hasReactions,
+                  ),
+                )
+              else
+                Flexible(
+                  child: _buildMessageWrapper(
+                    isDeleteforEveryone,
+                    context,
+                    lastName,
+                    isReplying,
+                    isStoryReply,
+                    isLocationMessage,
+                    isHasMetaData,
+                    isAudioAttachment,
+                    hasReactions,
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -246,13 +235,81 @@ class MessageItem extends StatelessWidget {
     );
   }
 
+  MessageHoverWrapper _buildMessageWrapper(
+    bool isDeleteforEveryone,
+    BuildContext context,
+    String lastName,
+    bool isReplying,
+    bool isStoryReply,
+    bool isLocationMessage,
+    bool isHasMetaData,
+    bool isAudioAttachment,
+    bool hasReactions,
+  ) {
+    return MessageHoverWrapper(
+      fromMe: fromMe,
+      isDeleted: isDeleteforEveryone,
+      onReact: onReactAction ?? onDoubleTap,
+      onReply: onReplyAction,
+      onMore: onLongPress,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onLongPress: onLongPress,
+          onDoubleTap: onDoubleTap,
+
+          child: Stack(
+            clipBehavior: Clip.none,
+            fit: StackFit.loose,
+            children: [
+              isDeleteforEveryone
+                  ? _buildDeletedMessage(context, lastName, fromMe)
+                  : isReplying
+                  ? _buildReplyMessage(context)
+                  : isStoryReply
+                  ? _buildStoryReplyMessage(context)
+                  : isLocationMessage
+                  ? _buildLocationMessage(context)
+                  : isHasMetaData
+                  ? VideoCallMessageItem(
+                      fromMe: fromMe,
+                      callType: message.metadata!.type == 'video_call'
+                          ? 'video'
+                          : 'audio',
+                      callStatus: message.metadata!.callStatus ?? 'completed',
+                      duration: message.metadata!.duration,
+                      timestamp: message.createdAt,
+                      onCallAgain: onCallAgain,
+                    )
+                  :
+                    // Kiểm tra xem có phải là emoji không
+                    message.text != null && _isOnlyEmoji(message.text!)
+                  ? _buildEmojiMessage()
+                  : isAudioAttachment
+                  ? AudioMessageBubble(
+                      fromMe: fromMe,
+                      attachment: message.attachments.first,
+                    )
+                  : _buildMessageContent(context),
+
+              // Show reactions if any
+              if (hasReactions) _buildReactionBubble(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDeletedMessage(
     BuildContext context,
     String lastName,
     bool fromMe,
   ) {
     return Container(
-      constraints: BoxConstraints(maxWidth: 0.7.sw),
+      constraints: BoxConstraints(
+        maxWidth: (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw),
+      ),
       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
       decoration: BoxDecoration(
         color: AppColors.background,
@@ -425,28 +482,35 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildEmojiMessage() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (message.text != null && message.text!.isNotEmpty)
-          Text(
-            message.text!,
-            style: TextStyle(
-              fontSize: 26.sp, // Cỡ chữ lớn hơn cho emoji
+    return MouseRegion(
+      cursor: SystemMouseCursors.text,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (message.text != null && message.text!.isNotEmpty)
+            SelectionArea(
+              child: Text(
+                message.text!,
+                style: TextStyle(
+                  fontSize: 26.sp, // Cỡ chữ lớn hơn cho emoji
+                ),
+              ),
             ),
-          ),
 
-        // Show attachments if any
-        // if (message.attachments.isNotEmpty)
-        //   _buildAttachmentsGrid(context, message.attachments),
-      ],
+          // Show attachments if any
+          // if (message.attachments.isNotEmpty)
+          //   _buildAttachmentsGrid(context, message.attachments),
+        ],
+      ),
     );
   }
 
   Widget _buildReplyMessage(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(maxWidth: 0.7.sw),
+      constraints: BoxConstraints(
+        maxWidth: (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw),
+      ),
       decoration: BoxDecoration(
         color: fromMe
             ? AppColors.primary
@@ -545,11 +609,16 @@ class MessageItem extends StatelessWidget {
 
               children: [
                 if (message.text != null && message.text!.isNotEmpty)
-                  Text(
-                    message.text!,
-                    style: TextStyle(
-                      color: fromMe ? Colors.white : AppColors.textPrimary,
-                      fontSize: 14.sp,
+                  MouseRegion(
+                    cursor: SystemMouseCursors.text,
+                    child: SelectionArea(
+                      child: Text(
+                        message.text!,
+                        style: TextStyle(
+                          color: fromMe ? Colors.white : AppColors.textPrimary,
+                          fontSize: 14.sp,
+                        ),
+                      ),
                     ),
                   ),
 
@@ -578,7 +647,9 @@ class MessageItem extends StatelessWidget {
   Widget _buildStoryReplyMessage(BuildContext context) {
     final story = message.story!;
     return Container(
-      constraints: BoxConstraints(maxWidth: 0.7.sw),
+      constraints: BoxConstraints(
+        maxWidth: (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw),
+      ),
       decoration: BoxDecoration(
         color: fromMe
             ? AppColors.primary
@@ -643,11 +714,18 @@ class MessageItem extends StatelessWidget {
           if (message.text != null && message.text!.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(left: 14.w, right: 14.w, bottom: 8.h),
-              child: Text(
-                message.text!,
-                style: TextStyle(
-                  color: fromMe ? AppColors.background : AppColors.textPrimary,
-                  fontSize: 14.sp,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.text,
+                child: SelectionArea(
+                  child: Text(
+                    message.text!,
+                    style: TextStyle(
+                      color: fromMe
+                          ? AppColors.background
+                          : AppColors.textPrimary,
+                      fontSize: 14.sp,
+                    ),
+                  ),
                 ),
               ),
             )
@@ -659,26 +737,33 @@ class MessageItem extends StatelessWidget {
   }
 
   Widget _buildNormalMessage() {
-    return Container(
-      // Giới hạn chiều rộng tối đa của tin nhắn (khoảng 70% màn hình)
-      constraints: BoxConstraints(maxWidth: 0.7.sw),
-      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
-      decoration: BoxDecoration(
-        color: fromMe
-            ? AppColors.primary
-            : AppColors.textSecondary.withOpacity(0.1),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(14.r),
-          topRight: Radius.circular(14.r),
-          bottomLeft: Radius.circular(fromMe ? 14.r : 0),
-          bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+    return MouseRegion(
+      cursor: SystemMouseCursors.text,
+      child: Container(
+        // Giới hạn chiều rộng tối đa của tin nhắn (khoảng 70% màn hình)
+        constraints: BoxConstraints(
+          maxWidth: (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw),
         ),
-      ),
-      child: Text(
-        message.text!,
-        style: TextStyle(
-          color: fromMe ? Colors.white : AppColors.textPrimary,
-          fontSize: 14.sp,
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
+        decoration: BoxDecoration(
+          color: fromMe
+              ? AppColors.primary
+              : AppColors.textSecondary.withOpacity(0.1),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(14.r),
+            topRight: Radius.circular(14.r),
+            bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+            bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+          ),
+        ),
+        child: SelectionArea(
+          child: Text(
+            message.text!,
+            style: TextStyle(
+              color: fromMe ? Colors.white : AppColors.textPrimary,
+              fontSize: 14.sp,
+            ),
+          ),
         ),
       ),
     );
@@ -756,7 +841,9 @@ class MessageItem extends StatelessWidget {
           },
           child: Container(
             margin: EdgeInsets.only(top: 4.h),
-            constraints: BoxConstraints(maxWidth: 0.7.sw),
+            constraints: BoxConstraints(
+              maxWidth: (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw),
+            ),
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
             decoration: BoxDecoration(
               color: fromMe
@@ -853,7 +940,9 @@ class MessageItem extends StatelessWidget {
         bottomRight: Radius.circular(fromMe ? 0 : 14.r),
       ),
       child: Container(
-        constraints: BoxConstraints(maxWidth: 0.7.sw),
+        constraints: BoxConstraints(
+          maxWidth: (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw),
+        ),
         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
         decoration: BoxDecoration(
           color: fromMe
@@ -941,7 +1030,7 @@ class MessageItem extends StatelessWidget {
 
     // Calculate grid layout
     final imageCount = imageAttachments.length;
-    final maxWidth = 0.7.sw;
+    final maxWidth = (ResponsiveHelper.isWebOrDesktop ? 400.0 : 0.7.sw);
     final spacing = 4.w;
     final itemSize = (maxWidth - (spacing * 2)) / 3; // 3 items per row
 

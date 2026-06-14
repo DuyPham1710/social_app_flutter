@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Tin nhắn'**
   String get chatTitle;
 
+  /// No description provided for @chatChooseConversation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới'**
+  String get chatChooseConversation;
+
   /// No description provided for @chatSearchHint.
   ///
   /// In vi, this message translates to:
@@ -1865,6 +1871,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Lỗi không xác định'**
   String get commonUnknownError;
+
+  /// No description provided for @commonFeatureNotSupported.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng không hỗ trợ'**
+  String get commonFeatureNotSupported;
+
+  /// No description provided for @commonMobileOnlyFeature.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng {featureName} chỉ hỗ trợ thực hiện trên thiết bị điện thoại di động.'**
+  String commonMobileOnlyFeature(String featureName);
 
   /// No description provided for @communityAdmin.
   ///

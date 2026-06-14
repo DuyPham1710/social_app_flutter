@@ -28,7 +28,9 @@ class ReactionListModal extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.rsr(context))),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.rsr(context)),
+        ),
       ),
       builder: (context) => ReactionListModal(
         reacts: reacts,
@@ -50,7 +52,9 @@ class ReactionListModal extends StatelessWidget {
       height: 400.rsh(context),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.rsr(context))),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.rsr(context)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

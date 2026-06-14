@@ -122,6 +122,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatTitle => 'Chats';
 
   @override
+  String get chatChooseConversation =>
+      'Select a chat or start a new conversation';
+
+  @override
   String get chatSearchHint => 'Search';
 
   @override
@@ -992,6 +996,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonUnknownError => 'Unknown error';
+
+  @override
+  String get commonFeatureNotSupported => 'Feature not supported';
+
+  @override
+  String commonMobileOnlyFeature(String featureName) {
+    return 'The $featureName feature is only supported on mobile devices.';
+  }
 
   @override
   String get communityAdmin => 'Admin';

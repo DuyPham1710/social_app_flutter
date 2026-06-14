@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
 class AttachmentMenuWidget extends StatelessWidget {
   final VoidCallback onClose;
@@ -56,21 +57,22 @@ class AttachmentMenuWidget extends StatelessWidget {
             child: Divider(color: AppColors.divider, height: 1, thickness: 1),
           ),
 
-          _buildAttachmentMenuItem(
-            context: context,
-            title: context.l10n.messageLocation,
-            icon: CupertinoIcons.location_solid,
-            color: AppColors.primary,
-            onTap: () {
-              onClose();
-              onShareLocation?.call();
-            },
-          ),
-
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 4.h),
-            child: Divider(color: AppColors.divider, height: 1, thickness: 1),
-          ),
+          if (!ResponsiveHelper.isWebOrDesktop) ...[
+            _buildAttachmentMenuItem(
+              context: context,
+              title: context.l10n.messageLocation,
+              icon: CupertinoIcons.location_solid,
+              color: AppColors.primary,
+              onTap: () {
+                onClose();
+                onShareLocation?.call();
+              },
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: Divider(color: AppColors.divider, height: 1, thickness: 1),
+            ),
+          ],
 
           _buildAttachmentMenuItem(
             context: context,
