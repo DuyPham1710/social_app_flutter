@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:photo_manager/photo_manager.dart';
+import 'package:file_picker/file_picker.dart';
 
 class VideoUtil {
   static bool isVideo(dynamic imageData) {
@@ -12,7 +13,7 @@ class VideoUtil {
     } else if (imageData is String) {
       final extension = imageData.split('.').last.toLowerCase();
       return ['mp4', 'mov', 'avi', 'mkv', 'm4v', '3gp'].contains(extension);
-    } else if (imageData.runtimeType.toString() == 'PlatformFile') {
+    } else if (imageData is PlatformFile) {
       try {
         final extension = imageData.extension?.toLowerCase();
         return ['mp4', 'mov', 'avi', 'mkv', 'm4v', '3gp'].contains(extension);

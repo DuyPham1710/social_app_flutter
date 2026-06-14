@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter/cupertino.dart';
@@ -64,7 +65,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
     if (VideoUtil.isVideo(file)) {
       if (file is File) {
         return buildVideoThumbnail(file.path);
-      } else if (file.runtimeType.toString() == 'PlatformFile') {
+      } else if (file is PlatformFile) {
         try {
           return buildVideoThumbnail(file.name, videoBytes: file.bytes);
         } catch (e) {
@@ -79,7 +80,7 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
           width: double.infinity,
           key: ValueKey('_'),
         );
-      } else if (file.runtimeType.toString() == 'PlatformFile') {
+      } else if (file is PlatformFile) {
         try {
           return Image.memory(
             file.bytes!,
