@@ -39,4 +39,7 @@ abstract class AuthService {
 
   @DELETE('/user/face-registration')
   Future<Map<String, dynamic>> deleteFaceRegistration();
+
+  @DELETE('/auth/incomplete-registration/{id}')
+  Future<void> deleteIncompleteRegistration(@Path() String id);
 }

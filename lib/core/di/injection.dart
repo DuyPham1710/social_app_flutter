@@ -6,6 +6,7 @@ import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/auth/data/data_sources/auth_service.dart';
 import 'package:social_app_fe/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:social_app_fe/features/auth/domain/repository/auth_repository.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/delete_incomplete_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/register_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.dart';
@@ -273,6 +274,7 @@ Future<void> initializeDependencies() async {
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
+  s1.registerLazySingleton<DeleteIncompleteRegistrationUsecase>(() => DeleteIncompleteRegistrationUsecase(s1()));
   //s1.registerLazySingleton<CheckSavedUsecase>(() => CheckSavedUsecase(s1()));
   s1.registerLazySingleton<GetSavedItemsUsecase>(
     () => GetSavedItemsUsecase(s1()),
@@ -662,6 +664,7 @@ Future<void> initializeDependencies() async {
       resetPasswordUsecase: s1(),
       submitFaceRegistrationUsecase: s1(),
       updatePersonalInfoUsecase: s1(),
+      deleteIncompleteRegistrationUsecase: s1(),
     ),
   );
 

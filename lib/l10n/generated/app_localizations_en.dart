@@ -396,6 +396,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter your email to recover your account.';
 
   @override
+  String get authChangePassword => 'Change password';
+
+  @override
+  String get authChangePasswordDescription =>
+      'Enter your email to start the password change process.';
+
+  @override
   String get authContinue => 'Continue';
 
   @override
@@ -815,6 +822,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileFaceData => 'Face data';
+
+  @override
+  String get profileChangePasswordSubtitle =>
+      'Update your account protection password';
 
   @override
   String get profileFaceRegistered => 'Set up';

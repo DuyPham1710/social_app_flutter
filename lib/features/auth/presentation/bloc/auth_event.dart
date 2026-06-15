@@ -93,4 +93,13 @@ class SubmitFaceRegistrationEvent extends AuthEvent {
   List<Object?> get props => [userId, base64Images];
 }
 
+class DeleteIncompleteRegistrationEvent extends AuthEvent {
+  final String userId;
+
+  const DeleteIncompleteRegistrationEvent({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
+}
+
 class AuthReset extends AuthEvent {}

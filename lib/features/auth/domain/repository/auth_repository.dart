@@ -25,4 +25,6 @@ abstract class AuthRepository {
   );
 
   Future<DataState<Map<String, dynamic>>> deleteFaceRegistration();
+
+  Future<DataState<void>> deleteIncompleteRegistration(String userId);
 }

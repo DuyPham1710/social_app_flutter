@@ -756,6 +756,18 @@ abstract class AppLocalizations {
   /// **'Nhập email của bạn để khôi phục tài khoản.'**
   String get authForgotPasswordDescription;
 
+  /// No description provided for @authChangePassword.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thay đổi mật khẩu'**
+  String get authChangePassword;
+
+  /// No description provided for @authChangePasswordDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập email của bạn để bắt đầu quá trình đổi mật khẩu.'**
+  String get authChangePasswordDescription;
+
   /// No description provided for @authContinue.
   ///
   /// In vi, this message translates to:
@@ -1529,6 +1541,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Dữ liệu khuôn mặt'**
   String get profileFaceData;
+
+  /// No description provided for @profileChangePasswordSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cập nhật mật khẩu bảo vệ tài khoản'**
+  String get profileChangePasswordSubtitle;
 
   /// No description provided for @profileFaceRegistered.
   ///

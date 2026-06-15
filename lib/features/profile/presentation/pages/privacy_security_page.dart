@@ -123,6 +123,29 @@ class PrivacySecurityPage extends StatelessWidget {
                                   user?.userId,
                                 );
                               },
+                              isLast: false,
+                            ),
+
+                            Divider(height: 1, color: AppColors.divider),
+
+                            _buildActionItem(
+                              context,
+                              icon: CupertinoIcons.lock_fill,
+                              iconColor: Colors.orange,
+                              title: l10n.authChangePassword,
+                              subtitle: l10n.profileChangePasswordSubtitle,
+                              trailing: Icon(
+                                Icons.chevron_right,
+                                color: AppColors.unselectedIcon,
+                                size: 24.rsp(context),
+                              ),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/forgot-password',
+                                  arguments: {'isFromSettings': true},
+                                );
+                              },
                               isLast: true,
                             ),
                           ],

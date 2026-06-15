@@ -398,6 +398,13 @@ class AppLocalizationsVi extends AppLocalizations {
       'Nhập email của bạn để khôi phục tài khoản.';
 
   @override
+  String get authChangePassword => 'Thay đổi mật khẩu';
+
+  @override
+  String get authChangePasswordDescription =>
+      'Nhập email của bạn để bắt đầu quá trình đổi mật khẩu.';
+
+  @override
   String get authContinue => 'Tiếp tục';
 
   @override
@@ -817,6 +824,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get profileFaceData => 'Dữ liệu khuôn mặt';
+
+  @override
+  String get profileChangePasswordSubtitle =>
+      'Cập nhật mật khẩu bảo vệ tài khoản';
 
   @override
   String get profileFaceRegistered => 'Đã thiết lập';

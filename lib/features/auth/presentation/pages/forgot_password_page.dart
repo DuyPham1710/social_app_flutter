@@ -48,22 +48,34 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           if (state is OtpResendSuccess && state.flowType == 'resend_otp') {
             // Reset state trước khi navigate để tránh state cũ trigger ở OTP page
             BlocProvider.of<AuthBloc>(context).add(AuthReset());
+            final args =
+                ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>?;
+            final isFromSettings = args?['isFromSettings'] as bool? ?? false;
+
             Navigator.pushNamed(
               context,
               '/otp',
               arguments: {
                 'email': _emailController.text.trim(),
                 'isForgotPassword': true,
+                'isFromSettings': isFromSettings,
               },
             );
           } else if (state is AuthError && state.flowType == 'resend_otp') {
-            final message = state.errorMessage ?? context.l10n.authSendOtpFailed;
+            final message =
+                state.errorMessage ?? context.l10n.authSendOtpFailed;
             UIUtils.showErrorMessage(context, message);
             BlocProvider.of<AuthBloc>(context).add(AuthReset());
           }
         },
 
         builder: (context, state) {
+          final args =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          final isFromSettings = args?['isFromSettings'] as bool? ?? false;
+
           return AuthResponsiveWrapper(
             child: SingleChildScrollView(
               child: Padding(
@@ -77,9 +89,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: AppColors.unselectedIcon,
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          padding: const EdgeInsets.only(right: 24, bottom: 24),
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: AppColors.unselectedIcon,
+                          ),
                         ),
                       ),
 
@@ -88,7 +104,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          context.l10n.authForgotPassword,
+                          isFromSettings
+                              ? context.l10n.authChangePassword
+                              : context.l10n.authForgotPassword,
                           style: TextStyle(
                             fontSize: 24.rsp(context),
                             fontWeight: FontWeight.bold,
@@ -99,7 +117,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       SizedBox(height: 10.rsh(context)),
 
                       Text(
-                        context.l10n.authForgotPasswordDescription,
+                        isFromSettings
+                            ? context.l10n.authChangePasswordDescription
+                            : context.l10n.authForgotPasswordDescription,
                         style: TextStyle(
                           fontSize: 16.rsp(context),
                           color: AppColors.textSecondary,
@@ -130,38 +150,40 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               ),
                             )
                           : ButtonCustom(
-                              onPressed: () => _onForgotPasswordPressed(context),
+                              onPressed: () =>
+                                  _onForgotPasswordPressed(context),
                               text: context.l10n.authContinue,
                             ),
 
                       SizedBox(height: 24.rsh(context)),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            context.l10n.authNoAccount,
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 14.rsp(context),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/signup');
-                            },
-                            child: Text(
-                              context.l10n.authRegister,
+                      if (!isFromSettings)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              context.l10n.authNoAccount,
                               style: TextStyle(
-                                color: AppColors.primary,
+                                color: AppColors.textPrimary,
                                 fontSize: 14.rsp(context),
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/signup');
+                              },
+                              child: Text(
+                                context.l10n.authRegister,
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 14.rsp(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
