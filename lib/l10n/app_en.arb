@@ -50,6 +50,7 @@
     }
   },
   "chatTitle": "Chats",
+  "chatChooseConversation": "Select a chat or start a new conversation",
   "chatSearchHint": "Search",
   "chatYourStory": "Your story",
   "chatCreateStory": "Create story",
@@ -221,6 +222,8 @@
   "authForgotPassword": "Forgot password",
   "authForgotPasswordQuestion": "Forgot password?",
   "authForgotPasswordDescription": "Enter your email to recover your account.",
+  "authChangePassword": "Change password",
+  "authChangePasswordDescription": "Enter your email to start the password change process.",
   "authContinue": "Continue",
   "authSave": "Save",
   "authOr": "or",
@@ -413,6 +416,7 @@
   "profileAgree": "Agree",
   "profileAccountSecurity": "Account security",
   "profileFaceData": "Face data",
+  "profileChangePasswordSubtitle": "Update your account protection password",
   "profileFaceRegistered": "Set up",
   "profileFaceNotRegistered": "Not set up",
   "profileFaceDataSuccessDeleted": "Face data deleted successfully",
@@ -490,6 +494,15 @@
   "commonUnderstood": "Got it",
   "commonUnexpectedErrorRetry": "An unexpected error occurred. Please try again.",
   "commonUnknownError": "Unknown error",
+  "commonFeatureNotSupported": "Feature not supported",
+  "commonMobileOnlyFeature": "The {featureName} feature is only supported on mobile devices.",
+  "@commonMobileOnlyFeature": {
+    "placeholders": {
+      "featureName": {
+        "type": "String"
+      }
+    }
+  },
   "communityAdmin": "Admin",
   "communityAdminDemoted": "Admin role removed",
   "communityAdminPanelSubtitle": "Review new members and moderate posts before they appear.",

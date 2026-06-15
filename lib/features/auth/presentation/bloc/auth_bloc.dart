@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/auth/domain/usecases/resend_otp_usecase.d
 import 'package:social_app_fe/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/delete_incomplete_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -24,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UpdatePersonalInfoUsecase updatePersonalInfoUsecase;
   final ResetPasswordUsecase resetPasswordUsecase;
   final SubmitFaceRegistrationUsecase submitFaceRegistrationUsecase;
+  final DeleteIncompleteRegistrationUsecase deleteIncompleteRegistrationUsecase;
 
   AuthBloc({
     required this.loginUsecase,
@@ -33,6 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.updatePersonalInfoUsecase,
     required this.resetPasswordUsecase,
     required this.submitFaceRegistrationUsecase,
+    required this.deleteIncompleteRegistrationUsecase,
   }) : super(AuthInitial()) {
     on<LoginEvent>(_login);
     on<RegisterEvent>(_register);
@@ -41,6 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UpdatePersonalInfoEvent>(_updatePersonalInfo);
     on<ResetPasswordEvent>(_resetPassword);
     on<SubmitFaceRegistrationEvent>(_submitFaceRegistration);
+    on<DeleteIncompleteRegistrationEvent>(_deleteIncompleteRegistration);
     on<AuthReset>((event, emit) {
       emit(AuthInitial());
     });
@@ -240,5 +244,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       debugPrint('[AuthBloc] Face registration error: $e');
       emit(FaceRegistrationError(message: 'Đã xảy ra lỗi. Vui lòng thử lại.'));
     }
+  }
+
+  void _deleteIncompleteRegistration(
+    DeleteIncompleteRegistrationEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    await deleteIncompleteRegistrationUsecase(params: event.userId);
   }
 }

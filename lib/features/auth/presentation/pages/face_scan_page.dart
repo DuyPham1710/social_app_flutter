@@ -15,6 +15,7 @@ import 'package:social_app_fe/features/auth/presentation/widgets/auth_responsive
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_mobile_only_dialog.dart';
 
 enum FacePose { center, up, down, left, right }
 
@@ -55,7 +56,13 @@ class _FaceScanPageState extends State<FaceScanPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (ResponsiveHelper.isWebOrDesktop) {
-        _showMobileOnlyDialog();
+        showMobileOnlyDialog(
+          context,
+          featureName: context.l10n.faceScanTitle,
+          onConfirm: () {
+            Navigator.of(this.context).pop();
+          },
+        );
       } else {
         final args =
             ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
@@ -66,84 +73,6 @@ class _FaceScanPageState extends State<FaceScanPage> {
         _initCamera();
       }
     });
-  }
-
-  void _showMobileOnlyDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Align(
-          alignment: Alignment.center,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Dialog(
-              backgroundColor: AppColors.secondBackground,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.device_phone_portrait,
-                      size: 64,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      "Tính năng không hỗ trợ",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "Tính năng quét khuôn mặt chỉ hỗ trợ thực hiện trên thiết bị điện thoại di động.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close dialog
-                          Navigator.of(this.context).pop(); // Go back
-                        },
-                        child: const Text(
-                          "Đồng ý",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 
   Future<void> _initCamera() async {
@@ -522,16 +451,20 @@ class _FaceScanPageState extends State<FaceScanPage> {
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.2),
-                          ),
-                          child: Icon(
-                            CupertinoIcons.back,
-                            color: Colors.white,
-                            size: 24.rsp(context),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16, bottom: 8, top: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.rsp(context),
+                            ),
                           ),
                         ),
                       ),

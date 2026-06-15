@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -13,21 +14,46 @@ class MessageEditHistoryDialog {
     required MessageEntity message,
     required List<MessageEditLogEntity> editLogs,
   }) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) =>
-          _MessageEditHistoryDialog(message: message, editLogs: editLogs),
-    );
+    final isWebOrDesktop = ResponsiveHelper.isWebOrDesktop;
+
+    if (!isWebOrDesktop) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => _MessageEditHistoryDialog(
+          message: message,
+          editLogs: editLogs,
+          isMobile: true,
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: _MessageEditHistoryDialog(
+              message: message,
+              editLogs: editLogs,
+              isMobile: false,
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 
 class _MessageEditHistoryDialog extends StatelessWidget {
   final MessageEntity message;
   final List<MessageEditLogEntity> editLogs;
+  final bool isMobile;
 
   const _MessageEditHistoryDialog({
     required this.message,
     required this.editLogs,
+    this.isMobile = true,
   });
 
   @override
@@ -56,10 +82,12 @@ class _MessageEditHistoryDialog extends StatelessWidget {
       height: 0.7.sh,
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
-        ),
+        borderRadius: isMobile
+            ? BorderRadius.only(
+                topLeft: Radius.circular(20.r),
+                topRight: Radius.circular(20.r),
+              )
+            : BorderRadius.circular(20.r),
       ),
       child: DefaultTextStyle.merge(
         style: const TextStyle(

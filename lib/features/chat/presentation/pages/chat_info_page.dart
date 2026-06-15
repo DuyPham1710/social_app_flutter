@@ -22,6 +22,7 @@ class ChatInfoPage extends StatefulWidget {
   final String? conversationId;
   final String? userId;
   final Function(String callType)? onInitiateCall;
+  final bool isWebLayout;
 
   const ChatInfoPage({
     super.key,
@@ -33,6 +34,7 @@ class ChatInfoPage extends StatefulWidget {
     this.conversationId,
     this.userId,
     this.onInitiateCall,
+    this.isWebLayout = false,
   });
 
   @override
@@ -64,10 +66,12 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
         backgroundColor: AppColors.background,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context, _groupName),
-        ),
+        leading: widget.isWebLayout
+            ? const SizedBox.shrink()
+            : IconButton(
+                icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
+                onPressed: () => Navigator.pop(context, _groupName),
+              ),
         actions: [
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: AppColors.textPrimary),

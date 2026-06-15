@@ -15,11 +15,15 @@ import 'package:social_app_fe/l10n/l10n.dart';
 class ChatSearchPage extends StatefulWidget {
   final List<FriendEntity> friends;
   final Future<void> Function(FriendEntity)? onNavigateToChat;
+  final bool isWebLayout;
+  final VoidCallback? onBack;
 
   const ChatSearchPage({
     super.key,
     this.friends = const [],
     this.onNavigateToChat,
+    this.isWebLayout = false,
+    this.onBack,
   });
 
   @override
@@ -67,23 +71,38 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     return Material(
       color: Colors.transparent,
       child: Container(
-        height: 0.9.sh,
+        height: widget.isWebLayout ? null : 0.9.sh,
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.r),
-            topRight: Radius.circular(20.r),
-          ),
+          borderRadius: widget.isWebLayout
+              ? null
+              : BorderRadius.only(
+                  topLeft: Radius.circular(20.r),
+                  topRight: Radius.circular(20.r),
+                ),
         ),
-
         child: Column(
           children: [
-            SizedBox(height: 40.h),
+            SizedBox(height: widget.isWebLayout ? 20.h : 40.h),
 
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Row(
                 children: [
+                  if (widget.isWebLayout)
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.w),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: AppColors.textPrimary,
+                          size: 24.sp,
+                        ),
+                        onPressed: widget.onBack,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
                   Expanded(
                     child: CupertinoSearchTextField(
                       controller: _controller,
@@ -94,18 +113,20 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                       },
                     ),
                   ),
-                  SizedBox(width: 8.w),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    child: Text(
-                      context.l10n.commonCancel,
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 16.sp,
+                  if (!widget.isWebLayout) ...[
+                    SizedBox(width: 8.w),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Text(
+                        context.l10n.commonCancel,
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 16.sp,
+                        ),
                       ),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -142,13 +163,32 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
 
             GestureDetector(
               onTap: () async {
-                // Navigate to recent searches management page
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RecentSearchManagementPage(),
-                  ),
-                );
+                if (widget.isWebLayout) {
+                  await showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 500,
+                          maxHeight: 0.8.sh,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20.r),
+                          child: const RecentSearchManagementPage(),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecentSearchManagementPage(),
+                    ),
+                  );
+                }
                 // Reload recent searches when coming back
                 await _loadRecentSearches();
               },

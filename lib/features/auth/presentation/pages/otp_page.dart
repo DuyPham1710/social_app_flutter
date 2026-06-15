@@ -32,6 +32,7 @@ class _OtpPageState extends State<OtpPage> {
   Timer? _timer;
   String? _email; // Lưu email vào biến local
   bool? _isForgotPassword;
+  bool? _isFromSettings;
 
   @override
   void initState() {
@@ -52,6 +53,7 @@ class _OtpPageState extends State<OtpPage> {
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       _email = args['email'] as String;
       _isForgotPassword = args['isForgotPassword'] as bool? ?? false;
+      _isFromSettings = args['isFromSettings'] as bool? ?? false;
     }
   }
 
@@ -107,179 +109,179 @@ class _OtpPageState extends State<OtpPage> {
   Widget build(BuildContext context) {
     final defaultPinTheme = _defaultPinTheme(context);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          // Chỉ xử lý state từ verify_otp flow
-          if (state is AuthLoaded && state.flowType == 'verify_otp') {
-            context.read<AuthBloc>().add(AuthReset());
+    return PopScope(
+      canPop: _isForgotPassword ?? false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
 
-            if (_isForgotPassword ?? false) {
-              Navigator.pushNamed(
+        if (!(_isForgotPassword ?? false)) {
+          // It's register flow, delete incomplete account and go to login
+          final args =
+              ModalRoute.of(context)!.settings.arguments
+                  as Map<String, dynamic>;
+          final userId = args['id'] as String;
+
+          context.read<AuthBloc>().add(
+            DeleteIncompleteRegistrationEvent(userId: userId),
+          );
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/login',
+            (route) => false,
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            // Chỉ xử lý state từ verify_otp flow
+            if (state is AuthLoaded && state.flowType == 'verify_otp') {
+              context.read<AuthBloc>().add(AuthReset());
+
+              if (_isForgotPassword ?? false) {
+                Navigator.pushNamed(
+                  context,
+                  '/reset-password',
+                  arguments: {
+                    'email': _email,
+                    'otp': otpCode,
+                    'isFromSettings': _isFromSettings,
+                  },
+                );
+              } else {
+                final args =
+                    ModalRoute.of(context)!.settings.arguments
+                        as Map<String, dynamic>;
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/personal-info',
+                  arguments: {'id': args['id']},
+                );
+              }
+            } else if (state is OtpResendSuccess &&
+                state.flowType == 'resend_otp') {
+              // Chỉ hiện message khi user thực sự resend OTP từ OTP page
+              showSuccessSnackBar(context, state.message);
+              _startCountdown();
+            } else if (state is AuthError && state.flowType == 'verify_otp') {
+              final message =
+                  state.errorMessage ?? context.l10n.authVerifyOtpFailed;
+              UIUtils.showErrorMessage(context, message);
+              BlocProvider.of<AuthBloc>(
                 context,
-                '/reset-password',
-                arguments: {'email': _email, 'otp': otpCode},
-              );
-            } else {
-              final args =
-                  ModalRoute.of(context)!.settings.arguments
-                      as Map<String, dynamic>;
-              Navigator.pushReplacementNamed(
-                context,
-                '/personal-info',
-                arguments: {'id': args['id']},
-              );
+              ).add(AuthReset()); // reset sau khi show lỗi
             }
-          } else if (state is OtpResendSuccess &&
-              state.flowType == 'resend_otp') {
-            // Chỉ hiện message khi user thực sự resend OTP từ OTP page
-            showSuccessSnackBar(context, state.message);
-            _startCountdown();
-          } else if (state is AuthError && state.flowType == 'verify_otp') {
-            final message = state.errorMessage ?? context.l10n.authVerifyOtpFailed;
-            UIUtils.showErrorMessage(context, message);
-            BlocProvider.of<AuthBloc>(
-              context,
-            ).add(AuthReset()); // reset sau khi show lỗi
-          }
-        },
+          },
 
-        builder: (context, state) {
-          return AuthResponsiveWrapper(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20.rsh(context)),
+          builder: (context, state) {
+            return AuthResponsiveWrapper(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20.rsh(context)),
 
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        CupertinoIcons.back,
-                        color: AppColors.unselectedIcon,
-                      ),
-                    ),
-
-                    SizedBox(height: 50.rsh(context)),
-
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        context.l10n.authOtpTitle,
-                        style: TextStyle(
-                          fontSize: 24.rsp(context),
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: 10.rsh(context)),
-
-                    Text(
-                      context.l10n.authOtpSentTo(_email ?? ''),
-                      style: TextStyle(
-                        fontSize: 16.rsp(context),
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-
-                    SizedBox(height: 40.rsh(context)),
-
-                    Pinput(
-                      length: 6,
-                      defaultPinTheme: defaultPinTheme,
-                      focusedPinTheme: defaultPinTheme.copyWith(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.rsr(context)),
-                          border: Border.all(
-                            color: AppColors.textPrimary,
-                            width: 2.rs(context),
+                      GestureDetector(
+                        onTap: () {
+                          if (!(_isForgotPassword ?? false)) {
+                            final args =
+                                ModalRoute.of(context)!.settings.arguments
+                                    as Map<String, dynamic>;
+                            final userId = args['id'] as String;
+                            context.read<AuthBloc>().add(
+                              DeleteIncompleteRegistrationEvent(userId: userId),
+                            );
+                          }
+                          Navigator.pop(context);
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          padding: const EdgeInsets.only(right: 24, bottom: 24),
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: AppColors.unselectedIcon,
                           ),
                         ),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          otpCode = value;
-                        });
-                      },
-                    ),
 
-                    SizedBox(height: 30.rsh(context)),
+                      SizedBox(height: 50.rsh(context)),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.l10n.authDidNotReceiveCode,
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          context.l10n.authOtpTitle,
                           style: TextStyle(
+                            fontSize: 24.rsp(context),
+                            fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
-                            fontSize: 14.rsp(context),
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                      ),
 
-                        GestureDetector(
-                          onTap: _secondsRemaining > 0
-                              ? null
-                              : () => _resendOtp(context),
-                          child: Text(
-                            state is OtpResendLoading
-                                ? context.l10n.authResendingOtp
-                                : _secondsRemaining > 0
-                                ? context.l10n.authResendInSeconds(
-                                    _secondsRemaining,
-                                  )
-                                : context.l10n.authResendCode,
-                            style: TextStyle(
-                              color: _secondsRemaining > 0
-                                  ? AppColors.primary
-                                  : Colors.red,
-                              fontSize: 14.rsp(context),
-                              fontWeight: FontWeight.bold,
+                      SizedBox(height: 10.rsh(context)),
+
+                      Text(
+                        context.l10n.authOtpSentTo(_email ?? ''),
+                        style: TextStyle(
+                          fontSize: 16.rsp(context),
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+
+                      SizedBox(height: 40.rsh(context)),
+
+                      Pinput(
+                        length: 6,
+                        defaultPinTheme: defaultPinTheme,
+                        focusedPinTheme: defaultPinTheme.copyWith(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.rsr(context)),
+                            border: Border.all(
+                              color: AppColors.textPrimary,
+                              width: 2.rs(context),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                        onChanged: (value) {
+                          setState(() {
+                            otpCode = value;
+                          });
+                        },
+                      ),
 
-                    SizedBox(height: 280.rsh(context)),
-
-                    state is AuthLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            ),
-                          )
-                        : ButtonCustom(
-                            onPressed: () => _verifyOtp(context),
-                            text: context.l10n.authVerify,
-                          ),
-
-                      SizedBox(height: 24.rsh(context)),
+                      SizedBox(height: 30.rsh(context)),
 
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            context.l10n.authHasAccount,
+                            context.l10n.authDidNotReceiveCode,
                             style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 14.rsp(context),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+
                           GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/login');
-                            },
+                            onTap: _secondsRemaining > 0
+                                ? null
+                                : () => _resendOtp(context),
                             child: Text(
-                              context.l10n.authLogin,
+                              state is OtpResendLoading
+                                  ? context.l10n.authResendingOtp
+                                  : _secondsRemaining > 0
+                                  ? context.l10n.authResendInSeconds(
+                                      _secondsRemaining,
+                                    )
+                                  : context.l10n.authResendCode,
                               style: TextStyle(
-                                color: AppColors.primary,
+                                color: _secondsRemaining > 0
+                                    ? AppColors.primary
+                                    : Colors.red,
                                 fontSize: 14.rsp(context),
                                 fontWeight: FontWeight.bold,
                               ),
@@ -287,12 +289,71 @@ class _OtpPageState extends State<OtpPage> {
                           ),
                         ],
                       ),
-                  ],
+
+                      SizedBox(height: 280.rsh(context)),
+
+                      state is AuthLoading
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            )
+                          : ButtonCustom(
+                              onPressed: () => _verifyOtp(context),
+                              text: context.l10n.authVerify,
+                            ),
+
+                      SizedBox(height: 24.rsh(context)),
+
+                      if (_isFromSettings != null && _isFromSettings == false)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              context.l10n.authHasAccount,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 14.rsp(context),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                if (!(_isForgotPassword ?? false)) {
+                                  final args =
+                                      ModalRoute.of(context)!.settings.arguments
+                                          as Map<String, dynamic>;
+                                  final userId = args['id'] as String;
+                                  context.read<AuthBloc>().add(
+                                    DeleteIncompleteRegistrationEvent(
+                                      userId: userId,
+                                    ),
+                                  );
+                                }
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/login',
+                                  (route) => false,
+                                );
+                              },
+                              child: Text(
+                                context.l10n.authLogin,
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 14.rsp(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

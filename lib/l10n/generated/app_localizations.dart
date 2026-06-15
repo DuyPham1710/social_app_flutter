@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Tin nhắn'**
   String get chatTitle;
 
+  /// No description provided for @chatChooseConversation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới'**
+  String get chatChooseConversation;
+
   /// No description provided for @chatSearchHint.
   ///
   /// In vi, this message translates to:
@@ -749,6 +755,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Nhập email của bạn để khôi phục tài khoản.'**
   String get authForgotPasswordDescription;
+
+  /// No description provided for @authChangePassword.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thay đổi mật khẩu'**
+  String get authChangePassword;
+
+  /// No description provided for @authChangePasswordDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập email của bạn để bắt đầu quá trình đổi mật khẩu.'**
+  String get authChangePasswordDescription;
 
   /// No description provided for @authContinue.
   ///
@@ -1524,6 +1542,12 @@ abstract class AppLocalizations {
   /// **'Dữ liệu khuôn mặt'**
   String get profileFaceData;
 
+  /// No description provided for @profileChangePasswordSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cập nhật mật khẩu bảo vệ tài khoản'**
+  String get profileChangePasswordSubtitle;
+
   /// No description provided for @profileFaceRegistered.
   ///
   /// In vi, this message translates to:
@@ -1901,6 +1925,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Lỗi không xác định'**
   String get commonUnknownError;
+
+  /// No description provided for @commonFeatureNotSupported.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng không hỗ trợ'**
+  String get commonFeatureNotSupported;
+
+  /// No description provided for @commonMobileOnlyFeature.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng {featureName} chỉ hỗ trợ thực hiện trên thiết bị điện thoại di động.'**
+  String commonMobileOnlyFeature(String featureName);
 
   /// No description provided for @communityAdmin.
   ///

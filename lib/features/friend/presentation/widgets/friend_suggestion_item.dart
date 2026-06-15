@@ -130,7 +130,9 @@ class FriendSuggestionItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 12.rsh(context)), // Khoảng cách giữa thông tin và nút
+                  SizedBox(
+                    height: 12.rsh(context),
+                  ), // Khoảng cách giữa thông tin và nút
                 ],
 
                 // Nếu không có bạn chung, thêm space nhỏ hơn

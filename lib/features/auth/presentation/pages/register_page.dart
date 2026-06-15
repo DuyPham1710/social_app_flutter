@@ -116,9 +116,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           context,
                           ModalRoute.withName('/login'),
                         ),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: AppColors.unselectedIcon,
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          padding: const EdgeInsets.only(right: 24, bottom: 24),
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: AppColors.unselectedIcon,
+                          ),
                         ),
                       ),
 
