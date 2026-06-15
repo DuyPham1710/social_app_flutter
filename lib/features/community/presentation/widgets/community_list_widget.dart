@@ -1,6 +1,7 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
@@ -11,7 +12,7 @@ import 'package:social_app_fe/l10n/l10n.dart';
 enum _CommunityFilter { all, publicOnly, privateOnly }
 
 class CommunityListWidget extends StatefulWidget {
-  const CommunityListWidget({super.key});
+  CommunityListWidget({super.key});
 
   @override
   State<CommunityListWidget> createState() => _CommunityListWidgetState();
@@ -46,7 +47,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
 
   void _onSearchChanged(String value) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+    _searchDebounce = Timer(Duration(milliseconds: 400), () {
       if (!mounted) {
         return;
       }
@@ -77,16 +78,21 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
 
   Widget _buildStickyHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        10.rsh(context),
+        16.rs(context),
+        8.rsh(context),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Container(
-              height: 42,
+              height: 42.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(14.rsr(context)),
                 border: Border.all(color: AppColors.divider),
                 boxShadow: [
                   BoxShadow(
@@ -98,24 +104,27 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
               ),
               child: TextField(
                 controller: _searchController,
+                cursorColor: AppColors.primary,
                 decoration: InputDecoration(
                   hintText: context.l10n.communitySearchHint,
                   hintStyle: TextStyle(color: AppColors.textSecondary),
                   prefixIcon: Icon(
                     Icons.search_rounded,
-                    size: 18,
+                    size: 18.rsp(context),
                     color: AppColors.textSecondary,
                   ),
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.rsh(context),
+                  ),
                 ),
                 style: TextStyle(color: AppColors.textPrimary),
                 onChanged: _onSearchChanged,
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.rs(context)),
           Theme(
             data: Theme.of(context).copyWith(
               splashColor: Colors.transparent,
@@ -134,50 +143,50 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: _CommunityFilter.all,
-                  height: 34,
+                  height: 34.rsh(context),
                   child: Text(
                     context.l10n.commonAll,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 12,
+                      fontSize: 12.rsp(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _CommunityFilter.publicOnly,
-                  height: 34,
+                  height: 34.rsh(context),
                   child: Text(
                     context.l10n.communityPublicOnly,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 12,
+                      fontSize: 12.rsp(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 PopupMenuItem(
                   value: _CommunityFilter.privateOnly,
-                  height: 34,
+                  height: 34.rsh(context),
                   child: Text(
                     context.l10n.communityPrivateOnly,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 12,
+                      fontSize: 12.rsp(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ],
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.rsr(context)),
               ),
               child: Container(
-                width: 34,
-                height: 34,
+                width: 34.rs(context),
+                height: 34.rsh(context),
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.rsr(context)),
                   border: Border.all(color: AppColors.divider),
                   boxShadow: [
                     BoxShadow(
@@ -192,18 +201,18 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                   children: [
                     Icon(
                       Icons.tune_rounded,
-                      size: 16,
+                      size: 16.rsp(context),
                       color: _activeFilter == _CommunityFilter.all
                           ? AppColors.textSecondary
                           : AppColors.primary,
                     ),
                     if (_activeFilter != _CommunityFilter.all)
                       Positioned(
-                        right: 8,
-                        top: 8,
+                        right: 8.rs(context),
+                        top: 8.rsh(context),
                         child: SizedBox(
-                          width: 5,
-                          height: 5,
+                          width: 5.rs(context),
+                          height: 5.rsh(context),
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: AppColors.primary,
@@ -227,7 +236,7 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
     return BlocBuilder<CommunityListBloc, CommunityListState>(
       builder: (context, state) {
         if (state is CommunityListLoading) {
-          return const _CommunityListSkeleton();
+          return _CommunityListSkeleton();
         }
 
         if (state is CommunityListLoaded) {
@@ -237,24 +246,24 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
             controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(child: _buildStickyHeader()),
-              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              SliverToBoxAdapter(child: SizedBox(height: 8.rsh(context))),
               if (filteredCommunities.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: EdgeInsets.symmetric(horizontal: 30.rs(context)),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.groups_2_outlined,
-                            size: 54,
+                            size: 54.rsp(context),
                             color: AppColors.textSecondary.withValues(
                               alpha: 0.75,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.rsh(context)),
                           Text(
                             state.searchQuery != null
                                 ? context.l10n.communityNoSearchResults
@@ -272,12 +281,17 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  padding: EdgeInsets.fromLTRB(
+                    16.rs(context),
+                    0,
+                    16.rs(context),
+                    20.rsh(context),
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final community = filteredCommunities[index];
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
+                        padding: EdgeInsets.only(bottom: 12.rsh(context)),
                         child: _AnimatedIn(
                           index: index,
                           child: CommunityItem(community: community),
@@ -293,17 +307,17 @@ class _CommunityListWidgetState extends State<CommunityListWidget> {
         if (state is CommunityListError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
+              padding: EdgeInsets.symmetric(horizontal: 28.rs(context)),
               child: Text(
                 localizedCommunityMessage(context.l10n, state.message),
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFFB42318)),
+                style: TextStyle(color: Color(0xFFB42318)),
               ),
             ),
           );
         }
 
-        return const Center(child: Text(''));
+        return Center(child: Text(''));
       },
     );
   }
@@ -313,7 +327,7 @@ class _AnimatedIn extends StatelessWidget {
   final int index;
   final Widget child;
 
-  const _AnimatedIn({required this.index, required this.child});
+  _AnimatedIn({required this.index, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -337,29 +351,49 @@ class _AnimatedIn extends StatelessWidget {
 }
 
 class _CommunityListSkeleton extends StatelessWidget {
-  const _CommunityListSkeleton();
+  _CommunityListSkeleton();
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-      children: const [
-        _SkeletonBlock(height: 52, radius: 18),
-        SizedBox(height: 10),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        12.rsh(context),
+        16.rs(context),
+        20.rsh(context),
+      ),
+      children: [
+        _SkeletonBlock(height: 52.rsh(context), radius: 18.rsr(context)),
+        SizedBox(height: 10.rsh(context)),
         Row(
           children: [
-            Expanded(child: _SkeletonBlock(height: 32, radius: 999)),
-            SizedBox(width: 8),
-            Expanded(child: _SkeletonBlock(height: 32, radius: 999)),
-            SizedBox(width: 8),
-            Expanded(child: _SkeletonBlock(height: 32, radius: 999)),
+            Expanded(
+              child: _SkeletonBlock(
+                height: 32.rsh(context),
+                radius: 999.rsr(context),
+              ),
+            ),
+            SizedBox(width: 8.rs(context)),
+            Expanded(
+              child: _SkeletonBlock(
+                height: 32.rsh(context),
+                radius: 999.rsr(context),
+              ),
+            ),
+            SizedBox(width: 8.rs(context)),
+            Expanded(
+              child: _SkeletonBlock(
+                height: 32.rsh(context),
+                radius: 999.rsr(context),
+              ),
+            ),
           ],
         ),
-        SizedBox(height: 14),
+        SizedBox(height: 14.rsh(context)),
         _SkeletonCommunityCard(),
-        SizedBox(height: 12),
+        SizedBox(height: 12.rsh(context)),
         _SkeletonCommunityCard(),
-        SizedBox(height: 12),
+        SizedBox(height: 12.rsh(context)),
         _SkeletonCommunityCard(),
       ],
     );
@@ -367,32 +401,41 @@ class _CommunityListSkeleton extends StatelessWidget {
 }
 
 class _SkeletonCommunityCard extends StatelessWidget {
-  const _SkeletonCommunityCard();
+  _SkeletonCommunityCard();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 96,
+      height: 96.rsh(context),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(12.rs(context)),
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
           border: Border.all(color: AppColors.divider),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            _SkeletonCircle(size: 60),
-            SizedBox(width: 12),
+            _SkeletonCircle(size: 60.rsp(context)),
+            SizedBox(width: 12.rs(context)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SkeletonBlock(height: 14, width: 140),
-                  SizedBox(height: 6),
-                  _SkeletonBlock(height: 12, width: 100),
-                  SizedBox(height: 6),
-                  _SkeletonBlock(height: 12, width: 180),
+                  _SkeletonBlock(
+                    height: 14.rsh(context),
+                    width: 140.rs(context),
+                  ),
+                  SizedBox(height: 6.rsh(context)),
+                  _SkeletonBlock(
+                    height: 12.rsh(context),
+                    width: 100.rs(context),
+                  ),
+                  SizedBox(height: 6.rsh(context)),
+                  _SkeletonBlock(
+                    height: 12.rsh(context),
+                    width: 180.rs(context),
+                  ),
                 ],
               ),
             ),
@@ -406,11 +449,11 @@ class _SkeletonCommunityCard extends StatelessWidget {
 class _SkeletonCircle extends StatelessWidget {
   final double size;
 
-  const _SkeletonCircle({required this.size});
+  _SkeletonCircle({required this.size});
 
   @override
   Widget build(BuildContext context) {
-    return _SkeletonBlock(height: size, width: size, radius: 999);
+    return _SkeletonBlock(height: size, width: size, radius: 999.rsr(context));
   }
 }
 
@@ -419,13 +462,13 @@ class _SkeletonBlock extends StatelessWidget {
   final double? width;
   final double radius;
 
-  const _SkeletonBlock({required this.height, this.width, this.radius = 10});
+  _SkeletonBlock({required this.height, this.width, this.radius = 10});
 
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.35, end: 0.8),
-      duration: const Duration(milliseconds: 900),
+      duration: Duration(milliseconds: 900),
       curve: Curves.easeInOut,
       builder: (context, value, _) {
         return Opacity(

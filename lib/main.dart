@@ -46,7 +46,6 @@ import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
-import 'package:giphy_get/giphy_get.dart';
 import 'package:giphy_get/l10n.dart';
 
 Future<void> main() async {

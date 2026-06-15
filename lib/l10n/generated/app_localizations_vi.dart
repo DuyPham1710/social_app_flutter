@@ -12,6 +12,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appTitle => 'commonhub';
 
   @override
+  String get navHome => 'Trang chủ';
+
+  @override
   String get commonCancel => 'Hủy';
 
   @override
@@ -847,6 +850,26 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get profileDeletingFaceData => 'Đang xóa dữ liệu khuôn mặt...';
+
+  @override
+  String get profileReportUser => 'Báo cáo người dùng';
+
+  @override
+  String get profileReportUserIntro =>
+      'Hãy chọn lý do phù hợp để chúng tôi xem xét tài khoản này.';
+
+  @override
+  String get profileReportUserSelfNotAllowed =>
+      'Bạn không thể báo cáo trang cá nhân của chính mình';
+
+  @override
+  String get profileReportUserSuccess => 'Đã gửi báo cáo người dùng';
+
+  @override
+  String get profileReportUserFailed => 'Không thể gửi báo cáo người dùng';
+
+  @override
+  String get profileReportReasonFakeAccount => 'Tài khoản giả mạo';
 
   @override
   String get appearanceDisplayModeSection => 'CHẾ ĐỘ HIỂN THỊ';
@@ -3304,6 +3327,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reactionSad => 'Buồn';
+
+  @override
+  String get storyAddMediaFromComputer => 'Thêm ảnh/video từ máy tính';
+
+  @override
+  String get storySelectFile => 'Chọn tệp';
+
+  @override
+  String get storyWebImageEditNotSupported =>
+      'Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web';
+
+  @override
+  String get commonImageOnlySupport => 'Chỉ hỗ trợ file ảnh';
 
   @override
   String get reactionAngry => 'Phẫn nộ';

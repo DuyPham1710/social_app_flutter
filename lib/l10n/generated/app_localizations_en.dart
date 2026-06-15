@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'commonhub';
 
   @override
+  String get navHome => 'Home';
+
+  @override
   String get commonCancel => 'Cancel';
 
   @override
@@ -844,6 +847,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeletingFaceData => 'Deleting face data...';
+
+  @override
+  String get profileReportUser => 'Report user';
+
+  @override
+  String get profileReportUserIntro =>
+      'Choose the right reason so we can review this profile.';
+
+  @override
+  String get profileReportUserSelfNotAllowed =>
+      'You cannot report your own profile';
+
+  @override
+  String get profileReportUserSuccess => 'User report sent';
+
+  @override
+  String get profileReportUserFailed => 'Unable to send user report';
+
+  @override
+  String get profileReportReasonFakeAccount => 'Fake account';
 
   @override
   String get appearanceDisplayModeSection => 'DISPLAY MODE';
@@ -3293,6 +3316,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reactionSad => 'Sad';
+
+  @override
+  String get storyAddMediaFromComputer => 'Add photo/video from computer';
+
+  @override
+  String get storySelectFile => 'Choose file';
+
+  @override
+  String get storyWebImageEditNotSupported =>
+      'Image editing is not supported on Web';
+
+  @override
+  String get commonImageOnlySupport => 'Only image files are supported';
 
   @override
   String get reactionAngry => 'Angry';

@@ -102,6 +102,7 @@ import 'package:social_app_fe/features/profile/domain/repository/user_repository
 import 'package:social_app_fe/features/profile/domain/usecases/get_other_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_usecase.dart';
 import 'package:social_app_fe/features/profile/domain/usecases/update_user_profile_usecase.dart';
+import 'package:social_app_fe/features/profile/domain/usecases/report_user_usecase.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
@@ -447,6 +448,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton(() => GetFriendRelationshipUseCase(s1()));
 
   s1.registerLazySingleton(() => UpdateUserProfileUseCase(s1()));
+  s1.registerLazySingleton<ReportUserUseCase>(() => ReportUserUseCase(s1()));
   // Chat UseCases
   s1.registerLazySingleton<ConnectChatUseCase>(() => ConnectChatUseCase(s1()));
   s1.registerLazySingleton<DisconnectChatUsecase>(
@@ -511,6 +513,9 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<GetSummaryUnreadUseCase>(
     () => GetSummaryUnreadUseCase(s1()),
+  );
+  s1.registerLazySingleton<TranslateMessageUseCase>(
+    () => TranslateMessageUseCase(s1()),
   );
 
   // Video Call UseCases
@@ -808,6 +813,7 @@ Future<void> initializeDependencies() async {
       listenMessageUpdatedUseCase: s1(),
       listenMessageReadUseCase: s1(),
       markAsReadUseCase: s1(),
+      translateMessageUseCase: s1(),
     ),
   );
 

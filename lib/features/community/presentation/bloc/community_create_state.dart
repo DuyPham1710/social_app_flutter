@@ -1,22 +1,22 @@
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 
 abstract class CommunityCreateState {
-  const CommunityCreateState();
+  CommunityCreateState();
 }
 
 class CommunityCreateInitial extends CommunityCreateState {
-  const CommunityCreateInitial();
+  CommunityCreateInitial();
 }
 
 class CommunityCreateLoading extends CommunityCreateState {
-  const CommunityCreateLoading();
+  CommunityCreateLoading();
 }
 
 class CommunityCreateSuccess extends CommunityCreateState {
   final CommunityModel community;
   final String message;
 
-  const CommunityCreateSuccess({
+  CommunityCreateSuccess({
     required this.community,
     this.message = 'Tạo cộng đồng thành công',
   });
@@ -25,5 +25,5 @@ class CommunityCreateSuccess extends CommunityCreateState {
 class CommunityCreateError extends CommunityCreateState {
   final String message;
 
-  const CommunityCreateError(this.message);
+  CommunityCreateError(this.message);
 }

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/story/data/models/deezer_music_model.dart';
 import 'package:social_app_fe/features/story/presentation/widgets/music_tile_widget.dart';
@@ -92,8 +94,16 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       _error = null;
     });
     try {
-      final res = await Dio().get('https://api.deezer.com/chart');
-      final data = res.data['tracks']?['data'] as List<dynamic>? ?? [];
+      final baseApiUrl =
+          dotenv.env['BASE_URL'] ?? 'https://api.commonshub.io.vn/';
+      final url = kIsWeb
+          ? '${baseApiUrl}deezer/chart'
+          : 'https://api.deezer.com/chart';
+      final res = await Dio().get(url);
+      final responseData = (kIsWeb && res.data['data'] != null && res.data['statusCode'] != null)
+          ? res.data['data']
+          : res.data;
+      final data = responseData['tracks']?['data'] as List<dynamic>? ?? [];
       final parsed = data
           .map(
             (e) => DeezerMusicModel.fromJson({
@@ -169,13 +179,22 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
 
     try {
       final index = page * 10;
+      final baseApiUrl =
+          dotenv.env['BASE_URL'] ?? 'https://api.commonshub.io.vn/';
+      final baseUrl = kIsWeb
+          ? '${baseApiUrl}deezer/search'
+          : 'https://api.deezer.com/search';
       final res = await Dio().get(
-        'https://api.deezer.com/search',
+        baseUrl,
         queryParameters: {'q': query, 'limit': 10, 'index': index},
       );
 
-      final data = res.data['data'] as List<dynamic>? ?? [];
-      final total = res.data['total'] as int? ?? 0;
+      final responseData = (kIsWeb && res.data['data'] != null && res.data['statusCode'] != null)
+          ? res.data['data']
+          : res.data;
+
+      final data = responseData['data'] as List<dynamic>? ?? [];
+      final total = responseData['total'] as int? ?? 0;
 
       final parsed = data
           .map(
@@ -264,40 +283,56 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildSearchBar(context),
-            if (!_isSearching)
-              Padding(
-                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
-                child: Row(
-                  children: [
-                    Text(
-                      context.l10n.storyMusicForYou,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w700,
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            body: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildSearchBar(context),
+                  if (!_isSearching)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        16.rs(context),
+                        16.rsh(context),
+                        16.rs(context),
+                        8.rsh(context),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            context.l10n.storyMusicForYou,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 18.rsp(context),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            context.l10n.commonViewAll,
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 14.rsp(context),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      context.l10n.commonViewAll,
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
+                  Expanded(child: _buildList()),
+                ],
               ),
-            Expanded(child: _buildList()),
-          ],
+            ),
+          ),
         ),
       ),
     );
@@ -305,7 +340,12 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
 
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8.w, 8.h, 8.w, 0),
+      padding: EdgeInsets.fromLTRB(
+        8.rs(context),
+        8.rsh(context),
+        8.rs(context),
+        0,
+      ),
       child: Row(
         children: [
           IconButton(
@@ -314,16 +354,16 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           ),
           Expanded(
             child: Container(
-              height: 42.h,
+              height: 42.rsh(context),
               decoration: BoxDecoration(
                 color: AppColors.secondBackground,
-                borderRadius: BorderRadius.circular(24.r),
+                borderRadius: BorderRadius.circular(24.rsr(context)),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
               child: Row(
                 children: [
                   Icon(Icons.search, color: AppColors.iconPrimary),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
@@ -334,7 +374,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
                       },
                       style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 14.sp,
+                        fontSize: 14.rsp(context),
                       ),
                       decoration: InputDecoration(
                         hintText: context.l10n.storyMusicSearchHint,
@@ -382,13 +422,19 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           children: [
             Text(
               _error!,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14.rsp(context),
+              ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12.rsh(context)),
             TextButton(
               onPressed: _fetchTracks,
-              child: Text(context.l10n.commonRetry),
+              child: Text(
+                context.l10n.commonRetry,
+                style: TextStyle(color: AppColors.primary),
+              ),
             ),
           ],
         ),
@@ -408,10 +454,13 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           children: [
             Text(
               _searchError!,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14.rsp(context),
+              ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12.rsh(context)),
             TextButton(
               onPressed: () => _searchTracks(_currentSearchQuery ?? ''),
               child: Text(context.l10n.commonRetry),
@@ -428,7 +477,10 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           _isSearching
               ? context.l10n.storyMusicNoSearchResults
               : context.l10n.storyMusicEmpty,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
         ),
       );
     }
@@ -441,11 +493,11 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
           : _fetchTracks,
       child: ListView.separated(
         controller: _scrollController,
-        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
         itemCount:
             _displayTracks.length +
             (_isSearching && _hasMoreSearchResults && _isSearchLoading ? 1 : 0),
-        separatorBuilder: (_, __) => SizedBox(height: 6.h),
+        separatorBuilder: (_, __) => SizedBox(height: 6.rsh(context)),
         itemBuilder: (context, index) {
           // Loading indicator khi đang tải thêm
           if (_isSearching &&
@@ -453,7 +505,7 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
               _isSearchLoading &&
               index == _displayTracks.length) {
             return Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h),
+              padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
               child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/comment/presentation/pages/modal_comment.dart';
@@ -115,7 +115,7 @@ class _PostActionState extends State<PostAction> {
     final String emojiIcon = _currentReaction?.icon ?? '👍';
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -132,53 +132,43 @@ class _PostActionState extends State<PostAction> {
                       ? Text(
                           emojiIcon,
                           key: _iconKey,
-                          style: TextStyle(fontSize: 20.sp),
+                          style: TextStyle(fontSize: 20.rsp(context)),
                         )
                       : Icon(
                           CupertinoIcons.hand_thumbsup,
                           key: _iconKey,
                           color: AppColors.unselectedIcon,
-                          size: 24.sp,
+                          size: 24.rsp(context),
                         ),
                 ),
               ),
 
-              SizedBox(width: 8.w),
+              SizedBox(width: 8.rs(context)),
 
               GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ModalComment(
-                        postId: postId,
-                        reacts: widget.reacts,
-                      );
-                    },
+                  ModalComment.show(
+                    context,
+                    postId: postId,
+                    reacts: widget.reacts,
                   );
                 },
                 child: Text(
                   "$_reactCount",
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 12.rsp(context),
                     color: AppColors.textSecondary,
                   ),
                 ),
               ),
-              SizedBox(width: 20.w),
+              SizedBox(width: 20.rs(context)),
               GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return ModalComment(
-                        postId: postId,
-                        reacts: widget.reacts,
-                        isPressComment: true,
-                      );
-                    },
+                  ModalComment.show(
+                    context,
+                    postId: postId,
+                    reacts: widget.reacts,
+                    isPressComment: true,
                   );
                 },
                 child: Row(
@@ -186,13 +176,13 @@ class _PostActionState extends State<PostAction> {
                     Icon(
                       CupertinoIcons.chat_bubble,
                       color: AppColors.unselectedIcon,
-                      size: 20.sp,
+                      size: 20.rsp(context),
                     ),
-                    SizedBox(width: 4.w),
+                    SizedBox(width: 4.rs(context)),
                     Text(
                       "$commentCount",
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12.rsp(context),
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -204,26 +194,21 @@ class _PostActionState extends State<PostAction> {
 
           GestureDetector(
             onTap: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext context) {
-                  return ModalComment(
-                    postId: postId,
-                    reacts: widget.reacts,
-                    isPressComment: true,
-                  );
-                },
+              ModalComment.show(
+                context,
+                postId: postId,
+                reacts: widget.reacts,
+                isPressComment: true,
               );
             },
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
               child: Text(
                 commentCount > 0
                     ? context.l10n.postViewAllComments(commentCount)
                     : context.l10n.postNoComments,
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 12.rsp(context),
                   color: AppColors.textSecondary,
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
@@ -9,7 +10,7 @@ import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class PendingCommunitiesWidget extends StatefulWidget {
-  const PendingCommunitiesWidget({super.key});
+  PendingCommunitiesWidget({super.key});
 
   @override
   State<PendingCommunitiesWidget> createState() =>
@@ -21,9 +22,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        context.read<CommunityListBloc>().add(
-          const PendingCommunitiesFetched(),
-        );
+        context.read<CommunityListBloc>().add(PendingCommunitiesFetched());
       },
       child: BlocConsumer<CommunityListBloc, CommunityListState>(
         listener: (context, state) {
@@ -48,16 +47,16 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
             if (state.communities.isEmpty) {
               return Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: EdgeInsets.symmetric(horizontal: 30.rs(context)),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.hourglass_empty_rounded,
-                        size: 54,
+                        size: 54.rsp(context),
                         color: AppColors.textSecondary.withValues(alpha: 0.75),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.rsh(context)),
                       Text(
                         context.l10n.communityNoPendingCommunities,
                         style: TextStyle(
@@ -65,12 +64,12 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.rsh(context)),
                       Text(
                         context.l10n.communityPendingCommunitiesHint,
                         style: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 12,
+                          fontSize: 12.rsp(context),
                         ),
                       ),
                     ],
@@ -80,7 +79,12 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
             }
 
             return ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              padding: EdgeInsets.fromLTRB(
+                16.rs(context),
+                12.rsh(context),
+                16.rs(context),
+                24.rsh(context),
+              ),
               itemCount: state.communities.length,
               itemBuilder: (context, index) {
                 final community = state.communities[index];
@@ -89,29 +93,33 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
                   child: PendingCommunityItem(community: community),
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => SizedBox(height: 12.rsh(context)),
             );
           }
 
           if (state is CommunityListError) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
+                padding: EdgeInsets.symmetric(horizontal: 28.rs(context)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
-                    const SizedBox(height: 12),
+                    Icon(
+                      Icons.error_outline,
+                      size: 48.rsp(context),
+                      color: Colors.red[400],
+                    ),
+                    SizedBox(height: 12.rsh(context)),
                     Text(
                       localizedCommunityMessage(context.l10n, state.message),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFB42318)),
+                      style: TextStyle(color: Color(0xFFB42318)),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.rsh(context)),
                     ElevatedButton(
                       onPressed: () {
                         context.read<CommunityListBloc>().add(
-                          const PendingCommunitiesFetched(),
+                          PendingCommunitiesFetched(),
                         );
                       },
                       child: Text(context.l10n.commonRetry),
@@ -122,7 +130,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
             );
           }
 
-          return const Center(child: Text(''));
+          return Center(child: Text(''));
         },
       ),
     );
@@ -132,7 +140,7 @@ class _PendingCommunitiesWidgetState extends State<PendingCommunitiesWidget> {
 class PendingCommunityItem extends StatelessWidget {
   final dynamic community;
 
-  const PendingCommunityItem({super.key, required this.community});
+  PendingCommunityItem({super.key, required this.community});
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +151,7 @@ class PendingCommunityItem extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
         onTap: () {
           Navigator.of(
             context,
@@ -152,7 +160,7 @@ class PendingCommunityItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.rsr(context)),
             border: Border.all(color: AppColors.divider, width: 1),
             boxShadow: [
               BoxShadow(
@@ -163,7 +171,12 @@ class PendingCommunityItem extends StatelessWidget {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            padding: EdgeInsets.fromLTRB(
+              12.rs(context),
+              12.rsh(context),
+              12.rs(context),
+              12.rsh(context),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -183,12 +196,12 @@ class PendingCommunityItem extends StatelessWidget {
                                   alpha: 0.08,
                                 ),
                                 blurRadius: 6,
-                                offset: const Offset(0, 2),
+                                offset: Offset(0, 2),
                               ),
                             ],
                           ),
                           child: CircleAvatar(
-                            radius: 28,
+                            radius: 28.rsr(context),
                             backgroundColor: AppColors.secondBackground,
                             backgroundImage:
                                 (avatarUrl != null && avatarUrl.isNotEmpty)
@@ -198,7 +211,7 @@ class PendingCommunityItem extends StatelessWidget {
                                 ? Icon(
                                     Icons.groups_rounded,
                                     color: AppColors.primary,
-                                    size: 28,
+                                    size: 28.rsp(context),
                                   )
                                 : null,
                           ),
@@ -208,25 +221,25 @@ class PendingCommunityItem extends StatelessWidget {
                           bottom: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.all(4),
+                            padding: EdgeInsets.all(4.rs(context)),
                             decoration: BoxDecoration(
                               color: Colors.orange,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.background,
-                                width: 1.5,
+                                width: 1.5.rs(context),
                               ),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.hourglass_bottom_outlined,
                               color: Colors.white,
-                              size: 12,
+                              size: 12.rsp(context),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.rs(context)),
                     // Community info
                     Expanded(
                       child: Column(
@@ -238,33 +251,35 @@ class PendingCommunityItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
-                              fontSize: 14,
+                              fontSize: 14.rsp(context),
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4.rsh(context)),
                           Text(
                             context.l10n.communityMembersCount(memberCount),
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.rsp(context),
                               color: AppColors.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6.rsh(context)),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.rs(context),
+                              vertical: 4.rsh(context),
                             ),
                             decoration: BoxDecoration(
                               color: Colors.orange[50],
                               border: Border.all(color: Colors.orange[200]!),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(
+                                4.rsr(context),
+                              ),
                             ),
                             child: Text(
                               context.l10n.communityPendingApproval,
-                              style: const TextStyle(
-                                fontSize: 11,
+                              style: TextStyle(
+                                fontSize: 11.rsp(context),
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFFF97316),
                               ),
@@ -277,20 +292,20 @@ class PendingCommunityItem extends StatelessWidget {
                 ),
                 // Description if available
                 if (description.isNotEmpty) ...[
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.rsh(context)),
                   Text(
                     description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.rsp(context),
                       color: AppColors.textSecondary,
-                      height: 1.4,
+                      height: 1.4.rsh(context),
                     ),
                   ),
                 ],
                 // Cancel request button
-                const SizedBox(height: 12),
+                SizedBox(height: 12.rsh(context)),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -298,9 +313,9 @@ class PendingCommunityItem extends StatelessWidget {
                       backgroundColor: AppColors.secondBackground,
                       foregroundColor: AppColors.textPrimary,
                       elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: EdgeInsets.symmetric(vertical: 8.rsh(context)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(6.rsr(context)),
                       ),
                     ),
                     onPressed: () {
@@ -308,8 +323,8 @@ class PendingCommunityItem extends StatelessWidget {
                     },
                     child: Text(
                       context.l10n.friendCancelRequest,
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: TextStyle(
+                        fontSize: 13.rsp(context),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -344,7 +359,7 @@ class PendingCommunityItem extends StatelessWidget {
             },
             child: Text(
               outerContext.l10n.commonCancel,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -359,14 +374,24 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        12.rsh(context),
+        16.rs(context),
+        24.rsh(context),
+      ),
       itemCount: 3,
       itemBuilder: (context, index) {
         return Container(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+          padding: EdgeInsets.fromLTRB(
+            12.rs(context),
+            12.rsh(context),
+            12.rs(context),
+            12.rsh(context),
+          ),
           decoration: BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.rsr(context)),
             border: Border.all(color: AppColors.divider, width: 1),
           ),
           child: Column(
@@ -375,27 +400,27 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 56,
-                    height: 56,
+                    width: 56.rs(context),
+                    height: 56.rsh(context),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.rs(context)),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: 150,
-                          height: 12,
+                          width: 150.rs(context),
+                          height: 12.rsh(context),
                           color: AppColors.textSecondary.withValues(alpha: 0.3),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.rsh(context)),
                         Container(
-                          width: 100,
-                          height: 10,
+                          width: 100.rs(context),
+                          height: 10.rsh(context),
                           color: AppColors.textSecondary.withValues(alpha: 0.2),
                         ),
                       ],
@@ -403,20 +428,20 @@ class _PendingCommunitiesSkeleton extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.rsh(context)),
               Container(
                 width: double.infinity,
-                height: 36,
+                height: 36.rsh(context),
                 decoration: BoxDecoration(
                   color: AppColors.textSecondary.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(6.rsr(context)),
                 ),
               ),
             ],
           ),
         );
       },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => SizedBox(height: 12.rsh(context)),
     );
   }
 }
@@ -440,7 +465,7 @@ class _AnimatedInState extends State<_AnimatedIn>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: Duration(milliseconds: 300),
       vsync: this,
     );
 
@@ -466,7 +491,7 @@ class _AnimatedInState extends State<_AnimatedIn>
       opacity: _animation,
       child: SlideTransition(
         position: Tween<Offset>(
-          begin: const Offset(0, 0.1),
+          begin: Offset(0, 0.1),
           end: Offset.zero,
         ).animate(_animation),
         child: widget.child,

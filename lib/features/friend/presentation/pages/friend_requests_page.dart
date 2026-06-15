@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_request_item.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/sent_friend_requests_page.dart';
@@ -17,6 +17,8 @@ class FriendRequestsPage extends StatefulWidget {
 }
 
 class _FriendRequestsPageState extends State<FriendRequestsPage> {
+  final GlobalKey _moreMenuKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -26,42 +28,53 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
-        ),
-        title: Text(
-          context.l10n.friendRequestsTitle,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+    return Container(
+      color: AppColors.background,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
           ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _showMoreOptions(context);
-            },
-            icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header section với số lượng lời mời
-            _buildHeaderSection(),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
+              ),
+              title: Text(
+                context.l10n.friendRequestsTitle,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  key: _moreMenuKey,
+                  onPressed: () {
+                    _showMoreOptions(context);
+                  },
+                  icon: Icon(Icons.more_vert, color: AppColors.textPrimary),
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // Header section với số lượng lời mời
+                  _buildHeaderSection(),
 
-            // Danh sách lời mời kết bạn
-            Expanded(child: _buildFriendRequestsList()),
-          ],
+                  // Danh sách lời mời kết bạn
+                  Expanded(child: _buildFriendRequestsList()),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -83,7 +96,10 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         }
 
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.rs(context),
+            vertical: 12.rsh(context),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -92,25 +108,25 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   Text(
                     context.l10n.friendRequestsTitle,
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 16.rsp(context),
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8.rs(context)),
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 2.h,
+                      horizontal: 8.rs(context),
+                      vertical: 2.rsh(context),
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red,
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(12.rsr(context)),
                     ),
                     child: Text(
                       '$requestCount',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12.rsp(context),
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -125,7 +141,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 child: Text(
                   context.l10n.friendSort,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                     fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
@@ -159,7 +175,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
             ),
           );
@@ -185,7 +201,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               duration: const Duration(seconds: 4),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
               action: SnackBarAction(
                 label: context.l10n.commonRetry,
@@ -236,9 +252,13 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 ); // Đảm bảo refresh indicator hiển thị
               },
               child: ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.rs(context),
+                  vertical: 8.rsh(context),
+                ),
                 itemCount: friendRequests.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                separatorBuilder: (context, index) =>
+                    SizedBox(height: 12.rsh(context)),
                 itemBuilder: (context, index) {
                   final request = friendRequests[index];
                   return _buildFriendRequestCard(
@@ -265,18 +285,18 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: 40.w,
-            height: 40.w,
+            width: 40.rs(context),
+            height: 40.rs(context),
             child: CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16.rsh(context)),
           Text(
             context.l10n.friendLoadingRequests,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14.rsp(context),
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -289,39 +309,49 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        padding: EdgeInsets.symmetric(horizontal: 32.rs(context)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
-            SizedBox(height: 16.h),
+            Icon(
+              Icons.error_outline,
+              size: 64.rsr(context),
+              color: Colors.red[300],
+            ),
+            SizedBox(height: 16.rsh(context)),
             Text(
               context.l10n.commonErrorOccurred,
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 18.rsp(context),
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8.rsh(context)),
             Text(
               localizedFriendActionMessage(context.l10n, message),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+              style: TextStyle(
+                fontSize: 14.rsp(context),
+                color: AppColors.textSecondary,
+              ),
             ),
-            SizedBox(height: 24.h),
+            SizedBox(height: 24.rsh(context)),
             ElevatedButton.icon(
               onPressed: () {
                 context.read<FriendBloc>().add(const LoadFriendPage());
               },
-              icon: const Icon(Icons.refresh, size: 18),
+              icon: Icon(Icons.refresh, size: 18.rsr(context)),
               label: Text(context.l10n.commonRetry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.background,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24.rs(context),
+                  vertical: 12.rsh(context),
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(8.rsr(context)),
                 ),
               ),
             ),
@@ -342,17 +372,16 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12.r,
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12.rsr(context),
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: FriendRequestItem(
-        // userId: request.senderId,
         userId: request.senderId,
         name: request.displayName,
         mutualFriends: request.displayMutualFriends,
@@ -389,38 +418,38 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           height: MediaQuery.of(context).size.height * 0.6,
           child: Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              padding: EdgeInsets.symmetric(horizontal: 32.rs(context)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 120.w,
-                    height: 120.w,
+                    width: 120.rs(context),
+                    height: 120.rs(context),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       CupertinoIcons.person_2,
-                      size: 64.r,
+                      size: 64.rsr(context),
                       color: AppColors.primary,
                     ),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 24.rsh(context)),
                   Text(
                     context.l10n.friendNoRequests,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18.rsp(context),
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     context.l10n.friendNoRequestsDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
                       color: AppColors.textSecondary,
                       height: 1.4,
                     ),
@@ -436,63 +465,157 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
 
   /// Hiển thị dialog sắp xếp
   void _showSortOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.r),
-            topRight: Radius.circular(20.r),
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: AppColors.background,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.rsr(context)),
+          ),
+          title: Center(
+            child: Text(
+              context.l10n.friendSortBy,
+              style: TextStyle(
+                fontSize: 18.rsp(context),
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          content: SizedBox(
+            width: 320.rs(context),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSortOption(
+                  context.l10n.friendSortNewest,
+                  'time',
+                  false,
+                  dialogContext,
+                ),
+                _buildSortOption(
+                  context.l10n.friendSortOldest,
+                  'time',
+                  true,
+                  dialogContext,
+                ),
+                _buildSortOption(
+                  context.l10n.friendSortNameAz,
+                  'name',
+                  true,
+                  dialogContext,
+                ),
+                _buildSortOption(
+                  context.l10n.friendSortNameZa,
+                  'name',
+                  false,
+                  dialogContext,
+                ),
+                _buildSortOption(
+                  context.l10n.friendSortMostMutual,
+                  'mutualFriends',
+                  false,
+                  dialogContext,
+                ),
+                _buildSortOption(
+                  context.l10n.friendSortLeastMutual,
+                  'mutualFriends',
+                  true,
+                  dialogContext,
+                ),
+              ],
+            ),
           ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40.w,
-              height: 4.h,
-              margin: EdgeInsets.symmetric(vertical: 12.h),
-              decoration: BoxDecoration(
-                color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2.r),
-              ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.rsr(context)),
+              topRight: Radius.circular(20.rsr(context)),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                context.l10n.friendSortBy,
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40.rs(context),
+                height: 4.rsh(context),
+                margin: EdgeInsets.symmetric(vertical: 12.rsh(context)),
+                decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(2.rsr(context)),
                 ),
               ),
-            ),
-            SizedBox(height: 16.h),
-            _buildSortOption(context.l10n.friendSortNewest, 'time', false),
-            _buildSortOption(context.l10n.friendSortOldest, 'time', true),
-            _buildSortOption(context.l10n.friendSortNameAz, 'name', true),
-            _buildSortOption(context.l10n.friendSortNameZa, 'name', false),
-            _buildSortOption(
-              context.l10n.friendSortMostMutual,
-              'mutualFriends',
-              false,
-            ),
-            _buildSortOption(
-              context.l10n.friendSortLeastMutual,
-              'mutualFriends',
-              true,
-            ),
-            SizedBox(height: 16.h),
-          ],
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                child: Text(
+                  context.l10n.friendSortBy,
+                  style: TextStyle(
+                    fontSize: 18.rsp(context),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.rsh(context)),
+              _buildSortOption(
+                context.l10n.friendSortNewest,
+                'time',
+                false,
+                context,
+              ),
+              _buildSortOption(
+                context.l10n.friendSortOldest,
+                'time',
+                true,
+                context,
+              ),
+              _buildSortOption(
+                context.l10n.friendSortNameAz,
+                'name',
+                true,
+                context,
+              ),
+              _buildSortOption(
+                context.l10n.friendSortNameZa,
+                'name',
+                false,
+                context,
+              ),
+              _buildSortOption(
+                context.l10n.friendSortMostMutual,
+                'mutualFriends',
+                false,
+                context,
+              ),
+              _buildSortOption(
+                context.l10n.friendSortLeastMutual,
+                'mutualFriends',
+                true,
+                context,
+              ),
+              SizedBox(height: 16.rsh(context)),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
-  Widget _buildSortOption(String title, String sortBy, bool ascending) {
+  Widget _buildSortOption(
+    String title,
+    String sortBy,
+    bool ascending,
+    BuildContext popContext,
+  ) {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
         bool isSelected = false;
@@ -506,27 +629,99 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           title: Text(
             title,
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               color: isSelected ? AppColors.primary : AppColors.textPrimary,
             ),
           ),
           trailing: isSelected
-              ? Icon(Icons.check, color: AppColors.primary, size: 20)
+              ? Icon(
+                  Icons.check,
+                  color: AppColors.primary,
+                  size: 20.rsr(context),
+                )
               : null,
           onTap: () {
             context.read<FriendBloc>().add(
               SortFriendRequests(sortBy: sortBy, ascending: ascending),
             );
-            Navigator.pop(context);
+            Navigator.pop(popContext);
           },
         );
       },
     );
   }
 
-  /// Hiển thị bottom modal với các tùy chọn
-  void _showMoreOptions(BuildContext context) {
+  /// Hiển thị bottom modal với các tùy chọn hoặc popup menu trên web
+  void _showMoreOptions(BuildContext context) async {
+    if (ResponsiveHelper.isWebOrDesktop) {
+      final renderBox =
+          _moreMenuKey.currentContext?.findRenderObject() as RenderBox?;
+      if (renderBox != null) {
+        final overlay =
+            Navigator.of(context).overlay!.context.findRenderObject()
+                as RenderBox;
+        final position = RelativeRect.fromRect(
+          Rect.fromPoints(
+            renderBox.localToGlobal(Offset.zero, ancestor: overlay),
+            renderBox.localToGlobal(
+              renderBox.size.bottomRight(Offset.zero),
+              ancestor: overlay,
+            ),
+          ),
+          Offset.zero & overlay.size,
+        );
+
+        final friendBloc = context.read<FriendBloc>();
+        final value = await showMenu<String>(
+          context: context,
+          position: position,
+          color: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.rsr(context)),
+          ),
+          items: [
+            PopupMenuItem(
+              value: 'sent_requests',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.send_outlined,
+                    color: AppColors.textPrimary,
+                    size: 18.rsr(context),
+                  ),
+                  SizedBox(width: 8.rs(context)),
+                  Text(
+                    context.l10n.friendViewSentRequests,
+                    style: TextStyle(
+                      fontSize: 14.rsp(context),
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+
+        if (!context.mounted) return;
+
+        if (value == 'sent_requests') {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SentFriendRequestsPage(),
+            ),
+          );
+          // Reload lại friend requests khi quay về
+          if (result == true && mounted) {
+            friendBloc.add(const LoadFriendPage());
+          }
+        }
+        return;
+      }
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -534,8 +729,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.r),
-            topRight: Radius.circular(20.r),
+            topLeft: Radius.circular(20.rsr(context)),
+            topRight: Radius.circular(20.rsr(context)),
           ),
         ),
         child: Column(
@@ -543,12 +738,12 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
           children: [
             // Handle bar
             Container(
-              width: 40.w,
-              height: 4.h,
-              margin: EdgeInsets.symmetric(vertical: 12.h),
+              width: 40.rs(context),
+              height: 4.rsh(context),
+              margin: EdgeInsets.symmetric(vertical: 12.rsh(context)),
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2.r),
+                borderRadius: BorderRadius.circular(2.rsr(context)),
               ),
             ),
 
@@ -557,17 +752,18 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
               leading: Icon(
                 Icons.send_outlined,
                 color: AppColors.textPrimary,
-                size: 24.r,
+                size: 24.rsr(context),
               ),
               title: Text(
                 context.l10n.friendViewSentRequests,
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16.rsp(context),
                   fontWeight: FontWeight.w500,
                   color: AppColors.textPrimary,
                 ),
               ),
               onTap: () async {
+                final friendBloc = context.read<FriendBloc>();
                 Navigator.pop(context);
                 final result = await Navigator.push(
                   context,
@@ -577,12 +773,12 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                 );
                 // Reload lại friend requests khi quay về
                 if (result == true && mounted) {
-                  context.read<FriendBloc>().add(const LoadFriendPage());
+                  friendBloc.add(const LoadFriendPage());
                 }
               },
             ),
 
-            SizedBox(height: 16.h),
+            SizedBox(height: 16.rsh(context)),
           ],
         ),
       ),

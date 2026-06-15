@@ -1,36 +1,36 @@
 part of 'invite_friends_bloc.dart';
 
 abstract class InviteFriendsState {
-  const InviteFriendsState();
+  InviteFriendsState();
 }
 
 class InviteFriendsInitial extends InviteFriendsState {
-  const InviteFriendsInitial();
+  InviteFriendsInitial();
 }
 
 class InviteFriendsLoading extends InviteFriendsState {
-  const InviteFriendsLoading();
+  InviteFriendsLoading();
 }
 
 class InviteFriendsLoaded extends InviteFriendsState {
   final List<dynamic> friends;
 
-  const InviteFriendsLoaded({required this.friends});
+  InviteFriendsLoaded({required this.friends});
 }
 
 class InviteFriendsInviting extends InviteFriendsState {
-  const InviteFriendsInviting();
+  InviteFriendsInviting();
 }
 
 class InviteFriendsSuccess extends InviteFriendsState {
   final String message;
   final List<dynamic> friends;
 
-  const InviteFriendsSuccess({required this.message, required this.friends});
+  InviteFriendsSuccess({required this.message, required this.friends});
 }
 
 class InviteFriendsError extends InviteFriendsState {
   final String message;
 
-  const InviteFriendsError({required this.message});
+  InviteFriendsError({required this.message});
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/post/domain/entities/react_post_entity.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/react_widgets/react_item_widget.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
@@ -24,7 +24,10 @@ class ReactListWidget extends StatelessWidget {
       return Center(
         child: Text(
           context.l10n.postNoReactions,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
         ),
       );
     }
@@ -63,7 +66,10 @@ class ReactListWidget extends StatelessWidget {
         }
 
         return ListView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.rs(context),
+            vertical: 8.rsh(context),
+          ),
           itemCount: reacts.length,
           itemBuilder: (context, index) {
             final react = reacts[index];

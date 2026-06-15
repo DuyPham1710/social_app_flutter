@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -59,101 +59,121 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         final currentThemeMode = prefs.themeMode;
         final l10n = context.l10n;
 
-        return Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.background,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: AppColors.iconPrimary,
-                size: 20.sp,
+        return Container(
+          color: AppColors.background,
+
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveHelper.feedMaxWidth,
               ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              l10n.menuAppearance,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
 
-          body: SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle(l10n.appearanceDisplayModeSection),
-                  SizedBox(height: 12.h),
-                  Row(
-                    children: [
-                      // Light mode option
-                      Expanded(
-                        child: _buildThemeOptionCard(
-                          title: l10n.appearanceLightMode,
-                          isSelected: currentThemeMode == ThemeMode.light,
-                          onTap: () => prefs.setThemeMode(ThemeMode.light),
-                          previewWidget: _buildLightCardPreview(),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      // Dark mode option
-                      Expanded(
-                        child: _buildThemeOptionCard(
-                          title: l10n.appearanceDarkMode,
-                          isSelected: currentThemeMode == ThemeMode.dark,
-                          onTap: () => prefs.setThemeMode(ThemeMode.dark),
-                          previewWidget: _buildDarkCardPreview(),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      // Auto/System mode option
-                      Expanded(
-                        child: _buildThemeOptionCard(
-                          title: l10n.appearanceAutoMode,
-                          isSelected: currentThemeMode == ThemeMode.system,
-                          onTap: () => prefs.setThemeMode(ThemeMode.system),
-                          previewWidget: _buildAutoCardPreview(),
-                        ),
-                      ),
-                    ],
+              child: Scaffold(
+                backgroundColor: AppColors.background,
+                appBar: AppBar(
+                  backgroundColor: AppColors.background,
+                  elevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  centerTitle: true,
+                  leading: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.iconPrimary,
+                      size: 20.rsp(context),
+                    ),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                  SizedBox(height: 28.h),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildSectionTitle(l10n.appearanceAccentColorSection),
-                      Text(
-                        _accentName(l10n, _selectedAccentKey),
-                        style: TextStyle(
-                          color: _selectedAccentColor,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  title: Text(
+                    l10n.menuAppearance,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 18.rsp(context),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  SizedBox(height: 12.h),
-                  _buildAccentColorPicker(isDark),
-                  SizedBox(height: 28.h),
+                ),
 
-                  _buildSectionTitle(l10n.appearanceTextSizeSection),
-                  SizedBox(height: 12.h),
-                  _buildTextSizeCard(isDark),
-                  SizedBox(height: 28.h),
+                body: SafeArea(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.rs(context),
+                      vertical: 16.rsh(context),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle(l10n.appearanceDisplayModeSection),
+                        SizedBox(height: 12.rsh(context)),
+                        Row(
+                          children: [
+                            // Light mode option
+                            Expanded(
+                              child: _buildThemeOptionCard(
+                                title: l10n.appearanceLightMode,
+                                isSelected: currentThemeMode == ThemeMode.light,
+                                onTap: () =>
+                                    prefs.setThemeMode(ThemeMode.light),
+                                previewWidget: _buildLightCardPreview(),
+                              ),
+                            ),
+                            SizedBox(width: 12.rs(context)),
+                            // Dark mode option
+                            Expanded(
+                              child: _buildThemeOptionCard(
+                                title: l10n.appearanceDarkMode,
+                                isSelected: currentThemeMode == ThemeMode.dark,
+                                onTap: () => prefs.setThemeMode(ThemeMode.dark),
+                                previewWidget: _buildDarkCardPreview(),
+                              ),
+                            ),
+                            SizedBox(width: 12.rs(context)),
+                            // Auto/System mode option
+                            Expanded(
+                              child: _buildThemeOptionCard(
+                                title: l10n.appearanceAutoMode,
+                                isSelected:
+                                    currentThemeMode == ThemeMode.system,
+                                onTap: () =>
+                                    prefs.setThemeMode(ThemeMode.system),
+                                previewWidget: _buildAutoCardPreview(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 28.rsh(context)),
 
-                  _buildAccessibilityCard(isDark),
-                  SizedBox(height: 24.h),
-                ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildSectionTitle(
+                              l10n.appearanceAccentColorSection,
+                            ),
+                            Text(
+                              _accentName(l10n, _selectedAccentKey),
+                              style: TextStyle(
+                                color: _selectedAccentColor,
+                                fontSize: 14.rsp(context),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.rsh(context)),
+                        _buildAccentColorPicker(isDark),
+                        SizedBox(height: 28.rsh(context)),
+
+                        _buildSectionTitle(l10n.appearanceTextSizeSection),
+                        SizedBox(height: 12.rsh(context)),
+                        _buildTextSizeCard(isDark),
+                        SizedBox(height: 28.rsh(context)),
+
+                        _buildAccessibilityCard(isDark),
+                        SizedBox(height: 24.rsh(context)),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -166,7 +186,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 11.sp,
+        fontSize: 11.rsp(context),
         fontWeight: FontWeight.bold,
         color: AppColors.textSecondary,
         letterSpacing: 1.2,
@@ -187,24 +207,24 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             width: double.infinity,
-            height: 120.h,
+            height: 120.rsh(context),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
               border: Border.all(
                 color: isSelected
                     ? _selectedAccentColor
                     : Colors.black.withOpacity(0.08),
-                width: isSelected ? 2.w : 1.w,
+                width: isSelected ? 2.rs(context) : 1.rs(context),
               ),
             ),
             child: previewWidget,
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 8.rsh(context)),
           Text(
             title,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 12.sp,
+              fontSize: 12.rsp(context),
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -217,39 +237,39 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(10.rsr(context)),
       ),
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(8.rs(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 12.h,
-            width: 35.w,
+            height: 12.rsh(context),
+            width: 35.rs(context),
             decoration: BoxDecoration(
               color: const Color(0xFFE1E3E4),
-              borderRadius: BorderRadius.circular(6.r),
+              borderRadius: BorderRadius.circular(6.rsr(context)),
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 6.rsh(context)),
           Container(
-            height: 8.h,
-            width: 20.w,
+            height: 8.rsh(context),
+            width: 20.rs(context),
             decoration: BoxDecoration(
               color: const Color(0xFFEDEEEF),
-              borderRadius: BorderRadius.circular(4.r),
+              borderRadius: BorderRadius.circular(4.rsr(context)),
             ),
           ),
           const Spacer(),
           Container(
-            height: 24.h,
+            height: 24.rsh(context),
             width: double.infinity,
             decoration: BoxDecoration(
               color: _selectedAccentColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(6.r),
+              borderRadius: BorderRadius.circular(6.rsr(context)),
               border: Border.all(
                 color: _selectedAccentColor.withOpacity(0.3),
-                width: 1.w,
+                width: 1.rs(context),
               ),
             ),
           ),
@@ -262,40 +282,40 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF2E3132),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(10.rsr(context)),
       ),
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(8.rs(context)),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 12.h,
-            width: 35.w,
+            height: 12.rsh(context),
+            width: 35.rs(context),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(6.r),
+              borderRadius: BorderRadius.circular(6.rsr(context)),
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 6.rsh(context)),
           Container(
-            height: 8.h,
-            width: 20.w,
+            height: 8.rsh(context),
+            width: 20.rs(context),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(4.r),
+              borderRadius: BorderRadius.circular(4.rsr(context)),
             ),
           ),
           const Spacer(),
           Container(
-            height: 24.h,
+            height: 24.rsh(context),
             width: double.infinity,
             decoration: BoxDecoration(
               color: _selectedAccentColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(6.r),
+              borderRadius: BorderRadius.circular(6.rsr(context)),
               border: Border.all(
                 color: _selectedAccentColor.withOpacity(0.3),
-                width: 1.w,
+                width: 1.rs(context),
               ),
             ),
           ),
@@ -306,32 +326,32 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   Widget _buildAutoCardPreview() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(10.rsr(context)),
       child: Row(
         children: [
           // Left side: light half
           Expanded(
             child: Container(
               color: Colors.white,
-              padding: EdgeInsets.all(8.w),
+              padding: EdgeInsets.all(8.rs(context)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: 12.h,
+                    height: 12.rsh(context),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: const Color(0xFFE1E3E4),
-                      borderRadius: BorderRadius.circular(6.r),
+                      borderRadius: BorderRadius.circular(6.rsr(context)),
                     ),
                   ),
                   const Spacer(),
                   Container(
-                    height: 24.h,
+                    height: 24.rsh(context),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: _selectedAccentColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6.r),
+                      borderRadius: BorderRadius.circular(6.rsr(context)),
                     ),
                   ),
                 ],
@@ -342,25 +362,25 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           Expanded(
             child: Container(
               color: const Color(0xFF2E3132),
-              padding: EdgeInsets.all(8.w),
+              padding: EdgeInsets.all(8.rs(context)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: 12.h,
+                    height: 12.rsh(context),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6.r),
+                      borderRadius: BorderRadius.circular(6.rsr(context)),
                     ),
                   ),
                   const Spacer(),
                   Container(
-                    height: 24.h,
+                    height: 24.rsh(context),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: _selectedAccentColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6.r),
+                      borderRadius: BorderRadius.circular(6.rsr(context)),
                     ),
                   ),
                 ],
@@ -375,16 +395,16 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget _buildAccentColorPicker(bool isDark) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(12.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.divider, width: 1.w),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
+        border: Border.all(color: AppColors.divider, width: 1.rs(context)),
       ),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
-        spacing: 8.w,
-        runSpacing: 8.h,
+        spacing: 8.rs(context),
+        runSpacing: 8.rsh(context),
         children:
             _accentColors.map((swatch) {
               final color = swatch['color'] as Color;
@@ -401,8 +421,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  width: 36.w,
-                  height: 36.w,
+                  width: 36.rs(context),
+                  height: 36.rs(context),
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
@@ -410,7 +430,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                       color: isSelected
                           ? (isDark ? Colors.white : Colors.black)
                           : Colors.transparent,
-                      width: isSelected ? 2.w : 0.w,
+                      width: isSelected ? 2.rs(context) : 0.rs(context),
                     ),
                     boxShadow: isSelected
                         ? [
@@ -429,16 +449,19 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 onTap: () => _showColorPicker(context),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  width: 36.w,
-                  height: 36.w,
+                  width: 36.rs(context),
+                  height: 36.rs(context),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.divider, width: 1.w),
+                    border: Border.all(
+                      color: AppColors.divider,
+                      width: 1.rs(context),
+                    ),
                     color: AppColors.secondBackground,
                   ),
                   child: Icon(
                     Icons.color_lens_outlined,
-                    size: 20.sp,
+                    size: 20.rsp(context),
                     color: AppColors.iconPrimary,
                   ),
                 ),
@@ -459,7 +482,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             context.l10n.appearanceChooseAccentColor,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -511,11 +534,11 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget _buildTextSizeCard(bool isDark) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(16.rs(context)),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.divider, width: 1.w),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
+        border: Border.all(color: AppColors.divider, width: 1.rs(context)),
       ),
       child: Column(
         children: [
@@ -525,13 +548,16 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             children: [
               Text(
                 'A',
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 12.sp),
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 12.rsp(context),
+                ),
               ),
               Text(
                 'A',
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 16.sp,
+                  fontSize: 16.rsp(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -539,13 +565,13 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 'A',
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 20.sp,
+                  fontSize: 20.rsp(context),
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 12.rsh(context)),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: _selectedAccentColor,
@@ -554,8 +580,10 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   : const Color(0xFFEDEEEF),
               thumbColor: _selectedAccentColor,
               overlayColor: _selectedAccentColor.withOpacity(0.12),
-              trackHeight: 6.h,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.r),
+              trackHeight: 6.rsh(context),
+              thumbShape: RoundSliderThumbShape(
+                enabledThumbRadius: 10.rsr(context),
+              ),
             ),
             child: Slider(
               value: _textSizeSliderValue,
@@ -569,7 +597,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               },
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 8.rsh(context)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -577,21 +605,21 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 context.l10n.appearanceSmallText,
                 style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 11.sp,
+                  fontSize: 11.rsp(context),
                 ),
               ),
               Text(
                 context.l10n.appearanceNormalText,
                 style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 11.sp,
+                  fontSize: 11.rsp(context),
                 ),
               ),
               Text(
                 context.l10n.appearanceLargeText,
                 style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 11.sp,
+                  fontSize: 11.rsp(context),
                 ),
               ),
             ],
@@ -606,14 +634,17 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.divider, width: 1.w),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
+        border: Border.all(color: AppColors.divider, width: 1.rs(context)),
       ),
       child: Column(
         children: [
           // Contrast toggle
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.rs(context),
+              vertical: 12.rsh(context),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -621,7 +652,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   context.l10n.appearanceHighContrast,
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                   ),
                 ),
                 Switch(
@@ -632,7 +663,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   inactiveTrackColor: isDark
                       ? const Color(0xFF333333)
                       : const Color(0xFFE0E0E0),
-                  trackOutlineColor: MaterialStateProperty.all(
+                  trackOutlineColor: WidgetStateProperty.all(
                     Colors.transparent,
                   ),
                   onChanged: (value) {
@@ -644,10 +675,17 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               ],
             ),
           ),
-          Divider(color: AppColors.divider, height: 1.h, thickness: 1.h),
+          Divider(
+            color: AppColors.divider,
+            height: 1.rsh(context),
+            thickness: 1.rsh(context),
+          ),
           // Reduce motion toggle
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.rs(context),
+              vertical: 12.rsh(context),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -655,7 +693,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   context.l10n.appearanceReduceMotion,
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                   ),
                 ),
                 Switch(
@@ -666,7 +704,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   inactiveTrackColor: isDark
                       ? const Color(0xFF333333)
                       : const Color(0xFFE0E0E0),
-                  trackOutlineColor: MaterialStateProperty.all(
+                  trackOutlineColor: WidgetStateProperty.all(
                     Colors.transparent,
                   ),
                   onChanged: (value) {

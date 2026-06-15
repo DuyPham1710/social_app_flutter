@@ -1,15 +1,15 @@
 part of 'community_list_bloc.dart';
 
 abstract class CommunityListState {
-  const CommunityListState();
+  CommunityListState();
 }
 
 class CommunityListInitial extends CommunityListState {
-  const CommunityListInitial();
+  CommunityListInitial();
 }
 
 class CommunityListLoading extends CommunityListState {
-  const CommunityListLoading();
+  CommunityListLoading();
 }
 
 class CommunityListLoaded extends CommunityListState {
@@ -20,7 +20,7 @@ class CommunityListLoaded extends CommunityListState {
   final bool hasNext;
   final String? searchQuery;
 
-  const CommunityListLoaded({
+  CommunityListLoaded({
     required this.communities,
     required this.page,
     required this.limit,
@@ -33,29 +33,29 @@ class CommunityListLoaded extends CommunityListState {
 class MyCommunitiesLoaded extends CommunityListState {
   final List<CommunityModel> communities;
 
-  const MyCommunitiesLoaded(this.communities);
+  MyCommunitiesLoaded(this.communities);
 }
 
 class MyInvitesLoaded extends CommunityListState {
   final List<CommunityInviteModel> invites;
 
-  const MyInvitesLoaded(this.invites);
+  MyInvitesLoaded(this.invites);
 }
 
 class PendingCommunitiesLoaded extends CommunityListState {
   final List<CommunityModel> communities;
 
-  const PendingCommunitiesLoaded(this.communities);
+  PendingCommunitiesLoaded(this.communities);
 }
 
 class CommunityListActionSuccess extends CommunityListState {
   final String message;
 
-  const CommunityListActionSuccess(this.message);
+  CommunityListActionSuccess(this.message);
 }
 
 class CommunityListError extends CommunityListState {
   final String message;
 
-  const CommunityListError(this.message);
+  CommunityListError(this.message);
 }

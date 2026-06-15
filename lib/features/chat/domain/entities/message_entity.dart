@@ -54,6 +54,11 @@ class MessageEntity extends Equatable {
   final StoryReplyEntity? story;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final String? translatedText;
+  final String? sourceLang;
+  final String? targetLang;
+  final bool? translationNotNeeded;
+  final bool? showTranslation;
 
   const MessageEntity({
     required this.id,
@@ -71,6 +76,11 @@ class MessageEntity extends Equatable {
     this.story,
     required this.createdAt,
     this.updatedAt,
+    this.translatedText,
+    this.sourceLang,
+    this.targetLang,
+    this.translationNotNeeded,
+    this.showTranslation = false,
   });
 
   @override
@@ -90,6 +100,11 @@ class MessageEntity extends Equatable {
     story,
     createdAt,
     updatedAt,
+    translatedText,
+    sourceLang,
+    targetLang,
+    translationNotNeeded,
+    showTranslation,
   ];
 
   // generate copyWith
@@ -109,6 +124,11 @@ class MessageEntity extends Equatable {
     StoryReplyEntity? story,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? translatedText,
+    String? sourceLang,
+    String? targetLang,
+    bool? translationNotNeeded,
+    bool? showTranslation,
   }) {
     return MessageEntity(
       id: id ?? this.id,
@@ -126,6 +146,11 @@ class MessageEntity extends Equatable {
       story: story ?? this.story,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      translatedText: translatedText ?? this.translatedText,
+      sourceLang: sourceLang ?? this.sourceLang,
+      targetLang: targetLang ?? this.targetLang,
+      translationNotNeeded: translationNotNeeded ?? this.translationNotNeeded,
+      showTranslation: showTranslation ?? this.showTranslation,
     );
   }
 }

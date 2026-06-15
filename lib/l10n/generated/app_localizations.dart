@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'commonhub'**
   String get appTitle;
 
+  /// No description provided for @navHome.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trang chủ'**
+  String get navHome;
+
   /// No description provided for @commonCancel.
   ///
   /// In vi, this message translates to:
@@ -1583,6 +1589,42 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đang xóa dữ liệu khuôn mặt...'**
   String get profileDeletingFaceData;
+
+  /// No description provided for @profileReportUser.
+  ///
+  /// In vi, this message translates to:
+  /// **'Báo cáo người dùng'**
+  String get profileReportUser;
+
+  /// No description provided for @profileReportUserIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hãy chọn lý do phù hợp để chúng tôi xem xét tài khoản này.'**
+  String get profileReportUserIntro;
+
+  /// No description provided for @profileReportUserSelfNotAllowed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn không thể báo cáo trang cá nhân của chính mình'**
+  String get profileReportUserSelfNotAllowed;
+
+  /// No description provided for @profileReportUserSuccess.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi báo cáo người dùng'**
+  String get profileReportUserSuccess;
+
+  /// No description provided for @profileReportUserFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể gửi báo cáo người dùng'**
+  String get profileReportUserFailed;
+
+  /// No description provided for @profileReportReasonFakeAccount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản giả mạo'**
+  String get profileReportReasonFakeAccount;
 
   /// No description provided for @appearanceDisplayModeSection.
   ///
@@ -5759,6 +5801,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Buồn'**
   String get reactionSad;
+
+  /// No description provided for @storyAddMediaFromComputer.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm ảnh/video từ máy tính'**
+  String get storyAddMediaFromComputer;
+
+  /// No description provided for @storySelectFile.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn tệp'**
+  String get storySelectFile;
+
+  /// No description provided for @storyWebImageEditNotSupported.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉnh sửa ảnh chưa hỗ trợ lưu trên nền tảng Web'**
+  String get storyWebImageEditNotSupported;
+
+  /// No description provided for @commonImageOnlySupport.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ hỗ trợ file ảnh'**
+  String get commonImageOnlySupport;
 
   /// No description provided for @reactionAngry.
   ///

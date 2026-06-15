@@ -72,6 +72,29 @@ class _UserRemoteDataSource implements UserRemoteDataSource {
   }
 
   @override
+  Future<void> reportUser(
+    String id,
+    Map<String, dynamic> body,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/user/${id}/report',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
   Future<UserModel> updateUserProfile({
     String? fullName,
     String? phoneNumber,
@@ -83,8 +106,8 @@ class _UserRemoteDataSource implements UserRemoteDataSource {
     String? hometown,
     String? workplace,
     String? relationshipStatus,
-    File? avatarFile,
-    File? coverFile,
+    List<MultipartFile>? avatarFile,
+    List<MultipartFile>? coverFile,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -122,30 +145,10 @@ class _UserRemoteDataSource implements UserRemoteDataSource {
       _data.fields.add(MapEntry('relationshipStatus', relationshipStatus));
     }
     if (avatarFile != null) {
-      if (avatarFile != null) {
-        _data.files.add(
-          MapEntry(
-            'file',
-            MultipartFile.fromFileSync(
-              avatarFile.path,
-              filename: avatarFile.path.split(Platform.pathSeparator).last,
-            ),
-          ),
-        );
-      }
+      _data.files.addAll(avatarFile.map((i) => MapEntry('file', i)));
     }
     if (coverFile != null) {
-      if (coverFile != null) {
-        _data.files.add(
-          MapEntry(
-            'cover',
-            MultipartFile.fromFileSync(
-              coverFile.path,
-              filename: coverFile.path.split(Platform.pathSeparator).last,
-            ),
-          ),
-        );
-      }
+      _data.files.addAll(coverFile.map((i) => MapEntry('cover', i)));
     }
     final _options = _setStreamType<UserModel>(
       Options(

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -38,106 +38,116 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header với back button, title và "Xóa tất cả"
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-              child: Row(
-                children: [
-                  // Back button
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      CupertinoIcons.back,
-                      color: AppColors.iconPrimary,
-                      size: 23.r,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Header với back button, title và "Xóa tất cả"
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.rs(context),
+                    vertical: 8.rsh(context),
                   ),
-                  SizedBox(width: 8.w),
-                  // Title
-                  Expanded(
-                    child: Text(
-                      context.l10n.searchHistory,
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                  child: Row(
+                    children: [
+                      // Back button
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(
+                          CupertinoIcons.back,
+                          color: AppColors.iconPrimary,
+                          size: 23.rsr(context),
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
-                    ),
-                  ),
-                  // Xóa tất cả button
-                  BlocBuilder<SearchBloc, SearchState>(
-                    builder: (context, state) {
-                      final hasHistory =
-                          state is SearchInitial &&
-                          state.history != null &&
-                          state.history!.isNotEmpty;
-
-                      if (!hasHistory) {
-                        return const SizedBox.shrink();
-                      }
-
-                      // Lưu SearchBloc từ context cha
-                      final searchBloc = context.read<SearchBloc>();
-
-                      return TextButton(
-                        onPressed: () {
-                          _showClearAllDialog(context, searchBloc);
-                        },
+                      SizedBox(width: 8.rs(context)),
+                      // Title
+                      Expanded(
                         child: Text(
-                          context.l10n.searchClearAll,
+                          context.l10n.searchHistory,
                           style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 20.rsp(context),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            // Danh sách lịch sử
-            Expanded(
-              child: BlocBuilder<SearchBloc, SearchState>(
-                builder: (context, state) {
-                  if (state is SearchInitial) {
-                    if (state.history != null && state.history!.isNotEmpty) {
-                      return RefreshIndicator(
-                        onRefresh: () async {
-                          context.read<SearchBloc>().add(
-                            const LoadSearchHistory(limit: 100),
+                      ),
+                      // Xóa tất cả button
+                      BlocBuilder<SearchBloc, SearchState>(
+                        builder: (context, state) {
+                          final hasHistory =
+                              state is SearchInitial &&
+                              state.history != null &&
+                              state.history!.isNotEmpty;
+
+                          if (!hasHistory) {
+                            return const SizedBox.shrink();
+                          }
+
+                          // Lưu SearchBloc từ context cha
+                          final searchBloc = context.read<SearchBloc>();
+
+                          return TextButton(
+                            onPressed: () {
+                              _showClearAllDialog(context, searchBloc);
+                            },
+                            child: Text(
+                              context.l10n.searchClearAll,
+                              style: TextStyle(
+                                fontSize: 14.rsp(context),
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           );
                         },
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: state.history!.length,
-                          itemBuilder: (context, index) {
-                            final historyItem = state.history![index];
-                            return SearchHistoryItem(
-                              history: historyItem,
-                              showDeleteIcon: true,
-                            );
-                          },
-                        ),
-                      );
-                    } else {
-                      return _buildEmptyState();
-                    }
-                  } else if (state is SearchLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else {
-                    return _buildEmptyState();
-                  }
-                },
-              ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Danh sách lịch sử
+                Expanded(
+                  child: BlocBuilder<SearchBloc, SearchState>(
+                    builder: (context, state) {
+                      if (state is SearchInitial) {
+                        if (state.history != null && state.history!.isNotEmpty) {
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              context.read<SearchBloc>().add(
+                                const LoadSearchHistory(limit: 100),
+                              );
+                            },
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: state.history!.length,
+                              itemBuilder: (context, index) {
+                                final historyItem = state.history![index];
+                                return SearchHistoryItem(
+                                  history: historyItem,
+                                  showDeleteIcon: true,
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return _buildEmptyState();
+                        }
+                      } else if (state is SearchLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return _buildEmptyState();
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -150,14 +160,14 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
         children: [
           Icon(
             CupertinoIcons.search,
-            size: 64.r,
+            size: 64.rsr(context),
             color: AppColors.textSecondary,
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16.rsh(context)),
           Text(
             context.l10n.searchNoHistory,
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -175,21 +185,21 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
         title: Text(
           context.l10n.searchClearAllHistoryTitle,
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: 18.rsp(context),
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
         content: Text(
           context.l10n.searchClearAllHistoryConfirmShort,
-          style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 14.rsp(context), color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               context.l10n.commonCancel,
-              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 14.rsp(context), color: AppColors.textSecondary),
             ),
           ),
           TextButton(
@@ -201,7 +211,7 @@ class _SearchHistoryPageContentState extends State<_SearchHistoryPageContent> {
             child: Text(
               context.l10n.commonDelete,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14.rsp(context),
                 color: Colors.red,
                 fontWeight: FontWeight.w600,
               ),

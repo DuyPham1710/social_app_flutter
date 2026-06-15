@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -206,18 +206,18 @@ class _PrivacyPageState extends State<PrivacyPage> {
       padding: EdgeInsets.all(16),
       children: [
         _buildDescription(state),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         _buildOptionsList(state),
         // Chỉ hiển thị toggle "Đặt làm mặc định" khi không phải edit post
         if (widget.postId == null && state != null) ...[
-          SizedBox(height: 12.h),
+          SizedBox(height: 12.rsh(context)),
           _buildDefaultToggle(state),
         ],
         if (_isUpdatingPost) ...[
-          SizedBox(height: 12.h),
+          SizedBox(height: 12.rsh(context)),
           Center(
             child: Padding(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.all(16.rs(context)),
               child: const CircularProgressIndicator(),
             ),
           ),
@@ -232,99 +232,110 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: AppColors.background,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: AppColors.background,
-        border: Border(
-          bottom: BorderSide(color: AppColors.divider, width: 0.5),
-        ),
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Icon(
-            CupertinoIcons.chevron_back,
-            color: AppColors.textSecondary,
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
           ),
-        ),
+          child: CupertinoPageScaffold(
+            backgroundColor: AppColors.background,
+            navigationBar: CupertinoNavigationBar(
+              backgroundColor: AppColors.background,
+              border: Border(
+                bottom: BorderSide(color: AppColors.divider, width: 0.5),
+              ),
+              leading: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Icon(
+                  CupertinoIcons.chevron_back,
+                  color: AppColors.textSecondary,
+                ),
+              ),
 
-        middle: Text(
-          context.l10n.privacyPostQuestion,
-          style: TextStyle(color: AppColors.textPrimary),
-        ),
+              middle: Text(
+                context.l10n.privacyPostQuestion,
+                style: TextStyle(color: AppColors.textPrimary),
+              ),
 
-        trailing: GestureDetector(
-          onTap: () async {
-            // Nếu có postId, cập nhật privacy của post
-            if (widget.postId != null && !shouldUpdateDefault) {
-              await _updatePostPrivacy();
-              return;
-            }
+              trailing: GestureDetector(
+                onTap: () async {
+                  // Nếu có postId, cập nhật privacy của post
+                  if (widget.postId != null && !shouldUpdateDefault) {
+                    await _updatePostPrivacy();
+                    return;
+                  }
 
-            // Nếu cần update default privacy, gọi API trước khi close
-            if (shouldUpdateDefault) {
-              _updateDefaultPrivacy();
-            } else {
-              // Nếu có PrivacyBloc trong context (khi tạo post mới), update state
-              try {
-                context.read<PrivacyBloc>().add(
-                  PrivacySelectionChanged(selectedPrivacy: selected),
-                );
-              } catch (_) {
-                // PrivacyBloc không có trong context (khi edit post), bỏ qua
-              }
-              // Return cả label và danh sách bạn bè
-              Navigator.pop(context, {
-                'label': selected,
-                'friendsExcept': _friendsExceptIds,
-                'friendsDetail': _friendsDetailIds,
-              });
-            }
-          },
-          child: Text(
-            context.l10n.commonDone,
-            style: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-
-      child: SafeArea(
-        child: Material(
-          color: AppColors.background,
-          child: widget.postId != null
-              ? _buildContentWithoutBloc()
-              : BlocListener<PrivacyBloc, PrivacyState>(
-                  listener: (context, state) {
-                    if (state is PrivacyUpdated) {
-                      showSuccessSnackBar(context, state.message);
-                      // Sau khi update thành công, close page với Map format
-                      Navigator.pop(context, {
-                        'label': selected,
-                        'friendsExcept': _friendsExceptIds,
-                        'friendsDetail': _friendsDetailIds,
-                      });
-                    } else if (state is PrivacyError) {
-                      showErrorSnackBar(context, state.message);
+                  // Nếu cần update default privacy, gọi API trước khi close
+                  if (shouldUpdateDefault) {
+                    _updateDefaultPrivacy();
+                  } else {
+                    // Nếu có PrivacyBloc trong context (khi tạo post mới), update state
+                    try {
+                      context.read<PrivacyBloc>().add(
+                        PrivacySelectionChanged(selectedPrivacy: selected),
+                      );
+                    } catch (_) {
+                      // PrivacyBloc không có trong context (khi edit post), bỏ qua
                     }
-                  },
-                  child: BlocBuilder<PrivacyBloc, PrivacyState>(
-                    builder: (context, state) {
-                      // Load initial friends on first build (chỉ khi không có postId)
-                      if (widget.postId == null &&
-                          state is PrivacyLoaded &&
-                          _friendsExceptIds.isEmpty &&
-                          _friendsDetailIds.isEmpty) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _loadInitialFriends();
-                        });
-                      }
-
-                      return _buildContent(state);
-                    },
+                    // Return cả label và danh sách bạn bè
+                    Navigator.pop(context, {
+                      'label': selected,
+                      'friendsExcept': _friendsExceptIds,
+                      'friendsDetail': _friendsDetailIds,
+                    });
+                  }
+                },
+                child: Text(
+                  context.l10n.commonDone,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+              ),
+            ),
+
+            child: SafeArea(
+              child: Material(
+                color: AppColors.background,
+                child: widget.postId != null
+                    ? _buildContentWithoutBloc()
+                    : BlocListener<PrivacyBloc, PrivacyState>(
+                        listener: (context, state) {
+                          if (state is PrivacyUpdated) {
+                            showSuccessSnackBar(context, state.message);
+                            // Sau khi update thành công, close page với Map format
+                            Navigator.pop(context, {
+                              'label': selected,
+                              'friendsExcept': _friendsExceptIds,
+                              'friendsDetail': _friendsDetailIds,
+                            });
+                          } else if (state is PrivacyError) {
+                            showErrorSnackBar(context, state.message);
+                          }
+                        },
+                        child: BlocBuilder<PrivacyBloc, PrivacyState>(
+                          builder: (context, state) {
+                            // Load initial friends on first build (chỉ khi không có postId)
+                            if (widget.postId == null &&
+                                state is PrivacyLoaded &&
+                                _friendsExceptIds.isEmpty &&
+                                _friendsDetailIds.isEmpty) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                _loadInitialFriends();
+                              });
+                            }
+
+                            return _buildContent(state);
+                          },
+                        ),
+                      ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -368,7 +379,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
             context.l10n.postErrorPrefix(state.message),
             style: const TextStyle(color: Colors.red),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16.rsh(context)),
           ...baseOptions.map((item) => _buildOptionTile(item)),
         ],
       );
@@ -403,7 +414,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
       subtitle: Text(
         _localizedPrivacyDescription(context, label),
-        style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+        style: TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 14.rsp(context),
+        ),
       ),
 
       trailing: Icon(
@@ -456,7 +470,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ),
           subtitle: Text(
             displayText,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14.rsp(context),
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -466,9 +483,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
               Icon(
                 CupertinoIcons.chevron_right,
                 color: AppColors.textSecondary,
-                size: 18.sp,
+                size: 18.rsp(context),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: 8.rs(context)),
               Icon(
                 isSelected
                     ? CupertinoIcons.check_mark_circled_solid
@@ -537,7 +554,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ),
           subtitle: Text(
             displayText,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14.rsp(context),
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -547,9 +567,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
               Icon(
                 CupertinoIcons.chevron_right,
                 color: AppColors.textSecondary,
-                size: 18.sp,
+                size: 18.rsp(context),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: 8.rs(context)),
               Icon(
                 isSelected
                     ? CupertinoIcons.check_mark_circled_solid
@@ -623,7 +643,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                 },
         ),
 
-        SizedBox(width: 8.w),
+        SizedBox(width: 8.rs(context)),
 
         Expanded(
           child: Text(
@@ -632,17 +652,17 @@ class _PrivacyPageState extends State<PrivacyPage> {
                 : context.l10n.privacyPostSetAsDefault,
             style: TextStyle(
               color: isCurrentDefault
-                  ? AppColors.textSecondary.withOpacity(0.6)
+                  ? AppColors.textSecondary.withValues(alpha: 0.6)
                   : AppColors.textSecondary,
             ),
           ),
         ),
         if (isUpdating)
           Padding(
-            padding: EdgeInsets.only(left: 8.w),
+            padding: EdgeInsets.only(left: 8.rs(context)),
             child: SizedBox(
-              width: 16.w,
-              height: 16.h,
+              width: 16.rs(context),
+              height: 16.rsh(context),
               child: CupertinoActivityIndicator(),
             ),
           ),

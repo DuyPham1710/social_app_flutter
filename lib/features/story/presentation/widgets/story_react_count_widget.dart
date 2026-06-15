@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/story/domain/entities/story_entity.dart';
 
@@ -37,15 +36,18 @@ class StoryReactCountWidget extends StatelessWidget {
     final topEmojis = sortedEmojis.take(2).toList();
 
     return Positioned(
-      left: 12.w,
-      bottom: 16.h,
+      left: 12.rs(context),
+      bottom: 16.rsh(context),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.rs(context),
+            vertical: 8.rsh(context),
+          ),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(20.r),
+            color: Colors.black.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(20.rsr(context)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -53,17 +55,17 @@ class StoryReactCountWidget extends StatelessWidget {
               // Hiển thị emoji icons
               if (topEmojis.isNotEmpty)
                 SizedBox(
-                  width: topEmojis.length > 1 ? 40.w : 24.w,
-                  height: 24.h,
+                  width: topEmojis.length > 1 ? 40.rs(context) : 24.rs(context),
+                  height: 24.rsh(context),
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
                       for (int i = 0; i < topEmojis.length; i++)
                         Positioned(
-                          left: (i * 18).w,
+                          left: (i * 18).rs(context),
                           child: Container(
-                            width: 24.w,
-                            height: 24.h,
+                            width: 24.rs(context),
+                            height: 24.rsh(context),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
@@ -71,7 +73,7 @@ class StoryReactCountWidget extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 topEmojis[i].key.icon,
-                                style: TextStyle(fontSize: 14.sp),
+                                style: TextStyle(fontSize: 14.rsp(context)),
                               ),
                             ),
                           ),
@@ -79,13 +81,13 @@ class StoryReactCountWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-              if (topEmojis.isNotEmpty) SizedBox(width: 8.w),
+              if (topEmojis.isNotEmpty) SizedBox(width: 8.rs(context)),
               // Hiển thị số lượng
               Text(
                 reactCount.toString(),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14.sp,
+                  fontSize: 14.rsp(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),

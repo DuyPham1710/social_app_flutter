@@ -127,6 +127,12 @@ abstract class ChatRepository {
     required String messageId,
   });
 
+  // Translate a message
+  Future<DataState<MessageTranslationEntity>> translateMessage({
+    required String messageId,
+    required String targetLang,
+  });
+
   // Get AI summary of unread messages
   Future<DataState<String>> getSummaryUnread({
     required String conversationId,

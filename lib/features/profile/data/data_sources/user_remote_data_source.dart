@@ -15,6 +15,12 @@ abstract class UserRemoteDataSource {
   @GET('/user/{id}')
   Future<UserModel> getUserProfileById(@Path('id') String id);
 
+  @POST('/user/{id}/report')
+  Future<void> reportUser(
+    @Path('id') String id,
+    @Body() Map<String, dynamic> body,
+  );
+
   @MultiPart()
   @PATCH('/user')
   Future<UserModel> updateUserProfile({
@@ -28,7 +34,7 @@ abstract class UserRemoteDataSource {
     @Part(name: 'hometown') String? hometown,
     @Part(name: 'workplace') String? workplace,
     @Part(name: 'relationshipStatus') String? relationshipStatus,
-    @Part(name: 'file') File? avatarFile,
-    @Part(name: 'cover') File? coverFile,
+    @Part(name: 'file') List<MultipartFile>? avatarFile,
+    @Part(name: 'cover') List<MultipartFile>? coverFile,
   });
 }

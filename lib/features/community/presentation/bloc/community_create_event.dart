@@ -1,5 +1,5 @@
 abstract class CommunityCreateEvent {
-  const CommunityCreateEvent();
+  CommunityCreateEvent();
 }
 
 class CreateCommunityRequested extends CommunityCreateEvent {
@@ -9,7 +9,7 @@ class CreateCommunityRequested extends CommunityCreateEvent {
   final String? avatarPath;
   final String? coverImagePath;
 
-  const CreateCommunityRequested({
+  CreateCommunityRequested({
     required this.name,
     this.description,
     required this.privacy,
@@ -26,7 +26,7 @@ class UpdateCommunityRequested extends CommunityCreateEvent {
   final String? avatarPath;
   final String? coverImagePath;
 
-  const UpdateCommunityRequested({
+  UpdateCommunityRequested({
     required this.communityId,
     this.name,
     this.description,

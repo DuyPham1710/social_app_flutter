@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:video_player/video_player.dart';
+import 'package:social_app_fe/core/utils/web_video_url_helper.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final dynamic videoData; // File hoặc String (URL)
@@ -26,6 +28,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool _hasError = false;
   String _errorMessage = '';
   bool _showControls = true;
+  String? _blobUrl;
   late Timer _hideControlsTimer;
   static const Duration _controlsAutoHideDuration = Duration(seconds: 3);
 
@@ -61,7 +64,18 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       if (widget.videoData is File) {
         _controller = VideoPlayerController.file(widget.videoData);
       } else if (widget.videoData is String) {
-        _controller = VideoPlayerController.network(widget.videoData);
+        _controller = VideoPlayerController.networkUrl(
+          Uri.parse(widget.videoData),
+        );
+      } else if (widget.videoData is PlatformFile) {
+        if (widget.videoData.bytes != null) {
+          _blobUrl = createObjectUrlFromBytes(widget.videoData.bytes!);
+          _controller = VideoPlayerController.networkUrl(
+            Uri.parse(_blobUrl!),
+          );
+        } else {
+           throw Exception('PlatformFile missing bytes for web video playback');
+        }
       } else {
         throw Exception(context.l10n.postUnsupportedVideoType);
       }
@@ -110,6 +124,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   void dispose() {
     _controller.dispose();
     _hideControlsTimer.cancel();
+    if (_blobUrl != null) {
+      revokeObjectUrl(_blobUrl!);
+    }
     super.dispose();
   }
 
@@ -165,20 +182,24 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         ),
         // Close button
         Positioned(
-          top: 12.h,
-          left: 12.w,
+          top: 12.rsh(context),
+          left: 12.rs(context),
           child: AnimatedOpacity(
             opacity: _showControls ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 300),
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Container(
-                padding: EdgeInsets.all(8.w),
+                padding: EdgeInsets.all(8.rs(context)),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24.rsp(context),
+                ),
               ),
             ),
           ),
@@ -195,24 +216,29 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     ? Icons.pause_circle_filled
                     : Icons.play_circle_filled,
                 color: Colors.white,
-                size: 64.sp,
+                size: 64.rsp(context),
               ),
             ),
           ),
         ),
         // Progress indicator and time info (bottom controls)
         Positioned(
-          left: 10.w,
-          right: 10.w,
-          bottom: 10.h,
+          left: 10.rs(context),
+          right: 10.rs(context),
+          bottom: 10.rsh(context),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _toggleControls,
             child: Container(
-              padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 10.h),
+              padding: EdgeInsets.fromLTRB(
+                12.rs(context),
+                10.rsh(context),
+                12.rs(context),
+                10.rsh(context),
+              ),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(16.rsr(context)),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.08),
                   width: 1,
@@ -223,12 +249,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 children: [
                   SliderTheme(
                     data: SliderThemeData(
-                      trackHeight: 2.8.h,
+                      trackHeight: 2.8.rsh(context),
                       thumbShape: RoundSliderThumbShape(
-                        enabledThumbRadius: 6.5.w,
+                        enabledThumbRadius: 6.5.rs(context),
                       ),
                       overlayShape: RoundSliderOverlayShape(
-                        overlayRadius: 12.w,
+                        overlayRadius: 12.rs(context),
                       ),
                       activeTrackColor: AppColors.primary,
                       inactiveTrackColor: Colors.white24,
@@ -260,7 +286,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         _formatDuration(_controller.value.position),
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 11.sp,
+                          fontSize: 11.rsp(context),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -268,7 +294,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         _formatDuration(_controller.value.duration),
                         style: TextStyle(
                           color: Colors.white70,
-                          fontSize: 11.sp,
+                          fontSize: 11.rsp(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -291,22 +317,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         child: _hasError
             ? Center(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  padding: EdgeInsets.symmetric(horizontal: 24.rs(context)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.error_outline,
                         color: Colors.white,
-                        size: 64.sp,
+                        size: 64.rsp(context),
                       ),
-                      SizedBox(height: 16.h),
+                      SizedBox(height: 16.rsh(context)),
                       Text(
                         _errorMessage,
-                        style: TextStyle(color: Colors.white, fontSize: 16.sp),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.rsp(context),
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 24.h),
+                      SizedBox(height: 24.rsh(context)),
                       ElevatedButton(
                         onPressed: _initializeVideo,
                         child: Text(context.l10n.commonRetry),
@@ -327,6 +356,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 child: Stack(
                                   children: [
                                     VideoPlayer(_controller),
+                                    Positioned.fill(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: _toggleControls,
+                                        child: const SizedBox.expand(),
+                                      ),
+                                    ),
                                     _buildControlsOverlay(),
                                   ],
                                 ),
@@ -340,12 +376,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     Colors.white,
                                   ),
                                 ),
-                                SizedBox(height: 16.h),
+                                SizedBox(height: 16.rsh(context)),
                                 Text(
                                   context.l10n.postLoadingVideo,
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 16.sp,
+                                    fontSize: 16.rsp(context),
                                   ),
                                 ),
                               ],

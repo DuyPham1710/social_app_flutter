@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class SearchBar extends StatefulWidget {
@@ -58,7 +58,7 @@ class _SearchBarState extends State<SearchBar> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.secondBackground,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
       ),
       child: TextField(
         controller: _controller,
@@ -67,13 +67,16 @@ class _SearchBarState extends State<SearchBar> {
         cursorColor: AppColors.primary,
         decoration: InputDecoration(
           hintText: widget.hintText ?? context.l10n.searchUserHint,
-          hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          hintStyle: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     CupertinoIcons.clear_circled_solid,
                     color: AppColors.iconPrimary,
-                    size: 20.r,
+                    size: 20.rsr(context),
                   ),
                   onPressed: () {
                     _controller.clear();
@@ -83,11 +86,14 @@ class _SearchBarState extends State<SearchBar> {
               : null,
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: 16.w,
-            vertical: 12.h,
+            horizontal: 16.rs(context),
+            vertical: 12.rsh(context),
           ),
         ),
-        style: TextStyle(fontSize: 14.sp, color: AppColors.textPrimary),
+        style: TextStyle(
+          fontSize: 14.rsp(context),
+          color: AppColors.textPrimary,
+        ),
         onChanged: (value) {
           setState(() {});
           _handleSearch(value);

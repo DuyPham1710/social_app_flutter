@@ -16,7 +16,7 @@ class CommunityInvitesBloc
     required RespondToInviteUseCase respondToInviteUseCase,
   }) : _getMyInvitesUseCase = getMyInvitesUseCase,
        _respondToInviteUseCase = respondToInviteUseCase,
-       super(const CommunityInvitesInitial()) {
+       super(CommunityInvitesInitial()) {
     on<FetchCommunityInvitesEvent>(_onFetchInvites);
     on<RespondToInviteEvent>(_onRespondToInvite);
     on<RefreshInvitesEvent>(_onRefreshInvites);

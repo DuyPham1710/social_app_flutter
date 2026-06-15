@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
@@ -13,11 +13,14 @@ class PostCreatingProgress extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: AppColors.background,
-      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+      padding: EdgeInsets.symmetric(
+        vertical: 8.rsh(context),
+        horizontal: 16.rs(context),
+      ),
       child: Row(
         children: [
           CircularProgressIndicator(color: AppColors.primary, strokeWidth: 3),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12.rs(context)),
           Expanded(
             child: Text(
               progress != null
@@ -27,7 +30,7 @@ class PostCreatingProgress extends StatelessWidget {
                   : context.l10n.postCreating,
               style: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 14.sp,
+                fontSize: 14.rsp(context),
                 fontWeight: FontWeight.w500,
               ),
             ),

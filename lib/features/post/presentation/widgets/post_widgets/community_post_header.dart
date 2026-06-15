@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
@@ -86,7 +86,10 @@ class CommunityPostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -102,24 +105,24 @@ class CommunityPostHeader extends StatelessWidget {
                     children: [
                       // Large Community Avatar with border
                       Container(
-                        width: 60.w,
-                        height: 60.w,
+                        width: 60.rs(context),
+                        height: 60.rs(context),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: AppColors.divider,
-                            width: 1.5.w,
+                            width: 1.5.rs(context),
                           ),
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(8.rsr(context)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
-                              offset: Offset(0, 2.h),
+                              offset: Offset(0, 2.rsh(context)),
                             ),
                           ],
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(8.rsr(context)),
                           child: community!.avatar != null
                               ? Image.network(
                                   community!.avatar!,
@@ -132,7 +135,7 @@ class CommunityPostHeader extends StatelessWidget {
                                   child: Center(
                                     child: Icon(
                                       Icons.group,
-                                      size: 24.sp,
+                                      size: 24.rsp(context),
                                       color: AppColors.primary,
                                     ),
                                   ),
@@ -141,24 +144,24 @@ class CommunityPostHeader extends StatelessWidget {
                       ),
                       // User Avatar overlay (bottom-right, 50% border)
                       Positioned(
-                        bottom: -6.h,
-                        right: -6.h,
+                        bottom: -6.rsh(context),
+                        right: -6.rsh(context),
                         child: GestureDetector(
                           onTap: () => _navigateToProfile(context),
                           child: Container(
-                            width: 36.w,
-                            height: 36.w,
+                            width: 36.rs(context),
+                            height: 36.rs(context),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.background,
-                                width: 2.5.w,
+                                width: 2.5.rs(context),
                               ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.15),
                                   blurRadius: 4,
-                                  offset: Offset(0, 2.h),
+                                  offset: Offset(0, 2.rsh(context)),
                                 ),
                               ],
                             ),
@@ -174,29 +177,29 @@ class CommunityPostHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-              if (showCommunityInfo) SizedBox(width: 12.w),
+              if (showCommunityInfo) SizedBox(width: 12.rs(context)),
               // Community Name + User Info (chỉ hiển thị community name nếu showCommunityInfo = true)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (showCommunityInfo) ...[
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 4.rsh(context)),
                       // Community Name
                       GestureDetector(
                         onTap: () => _navigateToCommunity(context),
                         child: Text(
                           community?.name ?? context.l10n.menuCommunity,
                           style: TextStyle(
-                            fontSize: 15.sp,
+                            fontSize: 15.rsp(context),
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
                           ),
                         ),
                       ),
-                      SizedBox(height: 2.h),
+                      SizedBox(height: 2.rsh(context)),
                     ] else
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 4.rsh(context)),
                     // User Name
                     GestureDetector(
                       onTap: () => _navigateToProfile(context),
@@ -207,37 +210,37 @@ class CommunityPostHeader extends StatelessWidget {
                                 user.username ??
                                 context.l10n.commonUnknown,
                             style: TextStyle(
-                              fontSize: 11.sp,
+                              fontSize: 11.rsp(context),
                               color: AppColors.textSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(width: 4.w),
+                          SizedBox(width: 4.rs(context)),
                           Text(
                             '·',
                             style: TextStyle(
-                              fontSize: 11.sp,
+                              fontSize: 11.rsp(context),
                               color: AppColors.textSecondary,
                             ),
                           ),
-                          SizedBox(width: 4.w),
+                          SizedBox(width: 4.rs(context)),
                           Icon(
                             Icons.groups_rounded,
-                            size: 14.sp,
+                            size: 14.rsp(context),
                             color: AppColors.textSecondary,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 2.h),
+                    SizedBox(height: 2.rsh(context)),
                     // Time · Visibility
                     Row(
                       children: [
                         Text(
                           localizedPostTime(context.l10n, createdAt),
                           style: TextStyle(
-                            fontSize: 11.sp,
+                            fontSize: 11.rsp(context),
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -286,10 +289,10 @@ class CommunityPostHeader extends StatelessWidget {
                                 isSaved
                                     ? Icons.bookmark_remove_outlined
                                     : Icons.bookmark_border_rounded,
-                                size: 18.sp,
+                                size: 18.rsp(context),
                                 color: AppColors.textSecondary,
                               ),
-                              SizedBox(width: 8.w),
+                              SizedBox(width: 8.rs(context)),
                               Text(
                                 isSaved
                                     ? context.l10n.postUnsave
@@ -305,10 +308,10 @@ class CommunityPostHeader extends StatelessWidget {
                             children: [
                               Icon(
                                 Icons.flag_outlined,
-                                size: 18.sp,
+                                size: 18.rsp(context),
                                 color: Colors.red,
                               ),
-                              SizedBox(width: 8.w),
+                              SizedBox(width: 8.rs(context)),
                               Text(context.l10n.postReport),
                             ],
                           ),
@@ -320,10 +323,10 @@ class CommunityPostHeader extends StatelessWidget {
                             children: [
                               Icon(
                                 Icons.delete_outline,
-                                size: 18.sp,
+                                size: 18.rsp(context),
                                 color: Colors.red,
                               ),
-                              SizedBox(width: 8.w),
+                              SizedBox(width: 8.rs(context)),
                               Text(
                                 context.l10n.postDeleteTitle,
                                 style: const TextStyle(color: Colors.red),
@@ -335,7 +338,7 @@ class CommunityPostHeader extends StatelessWidget {
                     icon: Icon(
                       Icons.more_vert,
                       color: AppColors.textSecondary,
-                      size: 18.sp,
+                      size: 18.rsp(context),
                     ),
                   );
                 },

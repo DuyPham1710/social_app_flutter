@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:social_app_fe/features/chat/data/models/message_reponse_model.dart';
 import 'package:social_app_fe/features/chat/data/models/message-edit-log_model.dart';
+import 'package:social_app_fe/features/chat/data/models/message_translation_model.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
 
@@ -1131,6 +1132,27 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     }
 
     _socketClient.emit('message:read', readData);
+  }
+
+  @override
+  Future<MessageTranslationEntity> translateMessage({
+    required String messageId,
+    required String targetLang,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/chat/message/$messageId/translate',
+        queryParameters: {'targetLang': targetLang},
+      );
+      if (response.data != null) {
+        return MessageTranslationModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+      throw Exception('Invalid translation response');
+    } catch (e) {
+      throw Exception('Failed to translate message: $e');
+    }
   }
 
   @override

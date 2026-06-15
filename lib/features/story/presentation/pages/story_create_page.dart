@@ -1,7 +1,7 @@
-import 'dart:typed_data';
-
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -34,6 +34,15 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   }
 
   Future<void> _fetchPathsAndAssets() async {
+    if (kIsWeb) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
     final PermissionState ps = await PhotoManager.requestPermissionExtend();
     if (!mounted) return;
     if (ps.isAuth) {
@@ -107,33 +116,73 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
     );
   }
 
+  Future<void> _pickFileWeb() async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.media,
+      allowMultiple: false,
+      withData: true,
+    );
+    if (result != null && result.files.isNotEmpty) {
+      final file = result.files.first;
+      if (!mounted) return;
+      final isVideo =
+          file.extension?.toLowerCase() == 'mp4' ||
+          file.extension?.toLowerCase() == 'webm';
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => s1<StoryCreateBloc>(),
+            child: StoryEditorPage(
+              webFileBytes: file.bytes,
+              webFileName: file.name,
+              isVideo: isVideo,
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(context),
-            SizedBox(height: 12.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: _buildActionRow(),
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            body: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildHeader(context),
+                  SizedBox(height: 12.rsh(context)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                    child: _buildActionRow(),
+                  ),
+                  if (!kIsWeb) ...[
+                    SizedBox(height: 12.rsh(context)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                      child: _buildMultiPickButton(),
+                    ),
+                    SizedBox(height: 16.rsh(context)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                      child: _buildLibraryHeader(),
+                    ),
+                  ],
+                  SizedBox(height: 8.rsh(context)),
+                  Expanded(child: _buildGrid()),
+                ],
+              ),
             ),
-            SizedBox(height: 12.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: _buildMultiPickButton(),
-            ),
-            SizedBox(height: 16.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: _buildLibraryHeader(),
-            ),
-            SizedBox(height: 8.h),
-            Expanded(child: _buildGrid()),
-          ],
+          ),
         ),
       ),
     );
@@ -141,7 +190,10 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.rs(context),
+        vertical: 8.rsh(context),
+      ),
       child: Row(
         children: [
           IconButton(
@@ -154,7 +206,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                 context.l10n.chatCreateStory,
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 18.sp,
+                  fontSize: 18.rsp(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -185,7 +237,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             onTap: () {},
           ),
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 8.rs(context)),
         Expanded(
           child: _ActionCard(
             icon: Icons.music_note_rounded,
@@ -197,7 +249,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             },
           ),
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 8.rs(context)),
         Expanded(
           child: _ActionCard(
             icon: Icons.photo_library_rounded,
@@ -214,9 +266,12 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.textPrimary,
         side: BorderSide(color: AppColors.divider),
-        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+        padding: EdgeInsets.symmetric(
+          vertical: 12.rsh(context),
+          horizontal: 12.rs(context),
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
         ),
       ),
       onPressed: () {},
@@ -234,11 +289,11 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
             _currentPath?.name ?? context.l10n.storyLibrary,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(width: 6.w),
+          SizedBox(width: 6.rs(context)),
           Icon(Icons.expand_more, color: AppColors.iconPrimary),
         ],
       ),
@@ -252,34 +307,36 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       context: context,
       backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20.rsr(context)),
+        ),
       ),
       builder: (context) => Container(
-        padding: EdgeInsets.symmetric(vertical: 16.h),
+        padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40.w,
-              height: 4.h,
-              margin: EdgeInsets.only(bottom: 16.h),
+              width: 40.rs(context),
+              height: 4.rsh(context),
+              margin: EdgeInsets.only(bottom: 16.rsh(context)),
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2.r),
+                borderRadius: BorderRadius.circular(2.rsr(context)),
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
               child: Text(
                 context.l10n.storyChooseFolder,
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 18.sp,
+                  fontSize: 18.rsp(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 16.rsh(context)),
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -300,7 +357,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                         color: isSelected
                             ? AppColors.primary
                             : AppColors.textPrimary,
-                        fontSize: 16.sp,
+                        fontSize: 16.rsp(context),
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.normal,
@@ -317,7 +374,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                           context.l10n.storyItemCount(count),
                           style: TextStyle(
                             color: AppColors.textSecondary,
-                            fontSize: 12.sp,
+                            fontSize: 12.rsp(context),
                           ),
                         );
                       },
@@ -340,6 +397,49 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   }
 
   Widget _buildGrid() {
+    if (kIsWeb) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.cloud_upload_rounded,
+              size: 64,
+              color: AppColors.iconPrimary.withValues(alpha: 0.5),
+            ),
+            SizedBox(height: 16.rsh(context)),
+            Text(
+              context.l10n.storyAddMediaFromComputer,
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 16.rsp(context),
+              ),
+            ),
+            SizedBox(height: 24.rsh(context)),
+            ElevatedButton.icon(
+              onPressed: _pickFileWeb,
+              icon: const Icon(Icons.upload_file),
+              label: Text(
+                context.l10n.storySelectFile,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24.rs(context),
+                  vertical: 14.rsh(context),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.rsr(context)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (_isLoading) {
       return Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
@@ -347,7 +447,10 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       return Center(
         child: Text(
           context.l10n.storyLibraryPermissionRequired,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
           textAlign: TextAlign.center,
         ),
       );
@@ -356,16 +459,19 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       return Center(
         child: Text(
           context.l10n.storyNoMediaInLibrary,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
         ),
       );
     }
     return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 8.w),
+      padding: EdgeInsets.symmetric(horizontal: 8.rs(context)),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        crossAxisSpacing: 2.w,
-        mainAxisSpacing: 2.w,
+        crossAxisSpacing: 2.rs(context),
+        mainAxisSpacing: 2.rs(context),
       ),
       itemCount: _assets.length,
       itemBuilder: (context, index) {
@@ -392,16 +498,16 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               // Hiển thị icon video và duration
               if (isVideo)
                 Positioned(
-                  bottom: 4.h,
-                  right: 4.w,
+                  bottom: 4.rsh(context),
+                  right: 4.rs(context),
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 6.w,
-                      vertical: 2.h,
+                      horizontal: 6.rs(context),
+                      vertical: 2.rsh(context),
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(4.r),
+                      color: Colors.black.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(4.rsr(context)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -409,9 +515,9 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                         Icon(
                           Icons.play_circle_filled,
                           color: Colors.white,
-                          size: 14.sp,
+                          size: 14.rsp(context),
                         ),
-                        SizedBox(width: 4.w),
+                        SizedBox(width: 4.rs(context)),
                         Builder(
                           builder: (context) {
                             final duration = asset.duration;
@@ -422,7 +528,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                                 '${minutes.toString().padLeft(1, '0')}:${seconds.toString().padLeft(2, '0')}',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 11.sp,
+                                  fontSize: 11.rsp(context),
                                   fontWeight: FontWeight.w600,
                                 ),
                               );
@@ -436,7 +542,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                 ),
               if (isSelected)
                 Container(
-                  color: Colors.black.withOpacity(0.45),
+                  color: Colors.black.withValues(alpha: 0.45),
                   child: Center(
                     child: Icon(
                       Icons.check_circle,
@@ -469,22 +575,22 @@ class _ActionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 70.h,
+        height: 70.rsh(context),
         decoration: BoxDecoration(
           color: AppColors.secondBackground,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
           border: Border.all(color: AppColors.divider),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: AppColors.iconPrimary, size: 26.sp),
-            SizedBox(height: 6.h),
+            Icon(icon, color: AppColors.iconPrimary, size: 26.rsp(context)),
+            SizedBox(height: 6.rsh(context)),
             Text(
               label,
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 13.sp,
+                fontSize: 13.rsp(context),
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -43,7 +43,7 @@ class CommunityDetailBloc
     this._leaveCommunityUseCase,
     this._respondToInviteUseCase,
     this._deleteCommunityUseCase,
-  ) : super(const CommunityDetailInitial()) {
+  ) : super(CommunityDetailInitial()) {
     on<CommunityDetailFetched>(_onCommunityDetailFetched);
     on<JoinCommunityRequested>(_onJoinCommunityRequested);
     on<CancelJoinRequestRequested>(_onCancelJoinRequestRequested);
@@ -57,7 +57,7 @@ class CommunityDetailBloc
     CommunityDetailFetched event,
     Emitter<CommunityDetailState> emit,
   ) async {
-    emit(const CommunityDetailLoading());
+    emit(CommunityDetailLoading());
 
     try {
       final dataState = await _getCommunityDetailUseCase(
@@ -279,7 +279,7 @@ class CommunityDetailBloc
     DeleteCommunityRequested event,
     Emitter<CommunityDetailState> emit,
   ) async {
-    emit(const CommunityDetailLoading());
+    emit(CommunityDetailLoading());
     try {
       final dataState = await _deleteCommunityUseCase(
         params: event.communityId,

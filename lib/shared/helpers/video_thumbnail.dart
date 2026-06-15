@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:social_app_fe/shared/helpers/web_video_preview.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 const int _maxThumbnailCacheSize = 10;
@@ -50,69 +52,80 @@ Future<Uint8List?> generateVideoThumbnail(String videoUrl) async {
 
 Widget buildVideoThumbnail(
   String videoUrl, {
+  Uint8List? videoBytes,
   BoxFit fit = BoxFit.cover,
   BorderRadius? borderRadius,
   double? height,
 }) {
-  final previewHeight = height ?? 300.h;
+  return Builder(
+    builder: (context) {
+      final previewHeight = height ?? 300.rsh(context);
 
-  return FutureBuilder<Uint8List?>(
-    future: getCachedVideoThumbnail(videoUrl),
-    builder: (context, snapshot) {
-      final thumbnailBytes = snapshot.data;
+      return FutureBuilder<Uint8List?>(
+        future: kIsWeb ? Future.value(null) : getCachedVideoThumbnail(videoUrl),
+        builder: (context, snapshot) {
+          final thumbnailBytes = snapshot.data;
 
-      final preview = thumbnailBytes != null
-          ? Image.memory(
-              thumbnailBytes,
-              fit: fit,
-              width: double.infinity,
-              height: double.infinity,
-              gaplessPlayback: true,
-            )
-          : Container(
-              color: Colors.black,
-              child: Center(
-                child: Icon(
-                  Icons.videocam_rounded,
-                  color: Colors.white54,
-                  size: 48.sp,
-                ),
-              ),
-            );
+          final preview = kIsWeb
+              ? WebVideoPreview(
+                  videoUrl: videoUrl,
+                  videoBytes: videoBytes,
+                  fit: fit,
+                )
+              : (thumbnailBytes != null
+                    ? Image.memory(
+                        thumbnailBytes,
+                        fit: fit,
+                        width: double.infinity,
+                        height: double.infinity,
+                        gaplessPlayback: true,
+                      )
+                    : Container(
+                        color: Colors.black,
+                        child: Center(
+                          child: Icon(
+                            Icons.videocam_rounded,
+                            color: Colors.white54,
+                            size: 48.rsp(context),
+                          ),
+                        ),
+                      ));
 
-      final thumbnail = SizedBox(
-        height: previewHeight,
-        width: double.infinity,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            preview,
-            Container(
-              color: Colors.black.withValues(alpha: 0.18),
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.all(14.w),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    shape: BoxShape.circle,
+          final thumbnail = SizedBox(
+            height: previewHeight,
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                preview,
+                Container(
+                  color: Colors.black.withValues(alpha: 0.18),
+                  child: Center(
+                    child: Container(
+                      padding: EdgeInsets.all(14.rs(context)),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.play_circle_filled_rounded,
+                        color: Colors.white,
+                        size: 52.rsp(context),
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.play_circle_filled_rounded,
-                    color: Colors.white,
-                    size: 52.sp,
-                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+
+          if (borderRadius != null) {
+            return ClipRRect(borderRadius: borderRadius, child: thumbnail);
+          }
+
+          return thumbnail;
+        },
       );
-
-      if (borderRadius != null) {
-        return ClipRRect(borderRadius: borderRadius, child: thumbnail);
-      }
-
-      return thumbnail;
     },
   );
 }

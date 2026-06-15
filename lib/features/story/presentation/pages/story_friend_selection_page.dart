@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
@@ -63,148 +63,166 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          widget.title ?? context.l10n.storyPrivacyHideFrom,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed:
-                (!widget.allowEmptySelection && _selectedFriendIds.isEmpty)
-                ? null
-                : _onDone,
-            child: Text(
-              context.l10n.commonDone,
-              style: TextStyle(
-                color:
-                    (!widget.allowEmptySelection && _selectedFriendIds.isEmpty)
-                    ? AppColors.textSecondary.withOpacity(0.5)
-                    : AppColors.primary,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
+                onPressed: () => Navigator.of(context).maybePop(),
               ),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Search bar
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.secondBackground,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: TextField(
-                controller: _searchController,
-                cursorColor: AppColors.primary,
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 14.sp),
-                decoration: InputDecoration(
-                  hintText: context.l10n.searchHint,
-                  hintStyle: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14.sp,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: AppColors.textSecondary,
-                    size: 20.sp,
-                  ),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.clear,
-                            color: AppColors.iconPrimary,
-                            size: 20.sp,
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 12.h,
-                  ),
+              title: Text(
+                widget.title ?? context.l10n.storyPrivacyHideFrom,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.w700,
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed:
+                      (!widget.allowEmptySelection &&
+                          _selectedFriendIds.isEmpty)
+                      ? null
+                      : _onDone,
+                  child: Text(
+                    context.l10n.commonDone,
+                    style: TextStyle(
+                      color:
+                          (!widget.allowEmptySelection &&
+                              _selectedFriendIds.isEmpty)
+                          ? AppColors.textSecondary.withValues(alpha: 0.5)
+                          : AppColors.primary,
+                      fontSize: 16.rsp(context),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          // Friends list
-          Expanded(
-            child: BlocBuilder<FriendBloc, FriendState>(
-              builder: (context, state) {
-                if (state is FriendLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  );
-                } else if (state is FriendLoaded) {
-                  final friends = state.friends;
-                  final filteredFriends = friends.where((f) {
-                    if (_searchQuery.isEmpty) return true;
-                    final q = _searchQuery;
-                    final name = (f.fullName ?? '').toLowerCase();
-                    final username = (f.username ?? '').toLowerCase();
-                    return name.contains(q) || username.contains(q);
-                  }).toList();
-
-                  if (filteredFriends.isEmpty) {
-                    return Center(
-                      child: Text(
-                        _searchQuery.isEmpty
-                            ? context.l10n.friendNoFriends
-                            : context.l10n.friendNoSearchResults,
-                        style: TextStyle(
+            body: Column(
+              children: [
+                // Search bar
+                Padding(
+                  padding: EdgeInsets.all(16.rs(context)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.secondBackground,
+                      borderRadius: BorderRadius.circular(12.rsr(context)),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      cursorColor: AppColors.primary,
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14.rsp(context),
+                      ),
+                      decoration: InputDecoration(
+                        hintText: context.l10n.searchHint,
+                        hintStyle: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 14.sp,
+                          fontSize: 14.rsp(context),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: AppColors.textSecondary,
+                          size: 20.rsp(context),
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: AppColors.iconPrimary,
+                                  size: 20.rsp(context),
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.rs(context),
+                          vertical: 12.rsh(context),
                         ),
                       ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    itemCount: filteredFriends.length,
-                    itemBuilder: (context, index) {
-                      final friend = filteredFriends[index];
-                      final isSelected = _selectedFriendIds.contains(
-                        friend.userId,
-                      );
-                      return _buildFriendItem(friend, isSelected);
-                    },
-                  );
-                } else if (state is FriendError) {
-                  return Center(
-                    child: Text(
-                      context.l10n.friendLoadFailed,
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14.sp,
-                      ),
                     ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
+                  ),
+                ),
+                // Friends list
+                Expanded(
+                  child: BlocBuilder<FriendBloc, FriendState>(
+                    builder: (context, state) {
+                      if (state is FriendLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        );
+                      } else if (state is FriendLoaded) {
+                        final friends = state.friends;
+                        final filteredFriends = friends.where((f) {
+                          if (_searchQuery.isEmpty) return true;
+                          final q = _searchQuery;
+                          final name = (f.fullName ?? '').toLowerCase();
+                          final username = (f.username ?? '').toLowerCase();
+                          return name.contains(q) || username.contains(q);
+                        }).toList();
+
+                        if (filteredFriends.isEmpty) {
+                          return Center(
+                            child: Text(
+                              _searchQuery.isEmpty
+                                  ? context.l10n.friendNoFriends
+                                  : context.l10n.friendNoSearchResults,
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14.rsp(context),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: filteredFriends.length,
+                          itemBuilder: (context, index) {
+                            final friend = filteredFriends[index];
+                            final isSelected = _selectedFriendIds.contains(
+                              friend.userId,
+                            );
+                            return _buildFriendItem(friend, isSelected);
+                          },
+                        );
+                      } else if (state is FriendError) {
+                        return Center(
+                          child: Text(
+                            context.l10n.friendLoadFailed,
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14.rsp(context),
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -216,14 +234,17 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
     return InkWell(
       onTap: () => _toggleSelection(friend.userId),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.rs(context),
+          vertical: 12.rsh(context),
+        ),
         child: Row(
           children: [
             // Avatar
             Stack(
               children: [
                 CircleAvatar(
-                  radius: 24.r,
+                  radius: 24.rsr(context),
                   backgroundColor: AppColors.secondBackground,
                   backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
                       ? NetworkImage(avatarUrl)
@@ -233,7 +254,7 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                           name.isNotEmpty ? name[0].toUpperCase() : '?',
                           style: TextStyle(
                             color: AppColors.textSecondary,
-                            fontSize: 18.sp,
+                            fontSize: 18.rsp(context),
                             fontWeight: FontWeight.w600,
                           ),
                         )
@@ -244,8 +265,8 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                     bottom: 0,
                     right: 0,
                     child: Container(
-                      width: 20.w,
-                      height: 20.w,
+                      width: 20.rs(context),
+                      height: 20.rs(context),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         shape: BoxShape.circle,
@@ -257,28 +278,28 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                       child: Icon(
                         Icons.check,
                         color: Colors.white,
-                        size: 12.sp,
+                        size: 12.rsp(context),
                       ),
                     ),
                   ),
               ],
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 12.rs(context)),
             // Name
             Expanded(
               child: Text(
                 name,
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 16.sp,
+                  fontSize: 16.rsp(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             // Checkbox
             Container(
-              width: 24.w,
-              height: 24.w,
+              width: 24.rs(context),
+              height: 24.rs(context),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -288,7 +309,11 @@ class _StoryFriendSelectionPageState extends State<StoryFriendSelectionPage> {
                 color: isSelected ? AppColors.primary : Colors.transparent,
               ),
               child: isSelected
-                  ? Icon(Icons.check, color: Colors.white, size: 16.sp)
+                  ? Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 16.rsp(context),
+                    )
                   : null,
             ),
           ],

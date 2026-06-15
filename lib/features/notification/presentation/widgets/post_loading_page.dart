@@ -3,6 +3,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
 class PostLoadingPage extends StatelessWidget {
   const PostLoadingPage({super.key});
@@ -10,93 +11,158 @@ class PostLoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = s1<AppPreferences>().isDarkMode;
+    final double textLineWidth = ResponsiveHelper.isWebOrDesktop
+        ? (ResponsiveHelper.feedMaxWidth * 0.7)
+        : (MediaQuery.of(context).size.width * 0.7);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Shimmer.fromColors(
-          baseColor: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
-          highlightColor: isDarkMode ? Colors.grey[700]! : Colors.grey[100]!,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Top Bar giả (Khớp với nút back và tên tiêu đề)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 10,
-                ),
-                child: Row(
-                  children: [
-                    // Giả lập nút Back
-                    _buildBox(width: 30, height: 30, radius: 8),
-                    const SizedBox(width: 60), // Khoảng cách tới title
-                    // Giả lập Title chính giữa/phía sau
-                    _buildBox(width: 150, height: 24, radius: 8),
-                  ],
-                ),
-              ),
-              const Divider(thickness: 1, color: Colors.white), // Đường kẻ mờ
-
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 2. Header: Avatar + Tên người đăng
-                    Row(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
+            ),
+            child: Shimmer.fromColors(
+              baseColor: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
+              highlightColor: isDarkMode
+                  ? Colors.grey[700]!
+                  : Colors.grey[100]!,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. Top Bar giả (Khớp với nút back và tên tiêu đề)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.rs(context),
+                      vertical: 10.rsh(context),
+                    ),
+                    child: Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white,
+                        // Giả lập nút Back
+                        _buildBox(
+                          context,
+                          width: 30.rs(context),
+                          height: 30.rsh(context),
+                          radius: 8.rsr(context),
                         ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        SizedBox(
+                          width: 60.rs(context),
+                        ), // Khoảng cách tới title
+                        // Giả lập Title chính giữa/phía sau
+                        _buildBox(
+                          context,
+                          width: 150.rs(context),
+                          height: 24.rsh(context),
+                          radius: 8.rsr(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(
+                    thickness: 1,
+                    color: Colors.white,
+                  ), // Đường kẻ mờ
+
+                  Padding(
+                    padding: EdgeInsets.all(16.rs(context)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 2. Header: Avatar + Tên người đăng
+                        Row(
                           children: [
-                            _buildBox(width: 160, height: 16, radius: 10),
-                            const SizedBox(height: 8),
-                            _buildBox(width: 100, height: 12, radius: 10),
+                            CircleAvatar(
+                              radius: 25.rsr(context),
+                              backgroundColor: Colors.white,
+                            ),
+                            SizedBox(width: 12.rs(context)),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildBox(
+                                  context,
+                                  width: 160.rs(context),
+                                  height: 16.rsh(context),
+                                  radius: 10.rsr(context),
+                                ),
+                                SizedBox(height: 8.rsh(context)),
+                                _buildBox(
+                                  context,
+                                  width: 100.rs(context),
+                                  height: 12.rsh(context),
+                                  radius: 10.rsr(context),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20.rsh(context)),
+
+                        // 3. Text lines (Nội dung ngắn)
+                        _buildBox(
+                          context,
+                          width: double.infinity,
+                          height: 14.rsh(context),
+                          radius: 10.rsr(context),
+                        ),
+                        SizedBox(height: 8.rsh(context)),
+                        _buildBox(
+                          context,
+                          width: textLineWidth,
+                          height: 14.rsh(context),
+                          radius: 10.rsr(context),
+                        ),
+                        SizedBox(height: 16.rsh(context)),
+
+                        // 4. Post Body (Khung ảnh)
+                        _buildBox(
+                          context,
+                          width: double.infinity,
+                          height: 250.rsh(context),
+                          radius: 15.rsr(context),
+                        ),
+                        SizedBox(height: 20.rsh(context)),
+
+                        // 5. Action Buttons (Like, Comment, Share)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildBox(
+                              context,
+                              width: 85.rs(context),
+                              height: 35.rsh(context),
+                              radius: 20.rsr(context),
+                            ),
+                            _buildBox(
+                              context,
+                              width: 85.rs(context),
+                              height: 35.rsh(context),
+                              radius: 20.rsr(context),
+                            ),
+                            _buildBox(
+                              context,
+                              width: 85.rs(context),
+                              height: 35.rsh(context),
+                              radius: 20.rsr(context),
+                            ),
                           ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // 3. Text lines (Nội dung ngắn)
-                    _buildBox(width: double.infinity, height: 14, radius: 10),
-                    const SizedBox(height: 8),
-                    _buildBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: 14,
-                      radius: 10,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // 4. Post Body (Khung ảnh)
-                    _buildBox(width: double.infinity, height: 250, radius: 15),
-                    const SizedBox(height: 20),
-
-                    // 5. Action Buttons (Like, Comment, Share)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildBox(width: 85, height: 35, radius: 20),
-                        _buildBox(width: 85, height: 35, radius: 20),
-                        _buildBox(width: 85, height: 35, radius: 20),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBox({
+  Widget _buildBox(
+    BuildContext context, {
     required double width,
     required double height,
     required double radius,

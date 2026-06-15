@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/search/presentation/bloc/search_bloc.dart';
 import 'package:social_app_fe/features/search/presentation/pages/search_history_page.dart';
@@ -52,106 +52,116 @@ class _SearchPageState extends State<SearchPage> {
 
           return Scaffold(
             backgroundColor: AppColors.background,
-            body: SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 8.h,
-                    ),
-                    child: Row(
-                      children: [
-                        // Icon back
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: Icon(
-                            CupertinoIcons.back,
-                            color: AppColors.iconPrimary,
-                            size: 23.r,
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+            body: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: ResponsiveHelper.feedMaxWidth,
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.rs(context),
+                          vertical: 8.rsh(context),
                         ),
-                        SizedBox(width: 4.w),
-                        // Search Bar
-                        Expanded(
-                          child: search_widget.SearchBar(
-                            onSearch: (query) {
-                              // Khi nhập từng ký tự: tìm kiếm để hiển thị kết quả (không lưu lịch sử)
-                              if (query.trim().isEmpty) {
-                                blocContext.read<SearchBloc>().add(
-                                  const ClearSearch(),
-                                );
-                              } else {
-                                blocContext.read<SearchBloc>().add(
-                                  SearchUsers(
-                                    query: query,
-                                    saveToHistory: false,
-                                  ),
-                                );
-                              }
-                            },
-                            onSearchSubmitted: (query) {
-                              // Khi nhấn Enter: tìm kiếm và lưu vào lịch sử
-                              if (query.trim().isEmpty) {
-                                blocContext.read<SearchBloc>().add(
-                                  const ClearSearch(),
-                                );
-                              } else {
-                                blocContext.read<SearchBloc>().add(
-                                  SearchUsers(
-                                    query: query,
-                                    saveToHistory: true,
-                                  ),
-                                );
-                              }
-                            },
-                            hintText: context.l10n.searchHint,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  // Results
-                  Expanded(
-                    child: BlocBuilder<SearchBloc, SearchState>(
-                      builder: (context, state) {
-                        if (state is SearchInitial) {
-                          if (state.history != null &&
-                              state.history!.isNotEmpty) {
-                            return _buildSearchHistory(
-                              state.history!,
-                              blocContext,
-                            );
-                          }
-                          return _buildEmptyState(
-                            icon: CupertinoIcons.search,
-                            message: context.l10n.searchEnterKeyword,
-                          );
-                        } else if (state is SearchLoading) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
+                        child: Row(
+                          children: [
+                            // Icon back
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: Icon(
+                                CupertinoIcons.back,
+                                color: AppColors.iconPrimary,
+                                size: 23.rsr(context),
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
                             ),
-                          );
-                        } else if (state is SearchError) {
-                          return _buildErrorState(state.message, blocContext);
-                        } else if (state is SearchLoaded) {
-                          if (state.results.userResponseDtos.isEmpty) {
-                            return _buildEmptyState(
-                              icon: CupertinoIcons.person_circle,
-                              message: context.l10n.searchNoResults,
-                            );
-                          }
-                          return _buildResultsList(state, blocContext);
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
+                            SizedBox(width: 4.rs(context)),
+                            // Search Bar
+                            Expanded(
+                              child: search_widget.SearchBar(
+                                onSearch: (query) {
+                                  // Khi nhập từng ký tự: tìm kiếm để hiển thị kết quả (không lưu lịch sử)
+                                  if (query.trim().isEmpty) {
+                                    blocContext.read<SearchBloc>().add(
+                                      const ClearSearch(),
+                                    );
+                                  } else {
+                                    blocContext.read<SearchBloc>().add(
+                                      SearchUsers(
+                                        query: query,
+                                        saveToHistory: false,
+                                      ),
+                                    );
+                                  }
+                                },
+                                onSearchSubmitted: (query) {
+                                  // Khi nhấn Enter: tìm kiếm và lưu vào lịch sử
+                                  if (query.trim().isEmpty) {
+                                    blocContext.read<SearchBloc>().add(
+                                      const ClearSearch(),
+                                    );
+                                  } else {
+                                    blocContext.read<SearchBloc>().add(
+                                      SearchUsers(
+                                        query: query,
+                                        saveToHistory: true,
+                                      ),
+                                    );
+                                  }
+                                },
+                                hintText: context.l10n.searchHint,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 8.rsh(context)),
+                      // Results
+                      Expanded(
+                        child: BlocBuilder<SearchBloc, SearchState>(
+                          builder: (context, state) {
+                            if (state is SearchInitial) {
+                              if (state.history != null &&
+                                  state.history!.isNotEmpty) {
+                                return _buildSearchHistory(
+                                  state.history!,
+                                  blocContext,
+                                );
+                              }
+                              return _buildEmptyState(
+                                icon: CupertinoIcons.search,
+                                message: context.l10n.searchEnterKeyword,
+                              );
+                            } else if (state is SearchLoading) {
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                ),
+                              );
+                            } else if (state is SearchError) {
+                              return _buildErrorState(
+                                state.message,
+                                blocContext,
+                              );
+                            } else if (state is SearchLoaded) {
+                              if (state.results.userResponseDtos.isEmpty) {
+                                return _buildEmptyState(
+                                  icon: CupertinoIcons.person_circle,
+                                  message: context.l10n.searchNoResults,
+                                );
+                              }
+                              return _buildResultsList(state, blocContext);
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           );
@@ -167,14 +177,14 @@ class _SearchPageState extends State<SearchPage> {
       },
       child: ListView.builder(
         controller: _scrollController,
-        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
         itemCount:
             state.results.userResponseDtos.length +
             (state.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == state.results.userResponseDtos.length) {
             return Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h),
+              padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
               child: const Center(child: CircularProgressIndicator()),
             );
           }
@@ -189,14 +199,17 @@ class _SearchPageState extends State<SearchPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.rs(context),
+            vertical: 8.rsh(context),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 context.l10n.searchRecent,
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 18.rsp(context),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
@@ -216,7 +229,7 @@ class _SearchPageState extends State<SearchPage> {
                 child: Text(
                   context.l10n.commonViewAll,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 14.rsp(context),
                     color: AppColors.primary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -243,12 +256,12 @@ class _SearchPageState extends State<SearchPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64.r, color: AppColors.textSecondary),
-          SizedBox(height: 16.h),
+          Icon(icon, size: 64.rsr(context), color: AppColors.textSecondary),
+          SizedBox(height: 16.rsh(context)),
           Text(
             message,
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -265,21 +278,21 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           Icon(
             CupertinoIcons.exclamationmark_triangle,
-            size: 64.r,
+            size: 64.rsr(context),
             color: Colors.red[300],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16.rsh(context)),
           Text(
             message,
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),
           if (blocContext != null) ...[
-            SizedBox(height: 16.h),
+            SizedBox(height: 16.rsh(context)),
             ElevatedButton(
               onPressed: () {
                 final state = blocContext.read<SearchBloc>().state;

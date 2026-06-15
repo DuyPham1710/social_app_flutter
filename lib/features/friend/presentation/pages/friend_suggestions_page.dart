@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/widgets/friend_suggestion_item.dart';
 import 'package:social_app_fe/features/friend/presentation/utils/friend_l10n_helper.dart';
@@ -64,44 +64,58 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
-        ),
-        title: Text(
-          context.l10n.friendSuggestionsTitle,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
-            icon: Icon(CupertinoIcons.search, color: AppColors.textPrimary),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header section
-            _buildHeaderSection(),
+    return Container(
+      color: AppColors.background,
 
-            // Danh sách gợi ý bạn bè
-            Expanded(child: _buildFriendSuggestionsList()),
-          ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
+          ),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              surfaceTintColor: Colors.transparent,
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(CupertinoIcons.back, color: AppColors.textPrimary),
+              ),
+              title: Text(
+                context.l10n.friendSuggestionsTitle,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/search');
+                  },
+                  icon: Icon(
+                    CupertinoIcons.search,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header section
+                  _buildHeaderSection(),
+
+                  // Danh sách gợi ý bạn bè
+                  Expanded(child: _buildFriendSuggestionsList()),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -110,20 +124,15 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
   Widget _buildHeaderSection() {
     return BlocBuilder<FriendBloc, FriendState>(
       builder: (context, state) {
-        int suggestionCount = 0;
-
-        if (state is FriendSuggestionsLoaded) {
-          suggestionCount = state.friendSuggestions.length;
-        } else if (state is FriendPageLoaded) {
-          suggestionCount = state.friendSuggestions.length;
-        }
-
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.rs(context),
+            vertical: 12.rsh(context),
+          ),
           child: Text(
             context.l10n.friendPeopleYouMayKnow,
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.rsp(context),
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
@@ -154,7 +163,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
             ),
           );
@@ -180,7 +189,7 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
               duration: const Duration(seconds: 4),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
               ),
               action: SnackBarAction(
                 label: context.l10n.commonRetry,
@@ -221,10 +230,14 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
               child: ListView.separated(
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.rs(context),
+                  vertical: 8.rsh(context),
+                ),
                 itemCount:
                     friendSuggestions.length + (_isLoadingMore(state) ? 1 : 0),
-                separatorBuilder: (context, index) => SizedBox(height: 8.h),
+                separatorBuilder: (context, index) =>
+                    SizedBox(height: 8.rsh(context)),
                 itemBuilder: (context, index) {
                   if (_isLoadingMore(state) &&
                       index == friendSuggestions.length) {
@@ -254,18 +267,18 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: 40.w,
-            height: 40.w,
+            width: 40.rs(context),
+            height: 40.rs(context),
             child: CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16.rsh(context)),
           Text(
             context.l10n.friendLoadingSuggestions,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14.rsp(context),
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
@@ -278,39 +291,49 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        padding: EdgeInsets.symmetric(horizontal: 32.rs(context)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64.r, color: Colors.red[300]),
-            SizedBox(height: 16.h),
+            Icon(
+              Icons.error_outline,
+              size: 64.rsr(context),
+              color: Colors.red[300],
+            ),
+            SizedBox(height: 16.rsh(context)),
             Text(
               context.l10n.commonErrorOccurred,
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 18.rsp(context),
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 8.rsh(context)),
             Text(
               localizedFriendActionMessage(context.l10n, message),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+              style: TextStyle(
+                fontSize: 14.rsp(context),
+                color: AppColors.textSecondary,
+              ),
             ),
-            SizedBox(height: 24.h),
+            SizedBox(height: 24.rsh(context)),
             ElevatedButton.icon(
               onPressed: () {
                 context.read<FriendBloc>().add(const LoadFriendPage());
               },
-              icon: const Icon(Icons.refresh, size: 18),
+              icon: Icon(Icons.refresh, size: 18.rsr(context)),
               label: Text(context.l10n.commonRetry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24.rs(context),
+                  vertical: 12.rsh(context),
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(8.rsr(context)),
                 ),
               ),
             ),
@@ -329,11 +352,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12.rsr(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12.r,
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12.rsr(context),
             offset: const Offset(0, 4),
           ),
         ],
@@ -369,11 +392,11 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
 
   Widget _buildLoadMoreIndicator() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.h),
+      padding: EdgeInsets.symmetric(vertical: 16.rsh(context)),
       child: Center(
         child: SizedBox(
-          width: 28.w,
-          height: 28.w,
+          width: 28.rs(context),
+          height: 28.rs(context),
           child: CircularProgressIndicator(
             strokeWidth: 3,
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -395,58 +418,58 @@ class _FriendSuggestionsPageState extends State<FriendSuggestionsPage> {
           height: MediaQuery.of(context).size.height * 0.6,
           child: Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              padding: EdgeInsets.symmetric(horizontal: 32.rs(context)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 120.w,
-                    height: 120.w,
+                    width: 120.rs(context),
+                    height: 120.rs(context),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       CupertinoIcons.person_2,
-                      size: 64.r,
+                      size: 64.rsr(context),
                       color: AppColors.primary,
                     ),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 24.rsh(context)),
                   Text(
                     context.l10n.friendNoSuggestions,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18.rsp(context),
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 12.rsh(context)),
                   Text(
                     context.l10n.friendNoSuggestionsDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 14.rsp(context),
                       color: AppColors.textSecondary,
                       height: 1.4,
                     ),
                   ),
-                  SizedBox(height: 32.h),
+                  SizedBox(height: 32.rsh(context)),
                   ElevatedButton.icon(
                     onPressed: () {
                       context.read<FriendBloc>().add(const LoadFriendPage());
                     },
-                    icon: const Icon(Icons.refresh, size: 18),
+                    icon: Icon(Icons.refresh, size: 18.rsr(context)),
                     label: Text(context.l10n.commonRefresh),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
-                        horizontal: 24.w,
-                        vertical: 12.h,
+                        horizontal: 24.rs(context),
+                        vertical: 12.rsh(context),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(8.rsr(context)),
                       ),
                     ),
                   ),

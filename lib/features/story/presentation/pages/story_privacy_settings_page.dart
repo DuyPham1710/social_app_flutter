@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
@@ -169,42 +169,64 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+      return Container(
+        color: AppColors.background,
+
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
+            ),
+            child: Scaffold(
+              backgroundColor: AppColors.background,
+              body: Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+            ),
+          ),
         ),
       );
     }
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          context.l10n.storyPrivacyTitle,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
+    return Container(
+      color: AppColors.background,
+
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: ResponsiveHelper.feedMaxWidth,
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 24.h),
-              // Who can see your story section
-              _buildWhoCanSeeSection(),
-            ],
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: AppColors.iconPrimary),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
+              title: Text(
+                context.l10n.storyPrivacyTitle,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18.rsp(context),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.rs(context)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 24.rsh(context)),
+                    // Who can see your story section
+                    _buildWhoCanSeeSection(),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -219,32 +241,35 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
           context.l10n.storyPrivacyQuestion,
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 20.sp,
+            fontSize: 20.rsp(context),
             fontWeight: FontWeight.w700,
           ),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8.rsh(context)),
         Text(
           context.l10n.storyPrivacyVisibleFor24h,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14.rsp(context),
+          ),
         ),
-        SizedBox(height: 20.h),
+        SizedBox(height: 20.rsh(context)),
         _buildPrivacyOption(
           icon: Icons.public,
           title: context.l10n.storyPrivacyPublic,
           description: context.l10n.storyPrivacyPublicDescription,
           value: _privacyPublic,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         _buildPrivacyOption(
           icon: Icons.people,
           title: context.l10n.storyPrivacyFriends,
           description: context.l10n.storyPrivacyFriendsDescription,
           value: _privacyFriends,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         _buildHideStoryOption(),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16.rsh(context)),
         _buildCustomPrivacyOption(),
       ],
     );
@@ -265,23 +290,30 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
         await _savePrivacy(value);
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+        padding: EdgeInsets.symmetric(
+          vertical: 12.rsh(context),
+          horizontal: 12.rs(context),
+        ),
         decoration: BoxDecoration(
           color: AppColors.secondBackground,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(12.rsr(context)),
         ),
         child: Row(
           children: [
             Container(
-              width: 40.w,
-              height: 40.w,
+              width: 40.rs(context),
+              height: 40.rs(context),
               decoration: BoxDecoration(
                 color: AppColors.background,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppColors.iconPrimary, size: 20.sp),
+              child: Icon(
+                icon,
+                color: AppColors.iconPrimary,
+                size: 20.rsp(context),
+              ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 12.rs(context)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,24 +322,24 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                     title,
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 16.sp,
+                      fontSize: 16.rsp(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 4.rsh(context)),
                   Text(
                     description,
                     style: TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 13.sp,
+                      fontSize: 13.rsp(context),
                     ),
                   ),
                 ],
               ),
             ),
             Container(
-              width: 24.w,
-              height: 24.w,
+              width: 24.rs(context),
+              height: 24.rs(context),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -318,8 +350,8 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               child: isSelected
                   ? Center(
                       child: Container(
-                        width: 14.w,
-                        height: 14.w,
+                        width: 14.rs(context),
+                        height: 14.rs(context),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
@@ -378,6 +410,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               _selectedPrivacy = _privacyFriendsExcept;
             });
             await _savePrivacy(_privacyFriendsExcept);
+            if (!context.mounted) return;
 
             final selectedIds = await Navigator.of(context).push<List<String>>(
               MaterialPageRoute(
@@ -395,10 +428,13 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
             }
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(
+              vertical: 12.rsh(context),
+              horizontal: 12.rs(context),
+            ),
             decoration: BoxDecoration(
               color: AppColors.secondBackground,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
             ),
             child: Row(
               children: [
@@ -410,16 +446,16 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                         context.l10n.storyPrivacyHideFrom,
                         style: TextStyle(
                           color: AppColors.textPrimary,
-                          fontSize: 16.sp,
+                          fontSize: 16.rsp(context),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 4.rsh(context)),
                       Text(
                         displayText,
                         style: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 13.sp,
+                          fontSize: 13.rsp(context),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -430,7 +466,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                 Icon(
                   Icons.chevron_right,
                   color: AppColors.textSecondary,
-                  size: 24.sp,
+                  size: 24.rsp(context),
                 ),
               ],
             ),
@@ -486,6 +522,7 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
               _selectedPrivacy = _privacyFriendsDetail;
             });
             await _savePrivacy(_privacyFriendsDetail);
+            if (!context.mounted) return;
 
             // Then navigate to friend selection page
             final selectedIds = await Navigator.of(context).push<List<String>>(
@@ -506,16 +543,19 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
             }
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(
+              vertical: 12.rsh(context),
+              horizontal: 12.rs(context),
+            ),
             decoration: BoxDecoration(
               color: AppColors.secondBackground,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 40.w,
-                  height: 40.w,
+                  width: 40.rs(context),
+                  height: 40.rs(context),
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     shape: BoxShape.circle,
@@ -523,10 +563,10 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   child: Icon(
                     Icons.person_outline,
                     color: AppColors.iconPrimary,
-                    size: 20.sp,
+                    size: 20.rsp(context),
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12.rs(context)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -535,16 +575,16 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                         context.l10n.storyPrivacyCustom,
                         style: TextStyle(
                           color: AppColors.textPrimary,
-                          fontSize: 16.sp,
+                          fontSize: 16.rsp(context),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 4.rsh(context)),
                       Text(
                         displayText,
                         style: TextStyle(
                           color: AppColors.textSecondary,
-                          fontSize: 13.sp,
+                          fontSize: 13.rsp(context),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -553,8 +593,8 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   ),
                 ),
                 Container(
-                  width: 24.w,
-                  height: 24.w,
+                  width: 24.rs(context),
+                  height: 24.rs(context),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -565,8 +605,8 @@ class _StoryPrivacySettingsPageState extends State<StoryPrivacySettingsPage> {
                   child: isSelected
                       ? Center(
                           child: Container(
-                            width: 14.w,
-                            height: 14.w,
+                            width: 14.rs(context),
+                            height: 14.rs(context),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               shape: BoxShape.circle,

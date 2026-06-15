@@ -3,8 +3,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/app/presentation/pages/profile_navigation_page.dart';
 import 'package:social_app_fe/features/app/presentation/widgets/custom_bottom_navigation.dart';
+import 'package:social_app_fe/features/app/presentation/widgets/side_navigation.dart';
 import 'package:social_app_fe/features/friend/presentation/pages/friend_page.dart';
 import 'package:social_app_fe/features/home/presentation/pages/home_page.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
@@ -119,16 +121,35 @@ class _MainPageState extends State<MainPage> {
       return;
     }
 
-    // Update _currentIndex AFTER jumpToPage to ensure onPageChanged works correctly
-    _pageController.jumpToPage(index);
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        setState(() {
-          _currentIndex = index;
-          _isBottomNavVisible = true; // reset visibility when changing tabs
-        });
+    final isSidebarLayout = ResponsiveHelper.shouldShowSidebar(context);
+
+    if (isSidebarLayout) {
+      // On web/desktop: use IndexedStack, just update index
+      _markNotificationsReadIfLeaving(index);
+      setState(() {
+        _currentIndex = index;
+      });
+    } else {
+      // On mobile: use PageView with jumpToPage
+      _pageController.jumpToPage(index);
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          setState(() {
+            _currentIndex = index;
+            _isBottomNavVisible = true; // reset visibility when changing tabs
+          });
+        }
+      });
+    }
+  }
+
+  void _markNotificationsReadIfLeaving(int newIndex) {
+    if (_currentIndex == 3 && newIndex != 3) {
+      final unread = context.read<NotificationBloc>().state.unread;
+      if (unread > 0) {
+        context.read<NotificationBloc>().add(MarkAllNotificationsRead());
       }
-    });
+    }
   }
 
   bool _handleScrollNotification(ScrollNotification notification) {
@@ -153,8 +174,30 @@ class _MainPageState extends State<MainPage> {
     return false;
   }
 
+  /// Build the list of page children (shared between mobile & desktop)
+  List<Widget> _buildPages() {
+    return [
+      HomePage(key: _homePageKey),
+      FriendPage(),
+      CreatePostPage(
+        onPostCreated: () {
+          if (ResponsiveHelper.shouldShowSidebar(context)) {
+            setState(() => _currentIndex = 0);
+          } else {
+            _pageController.jumpToPage(0);
+            setState(() => _currentIndex = 0);
+          }
+        },
+      ),
+      NotificationPage(),
+      ProfileNavigationPage(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isSidebarLayout = ResponsiveHelper.shouldShowSidebar(context);
+
     return ListenableBuilder(
       listenable: s1<AppPreferences>(),
       builder: (context, child) {
@@ -168,75 +211,97 @@ class _MainPageState extends State<MainPage> {
           },
           child: Scaffold(
             backgroundColor: AppColors.background,
-            body: Stack(
-              children: [
-                NotificationListener<ScrollNotification>(
-                  onNotification: _handleScrollNotification,
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      // Mark all notifications as read when leaving notification page
-                      if (_currentIndex == 3 && index != 3) {
-                        final unread = context
-                            .read<NotificationBloc>()
-                            .state
-                            .unread;
-                        if (unread > 0) {
-                          context.read<NotificationBloc>().add(
-                            MarkAllNotificationsRead(),
-                          );
-                        }
-                      }
-                      setState(() {
-                        _currentIndex = index;
-                        _isBottomNavVisible = true; // reset visibility
-                      });
-                    },
-                    //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
-                    children: [
-                      HomePage(key: _homePageKey),
-                      FriendPage(),
-                      CreatePostPage(
-                        onPostCreated: () {
-                          _pageController.jumpToPage(0);
-                          setState(() => _currentIndex = 0);
-                        },
-                      ),
-                      NotificationPage(),
-                      ProfileNavigationPage(),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    height: _isBottomNavVisible
-                        ? (86.h + MediaQuery.of(context).padding.bottom)
-                        : 0,
-                    child: SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: BlocBuilder<NotificationBloc, NotificationState>(
-                        builder: (context, notificationState) {
-                          return CustomBottomNavigation(
-                            currentIndex: _currentIndex,
-                            onTabSelected: _onTabSelected,
-                            unreadCount: notificationState.unread,
-                            avt: _getAvtCurrent(),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            body: isSidebarLayout
+                ? _buildDesktopLayout()
+                : _buildMobileLayout(),
           ),
         );
       },
+    );
+  }
+
+  /// Desktop/Web layout: Side Navigation + Content
+  Widget _buildDesktopLayout() {
+    final pages = _buildPages();
+
+    return Row(
+      children: [
+        // Side Navigation
+        BlocBuilder<NotificationBloc, NotificationState>(
+          builder: (context, notificationState) {
+            return SideNavigation(
+              currentIndex: _currentIndex,
+              onTabSelected: _onTabSelected,
+              unreadCount: notificationState.unread,
+              avt: _getAvtCurrent(),
+            );
+          },
+        ),
+
+        // Main Content Area
+        Expanded(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveHelper.feedMaxWidth,
+              ),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: _handleScrollNotification,
+                child: IndexedStack(index: _currentIndex, children: pages),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Mobile layout: PageView + Bottom Navigation (original layout)
+  Widget _buildMobileLayout() {
+    return Stack(
+      children: [
+        NotificationListener<ScrollNotification>(
+          onNotification: _handleScrollNotification,
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              // Mark all notifications as read when leaving notification page
+              _markNotificationsReadIfLeaving(index);
+              setState(() {
+                _currentIndex = index;
+                _isBottomNavVisible = true; // reset visibility
+              });
+            },
+            //   physics: const AlwaysScrollableScrollPhysics(), // chỉ cho đổi bằng nav
+            children: _buildPages(),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            height: _isBottomNavVisible
+                ? (86.h + MediaQuery.of(context).padding.bottom)
+                : 0,
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: BlocBuilder<NotificationBloc, NotificationState>(
+                builder: (context, notificationState) {
+                  return CustomBottomNavigation(
+                    currentIndex: _currentIndex,
+                    onTabSelected: _onTabSelected,
+                    unreadCount: notificationState.unread,
+                    avt: _getAvtCurrent(),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

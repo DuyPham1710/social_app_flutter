@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
@@ -120,63 +120,80 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => s1<SavedItemsBloc>()..add(const LoadSavedItems()),
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: AppColors.background,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: AppColors.iconPrimary),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            'Đã lưu',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.bold,
+      child: Container(
+        color: AppColors.background,
+
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveHelper.feedMaxWidth,
             ),
-          ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: Icon(Icons.search_rounded, color: AppColors.iconPrimary),
-              onPressed: () {
-                // TODO: Handle search within saved items
-              },
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            _buildArchivedStoriesTile(context),
-            _buildCategoryTabs(),
-            Expanded(
-              child: BlocConsumer<SavedItemsBloc, SavedItemsState>(
-                buildWhen: (previous, current) =>
-                    current is! SavedItemsActionSuccess,
-                listener: (context, state) {
-                  if (state is SavedItemsLoaded) {
-                    _refreshController.refreshCompleted();
-                    if (state.hasReachedMax) {
-                      _refreshController.loadNoData();
-                    } else {
-                      _refreshController.loadComplete();
-                    }
-                  } else if (state is SavedItemsError) {
-                    _refreshController.refreshFailed();
-                    _refreshController.loadFailed();
-                    showErrorSnackBar(context, state.message);
-                  } else if (state is SavedItemsActionSuccess) {
-                    showSuccessSnackBar(context, state.message);
-                  }
-                },
-                builder: (context, state) {
-                  return _buildContent(context, state);
-                },
+            child: Scaffold(
+              backgroundColor: AppColors.background,
+              appBar: AppBar(
+                backgroundColor: AppColors.background,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.iconPrimary,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                title: Text(
+                  'Đã lưu',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.search_rounded,
+                      color: AppColors.iconPrimary,
+                    ),
+                    onPressed: () {
+                      // TODO: Handle search within saved items
+                    },
+                  ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  _buildArchivedStoriesTile(context),
+                  _buildCategoryTabs(),
+                  Expanded(
+                    child: BlocConsumer<SavedItemsBloc, SavedItemsState>(
+                      buildWhen: (previous, current) =>
+                          current is! SavedItemsActionSuccess,
+                      listener: (context, state) {
+                        if (state is SavedItemsLoaded) {
+                          _refreshController.refreshCompleted();
+                          if (state.hasReachedMax) {
+                            _refreshController.loadNoData();
+                          } else {
+                            _refreshController.loadComplete();
+                          }
+                        } else if (state is SavedItemsError) {
+                          _refreshController.refreshFailed();
+                          _refreshController.loadFailed();
+                          showErrorSnackBar(context, state.message);
+                        } else if (state is SavedItemsActionSuccess) {
+                          showSuccessSnackBar(context, state.message);
+                        }
+                      },
+                      builder: (context, state) {
+                        return _buildContent(context, state);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -184,10 +201,15 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
 
   Widget _buildArchivedStoriesTile(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+      padding: EdgeInsets.fromLTRB(
+        16.rs(context),
+        8.rsh(context),
+        16.rs(context),
+        8.rsh(context),
+      ),
       child: Material(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(16.rsr(context)),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
@@ -199,23 +221,26 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
             );
           },
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 14.rs(context),
+              vertical: 12.rsh(context),
+            ),
             child: Row(
               children: [
                 Container(
-                  width: 44.w,
-                  height: 44.w,
+                  width: 44.rs(context),
+                  height: 44.rs(context),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(14.rsr(context)),
                   ),
                   child: Icon(
                     Icons.history_rounded,
                     color: AppColors.primary,
-                    size: 24.sp,
+                    size: 24.rsp(context),
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12.rs(context)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +266,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                 Icon(
                   Icons.chevron_right_rounded,
                   color: AppColors.textSecondary,
-                  size: 24.sp,
+                  size: 24.rsp(context),
                 ),
               ],
             ),
@@ -310,10 +335,15 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
           context.read<SavedItemsBloc>().add(const LoadSavedItems());
         },
         child: MasonryGridView.count(
-          padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 18.h),
+          padding: EdgeInsets.fromLTRB(
+            12.rs(context),
+            8.rsh(context),
+            12.rs(context),
+            18.rsh(context),
+          ),
           crossAxisCount: 2,
-          mainAxisSpacing: 12.w,
-          crossAxisSpacing: 12.w,
+          mainAxisSpacing: 12.rs(context),
+          crossAxisSpacing: 12.rs(context),
           itemCount: state.items.length,
           itemBuilder: (context, index) {
             final item = state.items[index];
@@ -334,23 +364,28 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     return MasonryGridView.count(
       key: key,
       physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 18.h),
+      padding: EdgeInsets.fromLTRB(
+        12.rs(context),
+        8.rsh(context),
+        12.rs(context),
+        18.rsh(context),
+      ),
       crossAxisCount: 2,
-      mainAxisSpacing: 12.w,
-      crossAxisSpacing: 12.w,
+      mainAxisSpacing: 12.rs(context),
+      crossAxisSpacing: 12.rs(context),
       itemCount: 8,
       itemBuilder: (context, index) {
-        final height = index % 3 == 0 ? 190.h : 142.h;
+        final height = index % 3 == 0 ? 190.rsh(context) : 142.rsh(context);
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return Container(
           height: height,
           decoration: BoxDecoration(
             color: AppColors.secondBackground,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(16.rsr(context)),
             border: Border.all(color: AppColors.divider),
           ),
           child: Padding(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(12.rs(context)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -360,14 +395,14 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                       color: isDark
                           ? AppColors.background
                           : const Color(0xFFE9EEF5),
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(12.rsr(context)),
                     ),
                   ),
                 ),
-                SizedBox(height: 10.h),
-                _SkeletonLine(width: 100.w),
-                SizedBox(height: 7.h),
-                _SkeletonLine(width: 72.w),
+                SizedBox(height: 10.rsh(context)),
+                _SkeletonLine(width: 100.rs(context)),
+                SizedBox(height: 7.rsh(context)),
+                _SkeletonLine(width: 72.rs(context)),
               ],
             ),
           ),
@@ -387,41 +422,45 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     return Center(
       key: key,
       child: Padding(
-        padding: EdgeInsets.all(28.w),
+        padding: EdgeInsets.all(28.rs(context)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 64.w,
-              height: 64.w,
+              width: 64.rs(context),
+              height: 64.rs(context),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.10),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppColors.primary, size: 32.sp),
+              child: Icon(
+                icon,
+                color: AppColors.primary,
+                size: 32.rsp(context),
+              ),
             ),
-            SizedBox(height: 14.h),
+            SizedBox(height: 14.rsh(context)),
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 16.rsp(context),
                 fontWeight: FontWeight.w800,
                 color: AppColors.textPrimary,
               ),
             ),
-            SizedBox(height: 6.h),
+            SizedBox(height: 6.rsh(context)),
             Text(
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13.sp,
+                fontSize: 13.rsp(context),
                 height: 1.35,
                 color: AppColors.textSecondary,
               ),
             ),
             if (actionLabel != null && onAction != null) ...[
-              SizedBox(height: 16.h),
+              SizedBox(height: 16.rsh(context)),
               FilledButton.icon(
                 onPressed: onAction,
                 icon: const Icon(Icons.refresh_rounded),
@@ -447,10 +486,15 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         }
 
         return SizedBox(
-          height: 54.h,
+          height: 54.rsh(context),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 10.h),
+            padding: EdgeInsets.fromLTRB(
+              16.rs(context),
+              8.rsh(context),
+              16.rs(context),
+              10.rsh(context),
+            ),
             itemCount: _currentCategories.length,
             itemBuilder: (context, index) {
               final category = _currentCategories[index];
@@ -472,13 +516,13 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   curve: Curves.easeOutCubic,
-                  margin: EdgeInsets.only(right: 12.w),
-                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  margin: EdgeInsets.only(right: 12.rs(context)),
+                  padding: EdgeInsets.symmetric(horizontal: 14.rs(context)),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary
                         : AppColors.secondBackground,
-                    borderRadius: BorderRadius.circular(999.r),
+                    borderRadius: BorderRadius.circular(999.rsr(context)),
                     border: Border.all(
                       color: isSelected ? AppColors.primary : AppColors.divider,
                     ),
@@ -489,7 +533,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                             BoxShadow(
                               color: AppColors.primary.withValues(alpha: 0.20),
                               blurRadius: 10,
-                              offset: Offset(0, 4.h),
+                              offset: Offset(0, 4.rsh(context)),
                             ),
                           ]
                         : null,
@@ -501,12 +545,12 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                       if (isCollection) ...[
                         Icon(
                           Icons.collections_bookmark_outlined,
-                          size: 15.sp,
+                          size: 15.rsp(context),
                           color: isSelected
                               ? Colors.white
                               : AppColors.textSecondary,
                         ),
-                        SizedBox(width: 6.w),
+                        SizedBox(width: 6.rs(context)),
                       ],
                       Text(
                         label,
@@ -517,7 +561,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                           fontWeight: isSelected
                               ? FontWeight.w800
                               : FontWeight.w600,
-                          fontSize: 13.sp,
+                          fontSize: 13.rsp(context),
                         ),
                       ),
                     ],
@@ -541,7 +585,7 @@ class _SkeletonLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
-      height: 10.h,
+      height: 10.rsh(context),
       decoration: BoxDecoration(
         color: const Color(0xFFE9EEF5),
         borderRadius: BorderRadius.circular(999),

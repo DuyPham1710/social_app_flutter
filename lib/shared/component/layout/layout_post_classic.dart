@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/shared/component/video_player_widget.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
@@ -72,6 +74,44 @@ class LayoutPostClassic extends StatelessWidget {
           },
         );
       }
+    } else if (imageData is Uint8List) {
+      mediaWidget = Image.memory(
+        imageData,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.broken_image, color: Colors.grey[600]),
+          );
+        },
+      );
+    } else if (imageData is PlatformFile) {
+      if (VideoUtil.isVideo(imageData)) {
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData);
+        }
+        mediaWidget = _buildVideoPreviewPlaceholder(imageData);
+      } else {
+        try {
+          mediaWidget = Image.memory(
+            imageData.bytes!,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[300],
+                child: Icon(Icons.broken_image, color: Colors.grey[600]),
+              );
+            },
+          );
+        } catch (e) {
+          mediaWidget = Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.broken_image, color: Colors.grey[600]),
+          );
+        }
+      }
     } else if (imageData != null && imageData.url != null) {
       if (VideoUtil.isVideo(imageData.url)) {
         if (urls.length != 1) {
@@ -101,39 +141,26 @@ class LayoutPostClassic extends StatelessWidget {
       );
     }
 
-    // // If it's a video, add play icon overlay
-    // if (VideoUtil.isVideo(imageData)) {
-    //   return Stack(
-    //     fit: StackFit.expand,
-    //     children: [
-    //       mediaWidget,
-    //       Container(
-    //         color: Colors.black.withOpacity(0.3),
-    //         child: Center(
-    //           child: Icon(
-    //             Icons.play_circle_filled,
-    //             color: Colors.white,
-    //             size: 48.sp,
-    //           ),
-    //         ),
-    //       ),
-    //     ],
-    //   );
-    // }
-
     return mediaWidget;
   }
 
-  Widget _buildVideoPreviewPlaceholder(String videoSource) {
-    return buildVideoThumbnail(videoSource);
+  Widget _buildVideoPreviewPlaceholder(dynamic videoSource) {
+    if (videoSource is PlatformFile) {
+      try {
+        return buildVideoThumbnail(videoSource.name, videoBytes: videoSource.bytes);
+      } catch (e) {
+        return buildVideoThumbnail(videoSource.name);
+      }
+    } else if (videoSource is String) {
+      return buildVideoThumbnail(videoSource);
+    }
+    return buildVideoThumbnail(videoSource.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     if (urls.isEmpty) return const SizedBox.shrink();
 
-    // Không cần sort cho local files vì chúng đã được sắp xếp
-    // final orderedUrls = sortedUrls;
     final orderedUrls = urls;
 
     if (orderedUrls.length == 1) {
@@ -143,8 +170,8 @@ class LayoutPostClassic extends StatelessWidget {
         child: AspectRatio(
           aspectRatio: 1.0,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-              child: _buildImageWidget(orderedUrls[0], 0),
+            borderRadius: BorderRadius.circular(8.rsr(context)),
+            child: _buildImageWidget(orderedUrls[0], 0),
           ),
         ),
       );
@@ -163,7 +190,7 @@ class LayoutPostClassic extends StatelessWidget {
               ),
             ),
 
-            SizedBox(width: 4.w),
+            SizedBox(width: 4.rs(context)),
 
             // Ảnh mới (ảnh thứ hai)
             Expanded(
@@ -178,11 +205,11 @@ class LayoutPostClassic extends StatelessWidget {
       );
     } else {
       // 3+ hình: xuống dòng, layout grid
-      return _buildClassicGrid(orderedUrls);
+      return _buildClassicGrid(context, orderedUrls);
     }
   }
 
-  Widget _buildClassicGrid(List<dynamic> orderedUrls) {
+  Widget _buildClassicGrid(BuildContext context, List<dynamic> orderedUrls) {
     return Column(
       children: [
         // Dòng đầu: 2 ảnh đầu tiên
@@ -196,7 +223,7 @@ class LayoutPostClassic extends StatelessWidget {
                   child: _buildImageWidget(orderedUrls[0], 0),
                 ),
               ),
-              SizedBox(width: 4.w),
+              SizedBox(width: 4.rs(context)),
               Expanded(
                 child: GestureDetector(
                   onTap: () => onImageTap(1),
@@ -207,18 +234,21 @@ class LayoutPostClassic extends StatelessWidget {
           ),
         ),
 
-        if (orderedUrls.length > 2) SizedBox(height: 4.h),
+        if (orderedUrls.length > 2) SizedBox(height: 4.rsh(context)),
 
         // Dòng thứ 2: ảnh còn lại
         AspectRatio(
           aspectRatio: 2.0,
-          child: Row(children: _buildSecondRowImages(orderedUrls)),
+          child: Row(children: _buildSecondRowImages(context, orderedUrls)),
         ),
       ],
     );
   }
 
-  List<Widget> _buildSecondRowImages(List<dynamic> orderedUrls) {
+  List<Widget> _buildSecondRowImages(
+    BuildContext context,
+    List<dynamic> orderedUrls,
+  ) {
     List<Widget> images = [];
     final maxImagesInSecondRow = orderedUrls.length > 4
         ? 2
@@ -226,7 +256,7 @@ class LayoutPostClassic extends StatelessWidget {
 
     for (int i = 2; i < 2 + maxImagesInSecondRow; i++) {
       // khoảng cách giữa các ảnh
-      if (i > 2) images.add(SizedBox(width: 4.w));
+      if (i > 2) images.add(SizedBox(width: 4.rs(context)));
 
       // Nếu là ảnh cuối cùng trong dòng 2 và còn nhiều ảnh hơn => overlay
       if (i == 3 && orderedUrls.length > 4) {
@@ -240,16 +270,13 @@ class LayoutPostClassic extends StatelessWidget {
                 children: [
                   _buildImageWidget(orderedUrls[i], i),
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      //          borderRadius: BorderRadius.circular(8.r),
-                    ),
+                    decoration: const BoxDecoration(color: Colors.black54),
                     alignment: Alignment.center,
                     child: Text(
                       '+$remaining',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 24.sp,
+                        fontSize: 24.rsp(context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -264,7 +291,7 @@ class LayoutPostClassic extends StatelessWidget {
           Expanded(
             child: GestureDetector(
               onTap: () => onImageTap(i),
-                child: _buildImageWidget(orderedUrls[i], i),
+              child: _buildImageWidget(orderedUrls[i], i),
             ),
           ),
         );

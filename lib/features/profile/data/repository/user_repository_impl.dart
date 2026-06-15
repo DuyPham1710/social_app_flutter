@@ -46,6 +46,32 @@ class UserRepositoryImpl implements UserRepository {
     UpdateUserEntity params,
   ) async {
     try {
+      MultipartFile? avatarMultipart;
+      if (params.avatarBytes != null && params.avatarName != null) {
+        avatarMultipart = MultipartFile.fromBytes(
+          params.avatarBytes!,
+          filename: params.avatarName,
+        );
+      } else if (params.avatarFile != null) {
+        avatarMultipart = await MultipartFile.fromFile(
+          params.avatarFile!.path,
+          filename: params.avatarFile!.path.split('/').last,
+        );
+      }
+
+      MultipartFile? coverMultipart;
+      if (params.coverBytes != null && params.coverName != null) {
+        coverMultipart = MultipartFile.fromBytes(
+          params.coverBytes!,
+          filename: params.coverName,
+        );
+      } else if (params.coverFile != null) {
+        coverMultipart = await MultipartFile.fromFile(
+          params.coverFile!.path,
+          filename: params.coverFile!.path.split('/').last,
+        );
+      }
+
       final userModel = await _remoteDataSource.updateUserProfile(
         fullName: params.fullName,
         phoneNumber: null, 
@@ -59,11 +85,31 @@ class UserRepositoryImpl implements UserRepository {
         relationshipStatus: params.relationshipStatus,
 
         // File ảnh
-        avatarFile: params.avatarFile,
-        coverFile: params.coverFile,
+        avatarFile: avatarMultipart != null ? [avatarMultipart] : null,
+        coverFile: coverMultipart != null ? [coverMultipart] : null,
       );
 
       return DataStateSuccess(userModel);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<void>> reportUser({
+    required String reportedUserId,
+    required String reason,
+    String? description,
+  }) async {
+    try {
+      await _remoteDataSource.reportUser(
+        reportedUserId,
+        {
+          'reason': reason,
+          if (description != null) 'description': description,
+        },
+      );
+      return const DataStateSuccess(null);
     } on DioException catch (e) {
       return DataStateError(e);
     }

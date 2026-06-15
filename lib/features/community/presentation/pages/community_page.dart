@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -17,7 +18,7 @@ import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class CommunityPage extends StatefulWidget {
-  const CommunityPage({super.key});
+  CommunityPage({super.key});
 
   @override
   State<CommunityPage> createState() => _CommunityPageState();
@@ -42,22 +43,20 @@ class _CommunityPageState extends State<CommunityPage>
     switch (index) {
       case 0:
         providerContext.read<CommunityListBloc>().add(
-          const CommunityListFetched(page: 1, limit: 10),
+          CommunityListFetched(page: 1, limit: 10),
         );
       case 1:
-        providerContext.read<CommunityListBloc>().add(
-          const MyCommunitiesFetched(),
-        );
+        providerContext.read<CommunityListBloc>().add(MyCommunitiesFetched());
       case 2:
-        providerContext.read<CommunityListBloc>().add(const MyInvitesFetched());
+        providerContext.read<CommunityListBloc>().add(MyInvitesFetched());
       case 3:
         providerContext.read<CommunityListBloc>().add(
-          const PendingCommunitiesFetched(),
+          PendingCommunitiesFetched(),
         );
       case 4:
         // Community posts tab
         providerContext.read<CommunityPostsTabBloc>().add(
-          const CommunityPostsTabFetched(status: 'all'),
+          CommunityPostsTabFetched(status: 'all'),
         );
     }
   }
@@ -90,14 +89,14 @@ class _CommunityPageState extends State<CommunityPage>
   Future<void> _openCreateCommunity(BuildContext providerContext) async {
     final result = await Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (_) => const CreateCommunityPage()));
+    ).push(MaterialPageRoute(builder: (_) => CreateCommunityPage()));
 
     if (!mounted || result == null) {
       return;
     }
 
     _tabController.animateTo(1);
-    providerContext.read<CommunityListBloc>().add(const MyCommunitiesFetched());
+    providerContext.read<CommunityListBloc>().add(MyCommunitiesFetched());
     showSuccessSnackBar(context, context.l10n.communityCreateSuccess);
   }
 
@@ -138,261 +137,297 @@ class _CommunityPageState extends State<CommunityPage>
             if (_tabController.index == 0) {
               _didInitialLoad = true;
               newContext.read<CommunityListBloc>().add(
-                const CommunityListFetched(page: 1, limit: 10),
+                CommunityListFetched(page: 1, limit: 10),
               );
             }
           });
 
-          return Scaffold(
-            backgroundColor: AppColors.secondBackground,
-            appBar: AppBar(
-              toolbarHeight: 172,
-              titleSpacing: 0,
-              automaticallyImplyLeading: false,
-              title: const SizedBox.shrink(),
-              backgroundColor: AppColors.secondBackground,
-              foregroundColor: AppColors.iconPrimary,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              surfaceTintColor: Colors.transparent,
-              flexibleSpace: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.18),
-                          AppColors.background,
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: -30,
-                    top: -24,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.background.withValues(alpha: 0.35),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: -40,
-                    top: 20,
-                    child: Container(
-                      width: 110,
-                      height: 110,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.background.withValues(alpha: 0.28),
-                      ),
-                    ),
-                  ),
-                  SafeArea(
-                    bottom: false,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(6, 4, 12, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: IconButton(
-                              onPressed: () {
-                                if (Navigator.of(context).canPop()) {
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              icon: const Icon(Icons.arrow_back_rounded),
-                              color: AppColors.iconPrimary,
-                              tooltip: context.l10n.commonBack,
-                              iconSize: 21,
-                              visualDensity: VisualDensity.compact,
-                              constraints: const BoxConstraints(
-                                minWidth: 34,
-                                minHeight: 34,
-                              ),
-                              padding: const EdgeInsets.all(6),
+          return Container(
+            color: AppColors.background,
+
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: ResponsiveHelper.feedMaxWidth,
+                ),
+
+                child: Scaffold(
+                  backgroundColor: AppColors.secondBackground,
+                  appBar: AppBar(
+                    toolbarHeight: 172,
+                    titleSpacing: 0,
+                    automaticallyImplyLeading: false,
+                    title: SizedBox.shrink(),
+                    backgroundColor: AppColors.secondBackground,
+                    foregroundColor: AppColors.iconPrimary,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    surfaceTintColor: Colors.transparent,
+                    flexibleSpace: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColors.primary.withValues(alpha: 0.18),
+                                AppColors.background,
+                              ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(
-                              context.l10n.communityExploreTitle,
-                              maxLines: 2,
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 24,
-                                height: 1.1,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                        ),
+                        Positioned(
+                          right: -30,
+                          top: -24,
+                          child: Container(
+                            width: 120.rs(context),
+                            height: 120.rsh(context),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.background.withValues(
+                                alpha: 0.35,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Row(
+                        ),
+                        Positioned(
+                          left: -40,
+                          top: 20.rsh(context),
+                          child: Container(
+                            width: 110.rs(context),
+                            height: 110.rsh(context),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.background.withValues(
+                                alpha: 0.28,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SafeArea(
+                          bottom: false,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              6.rs(context),
+                              4.rsh(context),
+                              12.rs(context),
+                              12.rsh(context),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      if (Navigator.of(context).canPop()) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                    icon: Icon(Icons.arrow_back_rounded),
+                                    color: AppColors.iconPrimary,
+                                    tooltip: context.l10n.commonBack,
+                                    iconSize: 21.rsp(context),
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: BoxConstraints(
+                                      minWidth: 34.rs(context),
+                                      minHeight: 34.rsh(context),
+                                    ),
+                                    padding: EdgeInsets.all(6.rs(context)),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 10.rs(context),
+                                  ),
                                   child: Text(
-                                    context.l10n.communityExploreSubtitle,
+                                    context.l10n.communityExploreTitle,
                                     maxLines: 2,
                                     softWrap: true,
                                     style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 24.rsp(context),
+                                      height: 1.1.rsh(context),
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                FilledButton.icon(
-                                  onPressed: () =>
-                                      _openCreateCommunity(newContext),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    minimumSize: const Size(92, 32),
-                                    textStyle: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
+                                SizedBox(height: 6.rsh(context)),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 10.rs(context),
                                   ),
-                                  icon: const Icon(Icons.group_add, size: 15),
-                                  label: Text(
-                                    context.l10n.communityCreateGroup,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          context.l10n.communityExploreSubtitle,
+                                          maxLines: 2,
+                                          softWrap: true,
+                                          style: TextStyle(
+                                            fontSize: 12.rsp(context),
+                                            color: AppColors.textSecondary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.rs(context)),
+                                      FilledButton.icon(
+                                        onPressed: () =>
+                                            _openCreateCommunity(newContext),
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: AppColors.primary,
+                                          foregroundColor: Colors.white,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.rs(context),
+                                            vertical: 6.rsh(context),
+                                          ),
+                                          minimumSize: Size(92, 32),
+                                          textStyle: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 12.rsp(context),
+                                          ),
+                                        ),
+                                        icon: Icon(
+                                          Icons.group_add,
+                                          size: 15.rsp(context),
+                                        ),
+                                        label: Text(
+                                          context.l10n.communityCreateGroup,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  body: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.secondBackground,
+                          AppColors.background,
                         ],
                       ),
                     ),
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.fromLTRB(0, 4.rsh(context), 0, 0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: AppColors.divider,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: TabBar(
+                            controller: _tabController,
+                            onTap: (index) {
+                              _onTabChanged(newContext, index);
+                            },
+                            isScrollable: true,
+                            tabAlignment: TabAlignment.start,
+                            padding: EdgeInsets.zero,
+                            indicatorSize: TabBarIndicatorSize.label,
+                            indicatorPadding: EdgeInsets.symmetric(
+                              horizontal: 0,
+                            ),
+                            indicatorWeight: 2.5,
+                            splashFactory: NoSplash.splashFactory,
+                            overlayColor: WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
+                            labelPadding: EdgeInsets.symmetric(
+                              horizontal: 16.rs(context),
+                              vertical: 4.rsh(context),
+                            ),
+                            labelColor: AppColors.primary,
+                            unselectedLabelColor: AppColors.textSecondary,
+                            dividerColor: Colors.transparent,
+                            indicator: UnderlineTabIndicator(
+                              borderSide: BorderSide(
+                                color: AppColors.primary,
+                                width: 2.5.rs(context),
+                              ),
+                            ),
+                            tabs: [
+                              Tab(
+                                child: Text(
+                                  context.l10n.communityExploreTab,
+                                  style: TextStyle(
+                                    fontSize: 13.rsp(context),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Tab(
+                                child: Text(
+                                  context.l10n.communityMineTab,
+                                  style: TextStyle(
+                                    fontSize: 13.rsp(context),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Tab(
+                                child: Text(
+                                  context.l10n.communityInvitesTab,
+                                  style: TextStyle(
+                                    fontSize: 13.rsp(context),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Tab(
+                                child: Text(
+                                  context.l10n.communityPendingTab,
+                                  style: TextStyle(
+                                    fontSize: 13.rsp(context),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Tab(
+                                child: Text(
+                                  context.l10n.communityPostsTab,
+                                  style: TextStyle(
+                                    fontSize: 13.rsp(context),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 12.rsh(context)),
+                        Expanded(
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              CommunityListWidget(),
+                              MyCommunitiesWidget(),
+                              MyInvitesWidget(),
+                              PendingCommunitiesWidget(),
+                              CommunityPostsWidget(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
-            body: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.secondBackground, AppColors.background],
                 ),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(0, 4, 0, 0),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: AppColors.divider, width: 1),
-                      ),
-                    ),
-                    child: TabBar(
-                      controller: _tabController,
-                      onTap: (index) {
-                        _onTabChanged(newContext, index);
-                      },
-                      isScrollable: true,
-                      tabAlignment: TabAlignment.start,
-                      padding: EdgeInsets.zero,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      indicatorPadding: const EdgeInsets.symmetric(
-                        horizontal: 0,
-                      ),
-                      indicatorWeight: 2.5,
-                      splashFactory: NoSplash.splashFactory,
-                      overlayColor: WidgetStateProperty.all(Colors.transparent),
-                      labelPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
-                      ),
-                      labelColor: AppColors.primary,
-                      unselectedLabelColor: AppColors.textSecondary,
-                      dividerColor: Colors.transparent,
-                      indicator: UnderlineTabIndicator(
-                        borderSide: BorderSide(
-                          color: AppColors.primary,
-                          width: 2.5,
-                        ),
-                      ),
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            context.l10n.communityExploreTab,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            context.l10n.communityMineTab,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            context.l10n.communityInvitesTab,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            context.l10n.communityPendingTab,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Tab(
-                          child: Text(
-                            context.l10n.communityPostsTab,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: const [
-                        CommunityListWidget(),
-                        MyCommunitiesWidget(),
-                        MyInvitesWidget(),
-                        PendingCommunitiesWidget(),
-                        CommunityPostsWidget(),
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ),
           );
@@ -404,7 +439,7 @@ class _CommunityPageState extends State<CommunityPage>
 
 // Tab: Các bài viết - Community posts
 class CommunityPostsWidget extends StatefulWidget {
-  const CommunityPostsWidget({super.key});
+  CommunityPostsWidget({super.key});
 
   @override
   State<CommunityPostsWidget> createState() => _CommunityPostsWidgetState();
@@ -434,11 +469,21 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
         : _selectedStatus;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-      padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
+      margin: EdgeInsets.fromLTRB(
+        12.rs(context),
+        0,
+        12.rs(context),
+        10.rsh(context),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        12.rs(context),
+        10.rsh(context),
+        10.rs(context),
+        10.rsh(context),
+      ),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.rsr(context)),
         border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
@@ -451,19 +496,19 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
       child: Row(
         children: [
           Container(
-            width: 34,
-            height: 34,
+            width: 34.rs(context),
+            height: 34.rsh(context),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10.rsr(context)),
             ),
             child: Icon(
               _statusIcon(currentStatus),
               color: AppColors.primary,
-              size: 19,
+              size: 19.rsp(context),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.rs(context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,19 +518,19 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w800,
-                    fontSize: 14,
+                    fontSize: 14.rsp(context),
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2.rsh(context)),
                 AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
+                  duration: Duration(milliseconds: 180),
                   child: Text(
                     _statusLabel(context, currentStatus),
                     key: ValueKey(currentStatus),
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
-                      fontSize: 12,
+                      fontSize: 12.rsp(context),
                     ),
                   ),
                 ),
@@ -498,7 +543,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
             color: AppColors.background,
             elevation: 8,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.rsr(context)),
             ),
             onSelected: (status) {
               setState(() => _selectedStatus = status);
@@ -530,10 +575,13 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
               ),
             ],
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              padding: EdgeInsets.symmetric(
+                horizontal: 10.rs(context),
+                vertical: 7.rsh(context),
+              ),
               decoration: BoxDecoration(
                 color: AppColors.secondBackground,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.rsr(context)),
                 border: Border.all(color: AppColors.divider),
               ),
               child: Row(
@@ -542,13 +590,13 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
                   Icon(
                     Icons.tune_rounded,
                     color: AppColors.textSecondary,
-                    size: 17,
+                    size: 17.rsp(context),
                   ),
-                  const SizedBox(width: 5),
+                  SizedBox(width: 5.rs(context)),
                   Icon(
                     Icons.keyboard_arrow_down_rounded,
                     color: AppColors.textSecondary,
-                    size: 18,
+                    size: 18.rsp(context),
                   ),
                 ],
               ),
@@ -561,7 +609,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
 
   Widget _buildPostsList(CommunityPostsTabState state) {
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 260),
+      duration: Duration(milliseconds: 260),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (child, animation) {
@@ -578,7 +626,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
 
     if (state is CommunityPostsTabError) {
       return _PostsErrorState(
-        key: const ValueKey('error'),
+        key: ValueKey('error'),
         message: localizedCommunityMessage(context.l10n, state.message),
         onRetry: () {
           context.read<CommunityPostsTabBloc>().add(
@@ -598,7 +646,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
 
       return ListView.builder(
         key: ValueKey('loaded-${state.status}-${state.posts.length}'),
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+        padding: EdgeInsets.fromLTRB(0, 0, 0, 20.rsh(context)),
         itemCount: state.posts.length,
         itemBuilder: (context, index) {
           final post = state.posts[index];
@@ -615,10 +663,7 @@ class _CommunityPostsWidgetState extends State<CommunityPostsWidget> {
       );
     }
 
-    return _PostsEmptyState(
-      key: const ValueKey('initial'),
-      status: _selectedStatus,
-    );
+    return _PostsEmptyState(key: ValueKey('initial'), status: _selectedStatus);
   }
 
   String _statusLabel(BuildContext context, String status) {
@@ -654,8 +699,8 @@ class _PostFilterOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.primary),
-        const SizedBox(width: 10),
+        Icon(icon, size: 18.rsp(context), color: AppColors.primary),
+        SizedBox(width: 10.rs(context)),
         Text(
           label,
           style: TextStyle(
@@ -674,16 +719,21 @@ class _PostsTabSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+      padding: EdgeInsets.fromLTRB(
+        12.rs(context),
+        0,
+        12.rs(context),
+        20.rsh(context),
+      ),
       itemCount: 4,
       itemBuilder: (context, index) {
         return _AnimatedIn(
           index: index,
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14.rs(context)),
             decoration: BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(14.rsr(context)),
               border: Border.all(color: AppColors.divider),
               boxShadow: [
                 BoxShadow(
@@ -696,38 +746,54 @@ class _PostsTabSkeleton extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    _SkeletonBox(width: 42, height: 42, radius: 21),
-                    SizedBox(width: 10),
+                    _SkeletonBox(
+                      width: 42.rs(context),
+                      height: 42.rsh(context),
+                      radius: 21.rsr(context),
+                    ),
+                    SizedBox(width: 10.rs(context)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SkeletonBox(width: 160, height: 14, radius: 7),
-                          SizedBox(height: 8),
-                          _SkeletonBox(width: 94, height: 12, radius: 6),
+                          _SkeletonBox(
+                            width: 160.rs(context),
+                            height: 14.rsh(context),
+                            radius: 7.rsr(context),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          _SkeletonBox(
+                            width: 94.rs(context),
+                            height: 12.rsh(context),
+                            radius: 6.rsr(context),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                const _SkeletonBox(
+                SizedBox(height: 14.rsh(context)),
+                _SkeletonBox(
                   width: double.infinity,
-                  height: 13,
-                  radius: 7,
+                  height: 13.rsh(context),
+                  radius: 7.rsr(context),
                 ),
-                const SizedBox(height: 8),
-                const _SkeletonBox(width: 230, height: 13, radius: 7),
+                SizedBox(height: 8.rsh(context)),
+                _SkeletonBox(
+                  width: 230.rs(context),
+                  height: 13.rsh(context),
+                  radius: 7.rsr(context),
+                ),
                 if (index == 0) ...[
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.rsh(context)),
                   AspectRatio(
                     aspectRatio: 16 / 8.5,
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.textSecondary.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.rsr(context)),
                       ),
                     ),
                   ),
@@ -737,7 +803,7 @@ class _PostsTabSkeleton extends StatelessWidget {
           ),
         );
       },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, __) => SizedBox(height: 12.rsh(context)),
     );
   }
 }
@@ -753,16 +819,16 @@ class _PostsEmptyState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28),
+        padding: EdgeInsets.symmetric(horizontal: 28.rs(context)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.article_outlined,
-              size: 54,
+              size: 54.rsp(context),
               color: AppColors.textSecondary.withValues(alpha: 0.75),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.rsh(context)),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -803,26 +869,26 @@ class _PostsErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: 24.rs(context)),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.rs(context)),
           decoration: BoxDecoration(
-            color: const Color(0xFFE11D48).withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(14),
+            color: Color(0xFFE11D48).withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(14.rsr(context)),
             border: Border.all(
-              color: const Color(0xFFE11D48).withValues(alpha: 0.28),
+              color: Color(0xFFE11D48).withValues(alpha: 0.28),
             ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline_rounded,
                 color: Color(0xFFE11D48),
-                size: 30,
+                size: 30.rsp(context),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.rsh(context)),
               Text(
                 context.l10n.homeLoadPostsFailed,
                 style: TextStyle(
@@ -830,16 +896,16 @@ class _PostsErrorState extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4.rsh(context)),
               Text(
                 message,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.rsh(context)),
               OutlinedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded),
+                icon: Icon(Icons.refresh_rounded),
                 label: Text(context.l10n.commonRetry),
               ),
             ],

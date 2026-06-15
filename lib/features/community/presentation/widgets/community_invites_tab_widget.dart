@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -9,7 +10,7 @@ import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
 import 'package:social_app_fe/shared/helpers/show_success_snackBar.dart';
 
 class CommunityInvitesTabWidget extends StatefulWidget {
-  const CommunityInvitesTabWidget({Key? key}) : super(key: key);
+  CommunityInvitesTabWidget({super.key});
 
   @override
   State<CommunityInvitesTabWidget> createState() =>
@@ -47,7 +48,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
         child: BlocBuilder<CommunityInvitesBloc, CommunityInvitesState>(
           builder: (context, state) {
             if (state is CommunityInvitesLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator());
             }
 
             if (state is CommunityInvitesEmpty) {
@@ -57,14 +58,14 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                   children: [
                     Icon(
                       Icons.mail_outline,
-                      size: 64,
+                      size: 64.rsp(context),
                       color: AppColors.textSecondary.withValues(alpha: 0.75),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.rsh(context)),
                     Text(
                       context.l10n.communityNoCommunityInvites,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.rsp(context),
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -78,14 +79,18 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                    const SizedBox(height: 16),
+                    Icon(
+                      Icons.error_outline,
+                      size: 64.rsp(context),
+                      color: Colors.red[300],
+                    ),
+                    SizedBox(height: 16.rsh(context)),
                     Text(
                       localizedCommunityMessage(context.l10n, state.message),
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: Colors.red),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.rsh(context)),
                     ElevatedButton(
                       onPressed: () {
                         _bloc.add(RefreshInvitesEvent());
@@ -108,7 +113,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
             return RefreshIndicator(
               onRefresh: () async {
                 _bloc.add(RefreshInvitesEvent());
-                await Future.delayed(const Duration(seconds: 1));
+                await Future.delayed(Duration(seconds: 1));
               },
               child: ListView.builder(
                 itemCount: invites.length,
@@ -139,20 +144,20 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                       : DateTime.now();
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.rs(context),
+                      vertical: 8.rsh(context),
                     ),
                     child: Material(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.rsr(context)),
                       shadowColor: AppColors.textSecondary.withValues(
                         alpha: 0.08,
                       ),
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.rsr(context)),
                         child: Padding(
-                          padding: const EdgeInsets.all(12),
+                          padding: EdgeInsets.all(12.rs(context)),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -161,7 +166,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                 children: [
                                   // Avatar
                                   CircleAvatar(
-                                    radius: 28,
+                                    radius: 28.rsr(context),
                                     backgroundImage:
                                         communityAvatar != null &&
                                             communityAvatar.isNotEmpty
@@ -172,12 +177,12 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                             communityAvatar.isEmpty
                                         ? Icon(
                                             Icons.groups,
-                                            size: 28,
+                                            size: 28.rsp(context),
                                             color: AppColors.textSecondary,
                                           )
                                         : null,
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12.rs(context)),
                                   // Community details
                                   Expanded(
                                     child: Column(
@@ -187,7 +192,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                         Text(
                                           communityName,
                                           style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 15.rsp(context),
                                             fontWeight: FontWeight.w600,
                                             color: AppColors.textPrimary,
                                           ),
@@ -195,11 +200,11 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         if (communityDescription != null &&
-                                            communityDescription!.isNotEmpty)
+                                            communityDescription.isNotEmpty)
                                           Text(
-                                            communityDescription!,
+                                            communityDescription,
                                             style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: 13.rsp(context),
                                               color: AppColors.textSecondary,
                                             ),
                                             maxLines: 1,
@@ -211,7 +216,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                             createdAt,
                                           ),
                                           style: TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 12.rsp(context),
                                             color: AppColors.textSecondary,
                                           ),
                                         ),
@@ -220,7 +225,7 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12.rsh(context)),
                               // Action buttons
                               Row(
                                 children: [
@@ -238,11 +243,14 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                                 ),
                                               );
                                             },
-                                      icon: const Icon(Icons.clear, size: 18),
+                                      icon: Icon(
+                                        Icons.clear,
+                                        size: 18.rsp(context),
+                                      ),
                                       label: Text(context.l10n.friendReject),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12.rs(context)),
                                   Expanded(
                                     child: ElevatedButton.icon(
                                       onPressed:
@@ -257,7 +265,10 @@ class _CommunityInvitesTabWidgetState extends State<CommunityInvitesTabWidget> {
                                                 ),
                                               );
                                             },
-                                      icon: const Icon(Icons.check, size: 18),
+                                      icon: Icon(
+                                        Icons.check,
+                                        size: 18.rsp(context),
+                                      ),
                                       label: Text(context.l10n.friendAccept),
                                     ),
                                   ),

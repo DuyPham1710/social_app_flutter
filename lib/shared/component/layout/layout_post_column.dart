@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/utils/video_util.dart';
 import 'package:social_app_fe/shared/component/video_player_widget.dart';
 import 'package:social_app_fe/shared/helpers/video_thumbnail.dart';
@@ -68,6 +70,44 @@ class LayoutPostColumn extends StatelessWidget {
           },
         );
       }
+    } else if (imageData is Uint8List) {
+      mediaWidget = Image.memory(
+        imageData,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.broken_image, color: Colors.grey[600]),
+          );
+        },
+      );
+    } else if (imageData is PlatformFile) {
+      if (VideoUtil.isVideo(imageData)) {
+        if (urls.length != 1) {
+          return _buildVideoPreviewPlaceholder(imageData);
+        }
+        mediaWidget = _buildVideoPreviewPlaceholder(imageData);
+      } else {
+        try {
+          mediaWidget = Image.memory(
+            imageData.bytes!,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[300],
+                child: Icon(Icons.broken_image, color: Colors.grey[600]),
+              );
+            },
+          );
+        } catch (e) {
+          mediaWidget = Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.broken_image, color: Colors.grey[600]),
+          );
+        }
+      }
     } else if (imageData != null && imageData.url != null) {
       if (VideoUtil.isVideo(imageData.url)) {
         if (urls.length != 1) {
@@ -100,8 +140,17 @@ class LayoutPostColumn extends StatelessWidget {
     return mediaWidget;
   }
 
-  Widget _buildVideoPreviewPlaceholder(String videoSource) {
-    return buildVideoThumbnail(videoSource);
+  Widget _buildVideoPreviewPlaceholder(dynamic videoSource) {
+    if (videoSource is PlatformFile) {
+      try {
+        return buildVideoThumbnail(videoSource.name, videoBytes: videoSource.bytes);
+      } catch (e) {
+        return buildVideoThumbnail(videoSource.name);
+      }
+    } else if (videoSource is String) {
+      return buildVideoThumbnail(videoSource);
+    }
+    return buildVideoThumbnail(videoSource.toString());
   }
 
   @override
@@ -117,7 +166,7 @@ class LayoutPostColumn extends StatelessWidget {
         child: AspectRatio(
           aspectRatio: 1.0,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: BorderRadius.circular(8.rsr(context)),
             child: _buildImageWidget(orderedUrls[0], 0),
           ),
         ),
@@ -125,19 +174,19 @@ class LayoutPostColumn extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 280.h,
+      height: 280.rsh(context),
       child: Row(
         children: [
           for (int i = 0; i < maxImages; i++) ...[
-            if (i > 0) SizedBox(width: 4.w),
-            Expanded(child: _buildColumnImage(i, orderedUrls)),
+            if (i > 0) SizedBox(width: 4.rs(context)),
+            Expanded(child: _buildColumnImage(context, i, orderedUrls)),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildColumnImage(int index, List<dynamic> orderedUrls) {
+  Widget _buildColumnImage(BuildContext context, int index, List<dynamic> orderedUrls) {
     double topPadding = 0;
     double bottomPadding = 0;
 
@@ -145,15 +194,15 @@ class LayoutPostColumn extends StatelessWidget {
       switch (index % 4) {
         case 0:
           topPadding = 0;
-          bottomPadding = 30.h;
+          bottomPadding = 30.rsh(context);
         case 1:
-          topPadding = 10.h;
+          topPadding = 10.rsh(context);
           bottomPadding = 0;
         case 2:
-          topPadding = 0.h;
-          bottomPadding = 30.h;
+          topPadding = 0;
+          bottomPadding = 30.rsh(context);
         case 3:
-          topPadding = 10.h;
+          topPadding = 10.rsh(context);
           bottomPadding = 0;
       }
     }
@@ -161,9 +210,9 @@ class LayoutPostColumn extends StatelessWidget {
     Widget imageWidget = GestureDetector(
       onTap: () => onImageTap(index),
       child: SizedBox(
-        height: 250.h,
+        height: 250.rsh(context),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(8.rsr(context)),
           child: _buildImageWidget(orderedUrls[index], index),
         ),
       ),
@@ -174,25 +223,25 @@ class LayoutPostColumn extends StatelessWidget {
       imageWidget = GestureDetector(
         onTap: () => onImageTap(index),
         child: SizedBox(
-          height: 250.h,
+          height: 250.rsh(context),
           child: Stack(
             fit: StackFit.expand,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8.rsr(context)),
                 child: _buildImageWidget(orderedUrls[index], index),
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8.rsr(context)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '+$remaining',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28.sp,
+                    fontSize: 28.rsp(context),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
