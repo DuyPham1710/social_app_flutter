@@ -11,6 +11,8 @@ import 'package:social_app_fe/features/chat/data/services/chat_presence_service.
 import 'package:social_app_fe/features/chat/presentation/helper/chat_helper.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:social_app_fe/shared/helpers/show_mobile_only_dialog.dart';
 
 class ChatAppbar extends StatefulWidget {
   final bool isGroup;
@@ -21,7 +23,9 @@ class ChatAppbar extends StatefulWidget {
   final String? conversationId;
   final String userId;
   final String username;
+  final bool isWebLayout;
   final Function(String callType)? onInitiateCall;
+  final VoidCallback? onInfoTap;
 
   const ChatAppbar({
     super.key,
@@ -33,7 +37,9 @@ class ChatAppbar extends StatefulWidget {
     required this.conversationId,
     required this.userId,
     required this.username,
+    this.isWebLayout = false,
     this.onInitiateCall,
+    this.onInfoTap,
   });
 
   @override
@@ -152,13 +158,19 @@ class _ChatAppbarState extends State<ChatAppbar> {
           width: 1,
         ),
       ),
-      leadingWidth: 40,
-      leading: IconButton(
-        icon: Icon(CupertinoIcons.back, color: AppColors.primary),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leadingWidth: widget.isWebLayout ? 16 : 40,
+      leading: widget.isWebLayout
+          ? const SizedBox.shrink()
+          : IconButton(
+              icon: Icon(CupertinoIcons.back, color: AppColors.primary),
+              onPressed: () => Navigator.pop(context),
+            ),
       title: GestureDetector(
         onTap: () {
+          if (widget.onInfoTap != null) {
+            widget.onInfoTap!();
+            return;
+          }
           Navigator.push(
             context,
             CupertinoPageRoute(
@@ -238,7 +250,16 @@ class _ChatAppbarState extends State<ChatAppbar> {
             color: AppColors.primary,
             size: 24.sp,
           ),
-          onPressed: () => widget.onInitiateCall?.call('audio'),
+          onPressed: () {
+            if (ResponsiveHelper.isWebOrDesktop) {
+              showMobileOnlyDialog(
+                context,
+                featureName: context.l10n.chatAudioCall,
+              );
+            } else {
+              widget.onInitiateCall?.call('audio');
+            }
+          },
         ),
         IconButton(
           icon: Icon(
@@ -246,7 +267,16 @@ class _ChatAppbarState extends State<ChatAppbar> {
             color: AppColors.primary,
             size: 30.sp,
           ),
-          onPressed: () => widget.onInitiateCall?.call('video'),
+          onPressed: () {
+            if (ResponsiveHelper.isWebOrDesktop) {
+              showMobileOnlyDialog(
+                context,
+                featureName: context.l10n.chatVideoCall,
+              );
+            } else {
+              widget.onInitiateCall?.call('video');
+            }
+          },
         ),
         IconButton(
           icon: Icon(
@@ -255,6 +285,10 @@ class _ChatAppbarState extends State<ChatAppbar> {
             size: 24.sp,
           ),
           onPressed: () {
+            if (widget.onInfoTap != null) {
+              widget.onInfoTap!();
+              return;
+            }
             Navigator.push(
               context,
               CupertinoPageRoute(

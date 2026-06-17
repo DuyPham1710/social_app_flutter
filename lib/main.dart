@@ -44,6 +44,8 @@ import 'package:social_app_fe/features/video_call/presentation/pages/video_call_
 import 'package:social_app_fe/firebase_options.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/chat_web_page.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:giphy_get/l10n.dart';
@@ -510,62 +512,78 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812), // iPhone X design size
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return BlocListener<VideoCallBloc, VideoCallState>(
-          listener: (context, state) {
-            _handleVideoCallStateChange(context, state);
-          },
-          child: ListenableBuilder(
-            listenable: s1<AppPreferences>(),
-            builder: (context, child) {
-              return MaterialApp(
-                navigatorKey: _navigatorKey, // Add global navigator key
-                onGenerateTitle: (context) => context.l10n.appTitle,
-                debugShowCheckedModeBanner: false,
-                theme: theme(),
-                darkTheme: darkTheme(),
-                themeMode: s1<AppPreferences>().themeMode,
-                locale: s1<AppPreferences>().locale,
-                localizationsDelegates: [
-                  ...AppLocalizations.localizationsDelegates,
-                  GiphyGetUILocalizations.delegate,
-                ],
-                supportedLocales: AppLocalizations.supportedLocales,
-                initialRoute: '/splash',
-                onGenerateRoute: _onGenerateRoute,
-                routes: <String, WidgetBuilder>{
-                  '/face-registration': (context) =>
-                      const FaceRegistrationPage(),
-                  '/face-scan': (context) => const FaceScanPage(),
-                  '/splash': (context) => const SplashPage(),
-                  '/main': (BuildContext context) {
-                    final args =
-                        ModalRoute.of(context)?.settings.arguments
-                            as Map<String, dynamic>?;
-                    return MainPage(
-                      userData: userData,
-                      initialTab: args?['initialTab'] as int?,
-                    );
-                  },
-                  '/login': (BuildContext context) => const LoginPage(),
-                  '/home': (BuildContext context) => const HomePage(),
-                  '/signup': (BuildContext context) => const RegisterPage(),
-                  '/forgot-password': (BuildContext context) =>
-                      const ForgotPasswordPage(),
-                  '/otp': (BuildContext context) => const OtpPage(),
-                  '/personal-info': (BuildContext context) =>
-                      const PersonalInfoPage(),
-                  '/reset-password': (BuildContext context) =>
-                      const ResetPasswordPage(),
-                  '/search': (BuildContext context) => const SearchPage(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 1920.0;
+        final height = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : 1080.0;
+        final designSize = ResponsiveHelper.isWebOrDesktop
+            ? Size(width, height)
+            : const Size(375, 812);
+
+        return ScreenUtilInit(
+          designSize:
+              designSize, // iPhone X design size for mobile, current screen size for web
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) {
+            return BlocListener<VideoCallBloc, VideoCallState>(
+              listener: (context, state) {
+                _handleVideoCallStateChange(context, state);
+              },
+              child: ListenableBuilder(
+                listenable: s1<AppPreferences>(),
+                builder: (context, child) {
+                  return MaterialApp(
+                    navigatorKey: _navigatorKey, // Add global navigator key
+                    onGenerateTitle: (context) => context.l10n.appTitle,
+                    debugShowCheckedModeBanner: false,
+                    theme: theme(),
+                    darkTheme: darkTheme(),
+                    themeMode: s1<AppPreferences>().themeMode,
+                    locale: s1<AppPreferences>().locale,
+                    localizationsDelegates: [
+                      ...AppLocalizations.localizationsDelegates,
+                      GiphyGetUILocalizations.delegate,
+                    ],
+                    supportedLocales: AppLocalizations.supportedLocales,
+                    initialRoute: '/splash',
+                    onGenerateRoute: _onGenerateRoute,
+                    routes: <String, WidgetBuilder>{
+                      '/face-registration': (context) =>
+                          const FaceRegistrationPage(),
+                      '/face-scan': (context) => const FaceScanPage(),
+                      '/splash': (context) => const SplashPage(),
+                      '/chat-web': (context) => const ChatWebPage(),
+                      '/main': (BuildContext context) {
+                        final args =
+                            ModalRoute.of(context)?.settings.arguments
+                                as Map<String, dynamic>?;
+                        return MainPage(
+                          userData: userData,
+                          initialTab: args?['initialTab'] as int?,
+                        );
+                      },
+                      '/login': (BuildContext context) => const LoginPage(),
+                      '/home': (BuildContext context) => const HomePage(),
+                      '/signup': (BuildContext context) => const RegisterPage(),
+                      '/forgot-password': (BuildContext context) =>
+                          const ForgotPasswordPage(),
+                      '/otp': (BuildContext context) => const OtpPage(),
+                      '/personal-info': (BuildContext context) =>
+                          const PersonalInfoPage(),
+                      '/reset-password': (BuildContext context) =>
+                          const ResetPasswordPage(),
+                      '/search': (BuildContext context) => const SearchPage(),
+                    },
+                  );
                 },
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
     );

@@ -174,4 +174,14 @@ class AuthRepositoryImpl implements AuthRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<void>> deleteIncompleteRegistration(String userId) async {
+    try {
+      await authService.deleteIncompleteRegistration(userId);
+      return DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/local/app_preferences.dart';
@@ -136,12 +137,17 @@ class _SideNavigationState extends State<SideNavigation>
                     activeIcon: CupertinoIcons.chat_bubble_2_fill,
                     label: context.l10n.chatTitle,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (_) => const ChatListPage(),
-                        ),
-                      );
+                      if (!ResponsiveHelper.isMobile(context) &&
+                          ResponsiveHelper.shouldShowSidebar(context)) {
+                        Navigator.pushNamed(context, '/chat-web');
+                      } else {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) => const ChatListPage(),
+                          ),
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: 16),

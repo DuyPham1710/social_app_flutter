@@ -106,283 +106,332 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final userId = args['id'];
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthLoaded && state.flowType == 'update_personal_info') {
-            BlocProvider.of<AuthBloc>(context).add(AuthReset());
-            // Navigate to face registration page (instead of login)
-            Navigator.pushReplacementNamed(
-              context,
-              '/face-registration',
-              arguments: {'userId': userId},
-            );
-          } else if (state is AuthError &&
-              state.flowType == 'update_personal_info') {
-            final message =
-                state.errorMessage ?? context.l10n.authUpdatePersonalInfoFailed;
-            UIUtils.showErrorMessage(context, message);
-          }
-        },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
 
-        builder: (context, state) {
-          return AuthResponsiveWrapper(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.rsh(context)),
+        // Delete incomplete account and go to login
+        context.read<AuthBloc>().add(
+          DeleteIncompleteRegistrationEvent(userId: userId),
+        );
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthLoaded &&
+                state.flowType == 'update_personal_info') {
+              BlocProvider.of<AuthBloc>(context).add(AuthReset());
+              // Navigate to face registration page (instead of login)
+              Navigator.pushReplacementNamed(
+                context,
+                '/face-registration',
+                arguments: {'userId': userId},
+              );
+            } else if (state is AuthError &&
+                state.flowType == 'update_personal_info') {
+              final message =
+                  state.errorMessage ??
+                  context.l10n.authUpdatePersonalInfoFailed;
+              UIUtils.showErrorMessage(context, message);
+            }
+          },
 
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          CupertinoIcons.back,
-                          color: AppColors.unselectedIcon,
+          builder: (context, state) {
+            return AuthResponsiveWrapper(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20.rsh(context)),
+
+                        GestureDetector(
+                          onTap: () {
+                            context.read<AuthBloc>().add(
+                              DeleteIncompleteRegistrationEvent(userId: userId),
+                            );
+                            Navigator.pop(context);
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 24, bottom: 24),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: AppColors.unselectedIcon,
+                            ),
+                          ),
                         ),
-                      ),
 
-                      SizedBox(height: 50.rsh(context)),
+                        SizedBox(height: 50.rsh(context)),
 
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          context.l10n.authPersonalInfoTitle,
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            context.l10n.authPersonalInfoTitle,
+                            style: TextStyle(
+                              fontSize: 24.rsp(context),
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 10.rsh(context)),
+
+                        Text(
+                          context.l10n.authPersonalInfoDescription,
                           style: TextStyle(
-                            fontSize: 24.rsp(context),
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            fontSize: 16.rsp(context),
+                            color: AppColors.textSecondary,
                           ),
                         ),
-                      ),
 
-                      SizedBox(height: 10.rsh(context)),
+                        SizedBox(height: 40.rsh(context)),
 
-                      Text(
-                        context.l10n.authPersonalInfoDescription,
-                        style: TextStyle(
-                          fontSize: 16.rsp(context),
-                          color: AppColors.textSecondary,
+                        TextformfieldCustom(
+                          label: context.l10n.authFullName,
+                          isPassword: false,
+                          controller: fullNameController,
+                          focusNode: fullNameFocusNode,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return context.l10n.authEnterFullName;
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-
-                      SizedBox(height: 40.rsh(context)),
-
-                      TextformfieldCustom(
-                        label: context.l10n.authFullName,
-                        isPassword: false,
-                        controller: fullNameController,
-                        focusNode: fullNameFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return context.l10n.authEnterFullName;
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20.rsh(context)),
-                      TextformfieldCustom(
-                        label: context.l10n.authPhoneNumber,
-                        isPassword: false,
-                        controller: phoneNumberController,
-                        focusNode: phoneNumberFocusNode,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return context.l10n.authEnterPhoneNumber;
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20.rsh(context)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextformfieldCustom(
-                            width: 150.rs(context),
-                            label: context.l10n.authDateOfBirth,
-                            isPassword: false,
-                            controller: dateOfBirthController,
-                            focusNode: dateOfBirthFocusNode,
-                            suffixIcon: Icon(
-                              CupertinoIcons.calendar,
-                              size: 20.rsp(context),
-                              color: dateOfBirthFocusNode.hasFocus
-                                  ? AppColors.primary
-                                  : AppColors.unselectedIcon,
+                        SizedBox(height: 20.rsh(context)),
+                        TextformfieldCustom(
+                          label: context.l10n.authPhoneNumber,
+                          isPassword: false,
+                          controller: phoneNumberController,
+                          focusNode: phoneNumberFocusNode,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return context.l10n.authEnterPhoneNumber;
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20.rsh(context)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextformfieldCustom(
+                              width: 150.rs(context),
+                              label: context.l10n.authDateOfBirth,
+                              isPassword: false,
+                              controller: dateOfBirthController,
+                              focusNode: dateOfBirthFocusNode,
+                              suffixIcon: Icon(
+                                CupertinoIcons.calendar,
+                                size: 20.rsp(context),
+                                color: dateOfBirthFocusNode.hasFocus
+                                    ? AppColors.primary
+                                    : AppColors.unselectedIcon,
+                              ),
+                              onTap: () async {
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(FocusNode()); // tắt bàn phím
+                                final picked = await DatePickerWidget.show(
+                                  context,
+                                );
+                                if (picked != null) {
+                                  dateOfBirthController.text =
+                                      "${picked.day}/${picked.month}/${picked.year}";
+                                }
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return context.l10n.authEnterDateOfBirth;
+                                }
+                                return null;
+                              },
                             ),
-                            onTap: () async {
-                              FocusScope.of(
-                                context,
-                              ).requestFocus(FocusNode()); // tắt bàn phím
-                              final picked = await DatePickerWidget.show(
-                                context,
-                              );
-                              if (picked != null) {
-                                dateOfBirthController.text =
-                                    "${picked.day}/${picked.month}/${picked.year}";
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return context.l10n.authEnterDateOfBirth;
-                              }
-                              return null;
-                            },
-                          ),
 
-                          TextformfieldCustom(
-                            key: _genderKey,
-                            width: 150.rs(context),
-                            label: context.l10n.authGender,
-                            isPassword: false,
-                            controller: genderController,
-                            focusNode: genderFocusNode,
-                            suffixIcon: Icon(
-                              Icons.arrow_drop_down,
-                              size: 20.rsp(context),
-                              color: genderFocusNode.hasFocus
-                                  ? AppColors.primary
-                                  : AppColors.unselectedIcon,
-                            ),
-                            onTap: () async {
-                              FocusScope.of(
-                                context,
-                              ).requestFocus(FocusNode()); // tắt bàn phím
-                              
-                              String? gender;
-                              if (!ResponsiveHelper.isMobile(context)) {
-                                final renderBox = _genderKey.currentContext?.findRenderObject() as RenderBox?;
-                                if (renderBox != null) {
-                                  final overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
-                                  final position = RelativeRect.fromRect(
-                                    Rect.fromPoints(
-                                      renderBox.localToGlobal(Offset.zero, ancestor: overlay),
-                                      renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero), ancestor: overlay),
-                                    ),
-                                    Offset.zero & overlay.size,
-                                  );
+                            TextformfieldCustom(
+                              key: _genderKey,
+                              width: 150.rs(context),
+                              label: context.l10n.authGender,
+                              isPassword: false,
+                              controller: genderController,
+                              focusNode: genderFocusNode,
+                              suffixIcon: Icon(
+                                Icons.arrow_drop_down,
+                                size: 20.rsp(context),
+                                color: genderFocusNode.hasFocus
+                                    ? AppColors.primary
+                                    : AppColors.unselectedIcon,
+                              ),
+                              onTap: () async {
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(FocusNode()); // tắt bàn phím
 
-                                  gender = await showMenu<String>(
-                                    context: context,
-                                    position: position,
-                                    color: AppColors.secondBackground,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.rsr(context)),
-                                    ),
-                                    items: [
-                                      PopupMenuItem(
-                                        value: "Nam",
-                                        child: Text(
-                                          context.l10n.authGenderMale,
-                                          style: TextStyle(color: AppColors.textPrimary),
+                                String? gender;
+                                if (!ResponsiveHelper.isMobile(context)) {
+                                  final renderBox =
+                                      _genderKey.currentContext
+                                              ?.findRenderObject()
+                                          as RenderBox?;
+                                  if (renderBox != null) {
+                                    final overlay =
+                                        Navigator.of(context).overlay!.context
+                                                .findRenderObject()
+                                            as RenderBox;
+                                    final position = RelativeRect.fromRect(
+                                      Rect.fromPoints(
+                                        renderBox.localToGlobal(
+                                          Offset.zero,
+                                          ancestor: overlay,
+                                        ),
+                                        renderBox.localToGlobal(
+                                          renderBox.size.bottomRight(
+                                            Offset.zero,
+                                          ),
+                                          ancestor: overlay,
                                         ),
                                       ),
-                                      PopupMenuItem(
-                                        value: "Nữ",
-                                        child: Text(
-                                          context.l10n.authGenderFemale,
-                                          style: TextStyle(color: AppColors.textPrimary),
+                                      Offset.zero & overlay.size,
+                                    );
+
+                                    gender = await showMenu<String>(
+                                      context: context,
+                                      position: position,
+                                      color: AppColors.secondBackground,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          12.rsr(context),
                                         ),
                                       ),
-                                      PopupMenuItem(
-                                        value: "Khác",
-                                        child: Text(
-                                          context.l10n.authGenderOther,
-                                          style: TextStyle(color: AppColors.textPrimary),
+                                      items: [
+                                        PopupMenuItem(
+                                          value: "Nam",
+                                          child: Text(
+                                            context.l10n.authGenderMale,
+                                            style: TextStyle(
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        PopupMenuItem(
+                                          value: "Nữ",
+                                          child: Text(
+                                            context.l10n.authGenderFemale,
+                                            style: TextStyle(
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: "Khác",
+                                          child: Text(
+                                            context.l10n.authGenderOther,
+                                            style: TextStyle(
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                } else {
+                                  gender =
+                                      await showCupertinoModalPopup<String>(
+                                        context: context,
+                                        builder: (context) {
+                                          return const ModalGender();
+                                        },
+                                      );
+                                }
+
+                                if (gender != null) {
+                                  _selectedGenderValue = gender;
+                                  genderController.text = _localizedGenderLabel(
+                                    context,
+                                    gender,
                                   );
                                 }
-                              } else {
-                                gender = await showCupertinoModalPopup<String>(
-                                  context: context,
-                                  builder: (context) {
-                                    return const ModalGender();
-                                  },
-                                );
-                              }
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return context.l10n.authEnterGender;
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
 
-                              if (gender != null) {
-                                _selectedGenderValue = gender;
-                                genderController.text = _localizedGenderLabel(
-                                  context,
-                                  gender,
-                                );
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return context.l10n.authEnterGender;
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                      ),
+                        SizedBox(height: 20.rsh(context)),
 
-                      SizedBox(height: 20.rsh(context)),
+                        TextformfieldCustom(
+                          label: context.l10n.authBio,
+                          isPassword: false,
+                          controller: bioController,
+                          focusNode: bioFocusNode,
+                        ),
 
-                      TextformfieldCustom(
-                        label: context.l10n.authBio,
-                        isPassword: false,
-                        controller: bioController,
-                        focusNode: bioFocusNode,
-                      ),
+                        SizedBox(height: 70.rsh(context)),
 
-                      SizedBox(height: 70.rsh(context)),
-
-                      state is AuthLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
+                        state is AuthLoading
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                ),
+                              )
+                            : ButtonCustom(
+                                onPressed: () =>
+                                    _onInfoSubmitted(context, userId),
+                                text: context.l10n.authContinue,
                               ),
-                            )
-                          : ButtonCustom(
-                              onPressed: () =>
-                                  _onInfoSubmitted(context, userId),
-                              text: context.l10n.authContinue,
-                            ),
 
-                      SizedBox(height: 24.rsh(context)),
+                        SizedBox(height: 24.rsh(context)),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            context.l10n.authHasAccount,
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 14.rsp(context),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/login');
-                            },
-                            child: Text(
-                              context.l10n.authLogin,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              context.l10n.authHasAccount,
                               style: TextStyle(
-                                color: AppColors.primary,
+                                color: AppColors.textPrimary,
                                 fontSize: 14.rsp(context),
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            GestureDetector(
+                              onTap: () {
+                                context.read<AuthBloc>().add(
+                                  DeleteIncompleteRegistrationEvent(userId: userId),
+                                );
+                                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                              },
+                              child: Text(
+                                context.l10n.authLogin,
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 14.rsp(context),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

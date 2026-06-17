@@ -19,6 +19,7 @@ class MessageActionSheet {
     required VoidCallback? onCopy,
     required VoidCallback? onDelete,
     required VoidCallback? onMore,
+    bool showOnlyReactions = false,
   }) {
     final RenderBox? renderBox =
         messageKey.currentContext?.findRenderObject() as RenderBox?;
@@ -67,6 +68,7 @@ class MessageActionSheet {
                   onMore();
                 }
               : null,
+          showOnlyReactions: showOnlyReactions,
         );
       },
     );
@@ -84,6 +86,7 @@ class _MessageActionContent extends StatefulWidget {
   final VoidCallback? onCopy;
   final VoidCallback? onDelete;
   final VoidCallback? onMore;
+  final bool showOnlyReactions;
 
   const _MessageActionContent({
     required this.message,
@@ -96,6 +99,7 @@ class _MessageActionContent extends StatefulWidget {
     this.onCopy,
     this.onDelete,
     this.onMore,
+    this.showOnlyReactions = false,
   });
 
   @override
@@ -275,78 +279,82 @@ class _MessageActionContentState extends State<_MessageActionContent>
         ),
 
         // Bottom Action Buttons
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: SlideTransition(
-            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-                .animate(
-                  CurvedAnimation(
-                    parent: widget.animation,
-                    curve: Curves.easeOut,
+        if (!widget.showOnlyReactions)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0, 1),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: widget.animation,
+                      curve: Curves.easeOut,
+                    ),
                   ),
-                ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.r),
-                  topRight: Radius.circular(20.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.r),
+                    topRight: Radius.circular(20.r),
                   ),
-                ],
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Reply Action
-                      _buildActionItem(
-                        icon: CupertinoIcons.arrowshape_turn_up_left_fill,
-                        label: context.l10n.commentReply,
-                        onTap: widget.onReply,
-                      ),
-
-                      // Copy Action (if message has text)
-                      if (widget.message.text != null &&
-                          widget.message.text!.isNotEmpty &&
-                          widget.onCopy != null)
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Reply Action
                         _buildActionItem(
-                          icon: CupertinoIcons.doc_on_doc_fill,
-                          label: context.l10n.commonCopy,
-                          onTap: widget.onCopy!,
+                          icon: CupertinoIcons.arrowshape_turn_up_left_fill,
+                          label: context.l10n.commentReply,
+                          onTap: widget.onReply,
                         ),
 
-                      // Delete Action (if from me)
-                      if (widget.fromMe && widget.onDelete != null)
-                        _buildActionItem(
-                          icon: CupertinoIcons.trash_fill,
-                          label: context.l10n.commonDelete,
-                          onTap: widget.onDelete!,
-                          isDestructive: true,
-                        ),
+                        // Copy Action (if message has text)
+                        if (widget.message.text != null &&
+                            widget.message.text!.isNotEmpty &&
+                            widget.onCopy != null)
+                          _buildActionItem(
+                            icon: CupertinoIcons.doc_on_doc_fill,
+                            label: context.l10n.commonCopy,
+                            onTap: widget.onCopy!,
+                          ),
 
-                      // More Action
-                      _buildActionItem(
-                        icon: CupertinoIcons.line_horizontal_3,
-                        label: context.l10n.chatMore,
-                        onTap: widget.onMore!,
-                      ),
-                    ],
+                        // Delete Action (if from me)
+                        if (widget.fromMe && widget.onDelete != null)
+                          _buildActionItem(
+                            icon: CupertinoIcons.trash_fill,
+                            label: context.l10n.commonDelete,
+                            onTap: widget.onDelete!,
+                            isDestructive: true,
+                          ),
+
+                        // More Action
+                        _buildActionItem(
+                          icon: CupertinoIcons.line_horizontal_3,
+                          label: context.l10n.chatMore,
+                          onTap: widget.onMore!,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

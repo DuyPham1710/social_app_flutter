@@ -34,7 +34,14 @@ import 'package:social_app_fe/features/chat/data/services/chat_presence_service.
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatListPage extends StatefulWidget {
-  const ChatListPage({super.key});
+  final bool isWebLayout;
+  final Function(Map<String, dynamic>)? onConversationSelected;
+
+  const ChatListPage({
+    super.key,
+    this.isWebLayout = false,
+    this.onConversationSelected,
+  });
 
   @override
   State<ChatListPage> createState() => _ChatListPageState();
@@ -48,6 +55,7 @@ class _ChatListPageState extends State<ChatListPage> {
   late final ConversationBloc _conversationBloc;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
+  bool _isSearching = false;
 
   SocketClient? _presenceSocketClient;
   ChatPresenceService? _chatPresenceService;
@@ -210,26 +218,42 @@ class _ChatListPageState extends State<ChatListPage> {
       );
     }
 
-    Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => messageBloc,
-          child: ChatDetailPage(
-            userId: userId!,
-            username: username!,
-            conversationId: conversationId,
-            friendInfo: friendInfo,
-            unreadCount: unreadCount,
-            firstUnreadMessageIndex: firstUnreadMessageIndex,
-            isGroup: isGroup,
-            groupName: groupName,
-            groupAvatar: groupAvatar,
-            participants: participants,
+    if (widget.isWebLayout) {
+      widget.onConversationSelected?.call({
+        'userId': userId!,
+        'username': username!,
+        'conversationId': conversationId,
+        'friendInfo': friendInfo,
+        'unreadCount': unreadCount,
+        'firstUnreadMessageIndex': firstUnreadMessageIndex,
+        'isGroup': isGroup,
+        'groupName': groupName,
+        'groupAvatar': groupAvatar,
+        'participants': participants,
+        'messageBloc': messageBloc,
+      });
+    } else {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => messageBloc,
+            child: ChatDetailPage(
+              userId: userId!,
+              username: username!,
+              conversationId: conversationId,
+              friendInfo: friendInfo,
+              unreadCount: unreadCount,
+              firstUnreadMessageIndex: firstUnreadMessageIndex,
+              isGroup: isGroup,
+              groupName: groupName,
+              groupAvatar: groupAvatar,
+              participants: participants,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   /// Find existing 1-1 conversation with a friend
@@ -319,21 +343,31 @@ class _ChatListPageState extends State<ChatListPage> {
         );
         messageBloc = s1<MessageBloc>();
 
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => messageBloc,
-              child: ChatDetailPage(
-                // Pass friendId to create new conversation
-                userId: userId!,
-                username: username!,
-                friendId: friend.userId,
-                friendInfo: friendInfo,
+        if (widget.isWebLayout) {
+          widget.onConversationSelected?.call({
+            'userId': userId!,
+            'username': username!,
+            'friendId': friend.userId,
+            'friendInfo': friendInfo,
+            'messageBloc': messageBloc,
+          });
+        } else {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => messageBloc,
+                child: ChatDetailPage(
+                  // Pass friendId to create new conversation
+                  userId: userId!,
+                  username: username!,
+                  friendId: friend.userId,
+                  friendInfo: friendInfo,
+                ),
               ),
             ),
-          ),
-        );
+          );
+        }
       }
     } catch (e) {
       // Hide loading indicator if error
@@ -412,19 +446,22 @@ class _ChatListPageState extends State<ChatListPage> {
                 backgroundColor: AppColors.background,
                 elevation: 0,
 
-                leading: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        CupertinoIcons.back,
-                        color: AppColors.textPrimary,
+                leading: widget.isWebLayout
+                    ? const SizedBox.shrink()
+                    : Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              CupertinoIcons.back,
+                              color: AppColors.textPrimary,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
+                leadingWidth: widget.isWebLayout ? 16 : null,
                 title: Text(
                   state.user.fullName ?? context.l10n.chatTitle,
                   style: TextStyle(
@@ -442,13 +479,35 @@ class _ChatListPageState extends State<ChatListPage> {
                         friendsList = friendState.friends;
                       }
 
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (_) =>
-                              CreateGroupChatPage(friends: friendsList),
-                        ),
-                      );
+                      if (widget.isWebLayout) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: 500,
+                                maxHeight: 0.8.sh,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20.r),
+                                child: CreateGroupChatPage(
+                                  friends: friendsList,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) =>
+                                CreateGroupChatPage(friends: friendsList),
+                          ),
+                        );
+                      }
                     },
                     icon: Icon(
                       CupertinoIcons.plus_app,
@@ -457,408 +516,475 @@ class _ChatListPageState extends State<ChatListPage> {
                     ),
                   ),
 
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.settings, color: AppColors.textPrimary),
-                  ),
+                  // IconButton(
+                  //   onPressed: () {},
+                  //   icon: Icon(Icons.settings, color: AppColors.textPrimary),
+                  // ),
                 ],
               ),
 
-              body: RefreshIndicator(
-                onRefresh: _loadData,
-                color: AppColors.primary,
-                backgroundColor: AppColors.background,
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: [
-                    // Ô tìm kiếm
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 8.h,
-                        ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(30),
-                          onTap: () {
-                            final friendState = context
-                                .read<FriendBloc>()
-                                .state;
-                            List<FriendEntity> friendsList = [];
+              body: _isSearching && widget.isWebLayout
+                  ? Builder(
+                      builder: (context) {
+                        final friendState = context.read<FriendBloc>().state;
+                        List<FriendEntity> friendsList = [];
 
-                            if (friendState is FriendLoaded) {
-                              friendsList = friendState.friends;
+                        if (friendState is FriendLoaded) {
+                          friendsList = friendState.friends;
+                        }
+                        return ChatSearchPage(
+                          friends: friendsList,
+                          onNavigateToChat: (friend) async {
+                            await _handleFriendTap(friend);
+                            if (mounted) {
+                              setState(() {
+                                _isSearching = false;
+                              });
                             }
-
-                            Navigator.of(
-                              context,
-                            ).push(_searchRoute(friendsList));
                           },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 10.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.textSecondary.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.search,
-                                  color: AppColors.textSecondary,
-                                ),
-                                SizedBox(width: 10.w),
-                                Text(
-                                  context.l10n.chatSearchHint,
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 15.sp,
+                          isWebLayout: true,
+                          onBack: () {
+                            setState(() {
+                              _isSearching = false;
+                            });
+                          },
+                        );
+                      },
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadData,
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.background,
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        slivers: [
+                          // Ô tìm kiếm
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 8.h,
+                              ),
+                              child: InkWell(
+                                mouseCursor: SystemMouseCursors.text,
+                                borderRadius: BorderRadius.circular(30),
+                                onTap: () {
+                                  if (widget.isWebLayout) {
+                                    setState(() {
+                                      _isSearching = true;
+                                    });
+                                    return;
+                                  }
+
+                                  final friendState = context
+                                      .read<FriendBloc>()
+                                      .state;
+                                  List<FriendEntity> friendsList = [];
+
+                                  if (friendState is FriendLoaded) {
+                                    friendsList = friendState.friends;
+                                  }
+
+                                  Navigator.of(
+                                    context,
+                                  ).push(_searchRoute(friendsList));
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 10.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.textSecondary.withOpacity(
+                                      0.05,
+                                    ),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.search,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                      SizedBox(width: 10.w),
+                                      Text(
+                                        context.l10n.chatSearchHint,
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 15.sp,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
 
-                    // Story List (Friends)
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 95.h,
-                        child: BlocBuilder<FriendBloc, FriendState>(
-                          builder: (context, friendState) {
-                            if (friendState is FriendLoaded) {
-                              final friends = friendState.friends;
+                          // Story List (Friends)
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: 95.h,
+                              child: BlocBuilder<FriendBloc, FriendState>(
+                                builder: (context, friendState) {
+                                  if (friendState is FriendLoaded) {
+                                    final friends = friendState.friends;
 
-                              if (friends.isEmpty) {
-                                return Padding(
-                                  padding: EdgeInsets.only(right: 12.w),
-                                  child: StoryChatItemWidget(
-                                    imageUrl: "https://i.pravatar.cc/200",
-                                    name: context.l10n.chatYourStory,
-                                    showAddButton: true,
-                                    onTap: () {
-                                      // Handle add story tap
-                                    },
-                                  ),
-                                );
-                              }
-                              return ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                itemCount:
-                                    friends.length +
-                                    1, // +1 for add story button
-                                itemBuilder: (context, index) {
-                                  if (index == 0) {
-                                    // Add story button
-                                    return Padding(
-                                      padding: EdgeInsets.only(right: 12.w),
-                                      child: StoryChatItemWidget(
-                                        imageUrl:
-                                            state.user.avatarUrl ??
-                                            "https://i.pravatar.cc/200",
-                                        name: context.l10n.chatCreateStory,
-                                        showAddButton: true,
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) {
-                                                return StoryCreatePage();
+                                    if (friends.isEmpty) {
+                                      return Padding(
+                                        padding: EdgeInsets.only(right: 12.w),
+                                        child: StoryChatItemWidget(
+                                          imageUrl: "https://i.pravatar.cc/200",
+                                          name: context.l10n.chatYourStory,
+                                          showAddButton: true,
+                                          onTap: () {
+                                            // Handle add story tap
+                                          },
+                                        ),
+                                      );
+                                    }
+                                    return ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w,
+                                      ),
+                                      itemCount:
+                                          friends.length +
+                                          1, // +1 for add story button
+                                      itemBuilder: (context, index) {
+                                        if (index == 0) {
+                                          // Add story button
+                                          return Padding(
+                                            padding: EdgeInsets.only(
+                                              right: 12.w,
+                                            ),
+                                            child: StoryChatItemWidget(
+                                              imageUrl:
+                                                  state.user.avatarUrl ??
+                                                  "https://i.pravatar.cc/200",
+                                              name:
+                                                  context.l10n.chatCreateStory,
+                                              showAddButton: true,
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  CupertinoPageRoute(
+                                                    builder: (context) {
+                                                      return StoryCreatePage();
+                                                    },
+                                                  ),
+                                                );
                                               },
                                             ),
+                                          );
+                                        }
+
+                                        final friend = friends[index - 1];
+                                        return Padding(
+                                          padding: EdgeInsets.only(right: 12.w),
+                                          child: StoryChatItemWidget(
+                                            imageUrl:
+                                                friend.avatarUrl ??
+                                                "https://i.pravatar.cc/200",
+                                            name: friend.fullName!
+                                                .trim()
+                                                .split(' ')
+                                                .last,
+                                            showAddButton: false,
+                                            onTap: () {
+                                              // Check if conversation exists with this friend
+                                              _handleFriendTap(friend);
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  } else if (friendState is FriendLoading) {
+                                    return const ListFriendLoading();
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                            ),
+                          ),
+
+                          // Spacing
+                          SliverToBoxAdapter(child: SizedBox(height: 4.h)),
+
+                          // Danh sách hội thoại
+                          BlocBuilder<ConversationBloc, ConversationState>(
+                            builder: (context, state) {
+                              // Handle loading state
+                              if (state is ConversationsLoading) {
+                                return const SliverToBoxAdapter(
+                                  child: ConversationsLoadingWidget(),
+                                );
+                              }
+
+                              // Handle loaded state (including when join conversation is successful)
+                              // ConversationsLoaded? conversationsState;
+                              // if (state is ConversationsLoaded) {
+                              //   conversationsState = state;
+                              // }
+                              // // Keep showing conversations even after successful join
+                              // else if (state is JoinConversationSuccess) {
+                              //   // Try to get the last conversations state from bloc
+                              //   // For now, we'll trigger a reload
+                              //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                              //     _loadConversations();
+                              //   });
+                              //   // return const SliverToBoxAdapter(
+                              //   //   child: ConversationsLoadingWidget(),
+                              //   // );
+                              // }
+
+                              if (state is ConversationsLoaded) {
+                                final conversations = state.conversations.data;
+                                if (conversations.isEmpty) {
+                                  // Show friend suggestions when no conversations
+                                  return SliverToBoxAdapter(
+                                    child: _buildEmptyConversationView(),
+                                  );
+                                }
+                                return SliverList(
+                                  delegate: SliverChildBuilderDelegate((
+                                    context,
+                                    index,
+                                  ) {
+                                    final conversation = conversations[index];
+
+                                    // Lấy danh sách participants khác với user hiện tại
+                                    final otherParticipants = conversation
+                                        .participants
+                                        .where(
+                                          (participant) =>
+                                              participant.userId != userId,
+                                        )
+                                        .toList();
+
+                                    // Participant đầu tiên để dùng cho navigation
+                                    final firstParticipant =
+                                        otherParticipants.isNotEmpty
+                                        ? otherParticipants.first
+                                        : conversation.participants.firstOrNull;
+
+                                    // Xử lý tên hiển thị cho group
+                                    String displayName =
+                                        ChatHelper.formatConversationName(
+                                          conversation,
+                                          otherParticipants,
+                                          firstParticipant,
+                                        );
+
+                                    // Xử lý preview text
+                                    final String previewText;
+
+                                    if (conversation.lastMessage != null) {
+                                      final bool fromMe =
+                                          conversation
+                                              .lastMessage!
+                                              .sender
+                                              .userId ==
+                                          userId;
+
+                                      // Lấy tên người gửi
+                                      String senderName;
+                                      if (fromMe) {
+                                        senderName = context.l10n.chatYou;
+                                      } else if (conversation.isGroup) {
+                                        // Trong group, hiển thị tên người gửi
+                                        final sender = conversation.participants
+                                            .firstWhere(
+                                              (p) =>
+                                                  p.userId ==
+                                                  conversation
+                                                      .lastMessage!
+                                                      .sender
+                                                      .userId,
+                                            );
+                                        senderName =
+                                            sender.fullName
+                                                ?.trim()
+                                                .split(' ')
+                                                .last ??
+                                            sender.username ??
+                                            context.l10n.commonUser;
+                                      } else {
+                                        senderName = "";
+                                      }
+
+                                      if (conversation
+                                          .lastMessage!
+                                          .attachments
+                                          .isNotEmpty) {
+                                        previewText = context.l10n
+                                            .chatSentAttachmentPreview(
+                                              senderName.isNotEmpty
+                                                  ? '$senderName '
+                                                  : '',
+                                              conversation
+                                                  .lastMessage!
+                                                  .attachments
+                                                  .first
+                                                  .type,
+                                              conversation
+                                                  .lastMessage!
+                                                  .createdAt
+                                                  .formatChatTime(),
+                                            );
+                                      } else {
+                                        previewText = context.l10n
+                                            .chatTextPreview(
+                                              senderName.isNotEmpty || fromMe
+                                                  ? '$senderName: '
+                                                  : '',
+                                              conversation.lastMessage!.text ??
+                                                  '',
+                                              conversation
+                                                  .lastMessage!
+                                                  .createdAt
+                                                  .formatChatTime(),
+                                            );
+                                      }
+                                    } else {
+                                      // Không có lastMessage
+                                      if (conversation.isGroup) {
+                                        // Group mới tạo - hiển thị người tạo
+                                        final creator = conversation.createdBy!;
+                                        final creatorName =
+                                            creator.userId == userId
+                                            ? context.l10n.chatYou
+                                            : creator.fullName
+                                                      ?.trim()
+                                                      .split(' ')
+                                                      .last ??
+                                                  creator.username ??
+                                                  context.l10n.chatSomeone;
+                                        previewText = context.l10n
+                                            .chatGroupCreatedPreview(
+                                              creatorName,
+                                            );
+                                      } else {
+                                        // 1-1 chat chưa có tin nhắn
+                                        previewText =
+                                            context.l10n.chatConnected;
+                                      }
+                                    }
+
+                                    bool? isOnline;
+                                    if (!conversation.isGroup &&
+                                        firstParticipant != null) {
+                                      final otherUserId =
+                                          firstParticipant.userId;
+                                      final status =
+                                          _presenceByUserId[otherUserId];
+                                      if (status != null) {
+                                        isOnline = status.isOnline;
+                                      }
+
+                                      if (_chatPresenceService != null &&
+                                          !_presenceRequestedUserIds.contains(
+                                            otherUserId,
+                                          )) {
+                                        _presenceRequestedUserIds.add(
+                                          otherUserId,
+                                        );
+                                        _chatPresenceService!.requestPresence([
+                                          otherUserId,
+                                        ]);
+                                      }
+                                    }
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(bottom: 6.h),
+                                      child: ConversationItem(
+                                        avatarUrl:
+                                            conversation.isGroup &&
+                                                conversation.avatar != null
+                                            ? conversation.avatar
+                                            : firstParticipant!.avatarUrl ??
+                                                  'https://i.pravatar.cc/200',
+                                        name: displayName,
+                                        preview: previewText,
+                                        isUnread:
+                                            (conversation.unreadCount ?? 0) > 0,
+                                        isGroup: conversation.isGroup,
+                                        participants: conversation.isGroup
+                                            ? otherParticipants
+                                            : (firstParticipant != null
+                                                  ? [firstParticipant]
+                                                  : null),
+                                        isOnline: isOnline,
+                                        onTap: () {
+                                          _joinConversationAndNavigate(
+                                            conversation.id,
+                                            firstParticipant!,
+                                            conversation.unreadCount ?? 0,
+                                            conversation
+                                                .firstUnreadMessageIndex,
+                                            isGroup: conversation.isGroup,
+                                            groupName: displayName,
+                                            groupAvatar: conversation.avatar,
+                                            participants: conversation.isGroup
+                                                ? otherParticipants
+                                                : null,
                                           );
                                         },
                                       ),
                                     );
-                                  }
+                                  }, childCount: conversations.length),
+                                );
+                              }
 
-                                  final friend = friends[index - 1];
-                                  return Padding(
-                                    padding: EdgeInsets.only(right: 12.w),
-                                    child: StoryChatItemWidget(
-                                      imageUrl:
-                                          friend.avatarUrl ??
-                                          "https://i.pravatar.cc/200",
-                                      name: friend.fullName!
-                                          .trim()
-                                          .split(' ')
-                                          .last,
-                                      showAddButton: false,
-                                      onTap: () {
-                                        // Check if conversation exists with this friend
-                                        _handleFriendTap(friend);
-                                      },
+                              // Show loading indicator at bottom when loading more
+                              if (state is ConversationsLoaded &&
+                                  _isLoadingMore) {
+                                return SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.h),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primary,
+                                      ),
                                     ),
-                                  );
-                                },
-                              );
-                            } else if (friendState is FriendLoading) {
-                              return const ListFriendLoading();
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
+                                  ),
+                                );
+                              }
+                              // Handle error state
+                              else if (state is ConversationsError) {
+                                return SliverToBoxAdapter(
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          context.l10n.commonErrorWithMessage(
+                                            state.message ??
+                                                context.l10n.commonUnknown,
+                                          ),
+                                        ),
+                                        SizedBox(height: 16.h),
+                                        ElevatedButton(
+                                          onPressed: _loadConversations,
+                                          child: Text(context.l10n.commonRetry),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return const SliverToBoxAdapter(
+                                  child: ConversationsLoadingWidget(),
+                                );
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
-
-                    // Spacing
-                    SliverToBoxAdapter(child: SizedBox(height: 4.h)),
-
-                    // Danh sách hội thoại
-                    BlocBuilder<ConversationBloc, ConversationState>(
-                      builder: (context, state) {
-                        // Handle loading state
-                        if (state is ConversationsLoading) {
-                          return const SliverToBoxAdapter(
-                            child: ConversationsLoadingWidget(),
-                          );
-                        }
-
-                        // Handle loaded state (including when join conversation is successful)
-                        // ConversationsLoaded? conversationsState;
-                        // if (state is ConversationsLoaded) {
-                        //   conversationsState = state;
-                        // }
-                        // // Keep showing conversations even after successful join
-                        // else if (state is JoinConversationSuccess) {
-                        //   // Try to get the last conversations state from bloc
-                        //   // For now, we'll trigger a reload
-                        //   WidgetsBinding.instance.addPostFrameCallback((_) {
-                        //     _loadConversations();
-                        //   });
-                        //   // return const SliverToBoxAdapter(
-                        //   //   child: ConversationsLoadingWidget(),
-                        //   // );
-                        // }
-
-                        if (state is ConversationsLoaded) {
-                          final conversations = state.conversations.data;
-                          if (conversations.isEmpty) {
-                            // Show friend suggestions when no conversations
-                            return SliverToBoxAdapter(
-                              child: _buildEmptyConversationView(),
-                            );
-                          }
-                          return SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final conversation = conversations[index];
-
-                              // Lấy danh sách participants khác với user hiện tại
-                              final otherParticipants = conversation
-                                  .participants
-                                  .where(
-                                    (participant) =>
-                                        participant.userId != userId,
-                                  )
-                                  .toList();
-
-                              // Participant đầu tiên để dùng cho navigation
-                              final firstParticipant =
-                                  otherParticipants.isNotEmpty
-                                  ? otherParticipants.first
-                                  : conversation.participants.firstOrNull;
-
-                              // Xử lý tên hiển thị cho group
-                              String displayName =
-                                  ChatHelper.formatConversationName(
-                                    conversation,
-                                    otherParticipants,
-                                    firstParticipant,
-                                  );
-
-                              // Xử lý preview text
-                              final String previewText;
-
-                              if (conversation.lastMessage != null) {
-                                final bool fromMe =
-                                    conversation.lastMessage!.sender.userId ==
-                                    userId;
-
-                                // Lấy tên người gửi
-                                String senderName;
-                                if (fromMe) {
-                                  senderName = context.l10n.chatYou;
-                                } else if (conversation.isGroup) {
-                                  // Trong group, hiển thị tên người gửi
-                                  final sender = conversation.participants
-                                      .firstWhere(
-                                        (p) =>
-                                            p.userId ==
-                                            conversation
-                                                .lastMessage!
-                                                .sender
-                                                .userId,
-                                      );
-                                  senderName =
-                                      sender.fullName?.trim().split(' ').last ??
-                                      sender.username ??
-                                      context.l10n.commonUser;
-                                } else {
-                                  senderName = "";
-                                }
-
-                                if (conversation
-                                    .lastMessage!
-                                    .attachments
-                                    .isNotEmpty) {
-                                  previewText = context.l10n
-                                      .chatSentAttachmentPreview(
-                                        senderName.isNotEmpty
-                                            ? '$senderName '
-                                            : '',
-                                        conversation
-                                            .lastMessage!
-                                            .attachments
-                                            .first
-                                            .type,
-                                        conversation.lastMessage!.createdAt
-                                            .formatChatTime(),
-                                      );
-                                } else {
-                                  previewText = context.l10n.chatTextPreview(
-                                    senderName.isNotEmpty || fromMe
-                                        ? '$senderName: '
-                                        : '',
-                                    conversation.lastMessage!.text ?? '',
-                                    conversation.lastMessage!.createdAt
-                                        .formatChatTime(),
-                                  );
-                                }
-                              } else {
-                                // Không có lastMessage
-                                if (conversation.isGroup) {
-                                  // Group mới tạo - hiển thị người tạo
-                                  final creator = conversation.createdBy!;
-                                  final creatorName = creator.userId == userId
-                                      ? context.l10n.chatYou
-                                      : creator.fullName
-                                                ?.trim()
-                                                .split(' ')
-                                                .last ??
-                                            creator.username ??
-                                            context.l10n.chatSomeone;
-                                  previewText = context.l10n
-                                      .chatGroupCreatedPreview(creatorName);
-                                } else {
-                                  // 1-1 chat chưa có tin nhắn
-                                  previewText = context.l10n.chatConnected;
-                                }
-                              }
-
-                              bool? isOnline;
-                              if (!conversation.isGroup &&
-                                  firstParticipant != null) {
-                                final otherUserId = firstParticipant.userId;
-                                final status = _presenceByUserId[otherUserId];
-                                if (status != null) {
-                                  isOnline = status.isOnline;
-                                }
-
-                                if (_chatPresenceService != null &&
-                                    !_presenceRequestedUserIds.contains(
-                                      otherUserId,
-                                    )) {
-                                  _presenceRequestedUserIds.add(otherUserId);
-                                  _chatPresenceService!.requestPresence([
-                                    otherUserId,
-                                  ]);
-                                }
-                              }
-
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: 6.h),
-                                child: ConversationItem(
-                                  avatarUrl:
-                                      conversation.isGroup &&
-                                          conversation.avatar != null
-                                      ? conversation.avatar
-                                      : firstParticipant!.avatarUrl ??
-                                            'https://i.pravatar.cc/200',
-                                  name: displayName,
-                                  preview: previewText,
-                                  isUnread: (conversation.unreadCount ?? 0) > 0,
-                                  isGroup: conversation.isGroup,
-                                  participants: conversation.isGroup
-                                      ? otherParticipants
-                                      : (firstParticipant != null
-                                            ? [firstParticipant]
-                                            : null),
-                                  isOnline: isOnline,
-                                  onTap: () {
-                                    _joinConversationAndNavigate(
-                                      conversation.id,
-                                      firstParticipant!,
-                                      conversation.unreadCount ?? 0,
-                                      conversation.firstUnreadMessageIndex,
-                                      isGroup: conversation.isGroup,
-                                      groupName: displayName,
-                                      groupAvatar: conversation.avatar,
-                                      participants: conversation.isGroup
-                                          ? otherParticipants
-                                          : null,
-                                    );
-                                  },
-                                ),
-                              );
-                            }, childCount: conversations.length),
-                          );
-                        }
-
-                        // Show loading indicator at bottom when loading more
-                        if (state is ConversationsLoaded && _isLoadingMore) {
-                          return SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.h),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                        // Handle error state
-                        else if (state is ConversationsError) {
-                          return SliverToBoxAdapter(
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    context.l10n.commonErrorWithMessage(
-                                      state.message ??
-                                          context.l10n.commonUnknown,
-                                    ),
-                                  ),
-                                  SizedBox(height: 16.h),
-                                  ElevatedButton(
-                                    onPressed: _loadConversations,
-                                    child: Text(context.l10n.commonRetry),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          return const SliverToBoxAdapter(
-                            child: ConversationsLoadingWidget(),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
             );
           }
 
@@ -899,9 +1025,7 @@ class _ChatListPageState extends State<ChatListPage> {
               ),
               ...friends.map((friend) {
                 return FriendMessageSuggestionItem(
-                  avatar:
-                      friend.avatarUrl ??
-                      "https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg",
+                  avatar: friend.avatarUrl ?? '',
                   name:
                       friend.fullName ??
                       friend.username ??

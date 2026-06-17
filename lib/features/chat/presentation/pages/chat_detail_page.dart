@@ -13,6 +13,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/permission_helper.dart';
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/domain/entities/chat_entities.dart';
 import 'package:social_app_fe/features/chat/domain/entities/message-edit-log_entity.dart';
@@ -59,11 +60,13 @@ class ChatDetailPage extends StatefulWidget {
   final int? unreadCount;
   final int? firstUnreadMessageIndex;
   final bool isGroup;
+  final bool isWebLayout;
   final String? groupName;
   final String? groupAvatar;
   final List<UserEntity>? participants;
+  final VoidCallback? onInfoTap;
 
-  ChatDetailPage({
+  const ChatDetailPage({
     super.key,
     required this.userId,
     required this.username,
@@ -73,9 +76,11 @@ class ChatDetailPage extends StatefulWidget {
     this.unreadCount,
     this.firstUnreadMessageIndex,
     this.isGroup = false,
+    this.isWebLayout = false,
     this.groupName,
     this.groupAvatar,
     this.participants,
+    this.onInfoTap,
   });
 
   @override
@@ -792,6 +797,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
               _setEditMessage(message);
             }
           : null,
+      onCopy: message.text != null && message.text!.isNotEmpty
+          ? () {
+              _handleCopyMessage(message);
+            }
+          : null,
       onPin: () {
         showInfoSnackBar(context, context.l10n.chatPinInDevelopment);
       },
@@ -1142,7 +1152,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
             conversationId: _currentConversationId ?? widget.conversationId,
             userId: widget.userId,
             username: widget.username,
+            isWebLayout: widget.isWebLayout,
             onInitiateCall: _initiateCall,
+            onInfoTap: widget.onInfoTap,
           ),
         ),
 
@@ -1693,19 +1705,25 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                       key: messageKey,
 
                                                       onRightSwipe:
-                                                          !message
-                                                              .deletedForEveryone
+                                                          ResponsiveHelper
+                                                              .isWebOrDesktop
+                                                          ? null
+                                                          : !message
+                                                                .deletedForEveryone
                                                           ? !fromMe
                                                                 ? (details) {
                                                                     _setReplyMessage(
                                                                       message,
                                                                     );
                                                                   }
-                                                                : null // null nghĩa là disable hướng này
+                                                                : null
                                                           : null,
                                                       onLeftSwipe:
-                                                          !message
-                                                              .deletedForEveryone
+                                                          ResponsiveHelper
+                                                              .isWebOrDesktop
+                                                          ? null
+                                                          : !message
+                                                                .deletedForEveryone
                                                           ? fromMe
                                                                 ? (details) {
                                                                     _setReplyMessage(
@@ -1741,9 +1759,58 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                                         onLongPress: () {
                                                           if (!message
                                                               .deletedForEveryone) {
-                                                            _handleMessageLongPress(
+                                                            if (ResponsiveHelper
+                                                                .isWebOrDesktop) {
+                                                              _showMoreOptionsDialog(
+                                                                message,
+                                                                fromMe,
+                                                              );
+                                                            } else {
+                                                              _handleMessageLongPress(
+                                                                message,
+                                                                fromMe,
+                                                              );
+                                                            }
+                                                          }
+                                                        },
+                                                        onReactAction: () {
+                                                          if (!message
+                                                              .deletedForEveryone) {
+                                                            final messageKey =
+                                                                _messageKeys[message
+                                                                    .id];
+                                                            if (messageKey !=
+                                                                null) {
+                                                              MessageActionSheet.show(
+                                                                context:
+                                                                    context,
+                                                                message:
+                                                                    message,
+                                                                fromMe: fromMe,
+                                                                messageKey:
+                                                                    messageKey,
+                                                                showOnlyReactions:
+                                                                    true,
+                                                                onReactionSelected:
+                                                                    (emoji) {
+                                                                      _handleReactionSelected(
+                                                                        message,
+                                                                        emoji,
+                                                                      );
+                                                                    },
+                                                                onReply: () {},
+                                                                onCopy: null,
+                                                                onDelete: null,
+                                                                onMore: null,
+                                                              );
+                                                            }
+                                                          }
+                                                        },
+                                                        onReplyAction: () {
+                                                          if (!message
+                                                              .deletedForEveryone) {
+                                                            _setReplyMessage(
                                                               message,
-                                                              fromMe,
                                                             );
                                                           }
                                                         },
@@ -2021,14 +2088,15 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                     });
                   },
                 ),
-                IconButton(
-                  icon: Icon(
-                    CupertinoIcons.camera_fill,
-                    color: AppColors.primary,
-                    size: 24.sp,
+                if (!ResponsiveHelper.isWebOrDesktop)
+                  IconButton(
+                    icon: Icon(
+                      CupertinoIcons.camera_fill,
+                      color: AppColors.primary,
+                      size: 24.sp,
+                    ),
+                    onPressed: _openCamera,
                   ),
-                  onPressed: _openCamera,
-                ),
                 IconButton(
                   icon: Icon(
                     CupertinoIcons.photo_fill,
@@ -2036,14 +2104,54 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                     size: 24.sp,
                   ),
                   onPressed: () async {
-                    if (!_showPhotoPicker) {
-                      // Mở photo picker - request permission và load ảnh
-                      await _requestPhotoPermissionAndLoad();
+                    if (ResponsiveHelper.isWebOrDesktop) {
+                      try {
+                        final result = await FilePicker.pickFiles(
+                          allowMultiple: true,
+                          type: FileType.image,
+                        );
+
+                        if (result != null && result.paths.isNotEmpty) {
+                          final filePaths = result.paths
+                              .whereType<String>()
+                              .toList();
+                          if (filePaths.isEmpty) return;
+
+                          final conversationId =
+                              _currentConversationId ?? widget.conversationId;
+                          if (conversationId == null) return;
+
+                          _typingDebounceTimer?.cancel();
+                          final messageBloc = context.read<MessageBloc>();
+                          messageBloc.emitTypingStop(
+                            widget.userId,
+                            conversationId,
+                          );
+
+                          messageBloc.add(
+                            SendMessageWithFilesEvent(
+                              userId: widget.userId,
+                              conversationId: conversationId,
+                              filePaths: filePaths,
+                              replyTo: _replyingMessage?.id,
+                            ),
+                          );
+                          _clearReplyMessage();
+                          _scrollToBottom();
+                        }
+                      } catch (e) {
+                        print('Error picking image on web: $e');
+                      }
                     } else {
-                      // Đóng photo picker
-                      setState(() {
-                        _showPhotoPicker = false;
-                      });
+                      if (!_showPhotoPicker) {
+                        // Mở photo picker - request permission và load ảnh
+                        await _requestPhotoPermissionAndLoad();
+                      } else {
+                        // Đóng photo picker
+                        setState(() {
+                          _showPhotoPicker = false;
+                        });
+                      }
                     }
                   },
                 ),
