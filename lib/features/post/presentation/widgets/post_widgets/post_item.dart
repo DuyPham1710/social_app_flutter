@@ -10,6 +10,7 @@ import 'package:social_app_fe/features/post/domain/entities/react_post_entity.da
 import 'package:social_app_fe/features/post/presentation/helpers/tag_action_helper.dart';
 import 'dart:async';
 import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/animated_post_border.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_action.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/community_post_header.dart';
@@ -289,14 +290,8 @@ class _PostItemState extends State<PostItem> {
         horizontal: 12.rs(context),
         vertical: 8.rsh(context),
       ),
-      padding: EdgeInsets.symmetric(vertical: 8.rsh(context)),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border.all(
-          color: AppColors.divider.withValues(alpha: 0.85),
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(12.rsr(context)),
+        borderRadius: BorderRadius.circular(13.rsr(context)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -312,179 +307,192 @@ class _PostItemState extends State<PostItem> {
           ),
         ],
       ),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header - chọn header dựa trên loại post (kiểm tra communityStatus)
-          if (widget.post.communityStatus != null) ...[
-            // Post trong community
-            if (widget.isInCommunityDetail)
-              // Trong community detail: dùng CommunityPostHeaderBase (header đơn giản)
-              CommunityPostHeaderBase(
-                user: user,
-                createdAt: widget.post.createdAt,
-                communityUserRole: widget.communityUserRole,
-                isSaved: _isSaved,
-                onOptionsTap: () {
-                  _showCommunityPostOptions();
-                },
-                onReportTap: () {
-                  ReportPostBottomSheet.show(
-                    context,
-                    postId: widget.post.id,
-                    ownerUserId: user.userId,
-                  );
-                },
-                onSaveTap: () {
-                  if (_isSaved) {
-                    _handleUnsave();
-                  } else {
-                    SavePostBottomSheet.show(
-                      context,
-                      post: widget.post,
-                      onSaved: (savedId) {
-                        setState(() {
-                          _savedId = savedId;
-                          _isSaved = true;
-                        });
-                      },
-                    );
-                  }
-                },
-              )
-            else
-              // Ngoài community: dùng CommunityPostHeader (header full với community info)
-              CommunityPostHeader(
-                community: widget.post.community,
-                user: user,
-                createdAt: widget.post.createdAt,
-                showCommunityInfo: true,
-                communityUserRole: widget.communityUserRole,
-                isSaved: _isSaved,
-                onOptionsTap: () {
-                  _showCommunityPostOptions();
-                },
-                onReportTap: () {
-                  ReportPostBottomSheet.show(
-                    context,
-                    postId: widget.post.id,
-                    ownerUserId: user.userId,
-                  );
-                },
-                onSaveTap: () {
-                  if (_isSaved) {
-                    _handleUnsave();
-                  } else {
-                    SavePostBottomSheet.show(
-                      context,
-                      post: widget.post,
-                      onSaved: (savedId) {
-                        setState(() {
-                          _savedId = savedId;
-                          _isSaved = true;
-                        });
-                      },
-                    );
-                  }
-                },
-              ),
-          ] else ...[
-            // Header
-            PostHeader(
-              user: user,
-              createdAt: widget.post.createdAt,
-              taggedUsers: widget.post.taggedUsers,
-              visibleOnProfileUserIds: _visibleOnProfileUserIds,
-              onTagVisibilityTap: _handleTagVisibility,
-              onRemoveTagTap: _handleRemoveTag,
-              onOptionsTap: () {
-                _showPostOptions();
-              },
-              isSaved: _isSaved,
-              onReportTap: () {
-                ReportPostBottomSheet.show(
-                  context,
-                  postId: widget.post.id,
-                  ownerUserId: user.userId,
-                );
-              },
-              onSaveTap: () {
-                if (_isSaved) {
-                  _handleUnsave();
-                } else {
-                  SavePostBottomSheet.show(
-                    context,
-                    post: widget.post,
-                    onSaved: (savedId) {
-                      setState(() {
-                        _savedId = savedId;
-                        _isSaved = true;
-                      });
+      child: AnimatedPostBorder(
+        borderWidth: 1.0,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 8.rsh(context)),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(12.rsr(context)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header - chọn header dựa trên loại post (kiểm tra communityStatus)
+              if (widget.post.communityStatus != null) ...[
+                // Post trong community
+                if (widget.isInCommunityDetail)
+                  // Trong community detail: dùng CommunityPostHeaderBase (header đơn giản)
+                  CommunityPostHeaderBase(
+                    user: user,
+                    createdAt: widget.post.createdAt,
+                    communityUserRole: widget.communityUserRole,
+                    isSaved: _isSaved,
+                    location: widget.post.location,
+                    onOptionsTap: () {
+                      _showCommunityPostOptions();
                     },
-                  );
-                }
-              },
-            ),
-          ],
+                    onReportTap: () {
+                      ReportPostBottomSheet.show(
+                        context,
+                        postId: widget.post.id,
+                        ownerUserId: user.userId,
+                      );
+                    },
+                    onSaveTap: () {
+                      if (_isSaved) {
+                        _handleUnsave();
+                      } else {
+                        SavePostBottomSheet.show(
+                          context,
+                          post: widget.post,
+                          onSaved: (savedId) {
+                            setState(() {
+                              _savedId = savedId;
+                              _isSaved = true;
+                            });
+                          },
+                        );
+                      }
+                    },
+                  )
+                else
+                  // Ngoài community: dùng CommunityPostHeader (header full với community info)
+                  CommunityPostHeader(
+                    community: widget.post.community,
+                    user: user,
+                    createdAt: widget.post.createdAt,
+                    showCommunityInfo: true,
+                    communityUserRole: widget.communityUserRole,
+                    isSaved: _isSaved,
+                    location: widget.post.location,
+                    onOptionsTap: () {
+                      _showCommunityPostOptions();
+                    },
+                    onReportTap: () {
+                      ReportPostBottomSheet.show(
+                        context,
+                        postId: widget.post.id,
+                        ownerUserId: user.userId,
+                      );
+                    },
+                    onSaveTap: () {
+                      if (_isSaved) {
+                        _handleUnsave();
+                      } else {
+                        SavePostBottomSheet.show(
+                          context,
+                          post: widget.post,
+                          onSaved: (savedId) {
+                            setState(() {
+                              _savedId = savedId;
+                              _isSaved = true;
+                            });
+                          },
+                        );
+                      }
+                    },
+                  ),
+              ] else ...[
+                // Header
+                PostHeader(
+                  user: user,
+                  createdAt: widget.post.createdAt,
+                  taggedUsers: widget.post.taggedUsers,
+                  location: widget.post.location,
+                  visibleOnProfileUserIds: _visibleOnProfileUserIds,
+                  onTagVisibilityTap: _handleTagVisibility,
+                  onRemoveTagTap: _handleRemoveTag,
+                  onOptionsTap: () {
+                    _showPostOptions();
+                  },
+                  isSaved: _isSaved,
+                  onReportTap: () {
+                    ReportPostBottomSheet.show(
+                      context,
+                      postId: widget.post.id,
+                      ownerUserId: user.userId,
+                    );
+                  },
+                  onSaveTap: () {
+                    if (_isSaved) {
+                      _handleUnsave();
+                    } else {
+                      SavePostBottomSheet.show(
+                        context,
+                        post: widget.post,
+                        onSaved: (savedId) {
+                          setState(() {
+                            _savedId = savedId;
+                            _isSaved = true;
+                          });
+                        },
+                      );
+                    }
+                  },
+                ),
+              ],
 
-          // Caption + dịch
-          if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
-            GestureDetector(
-              onTap: widget.post.urls.isEmpty ? _openPostDetail : null,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
-                child: PostTranslatableCaption(
-                  postId: widget.post.id,
-                  caption: widget.post.caption!,
-                  textStyle: TextStyle(
-                    fontSize: 13.rsp(context),
-                    color: AppColors.textPrimary,
+              // Caption + dịch
+              if (widget.post.caption != null &&
+                  widget.post.caption!.isNotEmpty)
+                GestureDetector(
+                  onTap: widget.post.urls.isEmpty ? _openPostDetail : null,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.rs(context)),
+                    child: PostTranslatableCaption(
+                      postId: widget.post.id,
+                      caption: widget.post.caption!,
+                      textStyle: TextStyle(
+                        fontSize: 13.rsp(context),
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-          SizedBox(height: 8.rsh(context)),
+              SizedBox(height: 8.rsh(context)),
 
-          // Media (images)
-          if (urls.isNotEmpty)
-            _buildMediaLayout(context, urls)
-          else
-            GestureDetector(
-              onTap: _openPostDetail,
-              behavior: HitTestBehavior.opaque,
-              child: SizedBox(height: 8.rsh(context)),
-            ),
+              // Media (images)
+              if (urls.isNotEmpty)
+                _buildMediaLayout(context, urls)
+              else
+                GestureDetector(
+                  onTap: _openPostDetail,
+                  behavior: HitTestBehavior.opaque,
+                  child: SizedBox(height: 8.rsh(context)),
+                ),
 
-          SizedBox(height: 8.rsh(context)),
+              SizedBox(height: 8.rsh(context)),
 
-          // Likes info - ẩn nếu bài viết đang chờ duyệt
-          if (widget.post.communityStatus != 'pending')
-            GestureDetector(
-              onTap: () {
-                ModalComment.show(
-                  context,
+              // Likes info - ẩn nếu bài viết đang chờ duyệt
+              if (widget.post.communityStatus != 'pending')
+                GestureDetector(
+                  onTap: () {
+                    ModalComment.show(
+                      context,
+                      postId: widget.post.id,
+                      reacts: _localReacts,
+                    );
+                  },
+                  child: PostReactInfo(reacts: _localReacts),
+                ),
+
+              SizedBox(height: 20.rsh(context)),
+
+              // Post actions - ẩn nếu bài viết đang chờ duyệt
+              if (widget.post.communityStatus != 'pending')
+                PostAction(
                   postId: widget.post.id,
+                  reactCount: _localReacts.length,
+                  isReact: _currentUserReaction,
                   reacts: _localReacts,
-                );
-              },
-              child: PostReactInfo(reacts: _localReacts),
-            ),
-
-          SizedBox(height: 20.rsh(context)),
-
-          // Post actions - ẩn nếu bài viết đang chờ duyệt
-          if (widget.post.communityStatus != 'pending')
-            PostAction(
-              postId: widget.post.id,
-              reactCount: _localReacts.length,
-              isReact: _currentUserReaction,
-              reacts: _localReacts,
-              commentCount: widget.commentCount,
-              onReactionChanged: _onReactionChanged,
-            ),
-        ],
+                  commentCount: widget.commentCount,
+                  onReactionChanged: _onReactionChanged,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -25,6 +25,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
   final VoidCallback? onSaveTap;
   final bool isSaved;
   final String? communityUserRole;
+  final String? location;
 
   const CommunityPostHeaderBase({
     super.key,
@@ -35,6 +36,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
     this.onSaveTap,
     this.isSaved = false,
     this.communityUserRole,
+    this.location,
   });
 
   Future<void> _navigateToProfile(BuildContext context) async {
@@ -93,16 +95,40 @@ class CommunityPostHeaderBase extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () => _navigateToProfile(context),
-                  child: Text(
-                    user.fullName ?? context.l10n.commonUser,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.rsp(context),
-                      color: AppColors.textPrimary,
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _navigateToProfile(context),
+                      child: Text(
+                        user.fullName ?? context.l10n.commonUser,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.rsp(context),
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (location != null && location!.isNotEmpty) ...[
+                      SizedBox(width: 6.rs(context)),
+                      Text(
+                        context.l10n.postAtLocation,
+                        style: TextStyle(
+                          fontSize: 14.rsp(context),
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      SizedBox(width: 6.rs(context)),
+                      Text(
+                        location!,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.rsp(context),
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 Text(
                   localizedPostTime(context.l10n, createdAt),

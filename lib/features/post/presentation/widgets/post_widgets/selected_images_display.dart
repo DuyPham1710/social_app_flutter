@@ -309,6 +309,13 @@ class _SelectedImagesDisplayState extends State<SelectedImagesDisplay> {
           onAdd: widget.onEdit,
           onRemoveAtIndex: (removeIndex) {
             widget.onRemoveAtIndex?.call(removeIndex);
+            
+            if (mounted && removeIndex < _imageFiles.length) {
+              setState(() {
+                _imageFiles.removeAt(removeIndex);
+              });
+            }
+
             if (_imageFiles.isEmpty) {
               Navigator.pop(context);
             }

@@ -3810,6 +3810,30 @@ abstract class AppLocalizations {
   /// **'Vị trí'**
   String get postLocation;
 
+  /// No description provided for @postSelectImageForLocation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vui lòng chọn ảnh để gợi ý địa điểm'**
+  String get postSelectImageForLocation;
+
+  /// No description provided for @postLocationSuggestionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gợi ý check-in'**
+  String get postLocationSuggestionTitle;
+
+  /// No description provided for @postLocationSuggestionDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có muốn chia sẻ địa chỉ này trên bài viết không?'**
+  String get postLocationSuggestionDesc;
+
+  /// No description provided for @postAtLocation.
+  ///
+  /// In vi, this message translates to:
+  /// **'tại'**
+  String get postAtLocation;
+
   /// No description provided for @postMediaItemCount.
   ///
   /// In vi, this message translates to:

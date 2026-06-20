@@ -2144,6 +2144,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postLocation => 'Location';
 
   @override
+  String get postSelectImageForLocation =>
+      'Please select an image to suggest a location';
+
+  @override
+  String get postLocationSuggestionTitle => 'Check-in suggestion';
+
+  @override
+  String get postLocationSuggestionDesc =>
+      'Do you want to share this location on your post?';
+
+  @override
+  String get postAtLocation => 'at';
+
+  @override
   String postMediaItemCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

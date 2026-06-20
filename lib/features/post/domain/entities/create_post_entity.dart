@@ -5,6 +5,7 @@ import 'package:social_app_fe/core/enums/privacy_type.dart';
 
 class CreatePostEntity {
   final String? caption;
+  final String? location;
   final List<File>? files;
   final List<String>? titles;
   final List<int>? orders;
@@ -19,6 +20,7 @@ class CreatePostEntity {
 
   const CreatePostEntity({
     this.caption,
+    this.location,
     this.files,
     this.titles,
     this.orders,

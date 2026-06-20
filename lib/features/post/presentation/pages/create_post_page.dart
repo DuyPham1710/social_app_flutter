@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart' as import_geo;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart' as import_photo_manager;
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,9 +32,11 @@ import 'package:social_app_fe/features/post/presentation/pages/edit_selected_ima
 import 'package:social_app_fe/features/privacy/presentation/page/privacy_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/location_bottom_sheet.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 
 class CreatePostPage extends StatefulWidget {
   final VoidCallback? onPostCreated;
@@ -56,6 +58,75 @@ class _CreatePostPageState extends State<CreatePostPage> {
   List<String> _friendsDetailIds = [];
   List<Map<String, String>> _taggedUsers = [];
   bool _isCreatingPost = false;
+  String? _selectedLocation;
+
+  Future<void> _extractLocationFromAssets(List<dynamic> assets) async {
+    List<String> foundLocations = [];
+
+    // Xin quyền ACCESS_MEDIA_LOCATION trên Android
+    if (Platform.isAndroid) {
+      await Permission.accessMediaLocation.request();
+    }
+
+    for (var asset in assets) {
+      if (asset is AssetEntity) {
+        final latlng = await asset.latlngAsync();
+        if (latlng != null) {
+          double lat = latlng.latitude;
+          double lng = latlng.longitude;
+
+          if (lat != 0.0 && lng != 0.0) {
+            try {
+              List<import_geo.Placemark> placemarks = await import_geo
+                  .placemarkFromCoordinates(lat, lng);
+              if (placemarks.isNotEmpty) {
+                final placemark = placemarks.first;
+                final String address = [
+                  placemark.locality,
+                  placemark.administrativeArea,
+                  placemark.country,
+                ].where((e) => e != null && e.isNotEmpty).join(', ');
+
+                if (address.isNotEmpty) {
+                  foundLocations.add(address);
+                }
+              }
+            } catch (e) {
+              print("Error getting location: $e");
+            }
+          }
+        }
+      }
+    }
+
+    if (foundLocations.isNotEmpty) {
+      // Tìm địa chỉ xuất hiện nhiều nhất
+      final locationCounts = <String, int>{};
+      for (var loc in foundLocations) {
+        locationCounts[loc] = (locationCounts[loc] ?? 0) + 1;
+      }
+
+      var mostCommonLoc = foundLocations.first;
+      var maxCount = 0;
+      locationCounts.forEach((loc, count) {
+        if (count > maxCount) {
+          maxCount = count;
+          mostCommonLoc = loc;
+        }
+      });
+
+      LocationBottomSheet.show(
+        context,
+        address: mostCommonLoc,
+        onConfirm: () {
+          setState(() {
+            _selectedLocation = mostCommonLoc;
+          });
+          Navigator.pop(context);
+        },
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -136,6 +207,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         caption: _captionController.text.trim().isNotEmpty
             ? _captionController.text.trim()
             : null,
+        location: _selectedLocation,
         files: files.isNotEmpty ? files : null,
         fileBytesList: fileBytesList.isNotEmpty ? fileBytesList : null,
         fileNames: fileNames.isNotEmpty ? fileNames : null,
@@ -189,28 +261,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
       return;
     }
 
-    PermissionStatus status;
+    // Xin quyền bằng PhotoManager
+    final import_photo_manager.PermissionState ps =
+        await import_photo_manager.PhotoManager.requestPermissionExtend();
 
-    if (Platform.isIOS) {
-      // iOS dùng quyền photos
-      status = await Permission.photos.request();
-    } else {
-      // Android
-      if (Platform.isAndroid) {
-        // Android 13 (SDK 33+) trở lên có quyền riêng cho ảnh
-        if (await Permission.photos.isGranted ||
-            await Permission.photos.request().isGranted) {
-          status = PermissionStatus.granted;
-        } else {
-          // Dự phòng cho các bản Android cũ hơn
-          status = await Permission.storage.request();
-        }
-      } else {
-        status = await Permission.storage.request();
-      }
-    }
-
-    if (status.isGranted) {
+    if (ps.isAuth || ps == import_photo_manager.PermissionState.limited) {
       final result = await Navigator.push(
         context,
         CupertinoPageRoute(
@@ -226,11 +281,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
           // Xóa hết ảnh cũ nếu là dùng gallery picker (vì result trả về danh sách chọn mới)
           _selectedAssets = result;
         });
+        _extractLocationFromAssets(result);
       }
-    } else if (status.isPermanentlyDenied) {
-      openAppSettings();
     } else {
       showErrorSnackBar(context, context.l10n.postPhotoPermissionRequired);
+      import_photo_manager.PhotoManager.openSetting();
     }
   }
 
@@ -665,6 +720,56 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                       child: _buildTaggedText(),
                                                     ),
                                                   ],
+                                                  if (_selectedLocation !=
+                                                      null) ...[
+                                                    SizedBox(
+                                                      width: 6.rs(context),
+                                                    ),
+                                                    Text(
+                                                      context
+                                                          .l10n
+                                                          .postAtLocation,
+                                                      style: TextStyle(
+                                                        fontSize: 14.rsp(
+                                                          context,
+                                                        ),
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 6.rs(context),
+                                                    ),
+                                                    Text(
+                                                      _selectedLocation!,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14.rsp(
+                                                          context,
+                                                        ),
+                                                        color: AppColors
+                                                            .textPrimary,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 4.rs(context),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _selectedLocation =
+                                                              null;
+                                                        });
+                                                      },
+                                                      child: Icon(
+                                                        Icons.close,
+                                                        size: 16.rsp(context),
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ],
                                               ),
 
@@ -884,12 +989,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           onEdit: () => _onSelectImage(context),
                           onRemove: (assets) {
                             setState(() {
-                              _selectedAssets.clear();
+                              _selectedAssets = [];
                             });
                           },
                           onRemoveAtIndex: (index) {
                             setState(() {
                               _selectedAssets.removeAt(index);
+                              _selectedAssets = List.from(_selectedAssets);
                             });
                           },
                           onImageEdited: (index, newFile) async {
@@ -899,6 +1005,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               if (asset != null && mounted) {
                                 setState(() {
                                   _selectedAssets[index] = asset;
+                                  _selectedAssets = List.from(_selectedAssets);
                                 });
                               }
                             } catch (e) {
@@ -950,6 +1057,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           _bottomIcon(
                             Icons.location_on_outlined,
                             context.l10n.postLocation,
+                            onTap: () {
+                              if (_selectedAssets.isNotEmpty) {
+                                _extractLocationFromAssets(_selectedAssets);
+                              } else {
+                                showInfoSnackBar(
+                                  context,
+                                  context.l10n.postSelectImageForLocation,
+                                );
+                              }
+                            },
                           ),
                           _bottomIcon(
                             CupertinoIcons.ellipsis,

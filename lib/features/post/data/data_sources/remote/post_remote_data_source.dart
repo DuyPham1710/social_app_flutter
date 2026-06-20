@@ -46,6 +46,7 @@ abstract class PostRemoteDataSource {
     @Part(name: 'friends_detail') String? friendsDetail,
     @Part(name: 'taggedUserIds') String? taggedUserIds,
     @Part(name: 'communityId') String? communityId,
+    @Part(name: 'location') String? location,
     @Part(name: 'files') List<MultipartFile>? files,
   );
 

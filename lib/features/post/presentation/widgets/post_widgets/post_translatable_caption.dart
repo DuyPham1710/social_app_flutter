@@ -46,6 +46,8 @@ class _PostTranslatableCaptionState extends State<PostTranslatableCaption> {
   }
 
   Future<void> _checkEligibility() async {
+    if (!mounted) return;
+
     if (widget.caption.trim().isEmpty) {
       if (mounted) {
         setState(() {

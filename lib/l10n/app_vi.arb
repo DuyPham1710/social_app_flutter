@@ -1044,6 +1044,10 @@
   "postLiveVideo": "Video trực tiếp",
   "postLoadingVideo": "Đang tải video...",
   "postLocation": "Vị trí",
+  "postSelectImageForLocation": "Vui lòng chọn ảnh để gợi ý địa điểm",
+  "postLocationSuggestionTitle": "Gợi ý check-in",
+  "postLocationSuggestionDesc": "Bạn có muốn chia sẻ địa chỉ này trên bài viết không?",
+  "postAtLocation": "tại",
   "postMediaItemCount": "{count, plural, =0{0 mục} =1{1 mục} other{{count} mục}}",
   "@postMediaItemCount": {
     "placeholders": {

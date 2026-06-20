@@ -62,6 +62,7 @@ class PostModel extends PostEntity with _$PostModel {
   const factory PostModel({
     @JsonKey(name: '_id') required String id,
     String? caption,
+    String? location,
     @JsonKey(name: 'userId') required UserModel user,
     required List<PostUrlModel> urls,
     required String layout,
