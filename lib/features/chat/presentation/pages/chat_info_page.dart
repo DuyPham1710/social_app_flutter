@@ -11,6 +11,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_b
 import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
+import 'package:social_app_fe/features/profile/presentation/widgets/report_user_bottom_sheet.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatInfoPage extends StatefulWidget {
@@ -216,7 +217,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                     child: Text(
                       _groupName.isNotEmpty
                           ? _groupName
-                          : widget.userInfo?.fullName ?? context.l10n.authUsername,
+                          : widget.userInfo?.fullName ??
+                                context.l10n.authUsername,
                       style: TextStyle(
                         fontSize: 22.sp,
                         fontWeight: FontWeight.bold,
@@ -425,7 +427,14 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
               ),
               title: context.l10n.commonReport,
               subtitle: context.l10n.chatFeedbackAndReportConversation,
-              onTap: () {},
+              onTap: () {
+                if (widget.userInfo != null) {
+                  ReportUserBottomSheet.show(
+                    context,
+                    reportedUserId: widget.userInfo!.userId,
+                  );
+                }
+              },
             ),
 
             // SECTION: ACTIONS CHỈ CHO NHÓM
@@ -633,7 +642,9 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) => ChangeGroupNameDialog(
-        currentName: _groupName.isNotEmpty ? _groupName : context.l10n.chatGroupName,
+        currentName: _groupName.isNotEmpty
+            ? _groupName
+            : context.l10n.chatGroupName,
         conversationId: widget.conversationId,
         userId: widget.userId,
       ),

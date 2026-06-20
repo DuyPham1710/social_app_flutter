@@ -11,6 +11,10 @@ import 'package:social_app_fe/features/search/presentation/widgets/search_bar.da
 import 'package:social_app_fe/features/search/presentation/widgets/search_history_item.dart';
 import 'package:social_app_fe/features/search/presentation/widgets/search_result_item.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/app/presentation/widgets/side_navigation.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
+import 'package:social_app_fe/features/notification/presentation/bloc/notification_state.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -22,6 +26,45 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final ScrollController _scrollController = ScrollController();
   BuildContext? _blocContext;
+  Map<String, dynamic>? _currentUserData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await TokenStorage.getUserData();
+    if (mounted) {
+      setState(() {
+        _currentUserData = userData;
+      });
+    }
+  }
+
+  String _getAvtCurrent() {
+    final avatarUrl = _currentUserData?['avatarUrl'] as String?;
+    if (avatarUrl != null && avatarUrl.isNotEmpty) return avatarUrl;
+    final avatar = _currentUserData?['avatar'] as String?;
+    if (avatar != null && avatar.isNotEmpty) return avatar;
+    return '';
+  }
+
+  void _onTabSelected(int index) {
+    if (index == -1) return; // Already on search
+    if (index == -2) {
+      Navigator.pushNamed(context, '/chat-web');
+      return;
+    }
+    // Navigate back to main page with selected tab
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/main',
+      (route) => false,
+      arguments: {'initialTab': index},
+    );
+  }
 
   @override
   void dispose() {
@@ -50,9 +93,9 @@ class _SearchPageState extends State<SearchPage> {
           _scrollController.removeListener(_onScroll);
           _scrollController.addListener(_onScroll);
 
-          return Scaffold(
-            backgroundColor: AppColors.background,
-            body: Center(
+          final isSidebarLayout = ResponsiveHelper.shouldShowSidebar(context);
+
+          Widget content = Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxWidth: ResponsiveHelper.feedMaxWidth,
@@ -163,7 +206,32 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
               ),
-            ),
+            );
+
+          if (isSidebarLayout) {
+            return Scaffold(
+              backgroundColor: AppColors.background,
+              body: Row(
+                children: [
+                  BlocBuilder<NotificationBloc, NotificationState>(
+                    builder: (context, notificationState) {
+                      return SideNavigation(
+                        currentIndex: -1,
+                        onTabSelected: _onTabSelected,
+                        unreadCount: notificationState.unread,
+                        avt: _getAvtCurrent(),
+                      );
+                    },
+                  ),
+                  Expanded(child: content),
+                ],
+              ),
+            );
+          }
+
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            body: content,
           );
         },
       ),

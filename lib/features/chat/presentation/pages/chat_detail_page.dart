@@ -1219,7 +1219,9 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                                     final List<String> unreadTexts = [];
                                     final limit = _firstUnreadMessageIndex! + 1;
                                     final messagesToProcess = currentMessages
-                                        .take(limit);
+                                        .take(limit)
+                                        .toList()
+                                        .reversed;
                                     for (final msg in messagesToProcess) {
                                       if (msg.sender.userId != widget.userId) {
                                         final senderName =
