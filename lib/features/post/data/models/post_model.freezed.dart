@@ -24,6 +24,7 @@ mixin _$PostModel {
   @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
   String? get caption => throw _privateConstructorUsedError;
+  String? get location => throw _privateConstructorUsedError;
   @JsonKey(name: 'userId')
   UserModel get user => throw _privateConstructorUsedError;
   List<PostUrlModel> get urls => throw _privateConstructorUsedError;
@@ -70,6 +71,7 @@ abstract class $PostModelCopyWith<$Res> {
   $Res call({
     @JsonKey(name: '_id') String id,
     String? caption,
+    String? location,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
@@ -111,6 +113,7 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
   $Res call({
     Object? id = null,
     Object? caption = freezed,
+    Object? location = freezed,
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
@@ -135,6 +138,10 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
             caption: freezed == caption
                 ? _value.caption
                 : caption // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            location: freezed == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
                       as String?,
             user: null == user
                 ? _value.user
@@ -220,6 +227,7 @@ abstract class _$$PostModelImplCopyWith<$Res>
   $Res call({
     @JsonKey(name: '_id') String id,
     String? caption,
+    String? location,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
@@ -261,6 +269,7 @@ class __$$PostModelImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? caption = freezed,
+    Object? location = freezed,
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
@@ -285,6 +294,10 @@ class __$$PostModelImplCopyWithImpl<$Res>
         caption: freezed == caption
             ? _value.caption
             : caption // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        location: freezed == location
+            ? _value.location
+            : location // ignore: cast_nullable_to_non_nullable
                   as String?,
         user: null == user
             ? _value.user
@@ -353,6 +366,7 @@ class _$PostModelImpl implements _PostModel {
   const _$PostModelImpl({
     @JsonKey(name: '_id') required this.id,
     this.caption,
+    this.location,
     @JsonKey(name: 'userId') required this.user,
     required final List<PostUrlModel> urls,
     required this.layout,
@@ -389,6 +403,8 @@ class _$PostModelImpl implements _PostModel {
   final String id;
   @override
   final String? caption;
+  @override
+  final String? location;
   @override
   @JsonKey(name: 'userId')
   final UserModel user;
@@ -478,6 +494,8 @@ class _$PostModelImpl implements _PostModel {
             other is _$PostModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.caption, caption) || other.caption == caption) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
             (identical(other.user, user) || other.user == user) &&
             const DeepCollectionEquality().equals(other._urls, _urls) &&
             (identical(other.layout, layout) || other.layout == layout) &&
@@ -517,6 +535,7 @@ class _$PostModelImpl implements _PostModel {
     runtimeType,
     id,
     caption,
+    location,
     user,
     const DeepCollectionEquality().hash(_urls),
     layout,
@@ -551,6 +570,7 @@ abstract class _PostModel implements PostModel {
   const factory _PostModel({
     @JsonKey(name: '_id') required final String id,
     final String? caption,
+    final String? location,
     @JsonKey(name: 'userId') required final UserModel user,
     required final List<PostUrlModel> urls,
     required final String layout,
@@ -580,6 +600,8 @@ abstract class _PostModel implements PostModel {
   String get id;
   @override
   String? get caption;
+  @override
+  String? get location;
   @override
   @JsonKey(name: 'userId')
   UserModel get user;

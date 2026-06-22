@@ -116,6 +116,48 @@ class _NotificationPageState extends State<NotificationPage> {
     context.read<NotificationBloc>().add(MarkNotificationRead(notificationId));
   }
 
+  Widget _buildWrappedNotificationItem(dynamic notification) {
+    return Stack(
+      children: [
+        _buildNotificationItem(notification),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: PopupMenuButton<String>(
+            color: AppColors.background,
+            padding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            onSelected: (value) {
+              if (value == 'delete') {
+                context.read<NotificationBloc>().add(
+                  RemoveNotification(notification.id),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    const Icon(Icons.delete, color: Colors.red, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      context.l10n.friendDelete,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            child: const SizedBox(width: 48, height: 48),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildNotificationItem(dynamic notification) {
     switch (notification.type) {
       case NotificationType.FRIEND_REQUEST:
@@ -839,7 +881,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 ),
               ),
             ),
-            ...unreadNotifications.map((n) => _buildNotificationItem(n)),
+            ...unreadNotifications.map((n) => _buildWrappedNotificationItem(n)),
           ],
           // "Cũ hơn" section (read notifications)
           // Only show title if there are both unread and read notifications
@@ -858,7 +900,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ],
           // Show read notifications (with or without title)
           if (readNotifications.isNotEmpty)
-            ...readNotifications.map((n) => _buildNotificationItem(n)),
+            ...readNotifications.map((n) => _buildWrappedNotificationItem(n)),
 
           // Loading indicator when loading more
           if (state.isLoadingMore)

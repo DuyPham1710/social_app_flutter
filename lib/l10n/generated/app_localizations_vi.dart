@@ -2147,6 +2147,20 @@ class AppLocalizationsVi extends AppLocalizations {
   String get postLocation => 'Vị trí';
 
   @override
+  String get postSelectImageForLocation =>
+      'Vui lòng chọn ảnh để gợi ý địa điểm';
+
+  @override
+  String get postLocationSuggestionTitle => 'Gợi ý check-in';
+
+  @override
+  String get postLocationSuggestionDesc =>
+      'Bạn có muốn chia sẻ địa chỉ này trên bài viết không?';
+
+  @override
+  String get postAtLocation => 'tại';
+
+  @override
   String postMediaItemCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

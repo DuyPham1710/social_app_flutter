@@ -368,6 +368,10 @@ class _EditSelectedImagePageState extends State<EditSelectedImagePage> {
                                 onTap: () {
                                   setState(() {
                                     widget.imageFiles.removeAt(index);
+                                    if (index < _captionControllers.length) {
+                                      _captionControllers[index].dispose();
+                                      _captionControllers.removeAt(index);
+                                    }
                                   });
                                   widget.onRemoveAtIndex?.call(index);
                                 },

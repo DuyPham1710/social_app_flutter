@@ -189,6 +189,7 @@ class PostRepositoryImpl implements PostRepository {
         friendsDetailString,
         taggedUserIdsString,
         post.communityId,
+        post.location,
         multipartFiles,
       );
 

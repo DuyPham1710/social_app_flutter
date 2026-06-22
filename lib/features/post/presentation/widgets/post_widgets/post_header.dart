@@ -26,6 +26,7 @@ class PostHeader extends StatelessWidget {
   final List<String>? visibleOnProfileUserIds;
   final Function(bool)? onTagVisibilityTap;
   final VoidCallback? onRemoveTagTap;
+  final String? location;
 
   const PostHeader({
     super.key,
@@ -39,6 +40,7 @@ class PostHeader extends StatelessWidget {
     this.visibleOnProfileUserIds,
     this.onTagVisibilityTap,
     this.onRemoveTagTap,
+    this.location,
   });
 
   Future<void> _navigateToProfile(BuildContext context) async {
@@ -83,6 +85,7 @@ class PostHeader extends StatelessWidget {
       l10n: l10n,
       ownerName: ownerName,
       taggedNames: taggedNames,
+      location: location,
       boldStyle: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 14.rsp(context),

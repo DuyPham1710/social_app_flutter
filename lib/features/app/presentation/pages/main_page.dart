@@ -152,24 +152,34 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  double _scrollDelta = 0;
+
   bool _handleScrollNotification(ScrollNotification notification) {
     // Xử lý ẩn/hiện bottom nav bar ở trang Home (0), Friend (1), Notification (3)
     if (_currentIndex == 2) return false;
 
-    if (notification is UserScrollNotification) {
+    if (notification is ScrollUpdateNotification) {
       if (notification.metrics.axis == Axis.vertical) {
-        if (notification.direction == ScrollDirection.reverse) {
-          // Vuốt lên (cuộn xuống dưới) -> Ẩn bottom nav
+        _scrollDelta += notification.scrollDelta ?? 0;
+
+        // Nếu cuộn xuống (vuốt lên) hơn 50px -> Ẩn
+        if (_scrollDelta > 50) {
           if (_isBottomNavVisible) {
             setState(() => _isBottomNavVisible = false);
           }
-        } else if (notification.direction == ScrollDirection.forward) {
-          // Vuốt xuống (cuộn lên trên) -> Hiện bottom nav
+          _scrollDelta = 0;
+        }
+        // Nếu cuộn lên (vuốt xuống) hơn 50px -> Hiện
+        else if (_scrollDelta < -200) {
           if (!_isBottomNavVisible) {
             setState(() => _isBottomNavVisible = true);
           }
+          _scrollDelta = 0;
         }
       }
+    } else if (notification is UserScrollNotification) {
+      // Khi người dùng thay đổi hướng cuộn, reset lại delta để tính toán lại từ đầu
+      _scrollDelta = 0;
     }
     return false;
   }

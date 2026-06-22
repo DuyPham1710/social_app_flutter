@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/community/domain/entities/community_entit
 class PostEntity extends PrivacyBase {
   final String id;
   final String? caption;
+  final String? location;
   final UserEntity user;
   final List<PostUrlEntity> urls;
   final String layout;
@@ -23,6 +24,7 @@ class PostEntity extends PrivacyBase {
   const PostEntity({
     required this.id,
     this.caption,
+    this.location,
     required this.user,
     required this.urls,
     required this.layout,

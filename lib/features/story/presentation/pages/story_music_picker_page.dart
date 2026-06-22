@@ -96,11 +96,9 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
     try {
       final baseApiUrl =
           dotenv.env['BASE_URL'] ?? 'https://api.commonshub.io.vn/';
-      final url = kIsWeb
-          ? '${baseApiUrl}deezer/chart'
-          : 'https://api.deezer.com/chart';
+      final url = '${baseApiUrl}deezer/chart';
       final res = await Dio().get(url);
-      final responseData = (kIsWeb && res.data['data'] != null && res.data['statusCode'] != null)
+      final responseData = (res.data['data'] != null && res.data['statusCode'] != null)
           ? res.data['data']
           : res.data;
       final data = responseData['tracks']?['data'] as List<dynamic>? ?? [];
@@ -181,15 +179,13 @@ class _StoryMusicPickerPageState extends State<StoryMusicPickerPage> {
       final index = page * 10;
       final baseApiUrl =
           dotenv.env['BASE_URL'] ?? 'https://api.commonshub.io.vn/';
-      final baseUrl = kIsWeb
-          ? '${baseApiUrl}deezer/search'
-          : 'https://api.deezer.com/search';
+      final baseUrl = '${baseApiUrl}deezer/search';
       final res = await Dio().get(
         baseUrl,
         queryParameters: {'q': query, 'limit': 10, 'index': index},
       );
 
-      final responseData = (kIsWeb && res.data['data'] != null && res.data['statusCode'] != null)
+      final responseData = (res.data['data'] != null && res.data['statusCode'] != null)
           ? res.data['data']
           : res.data;
 

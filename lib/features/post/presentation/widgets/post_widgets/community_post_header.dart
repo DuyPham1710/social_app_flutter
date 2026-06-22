@@ -29,6 +29,7 @@ class CommunityPostHeader extends StatelessWidget {
   final bool isSaved;
   final bool showCommunityInfo; // Ẩn info nhóm khi xem trong community detail
   final String? communityUserRole;
+  final String? location;
 
   const CommunityPostHeader({
     super.key,
@@ -41,6 +42,7 @@ class CommunityPostHeader extends StatelessWidget {
     this.isSaved = false,
     this.showCommunityInfo = true, // Default: hiển thị info nhóm
     this.communityUserRole,
+    this.location,
   });
 
   Future<void> _navigateToCommunity(BuildContext context) async {
@@ -125,7 +127,7 @@ class CommunityPostHeader extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.rsr(context)),
                           child: community!.avatar != null
                               ? Image.network(
-                                  community!.avatar!,
+                                  community!.avatar,
                                   fit: BoxFit.cover,
                                 )
                               : Container(
@@ -201,11 +203,12 @@ class CommunityPostHeader extends StatelessWidget {
                     ] else
                       SizedBox(height: 4.rsh(context)),
                     // User Name
-                    GestureDetector(
-                      onTap: () => _navigateToProfile(context),
-                      child: Row(
-                        children: [
-                          Text(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _navigateToProfile(context),
+                          child: Text(
                             user.fullName ??
                                 user.username ??
                                 context.l10n.commonUnknown,
@@ -216,22 +219,43 @@ class CommunityPostHeader extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        if (location != null && location!.isNotEmpty) ...[
                           SizedBox(width: 4.rs(context)),
                           Text(
-                            '·',
+                            context.l10n.postAtLocation,
                             style: TextStyle(
                               fontSize: 11.rsp(context),
                               color: AppColors.textSecondary,
                             ),
                           ),
                           SizedBox(width: 4.rs(context)),
-                          Icon(
-                            Icons.groups_rounded,
-                            size: 14.rsp(context),
-                            color: AppColors.textSecondary,
+                          Text(
+                            location!,
+                            style: TextStyle(
+                              fontSize: 11.rsp(context),
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                      ),
+                        SizedBox(width: 4.rs(context)),
+                        Text(
+                          '·',
+                          style: TextStyle(
+                            fontSize: 11.rsp(context),
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        SizedBox(width: 4.rs(context)),
+                        Icon(
+                          Icons.groups_rounded,
+                          size: 14.rsp(context),
+                          color: AppColors.textSecondary,
+                        ),
+                      ],
                     ),
                     SizedBox(height: 2.rsh(context)),
                     // Time · Visibility

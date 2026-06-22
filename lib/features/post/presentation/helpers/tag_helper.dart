@@ -10,6 +10,7 @@ class TagHelper {
     required AppLocalizations l10n,
     required String ownerName,
     required List<String> taggedNames,
+    String? location,
     TextStyle? boldStyle,
     TextStyle? normalStyle,
   }) {
@@ -30,58 +31,51 @@ class TagHelper {
         );
 
     final int count = taggedNames.length;
-
-    if (count == 0) {
-      return Text(ownerName, style: bStyle);
-    }
+    List<TextSpan> spans = [
+      TextSpan(text: ownerName, style: bStyle),
+    ];
 
     if (count == 1) {
-      return RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(text: ownerName, style: bStyle),
-            TextSpan(text: ' '),
-            TextSpan(text: l10n.postWith, style: nStyle),
-            TextSpan(text: ' '),
-            TextSpan(text: taggedNames[0], style: bStyle),
-          ],
-        ),
-      );
+      spans.addAll([
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postWith, style: nStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: taggedNames[0], style: bStyle),
+      ]);
+    } else if (count == 2) {
+      spans.addAll([
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postWith, style: nStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: taggedNames[0], style: bStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postAnd, style: nStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: taggedNames[1], style: bStyle),
+      ]);
+    } else if (count > 2) {
+      spans.addAll([
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postWith, style: nStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: taggedNames[0], style: bStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postAnd, style: nStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
+      ]);
     }
 
-    if (count == 2) {
-      return RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(text: ownerName, style: bStyle),
-            TextSpan(text: ' '),
-            TextSpan(text: l10n.postWith, style: nStyle),
-            TextSpan(text: ' '),
-            TextSpan(text: taggedNames[0], style: bStyle),
-            TextSpan(text: ' '),
-            TextSpan(text: l10n.postAnd, style: nStyle),
-            TextSpan(text: ' '),
-            TextSpan(text: taggedNames[1], style: bStyle),
-          ],
-        ),
-      );
+    if (location != null && location.isNotEmpty) {
+      spans.addAll([
+        TextSpan(text: ' '),
+        TextSpan(text: l10n.postAtLocation, style: nStyle),
+        TextSpan(text: ' '),
+        TextSpan(text: location, style: bStyle),
+      ]);
     }
 
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(text: ownerName, style: bStyle),
-          TextSpan(text: ' '),
-          TextSpan(text: l10n.postWith, style: nStyle),
-          TextSpan(text: ' '),
-          TextSpan(text: taggedNames[0], style: bStyle),
-          TextSpan(text: ' '),
-          TextSpan(text: l10n.postAnd, style: nStyle),
-          TextSpan(text: ' '),
-          TextSpan(text: l10n.postOtherPeople(count - 1), style: bStyle),
-        ],
-      ),
-    );
+    return RichText(text: TextSpan(children: spans));
   }
 
   /// Chỉ hiển thị phần thẻ: [Tên bạn bè 1] và [n người khác]
