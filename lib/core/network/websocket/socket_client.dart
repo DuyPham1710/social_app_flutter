@@ -36,8 +36,8 @@ class SocketClient {
     final baseUrl = dotenv.env['BASE_URL']?.replaceAll(RegExp(r'/$'), '') ?? '';
     // final socketUrl = baseUrl.replaceAll(RegExp(r'http'), 'ws');
     final socketUrl = baseUrl.startsWith('https://')
-    ? baseUrl.replaceFirst('https://', 'wss://')
-    : baseUrl.replaceFirst('http://', 'ws://');
+        ? baseUrl.replaceFirst('https://', 'wss://')
+        : baseUrl.replaceFirst('http://', 'ws://');
     _currentNamespace = namespace;
 
     developer.log(

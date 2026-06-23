@@ -4,3 +4,5 @@ export 'last_message_model.dart';
 export 'message_model.dart';
 export 'paginated_response_model.dart';
 export 'message_translation_model.dart';
+export 'chat_media_model.dart';
+export 'chat_media_response_model.dart';

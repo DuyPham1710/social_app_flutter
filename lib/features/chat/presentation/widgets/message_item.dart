@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/enums/attachment_type.dart';
@@ -103,6 +104,16 @@ class MessageItem extends StatelessWidget {
     String fileName,
   ) async {
     try {
+      if (kIsWeb) {
+        final uri = Uri.tryParse(url);
+        if (uri != null) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          showErrorSnackBar(context, 'Invalid download URL');
+        }
+        return;
+      }
+
       showInfoSnackBar(context, context.l10n.chatDownloadingFile);
 
       final tempDir = await getTemporaryDirectory();
@@ -847,6 +858,14 @@ class MessageItem extends StatelessWidget {
                   ? baseUrl.substring(0, baseUrl.length - 1)
                   : baseUrl;
               downloadUrl = '$baseUrlWithoutTrailingSlash$downloadUrl';
+            }
+
+            if (kIsWeb) {
+              final uri = Uri.tryParse(downloadUrl);
+              if (uri != null) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+              return;
             }
 
             final fileName = file.name?.toLowerCase() ?? '';

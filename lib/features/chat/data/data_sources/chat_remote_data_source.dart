@@ -139,6 +139,14 @@ abstract class ChatRemoteDataSource {
     required String lang,
   });
 
+  // Get conversation media
+  Future<ChatMediaResponseModel> getConversationMedia({
+    required String conversationId,
+    required String type,
+    int page = 1,
+    int limit = 30,
+  });
+
   // // Real-time events
   Stream<ConversationsResponseModel> get onConversationsLoaded;
   Stream<MessageReponseModel> get onMessagesLoaded;

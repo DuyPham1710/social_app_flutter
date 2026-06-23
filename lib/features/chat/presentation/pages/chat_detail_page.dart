@@ -265,8 +265,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   void _onFocusChanged() {
-    // Không tự động set expanded khi focus, để có thể toggle
-    // Chỉ set expanded = false khi unfocus
+    // Tự động set expanded khi focus, và set false khi unfocus
     if (!_focusNode.hasFocus) {
       setState(() {
         _isInputExpanded = false;
@@ -275,6 +274,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       setState(() {
         _showPhotoPicker = false;
         _showAttachmentMenu = false;
+        _isInputExpanded = true;
       });
     }
   }
@@ -814,32 +814,33 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       onCreateAIImage: () {
         showInfoSnackBar(context, context.l10n.chatAiImageInDevelopment);
       },
-      onTranslate: message.text != null &&
+      onTranslate:
+          message.text != null &&
               message.text!.trim().isNotEmpty &&
               message.translationNotNeeded != true
           ? () {
               if (message.translatedText != null) {
                 context.read<MessageBloc>().add(
-                      ToggleMessageTranslationEvent(
-                        messageId: message.id,
-                        showTranslation: !(message.showTranslation ?? false),
-                      ),
-                    );
+                  ToggleMessageTranslationEvent(
+                    messageId: message.id,
+                    showTranslation: !(message.showTranslation ?? false),
+                  ),
+                );
               } else {
                 final targetLang = appTranslationTargetLang(context);
                 context.read<MessageBloc>().add(
-                      TranslateMessageEvent(
-                        messageId: message.id,
-                        targetLang: targetLang,
-                      ),
-                    );
+                  TranslateMessageEvent(
+                    messageId: message.id,
+                    targetLang: targetLang,
+                  ),
+                );
               }
             }
           : null,
       translateLabel: message.translatedText != null
           ? (message.showTranslation == true
-              ? context.l10n.postSeeOriginal
-              : context.l10n.postSeeTranslation)
+                ? context.l10n.postSeeOriginal
+                : context.l10n.postSeeTranslation)
           : context.l10n.postSeeTranslation,
     );
   }
@@ -2184,8 +2185,11 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                     cursorColor: AppColors.primary,
                     onChanged: _onTextChanged,
                     onTap: () {
-                      // Toggle expansion khi ấn vào TextField
-                      _toggleInputExpansion();
+                      if (!_isInputExpanded) {
+                        setState(() {
+                          _isInputExpanded = true;
+                        });
+                      }
 
                       // Scroll sau khi keyboard animation hoàn thành
                       Future.delayed(const Duration(milliseconds: 350), () {
@@ -2194,12 +2198,10 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                         }
                       });
                     },
-                    maxLines: _isInputExpanded ? null : 1,
+                    maxLines: null,
                     minLines: 1,
                     textInputAction: TextInputAction.newline,
-                    keyboardType: _isInputExpanded
-                        ? TextInputType.multiline
-                        : TextInputType.text,
+                    keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
                       hintText: context.l10n.chatMessageHint,
                       hintStyle: TextStyle(

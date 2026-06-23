@@ -519,6 +519,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<TranslateMessageUseCase>(
     () => TranslateMessageUseCase(s1()),
   );
+  s1.registerLazySingleton<GetConversationMediaUseCase>(
+    () => GetConversationMediaUseCase(s1()),
+  );
 
   // Video Call UseCases
   s1.registerLazySingleton<ConnectVideoCallUseCase>(

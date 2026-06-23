@@ -10,6 +10,8 @@ import 'package:social_app_fe/features/notification/presentation/bloc/notificati
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_state.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/message/message_bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_info_page.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/group_members_page.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/conversation_media_page.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
@@ -24,6 +26,8 @@ class _ChatWebPageState extends State<ChatWebPage> {
   Map<String, dynamic>? _selectedConversationArgs;
   Map<String, dynamic>? _currentUserData;
   bool _showInfoPane = false;
+  bool _showMembersPane = false;
+  bool _showMediaPane = false;
 
   @override
   void initState() {
@@ -80,6 +84,8 @@ class _ChatWebPageState extends State<ChatWebPage> {
 
     setState(() {
       _selectedConversationArgs = args;
+      _showMembersPane = false;
+      _showMediaPane = false;
     });
   }
 
@@ -200,8 +206,10 @@ class _ChatWebPageState extends State<ChatWebPage> {
                       ),
               ),
 
-              // Chat Info Pane (Right Side)
-              if (_showInfoPane && _selectedConversationArgs != null && canShowInfoPane)
+              // Chat Info / Members Pane (Right Side)
+              if (_showInfoPane &&
+                  _selectedConversationArgs != null &&
+                  canShowInfoPane)
                 Container(
                   width: 350,
                   decoration: BoxDecoration(
@@ -212,25 +220,67 @@ class _ChatWebPageState extends State<ChatWebPage> {
                       ),
                     ),
                   ),
-                  child: ChatInfoPage(
-                    isGroup: _selectedConversationArgs!['isGroup'] ?? false,
-                    displayName:
-                        _selectedConversationArgs!['groupName'] ??
-                        (_selectedConversationArgs!['friendInfo']
-                                as UserEntity?)
-                            ?.fullName ??
-                        (_selectedConversationArgs!['friendInfo']
-                                as UserEntity?)
-                            ?.username ??
-                        '',
-                    groupAvatar: _selectedConversationArgs!['groupAvatar'],
-                    participants: _selectedConversationArgs!['participants'],
-                    userInfo: _selectedConversationArgs!['friendInfo'],
-                    conversationId:
-                        _selectedConversationArgs!['conversationId'],
-                    userId: _selectedConversationArgs!['userId'],
-                    isWebLayout: true,
-                  ),
+                  child: _showMediaPane
+                      ? ConversationMediaPage(
+                          conversationId: _selectedConversationArgs!['conversationId'] as String? ?? '',
+                          isWebLayout: true,
+                          onBack: () {
+                            setState(() {
+                              _showMediaPane = false;
+                            });
+                          },
+                        )
+                      : _showMembersPane &&
+                          (_selectedConversationArgs!['isGroup'] ?? false) &&
+                          _selectedConversationArgs!['participants'] != null
+                      ? GroupMembersPage(
+                          participants:
+                              _selectedConversationArgs!['participants']
+                                  as List<UserEntity>,
+                          currentUserId:
+                              _selectedConversationArgs!['userId'] as String?,
+                          groupName:
+                              _selectedConversationArgs!['groupName']
+                                  as String?,
+                          isWebLayout: true,
+                          onBack: () {
+                            setState(() {
+                              _showMembersPane = false;
+                            });
+                          },
+                        )
+                      : ChatInfoPage(
+                          isGroup:
+                              _selectedConversationArgs!['isGroup'] ?? false,
+                          displayName:
+                              _selectedConversationArgs!['groupName'] ??
+                              (_selectedConversationArgs!['friendInfo']
+                                      as UserEntity?)
+                                  ?.fullName ??
+                              (_selectedConversationArgs!['friendInfo']
+                                      as UserEntity?)
+                                  ?.username ??
+                              '',
+                          groupAvatar:
+                              _selectedConversationArgs!['groupAvatar'],
+                          participants:
+                              _selectedConversationArgs!['participants'],
+                          userInfo: _selectedConversationArgs!['friendInfo'],
+                          conversationId:
+                              _selectedConversationArgs!['conversationId'],
+                          userId: _selectedConversationArgs!['userId'],
+                          isWebLayout: true,
+                          onShowMembers: () {
+                            setState(() {
+                              _showMembersPane = true;
+                            });
+                          },
+                          onShowMedia: () {
+                            setState(() {
+                              _showMediaPane = true;
+                            });
+                          },
+                        ),
                 ),
             ],
           );
