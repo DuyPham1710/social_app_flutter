@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -13,7 +14,10 @@ import 'package:social_app_fe/features/auth/domain/usecases/reset_password_useca
 import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/delete_incomplete_registration_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/google_auth_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -26,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ResetPasswordUsecase resetPasswordUsecase;
   final SubmitFaceRegistrationUsecase submitFaceRegistrationUsecase;
   final DeleteIncompleteRegistrationUsecase deleteIncompleteRegistrationUsecase;
+  final GoogleAuthUsecase googleAuthUsecase;
 
   AuthBloc({
     required this.loginUsecase,
@@ -36,6 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.resetPasswordUsecase,
     required this.submitFaceRegistrationUsecase,
     required this.deleteIncompleteRegistrationUsecase,
+    required this.googleAuthUsecase,
   }) : super(AuthInitial()) {
     on<LoginEvent>(_login);
     on<RegisterEvent>(_register);
@@ -45,6 +51,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResetPasswordEvent>(_resetPassword);
     on<SubmitFaceRegistrationEvent>(_submitFaceRegistration);
     on<DeleteIncompleteRegistrationEvent>(_deleteIncompleteRegistration);
+    on<GoogleSignInEvent>(_googleSignIn);
     on<AuthReset>((event, emit) {
       emit(AuthInitial());
     });
@@ -251,5 +258,76 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     await deleteIncompleteRegistrationUsecase(params: event.userId);
+  }
+
+  void _googleSignIn(GoogleSignInEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    try {
+      // Sign in with Google
+      final googleSignIn = GoogleSignIn(
+        scopes: const ['email', 'profile'],
+        serverClientId: dotenv.env['GOOGLE_SERVER_CLIENT_ID'],
+      );
+
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        // User cancelled
+        emit(AuthInitial());
+        return;
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        emit(
+          AuthError(
+            DioException(
+              requestOptions: RequestOptions(path: ''),
+              error: 'Không lấy được token từ Google',
+            ),
+            errorMessage: 'Không lấy được token từ Google',
+            flowType: 'google_sign_in',
+          ),
+        );
+        return;
+      }
+
+      // Send idToken to backend
+      final dataState = await googleAuthUsecase(params: idToken);
+
+      if (dataState is DataStateSuccess && dataState.data != null) {
+        final user = dataState.data!['user'];
+        final isNewUser = dataState.data!['isNewUser'] as bool? ?? false;
+
+        if (isNewUser) {
+          emit(AuthLoaded(user, flowType: 'google_new_user'));
+        } else {
+          emit(AuthLoaded(user, flowType: 'login'));
+        }
+      } else {
+        final errorMessage = ErrorUtils.getErrorMessage(dataState.error!);
+        emit(
+          AuthError(
+            dataState.error!,
+            errorMessage: errorMessage,
+            flowType: 'google_sign_in',
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('[AuthBloc] Google sign-in error: $e');
+      emit(
+        AuthError(
+          DioException(
+            requestOptions: RequestOptions(path: ''),
+            error: e.toString(),
+          ),
+          errorMessage: 'Đăng nhập Google thất bại: $e',
+          flowType: 'google_sign_in',
+        ),
+      );
+    }
   }
 }

@@ -814,32 +814,33 @@ class _ChatDetailPageState extends State<ChatDetailPage>
       onCreateAIImage: () {
         showInfoSnackBar(context, context.l10n.chatAiImageInDevelopment);
       },
-      onTranslate: message.text != null &&
+      onTranslate:
+          message.text != null &&
               message.text!.trim().isNotEmpty &&
               message.translationNotNeeded != true
           ? () {
               if (message.translatedText != null) {
                 context.read<MessageBloc>().add(
-                      ToggleMessageTranslationEvent(
-                        messageId: message.id,
-                        showTranslation: !(message.showTranslation ?? false),
-                      ),
-                    );
+                  ToggleMessageTranslationEvent(
+                    messageId: message.id,
+                    showTranslation: !(message.showTranslation ?? false),
+                  ),
+                );
               } else {
                 final targetLang = appTranslationTargetLang(context);
                 context.read<MessageBloc>().add(
-                      TranslateMessageEvent(
-                        messageId: message.id,
-                        targetLang: targetLang,
-                      ),
-                    );
+                  TranslateMessageEvent(
+                    messageId: message.id,
+                    targetLang: targetLang,
+                  ),
+                );
               }
             }
           : null,
       translateLabel: message.translatedText != null
           ? (message.showTranslation == true
-              ? context.l10n.postSeeOriginal
-              : context.l10n.postSeeTranslation)
+                ? context.l10n.postSeeOriginal
+                : context.l10n.postSeeTranslation)
           : context.l10n.postSeeTranslation,
     );
   }
@@ -2178,44 +2179,56 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                     color: AppColors.textSecondary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(24.r),
                   ),
-                  child: TextField(
-                    controller: _messageController,
-                    focusNode: _focusNode,
-                    cursorColor: AppColors.primary,
-                    onChanged: _onTextChanged,
-                    onTap: () {
-                      // Toggle expansion khi ấn vào TextField
-                      _toggleInputExpansion();
-
-                      // Scroll sau khi keyboard animation hoàn thành
-                      Future.delayed(const Duration(milliseconds: 350), () {
-                        if (mounted) {
-                          _scrollToBottom();
-                        }
-                      });
+                  child: Focus(
+                    onKeyEvent: (node, event) {
+                      if (ResponsiveHelper.isWebOrDesktop &&
+                          event is KeyDownEvent &&
+                          event.logicalKey == LogicalKeyboardKey.enter &&
+                          !HardwareKeyboard.instance.isShiftPressed) {
+                        _sendMessage();
+                        return KeyEventResult.handled;
+                      }
+                      return KeyEventResult.ignored;
                     },
-                    maxLines: _isInputExpanded ? null : 1,
-                    minLines: 1,
-                    textInputAction: TextInputAction.newline,
-                    keyboardType: _isInputExpanded
-                        ? TextInputType.multiline
-                        : TextInputType.text,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.chatMessageHint,
-                      hintStyle: TextStyle(
+                    child: TextField(
+                      controller: _messageController,
+                      focusNode: _focusNode,
+                      cursorColor: AppColors.primary,
+                      onChanged: _onTextChanged,
+                      onTap: () {
+                        // Toggle expansion khi ấn vào TextField
+                        _toggleInputExpansion();
+
+                        // Scroll sau khi keyboard animation hoàn thành
+                        Future.delayed(const Duration(milliseconds: 350), () {
+                          if (mounted) {
+                            _scrollToBottom();
+                          }
+                        });
+                      },
+                      maxLines: _isInputExpanded ? null : 1,
+                      minLines: 1,
+                      textInputAction: TextInputAction.newline,
+                      keyboardType: _isInputExpanded
+                          ? TextInputType.multiline
+                          : TextInputType.text,
+                      decoration: InputDecoration(
+                        hintText: context.l10n.chatMessageHint,
+                        hintStyle: TextStyle(
+                          fontSize: 14.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 8.h,
+                        ),
+                        isDense: true,
+                      ),
+                      style: TextStyle(
                         fontSize: 14.sp,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textPrimary,
                       ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 8.h,
-                      ),
-                      isDense: true,
-                    ),
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
