@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_community_detail_usecase.dart';
@@ -23,27 +22,22 @@ class CommunityDetailBloc
   final RespondToInviteUseCase _respondToInviteUseCase;
   final DeleteCommunityUseCase _deleteCommunityUseCase;
 
-  factory CommunityDetailBloc() {
-    return CommunityDetailBloc.withDeps(
-      s1<GetCommunityDetailUseCase>(),
-      s1<GetMemberStatusUseCase>(),
-      s1<JoinCommunityUseCase>(),
-      s1<CancelJoinRequestUseCase>(),
-      s1<LeaveCommunityUseCase>(),
-      s1<RespondToInviteUseCase>(),
-      s1<DeleteCommunityUseCase>(),
-    );
-  }
-
-  CommunityDetailBloc.withDeps(
-    this._getCommunityDetailUseCase,
-    this._getMemberStatusUseCase,
-    this._joinCommunityUseCase,
-    this._cancelJoinRequestUseCase,
-    this._leaveCommunityUseCase,
-    this._respondToInviteUseCase,
-    this._deleteCommunityUseCase,
-  ) : super(CommunityDetailInitial()) {
+  CommunityDetailBloc({
+    required GetCommunityDetailUseCase getCommunityDetailUseCase,
+    required GetMemberStatusUseCase getMemberStatusUseCase,
+    required JoinCommunityUseCase joinCommunityUseCase,
+    required CancelJoinRequestUseCase cancelJoinRequestUseCase,
+    required LeaveCommunityUseCase leaveCommunityUseCase,
+    required RespondToInviteUseCase respondToInviteUseCase,
+    required DeleteCommunityUseCase deleteCommunityUseCase,
+  })  : _getCommunityDetailUseCase = getCommunityDetailUseCase,
+        _getMemberStatusUseCase = getMemberStatusUseCase,
+        _joinCommunityUseCase = joinCommunityUseCase,
+        _cancelJoinRequestUseCase = cancelJoinRequestUseCase,
+        _leaveCommunityUseCase = leaveCommunityUseCase,
+        _respondToInviteUseCase = respondToInviteUseCase,
+        _deleteCommunityUseCase = deleteCommunityUseCase,
+        super(CommunityDetailInitial()) {
     on<CommunityDetailFetched>(_onCommunityDetailFetched);
     on<JoinCommunityRequested>(_onJoinCommunityRequested);
     on<CancelJoinRequestRequested>(_onCancelJoinRequestRequested);

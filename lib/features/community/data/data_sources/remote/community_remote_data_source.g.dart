@@ -22,6 +22,7 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
     required String name,
     String? description,
     required String privacy,
+    String? type,
     List<MultipartFile>? avatar,
     List<MultipartFile>? coverImage,
   }) async {
@@ -35,6 +36,9 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
       _data.fields.add(MapEntry('description', description));
     }
     _data.fields.add(MapEntry('privacy', privacy));
+    if (type != null) {
+      _data.fields.add(MapEntry('type', type));
+    }
     if (avatar != null) {
       _data.files.addAll(avatar.map((i) => MapEntry('avatar', i)));
     }
@@ -674,13 +678,115 @@ class _CommunityRemoteDataSource implements CommunityRemoteDataSource {
       Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/community/${communityId}/posts/${postId}',
+            '/community/${communityId}/posts/${postId}/approve',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<RoadmapPointListModel> getRoadmapPoints({
+    required String communityId,
+    int? page,
+    int? limit,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<RoadmapPointListModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/community/${communityId}/roadmap',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late RoadmapPointListModel _value;
+    try {
+      _value = RoadmapPointListModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<RoadmapPointListModel> getNearbyRoadmapPoints({
+    required String communityId,
+    required double lat,
+    required double lng,
+    double? radius,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'lat': lat,
+      r'lng': lng,
+      r'radius': radius,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<RoadmapPointListModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/community/${communityId}/roadmap/nearby',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late RoadmapPointListModel _value;
+    try {
+      _value = RoadmapPointListModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<CommunityPostListModel> getRoadmapPointPosts({
+    required String communityId,
+    required String roadmapId,
+    int? page,
+    int? limit,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page, r'limit': limit};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<CommunityPostListModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/community/${communityId}/roadmap/${roadmapId}/posts',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late CommunityPostListModel _value;
+    try {
+      _value = CommunityPostListModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

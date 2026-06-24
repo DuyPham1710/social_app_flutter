@@ -30,6 +30,7 @@ class CommunityCreateBloc
           name: event.name,
           description: event.description,
           privacy: event.privacy,
+          type: event.type,
           avatar: event.avatarPath,
           coverImage: event.coverImagePath,
         ),

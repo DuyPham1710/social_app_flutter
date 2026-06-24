@@ -37,3 +37,12 @@ class CommunityPostsTabStatusChanged extends CommunityPostsTabEvent {
   @override
   List<Object?> get props => [status];
 }
+
+class CommunityPostsTabCommentCountsUpdated extends CommunityPostsTabEvent {
+  final Map<String, int> counts;
+
+  CommunityPostsTabCommentCountsUpdated(this.counts);
+
+  @override
+  List<Object?> get props => [counts];
+}

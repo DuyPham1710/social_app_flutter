@@ -96,7 +96,7 @@ class CommunityDetailHeader extends StatelessWidget {
                       Text(
                         context.l10n.communityPrivacyMembers(
                           privacyLabel,
-                          community.memberCount ?? 0,
+                          community.memberCount,
                         ),
                         style: TextStyle(
                           color: AppColors.textSecondary,

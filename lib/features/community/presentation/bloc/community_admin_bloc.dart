@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_pending_requests_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_join_request_usecase.dart';

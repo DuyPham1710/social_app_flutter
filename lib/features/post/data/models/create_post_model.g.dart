@@ -10,6 +10,9 @@ _$CreatePostModelImpl _$$CreatePostModelImplFromJson(
   Map<String, dynamic> json,
 ) => _$CreatePostModelImpl(
   caption: json['caption'] as String?,
+  location: json['location'] as String?,
+  latitude: (json['latitude'] as num?)?.toDouble(),
+  longitude: (json['longitude'] as num?)?.toDouble(),
   titles: (json['titles'] as List<dynamic>?)?.map((e) => e as String).toList(),
   orders: (json['orders'] as List<dynamic>?)
       ?.map((e) => (e as num).toInt())
@@ -32,6 +35,9 @@ Map<String, dynamic> _$$CreatePostModelImplToJson(
   _$CreatePostModelImpl instance,
 ) => <String, dynamic>{
   'caption': instance.caption,
+  'location': instance.location,
+  'latitude': instance.latitude,
+  'longitude': instance.longitude,
   'titles': instance.titles,
   'orders': instance.orders,
   'layout': _$LayoutTypeEnumMap[instance.layout],

@@ -1134,7 +1134,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get communityExploreSubtitle =>
-      'Discover relevant groups and keep track of posts waiting for review.';
+      'Explore communities and share interesting things.';
 
   @override
   String get communityExploreTab => 'Explore';
@@ -1454,6 +1454,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get communityType => 'Community type';
+
+  @override
+  String get communityRoadmap => 'Roadmap';
+
+  @override
+  String get communityRoadmapTitle => 'Roadmap';
+
+  @override
+  String get communityRoadmapViewFull => 'View Full Roadmap';
+
+  @override
+  String get communityRoadmapEmpty => 'No locations on the roadmap yet';
+
+  @override
+  String get communityRoadmapMyLocation => 'My Location';
+
+  @override
+  String communityRoadmapPostCount(num count) {
+    return '$count posts';
+  }
+
+  @override
+  String get communityRoadmapViewPost => 'View Post';
+
+  @override
+  String get communityRoadmapSearchNearby => 'Search nearby';
+
+  @override
+  String communityRoadmapRadius(num radius) {
+    return 'Radius: $radius km';
+  }
+
+  @override
+  String communityRoadmapRadiusLabel(num radius) {
+    return '$radius km';
+  }
+
+  @override
+  String get communityRoadmapApplyFilter => 'Apply';
+
+  @override
+  String get communityRoadmapErrorLoadPosts => 'An error occurred';
+
+  @override
+  String get communityRoadmapNoPosts => 'No posts found';
+
+  @override
+  String communityRoadmapFirstCheckedInBy(String name) {
+    return 'First checked in by $name';
+  }
+
+  @override
+  String get communityRoadmapFilterTooltip => 'Filter around location';
 
   @override
   String get communityUpdateSuccess => 'Community updated successfully';
@@ -3380,4 +3433,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String chatGiphyError(Object error) {
     return 'Error loading GIPHY stickers: $error';
   }
+
+  @override
+  String get communityRoadmapNoPoints => 'No locations in roadmap yet';
+
+  @override
+  String get communityRoadmapPoint => 'Location point';
+
+  @override
+  String get communityRoadmapNearby => 'Nearby Roadmap';
+
+  @override
+  String communityRoadmapPosts(num count) {
+    return '$count posts';
+  }
+
+  @override
+  String get locationSearchHint => 'Search for location...';
+
+  @override
+  String get locationNotFound => 'Location not found';
+
+  @override
+  String get locationSearchError =>
+      'Error searching for location (network error or not found)';
+
+  @override
+  String get locationSelected => 'Selected location';
+
+  @override
+  String get locationNotSelected => 'Location not selected';
+
+  @override
+  String get locationUnknown => 'Unknown location';
+
+  @override
+  String get postShareSuccess => 'Shared successfully';
 }

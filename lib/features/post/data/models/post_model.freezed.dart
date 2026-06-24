@@ -25,6 +25,10 @@ mixin _$PostModel {
   String get id => throw _privateConstructorUsedError;
   String? get caption => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
+  @JsonKey(name: 'latitude')
+  double? get latitude => throw _privateConstructorUsedError;
+  @JsonKey(name: 'longitude')
+  double? get longitude => throw _privateConstructorUsedError;
   @JsonKey(name: 'userId')
   UserModel get user => throw _privateConstructorUsedError;
   List<PostUrlModel> get urls => throw _privateConstructorUsedError;
@@ -72,6 +76,8 @@ abstract class $PostModelCopyWith<$Res> {
     @JsonKey(name: '_id') String id,
     String? caption,
     String? location,
+    @JsonKey(name: 'latitude') double? latitude,
+    @JsonKey(name: 'longitude') double? longitude,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
@@ -114,6 +120,8 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
     Object? id = null,
     Object? caption = freezed,
     Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
@@ -143,6 +151,14 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
                 ? _value.location
                 : location // ignore: cast_nullable_to_non_nullable
                       as String?,
+            latitude: freezed == latitude
+                ? _value.latitude
+                : latitude // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            longitude: freezed == longitude
+                ? _value.longitude
+                : longitude // ignore: cast_nullable_to_non_nullable
+                      as double?,
             user: null == user
                 ? _value.user
                 : user // ignore: cast_nullable_to_non_nullable
@@ -228,6 +244,8 @@ abstract class _$$PostModelImplCopyWith<$Res>
     @JsonKey(name: '_id') String id,
     String? caption,
     String? location,
+    @JsonKey(name: 'latitude') double? latitude,
+    @JsonKey(name: 'longitude') double? longitude,
     @JsonKey(name: 'userId') UserModel user,
     List<PostUrlModel> urls,
     String layout,
@@ -270,6 +288,8 @@ class __$$PostModelImplCopyWithImpl<$Res>
     Object? id = null,
     Object? caption = freezed,
     Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? user = null,
     Object? urls = null,
     Object? layout = null,
@@ -299,6 +319,14 @@ class __$$PostModelImplCopyWithImpl<$Res>
             ? _value.location
             : location // ignore: cast_nullable_to_non_nullable
                   as String?,
+        latitude: freezed == latitude
+            ? _value.latitude
+            : latitude // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        longitude: freezed == longitude
+            ? _value.longitude
+            : longitude // ignore: cast_nullable_to_non_nullable
+                  as double?,
         user: null == user
             ? _value.user
             : user // ignore: cast_nullable_to_non_nullable
@@ -367,6 +395,8 @@ class _$PostModelImpl implements _PostModel {
     @JsonKey(name: '_id') required this.id,
     this.caption,
     this.location,
+    @JsonKey(name: 'latitude') this.latitude,
+    @JsonKey(name: 'longitude') this.longitude,
     @JsonKey(name: 'userId') required this.user,
     required final List<PostUrlModel> urls,
     required this.layout,
@@ -405,6 +435,12 @@ class _$PostModelImpl implements _PostModel {
   final String? caption;
   @override
   final String? location;
+  @override
+  @JsonKey(name: 'latitude')
+  final double? latitude;
+  @override
+  @JsonKey(name: 'longitude')
+  final double? longitude;
   @override
   @JsonKey(name: 'userId')
   final UserModel user;
@@ -496,6 +532,10 @@ class _$PostModelImpl implements _PostModel {
             (identical(other.caption, caption) || other.caption == caption) &&
             (identical(other.location, location) ||
                 other.location == location) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.user, user) || other.user == user) &&
             const DeepCollectionEquality().equals(other._urls, _urls) &&
             (identical(other.layout, layout) || other.layout == layout) &&
@@ -531,11 +571,13 @@ class _$PostModelImpl implements _PostModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     caption,
     location,
+    latitude,
+    longitude,
     user,
     const DeepCollectionEquality().hash(_urls),
     layout,
@@ -550,7 +592,7 @@ class _$PostModelImpl implements _PostModel {
     updatedAt,
     community,
     communityStatus,
-  );
+  ]);
 
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
@@ -571,6 +613,8 @@ abstract class _PostModel implements PostModel {
     @JsonKey(name: '_id') required final String id,
     final String? caption,
     final String? location,
+    @JsonKey(name: 'latitude') final double? latitude,
+    @JsonKey(name: 'longitude') final double? longitude,
     @JsonKey(name: 'userId') required final UserModel user,
     required final List<PostUrlModel> urls,
     required final String layout,
@@ -602,6 +646,12 @@ abstract class _PostModel implements PostModel {
   String? get caption;
   @override
   String? get location;
+  @override
+  @JsonKey(name: 'latitude')
+  double? get latitude;
+  @override
+  @JsonKey(name: 'longitude')
+  double? get longitude;
   @override
   @JsonKey(name: 'userId')
   UserModel get user;

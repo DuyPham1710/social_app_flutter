@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/utils/community_l10n_helper.dart';
@@ -514,7 +514,7 @@ class _CommunityAdminPanelState extends State<CommunityAdminPanel> {
     );
   }
 
-  Widget _buildPostCard(BuildContext context, CommunityPostModel post) {
+  Widget _buildPostCard(BuildContext context, PostEntity post) {
     final isProcessing = _processingPostIds.contains(post.id);
     final caption = (post.caption ?? '').trim();
     final hasImage = post.urls.isNotEmpty && post.urls.first.url.isNotEmpty;
