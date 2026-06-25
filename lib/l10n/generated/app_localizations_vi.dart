@@ -3391,4 +3391,48 @@ class AppLocalizationsVi extends AppLocalizations {
   String chatGiphyError(Object error) {
     return 'Lỗi tải sticker GIPHY: $error';
   }
+
+  @override
+  String get authBannedTitle => 'Tài Khoản Bị Khóa';
+
+  @override
+  String get authBannedUntil => 'Thời gian mở khóa dự kiến:';
+
+  @override
+  String get authBannedReason => 'Lý do khóa:';
+
+  @override
+  String get authBannedNotice =>
+      'Nếu bạn tin rằng đây là một sự nhầm lẫn, vui lòng liên hệ với ban quản trị để được hỗ trợ giải quyết.';
+
+  @override
+  String get authBannedContactSupport => 'Liên hệ hỗ trợ';
+
+  @override
+  String get authBannedLogout => 'Đăng xuất';
+
+  @override
+  String get authBannedEmailSubject => 'Yêu cầu mở khóa tài khoản';
+
+  @override
+  String authBannedEmailBody(String message) {
+    return 'Xin chào ban quản trị,\nTài khoản của tôi bị khóa với thông báo: \"$message\".\n...';
+  }
+
+  @override
+  String get authBannedEmailError =>
+      'Không thể mở ứng dụng email. Vui lòng gửi email đến support@socialnetwork.com';
+
+  @override
+  String authBannedGenericError(String error) {
+    return 'Đã xảy ra lỗi: $error';
+  }
+
+  @override
+  String get authBannedTemporaryFallback =>
+      'Tài khoản của bạn tạm thời bị khóa';
+
+  @override
+  String get authBannedPermanentFallback =>
+      'Tài khoản của bạn đã bị khóa vĩnh viễn';
 }

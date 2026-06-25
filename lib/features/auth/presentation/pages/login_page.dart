@@ -76,7 +76,17 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.pushReplacementNamed(context, '/main');
           } else if (state is AuthError && state.flowType == 'login') {
             final errorMsg = state.errorMessage ?? context.l10n.authLoginFailed;
-            UIUtils.showErrorMessage(context, errorMsg);
+            if (state.error?.response?.statusCode == 403 ||
+                errorMsg.contains("khóa") ||
+                errorMsg.contains("bị cấm")) {
+              Navigator.pushNamed(
+                context,
+                '/banned',
+                arguments: {'banMessage': errorMsg},
+              );
+            } else {
+              UIUtils.showErrorMessage(context, errorMsg);
+            }
           }
         },
 

@@ -1542,5 +1542,31 @@
   "reactionAngry": "Phẫn nộ",
   "chatGiphySticker": "Nhãn dán GIPHY",
   "chatGiphySearch": "Tìm kiếm sticker GIPHY...",
-  "chatGiphyError": "Lỗi tải sticker GIPHY: {error}"
+  "chatGiphyError": "Lỗi tải sticker GIPHY: {error}",
+  "authBannedTitle": "Tài Khoản Bị Khóa",
+  "authBannedUntil": "Thời gian mở khóa dự kiến:",
+  "authBannedReason": "Lý do khóa:",
+  "authBannedNotice": "Nếu bạn tin rằng đây là một sự nhầm lẫn, vui lòng liên hệ với ban quản trị để được hỗ trợ giải quyết.",
+  "authBannedContactSupport": "Liên hệ hỗ trợ",
+  "authBannedLogout": "Đăng xuất",
+  "authBannedEmailSubject": "Yêu cầu mở khóa tài khoản",
+  "authBannedEmailBody": "Xin chào ban quản trị,\nTài khoản của tôi bị khóa với thông báo: \"{message}\".\n...",
+  "@authBannedEmailBody": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "authBannedEmailError": "Không thể mở ứng dụng email. Vui lòng gửi email đến support@socialnetwork.com",
+  "authBannedGenericError": "Đã xảy ra lỗi: {error}",
+  "@authBannedGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authBannedTemporaryFallback": "Tài khoản của bạn tạm thời bị khóa",
+  "authBannedPermanentFallback": "Tài khoản của bạn đã bị khóa vĩnh viễn"
 }

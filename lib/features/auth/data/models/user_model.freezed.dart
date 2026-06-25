@@ -57,6 +57,12 @@ mixin _$UserModel {
   String? get relationshipStatus => throw _privateConstructorUsedError;
   @JsonKey(includeIfNull: false)
   bool? get isFaceRegistered => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  bool? get isBan => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  DateTime? get banUntil => throw _privateConstructorUsedError;
+  @JsonKey(includeIfNull: false)
+  String? get banReason => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -92,6 +98,9 @@ abstract class $UserModelCopyWith<$Res> {
     @JsonKey(includeIfNull: false) String? workplace,
     @JsonKey(includeIfNull: false) String? relationshipStatus,
     @JsonKey(includeIfNull: false) bool? isFaceRegistered,
+    @JsonKey(includeIfNull: false) bool? isBan,
+    @JsonKey(includeIfNull: false) DateTime? banUntil,
+    @JsonKey(includeIfNull: false) String? banReason,
   });
 }
 
@@ -128,6 +137,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? workplace = freezed,
     Object? relationshipStatus = freezed,
     Object? isFaceRegistered = freezed,
+    Object? isBan = freezed,
+    Object? banUntil = freezed,
+    Object? banReason = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -203,6 +215,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.isFaceRegistered
                 : isFaceRegistered // ignore: cast_nullable_to_non_nullable
                       as bool?,
+            isBan: freezed == isBan
+                ? _value.isBan
+                : isBan // ignore: cast_nullable_to_non_nullable
+                      as bool?,
+            banUntil: freezed == banUntil
+                ? _value.banUntil
+                : banUntil // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            banReason: freezed == banReason
+                ? _value.banReason
+                : banReason // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -237,6 +261,9 @@ abstract class _$$UserModelImplCopyWith<$Res>
     @JsonKey(includeIfNull: false) String? workplace,
     @JsonKey(includeIfNull: false) String? relationshipStatus,
     @JsonKey(includeIfNull: false) bool? isFaceRegistered,
+    @JsonKey(includeIfNull: false) bool? isBan,
+    @JsonKey(includeIfNull: false) DateTime? banUntil,
+    @JsonKey(includeIfNull: false) String? banReason,
   });
 }
 
@@ -272,6 +299,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? workplace = freezed,
     Object? relationshipStatus = freezed,
     Object? isFaceRegistered = freezed,
+    Object? isBan = freezed,
+    Object? banUntil = freezed,
+    Object? banReason = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -347,6 +377,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.isFaceRegistered
             : isFaceRegistered // ignore: cast_nullable_to_non_nullable
                   as bool?,
+        isBan: freezed == isBan
+            ? _value.isBan
+            : isBan // ignore: cast_nullable_to_non_nullable
+                  as bool?,
+        banUntil: freezed == banUntil
+            ? _value.banUntil
+            : banUntil // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        banReason: freezed == banReason
+            ? _value.banReason
+            : banReason // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -374,6 +416,9 @@ class _$UserModelImpl implements _UserModel {
     @JsonKey(includeIfNull: false) this.workplace,
     @JsonKey(includeIfNull: false) this.relationshipStatus,
     @JsonKey(includeIfNull: false) this.isFaceRegistered,
+    @JsonKey(includeIfNull: false) this.isBan,
+    @JsonKey(includeIfNull: false) this.banUntil,
+    @JsonKey(includeIfNull: false) this.banReason,
   });
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -433,10 +478,19 @@ class _$UserModelImpl implements _UserModel {
   @override
   @JsonKey(includeIfNull: false)
   final bool? isFaceRegistered;
+  @override
+  @JsonKey(includeIfNull: false)
+  final bool? isBan;
+  @override
+  @JsonKey(includeIfNull: false)
+  final DateTime? banUntil;
+  @override
+  @JsonKey(includeIfNull: false)
+  final String? banReason;
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, fullName: $fullName, phoneNumber: $phoneNumber, bio: $bio, avatarUrl: $avatarUrl, dateOfBirth: $dateOfBirth, gender: $gender, email: $email, username: $username, isActive: $isActive, createdAt: $createdAt, coverUrl: $coverUrl, school: $school, currentCity: $currentCity, hometown: $hometown, workplace: $workplace, relationshipStatus: $relationshipStatus, isFaceRegistered: $isFaceRegistered)';
+    return 'UserModel(userId: $userId, fullName: $fullName, phoneNumber: $phoneNumber, bio: $bio, avatarUrl: $avatarUrl, dateOfBirth: $dateOfBirth, gender: $gender, email: $email, username: $username, isActive: $isActive, createdAt: $createdAt, coverUrl: $coverUrl, school: $school, currentCity: $currentCity, hometown: $hometown, workplace: $workplace, relationshipStatus: $relationshipStatus, isFaceRegistered: $isFaceRegistered, isBan: $isBan, banUntil: $banUntil, banReason: $banReason)';
   }
 
   @override
@@ -474,12 +528,17 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.relationshipStatus, relationshipStatus) ||
                 other.relationshipStatus == relationshipStatus) &&
             (identical(other.isFaceRegistered, isFaceRegistered) ||
-                other.isFaceRegistered == isFaceRegistered));
+                other.isFaceRegistered == isFaceRegistered) &&
+            (identical(other.isBan, isBan) || other.isBan == isBan) &&
+            (identical(other.banUntil, banUntil) ||
+                other.banUntil == banUntil) &&
+            (identical(other.banReason, banReason) ||
+                other.banReason == banReason));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     userId,
     fullName,
@@ -499,7 +558,10 @@ class _$UserModelImpl implements _UserModel {
     workplace,
     relationshipStatus,
     isFaceRegistered,
-  );
+    isBan,
+    banUntil,
+    banReason,
+  ]);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -535,6 +597,9 @@ abstract class _UserModel implements UserModel {
     @JsonKey(includeIfNull: false) final String? workplace,
     @JsonKey(includeIfNull: false) final String? relationshipStatus,
     @JsonKey(includeIfNull: false) final bool? isFaceRegistered,
+    @JsonKey(includeIfNull: false) final bool? isBan,
+    @JsonKey(includeIfNull: false) final DateTime? banUntil,
+    @JsonKey(includeIfNull: false) final String? banReason,
   }) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
@@ -594,6 +659,15 @@ abstract class _UserModel implements UserModel {
   @override
   @JsonKey(includeIfNull: false)
   bool? get isFaceRegistered;
+  @override
+  @JsonKey(includeIfNull: false)
+  bool? get isBan;
+  @override
+  @JsonKey(includeIfNull: false)
+  DateTime? get banUntil;
+  @override
+  @JsonKey(includeIfNull: false)
+  String? get banReason;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
