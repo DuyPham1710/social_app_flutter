@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/date_time_extensions.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_bloc.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/conversation/conversation_event.dart';
@@ -29,6 +30,7 @@ import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
 import 'package:social_app_fe/features/story/presentation/pages/story_create_page.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/shared/helpers/show_info_snackBar.dart';
 import 'package:social_app_fe/core/network/websocket/socket_client.dart';
 import 'package:social_app_fe/features/chat/data/services/chat_presence_service.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
@@ -391,6 +393,129 @@ class _ChatListPageState extends State<ChatListPage> {
         return SlideTransition(position: offsetAnimation, child: child);
       },
     );
+  }
+
+  void _showConversationOptions(BuildContext context, dynamic conversation) {
+    Widget buildOptions() {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(
+              CupertinoIcons.pin_fill,
+              color: AppColors.textPrimary,
+            ),
+            title: Text(
+              context.l10n.chatPin,
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              showInfoSnackBar(
+                context,
+                context.l10n.chatPinInDevelopment ??
+                    'Tính năng ghim tin nhắn đang phát triển',
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.mark_email_unread_outlined,
+              color: AppColors.textPrimary,
+            ),
+            title: Text(
+              'Đánh dấu chưa đọc',
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              showInfoSnackBar(
+                context,
+                'Tính năng đánh dấu chưa đọc đang phát triển',
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.notifications_off_outlined,
+              color: AppColors.textPrimary,
+            ),
+            title: Text(
+              'Tắt thông báo',
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              showInfoSnackBar(
+                context,
+                'Tính năng tắt thông báo đang phát triển',
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(CupertinoIcons.delete_solid, color: Colors.red),
+            title: Text(
+              context.l10n.chatDeleteConversation,
+              style: TextStyle(color: Colors.red),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              showInfoSnackBar(
+                context,
+                'Tính năng xóa cuộc trò chuyện đang phát triển',
+              );
+            },
+          ),
+        ],
+      );
+    }
+
+    if (ResponsiveHelper.isWebOrDesktop) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Container(
+              width: 300.w,
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: buildOptions(),
+            ),
+          );
+        },
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        builder: (context) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 8.h, bottom: 16.h),
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.textSecondary.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                buildOptions(),
+                SizedBox(height: 8.h),
+              ],
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -930,6 +1055,25 @@ class _ChatListPageState extends State<ChatListPage> {
                                             participants: conversation.isGroup
                                                 ? otherParticipants
                                                 : null,
+                                          );
+                                        },
+                                        onLongPress: () {
+                                          _showConversationOptions(
+                                            context,
+                                            conversation,
+                                          );
+                                        },
+                                        onPin: () {
+                                          showInfoSnackBar(
+                                            context,
+                                            context.l10n.chatPinInDevelopment ??
+                                                'Tính năng ghim tin nhắn đang phát triển',
+                                          );
+                                        },
+                                        onDelete: () {
+                                          showInfoSnackBar(
+                                            context,
+                                            'Tính năng xóa cuộc trò chuyện đang phát triển',
                                           );
                                         },
                                       ),

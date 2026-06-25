@@ -102,4 +102,8 @@ class DeleteIncompleteRegistrationEvent extends AuthEvent {
   List<Object?> get props => [userId];
 }
 
+class GoogleSignInEvent extends AuthEvent {
+  const GoogleSignInEvent();
+}
+
 class AuthReset extends AuthEvent {}

@@ -16,6 +16,8 @@ import 'package:social_app_fe/shared/component/button_custom.dart';
 import 'package:social_app_fe/shared/component/textFormField_custom.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
+import 'package:flutter/foundation.dart';
+import 'package:social_app_fe/shared/helpers/show_mobile_only_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -74,7 +76,19 @@ class _LoginPageState extends State<LoginPage> {
             // Update FCM token after successful login
             await FcmService().updateFcmToken();
             Navigator.pushReplacementNamed(context, '/main');
-          } else if (state is AuthError && state.flowType == 'login') {
+          } else if (state is AuthLoaded &&
+              state.flowType == 'google_new_user') {
+            // New Google user → redirect to personal info page
+            context.read<MenuBloc>().add(LoadCurrentUserEvent());
+            await FcmService().updateFcmToken();
+            Navigator.pushReplacementNamed(
+              context,
+              '/personal-info',
+              arguments: {'id': state.user!.userId},
+            );
+          } else if (state is AuthError &&
+              (state.flowType == 'login' ||
+                  state.flowType == 'google_sign_in')) {
             final errorMsg = state.errorMessage ?? context.l10n.authLoginFailed;
             UIUtils.showErrorMessage(context, errorMsg);
           }
@@ -208,33 +222,49 @@ class _LoginPageState extends State<LoginPage> {
 
                       SizedBox(height: 30.rsh(context)),
 
-                      Container(
-                        width: double.infinity,
-                        height: 60.rsh(context),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(12.rsr(context)),
-                          border: Border.all(color: AppColors.divider),
-                        ),
+                      GestureDetector(
+                        onTap: () {
+                          if (kIsWeb) {
+                            showMobileOnlyDialog(
+                              context,
+                              featureName: context.l10n.authLoginWithGoogle,
+                            );
+                            return;
+                          }
+                          context.read<AuthBloc>().add(
+                            const GoogleSignInEvent(),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 60.rsh(context),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(
+                              12.rsr(context),
+                            ),
+                            border: Border.all(color: AppColors.divider),
+                          ),
 
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/google.png',
-                              height: 24.rsh(context),
-                              width: 24.rs(context),
-                            ),
-                            SizedBox(width: 12.rs(context)),
-                            Text(
-                              context.l10n.authLoginWithGoogle,
-                              style: TextStyle(
-                                fontSize: 16.rsp(context),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/icons/google.png',
+                                height: 24.rsh(context),
+                                width: 24.rs(context),
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 12.rs(context)),
+                              Text(
+                                context.l10n.authLoginWithGoogle,
+                                style: TextStyle(
+                                  fontSize: 16.rsp(context),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 

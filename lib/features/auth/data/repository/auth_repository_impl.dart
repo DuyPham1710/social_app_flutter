@@ -184,4 +184,36 @@ class AuthRepositoryImpl implements AuthRepository {
       return DataStateError(e);
     }
   }
+
+  @override
+  Future<DataState<Map<String, dynamic>>> googleAuth(String idToken) async {
+    try {
+      final response = await authService.googleAuth({'idToken': idToken});
+
+      final accessToken = response['accessToken'] as String;
+      final refreshToken = response['refreshToken'] as String;
+      final userMap = response['user'] as Map<String, dynamic>;
+      final isNewUser = response['isNewUser'] as bool? ?? false;
+
+      // Save tokens
+      await TokenStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userData: {
+          'id': userMap['userId'],
+          'fullName': userMap['fullName'],
+          'email': userMap['email'],
+          'username': userMap['username'],
+          'avatarUrl': userMap['avatarUrl'],
+        },
+      );
+
+      return DataStateSuccess({
+        'user': UserModel.fromJson(userMap),
+        'isNewUser': isNewUser,
+      });
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
 }

@@ -399,7 +399,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                           ),
                           SizedBox(height: 8.rsh(context)),
                           DropdownButtonFormField<String>(
-                            initialValue: _selectedPrivacy,
+                            value: _selectedPrivacy,
                             dropdownColor: AppColors.background,
                             iconEnabledColor: AppColors.iconPrimary,
                             style: TextStyle(color: AppColors.textPrimary),
@@ -476,7 +476,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                           ),
                           SizedBox(height: 8.rsh(context)),
                           DropdownButtonFormField<String>(
-                            initialValue: _selectedType,
+                            value: _selectedType,
                             dropdownColor: AppColors.background,
                             iconEnabledColor: AppColors.iconPrimary,
                             style: TextStyle(color: AppColors.textPrimary),

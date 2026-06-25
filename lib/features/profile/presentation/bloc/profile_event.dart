@@ -12,11 +12,12 @@ class LoadProfilePostsEvent extends ProfileEvent {
   final int page;
   final int limit;
 
-  const LoadProfilePostsEvent({this.page = 1, this.limit = 2});
+  const LoadProfilePostsEvent({this.page = 1, this.limit = 8});
 
   @override
   List<Object?> get props => [page, limit];
 }
+
 class LoadMoreProfilePostsEvent extends ProfileEvent {
   const LoadMoreProfilePostsEvent();
 }
