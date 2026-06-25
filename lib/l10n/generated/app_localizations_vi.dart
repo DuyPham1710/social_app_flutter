@@ -1136,7 +1136,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get communityExploreSubtitle =>
-      'Khám phá nhóm phù hợp và theo dõi các bài viết đang chờ duyệt.';
+      'Khám phá các cộng đồng và chia sẻ những điều thú vị.';
 
   @override
   String get communityExploreTab => 'Khám phá';
@@ -1459,6 +1459,59 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get communityType => 'Loại cộng đồng';
+
+  @override
+  String get communityRoadmap => 'Bản đồ';
+
+  @override
+  String get communityRoadmapTitle => 'Bản đồ lộ trình';
+
+  @override
+  String get communityRoadmapViewFull => 'Xem bản đồ lớn';
+
+  @override
+  String get communityRoadmapEmpty => 'Chưa có địa điểm nào trên bản đồ';
+
+  @override
+  String get communityRoadmapMyLocation => 'Vị trí của tôi';
+
+  @override
+  String communityRoadmapPostCount(num count) {
+    return '$count bài viết';
+  }
+
+  @override
+  String get communityRoadmapViewPost => 'Xem bài viết';
+
+  @override
+  String get communityRoadmapSearchNearby => 'Tìm kiếm quanh đây';
+
+  @override
+  String communityRoadmapRadius(num radius) {
+    return 'Bán kính: $radius km';
+  }
+
+  @override
+  String communityRoadmapRadiusLabel(num radius) {
+    return '$radius km';
+  }
+
+  @override
+  String get communityRoadmapApplyFilter => 'Áp dụng';
+
+  @override
+  String get communityRoadmapErrorLoadPosts => 'Đã có lỗi xảy ra';
+
+  @override
+  String get communityRoadmapNoPosts => 'Không có bài viết nào';
+
+  @override
+  String communityRoadmapFirstCheckedInBy(String name) {
+    return 'Được check-in lần đầu bởi $name';
+  }
+
+  @override
+  String get communityRoadmapFilterTooltip => 'Lọc quanh vị trí';
 
   @override
   String get communityUpdateSuccess => 'Cập nhật cộng đồng thành công';
@@ -3391,6 +3444,42 @@ class AppLocalizationsVi extends AppLocalizations {
   String chatGiphyError(Object error) {
     return 'Lỗi tải sticker GIPHY: $error';
   }
+
+  @override
+  String get communityRoadmapNoPoints => 'Chưa có địa điểm nào trên bản đồ';
+
+  @override
+  String get communityRoadmapPoint => 'Điểm đến';
+
+  @override
+  String get communityRoadmapNearby => 'Địa điểm gần đây';
+
+  @override
+  String communityRoadmapPosts(num count) {
+    return '$count bài viết';
+  }
+
+  @override
+  String get locationSearchHint => 'Tìm kiếm vị trí...';
+
+  @override
+  String get locationNotFound => 'Không tìm thấy vị trí';
+
+  @override
+  String get locationSearchError =>
+      'Lỗi tìm kiếm vị trí (có thể do lỗi kết nối hoặc không tìm thấy)';
+
+  @override
+  String get locationSelected => 'Vị trí đã chọn';
+
+  @override
+  String get locationNotSelected => 'Chưa chọn vị trí';
+
+  @override
+  String get locationUnknown => 'Vị trí không xác định';
+
+  @override
+  String get postShareSuccess => 'Chia sẻ thành công';
 
   @override
   String get authBannedTitle => 'Tài Khoản Bị Khóa';

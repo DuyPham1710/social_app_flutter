@@ -34,6 +34,7 @@ mixin _$CommunityModel {
   String get createdBy => throw _privateConstructorUsedError;
   @JsonKey(name: 'privacy')
   String? get status => throw _privateConstructorUsedError;
+  String? get type => throw _privateConstructorUsedError;
   @JsonKey(name: 'myRole')
   String? get myRole => throw _privateConstructorUsedError;
   @JsonKey(name: 'memberStatus')
@@ -66,6 +67,7 @@ abstract class $CommunityModelCopyWith<$Res> {
     @JsonKey(fromJson: _parseDateTime) DateTime createdAt,
     @JsonKey(name: 'adminId', fromJson: _extractAdminId) String createdBy,
     @JsonKey(name: 'privacy') String? status,
+    String? type,
     @JsonKey(name: 'myRole') String? myRole,
     @JsonKey(name: 'memberStatus') String? memberStatus,
   });
@@ -95,6 +97,7 @@ class _$CommunityModelCopyWithImpl<$Res, $Val extends CommunityModel>
     Object? createdAt = null,
     Object? createdBy = null,
     Object? status = freezed,
+    Object? type = freezed,
     Object? myRole = freezed,
     Object? memberStatus = freezed,
   }) {
@@ -136,6 +139,10 @@ class _$CommunityModelCopyWithImpl<$Res, $Val extends CommunityModel>
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as String?,
+            type: freezed == type
+                ? _value.type
+                : type // ignore: cast_nullable_to_non_nullable
+                      as String?,
             myRole: freezed == myRole
                 ? _value.myRole
                 : myRole // ignore: cast_nullable_to_non_nullable
@@ -169,6 +176,7 @@ abstract class _$$CommunityModelImplCopyWith<$Res>
     @JsonKey(fromJson: _parseDateTime) DateTime createdAt,
     @JsonKey(name: 'adminId', fromJson: _extractAdminId) String createdBy,
     @JsonKey(name: 'privacy') String? status,
+    String? type,
     @JsonKey(name: 'myRole') String? myRole,
     @JsonKey(name: 'memberStatus') String? memberStatus,
   });
@@ -197,6 +205,7 @@ class __$$CommunityModelImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? createdBy = null,
     Object? status = freezed,
+    Object? type = freezed,
     Object? myRole = freezed,
     Object? memberStatus = freezed,
   }) {
@@ -238,6 +247,10 @@ class __$$CommunityModelImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as String?,
+        type: freezed == type
+            ? _value.type
+            : type // ignore: cast_nullable_to_non_nullable
+                  as String?,
         myRole: freezed == myRole
             ? _value.myRole
             : myRole // ignore: cast_nullable_to_non_nullable
@@ -265,6 +278,7 @@ class _$CommunityModelImpl implements _CommunityModel {
     @JsonKey(name: 'adminId', fromJson: _extractAdminId)
     required this.createdBy,
     @JsonKey(name: 'privacy') this.status,
+    this.type,
     @JsonKey(name: 'myRole') this.myRole,
     @JsonKey(name: 'memberStatus') this.memberStatus,
   });
@@ -295,6 +309,8 @@ class _$CommunityModelImpl implements _CommunityModel {
   @JsonKey(name: 'privacy')
   final String? status;
   @override
+  final String? type;
+  @override
   @JsonKey(name: 'myRole')
   final String? myRole;
   @override
@@ -303,7 +319,7 @@ class _$CommunityModelImpl implements _CommunityModel {
 
   @override
   String toString() {
-    return 'CommunityModel(id: $id, name: $name, description: $description, avatar: $avatar, coverImage: $coverImage, memberCount: $memberCount, createdAt: $createdAt, createdBy: $createdBy, status: $status, myRole: $myRole, memberStatus: $memberStatus)';
+    return 'CommunityModel(id: $id, name: $name, description: $description, avatar: $avatar, coverImage: $coverImage, memberCount: $memberCount, createdAt: $createdAt, createdBy: $createdBy, status: $status, type: $type, myRole: $myRole, memberStatus: $memberStatus)';
   }
 
   @override
@@ -325,6 +341,7 @@ class _$CommunityModelImpl implements _CommunityModel {
             (identical(other.createdBy, createdBy) ||
                 other.createdBy == createdBy) &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.type, type) || other.type == type) &&
             (identical(other.myRole, myRole) || other.myRole == myRole) &&
             (identical(other.memberStatus, memberStatus) ||
                 other.memberStatus == memberStatus));
@@ -343,6 +360,7 @@ class _$CommunityModelImpl implements _CommunityModel {
     createdAt,
     createdBy,
     status,
+    type,
     myRole,
     memberStatus,
   );
@@ -376,6 +394,7 @@ abstract class _CommunityModel implements CommunityModel {
     @JsonKey(name: 'adminId', fromJson: _extractAdminId)
     required final String createdBy,
     @JsonKey(name: 'privacy') final String? status,
+    final String? type,
     @JsonKey(name: 'myRole') final String? myRole,
     @JsonKey(name: 'memberStatus') final String? memberStatus,
   }) = _$CommunityModelImpl;
@@ -405,6 +424,8 @@ abstract class _CommunityModel implements CommunityModel {
   @override
   @JsonKey(name: 'privacy')
   String? get status;
+  @override
+  String? get type;
   @override
   @JsonKey(name: 'myRole')
   String? get myRole;

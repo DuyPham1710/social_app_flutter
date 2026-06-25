@@ -2,13 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/community/data/models/community_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_list_model.dart';
-import 'package:social_app_fe/features/community/data/models/member_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_status_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_list_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_invite_model.dart';
+import 'package:social_app_fe/features/community/data/models/roadmap_point_list_model.dart';
 
 part 'community_remote_data_source.g.dart';
 
@@ -23,6 +22,7 @@ abstract class CommunityRemoteDataSource {
     @Part(name: 'name') required String name,
     @Part(name: 'description') String? description,
     @Part(name: 'privacy') required String privacy,
+    @Part(name: 'type') String? type,
     @Part(name: 'avatar') List<MultipartFile>? avatar,
     @Part(name: 'coverImage') List<MultipartFile>? coverImage,
   });
@@ -148,10 +148,33 @@ abstract class CommunityRemoteDataSource {
     @Query('limit') required int limit,
   });
 
-  @PATCH('/community/{communityId}/posts/{postId}')
+  @PATCH('/community/{communityId}/posts/{postId}/approve')
   Future<void> approveCommunityPost({
     @Path('communityId') required String communityId,
     @Path('postId') required String postId,
     @Body() required Map<String, dynamic> body,
+  });
+
+  @GET('/community/{communityId}/roadmap')
+  Future<RoadmapPointListModel> getRoadmapPoints({
+    @Path('communityId') required String communityId,
+    @Query('page') int? page,
+    @Query('limit') int? limit,
+  });
+
+  @GET('/community/{communityId}/roadmap/nearby')
+  Future<RoadmapPointListModel> getNearbyRoadmapPoints({
+    @Path('communityId') required String communityId,
+    @Query('lat') required double lat,
+    @Query('lng') required double lng,
+    @Query('radius') double? radius,
+  });
+
+  @GET('/community/{communityId}/roadmap/{roadmapId}/posts')
+  Future<CommunityPostListModel> getRoadmapPointPosts({
+    @Path('communityId') required String communityId,
+    @Path('roadmapId') required String roadmapId,
+    @Query('page') int? page,
+    @Query('limit') int? limit,
   });
 }

@@ -91,7 +91,7 @@ class _CommunityPageState extends State<CommunityPage>
       context,
     ).push(MaterialPageRoute(builder: (_) => CreateCommunityPage()));
 
-    if (!mounted || result == null) {
+    if (!mounted || !providerContext.mounted || result == null) {
       return;
     }
 

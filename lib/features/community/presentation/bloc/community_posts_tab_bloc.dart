@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/features/comment/domain/repository/comment_repository.dart';
 import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
@@ -21,39 +20,24 @@ class CommunityPostsTabBloc
   int currentPage = 1;
   List<PostEntity> currentPosts = [];
 
-  factory CommunityPostsTabBloc() {
-    return CommunityPostsTabBloc.withDeps(
-      s1<GetUserCommunityPostsUseCase>(),
-      s1<CommentRepository>(),
-    );
-  }
-
-  CommunityPostsTabBloc.withDeps(
-    this._getUserCommunityPostsUseCase,
-    this._commentRepository,
-  ) : super(CommunityPostsTabInitial()) {
+  CommunityPostsTabBloc({
+    required GetUserCommunityPostsUseCase getUserCommunityPostsUseCase,
+    required CommentRepository commentRepository,
+  })  : _getUserCommunityPostsUseCase = getUserCommunityPostsUseCase,
+        _commentRepository = commentRepository,
+        super(CommunityPostsTabInitial()) {
     on<CommunityPostsTabFetched>(_onFetched);
     on<CommunityPostsTabPageChanged>(_onPageChanged);
     on<CommunityPostsTabStatusChanged>(_onStatusChanged);
+
+    on<CommunityPostsTabCommentCountsUpdated>(_onCommentCountsUpdated);
 
     // Listen to comment count updates
     _commentCountSubscription = _commentRepository.commentCountStream.listen((
       counts,
     ) {
-      commentCounts = counts;
-      if (state is CommunityPostsTabLoaded && !isClosed) {
-        final currentState = state as CommunityPostsTabLoaded;
-        emit(
-          CommunityPostsTabLoaded(
-            posts: currentState.posts,
-            page: currentState.page,
-            limit: currentState.limit,
-            total: currentState.total,
-            hasNext: currentState.hasNext,
-            status: currentState.status,
-            commentCounts: commentCounts,
-          ),
-        );
+      if (!isClosed) {
+        add(CommunityPostsTabCommentCountsUpdated(counts));
       }
     });
   }
@@ -121,6 +105,27 @@ class CommunityPostsTabBloc
   ) async {
     currentStatus = event.status;
     await _onFetched(CommunityPostsTabFetched(status: event.status), emit);
+  }
+
+  void _onCommentCountsUpdated(
+    CommunityPostsTabCommentCountsUpdated event,
+    Emitter<CommunityPostsTabState> emit,
+  ) {
+    commentCounts = event.counts;
+    if (state is CommunityPostsTabLoaded) {
+      final currentState = state as CommunityPostsTabLoaded;
+      emit(
+        CommunityPostsTabLoaded(
+          posts: currentState.posts,
+          page: currentState.page,
+          limit: currentState.limit,
+          total: currentState.total,
+          hasNext: currentState.hasNext,
+          status: currentState.status,
+          commentCounts: commentCounts,
+        ),
+      );
+    }
   }
 
   @override

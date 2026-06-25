@@ -4,13 +4,15 @@ import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/di/injection.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
+import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_create_post_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_detail_header.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_members_widget.dart';
+import 'package:social_app_fe/features/community/presentation/widgets/community_roadmap_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/community_posts_widget.dart';
 import 'package:social_app_fe/features/community/presentation/widgets/invite_friends_bottom_sheet.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_create_post_page.dart';
@@ -300,7 +302,10 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     EditCommunityPage(initialCommunity: state.community),
               ),
             )
-            .then((_) => _refreshContent(context));
+            .then((_) {
+          if (!context.mounted) return;
+          _refreshContent(context);
+        });
       case 'delete_community':
         _showDeleteConfirmation(context);
       case 'leave_community':
@@ -744,7 +749,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
     );
   }
 
-  Widget _buildReviewPostCard(BuildContext context, CommunityPostModel post) {
+  Widget _buildReviewPostCard(BuildContext context, PostEntity post) {
     final caption = (post.caption ?? '').trim();
     final hasImage = post.urls.isNotEmpty && post.urls.first.url.isNotEmpty;
 
@@ -1116,7 +1121,7 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                     showSuccessSnackBar(context, message);
                     if (message == context.l10n.communityDeleteSuccess) {
                       Future.delayed(Duration(milliseconds: 300), () {
-                        if (mounted) Navigator.of(context).pop(true);
+                        if (context.mounted) Navigator.of(context).pop(true);
                       });
                     } else {
                       _refreshContent(context);
@@ -1301,6 +1306,12 @@ class _CommunityDetailPageState extends State<CommunityDetailPage> {
                                       ),
                                     ),
                                   SizedBox(height: 8.rsh(context)),
+                                  if (isMember && state.community.type == 'travel')
+                                    CommunityRoadmapWidget(
+                                      communityId: widget.communityId,
+                                    ),
+                                  if (isMember && state.community.type == 'travel')
+                                    SizedBox(height: 8.rsh(context)),
                                   CommunityPostsWidget(
                                     communityId: widget.communityId,
                                     refreshSeed: _refreshSeed,

@@ -22,6 +22,9 @@ CreatePostModel _$CreatePostModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$CreatePostModel {
   String? get caption => throw _privateConstructorUsedError;
+  String? get location => throw _privateConstructorUsedError;
+  double? get latitude => throw _privateConstructorUsedError;
+  double? get longitude => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   List<File>? get files => throw _privateConstructorUsedError;
   List<String>? get titles => throw _privateConstructorUsedError;
@@ -56,6 +59,9 @@ abstract class $CreatePostModelCopyWith<$Res> {
   @useResult
   $Res call({
     String? caption,
+    String? location,
+    double? latitude,
+    double? longitude,
     @JsonKey(ignore: true) List<File>? files,
     List<String>? titles,
     List<int>? orders,
@@ -86,6 +92,9 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
   @override
   $Res call({
     Object? caption = freezed,
+    Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? files = freezed,
     Object? titles = freezed,
     Object? orders = freezed,
@@ -104,6 +113,18 @@ class _$CreatePostModelCopyWithImpl<$Res, $Val extends CreatePostModel>
                 ? _value.caption
                 : caption // ignore: cast_nullable_to_non_nullable
                       as String?,
+            location: freezed == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            latitude: freezed == latitude
+                ? _value.latitude
+                : latitude // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            longitude: freezed == longitude
+                ? _value.longitude
+                : longitude // ignore: cast_nullable_to_non_nullable
+                      as double?,
             files: freezed == files
                 ? _value.files
                 : files // ignore: cast_nullable_to_non_nullable
@@ -165,6 +186,9 @@ abstract class _$$CreatePostModelImplCopyWith<$Res>
   @useResult
   $Res call({
     String? caption,
+    String? location,
+    double? latitude,
+    double? longitude,
     @JsonKey(ignore: true) List<File>? files,
     List<String>? titles,
     List<int>? orders,
@@ -194,6 +218,9 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? caption = freezed,
+    Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? files = freezed,
     Object? titles = freezed,
     Object? orders = freezed,
@@ -212,6 +239,18 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
             ? _value.caption
             : caption // ignore: cast_nullable_to_non_nullable
                   as String?,
+        location: freezed == location
+            ? _value.location
+            : location // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        latitude: freezed == latitude
+            ? _value.latitude
+            : latitude // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        longitude: freezed == longitude
+            ? _value.longitude
+            : longitude // ignore: cast_nullable_to_non_nullable
+                  as double?,
         files: freezed == files
             ? _value._files
             : files // ignore: cast_nullable_to_non_nullable
@@ -266,6 +305,9 @@ class __$$CreatePostModelImplCopyWithImpl<$Res>
 class _$CreatePostModelImpl implements _CreatePostModel {
   const _$CreatePostModelImpl({
     this.caption,
+    this.location,
+    this.latitude,
+    this.longitude,
     @JsonKey(ignore: true) final List<File>? files,
     final List<String>? titles,
     final List<int>? orders,
@@ -291,6 +333,12 @@ class _$CreatePostModelImpl implements _CreatePostModel {
 
   @override
   final String? caption;
+  @override
+  final String? location;
+  @override
+  final double? latitude;
+  @override
+  final double? longitude;
   final List<File>? _files;
   @override
   @JsonKey(ignore: true)
@@ -382,7 +430,7 @@ class _$CreatePostModelImpl implements _CreatePostModel {
 
   @override
   String toString() {
-    return 'CreatePostModel(caption: $caption, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail, taggedUserIds: $taggedUserIds, communityId: $communityId, fileBytesList: $fileBytesList, fileNames: $fileNames)';
+    return 'CreatePostModel(caption: $caption, location: $location, latitude: $latitude, longitude: $longitude, files: $files, titles: $titles, orders: $orders, layout: $layout, privacyType: $privacyType, friendsExcept: $friendsExcept, friendsDetail: $friendsDetail, taggedUserIds: $taggedUserIds, communityId: $communityId, fileBytesList: $fileBytesList, fileNames: $fileNames)';
   }
 
   @override
@@ -391,6 +439,12 @@ class _$CreatePostModelImpl implements _CreatePostModel {
         (other.runtimeType == runtimeType &&
             other is _$CreatePostModelImpl &&
             (identical(other.caption, caption) || other.caption == caption) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             const DeepCollectionEquality().equals(other._files, _files) &&
             const DeepCollectionEquality().equals(other._titles, _titles) &&
             const DeepCollectionEquality().equals(other._orders, _orders) &&
@@ -426,6 +480,9 @@ class _$CreatePostModelImpl implements _CreatePostModel {
   int get hashCode => Object.hash(
     runtimeType,
     caption,
+    location,
+    latitude,
+    longitude,
     const DeepCollectionEquality().hash(_files),
     const DeepCollectionEquality().hash(_titles),
     const DeepCollectionEquality().hash(_orders),
@@ -459,6 +516,9 @@ class _$CreatePostModelImpl implements _CreatePostModel {
 abstract class _CreatePostModel implements CreatePostModel {
   const factory _CreatePostModel({
     final String? caption,
+    final String? location,
+    final double? latitude,
+    final double? longitude,
     @JsonKey(ignore: true) final List<File>? files,
     final List<String>? titles,
     final List<int>? orders,
@@ -477,6 +537,12 @@ abstract class _CreatePostModel implements CreatePostModel {
 
   @override
   String? get caption;
+  @override
+  String? get location;
+  @override
+  double? get latitude;
+  @override
+  double? get longitude;
   @override
   @JsonKey(ignore: true)
   List<File>? get files;

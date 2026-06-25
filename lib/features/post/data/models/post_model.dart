@@ -63,6 +63,8 @@ class PostModel extends PostEntity with _$PostModel {
     @JsonKey(name: '_id') required String id,
     String? caption,
     String? location,
+    @JsonKey(name: 'latitude') double? latitude,
+    @JsonKey(name: 'longitude') double? longitude,
     @JsonKey(name: 'userId') required UserModel user,
     required List<PostUrlModel> urls,
     required String layout,

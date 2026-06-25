@@ -533,7 +533,7 @@
   "communityEditIntro": "Update details so members understand this community better.",
   "communityEditTitle": "Edit community",
   "communityEmpty": "No communities yet",
-  "communityExploreSubtitle": "Discover relevant groups and keep track of posts waiting for review.",
+  "communityExploreSubtitle": "Explore communities and share interesting things.",
   "communityExploreTab": "Explore",
   "communityExploreTitle": "Communities",
   "communityFilterPosts": "Filter posts",
@@ -672,6 +672,49 @@
   "communitySearchMembersHint": "Search members",
   "communitySendingInvite": "Sending invite...",
   "communityType": "Community type",
+  "communityRoadmap": "Community Roadmap",
+  "communityRoadmapTitle": "Roadmap",
+  "communityRoadmapViewFull": "View Full Map",
+  "communityRoadmapEmpty": "No locations on the roadmap yet",
+  "communityRoadmapMyLocation": "My Location",
+  "communityRoadmapPostCount": "{count} posts",
+  "@communityRoadmapPostCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityRoadmapViewPost": "View Post",
+  "communityRoadmapSearchNearby": "Search nearby",
+  "communityRoadmapRadius": "Radius: {radius} km",
+  "@communityRoadmapRadius": {
+    "placeholders": {
+      "radius": {
+        "type": "num"
+      }
+    }
+  },
+  "communityRoadmapRadiusLabel": "{radius} km",
+  "@communityRoadmapRadiusLabel": {
+    "placeholders": {
+      "radius": {
+        "type": "num"
+      }
+    }
+  },
+  "communityRoadmapApplyFilter": "Apply",
+  "communityRoadmapErrorLoadPosts": "An error occurred",
+  "communityRoadmapNoPosts": "No posts found",
+  "communityRoadmapFirstCheckedInBy": "First checked in by {name}",
+  "@communityRoadmapFirstCheckedInBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "communityRoadmapFilterTooltip": "Filter around location",
   "communityUpdateSuccess": "Community updated successfully",
   "communityVisibleMembersCount": "{visible}/{total} members",
   "@communityVisibleMembersCount": {
@@ -1543,6 +1586,20 @@
   "chatGiphySticker": "GIPHY Sticker",
   "chatGiphySearch": "Search GIPHY stickers...",
   "chatGiphyError": "Error loading GIPHY stickers: {error}",
+  "communityRoadmap": "Roadmap",
+  "communityRoadmapNoPoints": "No locations in roadmap yet",
+  "communityRoadmapPoint": "Location point",
+  "communityRoadmapViewFull": "View Full Roadmap",
+  "communityRoadmapNearby": "Nearby Roadmap",
+  "communityRoadmapPosts": "{count} posts",
+  "@communityRoadmapPosts": {"placeholders": {"count": {"type": "num"}}},
+  "locationSearchHint": "Search for location...",
+  "locationNotFound": "Location not found",
+  "locationSearchError": "Error searching for location (network error or not found)",
+  "locationSelected": "Selected location",
+  "locationNotSelected": "Location not selected",
+  "locationUnknown": "Unknown location",
+  "postShareSuccess": "Shared successfully",
   "authBannedTitle": "Account Suspended",
   "authBannedUntil": "Estimated unlock time:",
   "authBannedReason": "Reason:",

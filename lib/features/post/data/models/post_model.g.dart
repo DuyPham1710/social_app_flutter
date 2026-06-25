@@ -11,6 +11,8 @@ _$PostModelImpl _$$PostModelImplFromJson(Map<String, dynamic> json) =>
       id: json['_id'] as String,
       caption: json['caption'] as String?,
       location: json['location'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       user: UserModel.fromJson(json['userId'] as Map<String, dynamic>),
       urls: (json['urls'] as List<dynamic>)
           .map((e) => PostUrlModel.fromJson(e as Map<String, dynamic>))
@@ -61,6 +63,8 @@ Map<String, dynamic> _$$PostModelImplToJson(_$PostModelImpl instance) =>
       '_id': instance.id,
       'caption': instance.caption,
       'location': instance.location,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
       'userId': instance.user,
       'urls': instance.urls,
       'layout': instance.layout,

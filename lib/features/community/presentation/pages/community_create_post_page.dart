@@ -1,13 +1,13 @@
 import 'dart:io';
-import 'dart:typed_data';
-
+import 'package:geocoding/geocoding.dart' as import_geo;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/photo_manager.dart' hide LatLng;
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
@@ -25,7 +25,9 @@ import 'package:social_app_fe/features/post/presentation/pages/camera_screen.dar
 import 'package:social_app_fe/features/post/presentation/pages/edit_selected_image_page.dart';
 import 'package:social_app_fe/features/post/presentation/pages/gallery_picker_screen.dart';
 import 'package:social_app_fe/features/post/presentation/pages/tag_friends_page.dart';
+import 'package:social_app_fe/features/post/presentation/pages/location_picker_page.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/selected_images_display.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/location_bottom_sheet.dart';
 import 'package:social_app_fe/shared/helpers/camera_helper.dart';
 import 'package:social_app_fe/shared/helpers/privacy_helper.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
@@ -59,6 +61,89 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
   );
   bool _isCreatingPost = false;
   List<Map<String, String>> _taggedUsers = [];
+  String? _selectedLocation;
+  double? _selectedLat;
+  double? _selectedLng;
+
+  Future<void> _extractLocationFromAssets(List<dynamic> assets) async {
+    List<Map<String, dynamic>> foundLocations = [];
+
+    if (Platform.isAndroid) {
+      await Permission.accessMediaLocation.request();
+    }
+
+    for (var asset in assets) {
+      if (asset is AssetEntity) {
+        final latlng = await asset.latlngAsync();
+        if (latlng != null) {
+          double lat = latlng.latitude;
+          double lng = latlng.longitude;
+
+          if (lat != 0.0 && lng != 0.0) {
+            try {
+              List<import_geo.Placemark> placemarks = await import_geo
+                  .placemarkFromCoordinates(lat, lng);
+              if (placemarks.isNotEmpty) {
+                final placemark = placemarks.first;
+                final String address = [
+                  placemark.locality,
+                  placemark.administrativeArea,
+                  placemark.country,
+                ].where((e) => e != null && e.isNotEmpty).join(', ');
+
+                if (address.isNotEmpty) {
+                  foundLocations.add({
+                    'address': address,
+                    'lat': lat,
+                    'lng': lng,
+                  });
+                }
+              }
+            } catch (e) {
+              print("Error getting location: $e");
+            }
+          }
+        }
+      }
+    }
+
+    if (foundLocations.isNotEmpty) {
+      final locationCounts = <String, int>{};
+      final locationData = <String, Map<String, dynamic>>{};
+      
+      for (var loc in foundLocations) {
+        String address = loc['address'];
+        locationCounts[address] = (locationCounts[address] ?? 0) + 1;
+        if (!locationData.containsKey(address)) {
+          locationData[address] = loc;
+        }
+      }
+
+      var mostCommonLoc = foundLocations.first['address'] as String;
+      var maxCount = 0;
+      locationCounts.forEach((loc, count) {
+        if (count > maxCount) {
+          maxCount = count;
+          mostCommonLoc = loc;
+        }
+      });
+
+      if (!mounted) return;
+
+      LocationBottomSheet.show(
+        context,
+        address: mostCommonLoc,
+        onConfirm: () {
+          setState(() {
+            _selectedLocation = mostCommonLoc;
+            _selectedLat = locationData[mostCommonLoc]!['lat'];
+            _selectedLng = locationData[mostCommonLoc]!['lng'];
+          });
+          Navigator.pop(context);
+        },
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -107,6 +192,9 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         caption: _captionController.text.trim().isNotEmpty
             ? _captionController.text.trim()
             : null,
+        location: _selectedLocation,
+        latitude: _selectedLat,
+        longitude: _selectedLng,
         files: files.isNotEmpty ? files : null,
         fileBytesList: fileBytesList.isNotEmpty ? fileBytesList : null,
         fileNames: fileNames.isNotEmpty ? fileNames : null,
@@ -124,8 +212,12 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         communityId: widget.communityId,
       );
 
+      if (!mounted) return;
+
       context.read<PostBloc>().add(CreatePostRequested(postEntity: postEntity));
     } catch (e) {
+      if (!mounted) return;
+      
       setState(() {
         _isCreatingPost = false;
       });
@@ -137,7 +229,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     }
   }
 
-  void _onSelectImage(BuildContext context) async {
+  void _onSelectImage() async {
     if (kIsWeb) {
       final result = await FilePicker.pickFiles(
         type: FileType.media,
@@ -173,6 +265,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     }
 
     if (status.isGranted) {
+      if (!mounted) return;
       final result = await Navigator.push(
         context,
         CupertinoPageRoute(
@@ -187,10 +280,12 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         setState(() {
           _selectedAssets = result;
         });
+        _extractLocationFromAssets(result);
       }
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
     } else {
+      if (!mounted) return;
       showErrorSnackBar(context, context.l10n.postPhotoPermissionRequired);
     }
   }
@@ -218,6 +313,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         return;
       }
 
+      if (!mounted) return;
       final result = await Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CameraScreen()),
@@ -336,7 +432,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                 Icons.image,
                 context.l10n.postPhotoVideo,
                 Colors.green,
-                onTap: () => {Navigator.pop(context), _onSelectImage(context)},
+                onTap: () => {Navigator.pop(context), _onSelectImage()},
               ),
               _optionRow(
                 CupertinoIcons.chart_bar,
@@ -357,6 +453,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                 Icons.location_on,
                 context.l10n.postCheckIn,
                 Colors.redAccent,
+                onTap: () => _openLocationPicker(context, isFromBottomSheet: true),
               ),
               _optionRow(
                 Icons.video_camera_front,
@@ -379,6 +476,30 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
         );
       },
     );
+  }
+
+  Future<void> _openLocationPicker(BuildContext context, {bool isFromBottomSheet = false}) async {
+    if (isFromBottomSheet) {
+      Navigator.pop(context); // Close the bottom sheet options
+    }
+    final result = await Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (_) => LocationPickerPage(
+          initialLocation: _selectedLat != null && _selectedLng != null
+              ? LatLng(_selectedLat!, _selectedLng!)
+              : null,
+        ),
+      ),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _selectedLat = result['lat'];
+        _selectedLng = result['lng'];
+        _selectedLocation = result['address'];
+      });
+    }
   }
 
   Widget _optionRow(
@@ -434,7 +555,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
             _selectedAssets.clear();
           });
 
-          // Nếu user không phải admin, thông báo bài viết chờ duyệt
+          // Náº¿u user khÃ´ng pháº£i admin, thÃ´ng bÃ¡o bÃ i viáº¿t chá» duyá»‡t
           if (widget.userRole != 'admin') {
             showSuccessSnackBar(
               context,
@@ -604,6 +725,53 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                                                       child: _buildTaggedText(),
                                                     ),
                                                   ],
+                                                  if (_selectedLocation !=
+                                                      null) ...[
+                                                    Text(
+                                                      " - ",
+                                                      style: TextStyle(
+                                                        fontSize: 14.rsp(
+                                                          context,
+                                                        ),
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 6.rs(context),
+                                                    ),
+                                                    Text(
+                                                      _selectedLocation!,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14.rsp(
+                                                          context,
+                                                        ),
+                                                        color: AppColors
+                                                            .textPrimary,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 4.rs(context),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _selectedLocation =
+                                                              null;
+                                                          _selectedLat = null;
+                                                          _selectedLng = null;
+                                                        });
+                                                      },
+                                                      child: Icon(
+                                                        Icons.close,
+                                                        size: 16.rsp(context),
+                                                        color: AppColors
+                                                            .textSecondary,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ],
                                               ),
 
@@ -616,7 +784,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.primary
-                                                      .withOpacity(0.1),
+                                                      .withValues(alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                         8.rsr(context),
@@ -689,7 +857,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                               _selectedLayout = layout;
                             });
                           },
-                          onEdit: () => _onSelectImage(context),
+                          onEdit: () => _onSelectImage(),
                           onRemove: (assets) {
                             setState(() {
                               _selectedAssets.clear();
@@ -726,7 +894,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                           _bottomIcon(
                             Icons.image_outlined,
                             context.l10n.postLibrary,
-                            onTap: () => _onSelectImage(context),
+                            onTap: () => _onSelectImage(),
                           ),
                           _bottomIcon(
                             Icons.person_add_alt_1,
@@ -740,6 +908,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
                           _bottomIcon(
                             Icons.location_on_outlined,
                             context.l10n.postLocation,
+                            onTap: () => _openLocationPicker(context),
                           ),
                           _bottomIcon(
                             CupertinoIcons.ellipsis,
@@ -770,7 +939,7 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
           horizontal: 12.rs(context),
         ),
         decoration: BoxDecoration(
-          color: AppColors.textSecondary.withOpacity(0.15),
+          color: AppColors.textSecondary.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12.rsr(context)),
         ),
         child: Column(
@@ -792,3 +961,4 @@ class _CommunityCreatePostPageState extends State<CommunityCreatePostPage> {
     );
   }
 }
+

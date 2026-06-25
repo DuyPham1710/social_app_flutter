@@ -533,7 +533,7 @@
   "communityEditIntro": "Cập nhật thông tin để thành viên hiểu rõ hơn về cộng đồng.",
   "communityEditTitle": "Chỉnh sửa cộng đồng",
   "communityEmpty": "Chưa có cộng đồng nào",
-  "communityExploreSubtitle": "Khám phá nhóm phù hợp và theo dõi các bài viết đang chờ duyệt.",
+  "communityExploreSubtitle": "Khám phá các cộng đồng và chia sẻ những điều thú vị.",
   "communityExploreTab": "Khám phá",
   "communityExploreTitle": "Cộng đồng",
   "communityFilterPosts": "Lọc bài viết",
@@ -672,6 +672,49 @@
   "communitySearchMembersHint": "Tìm thành viên",
   "communitySendingInvite": "Đang gửi lời mời...",
   "communityType": "Loại cộng đồng",
+  "communityRoadmap": "Bản đồ Cộng đồng",
+  "communityRoadmapTitle": "Bản đồ lộ trình",
+  "communityRoadmapViewFull": "Xem bản đồ",
+  "communityRoadmapEmpty": "Chưa có địa điểm nào trên bản đồ",
+  "communityRoadmapMyLocation": "Vị trí của tôi",
+  "communityRoadmapPostCount": "{count} bài viết",
+  "@communityRoadmapPostCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "communityRoadmapViewPost": "Xem bài viết",
+  "communityRoadmapSearchNearby": "Tìm kiếm quanh đây",
+  "communityRoadmapRadius": "Bán kính: {radius} km",
+  "@communityRoadmapRadius": {
+    "placeholders": {
+      "radius": {
+        "type": "num"
+      }
+    }
+  },
+  "communityRoadmapRadiusLabel": "{radius} km",
+  "@communityRoadmapRadiusLabel": {
+    "placeholders": {
+      "radius": {
+        "type": "num"
+      }
+    }
+  },
+  "communityRoadmapApplyFilter": "Áp dụng",
+  "communityRoadmapErrorLoadPosts": "Đã có lỗi xảy ra",
+  "communityRoadmapNoPosts": "Không có bài viết nào",
+  "communityRoadmapFirstCheckedInBy": "Được check-in lần đầu bởi {name}",
+  "@communityRoadmapFirstCheckedInBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "communityRoadmapFilterTooltip": "Lọc quanh vị trí",
   "communityUpdateSuccess": "Cập nhật cộng đồng thành công",
   "communityVisibleMembersCount": "{visible}/{total} thành viên",
   "@communityVisibleMembersCount": {
@@ -1543,6 +1586,20 @@
   "chatGiphySticker": "Nhãn dán GIPHY",
   "chatGiphySearch": "Tìm kiếm sticker GIPHY...",
   "chatGiphyError": "Lỗi tải sticker GIPHY: {error}",
+  "communityRoadmap": "Bản đồ",
+  "communityRoadmapNoPoints": "Chưa có địa điểm nào trên bản đồ",
+  "communityRoadmapPoint": "Điểm đến",
+  "communityRoadmapViewFull": "Xem bản đồ lớn",
+  "communityRoadmapNearby": "Địa điểm gần đây",
+  "communityRoadmapPosts": "{count} bài viết",
+  "@communityRoadmapPosts": {"placeholders": {"count": {"type": "num"}}},
+  "locationSearchHint": "Tìm kiếm vị trí...",
+  "locationNotFound": "Không tìm thấy vị trí",
+  "locationSearchError": "Lỗi tìm kiếm vị trí (có thể do lỗi kết nối hoặc không tìm thấy)",
+  "locationSelected": "Vị trí đã chọn",
+  "locationNotSelected": "Chưa chọn vị trí",
+  "locationUnknown": "Vị trí không xác định",
+  "postShareSuccess": "Chia sẻ thành công",
   "authBannedTitle": "Tài Khoản Bị Khóa",
   "authBannedUntil": "Thời gian mở khóa dự kiến:",
   "authBannedReason": "Lý do khóa:",

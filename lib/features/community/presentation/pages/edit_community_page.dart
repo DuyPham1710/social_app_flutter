@@ -65,6 +65,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       showErrorSnackBar(
         context,
         context.l10n.communityPickImageError(e.toString()),
@@ -120,7 +121,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
               localizedCommunityMessage(context.l10n, state.message),
             );
             Future.delayed(Duration(seconds: 1), () {
-              if (mounted) {
+              if (context.mounted) {
                 Navigator.of(context).pop(state.community);
               }
             });
@@ -406,7 +407,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                           ),
                           SizedBox(height: 8.rsh(context)),
                           DropdownButtonFormField<String>(
-                            value: _selectedPrivacy,
+                            initialValue: _selectedPrivacy,
                             dropdownColor: AppColors.background,
                             iconEnabledColor: AppColors.iconPrimary,
                             style: TextStyle(color: AppColors.textPrimary),
