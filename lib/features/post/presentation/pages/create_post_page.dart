@@ -59,9 +59,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
   List<Map<String, String>> _taggedUsers = [];
   bool _isCreatingPost = false;
   String? _selectedLocation;
+  double? _selectedLat;
+  double? _selectedLng;
 
   Future<void> _extractLocationFromAssets(List<dynamic> assets) async {
-    List<String> foundLocations = [];
+    List<Map<String, dynamic>> foundLocations = [];
 
     // Xin quyền ACCESS_MEDIA_LOCATION trên Android
     if (Platform.isAndroid) {
@@ -88,7 +90,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 ].where((e) => e != null && e.isNotEmpty).join(', ');
 
                 if (address.isNotEmpty) {
-                  foundLocations.add(address);
+                  foundLocations.add({
+                    'address': address,
+                    'lat': lat,
+                    'lng': lng,
+                  });
                 }
               }
             } catch (e) {
@@ -102,11 +108,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
     if (foundLocations.isNotEmpty) {
       // Tìm địa chỉ xuất hiện nhiều nhất
       final locationCounts = <String, int>{};
+      final locationData = <String, Map<String, dynamic>>{};
+      
       for (var loc in foundLocations) {
-        locationCounts[loc] = (locationCounts[loc] ?? 0) + 1;
+        String address = loc['address'];
+        locationCounts[address] = (locationCounts[address] ?? 0) + 1;
+        if (!locationData.containsKey(address)) {
+          locationData[address] = loc;
+        }
       }
 
-      var mostCommonLoc = foundLocations.first;
+      var mostCommonLoc = foundLocations.first['address'] as String;
       var maxCount = 0;
       locationCounts.forEach((loc, count) {
         if (count > maxCount) {
@@ -121,6 +133,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
         onConfirm: () {
           setState(() {
             _selectedLocation = mostCommonLoc;
+            _selectedLat = locationData[mostCommonLoc]!['lat'];
+            _selectedLng = locationData[mostCommonLoc]!['lng'];
           });
           Navigator.pop(context);
         },
@@ -208,6 +222,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ? _captionController.text.trim()
             : null,
         location: _selectedLocation,
+        latitude: _selectedLat,
+        longitude: _selectedLng,
         files: files.isNotEmpty ? files : null,
         fileBytesList: fileBytesList.isNotEmpty ? fileBytesList : null,
         fileNames: fileNames.isNotEmpty ? fileNames : null,
@@ -757,10 +773,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                     ),
                                                     GestureDetector(
                                                       onTap: () {
-                                                        setState(() {
-                                                          _selectedLocation =
-                                                              null;
-                                                        });
+                                                          setState(() {
+                                                            _selectedLocation =
+                                                                null;
+                                                            _selectedLat = null;
+                                                            _selectedLng = null;
+                                                          });
                                                       },
                                                       child: Icon(
                                                         Icons.close,

@@ -390,6 +390,28 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<DataState<ChatMediaResponseEntity>> getConversationMedia({
+    required String conversationId,
+    required String type,
+    int page = 1,
+    int limit = 30,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getConversationMedia(
+        conversationId: conversationId,
+        type: type,
+        page: page,
+        limit: limit,
+      );
+      return DataStateSuccess(response.toEntity());
+    } catch (e) {
+      return DataStateError(
+        DioException(requestOptions: RequestOptions(), message: e.toString()),
+      );
+    }
+  }
+
+  @override
   Stream<MessageEntity> get onMessageUpdated =>
       _remoteDataSource.onMessageUpdated;
 

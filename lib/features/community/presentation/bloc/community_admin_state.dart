@@ -19,7 +19,7 @@ class PendingRequestsLoaded extends CommunityAdminState {
 }
 
 class PendingPostsLoaded extends CommunityAdminState {
-  final List<CommunityPostModel> posts;
+  final List<PostEntity> posts;
   final int page;
   final int limit;
 

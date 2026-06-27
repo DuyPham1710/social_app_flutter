@@ -7,6 +7,7 @@ class CommunityEntity {
   final String avatar;
   final String coverImage;
   final String privacy;
+  final String? type;
   final int memberCount;
   final UserModel admin;
   final DateTime? createdAt;
@@ -19,6 +20,7 @@ class CommunityEntity {
     required this.avatar,
     required this.coverImage,
     required this.privacy,
+    this.type,
     required this.memberCount,
     required this.admin,
     this.createdAt,

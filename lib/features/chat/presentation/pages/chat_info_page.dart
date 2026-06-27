@@ -12,6 +12,8 @@ import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_e
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/core/di/injection.dart' as di;
 import 'package:social_app_fe/features/profile/presentation/widgets/report_user_bottom_sheet.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/group_members_page.dart';
+import 'package:social_app_fe/features/chat/presentation/pages/conversation_media_page.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class ChatInfoPage extends StatefulWidget {
@@ -24,6 +26,8 @@ class ChatInfoPage extends StatefulWidget {
   final String? userId;
   final Function(String callType)? onInitiateCall;
   final bool isWebLayout;
+  final VoidCallback? onShowMembers;
+  final VoidCallback? onShowMedia;
 
   const ChatInfoPage({
     super.key,
@@ -36,6 +40,8 @@ class ChatInfoPage extends StatefulWidget {
     this.userId,
     this.onInitiateCall,
     this.isWebLayout = false,
+    this.onShowMembers,
+    this.onShowMedia,
   });
 
   @override
@@ -318,7 +324,10 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
 
             // SECTION: Thông tin về đoạn chat
             widget.isGroup
-                ? _buildSectionInfoGroupChat(widget.participants!)
+                ? _buildSectionInfoGroupChat(
+                    widget.participants!,
+                    widget.onShowMembers,
+                  )
                 : SizedBox.shrink(),
 
             // SECTION: HÀNH ĐỘNG KHÁC
@@ -334,14 +343,28 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                     onTap: () {},
                   )
                 : SizedBox.shrink(),
-            _buildListTile(
+             _buildListTile(
               iconWidget: Icon(
                 CupertinoIcons.photo,
                 color: AppColors.textPrimary,
                 size: 24.sp,
               ),
               title: context.l10n.chatViewMediaFilesLinks,
-              onTap: () {},
+              onTap: () {
+                if (widget.conversationId != null) {
+                  if (widget.isWebLayout && widget.onShowMedia != null) {
+                    widget.onShowMedia!();
+                  } else {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ConversationMediaPage(
+                          conversationId: widget.conversationId!,
+                        ),
+                      ),
+                    );
+                  }
+                }
+              },
             ),
             _buildListTile(
               iconWidget: Icon(
@@ -466,7 +489,10 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
     );
   }
 
-  Widget _buildSectionInfoGroupChat(List<UserEntity> participants) {
+  Widget _buildSectionInfoGroupChat(
+    List<UserEntity> participants,
+    VoidCallback? onShowMembers,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -480,7 +506,24 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
           ),
           title: context.l10n.chatViewGroupMembers,
           subtitle: context.l10n.chatMembersCount(participants.length),
-          onTap: () {},
+          onTap: () {
+            if (widget.isWebLayout && onShowMembers != null) {
+              onShowMembers();
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => GroupMembersPage(
+                    participants: participants,
+                    currentUserId: widget.userId,
+                    groupName: _groupName.isNotEmpty
+                        ? _groupName
+                        : widget.displayName,
+                  ),
+                ),
+              );
+            }
+          },
         ),
         _buildListTile(
           iconWidget: Icon(

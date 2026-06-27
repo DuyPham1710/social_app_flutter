@@ -28,7 +28,8 @@ jobs:
           cat > .env <<EOF
           BASE_URL=${{ secrets.BASE_URL }}
           OTP_DURATION=60
-          GIPHY_API_KEY=6BGqCNVoJwK8IQa1XZHyky6IAOUELKIi
+          GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}
+          GOOGLE_SERVER_CLIENT_ID=${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
           TRANSITION_TIME=400
           CHAT_DEBOUNCE_TIME=4
           CHAT_LOAD_LIMIT=25

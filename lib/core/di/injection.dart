@@ -15,6 +15,7 @@ import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registra
 import 'package:social_app_fe/features/auth/domain/usecases/delete_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/google_auth_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source.dart';
 import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source_impl.dart';
@@ -161,6 +162,8 @@ import 'package:social_app_fe/features/community/domain/usecases/delete_communit
 import 'package:social_app_fe/features/community/domain/usecases/kick_member_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/get_available_friends_usecase.dart';
 import 'package:social_app_fe/features/community/domain/usecases/invite_friend_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_roadmap_points_usecase.dart';
+import 'package:social_app_fe/features/community/domain/usecases/get_nearby_roadmap_points_usecase.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_create_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_list_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_detail_bloc.dart';
@@ -168,6 +171,7 @@ import 'package:social_app_fe/features/community/presentation/bloc/community_adm
 import 'package:social_app_fe/features/community/presentation/bloc/community_posts_tab_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/invite_friends_bloc.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_invites_bloc.dart';
+import 'package:social_app_fe/features/community/presentation/bloc/roadmap/community_roadmap_bloc.dart';
 
 final s1 = GetIt.instance;
 
@@ -296,6 +300,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<UpdatePersonalInfoUsecase>(
     () => UpdatePersonalInfoUsecase(s1()),
   );
+  s1.registerLazySingleton<GoogleAuthUsecase>(() => GoogleAuthUsecase(s1()));
 
   // post usecase
   s1.registerLazySingleton<GetHomePostsUseCase>(
@@ -519,6 +524,9 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<TranslateMessageUseCase>(
     () => TranslateMessageUseCase(s1()),
   );
+  s1.registerLazySingleton<GetConversationMediaUseCase>(
+    () => GetConversationMediaUseCase(s1()),
+  );
 
   // Video Call UseCases
   s1.registerLazySingleton<ConnectVideoCallUseCase>(
@@ -670,6 +678,7 @@ Future<void> initializeDependencies() async {
       submitFaceRegistrationUsecase: s1(),
       updatePersonalInfoUsecase: s1(),
       deleteIncompleteRegistrationUsecase: s1(),
+      googleAuthUsecase: s1(),
     ),
   );
 
@@ -886,6 +895,12 @@ Future<void> initializeDependencies() async {
     () => DeleteCommunityUseCase(s1()),
   );
   s1.registerLazySingleton<KickMemberUseCase>(() => KickMemberUseCase(s1()));
+  s1.registerLazySingleton<GetRoadmapPointsUseCase>(
+    () => GetRoadmapPointsUseCase(s1()),
+  );
+  s1.registerLazySingleton<GetNearbyRoadmapPointsUseCase>(
+    () => GetNearbyRoadmapPointsUseCase(s1()),
+  );
 
   // Community BLoCs
   // Community BLoCs
@@ -899,14 +914,14 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<CommunityDetailBloc>(
-    () => CommunityDetailBloc.withDeps(
-      s1<GetCommunityDetailUseCase>(),
-      s1<GetMemberStatusUseCase>(),
-      s1<JoinCommunityUseCase>(),
-      s1<CancelJoinRequestUseCase>(),
-      s1<LeaveCommunityUseCase>(),
-      s1<RespondToInviteUseCase>(),
-      s1<DeleteCommunityUseCase>(),
+    () => CommunityDetailBloc(
+      getCommunityDetailUseCase: s1<GetCommunityDetailUseCase>(),
+      getMemberStatusUseCase: s1<GetMemberStatusUseCase>(),
+      joinCommunityUseCase: s1<JoinCommunityUseCase>(),
+      cancelJoinRequestUseCase: s1<CancelJoinRequestUseCase>(),
+      leaveCommunityUseCase: s1<LeaveCommunityUseCase>(),
+      respondToInviteUseCase: s1<RespondToInviteUseCase>(),
+      deleteCommunityUseCase: s1<DeleteCommunityUseCase>(),
     ),
   );
 
@@ -926,9 +941,9 @@ Future<void> initializeDependencies() async {
   );
 
   s1.registerFactory<CommunityPostsTabBloc>(
-    () => CommunityPostsTabBloc.withDeps(
-      s1<GetUserCommunityPostsUseCase>(),
-      s1<CommentRepository>(),
+    () => CommunityPostsTabBloc(
+      getUserCommunityPostsUseCase: s1<GetUserCommunityPostsUseCase>(),
+      commentRepository: s1<CommentRepository>(),
     ),
   );
 
@@ -944,6 +959,10 @@ Future<void> initializeDependencies() async {
       getMyInvitesUseCase: s1<GetMyInvitesUseCase>(),
       respondToInviteUseCase: s1<RespondToInviteUseCase>(),
     ),
+  );
+
+  s1.registerFactory<CommunityRoadmapBloc>(
+    () => CommunityRoadmapBloc(s1(), s1()),
   );
 
   // ==================== END COMMUNITY FEATURE ====================

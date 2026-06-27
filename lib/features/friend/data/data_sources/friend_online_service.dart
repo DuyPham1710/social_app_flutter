@@ -88,10 +88,6 @@ class FriendOnlineService {
       try {
         final count = data is Map ? (data['count'] as num?)?.toInt() ?? 0 : 0;
         _updateOnlineCount(count);
-        developer.log(
-          'Received online friends count: $count',
-          name: 'FriendOnlineService',
-        );
       } catch (e) {
         developer.log(
           'Error parsing onlineFriendsCount: $e',
@@ -135,11 +131,6 @@ class FriendOnlineService {
 
           // Emit update
           _friendsStatusController.add(Map.unmodifiable(_friendsStatus));
-
-          developer.log(
-            'Received online friends list: ${friends.length} friends',
-            name: 'FriendOnlineService',
-          );
         }
       } catch (e) {
         developer.log(

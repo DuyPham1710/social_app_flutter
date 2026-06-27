@@ -1175,6 +1175,33 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     }
   }
 
+  @override
+  Future<ChatMediaResponseModel> getConversationMedia({
+    required String conversationId,
+    required String type,
+    int page = 1,
+    int limit = 30,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/chat/conversation/$conversationId/media',
+        queryParameters: {
+          'type': type,
+          'page': page,
+          'limit': limit,
+        },
+      );
+      if (response.data != null) {
+        return ChatMediaResponseModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+      throw Exception('Invalid media response');
+    } catch (e) {
+      throw Exception('Failed to get conversation media: $e');
+    }
+  }
+
   /// Disconnect
   @override
   void disconnect() {

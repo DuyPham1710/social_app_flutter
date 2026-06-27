@@ -2121,7 +2121,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityExploreSubtitle.
   ///
   /// In vi, this message translates to:
-  /// **'Khám phá nhóm phù hợp và theo dõi các bài viết đang chờ duyệt.'**
+  /// **'Khám phá các cộng đồng và chia sẻ những điều thú vị.'**
   String get communityExploreSubtitle;
 
   /// No description provided for @communityExploreTab.
@@ -2681,6 +2681,96 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Loại cộng đồng'**
   String get communityType;
+
+  /// No description provided for @communityRoadmap.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bản đồ'**
+  String get communityRoadmap;
+
+  /// No description provided for @communityRoadmapTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bản đồ lộ trình'**
+  String get communityRoadmapTitle;
+
+  /// No description provided for @communityRoadmapViewFull.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem bản đồ lớn'**
+  String get communityRoadmapViewFull;
+
+  /// No description provided for @communityRoadmapEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có địa điểm nào trên bản đồ'**
+  String get communityRoadmapEmpty;
+
+  /// No description provided for @communityRoadmapMyLocation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vị trí của tôi'**
+  String get communityRoadmapMyLocation;
+
+  /// No description provided for @communityRoadmapPostCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} bài viết'**
+  String communityRoadmapPostCount(num count);
+
+  /// No description provided for @communityRoadmapViewPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem bài viết'**
+  String get communityRoadmapViewPost;
+
+  /// No description provided for @communityRoadmapSearchNearby.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tìm kiếm quanh đây'**
+  String get communityRoadmapSearchNearby;
+
+  /// No description provided for @communityRoadmapRadius.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bán kính: {radius} km'**
+  String communityRoadmapRadius(num radius);
+
+  /// No description provided for @communityRoadmapRadiusLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'{radius} km'**
+  String communityRoadmapRadiusLabel(num radius);
+
+  /// No description provided for @communityRoadmapApplyFilter.
+  ///
+  /// In vi, this message translates to:
+  /// **'Áp dụng'**
+  String get communityRoadmapApplyFilter;
+
+  /// No description provided for @communityRoadmapErrorLoadPosts.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã có lỗi xảy ra'**
+  String get communityRoadmapErrorLoadPosts;
+
+  /// No description provided for @communityRoadmapNoPosts.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có bài viết nào'**
+  String get communityRoadmapNoPosts;
+
+  /// No description provided for @communityRoadmapFirstCheckedInBy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Được check-in lần đầu bởi {name}'**
+  String communityRoadmapFirstCheckedInBy(String name);
+
+  /// No description provided for @communityRoadmapFilterTooltip.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lọc quanh vị trí'**
+  String get communityRoadmapFilterTooltip;
 
   /// No description provided for @communityUpdateSuccess.
   ///
@@ -5909,6 +5999,72 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Lỗi tải sticker GIPHY: {error}'**
   String chatGiphyError(Object error);
+
+  /// No description provided for @communityRoadmapNoPoints.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có địa điểm nào trên bản đồ'**
+  String get communityRoadmapNoPoints;
+
+  /// No description provided for @communityRoadmapPoint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điểm đến'**
+  String get communityRoadmapPoint;
+
+  /// No description provided for @communityRoadmapNearby.
+  ///
+  /// In vi, this message translates to:
+  /// **'Địa điểm gần đây'**
+  String get communityRoadmapNearby;
+
+  /// No description provided for @communityRoadmapPosts.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} bài viết'**
+  String communityRoadmapPosts(num count);
+
+  /// No description provided for @locationSearchHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tìm kiếm vị trí...'**
+  String get locationSearchHint;
+
+  /// No description provided for @locationNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tìm thấy vị trí'**
+  String get locationNotFound;
+
+  /// No description provided for @locationSearchError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lỗi tìm kiếm vị trí (có thể do lỗi kết nối hoặc không tìm thấy)'**
+  String get locationSearchError;
+
+  /// No description provided for @locationSelected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vị trí đã chọn'**
+  String get locationSelected;
+
+  /// No description provided for @locationNotSelected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa chọn vị trí'**
+  String get locationNotSelected;
+
+  /// No description provided for @locationUnknown.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vị trí không xác định'**
+  String get locationUnknown;
+
+  /// No description provided for @postShareSuccess.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chia sẻ thành công'**
+  String get postShareSuccess;
 }
 
 class _AppLocalizationsDelegate

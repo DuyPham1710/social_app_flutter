@@ -25,6 +25,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   String _selectedPrivacy = 'public';
+  String _selectedType = 'standard';
   String? _avatarPath;
   String? _coverImagePath;
   final ImagePicker _imagePicker = ImagePicker();
@@ -56,6 +57,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       showErrorSnackBar(
         context,
         context.l10n.communityPickImageError(e.toString()),
@@ -111,7 +113,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
               localizedCommunityMessage(context.l10n, state.message),
             );
             Future.delayed(Duration(seconds: 1), () {
-              if (mounted) {
+              if (context.mounted) {
                 Navigator.of(context).pop(state.community);
               }
             });
@@ -462,6 +464,83 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                               ),
                             ),
                           ),
+                          SizedBox(height: 24.rsh(context)),
+
+                          // Type Dropdown
+                          Text(
+                            'Loại cộng đồng', // TODO: L10n later
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 8.rsh(context)),
+                          DropdownButtonFormField<String>(
+                            value: _selectedType,
+                            dropdownColor: AppColors.background,
+                            iconEnabledColor: AppColors.iconPrimary,
+                            style: TextStyle(color: AppColors.textPrimary),
+                            items: [
+                              DropdownMenuItem(
+                                value: 'standard',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.group,
+                                      size: 20.rsp(context),
+                                      color: AppColors.iconPrimary,
+                                    ),
+                                    SizedBox(width: 8.rs(context)),
+                                    Text('Cộng đồng tiêu chuẩn'),
+                                  ],
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'travel',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.travel_explore,
+                                      size: 20.rsp(context),
+                                      color: AppColors.iconPrimary,
+                                    ),
+                                    SizedBox(width: 8.rs(context)),
+                                    Text('Cộng đồng du lịch'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _selectedType = value);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColors.background,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.divider,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12.rsr(context),
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
                           SizedBox(height: 32.rsh(context)),
 
                           // Submit Button
@@ -489,6 +568,7 @@ class _CreateCommunityPageState extends State<CreateCommunityPage> {
                                               ? _descriptionController.text
                                               : null,
                                           privacy: _selectedPrivacy,
+                                          type: _selectedType,
                                           avatarPath: _avatarPath,
                                           coverImagePath: _coverImagePath,
                                         ),

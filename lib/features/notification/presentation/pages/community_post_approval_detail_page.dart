@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_ref_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/community/domain/entities/community_entity.dart';
 import 'package:social_app_fe/features/community/presentation/bloc/community_admin_bloc.dart';
 import 'package:social_app_fe/features/notification/presentation/bloc/notification_bloc.dart';
@@ -37,30 +36,13 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
     this.createdAt,
   });
 
-  CommunityPostModel? _findPost(List<CommunityPostModel> posts) {
+  PostEntity? _findPost(List<PostEntity> posts) {
     for (final post in posts) {
       if (post.id == postId) {
         return post;
       }
     }
     return null;
-  }
-
-  CommunityEntity _toCommunityEntity(CommunityPostModel post) {
-    final CommunityRefModel community = post.community;
-    final avatar = community.avatar ?? senderAvatar;
-    return CommunityEntity(
-      id: community.id,
-      name: community.name,
-      description: '',
-      avatar: avatar,
-      coverImage: avatar,
-      privacy: 'public',
-      memberCount: 0,
-      admin: post.user,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-    );
   }
 
   void _handleAction(BuildContext context, String action) {
@@ -215,7 +197,7 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                     );
                   }
 
-                  final community = _toCommunityEntity(post);
+                  final community = post.community;
                   final mediaUrls = post.urls;
 
                   return Column(
@@ -226,14 +208,15 @@ class CommunityPostApprovalDetailPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CommunityPostHeader(
-                                community: community,
-                                user: post.user,
-                                createdAt: post.createdAt,
-                                showCommunityInfo: true,
-                                onOptionsTap: null,
-                                onReportTap: null,
-                              ),
+                              if (community != null)
+                                CommunityPostHeader(
+                                  community: community,
+                                  user: post.user,
+                                  createdAt: post.createdAt,
+                                  showCommunityInfo: true,
+                                  onOptionsTap: null,
+                                  onReportTap: null,
+                                ),
                               if (post.caption != null &&
                                   post.caption!.isNotEmpty)
                                 Padding(

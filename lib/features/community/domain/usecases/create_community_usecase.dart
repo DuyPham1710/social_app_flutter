@@ -7,6 +7,7 @@ class CreateCommunityParams {
   final String name;
   final String? description;
   final String privacy;
+  final String? type;
   final String? avatar;
   final String? coverImage;
 
@@ -14,6 +15,7 @@ class CreateCommunityParams {
     required this.name,
     this.description,
     required this.privacy,
+    this.type,
     this.avatar,
     this.coverImage,
   });
@@ -31,6 +33,7 @@ class CreateCommunityUseCase
       name: params!.name,
       description: params.description,
       privacy: params.privacy,
+      type: params.type,
       avatar: params.avatar,
       coverImage: params.coverImage,
     );

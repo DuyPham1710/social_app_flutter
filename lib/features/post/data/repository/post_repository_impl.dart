@@ -190,6 +190,8 @@ class PostRepositoryImpl implements PostRepository {
         taggedUserIdsString,
         post.communityId,
         post.location,
+        post.latitude,
+        post.longitude,
         multipartFiles,
       );
 

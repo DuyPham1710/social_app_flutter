@@ -5,3 +5,6 @@ export 'conversation/conversation_state.dart';
 export 'message/message_bloc.dart';
 export 'message/message_event.dart';
 export 'message/message_state.dart';
+
+export 'chat_media/chat_media_cubit.dart';
+export 'chat_media/chat_media_state.dart';

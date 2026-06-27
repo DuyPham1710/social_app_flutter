@@ -6,6 +6,7 @@ class CreateCommunityRequested extends CommunityCreateEvent {
   final String name;
   final String? description;
   final String privacy;
+  final String? type;
   final String? avatarPath;
   final String? coverImagePath;
 
@@ -13,6 +14,7 @@ class CreateCommunityRequested extends CommunityCreateEvent {
     required this.name,
     this.description,
     required this.privacy,
+    this.type,
     this.avatarPath,
     this.coverImagePath,
   });

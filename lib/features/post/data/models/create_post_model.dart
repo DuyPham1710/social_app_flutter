@@ -12,6 +12,9 @@ part 'create_post_model.g.dart';
 class CreatePostModel with _$CreatePostModel {
   const factory CreatePostModel({
     String? caption,
+    String? location,
+    double? latitude,
+    double? longitude,
     @JsonKey(ignore: true) List<File>? files,
     List<String>? titles,
     List<int>? orders,
@@ -32,6 +35,9 @@ class CreatePostModel with _$CreatePostModel {
   factory CreatePostModel.fromEntity(CreatePostEntity entity) {
     return CreatePostModel(
       caption: entity.caption,
+      location: entity.location,
+      latitude: entity.latitude,
+      longitude: entity.longitude,
       files: entity.files,
       titles: entity.titles,
       orders: entity.orders,

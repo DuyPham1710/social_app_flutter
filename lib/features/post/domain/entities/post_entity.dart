@@ -9,6 +9,8 @@ class PostEntity extends PrivacyBase {
   final String id;
   final String? caption;
   final String? location;
+  final double? latitude;
+  final double? longitude;
   final UserEntity user;
   final List<PostUrlEntity> urls;
   final String layout;
@@ -25,6 +27,8 @@ class PostEntity extends PrivacyBase {
     required this.id,
     this.caption,
     this.location,
+    this.latitude,
+    this.longitude,
     required this.user,
     required this.urls,
     required this.layout,

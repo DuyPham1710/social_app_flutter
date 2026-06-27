@@ -17,6 +17,7 @@ _$CommunityModelImpl _$$CommunityModelImplFromJson(Map<String, dynamic> json) =>
       createdAt: _parseDateTime(json['createdAt']),
       createdBy: _extractAdminId(json['adminId']),
       status: json['privacy'] as String?,
+      type: json['type'] as String?,
       myRole: json['myRole'] as String?,
       memberStatus: json['memberStatus'] as String?,
     );
@@ -33,6 +34,7 @@ Map<String, dynamic> _$$CommunityModelImplToJson(
   'createdAt': instance.createdAt.toIso8601String(),
   'adminId': instance.createdBy,
   'privacy': instance.status,
+  'type': instance.type,
   'myRole': instance.myRole,
   'memberStatus': instance.memberStatus,
 };

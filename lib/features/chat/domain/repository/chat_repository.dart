@@ -140,6 +140,14 @@ abstract class ChatRepository {
     required String lang,
   });
 
+  // Get conversation media
+  Future<DataState<ChatMediaResponseEntity>> getConversationMedia({
+    required String conversationId,
+    required String type,
+    int page = 1,
+    int limit = 30,
+  });
+
   // // Real-time events
   Stream<ConversationResponseEntity> get onConversationsLoaded;
   Stream<MessageResponseEntity> get onMessagesLoaded;

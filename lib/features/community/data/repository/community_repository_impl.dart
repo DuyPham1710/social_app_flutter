@@ -6,7 +6,9 @@ import 'package:social_app_fe/features/community/data/models/community_list_mode
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_status_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/community/data/models/roadmap_point_list_model.dart';
 import 'package:social_app_fe/features/community/domain/repository/community_repository.dart';
 import 'package:dio/dio.dart';
 
@@ -20,6 +22,7 @@ class CommunityRepositoryImpl implements CommunityRepository {
     required String name,
     String? description,
     required String privacy,
+    String? type,
     String? avatar,
     String? coverImage,
   }) async {
@@ -67,6 +70,7 @@ class CommunityRepositoryImpl implements CommunityRepository {
         name: name,
         description: description,
         privacy: privacy,
+        type: type,
         avatar: avatarFile != null ? [avatarFile] : null,
         coverImage: coverImageFile != null ? [coverImageFile] : null,
       );
@@ -406,7 +410,7 @@ class CommunityRepositoryImpl implements CommunityRepository {
   }
 
   @override
-  Future<DataState<List<CommunityPostModel>>> getCommunityPosts({
+  Future<DataState<List<PostEntity>>> getCommunityPosts({
     required String communityId,
     required int page,
     required int limit,
@@ -417,14 +421,15 @@ class CommunityRepositoryImpl implements CommunityRepository {
         page: page,
         limit: limit,
       );
-      return DataStateSuccess(response.data);
+      final posts = response.data.map((e) => e.toPostModel()).toList();
+      return DataStateSuccess(posts);
     } on DioException catch (e) {
       return DataStateError(e);
     }
   }
 
   @override
-  Future<DataState<List<CommunityPostModel>>> getPendingPosts({
+  Future<DataState<List<PostEntity>>> getPendingPosts({
     required String communityId,
     required int page,
     required int limit,
@@ -435,20 +440,10 @@ class CommunityRepositoryImpl implements CommunityRepository {
         page: page,
         limit: limit,
       );
-      // Extract posts from CommunityPostListModel
-      return DataStateSuccess(response.data);
+      final posts = response.data.map((e) => e.toPostModel()).toList();
+      return DataStateSuccess(posts);
     } on DioException catch (e) {
-      debugPrint('[getPendingPosts] DioException: ${e.message}');
       return DataStateError(e);
-    } catch (e, stackTrace) {
-      debugPrint('[getPendingPosts] Exception: $e');
-      debugPrint('[getPendingPosts] StackTrace: $stackTrace');
-      return DataStateError(
-        DioException(
-          requestOptions: RequestOptions(path: ''),
-          error: e.toString(),
-        ),
-      );
     }
   }
 
@@ -465,6 +460,65 @@ class CommunityRepositoryImpl implements CommunityRepository {
         body: {'action': action},
       );
       return DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<RoadmapPointListModel>> getRoadmapPoints({
+    required String communityId,
+    int? page,
+    int? limit,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getRoadmapPoints(
+        communityId: communityId,
+        page: page,
+        limit: limit,
+      );
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<RoadmapPointListModel>> getNearbyRoadmapPoints({
+    required String communityId,
+    required double lat,
+    required double lng,
+    double? radius,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getNearbyRoadmapPoints(
+        communityId: communityId,
+        lat: lat,
+        lng: lng,
+        radius: radius,
+      );
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<List<PostEntity>>> getRoadmapPointPosts({
+    required String communityId,
+    required String roadmapId,
+    int? page,
+    int? limit,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getRoadmapPointPosts(
+        communityId: communityId,
+        roadmapId: roadmapId,
+        page: page,
+        limit: limit,
+      );
+      final posts = response.data.map((e) => e.toPostModel()).toList();
+      return DataStateSuccess(posts);
     } on DioException catch (e) {
       return DataStateError(e);
     }

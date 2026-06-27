@@ -32,6 +32,7 @@ class CommunityModel with _$CommunityModel {
     @JsonKey(name: 'adminId', fromJson: _extractAdminId)
     required String createdBy,
     @JsonKey(name: 'privacy') String? status,
+    String? type,
     @JsonKey(name: 'myRole') String? myRole,
     @JsonKey(name: 'memberStatus') String? memberStatus,
   }) = _CommunityModel;

@@ -4,7 +4,8 @@ import 'package:social_app_fe/features/community/data/models/community_list_mode
 import 'package:social_app_fe/features/community/data/models/member_model.dart';
 import 'package:social_app_fe/features/community/data/models/member_status_model.dart';
 import 'package:social_app_fe/features/community/data/models/community_request_model.dart';
-import 'package:social_app_fe/features/community/data/models/community_post_model.dart';
+import 'package:social_app_fe/features/community/data/models/roadmap_point_list_model.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
 
 abstract class CommunityRepository {
   // Community CRUD
@@ -12,6 +13,7 @@ abstract class CommunityRepository {
     required String name,
     String? description,
     required String privacy,
+    String? type,
     String? avatar,
     String? coverImage,
   });
@@ -101,13 +103,13 @@ abstract class CommunityRepository {
   });
 
   // Posts
-  Future<DataState<List<CommunityPostModel>>> getCommunityPosts({
+  Future<DataState<List<PostEntity>>> getCommunityPosts({
     required String communityId,
     required int page,
     required int limit,
   });
 
-  Future<DataState<List<CommunityPostModel>>> getPendingPosts({
+  Future<DataState<List<PostEntity>>> getPendingPosts({
     required String communityId,
     required int page,
     required int limit,
@@ -117,5 +119,26 @@ abstract class CommunityRepository {
     required String communityId,
     required String postId,
     required String action, // 'approve' or 'reject'
+  });
+
+  // Roadmap Management
+  Future<DataState<RoadmapPointListModel>> getRoadmapPoints({
+    required String communityId,
+    int? page,
+    int? limit,
+  });
+
+  Future<DataState<RoadmapPointListModel>> getNearbyRoadmapPoints({
+    required String communityId,
+    required double lat,
+    required double lng,
+    double? radius,
+  });
+
+  Future<DataState<List<PostEntity>>> getRoadmapPointPosts({
+    required String communityId,
+    required String roadmapId,
+    int? page,
+    int? limit,
   });
 }
