@@ -6185,6 +6185,78 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Bài viết trong cộng đồng đang chờ duyệt'**
   String get notificationTitleCommunityPostPending;
+
+  /// No description provided for @authBannedTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài Khoản Bị Khóa'**
+  String get authBannedTitle;
+
+  /// No description provided for @authBannedUntil.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thời gian mở khóa dự kiến:'**
+  String get authBannedUntil;
+
+  /// No description provided for @authBannedReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do khóa:'**
+  String get authBannedReason;
+
+  /// No description provided for @authBannedNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nếu bạn tin rằng đây là một sự nhầm lẫn, vui lòng liên hệ với ban quản trị để được hỗ trợ giải quyết.'**
+  String get authBannedNotice;
+
+  /// No description provided for @authBannedContactSupport.
+  ///
+  /// In vi, this message translates to:
+  /// **'Liên hệ hỗ trợ'**
+  String get authBannedContactSupport;
+
+  /// No description provided for @authBannedLogout.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đăng xuất'**
+  String get authBannedLogout;
+
+  /// No description provided for @authBannedEmailSubject.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu mở khóa tài khoản'**
+  String get authBannedEmailSubject;
+
+  /// No description provided for @authBannedEmailBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xin chào ban quản trị,\nTài khoản của tôi bị khóa với thông báo: \"{message}\".\n...'**
+  String authBannedEmailBody(String message);
+
+  /// No description provided for @authBannedEmailError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể mở ứng dụng email. Vui lòng gửi email đến support@socialnetwork.com'**
+  String get authBannedEmailError;
+
+  /// No description provided for @authBannedGenericError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã xảy ra lỗi: {error}'**
+  String authBannedGenericError(String error);
+
+  /// No description provided for @authBannedTemporaryFallback.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản của bạn tạm thời bị khóa'**
+  String get authBannedTemporaryFallback;
+
+  /// No description provided for @authBannedPermanentFallback.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản của bạn đã bị khóa vĩnh viễn'**
+  String get authBannedPermanentFallback;
 }
 
 class _AppLocalizationsDelegate

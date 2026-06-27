@@ -25,6 +25,9 @@ class UserModel extends UserEntity with _$UserModel {
     @JsonKey(includeIfNull: false) String? workplace,
     @JsonKey(includeIfNull: false) String? relationshipStatus,
     @JsonKey(includeIfNull: false) bool? isFaceRegistered,
+    @JsonKey(includeIfNull: false) bool? isBan,
+    @JsonKey(includeIfNull: false) DateTime? banUntil,
+    @JsonKey(includeIfNull: false) String? banReason,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -51,5 +54,8 @@ extension UserModelX on UserModel {
     workplace: workplace,
     relationshipStatus: relationshipStatus,
     isFaceRegistered: isFaceRegistered,
+    isBan: isBan,
+    banUntil: banUntil,
+    banReason: banReason,
   );
 }

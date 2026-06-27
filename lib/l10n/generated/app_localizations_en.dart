@@ -3533,4 +3533,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationTitleCommunityPostPending => 'Community Post Pending';
+
+  @override
+  String get authBannedTitle => 'Account Suspended';
+
+  @override
+  String get authBannedUntil => 'Estimated unlock time:';
+
+  @override
+  String get authBannedReason => 'Reason:';
+
+  @override
+  String get authBannedNotice =>
+      'If you believe this is a mistake, please contact the administrator for assistance.';
+
+  @override
+  String get authBannedContactSupport => 'Contact Support';
+
+  @override
+  String get authBannedLogout => 'Log Out';
+
+  @override
+  String get authBannedEmailSubject => 'Account Unlock Request';
+
+  @override
+  String authBannedEmailBody(String message) {
+    return 'Dear support team,\nMy account has been suspended with the following message: \"$message\".\n...';
+  }
+
+  @override
+  String get authBannedEmailError =>
+      'Unable to open email client. Please email support@socialnetwork.com';
+
+  @override
+  String authBannedGenericError(String error) {
+    return 'An error occurred: $error';
+  }
+
+  @override
+  String get authBannedTemporaryFallback =>
+      'Your account has been temporarily locked';
+
+  @override
+  String get authBannedPermanentFallback =>
+      'Your account has been permanently locked';
 }

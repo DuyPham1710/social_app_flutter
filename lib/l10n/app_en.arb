@@ -1619,5 +1619,31 @@
   "notificationTitleCommunityJoinRejected": "Community Request Rejected",
   "notificationTitleCommunityPostApproved": "Community Post Approved",
   "notificationTitleCommunityPostRejected": "Community Post Rejected",
-  "notificationTitleCommunityPostPending": "Community Post Pending"
+  "notificationTitleCommunityPostPending": "Community Post Pending",
+  "authBannedTitle": "Account Suspended",
+  "authBannedUntil": "Estimated unlock time:",
+  "authBannedReason": "Reason:",
+  "authBannedNotice": "If you believe this is a mistake, please contact the administrator for assistance.",
+  "authBannedContactSupport": "Contact Support",
+  "authBannedLogout": "Log Out",
+  "authBannedEmailSubject": "Account Unlock Request",
+  "authBannedEmailBody": "Dear support team,\nMy account has been suspended with the following message: \"{message}\".\n...",
+  "@authBannedEmailBody": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "authBannedEmailError": "Unable to open email client. Please email support@socialnetwork.com",
+  "authBannedGenericError": "An error occurred: {error}",
+  "@authBannedGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authBannedTemporaryFallback": "Your account has been temporarily locked",
+  "authBannedPermanentFallback": "Your account has been permanently locked"
 }

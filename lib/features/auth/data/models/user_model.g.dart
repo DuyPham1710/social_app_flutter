@@ -28,6 +28,11 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       workplace: json['workplace'] as String?,
       relationshipStatus: json['relationshipStatus'] as String?,
       isFaceRegistered: json['isFaceRegistered'] as bool?,
+      isBan: json['isBan'] as bool?,
+      banUntil: json['banUntil'] == null
+          ? null
+          : DateTime.parse(json['banUntil'] as String),
+      banReason: json['banReason'] as String?,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(
@@ -53,4 +58,7 @@ Map<String, dynamic> _$$UserModelImplToJson(
   if (instance.relationshipStatus case final value?)
     'relationshipStatus': value,
   if (instance.isFaceRegistered case final value?) 'isFaceRegistered': value,
+  if (instance.isBan case final value?) 'isBan': value,
+  if (instance.banUntil?.toIso8601String() case final value?) 'banUntil': value,
+  if (instance.banReason case final value?) 'banReason': value,
 };

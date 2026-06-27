@@ -17,6 +17,9 @@ class UserEntity {
   final String? workplace;
   final String? relationshipStatus;
   final bool? isFaceRegistered;
+  final bool? isBan;
+  final DateTime? banUntil;
+  final String? banReason;
 
   const UserEntity({
     required this.userId,
@@ -37,5 +40,8 @@ class UserEntity {
     this.relationshipStatus,
     this.workplace,
     this.isFaceRegistered,
+    this.isBan,
+    this.banUntil,
+    this.banReason,
   });
 }

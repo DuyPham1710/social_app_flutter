@@ -28,6 +28,7 @@ import 'package:social_app_fe/features/auth/presentation/pages/register_page.dar
 import 'package:social_app_fe/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/face_registration_page.dart';
 import 'package:social_app_fe/features/auth/presentation/pages/face_scan_page.dart';
+import 'package:social_app_fe/features/auth/presentation/pages/user_banned_page.dart';
 import 'package:social_app_fe/features/chat/presentation/bloc/bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_bloc.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_for_user_bloc.dart';
@@ -560,6 +561,16 @@ class _MyAppState extends State<MyApp> {
                       '/face-scan': (context) => const FaceScanPage(),
                       '/splash': (context) => const SplashPage(),
                       '/chat-web': (context) => const ChatWebPage(),
+                      '/banned': (BuildContext context) {
+                        final args =
+                            ModalRoute.of(context)?.settings.arguments
+                                as Map<String, dynamic>?;
+                        return UserBannedPage(
+                          banMessage:
+                              args?['banMessage'] as String? ??
+                              'Tài khoản của bạn đã bị khóa.',
+                        );
+                      },
                       '/main': (BuildContext context) {
                         final args =
                             ModalRoute.of(context)?.settings.arguments
