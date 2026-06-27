@@ -42,4 +42,7 @@ abstract class AuthService {
 
   @DELETE('/auth/incomplete-registration/{id}')
   Future<void> deleteIncompleteRegistration(@Path() String id);
+
+  @POST('/auth/google')
+  Future<Map<String, dynamic>> googleAuth(@Body() Map<String, dynamic> body);
 }

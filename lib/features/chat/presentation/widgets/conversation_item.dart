@@ -1,11 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/group_avatar_widget.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:social_app_fe/core/utils/responsive_helper.dart';
 
-class ConversationItem extends StatelessWidget {
+class ConversationItem extends StatefulWidget {
   final String? avatarUrl;
   final String name;
   final String preview;
@@ -14,6 +17,9 @@ class ConversationItem extends StatelessWidget {
   final List<UserEntity>? participants;
   final bool? isOnline;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDelete;
+  final VoidCallback? onPin;
 
   const ConversationItem({
     super.key,
@@ -25,15 +31,27 @@ class ConversationItem extends StatelessWidget {
     this.participants,
     this.isOnline,
     required this.onTap,
+    this.onLongPress,
+    this.onDelete,
+    this.onPin,
   });
+
+  @override
+  State<ConversationItem> createState() => _ConversationItemState();
+}
+
+class _ConversationItemState extends State<ConversationItem> {
+  bool _isHovering = false;
 
   @override
   Widget build(BuildContext context) {
     // Build avatar widget
     Widget avatarWidget;
-    if (isGroup && participants != null && participants!.length > 1) {
+    if (widget.isGroup &&
+        widget.participants != null &&
+        widget.participants!.length > 1) {
       // Group chat với nhiều participants
-      final avatarUrls = participants!
+      final avatarUrls = widget.participants!
           .where((p) => p.avatarUrl != null && p.avatarUrl!.isNotEmpty)
           .map((p) => p.avatarUrl!)
           .toList();
@@ -42,19 +60,21 @@ class ConversationItem extends StatelessWidget {
         avatarUrls: avatarUrls.isNotEmpty
             ? avatarUrls
             : ['https://i.pravatar.cc/200'],
-        totalParticipants: participants!.length,
+        totalParticipants: widget.participants!.length,
         size: 52,
       );
     } else {
       // Single avatar (1-1 chat or group with custom avatar)
       avatarWidget = CircleAvatar(
         radius: 26.r,
-        backgroundImage: NetworkImage(avatarUrl ?? 'https://i.pravatar.cc/200'),
+        backgroundImage: NetworkImage(
+          widget.avatarUrl ?? 'https://i.pravatar.cc/200',
+        ),
         backgroundColor: AppColors.textSecondary.withOpacity(0.1),
       );
     }
 
-    final avatarWithStatus = (!isGroup && isOnline == true)
+    final avatarWithStatus = (!widget.isGroup && widget.isOnline == true)
         ? Stack(
             children: [
               avatarWidget,
@@ -75,32 +95,73 @@ class ConversationItem extends StatelessWidget {
           )
         : avatarWidget;
 
-    return ListTile(
+    Widget? trailingWidget;
+    if (ResponsiveHelper.isWebOrDesktop && _isHovering) {
+      trailingWidget = IconButton(
+        icon: Icon(Icons.more_horiz, color: AppColors.textSecondary),
+        onPressed: widget.onLongPress,
+      );
+    } else if (widget.isUnread) {
+      trailingWidget = Icon(Icons.circle, color: AppColors.primary, size: 10.r);
+    }
+
+    final listTile = ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
       leading: avatarWithStatus,
       title: Text(
-        name,
+        widget.name,
         style: TextStyle(
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
-        preview.contains('null') ? context.l10n.chatConnected : preview,
+        widget.preview.contains('null')
+            ? context.l10n.chatConnected
+            : widget.preview,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: isUnread ? AppColors.textPrimary : AppColors.textSecondary,
-          fontWeight: isUnread ? FontWeight.w600 : FontWeight.w400,
+          color: widget.isUnread
+              ? AppColors.textPrimary
+              : AppColors.textSecondary,
+          fontWeight: widget.isUnread ? FontWeight.w600 : FontWeight.w400,
         ),
       ),
+      trailing: trailingWidget,
+      onTap: widget.onTap,
+      onLongPress: ResponsiveHelper.isWebOrDesktop ? null : widget.onLongPress,
+    );
 
-      // Chỉ hiện chấm xanh nếu chưa đọc
-      trailing: isUnread
-          ? Icon(Icons.circle, color: AppColors.primary, size: 10.r)
-          : null,
+    if (ResponsiveHelper.isWebOrDesktop) {
+      return MouseRegion(
+        onEnter: (_) => setState(() => _isHovering = true),
+        onExit: (_) => setState(() => _isHovering = false),
+        child: listTile,
+      );
+    }
 
-      onTap: onTap,
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (_) => widget.onPin?.call(),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            icon: CupertinoIcons.pin_fill,
+            label: context.l10n.chatPin,
+          ),
+          SlidableAction(
+            onPressed: (_) => widget.onDelete?.call(),
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: CupertinoIcons.delete_solid,
+            label: context.l10n.chatDeleteConversation,
+          ),
+        ],
+      ),
+      child: listTile,
     );
   }
 }

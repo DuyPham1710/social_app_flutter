@@ -15,6 +15,7 @@ import 'package:social_app_fe/features/auth/domain/usecases/submit_face_registra
 import 'package:social_app_fe/features/auth/domain/usecases/delete_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/update_personal_info_usecase.dart';
 import 'package:social_app_fe/features/auth/domain/usecases/verify_otp_usecase.dart';
+import 'package:social_app_fe/features/auth/domain/usecases/google_auth_usecase.dart';
 import 'package:social_app_fe/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source.dart';
 import 'package:social_app_fe/features/chat/data/data_sources/chat_remote_data_source_impl.dart';
@@ -299,6 +300,7 @@ Future<void> initializeDependencies() async {
   s1.registerLazySingleton<UpdatePersonalInfoUsecase>(
     () => UpdatePersonalInfoUsecase(s1()),
   );
+  s1.registerLazySingleton<GoogleAuthUsecase>(() => GoogleAuthUsecase(s1()));
 
   // post usecase
   s1.registerLazySingleton<GetHomePostsUseCase>(
@@ -676,6 +678,7 @@ Future<void> initializeDependencies() async {
       submitFaceRegistrationUsecase: s1(),
       updatePersonalInfoUsecase: s1(),
       deleteIncompleteRegistrationUsecase: s1(),
+      googleAuthUsecase: s1(),
     ),
   );
 

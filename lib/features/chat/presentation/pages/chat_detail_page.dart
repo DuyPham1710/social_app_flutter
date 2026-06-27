@@ -265,7 +265,8 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   }
 
   void _onFocusChanged() {
-    // Tự động set expanded khi focus, và set false khi unfocus
+    // Không tự động set expanded khi focus, để có thể toggle
+    // Chỉ set expanded = false khi unfocus
     if (!_focusNode.hasFocus) {
       setState(() {
         _isInputExpanded = false;
@@ -2179,45 +2180,58 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                     color: AppColors.textSecondary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(24.r),
                   ),
-                  child: TextField(
-                    controller: _messageController,
-                    focusNode: _focusNode,
-                    cursorColor: AppColors.primary,
-                    onChanged: _onTextChanged,
-                    onTap: () {
-                      if (!_isInputExpanded) {
-                        setState(() {
-                          _isInputExpanded = true;
-                        });
+                  child: Focus(
+                    onKeyEvent: (node, event) {
+                      if (ResponsiveHelper.isWebOrDesktop &&
+                          event is KeyDownEvent &&
+                          event.logicalKey == LogicalKeyboardKey.enter &&
+                          !HardwareKeyboard.instance.isShiftPressed) {
+                        _sendMessage();
+                        return KeyEventResult.handled;
                       }
-
-                      // Scroll sau khi keyboard animation hoàn thành
-                      Future.delayed(const Duration(milliseconds: 350), () {
-                        if (mounted) {
-                          _scrollToBottom();
-                        }
-                      });
+                      return KeyEventResult.ignored;
                     },
-                    maxLines: null,
-                    minLines: 1,
-                    textInputAction: TextInputAction.newline,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      hintText: context.l10n.chatMessageHint,
-                      hintStyle: TextStyle(
+                    child: TextField(
+                      controller: _messageController,
+                      focusNode: _focusNode,
+                      cursorColor: AppColors.primary,
+                      onChanged: _onTextChanged,
+                      onTap: () {
+                        // Toggle expansion khi ấn vào TextField
+                        _toggleInputExpansion();
+                        if (!_isInputExpanded) {
+                          setState(() {
+                            _isInputExpanded = true;
+                          });
+                        }
+                        // Scroll sau khi keyboard animation hoàn thành
+                        Future.delayed(const Duration(milliseconds: 350), () {
+                          if (mounted) {
+                            _scrollToBottom();
+                          }
+                        });
+                      },
+                      maxLines: null,
+                      minLines: 1,
+                      textInputAction: TextInputAction.newline,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        hintText: context.l10n.chatMessageHint,
+                        hintStyle: TextStyle(
+                          fontSize: 14.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 8.h,
+                        ),
+                        isDense: true,
+                      ),
+                      style: TextStyle(
                         fontSize: 14.sp,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textPrimary,
                       ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 8.h,
-                      ),
-                      isDense: true,
-                    ),
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),

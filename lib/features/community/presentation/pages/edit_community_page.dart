@@ -407,7 +407,7 @@ class _EditCommunityPageState extends State<EditCommunityPage> {
                           ),
                           SizedBox(height: 8.rsh(context)),
                           DropdownButtonFormField<String>(
-                            initialValue: _selectedPrivacy,
+                            value: _selectedPrivacy,
                             dropdownColor: AppColors.background,
                             iconEnabledColor: AppColors.iconPrimary,
                             style: TextStyle(color: AppColors.textPrimary),
