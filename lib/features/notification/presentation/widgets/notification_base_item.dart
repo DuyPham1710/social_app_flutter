@@ -14,6 +14,7 @@ class NotificationBaseItem extends StatelessWidget {
   final String? userId;
   final VoidCallback? onAvatarTap;
   final bool? isImageAsset;
+  final VoidCallback? onItemTap;
 
   const NotificationBaseItem({
     super.key,
@@ -26,103 +27,113 @@ class NotificationBaseItem extends StatelessWidget {
     this.userId,
     this.onAvatarTap,
     this.isImageAsset = false,
+    this.onItemTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: isRead
-          ? AppColors.background
-          : (s1<AppPreferences>().isDarkMode
-                ? AppColors.primary.withValues(alpha: 0.12)
-                : const Color(0xFFEAF3FF)), // chưa đọc
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      // ignore: sort_child_properties_last
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Avatar + icon
-          GestureDetector(
-            onTap: onAvatarTap,
-            child: Stack(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Material(
+        color: isRead
+            ? AppColors.background
+            : (s1<AppPreferences>().isDarkMode
+                  ? AppColors.primary.withValues(alpha: 0.12)
+                  : const Color(0xFFEAF3FF)), // chưa đọc
+        child: InkWell(
+          onTap: onItemTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            // ignore: sort_child_properties_last
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipOval(
-                  child: isImageAsset == true
-                      ? Image.asset(
-                          avatarUrl,
-                          width: 55,
-                          height: 55,
-                          fit: BoxFit.cover,
-                        )
-                      : (avatarUrl.isEmpty || !avatarUrl.startsWith('http')
-                            ? Container(
-                                width: 55,
-                                height: 55,
-                                color: AppColors.secondBackground,
-                                child: Icon(
-                                  Icons.person,
-                                  color: AppColors.iconPrimary,
-                                  size: 26,
-                                ),
-                              )
-                            : Image.network(
+                // Avatar + icon
+                GestureDetector(
+                  onTap: onAvatarTap,
+                  child: Stack(
+                    children: [
+                      ClipOval(
+                        child: isImageAsset == true
+                            ? Image.asset(
                                 avatarUrl,
                                 width: 55,
                                 height: 55,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 55,
-                                    height: 55,
-                                    color: AppColors.secondBackground,
-                                    child: Icon(
-                                      Icons.person,
-                                      color: AppColors.iconPrimary,
-                                      size: 26,
-                                    ),
-                                  );
-                                },
-                              )),
-                ),
-                Positioned(bottom: 0, right: 0, child: iconOverlay),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                title,
-
-                if (preview != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      preview!,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: AppColors.textSecondary,
+                              )
+                            : (avatarUrl.isEmpty ||
+                                      !avatarUrl.startsWith('http')
+                                  ? Container(
+                                      width: 55,
+                                      height: 55,
+                                      color: AppColors.secondBackground,
+                                      child: Icon(
+                                        Icons.person,
+                                        color: AppColors.iconPrimary,
+                                        size: 26,
+                                      ),
+                                    )
+                                  : Image.network(
+                                      avatarUrl,
+                                      width: 55,
+                                      height: 55,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              width: 55,
+                                              height: 55,
+                                              color: AppColors.secondBackground,
+                                              child: Icon(
+                                                Icons.person,
+                                                color: AppColors.iconPrimary,
+                                                size: 26,
+                                              ),
+                                            );
+                                          },
+                                    )),
                       ),
-                    ),
+                      Positioned(bottom: 0, right: 0, child: iconOverlay),
+                    ],
                   ),
-
-                const SizedBox(height: 4),
-                Text(
-                  time == "0 phút" ? context.l10n.postJustNow : time,
-                  style: TextStyle(color: AppColors.textSecondary),
                 ),
+
+                const SizedBox(width: 12),
+
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      title,
+
+                      if (preview != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            preview!,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+
+                      const SizedBox(height: 4),
+                      Text(
+                        time == "0 phút" ? context.l10n.postJustNow : time,
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Icon(Icons.more_horiz, color: AppColors.iconPrimary),
               ],
             ),
           ),
-
-          Icon(Icons.more_horiz, color: AppColors.iconPrimary),
-        ],
+        ),
       ),
-      margin: const EdgeInsets.only(bottom: 2),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dar
 import 'package:social_app_fe/features/profile/presentation/widgets/friend_list_widget.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/other_profile_header.dart';
 import 'package:social_app_fe/features/profile/presentation/widgets/profile_info.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/profile_loading_skeleton.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import '../widgets/other_profile_actions.dart';
 import '../bloc/other_profile_bloc.dart';
@@ -109,7 +110,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
               return _fadeContent(
                 key: 'other-profile-loaded-${user.userId}',
                 child: RefreshIndicator(
-                  color: AppColors.primary,
+                  color: AppColors.textSecondary,
                   backgroundColor: AppColors.background,
                   onRefresh: () async {
                     _loadData();
@@ -256,7 +257,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                           ),
 
                           ProfileInfo(user: user),
-                          const Divider(),
+                          //Divider(color: AppColors.divider),
                           FriendListWidget(
                             onViewAll: () async {
                               await Navigator.push(
@@ -274,7 +275,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                               _loadData();
                             },
                           ),
-                          const Divider(),
+                          //Divider(color: AppColors.divider),
                           const SizedBox(height: 12),
                           _buildPostsSection(state, posts, commentCounts),
                         ]),
@@ -311,22 +312,21 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           pinned: true,
           backgroundColor: AppColors.background,
           elevation: 0,
-          title: Text(
-            context.l10n.profileTitle,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          title: const ProfileSkeletonShimmer(
+            child: ProfileSkeletonBox(width: 100, height: 24, radius: 12),
           ),
         ),
         SliverList(
           delegate: SliverChildListDelegate([
             const OtherProfileHeader(isLoading: true),
-            const _ProfileActionSkeleton(),
-            const Divider(),
-            const _ProfileInfoSkeleton(),
-            const Divider(),
-            const _PostSkeletonList(),
+            const ProfileActionSkeleton(),
+            Divider(color: AppColors.divider, height: 1),
+            const ProfileInfoSkeleton(),
+            Divider(color: AppColors.divider, height: 1),
+            const ProfileFriendsSkeleton(),
+            Divider(color: AppColors.divider, height: 1),
+            const SizedBox(height: 12),
+            const ProfilePostSkeletonList(),
           ]),
         ),
       ],
@@ -394,7 +394,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
         if (state is OtherProfileLoaded &&
             posts.isEmpty &&
             state.currentPage == null)
-          const _PostSkeletonList(),
+          const ProfilePostSkeletonList(),
         if (state is OtherProfileError)
           Padding(
             padding: const EdgeInsets.all(16),
@@ -423,7 +423,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
           Padding(
             padding: EdgeInsets.all(16),
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(color: AppColors.textSecondary),
             ),
           ),
         if (state is OtherProfileLoaded &&
@@ -439,133 +439,6 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _ProfileActionSkeleton extends StatelessWidget {
-  const _ProfileActionSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.rs(context),
-        vertical: 10.rsh(context),
-      ),
-      child: Row(
-        children: const [
-          Expanded(child: _SkeletonBox(height: 38, radius: 10)),
-          SizedBox(width: 10),
-          _SkeletonBox(width: 92, height: 38, radius: 10),
-          SizedBox(width: 10),
-          _SkeletonBox(width: 44, height: 38, radius: 10),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProfileInfoSkeleton extends StatelessWidget {
-  const _ProfileInfoSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        16.rs(context),
-        12.rsh(context),
-        16.rs(context),
-        12.rsh(context),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          _SkeletonBox(width: 210, height: 14, radius: 7),
-          SizedBox(height: 10),
-          _SkeletonBox(width: 160, height: 14, radius: 7),
-          SizedBox(height: 10),
-          _SkeletonBox(width: 190, height: 14, radius: 7),
-        ],
-      ),
-    );
-  }
-}
-
-class _PostSkeletonList extends StatelessWidget {
-  const _PostSkeletonList();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12.rs(context),
-        vertical: 8.rsh(context),
-      ),
-      child: Column(
-        children: List.generate(
-          2,
-          (index) => Container(
-            margin: EdgeInsets.only(bottom: 12.rsh(context)),
-            padding: EdgeInsets.all(14.rs(context)),
-            decoration: BoxDecoration(
-              color: AppColors.secondBackground,
-              borderRadius: BorderRadius.circular(14.rsr(context)),
-              border: Border.all(color: AppColors.divider),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Row(
-                  children: [
-                    _SkeletonBox(width: 42, height: 42, radius: 21),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _SkeletonBox(width: 150, height: 14, radius: 7),
-                          SizedBox(height: 8),
-                          _SkeletonBox(width: 90, height: 12, radius: 6),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 14.rsh(context)),
-                const _SkeletonBox(
-                  width: double.infinity,
-                  height: 13,
-                  radius: 7,
-                ),
-                SizedBox(height: 8.rsh(context)),
-                const _SkeletonBox(width: 230, height: 13, radius: 7),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SkeletonBox extends StatelessWidget {
-  final double? width;
-  final double height;
-  final double radius;
-
-  const _SkeletonBox({this.width, required this.height, required this.radius});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.background : const Color(0xFFE9EEF5),
-        borderRadius: BorderRadius.circular(radius),
-      ),
     );
   }
 }

@@ -26,6 +26,7 @@ import 'package:social_app_fe/features/chat/presentation/widgets/message_edit_hi
 import 'package:social_app_fe/features/chat/presentation/widgets/delete_message_bottom_sheet.dart';
 import 'package:social_app_fe/features/chat/presentation/widgets/chat_appbar.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/get_message_edit_logs_usecase.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:social_app_fe/features/chat/domain/usecases/get_summary_unread_usecase.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
 import 'package:social_app_fe/core/di/injection.dart';
@@ -160,6 +161,12 @@ class _ChatDetailPageState extends State<ChatDetailPage>
 
   // Cache cho thumbnails
   final Map<String, Uint8List> _thumbnailCache = {};
+
+  // Cache tóm tắt tin nhắn
+  String? _cachedSummary;
+  int? _cachedSummaryMessageCount;
+  String? _cachedSummaryConversationId;
+  String? _cachedSummaryLang;
 
   // Photo picker height và drag
   double _photoPickerHeight = 0.0;
@@ -3279,14 +3286,34 @@ class _ChatDetailPageState extends State<ChatDetailPage>
   void _showAiSummaryBottomSheet(BuildContext context, String conversationId) {
     final primaryColor = AppColors.primary;
 
-    Future<DataState<String>> fetchSummary(BuildContext ctx) {
-      return s1<GetSummaryUnreadUseCase>().call(
+    Future<DataState<String>> fetchSummary(BuildContext ctx) async {
+      final currentLang = appTranslationTargetLang(ctx);
+      
+      if (_cachedSummary != null &&
+          _cachedSummaryConversationId == conversationId &&
+          _cachedSummaryMessageCount == _unreadMessageTexts.length &&
+          _cachedSummaryLang == currentLang) {
+        return DataStateSuccess(_cachedSummary!);
+      }
+
+      final result = await s1<GetSummaryUnreadUseCase>().call(
         params: GetSummaryUnreadParams(
           conversationId: conversationId,
           messages: _unreadMessageTexts,
-          lang: appTranslationTargetLang(ctx),
+          lang: currentLang,
         ),
       );
+
+      if (result is DataStateSuccess && result.data != null) {
+        setState(() {
+          _cachedSummary = result.data;
+          _cachedSummaryConversationId = conversationId;
+          _cachedSummaryMessageCount = _unreadMessageTexts.length;
+          _cachedSummaryLang = currentLang;
+        });
+      }
+
+      return result;
     }
 
     Future<DataState<String>>? summaryFuture;
@@ -3358,7 +3385,7 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                       ),
                     ],
                   ),
-                  const Divider(),
+                  Divider(color: AppColors.divider),
                   SizedBox(height: 16.h),
 
                   // Future Builder to fetch summary
@@ -3425,12 +3452,18 @@ class _ChatDetailPageState extends State<ChatDetailPage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              summary,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: AppColors.textPrimary,
-                                height: 1.5,
+                            MarkdownBody(
+                              data: summary,
+                              styleSheet: MarkdownStyleSheet(
+                                p: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: AppColors.textPrimary,
+                                  height: 1.5,
+                                ),
+                                listBullet: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                           ],

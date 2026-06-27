@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In vi, this message translates to:
-  /// **'commonhub'**
+  /// **'commonshub'**
   String get appTitle;
 
   /// No description provided for @navHome.
@@ -6065,6 +6065,126 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chia sẻ thành công'**
   String get postShareSuccess;
+
+  /// No description provided for @notificationTitleFriendRequest.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu kết bạn'**
+  String get notificationTitleFriendRequest;
+
+  /// No description provided for @notificationTitleFriendAccept.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chấp nhận kết bạn'**
+  String get notificationTitleFriendAccept;
+
+  /// No description provided for @notificationTitleNewPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bài viết mới'**
+  String get notificationTitleNewPost;
+
+  /// No description provided for @notificationTitlePostComment.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bình luận mới'**
+  String get notificationTitlePostComment;
+
+  /// No description provided for @notificationTitlePostReaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cảm xúc bài viết'**
+  String get notificationTitlePostReaction;
+
+  /// No description provided for @notificationTitleMention.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã nhắc đến bạn'**
+  String get notificationTitleMention;
+
+  /// No description provided for @notificationTitleStoryReaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cảm xúc tin'**
+  String get notificationTitleStoryReaction;
+
+  /// No description provided for @notificationTitleCommentReaction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cảm xúc bình luận'**
+  String get notificationTitleCommentReaction;
+
+  /// No description provided for @notificationTitleReportReviewed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Báo cáo đã xét duyệt'**
+  String get notificationTitleReportReviewed;
+
+  /// No description provided for @notificationTitleTaggedYou.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gắn thẻ bạn'**
+  String get notificationTitleTaggedYou;
+
+  /// No description provided for @notificationTitleFaceDetected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phát hiện khuôn mặt'**
+  String get notificationTitleFaceDetected;
+
+  /// No description provided for @notificationTitleFaceTagSuggest.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gợi ý gắn thẻ'**
+  String get notificationTitleFaceTagSuggest;
+
+  /// No description provided for @notificationTitleCommunityPublicJoin.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thành viên mới'**
+  String get notificationTitleCommunityPublicJoin;
+
+  /// No description provided for @notificationTitleCommunityJoinRequest.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu tham gia cộng đồng'**
+  String get notificationTitleCommunityJoinRequest;
+
+  /// No description provided for @notificationTitleCommunityInvite.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lời mời tham gia cộng đồng'**
+  String get notificationTitleCommunityInvite;
+
+  /// No description provided for @notificationTitleCommunityJoinApproved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu tham gia được phê duyệt'**
+  String get notificationTitleCommunityJoinApproved;
+
+  /// No description provided for @notificationTitleCommunityJoinRejected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu tham gia bị từ chối'**
+  String get notificationTitleCommunityJoinRejected;
+
+  /// No description provided for @notificationTitleCommunityPostApproved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bài viết trong cộng đồng được phê duyệt'**
+  String get notificationTitleCommunityPostApproved;
+
+  /// No description provided for @notificationTitleCommunityPostRejected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bài viết trong cộng đồng bị từ chối'**
+  String get notificationTitleCommunityPostRejected;
+
+  /// No description provided for @notificationTitleCommunityPostPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bài viết trong cộng đồng đang chờ duyệt'**
+  String get notificationTitleCommunityPostPending;
 }
 
 class _AppLocalizationsDelegate

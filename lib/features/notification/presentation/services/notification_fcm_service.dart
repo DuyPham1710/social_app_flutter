@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:social_app_fe/core/helpers/notification_helper.dart';
 import 'package:social_app_fe/core/services/fcm_service.dart';
 
 /// Service to handle Firebase Cloud Messaging for app notifications
@@ -168,35 +169,31 @@ class NotificationFcmService {
     }
   }
 
-  /// Check if message type is an app notification (not chat/call)
   bool _isAppNotificationType(String? type) {
     if (type == null) return false;
 
     return type == 'FRIEND_REQUEST' ||
+        type == 'FRIEND_ACCEPT' ||
+        type == 'NEW_POST' ||
         type == 'POST_COMMENT' ||
         type == 'POST_REACTION' ||
         type == 'MENTION' ||
         type == 'STORY_REACTION' ||
         type == 'COMMENT_REACTION' ||
+        type == 'POST_REPORT_REVIEWED' ||
         type == 'TAG_POST' ||
         type == 'FACE_DETECTED' ||
-        type == 'FACE_TAG_SUGGEST';
+        type == 'FACE_TAG_SUGGEST' ||
+        type == 'COMMUNITY_PUBLIC_JOIN' ||
+        type == 'COMMUNITY_JOIN_REQUEST' ||
+        type == 'COMMUNITY_INVITE' ||
+        type == 'COMMUNITY_JOIN_APPROVED' ||
+        type == 'COMMUNITY_JOIN_REJECTED' ||
+        type == 'COMMUNITY_POST_APPROVED' ||
+        type == 'COMMUNITY_POST_REJECTED' ||
+        type == 'COMMUNITY_POST_PENDING';
   }
 
-  /// Parse mention format @[Name](userId) to plain text @Name
-  String _parseMentions(String text) {
-    debugPrint('[NotificationFCM] Parsing mentions - Original: $text');
-    final RegExp mentionRegex = RegExp(r'@\[([^\]]+)\]\(([^)]+)\)');
-    final parsed = text.replaceAllMapped(mentionRegex, (match) {
-      final name = match.group(1) ?? '';
-      debugPrint(
-        '[NotificationFCM] Found mention: ${match.group(0)} -> @$name',
-      );
-      return '@$name';
-    });
-    debugPrint('[NotificationFCM] Parsing mentions - Result: $parsed');
-    return parsed;
-  }
 
   /// Create notification channel for Android
   Future<void> _createNotificationChannel() async {
@@ -229,7 +226,17 @@ class NotificationFcmService {
       final type = message.data['type'] ?? '';
       final senderName = message.data['senderName'] ?? 'Someone';
       final rawMessage = message.data['message'] ?? 'New notification';
-      final notificationMessage = _parseMentions(rawMessage); // Parse mentions
+      final content = message.data['content'] ?? '';
+      
+      final l10n = await NotificationHelper.getAppLocalizations();
+      final notificationMessage = NotificationHelper.buildNotificationMessage(
+        type,
+        senderName,
+        rawMessage,
+        content,
+        l10n,
+      );
+
       final targetId = message.data['targetId'] ?? '';
       final senderId = message.data['senderId'] ?? '';
       final senderAvatar = message.data['senderAvatar'] ?? '';
@@ -253,8 +260,8 @@ class NotificationFcmService {
         }
       }
 
-      // Get appropriate icon and title based on type
-      final notificationInfo = _getNotificationInfo(type);
+      // Get appropriate icon and title based on type using l10n
+      final notificationInfo = NotificationHelper.getNotificationInfo(type, l10n);
 
       final AndroidNotificationDetails androidDetails =
           AndroidNotificationDetails(
@@ -293,31 +300,6 @@ class NotificationFcmService {
     }
   }
 
-  /// Get notification icon and title based on type
-  Map<String, String> _getNotificationInfo(String type) {
-    switch (type) {
-      case 'FRIEND_REQUEST':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Friend Request'};
-      case 'POST_COMMENT':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'New Comment'};
-      case 'POST_REACTION':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Post Reaction'};
-      case 'MENTION':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Mentioned You'};
-      case 'STORY_REACTION':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Story Reaction'};
-      case 'COMMENT_REACTION':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Comment Reaction'};
-      case 'TAG_POST':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Tagged You'};
-      case 'FACE_DETECTED':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Face Detected'};
-      case 'FACE_TAG_SUGGEST':
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Tag Suggestion'};
-      default:
-        return {'icon': '@mipmap/ic_launcher', 'title': 'Notification'};
-    }
-  }
 
   /// Handle pending initial message
   Future<void> handlePendingNavigation() async {

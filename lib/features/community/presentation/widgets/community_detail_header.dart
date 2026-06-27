@@ -190,45 +190,47 @@ class CommunityDetailHeader extends StatelessWidget {
                 ),
               )
             else if (memberStatus == 'pending')
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onCancelRequest,
-                      icon: Icon(Icons.cancel_outlined),
-                      label: Text(context.l10n.friendCancelRequest),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 12.rsh(context),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onCancelRequest,
+                        icon: Icon(Icons.cancel_outlined),
+                        label: Text(context.l10n.friendCancelRequest),
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12.rsh(context),
+                          ),
+                          side: BorderSide(color: AppColors.divider),
+                          foregroundColor: AppColors.textPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.rsr(context)),
+                          ),
                         ),
-                        side: BorderSide(color: AppColors.divider),
-                        foregroundColor: AppColors.textPrimary,
-                        shape: RoundedRectangleBorder(
+                      ),
+                    ),
+                    SizedBox(width: 8.rs(context)),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFF8E1),
                           borderRadius: BorderRadius.circular(10.rsr(context)),
+                          border: Border.all(color: Color(0xFFFDE68A)),
+                        ),
+                        child: Text(
+                          context.l10n.communityPendingApproval,
+                          style: TextStyle(
+                            color: Color(0xFFB45309),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8.rs(context)),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 13.rsh(context)),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFFF8E1),
-                        borderRadius: BorderRadius.circular(12.rsr(context)),
-                        border: Border.all(color: Color(0xFFFDE68A)),
-                      ),
-                      child: Text(
-                        context.l10n.communityPendingApproval,
-                        style: TextStyle(
-                          color: Color(0xFFB45309),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               )
             else if (memberStatus == 'member' || userRole == 'admin')
               if (userRole != 'admin')

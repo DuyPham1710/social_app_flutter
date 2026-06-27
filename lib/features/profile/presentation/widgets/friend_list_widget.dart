@@ -3,6 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/bloc/friend_bloc.dart';
+import 'package:social_app_fe/core/di/injection.dart' as di;
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/other_profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
+import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/profile_loading_skeleton.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class FriendListWidget extends StatefulWidget {
@@ -27,14 +36,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
       },
       builder: (context, state) {
         if (state is FriendLoading) {
-          return _buildContainer(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
-            ),
-          );
+          return const ProfileFriendsSkeleton();
         } else if (state is FriendError) {
           return _buildContainer(
             child: Padding(
@@ -160,6 +162,37 @@ class _FriendCard extends StatelessWidget {
 
   const _FriendCard({required this.friend});
 
+  Future<void> _navigateToProfile(BuildContext context) async {
+    final userData = await TokenStorage.getUserData();
+    if (!context.mounted) return;
+    final currentUserId = userData?['id'];
+
+    if (currentUserId == friend.userId) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                di.s1<ProfileBloc>()..add(const LoadUserProfileEvent()),
+            child: const ProfilePage(),
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                di.s1<OtherProfileBloc>()
+                  ..add(LoadOtherUserProfileEvent(userId: friend.userId)),
+            child: OtherProfilePage(userId: friend.userId),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final name =
@@ -183,9 +216,7 @@ class _FriendCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          // Xử lý khi nhấn vào thẻ bạn bè
-        },
+        onTap: () => _navigateToProfile(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

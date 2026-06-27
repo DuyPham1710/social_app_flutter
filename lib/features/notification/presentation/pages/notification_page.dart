@@ -8,6 +8,7 @@ import 'package:social_app_fe/core/enums/notification_type.dart';
 import 'package:social_app_fe/features/community/domain/usecases/respond_to_invite_usecase.dart';
 import 'package:social_app_fe/features/community/presentation/pages/community_detail_page.dart';
 import 'package:social_app_fe/features/notification/presentation/pages/community_post_approval_detail_page.dart';
+import 'package:social_app_fe/features/notification/presentation/widgets/comment_mention_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/community_invite_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/community_join_approved_notification_item.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/community_join_rejected_notification_item.dart';
@@ -190,6 +191,26 @@ class _NotificationPageState extends State<NotificationPage> {
               );
             }
           },
+          onItemTap: () {
+            if (notification.sender?.userId != null) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => s1<OtherProfileBloc>()
+                      ..add(
+                        LoadOtherUserProfileEvent(
+                          userId: notification.sender!.userId,
+                        ),
+                      ),
+                    child: OtherProfilePage(
+                      userId: notification.sender!.userId,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
           onAccept: () async {
             _handleAcceptFriendRequest(notification);
           },
@@ -198,6 +219,29 @@ class _NotificationPageState extends State<NotificationPage> {
           },
         );
 
+      case NotificationType.MENTION:
+        return CommentMentionNotificationItem(
+          avatarUrl:
+              notification.sender?.avatarUrl ??
+              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+          userName: notification.sender?.fullName ?? '',
+          userId: notification.sender?.userId ?? '',
+          content: notification.message,
+          time: _timeAgo(context, notification.createdAt),
+          isRead: notification.isRead,
+          actionText: context.l10n.notificationMentionedYouInComment,
+          onUserTap: () {
+            _handleViewerProfileTap(context, notification);
+          },
+          onMessageTap: () {
+            _navigateToCommentInPost(
+              postId: notification.content,
+              commentId: notification.targetId,
+              notificationId: notification.id,
+            );
+            // _markAsRead(notification.id);
+          },
+        );
       case NotificationType.POST_COMMENT:
         return CommentNotificationItem(
           avatarUrl:
@@ -504,7 +548,7 @@ class _NotificationPageState extends State<NotificationPage> {
             await _handleRejectInviteRequest(notification);
           },
           onCommunityTap: () {
-            final id = notification.targetId;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
@@ -526,7 +570,7 @@ class _NotificationPageState extends State<NotificationPage> {
           message: notification.message,
           actionText: context.l10n.notificationCommunityJoinApprovedByAdmin,
           onCommunityTap: () {
-            final id = notification.targetId;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,
@@ -551,7 +595,7 @@ class _NotificationPageState extends State<NotificationPage> {
           actionText: context.l10n.notificationCommunityJoinRejectedByAdmin,
           onUserTap: () {},
           onCommunityTap: () {
-            final id = notification.targetId;
+            final id = notification.community?.id;
             if (id != null) {
               Navigator.push(
                 context,

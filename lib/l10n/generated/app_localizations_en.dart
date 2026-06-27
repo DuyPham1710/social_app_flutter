@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'commonhub';
+  String get appTitle => 'commonshub';
 
   @override
   String get navHome => 'Home';
@@ -3469,4 +3469,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get postShareSuccess => 'Shared successfully';
+
+  @override
+  String get notificationTitleFriendRequest => 'Friend Request';
+
+  @override
+  String get notificationTitleFriendAccept => 'Friend Request Accepted';
+
+  @override
+  String get notificationTitleNewPost => 'New Post';
+
+  @override
+  String get notificationTitlePostComment => 'New Comment';
+
+  @override
+  String get notificationTitlePostReaction => 'Post Reaction';
+
+  @override
+  String get notificationTitleMention => 'Mentioned You';
+
+  @override
+  String get notificationTitleStoryReaction => 'Story Reaction';
+
+  @override
+  String get notificationTitleCommentReaction => 'Comment Reaction';
+
+  @override
+  String get notificationTitleReportReviewed => 'Report Reviewed';
+
+  @override
+  String get notificationTitleTaggedYou => 'Tagged You';
+
+  @override
+  String get notificationTitleFaceDetected => 'Face Detected';
+
+  @override
+  String get notificationTitleFaceTagSuggest => 'Tag Suggestion';
+
+  @override
+  String get notificationTitleCommunityPublicJoin => 'New Community Member';
+
+  @override
+  String get notificationTitleCommunityJoinRequest => 'Community Join Request';
+
+  @override
+  String get notificationTitleCommunityInvite => 'Community Invitation';
+
+  @override
+  String get notificationTitleCommunityJoinApproved =>
+      'Community Request Approved';
+
+  @override
+  String get notificationTitleCommunityJoinRejected =>
+      'Community Request Rejected';
+
+  @override
+  String get notificationTitleCommunityPostApproved =>
+      'Community Post Approved';
+
+  @override
+  String get notificationTitleCommunityPostRejected =>
+      'Community Post Rejected';
+
+  @override
+  String get notificationTitleCommunityPostPending => 'Community Post Pending';
 }

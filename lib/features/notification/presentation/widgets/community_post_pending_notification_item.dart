@@ -43,8 +43,8 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
         color: isRead
             ? AppColors.background
             : (s1<AppPreferences>().isDarkMode
-                  ? const Color(0xFFE6A23C).withValues(alpha: 0.15)
-                  : const Color(0xFFFFF7E8)),
+                  ? AppColors.primary.withValues(alpha: 0.12)
+                  : const Color(0xFFEAF3FF)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         margin: const EdgeInsets.only(bottom: 4),
         child: Row(
@@ -107,8 +107,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                 children: [
                   Builder(
                     builder: (context) {
-                      final msg =
-                        actionText;
+                      final msg = actionText;
                       final List<TextSpan> spans = [];
                       spans.add(
                         TextSpan(
@@ -123,7 +122,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                       );
                       spans.add(
                         TextSpan(
-                          text: msg,
+                          text: " $msg ",
                           style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 16,
@@ -144,10 +143,7 @@ class CommunityPostPendingNotificationItem extends StatelessWidget {
                         ),
                       );
                       //text căn 2 bên
-                      return RichText(
-                        text: TextSpan(children: spans),
-                        textAlign: TextAlign.justify,
-                      );
+                      return RichText(text: TextSpan(children: spans));
                     },
                   ),
 

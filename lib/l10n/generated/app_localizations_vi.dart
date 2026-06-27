@@ -9,7 +9,7 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appTitle => 'commonhub';
+  String get appTitle => 'commonshub';
 
   @override
   String get navHome => 'Trang chủ';
@@ -3480,4 +3480,70 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get postShareSuccess => 'Chia sẻ thành công';
+
+  @override
+  String get notificationTitleFriendRequest => 'Yêu cầu kết bạn';
+
+  @override
+  String get notificationTitleFriendAccept => 'Chấp nhận kết bạn';
+
+  @override
+  String get notificationTitleNewPost => 'Bài viết mới';
+
+  @override
+  String get notificationTitlePostComment => 'Bình luận mới';
+
+  @override
+  String get notificationTitlePostReaction => 'Cảm xúc bài viết';
+
+  @override
+  String get notificationTitleMention => 'Đã nhắc đến bạn';
+
+  @override
+  String get notificationTitleStoryReaction => 'Cảm xúc tin';
+
+  @override
+  String get notificationTitleCommentReaction => 'Cảm xúc bình luận';
+
+  @override
+  String get notificationTitleReportReviewed => 'Báo cáo đã xét duyệt';
+
+  @override
+  String get notificationTitleTaggedYou => 'Đã gắn thẻ bạn';
+
+  @override
+  String get notificationTitleFaceDetected => 'Phát hiện khuôn mặt';
+
+  @override
+  String get notificationTitleFaceTagSuggest => 'Gợi ý gắn thẻ';
+
+  @override
+  String get notificationTitleCommunityPublicJoin => 'Thành viên mới';
+
+  @override
+  String get notificationTitleCommunityJoinRequest =>
+      'Yêu cầu tham gia cộng đồng';
+
+  @override
+  String get notificationTitleCommunityInvite => 'Lời mời tham gia cộng đồng';
+
+  @override
+  String get notificationTitleCommunityJoinApproved =>
+      'Yêu cầu tham gia được phê duyệt';
+
+  @override
+  String get notificationTitleCommunityJoinRejected =>
+      'Yêu cầu tham gia bị từ chối';
+
+  @override
+  String get notificationTitleCommunityPostApproved =>
+      'Bài viết trong cộng đồng được phê duyệt';
+
+  @override
+  String get notificationTitleCommunityPostRejected =>
+      'Bài viết trong cộng đồng bị từ chối';
+
+  @override
+  String get notificationTitleCommunityPostPending =>
+      'Bài viết trong cộng đồng đang chờ duyệt';
 }

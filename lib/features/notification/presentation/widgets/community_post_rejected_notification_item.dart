@@ -106,8 +106,7 @@ class CommunityPostRejectedNotificationItem extends StatelessWidget {
                 children: [
                   Builder(
                     builder: (context) {
-                      final msg =
-                        actionText;
+                      final msg = actionText;
 
                       final List<TextSpan> spans = [];
 

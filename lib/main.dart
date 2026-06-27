@@ -46,6 +46,7 @@ import 'package:social_app_fe/features/chat/presentation/pages/chat_detail_page.
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/chat/presentation/pages/chat_web_page.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:giphy_get/l10n.dart';
@@ -537,7 +538,8 @@ class _MyAppState extends State<MyApp> {
               child: ListenableBuilder(
                 listenable: s1<AppPreferences>(),
                 builder: (context, child) {
-                  return MaterialApp(
+                  return Portal(
+                    child: MaterialApp(
                     navigatorKey: _navigatorKey, // Add global navigator key
                     onGenerateTitle: (context) => context.l10n.appTitle,
                     debugShowCheckedModeBanner: false,
@@ -579,6 +581,7 @@ class _MyAppState extends State<MyApp> {
                           const ResetPasswordPage(),
                       '/search': (BuildContext context) => const SearchPage(),
                     },
+                  ),
                   );
                 },
               ),

@@ -33,7 +33,9 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: onCommunityTap,
+      child: Container(
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
@@ -103,8 +105,7 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final msg =
-                      actionText;
+                    final msg = actionText;
                     return RichText(
                       text: TextSpan(
                         children: [
@@ -144,6 +145,7 @@ class CommunityJoinRejectedNotificationItem extends StatelessWidget {
           Icon(Icons.more_horiz, color: AppColors.iconPrimary),
         ],
       ),
+    ),
     );
   }
 }

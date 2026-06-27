@@ -47,6 +47,7 @@ class ReactPostNotificationItem extends StatelessWidget {
       avatarUrl: avatarUrl,
       userId: userId,
       onAvatarTap: onUserTap,
+      onItemTap: onMessageTap,
       title: RichText(
         maxLines: 2,
         overflow: TextOverflow.ellipsis,

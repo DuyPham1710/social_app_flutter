@@ -15,6 +15,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
   final VoidCallback? onUserTap;
   final VoidCallback? onAccept;
   final VoidCallback? onRemove;
+  final VoidCallback? onItemTap;
 
   const FriendRequestNotificationItem({
     super.key,
@@ -27,11 +28,14 @@ class FriendRequestNotificationItem extends StatelessWidget {
     this.onUserTap,
     this.onAccept,
     this.onRemove,
+    this.onItemTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: onItemTap,
+      child: Container(
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
@@ -206,6 +210,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
 
       //khoảng cách giữa các item
       margin: const EdgeInsets.only(bottom: 4),
+    ),
     );
   }
 }

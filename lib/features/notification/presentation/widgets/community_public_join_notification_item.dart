@@ -33,7 +33,9 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: onCommunityTap,
+      child: Container(
       color: isRead
           ? AppColors.background
           : (s1<AppPreferences>().isDarkMode
@@ -148,6 +150,7 @@ class CommunityPublicJoinNotificationItem extends StatelessWidget {
           Icon(Icons.more_horiz, color: AppColors.iconPrimary),
         ],
       ),
+    ),
     );
   }
 }

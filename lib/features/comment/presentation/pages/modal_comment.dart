@@ -517,8 +517,7 @@ class _ModalCommentState extends State<ModalComment> {
     }
 
     // Mobile: DraggableScrollableSheet truyền thống
-    return Portal(
-      child: MultiBlocProvider(
+    return MultiBlocProvider(
         providers: [
           BlocProvider.value(value: _commentBloc),
           BlocProvider.value(value: _commentDetailsBloc),
@@ -587,8 +586,7 @@ class _ModalCommentState extends State<ModalComment> {
             );
           },
         ),
-      ),
-    );
+      );
   }
 
   /// Xây dựng nội dung chính cho Web/Desktop dialog
@@ -596,8 +594,7 @@ class _ModalCommentState extends State<ModalComment> {
     BuildContext context,
     List<Map<String, dynamic>> effectiveSuggestionList,
   ) {
-    return Portal(
-      child: MultiBlocProvider(
+    return MultiBlocProvider(
         providers: [
           BlocProvider.value(value: _commentBloc),
           BlocProvider.value(value: _commentDetailsBloc),
@@ -680,8 +677,7 @@ class _ModalCommentState extends State<ModalComment> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   /// Widget chung cho danh sách comment (dùng chung cho cả Mobile và Web)

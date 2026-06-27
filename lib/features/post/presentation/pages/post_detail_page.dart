@@ -570,7 +570,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
                   return Column(
                     children: [
-                      Divider(),
+                      Divider(color: AppColors.divider),
 
                       Padding(
                         padding: EdgeInsets.only(bottom: 6.rsh(context)),

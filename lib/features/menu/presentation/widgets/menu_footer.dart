@@ -15,7 +15,7 @@ class MenuFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(),
+        Divider(color: AppColors.divider),
         ListTile(
           leading: const Icon(Icons.help_outline),
           title: Text(context.l10n.menuHelpSupport),

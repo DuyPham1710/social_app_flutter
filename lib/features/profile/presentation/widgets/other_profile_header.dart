@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/auth/domain/entities/user_entity.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/image_viewer_page.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/profile_loading_skeleton.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class OtherProfileHeader extends StatelessWidget {
@@ -15,10 +15,7 @@ class OtherProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      final isDark = Theme.of(context).brightness == Brightness.dark;
-      return Shimmer.fromColors(
-        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
-        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+      return ProfileSkeletonShimmer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -36,14 +33,17 @@ class OtherProfileHeader extends StatelessWidget {
                 ),
                 Positioned(
                   bottom: -60,
-                  left: 16,
-                  child: Container(
-                    width: 128.rsr(context),
-                    height: 128.rsr(context),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      width: 128.rsr(context),
+                      height: 128.rsr(context),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 4),
+                      ),
                     ),
                   ),
                 ),
@@ -120,43 +120,46 @@ class OtherProfileHeader extends StatelessWidget {
             // Avatar
             Positioned(
               bottom: -60,
-              left: 16,
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ImageViewerPage(
-                            imageUrl:
-                                user?.avatarUrl ??
-                                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
-                            title: context.l10n.profileAvatarPhoto,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImageViewerPage(
+                              imageUrl:
+                                  user?.avatarUrl ??
+                                  'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                              title: context.l10n.profileAvatarPhoto,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.background,
+                            width: 4,
                           ),
                         ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.background,
-                          width: 4,
-                        ),
-                      ),
-                      child: CircleAvatar(
-                        radius: 60,
-                        backgroundImage: NetworkImage(
-                          user?.avatarUrl ??
-                              'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundImage: NetworkImage(
+                            user?.avatarUrl ??
+                                'https://res.cloudinary.com/dk7ypst5k/image/upload/v1766304547/avt_bnegko.jpg',
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -180,17 +183,19 @@ class OtherProfileHeader extends StatelessWidget {
         SizedBox(height: 6.rsh(context)),
 
         // Bio
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40.rs(context)),
-          child: Text(
-            user?.bio?.isNotEmpty == true
-                ? user!.bio!
-                : context.l10n.profileNoBio,
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 13.rsp(context),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.rs(context)),
+            child: Text(
+              user?.bio?.isNotEmpty == true
+                  ? user!.bio!
+                  : context.l10n.profileNoBio,
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13.rsp(context),
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ),
 

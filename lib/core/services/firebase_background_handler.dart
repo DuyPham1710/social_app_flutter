@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:social_app_fe/core/services/callkit_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:social_app_fe/core/helpers/notification_helper.dart';
 
 final FlutterLocalNotificationsPlugin _localNotifications =
     FlutterLocalNotificationsPlugin();
@@ -41,14 +42,25 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 bool _isAppNotificationType(String? type) {
   if (type == null) return false;
   return type == 'FRIEND_REQUEST' ||
+      type == 'FRIEND_ACCEPT' ||
+      type == 'NEW_POST' ||
       type == 'POST_COMMENT' ||
       type == 'POST_REACTION' ||
       type == 'MENTION' ||
       type == 'STORY_REACTION' ||
       type == 'COMMENT_REACTION' ||
+      type == 'POST_REPORT_REVIEWED' ||
       type == 'TAG_POST' ||
       type == 'FACE_DETECTED' ||
-      type == 'FACE_TAG_SUGGEST';
+      type == 'FACE_TAG_SUGGEST' ||
+      type == 'COMMUNITY_PUBLIC_JOIN' ||
+      type == 'COMMUNITY_JOIN_REQUEST' ||
+      type == 'COMMUNITY_INVITE' ||
+      type == 'COMMUNITY_JOIN_APPROVED' ||
+      type == 'COMMUNITY_JOIN_REJECTED' ||
+      type == 'COMMUNITY_POST_APPROVED' ||
+      type == 'COMMUNITY_POST_REJECTED' ||
+      type == 'COMMUNITY_POST_PENDING';
 }
 
 /// Parse mention format @[Name](userId) to plain text @Name
@@ -115,11 +127,19 @@ Future<void> _handleBackgroundAppNotification(RemoteMessage message) async {
     final type = message.data['type'] ?? '';
     final senderName = message.data['senderName'] ?? 'Someone';
     final rawMessage = message.data['message'] ?? 'New notification';
-    final notificationMessage = _parseMentions(rawMessage); // Parse mentions
+    final content = message.data['content'] ?? '';
     final targetId = message.data['targetId'] ?? '';
     final senderId = message.data['senderId'] ?? '';
     final senderAvatar = message.data['senderAvatar'] ?? '';
     final notificationId = message.data['notificationId'] ?? '';
+    final l10n = await NotificationHelper.getAppLocalizations();
+    final notificationMessage = NotificationHelper.buildNotificationMessage(
+      type,
+      senderName,
+      rawMessage,
+      content,
+      l10n,
+    );
 
     debugPrint('[FCM Background] Handling app notification: $type');
     debugPrint('[FCM Background] Original message: $rawMessage');
@@ -141,8 +161,8 @@ Future<void> _handleBackgroundAppNotification(RemoteMessage message) async {
       }
     }
 
-    // Get appropriate icon and title based on type
-    final notificationInfo = _getNotificationInfo(type);
+    // Get appropriate icon and title based on type using l10n
+    final notificationInfo = NotificationHelper.getNotificationInfo(type, l10n);
 
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
@@ -181,28 +201,3 @@ Future<void> _handleBackgroundAppNotification(RemoteMessage message) async {
   }
 }
 
-/// Get notification icon and title based on type
-Map<String, String> _getNotificationInfo(String type) {
-  switch (type) {
-    case 'FRIEND_REQUEST':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Friend Request'};
-    case 'POST_COMMENT':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'New Comment'};
-    case 'POST_REACTION':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Post Reaction'};
-    case 'MENTION':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Mentioned You'};
-    case 'STORY_REACTION':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Story Reaction'};
-    case 'COMMENT_REACTION':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Comment Reaction'};
-    case 'TAG_POST':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Tagged You'};
-    case 'FACE_DETECTED':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Face Detected'};
-    case 'FACE_TAG_SUGGEST':
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Tag Suggestion'};
-    default:
-      return {'icon': '@mipmap/ic_launcher', 'title': 'Notification'};
-  }
-}

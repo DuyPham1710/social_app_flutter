@@ -4,7 +4,7 @@ import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/notification/presentation/widgets/notification_base_item.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
-class CommentNotificationItem extends StatelessWidget {
+class CommentMentionNotificationItem extends StatelessWidget {
   final String avatarUrl;
   final String userName;
   final String userId;
@@ -15,7 +15,7 @@ class CommentNotificationItem extends StatelessWidget {
   final VoidCallback? onUserTap;
   final VoidCallback? onMessageTap;
 
-  const CommentNotificationItem({
+  const CommentMentionNotificationItem({
     super.key,
     required this.avatarUrl,
     required this.userName,

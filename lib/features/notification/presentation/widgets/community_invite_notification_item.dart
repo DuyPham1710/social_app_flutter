@@ -35,15 +35,17 @@ class CommunityInviteNotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: isRead
-          ? AppColors.background
-          : (s1<AppPreferences>().isDarkMode
-                ? AppColors.primary.withValues(alpha: 0.12)
-                : const Color(0xFFEAF3FF)),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      margin: const EdgeInsets.only(bottom: 4),
-      child: Row(
+    return InkWell(
+      onTap: onCommunityTap,
+      child: Container(
+        color: isRead
+            ? AppColors.background
+            : (s1<AppPreferences>().isDarkMode
+                  ? AppColors.primary.withValues(alpha: 0.12)
+                  : const Color(0xFFEAF3FF)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        margin: const EdgeInsets.only(bottom: 4),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Avatar with icon overlay
@@ -207,6 +209,7 @@ class CommunityInviteNotificationItem extends StatelessWidget {
           Icon(Icons.more_horiz, color: AppColors.iconPrimary),
         ],
       ),
+    ),
     );
   }
 }

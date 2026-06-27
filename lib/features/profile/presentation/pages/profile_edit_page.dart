@@ -58,7 +58,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ),
           ],
         ),
-        const Divider(),
+        Divider(color: AppColors.divider),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
