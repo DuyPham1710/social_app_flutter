@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -49,7 +50,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
     if (type != 'post') {
       showErrorSnackBar(
         context,
-        'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu',
+        context.l10n.savedItemsOnlySupportPost,
       );
       return;
     }
@@ -74,7 +75,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         MaterialPageRoute(builder: (_) => PostDetailPage(post: result.data!)),
       );
     } else {
-      showErrorSnackBar(context, 'Không thể mở bài viết đã lưu');
+      showErrorSnackBar(context, context.l10n.savedItemsCannotOpenPost);
     }
   }
 
@@ -87,25 +88,25 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.background,
         title: Text(
-          'Bỏ lưu mục này?',
+          context.l10n.savedItemsUnsaveDialogTitle,
           style: TextStyle(color: AppColors.textPrimary),
         ),
         content: Text(
-          'Mục này sẽ được xóa khỏi danh sách đã lưu.',
+          context.l10n.savedItemsUnsaveDialogContent,
           style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(
-              'Hủy',
+              context.l10n.commonCancel,
               style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Bỏ lưu'),
+            child: Text(context.l10n.savedItemsUnsave),
           ),
         ],
       ),
@@ -142,7 +143,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                   onPressed: () => Navigator.pop(context),
                 ),
                 title: Text(
-                  'Đã lưu',
+                  context.l10n.savedItemsPageTitle,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
@@ -182,7 +183,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                           _refreshController.loadFailed();
                           showErrorSnackBar(context, state.message);
                         } else if (state is SavedItemsActionSuccess) {
-                          showSuccessSnackBar(context, state.message);
+                          showSuccessSnackBar(context, context.l10n.savedItemsUnsaveSuccess);
                         }
                       },
                       builder: (context, state) {
@@ -246,7 +247,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Tin lưu trữ',
+                        context.l10n.savedItemsArchivedStoriesTitle,
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
@@ -254,7 +255,7 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
                       ),
                       SizedBox(height: 3),
                       Text(
-                        'Xem lại các story đã đăng',
+                        context.l10n.savedItemsArchivedStoriesSubtitle,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 12,
@@ -285,9 +286,9 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
       return _buildInfoState(
         key: const ValueKey('saved-error'),
         icon: Icons.wifi_tethering_error_rounded,
-        title: 'Không thể tải danh sách đã lưu',
-        message: 'Kiểm tra kết nối rồi thử lại.',
-        actionLabel: 'Thử lại',
+        title: context.l10n.savedItemsLoadErrorTitle,
+        message: context.l10n.savedItemsLoadErrorMessage,
+        actionLabel: context.l10n.commonRetry,
         onAction: () {
           context.read<SavedItemsBloc>().add(
             const LoadSavedItems(isRefresh: true),
@@ -301,10 +302,10 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
         return _buildInfoState(
           key: ValueKey('saved-empty-${state.currentCategory}'),
           icon: Icons.bookmark_border_rounded,
-          title: 'Chưa có mục nào',
+          title: context.l10n.savedItemsEmptyTitle,
           message: state.currentCategory == 'Tất cả'
-              ? 'Các bài viết bạn lưu sẽ xuất hiện ở đây.'
-              : 'Không có mục phù hợp với bộ lọc này.',
+              ? context.l10n.savedItemsEmptyAllMessage
+              : context.l10n.savedItemsEmptyFilterMessage,
         );
       }
 
@@ -319,12 +320,12 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
           backgroundColor: AppColors.primary,
           color: Colors.white,
         ),
-        footer: const ClassicFooter(
-          loadingText: 'Đang tải thêm...',
-          idleText: 'Kéo để tải thêm',
-          noDataText: 'Đã hiển thị hết',
-          failedText: 'Không tải được',
-          canLoadingText: 'Thả để tải thêm',
+        footer: ClassicFooter(
+          loadingText: context.l10n.savedItemsLoadingMore,
+          idleText: context.l10n.savedItemsPullToLoad,
+          noDataText: context.l10n.savedItemsNoMoreData,
+          failedText: context.l10n.savedItemsLoadFailed,
+          canLoadingText: context.l10n.savedItemsReleaseToLoad,
         ),
         onRefresh: () {
           context.read<SavedItemsBloc>().add(
@@ -500,9 +501,26 @@ class _SavedItemsPageState extends State<SavedItemsPage> {
               final category = _currentCategories[index];
               final isSelected = category == _selectedCategory;
               final isCollection = category.startsWith('BST: ');
-              final label = isCollection
+              String label = isCollection
                   ? category.replaceFirst('BST: ', '')
                   : category;
+
+              if (!isCollection) {
+                switch (label) {
+                  case 'Tất cả':
+                    label = context.l10n.savedItemsCategoryAll;
+                    break;
+                  case 'Bài viết':
+                    label = context.l10n.savedItemsCategoryPost;
+                    break;
+                  case 'Thước phim':
+                    label = context.l10n.savedItemsCategoryReel;
+                    break;
+                  case 'Bình luận':
+                    label = context.l10n.savedItemsCategoryComment;
+                    break;
+                }
+              }
 
               return GestureDetector(
                 onTap: () {

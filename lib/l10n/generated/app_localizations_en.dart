@@ -153,6 +153,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sharedPostSent => 'Sent';
+
+  @override
+  String get sharePostSend => 'Send';
+
+  @override
   String chatTextPreview(String prefix, String message, String time) {
     return '$prefix$message   •   $time';
   }
@@ -3577,4 +3583,104 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authBannedPermanentFallback =>
       'Your account has been permanently locked';
+
+  @override
+  String timeDayMonth(String day, String month) {
+    return '$month $day';
+  }
+
+  @override
+  String timeDayMonthYear(String day, String month, String year) {
+    return '$month/$day/$year';
+  }
+
+  @override
+  String get savedItemsPageTitle => 'Saved';
+
+  @override
+  String get savedItemsArchivedStoriesTitle => 'Archived Stories';
+
+  @override
+  String get savedItemsArchivedStoriesSubtitle =>
+      'Review your published stories';
+
+  @override
+  String get savedItemsOnlySupportPost =>
+      'Currently only supports viewing saved posts';
+
+  @override
+  String get savedItemsCannotOpenPost => 'Cannot open saved post';
+
+  @override
+  String get savedItemsUnsaveDialogTitle => 'Unsave this item?';
+
+  @override
+  String get savedItemsUnsaveDialogContent =>
+      'This item will be removed from your saved list.';
+
+  @override
+  String get savedItemsUnsaveSuccess => 'Removed from saved list';
+
+  @override
+  String get savedItemsLoadErrorTitle => 'Cannot load saved list';
+
+  @override
+  String get savedItemsLoadErrorMessage =>
+      'Check your connection and try again.';
+
+  @override
+  String get savedItemsEmptyTitle => 'No items yet';
+
+  @override
+  String get savedItemsEmptyAllMessage => 'Posts you save will appear here.';
+
+  @override
+  String get savedItemsEmptyFilterMessage => 'No items match this filter.';
+
+  @override
+  String get savedItemsLoadingMore => 'Loading more...';
+
+  @override
+  String get savedItemsPullToLoad => 'Pull to load more';
+
+  @override
+  String get savedItemsReleaseToLoad => 'Release to load more';
+
+  @override
+  String get savedItemsNoMoreData => 'No more data';
+
+  @override
+  String get savedItemsLoadFailed => 'Failed to load';
+
+  @override
+  String get savedItemsNoContent => 'No content';
+
+  @override
+  String get savedItemsUnknownAuthor => 'Unknown';
+
+  @override
+  String get savedItemsOptionsTooltip => 'Options';
+
+  @override
+  String get savedItemsViewDetails => 'View details';
+
+  @override
+  String get savedItemsUnsave => 'Unsave';
+
+  @override
+  String get savedItemsCategoryAll => 'All';
+
+  @override
+  String get savedItemsCategoryPost => 'Posts';
+
+  @override
+  String get savedItemsCategoryReel => 'Reels';
+
+  @override
+  String get savedItemsCategoryComment => 'Comments';
+
+  @override
+  String storyDefaultTitle(int number) {
+    return 'Story $number';
+  }
 }

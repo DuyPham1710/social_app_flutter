@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/core/constants/app_colors.dart';
 import 'package:social_app_fe/features/save/domain/entities/saved_entity.dart';
@@ -94,7 +95,7 @@ class SavedItemCard extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(12.rs(context)),
                       child: Text(
-                        'Không có nội dung',
+                        context.l10n.savedItemsNoContent,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontStyle: FontStyle.italic,
@@ -124,7 +125,8 @@ class SavedItemCard extends StatelessWidget {
                           SizedBox(width: 8.rs(context)),
                           Expanded(
                             child: Text(
-                              item.authorName ?? 'Không xác định',
+                              item.authorName ??
+                                  context.l10n.savedItemsUnknownAuthor,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -144,7 +146,7 @@ class SavedItemCard extends StatelessWidget {
                 top: 6.rsh(context),
                 right: 6.rs(context),
                 child: PopupMenuButton<String>(
-                  tooltip: 'Tùy chọn',
+                  tooltip: context.l10n.savedItemsOptionsTooltip,
                   color: AppColors.background,
                   onSelected: (value) {
                     if (value == 'open') {
@@ -163,15 +165,15 @@ class SavedItemCard extends StatelessWidget {
                             size: 18,
                             color: AppColors.iconPrimary,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
-                            'Xem chi tiết',
+                            context.l10n.savedItemsViewDetails,
                             style: TextStyle(color: AppColors.textPrimary),
                           ),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'remove',
                       child: Row(
                         children: [
@@ -181,7 +183,10 @@ class SavedItemCard extends StatelessWidget {
                             color: Colors.red,
                           ),
                           SizedBox(width: 8),
-                          Text('Bỏ lưu', style: TextStyle(color: Colors.red)),
+                          Text(
+                            context.l10n.savedItemsUnsave,
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ],
                       ),
                     ),

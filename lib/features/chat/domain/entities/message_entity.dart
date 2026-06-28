@@ -3,6 +3,7 @@ import 'package:social_app_fe/core/enums/emoji.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import 'parent_message_entity.dart';
 import 'story_reply_entity.dart';
+import '../../../post/domain/entities/post_entity.dart';
 
 class MessageMetadataEntity extends Equatable {
   final String? type;
@@ -52,6 +53,7 @@ class MessageEntity extends Equatable {
   final bool isEdited;
   final MessageMetadataEntity? metadata;
   final StoryReplyEntity? story;
+  final PostEntity? post;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final String? translatedText;
@@ -74,6 +76,7 @@ class MessageEntity extends Equatable {
     this.isEdited = false,
     this.metadata,
     this.story,
+    this.post,
     required this.createdAt,
     this.updatedAt,
     this.translatedText,
@@ -98,6 +101,7 @@ class MessageEntity extends Equatable {
     isEdited,
     metadata,
     story,
+    post,
     createdAt,
     updatedAt,
     translatedText,
@@ -122,6 +126,7 @@ class MessageEntity extends Equatable {
     bool? isEdited,
     MessageMetadataEntity? metadata,
     StoryReplyEntity? story,
+    PostEntity? post,
     DateTime? createdAt,
     DateTime? updatedAt,
     String? translatedText,
@@ -144,6 +149,7 @@ class MessageEntity extends Equatable {
       isEdited: isEdited ?? this.isEdited,
       metadata: metadata ?? this.metadata,
       story: story ?? this.story,
+      post: post ?? this.post,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       translatedText: translatedText ?? this.translatedText,

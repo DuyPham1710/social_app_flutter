@@ -75,6 +75,7 @@ abstract class ChatRemoteDataSource {
     String? replyTo,
     Map<String, dynamic>? metadata,
     String? storyId,
+    String? postId,
   });
 
   // Upload files and return attachments URLs (HTTP with MultipartFile)

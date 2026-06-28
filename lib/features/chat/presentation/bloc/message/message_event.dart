@@ -113,6 +113,7 @@ class SendMessageEvent extends MessageEvent {
   final String? replyTo;
   final Map<String, dynamic>? metadata;
   final String? storyId;
+  final String? postId;
 
   const SendMessageEvent({
     required this.userId,
@@ -122,6 +123,7 @@ class SendMessageEvent extends MessageEvent {
     this.replyTo,
     this.metadata,
     this.storyId,
+    this.postId,
   });
 
   @override
@@ -133,6 +135,7 @@ class SendMessageEvent extends MessageEvent {
     replyTo,
     metadata,
     storyId,
+    postId,
   ];
 }
 

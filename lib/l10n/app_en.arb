@@ -8,7 +8,7 @@
   "commonBlock": "Block",
   "commonPrivacySupport": "Privacy & support",
   "commonMoreActions": "More actions",
-  "commonSavePhotoPermissionMessage":"Photo access permission is required to save images",
+  "commonSavePhotoPermissionMessage": "Photo access permission is required to save images",
   "commonSettings": "Settings",
   "commonOpenSettings": "Open Settings",
   "commonRetry": "Try again",
@@ -672,9 +672,9 @@
   "communitySearchMembersHint": "Search members",
   "communitySendingInvite": "Sending invite...",
   "communityType": "Community type",
-  "communityRoadmap": "Community Roadmap",
+  "communityRoadmap": "Roadmap",
   "communityRoadmapTitle": "Roadmap",
-  "communityRoadmapViewFull": "View Full Map",
+  "communityRoadmapViewFull": "View Full Roadmap",
   "communityRoadmapEmpty": "No locations on the roadmap yet",
   "communityRoadmapMyLocation": "My Location",
   "communityRoadmapPostCount": "{count} posts",
@@ -843,6 +843,8 @@
       }
     }
   },
+  "sharedPostSent": "Sent",
+  "sharePostSend": "Send",
   "friendSentRequestsTitle": "Sent requests",
   "friendSort": "Sort",
   "friendSortBy": "Sort by",
@@ -1242,11 +1244,16 @@
   "commonContentCopied": "Content copied",
   "commonEdit": "Edit",
   "commonLinkCopied": "Link copied",
-  "commonNo": "No",
   "commonRemove": "Remove",
   "commonSeeMore": "See more",
   "commonSendWithCount": "Send ({count})",
-  "@commonSendWithCount": {"placeholders": {"count": {"type": "num"}}},
+  "@commonSendWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "commonUpdate": "Update",
   "commonViewAll": "View all",
   "searchHint": "Search",
@@ -1293,7 +1300,13 @@
   "commentYourComment": "your comment",
   "commentWriteReplyHint": "Write a reply...",
   "commentReplyToHint": "Reply to {user}...",
-  "@commentReplyToHint": {"placeholders": {"user": {"type": "String"}}},
+  "@commentReplyToHint": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
   "commentWriteHint": "Write a comment...",
   "commentEditHistoryTitle": "Edit history",
   "commentNoEditHistory": "No edit history yet",
@@ -1301,7 +1314,16 @@
   "commentEditVersion": "Edit {version} • {time}",
   "commentOldContent": "Old content",
   "commentNewContent": "New content",
-  "@commentEditVersion": {"placeholders": {"version": {"type": "num"}, "time": {"type": "String"}}},
+  "@commentEditVersion": {
+    "placeholders": {
+      "version": {
+        "type": "num"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "storyPrivacyTitle": "Story privacy",
   "storyPrivacyQuestion": "Who can see your story?",
   "storyPrivacyVisibleFor24h": "Your story will be visible for 24 hours.",
@@ -1314,7 +1336,16 @@
   "storyPrivacyNoOneSelected": "No one selected",
   "storyPrivacyOnePerson": "1 person",
   "storyPrivacyAndOthers": "{firstNames} and {count} others",
-  "@storyPrivacyAndOthers": {"placeholders": {"firstNames": {"type": "String"}, "count": {"type": "num"}}},
+  "@storyPrivacyAndOthers": {
+    "placeholders": {
+      "firstNames": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "storySelectPeopleToShare": "Choose people to share your story with",
   "storyPrivacyUpdated": "Privacy updated",
   "storyPrivacyUpdateFailed": "Could not update privacy",
@@ -1334,7 +1365,13 @@
   "storyDeletePhoto": "Delete photo",
   "storyCopyShareLink": "Copy link to share this story",
   "storyLinkVisibility": "The story will be visible to {user}'s audience for 24 hours.",
-  "@storyLinkVisibility": {"placeholders": {"user": {"type": "String"}}},
+  "@storyLinkVisibility": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
   "storyArchivePageTitle": "Archived stories",
   "storyNoArchivedStories": "No archived stories yet",
   "storyDefaultName": "Story {number}",
@@ -1366,14 +1403,26 @@
   "storyImageOnlyEdit": "Only photos can be edited",
   "storyCannotReadDeviceFile": "Could not read file from device",
   "storyImageEditFailed": "Failed to edit image: {error}",
-  "@storyImageEditFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@storyImageEditFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "storyText": "Text",
   "storyPhotoGroup": "Photo group",
   "storySelectMultipleFiles": "Select multiple files",
   "storyLibrary": "Library",
   "storyChooseFolder": "Choose folder",
   "storyItemCount": "{count} items",
-  "@storyItemCount": {"placeholders": {"count": {"type": "num"}}},
+  "@storyItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "storyLibraryPermissionRequired": "Library access is required to show photos/videos.",
   "storyNoMediaInLibrary": "No photos/videos in the library yet.",
   "storyReactedPeople": "People who reacted",
@@ -1443,7 +1492,13 @@
   "chatDownloadingFile": "Downloading file...",
   "chatNoAppToOpenFile": "No app found to open this file",
   "chatOpenFileFailed": "Could not open file: {error}",
-  "@chatOpenFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatOpenFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatLoadingEditHistory": "Loading edit history...",
   "chatPinInDevelopment": "Pin message is in development",
   "chatForwardInDevelopment": "Forward message is in development",
@@ -1457,38 +1512,92 @@
   "chatSendLocationMessage": "Send location",
   "chatCurrentLocation": "Current location",
   "chatGetLocationFailed": "Could not get location: {error}",
-  "@chatGetLocationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatGetLocationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatSendingFile": "Sending file...",
   "chatPhotoPermissionTitle": "Photo access",
   "chatPhotoPermissionMessage": "The app needs photo access to show photos from your library. Please grant permission in Settings.",
   "chatPhotoPermissionRequired": "Photo access is required to show the library",
   "chatLoadPhotosFailed": "Failed to load photos: {error}",
-  "@chatLoadPhotosFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatLoadPhotosFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCameraPermissionMessage": "The app needs camera access to take photos.",
   "chatOpenCameraFailed": "Failed to open camera: {error}",
-  "@chatOpenCameraFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatOpenCameraFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCapturedPhoto": "Captured photo",
   "chatTapSendToShare": "Tap send to share",
   "chatMissingConversationForPhoto": "Could not send photo: missing conversation ID",
   "chatSendPhotoFailed": "Failed to send photo: {error}",
-  "@chatSendPhotoFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatSendPhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCannotProcessPhoto": "Could not process photo",
   "chatMissingConversationForFile": "Could not send file: missing conversation ID",
   "chatPickFileFailed": "Failed to choose file: {error}",
-  "@chatPickFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatPickFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatStartCallFailed": "Could not start call: {error}",
-  "@chatStartCallFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatStartCallFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCreateConversationFailed": "Failed to create conversation: {message}",
-  "@chatCreateConversationFailed": {"placeholders": {"message": {"type": "String"}}},
+  "@chatCreateConversationFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatDeletedForEveryone": "Message deleted for everyone",
   "chatDeletedForMe": "Message deleted for me",
   "chatOriginalMessageNotFound": "Original message not found",
   "chatLoadMessagesFailed": "Failed to load messages: {message}",
-  "@chatLoadMessagesFailed": {"placeholders": {"message": {"type": "String"}}},
+  "@chatLoadMessagesFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatMessagePlaceholder": "[Message]",
   "chatMyself": "myself",
   "chatReplyingTo": "Replying to {name}",
-  "@chatReplyingTo": {"placeholders": {"name": {"type": "String"}}},
+  "@chatReplyingTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "chatAudioMessage": "[Voice message]",
   "chatPhoto": "[Photo]",
   "chatFile": "[File]",
@@ -1496,16 +1605,40 @@
   "chatNoPhotos": "No photos",
   "chatUserNotFound": "User not found. Please log in again.",
   "chatFindConversationFailed": "Error finding conversation: {error}",
-  "@chatFindConversationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatFindConversationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatConversationError": "Conversation error: {message}",
-  "@chatConversationError": {"placeholders": {"message": {"type": "String"}}},
+  "@chatConversationError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatConversationsError": "Conversations error: {message}",
-  "@chatConversationsError": {"placeholders": {"message": {"type": "String"}}},
+  "@chatConversationsError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatNoFriendsToStart": "No friends found. Add some friends to start chatting!",
   "chatSuggestedFriends": "Suggested friends to message",
   "chatNoConversations": "No conversations found",
   "chatPickImageFailed": "Failed to choose image: {error}",
-  "@chatPickImageFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatPickImageFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatTakePhoto": "Take photo",
   "chatChooseFromLibrary": "Choose from library",
   "chatDiscardGroupTitle": "Discard changes?",
@@ -1513,7 +1646,13 @@
   "chatSelectAtLeastOnePerson": "Please select at least 1 person",
   "chatUserInfoNotFound": "User information not found",
   "chatCreateGroupFailed": "Failed to create group chat: {error}",
-  "@chatCreateGroupFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatCreateGroupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatNewGroup": "New group chat",
   "chatGroupNameOptional": "Group name (optional)",
   "chatSuggestions": "Suggestions",
@@ -1538,19 +1677,43 @@
   "chatChangeGroupName": "Change group name",
   "chatGroupNameChanged": "Group name changed",
   "chatChangeGroupNameFailed": "Could not change group name: {error}",
-  "@chatChangeGroupNameFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatChangeGroupNameFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatVideoCall": "Video call",
   "chatAudioCall": "Audio call",
   "chatMissedCall": "Missed call",
   "chatVideoCallMissed": "Missed video call",
   "chatYouDeletedMessage": "You deleted this message",
   "chatUserDeletedMessage": "{user} deleted this message",
-  "@chatUserDeletedMessage": {"placeholders": {"user": {"type": "String"}}},
+  "@chatUserDeletedMessage": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
   "chatUnreadMessages": "{count} unread messages",
-  "@chatUnreadMessages": {"placeholders": {"count": {"type": "num"}}},
+  "@chatUnreadMessages": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "chatEdited": "Edited",
   "chatSentAt": "Sent {time}",
-  "@chatSentAt": {"placeholders": {"time": {"type": "String"}}},
+  "@chatSentAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "chatMore": "More",
   "chatPin": "Pin",
   "chatForward": "Forward",
@@ -1560,9 +1723,9 @@
   "chatAddMember": "Add member",
   "chatMuteNotifications": "Mute notifications",
   "communityInviteAction": "Invite",
-  "messageDownloadingPhoto":"Downloading image...",
+  "messageDownloadingPhoto": "Downloading image...",
   "messageSavePhotoSuccess": "Image saved to gallery",
-  "messageSavePhotoError":"Failed to save image",
+  "messageSavePhotoError": "Failed to save image",
   "commonMaybeLater": "Maybe later",
   "faceRecognitionSetup": "Set up face recognition",
   "faceRecognitionDescription": "Use your facial data to enable smart AI features and enhance account security.",
@@ -1586,13 +1749,17 @@
   "chatGiphySticker": "GIPHY Sticker",
   "chatGiphySearch": "Search GIPHY stickers...",
   "chatGiphyError": "Error loading GIPHY stickers: {error}",
-  "communityRoadmap": "Roadmap",
   "communityRoadmapNoPoints": "No locations in roadmap yet",
   "communityRoadmapPoint": "Location point",
-  "communityRoadmapViewFull": "View Full Roadmap",
   "communityRoadmapNearby": "Nearby Roadmap",
   "communityRoadmapPosts": "{count} posts",
-  "@communityRoadmapPosts": {"placeholders": {"count": {"type": "num"}}},
+  "@communityRoadmapPosts": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "locationSearchHint": "Search for location...",
   "locationNotFound": "Location not found",
   "locationSearchError": "Error searching for location (network error or not found)",
@@ -1645,5 +1812,65 @@
     }
   },
   "authBannedTemporaryFallback": "Your account has been temporarily locked",
-  "authBannedPermanentFallback": "Your account has been permanently locked"
+  "authBannedPermanentFallback": "Your account has been permanently locked",
+  "timeDayMonth": "{month} {day}",
+  "@timeDayMonth": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "timeDayMonthYear": "{month}/{day}/{year}",
+  "@timeDayMonthYear": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "savedItemsPageTitle": "Saved",
+  "savedItemsArchivedStoriesTitle": "Archived Stories",
+  "savedItemsArchivedStoriesSubtitle": "Review your published stories",
+  "savedItemsOnlySupportPost": "Currently only supports viewing saved posts",
+  "savedItemsCannotOpenPost": "Cannot open saved post",
+  "savedItemsUnsaveDialogTitle": "Unsave this item?",
+  "savedItemsUnsaveDialogContent": "This item will be removed from your saved list.",
+  "savedItemsUnsaveSuccess": "Removed from saved list",
+  "savedItemsLoadErrorTitle": "Cannot load saved list",
+  "savedItemsLoadErrorMessage": "Check your connection and try again.",
+  "savedItemsEmptyTitle": "No items yet",
+  "savedItemsEmptyAllMessage": "Posts you save will appear here.",
+  "savedItemsEmptyFilterMessage": "No items match this filter.",
+  "savedItemsLoadingMore": "Loading more...",
+  "savedItemsPullToLoad": "Pull to load more",
+  "savedItemsReleaseToLoad": "Release to load more",
+  "savedItemsNoMoreData": "No more data",
+  "savedItemsLoadFailed": "Failed to load",
+  "savedItemsNoContent": "No content",
+  "savedItemsUnknownAuthor": "Unknown",
+  "savedItemsOptionsTooltip": "Options",
+  "savedItemsViewDetails": "View details",
+  "savedItemsUnsave": "Unsave",
+  "savedItemsCategoryAll": "All",
+  "savedItemsCategoryPost": "Posts",
+  "savedItemsCategoryReel": "Reels",
+  "savedItemsCategoryComment": "Comments",
+  "storyDefaultTitle": "Story {number}",
+  "@storyDefaultTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
 }

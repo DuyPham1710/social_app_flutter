@@ -59,9 +59,9 @@ class PostLoadingPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Divider(
+                  Divider(
                     thickness: 1,
-                    color: Colors.white,
+                    color: AppColors.divider,
                   ), // Đường kẻ mờ
 
                   Padding(

@@ -366,6 +366,18 @@ abstract class AppLocalizations {
     String time,
   );
 
+  /// No description provided for @sharedPostSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi'**
+  String get sharedPostSent;
+
+  /// No description provided for @sharePostSend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi'**
+  String get sharePostSend;
+
   /// No description provided for @chatTextPreview.
   ///
   /// In vi, this message translates to:
@@ -6257,6 +6269,186 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tài khoản của bạn đã bị khóa vĩnh viễn'**
   String get authBannedPermanentFallback;
+
+  /// No description provided for @timeDayMonth.
+  ///
+  /// In vi, this message translates to:
+  /// **'{day} tháng {month}'**
+  String timeDayMonth(String day, String month);
+
+  /// No description provided for @timeDayMonthYear.
+  ///
+  /// In vi, this message translates to:
+  /// **'{day}/{month}/{year}'**
+  String timeDayMonthYear(String day, String month, String year);
+
+  /// No description provided for @savedItemsPageTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu'**
+  String get savedItemsPageTitle;
+
+  /// No description provided for @savedItemsArchivedStoriesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tin lưu trữ'**
+  String get savedItemsArchivedStoriesTitle;
+
+  /// No description provided for @savedItemsArchivedStoriesSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem lại các story đã đăng'**
+  String get savedItemsArchivedStoriesSubtitle;
+
+  /// No description provided for @savedItemsOnlySupportPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu'**
+  String get savedItemsOnlySupportPost;
+
+  /// No description provided for @savedItemsCannotOpenPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể mở bài viết đã lưu'**
+  String get savedItemsCannotOpenPost;
+
+  /// No description provided for @savedItemsUnsaveDialogTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ lưu mục này?'**
+  String get savedItemsUnsaveDialogTitle;
+
+  /// No description provided for @savedItemsUnsaveDialogContent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mục này sẽ được xóa khỏi danh sách đã lưu.'**
+  String get savedItemsUnsaveDialogContent;
+
+  /// No description provided for @savedItemsUnsaveSuccess.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã xóa khỏi danh sách đã lưu'**
+  String get savedItemsUnsaveSuccess;
+
+  /// No description provided for @savedItemsLoadErrorTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể tải danh sách đã lưu'**
+  String get savedItemsLoadErrorTitle;
+
+  /// No description provided for @savedItemsLoadErrorMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Kiểm tra kết nối rồi thử lại.'**
+  String get savedItemsLoadErrorMessage;
+
+  /// No description provided for @savedItemsEmptyTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có mục nào'**
+  String get savedItemsEmptyTitle;
+
+  /// No description provided for @savedItemsEmptyAllMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các bài viết bạn lưu sẽ xuất hiện ở đây.'**
+  String get savedItemsEmptyAllMessage;
+
+  /// No description provided for @savedItemsEmptyFilterMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có mục phù hợp với bộ lọc này.'**
+  String get savedItemsEmptyFilterMessage;
+
+  /// No description provided for @savedItemsLoadingMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang tải thêm...'**
+  String get savedItemsLoadingMore;
+
+  /// No description provided for @savedItemsPullToLoad.
+  ///
+  /// In vi, this message translates to:
+  /// **'Kéo để tải thêm'**
+  String get savedItemsPullToLoad;
+
+  /// No description provided for @savedItemsReleaseToLoad.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thả để tải thêm'**
+  String get savedItemsReleaseToLoad;
+
+  /// No description provided for @savedItemsNoMoreData.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hiển thị hết'**
+  String get savedItemsNoMoreData;
+
+  /// No description provided for @savedItemsLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được'**
+  String get savedItemsLoadFailed;
+
+  /// No description provided for @savedItemsNoContent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có nội dung'**
+  String get savedItemsNoContent;
+
+  /// No description provided for @savedItemsUnknownAuthor.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không xác định'**
+  String get savedItemsUnknownAuthor;
+
+  /// No description provided for @savedItemsOptionsTooltip.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tùy chọn'**
+  String get savedItemsOptionsTooltip;
+
+  /// No description provided for @savedItemsViewDetails.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem chi tiết'**
+  String get savedItemsViewDetails;
+
+  /// No description provided for @savedItemsUnsave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ lưu'**
+  String get savedItemsUnsave;
+
+  /// No description provided for @savedItemsCategoryAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tất cả'**
+  String get savedItemsCategoryAll;
+
+  /// No description provided for @savedItemsCategoryPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bài viết'**
+  String get savedItemsCategoryPost;
+
+  /// No description provided for @savedItemsCategoryReel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thước phim'**
+  String get savedItemsCategoryReel;
+
+  /// No description provided for @savedItemsCategoryComment.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bình luận'**
+  String get savedItemsCategoryComment;
+
+  /// No description provided for @storyDefaultTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tin {number}'**
+  String storyDefaultTitle(int number);
 }
 
 class _AppLocalizationsDelegate

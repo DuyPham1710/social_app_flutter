@@ -27,6 +27,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/po
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_options_bottom_sheet.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/save_post_bottom_sheet.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/share_post_bottom_sheet.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_header.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/community_post_header.dart';
@@ -444,6 +445,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 ownerUserId: post.user.userId,
                               );
                             },
+                            onShareTap: () {
+                              SharePostBottomSheet.show(context, widget.post);
+                            },
                             onSaveTap: () {
                               if (_isSaved) {
                                 _handleUnsave();
@@ -486,6 +490,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 postId: widget.post.id,
                                 ownerUserId: post.user.userId,
                               );
+                            },
+                            onShareTap: () {
+                              SharePostBottomSheet.show(context, widget.post);
                             },
                             onSaveTap: () {
                               if (_isSaved) {

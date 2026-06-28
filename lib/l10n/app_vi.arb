@@ -8,7 +8,7 @@
   "commonBlock": "Chặn",
   "commonPrivacySupport": "Quyền riêng tư & Hỗ trợ",
   "commonMoreActions": "Hành động khác",
-  "commonSavePhotoPermissionMessage":"Cần quyền truy cập ảnh để lưu ảnh",
+  "commonSavePhotoPermissionMessage": "Cần quyền truy cập ảnh để lưu ảnh",
   "commonSettings": "Cài đặt",
   "commonOpenSettings": "Mở Cài đặt",
   "commonRetry": "Thử lại",
@@ -58,6 +58,8 @@
   "chatSomeone": "Ai đó",
   "chatConnected": "Đã kết nối",
   "chatSentAttachmentPreview": "{senderPrefix}đã gửi {attachmentType}   •   {time}",
+  "sharedPostSent": "Đã gửi",
+  "sharePostSend": "Gửi",
   "@chatSentAttachmentPreview": {
     "placeholders": {
       "senderPrefix": {
@@ -672,9 +674,9 @@
   "communitySearchMembersHint": "Tìm thành viên",
   "communitySendingInvite": "Đang gửi lời mời...",
   "communityType": "Loại cộng đồng",
-  "communityRoadmap": "Bản đồ Cộng đồng",
+  "communityRoadmap": "Bản đồ",
   "communityRoadmapTitle": "Bản đồ lộ trình",
-  "communityRoadmapViewFull": "Xem bản đồ",
+  "communityRoadmapViewFull": "Xem bản đồ lớn",
   "communityRoadmapEmpty": "Chưa có địa điểm nào trên bản đồ",
   "communityRoadmapMyLocation": "Vị trí của tôi",
   "communityRoadmapPostCount": "{count} bài viết",
@@ -1242,11 +1244,16 @@
   "commonContentCopied": "Đã sao chép nội dung",
   "commonEdit": "Chỉnh sửa",
   "commonLinkCopied": "Đã sao chép liên kết",
-  "commonNo": "Không",
   "commonRemove": "Gỡ",
   "commonSeeMore": "Xem thêm",
   "commonSendWithCount": "Gửi ({count})",
-  "@commonSendWithCount": {"placeholders": {"count": {"type": "num"}}},
+  "@commonSendWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "commonUpdate": "Cập nhật",
   "commonViewAll": "Xem tất cả",
   "searchHint": "Tìm kiếm",
@@ -1293,7 +1300,13 @@
   "commentYourComment": "bình luận của bạn",
   "commentWriteReplyHint": "Viết phản hồi...",
   "commentReplyToHint": "Trả lời {user}...",
-  "@commentReplyToHint": {"placeholders": {"user": {"type": "String"}}},
+  "@commentReplyToHint": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
   "commentWriteHint": "Viết bình luận...",
   "commentEditHistoryTitle": "Lịch sử chỉnh sửa",
   "commentNoEditHistory": "Chưa có lịch sử chỉnh sửa",
@@ -1301,7 +1314,16 @@
   "commentEditVersion": "Lần chỉnh sửa {version} • {time}",
   "commentOldContent": "Nội dung cũ",
   "commentNewContent": "Nội dung mới",
-  "@commentEditVersion": {"placeholders": {"version": {"type": "num"}, "time": {"type": "String"}}},
+  "@commentEditVersion": {
+    "placeholders": {
+      "version": {
+        "type": "num"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "storyPrivacyTitle": "Quyền riêng tư của tin",
   "storyPrivacyQuestion": "Ai có thể xem tin của bạn?",
   "storyPrivacyVisibleFor24h": "Tin của bạn sẽ hiển thị trong 24 giờ.",
@@ -1314,7 +1336,16 @@
   "storyPrivacyNoOneSelected": "Chưa chọn ai",
   "storyPrivacyOnePerson": "1 người",
   "storyPrivacyAndOthers": "{firstNames} và {count} người khác",
-  "@storyPrivacyAndOthers": {"placeholders": {"firstNames": {"type": "String"}, "count": {"type": "num"}}},
+  "@storyPrivacyAndOthers": {
+    "placeholders": {
+      "firstNames": {
+        "type": "String"
+      },
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "storySelectPeopleToShare": "Chọn người để chia sẻ tin",
   "storyPrivacyUpdated": "Đã cập nhật quyền riêng tư",
   "storyPrivacyUpdateFailed": "Không thể cập nhật quyền riêng tư",
@@ -1334,7 +1365,13 @@
   "storyDeletePhoto": "Xóa ảnh",
   "storyCopyShareLink": "Sao chép liên kết để chia sẻ tin này",
   "storyLinkVisibility": "Tin sẽ hiển thị với đối tượng của {user} trong 24 giờ.",
-  "@storyLinkVisibility": {"placeholders": {"user": {"type": "String"}}},
+  "@storyLinkVisibility": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
   "storyArchivePageTitle": "Tin lưu trữ",
   "storyNoArchivedStories": "Chưa có tin lưu trữ nào",
   "storyDefaultName": "Tin {number}",
@@ -1366,14 +1403,26 @@
   "storyImageOnlyEdit": "Chỉ có thể chỉnh sửa ảnh",
   "storyCannotReadDeviceFile": "Không thể đọc file từ thiết bị",
   "storyImageEditFailed": "Lỗi khi chỉnh sửa ảnh: {error}",
-  "@storyImageEditFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@storyImageEditFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "storyText": "Văn bản",
   "storyPhotoGroup": "Nhóm ảnh",
   "storySelectMultipleFiles": "Chọn nhiều file",
   "storyLibrary": "Thư viện",
   "storyChooseFolder": "Chọn thư mục",
   "storyItemCount": "{count} mục",
-  "@storyItemCount": {"placeholders": {"count": {"type": "num"}}},
+  "@storyItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "storyLibraryPermissionRequired": "Cần quyền truy cập thư viện để hiển thị ảnh/video.",
   "storyNoMediaInLibrary": "Chưa có ảnh/video trong thư viện.",
   "storyReactedPeople": "Người đã bày tỏ cảm xúc",
@@ -1443,7 +1492,13 @@
   "chatDownloadingFile": "Đang tải file...",
   "chatNoAppToOpenFile": "Không tìm thấy ứng dụng để mở file này",
   "chatOpenFileFailed": "Không thể mở file: {error}",
-  "@chatOpenFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatOpenFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatLoadingEditHistory": "Đang tải lịch sử chỉnh sửa...",
   "chatPinInDevelopment": "Tính năng ghim tin nhắn đang phát triển",
   "chatForwardInDevelopment": "Tính năng chuyển tiếp đang phát triển",
@@ -1457,38 +1512,92 @@
   "chatSendLocationMessage": "Gửi vị trí",
   "chatCurrentLocation": "Vị trí hiện tại",
   "chatGetLocationFailed": "Không thể lấy vị trí: {error}",
-  "@chatGetLocationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatGetLocationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatSendingFile": "Đang gửi file...",
   "chatPhotoPermissionTitle": "Quyền truy cập ảnh",
   "chatPhotoPermissionMessage": "Ứng dụng cần quyền truy cập ảnh để hiển thị ảnh từ thư viện. Vui lòng cấp quyền trong Cài đặt.",
   "chatPhotoPermissionRequired": "Cần quyền truy cập ảnh để hiển thị thư viện",
   "chatLoadPhotosFailed": "Lỗi khi tải ảnh: {error}",
-  "@chatLoadPhotosFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatLoadPhotosFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCameraPermissionMessage": "Ứng dụng cần quyền truy cập camera để chụp ảnh.",
   "chatOpenCameraFailed": "Lỗi khi mở camera: {error}",
-  "@chatOpenCameraFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatOpenCameraFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCapturedPhoto": "Ảnh vừa chụp",
   "chatTapSendToShare": "Nhấn gửi để chia sẻ",
   "chatMissingConversationForPhoto": "Không thể gửi ảnh: thiếu conversation ID",
   "chatSendPhotoFailed": "Lỗi khi gửi ảnh: {error}",
-  "@chatSendPhotoFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatSendPhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCannotProcessPhoto": "Không thể xử lý ảnh",
   "chatMissingConversationForFile": "Không thể gửi file: thiếu conversation ID",
   "chatPickFileFailed": "Lỗi khi chọn file: {error}",
-  "@chatPickFileFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatPickFileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatStartCallFailed": "Không thể thực hiện cuộc gọi: {error}",
-  "@chatStartCallFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatStartCallFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatCreateConversationFailed": "Lỗi tạo cuộc trò chuyện: {message}",
-  "@chatCreateConversationFailed": {"placeholders": {"message": {"type": "String"}}},
+  "@chatCreateConversationFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatDeletedForEveryone": "Đã xóa tin nhắn cho mọi người",
   "chatDeletedForMe": "Đã xóa tin nhắn cho tôi",
   "chatOriginalMessageNotFound": "Không tìm thấy tin nhắn gốc",
   "chatLoadMessagesFailed": "Lỗi khi tải tin nhắn: {message}",
-  "@chatLoadMessagesFailed": {"placeholders": {"message": {"type": "String"}}},
+  "@chatLoadMessagesFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatMessagePlaceholder": "[Tin nhắn]",
   "chatMyself": "chính mình",
   "chatReplyingTo": "Trả lời {name}",
-  "@chatReplyingTo": {"placeholders": {"name": {"type": "String"}}},
+  "@chatReplyingTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "chatAudioMessage": "[Tin nhắn thoại]",
   "chatPhoto": "[Ảnh]",
   "chatFile": "[Tệp tin]",
@@ -1496,16 +1605,40 @@
   "chatNoPhotos": "Không có ảnh nào",
   "chatUserNotFound": "Không tìm thấy người dùng. Vui lòng đăng nhập lại.",
   "chatFindConversationFailed": "Lỗi khi tìm cuộc trò chuyện: {error}",
-  "@chatFindConversationFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatFindConversationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatConversationError": "Lỗi cuộc trò chuyện: {message}",
-  "@chatConversationError": {"placeholders": {"message": {"type": "String"}}},
+  "@chatConversationError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatConversationsError": "Lỗi danh sách cuộc trò chuyện: {message}",
-  "@chatConversationsError": {"placeholders": {"message": {"type": "String"}}},
+  "@chatConversationsError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "chatNoFriendsToStart": "Chưa có bạn bè. Hãy thêm bạn bè để bắt đầu nhắn tin!",
   "chatSuggestedFriends": "Bạn bè gợi ý để nhắn tin",
   "chatNoConversations": "Không có cuộc trò chuyện nào",
   "chatPickImageFailed": "Lỗi khi chọn ảnh: {error}",
-  "@chatPickImageFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatPickImageFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatTakePhoto": "Chụp ảnh",
   "chatChooseFromLibrary": "Chọn từ thư viện",
   "chatDiscardGroupTitle": "Hủy thao tác?",
@@ -1513,7 +1646,13 @@
   "chatSelectAtLeastOnePerson": "Vui lòng chọn ít nhất 1 người",
   "chatUserInfoNotFound": "Không tìm thấy thông tin người dùng",
   "chatCreateGroupFailed": "Lỗi khi tạo nhóm chat: {error}",
-  "@chatCreateGroupFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatCreateGroupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatNewGroup": "Nhóm chat mới",
   "chatGroupNameOptional": "Tên nhóm (không bắt buộc)",
   "chatSuggestions": "Gợi ý",
@@ -1538,19 +1677,43 @@
   "chatChangeGroupName": "Đổi tên nhóm",
   "chatGroupNameChanged": "Đã đổi tên nhóm thành công",
   "chatChangeGroupNameFailed": "Không thể đổi tên nhóm: {error}",
-  "@chatChangeGroupNameFailed": {"placeholders": {"error": {"type": "String"}}},
+  "@chatChangeGroupNameFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "chatVideoCall": "Cuộc gọi video",
   "chatAudioCall": "Cuộc gọi thoại",
   "chatMissedCall": "Nhỡ cuộc gọi",
   "chatVideoCallMissed": "Đã bỏ lỡ cuộc gọi video",
   "chatYouDeletedMessage": "Bạn đã xóa tin nhắn này",
   "chatUserDeletedMessage": "{user} đã xóa tin nhắn này",
-  "@chatUserDeletedMessage": {"placeholders": {"user": {"type": "String"}}},
+  "@chatUserDeletedMessage": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
   "chatUnreadMessages": "{count} tin nhắn chưa đọc",
-  "@chatUnreadMessages": {"placeholders": {"count": {"type": "num"}}},
+  "@chatUnreadMessages": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "chatEdited": "Đã chỉnh sửa",
   "chatSentAt": "Đã gửi {time}",
-  "@chatSentAt": {"placeholders": {"time": {"type": "String"}}},
+  "@chatSentAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "chatMore": "Khác",
   "chatPin": "Ghim",
   "chatForward": "Chuyển tiếp",
@@ -1560,7 +1723,7 @@
   "chatAddMember": "Thêm thành viên",
   "chatMuteNotifications": "Tắt thông báo",
   "communityInviteAction": "Mời",
-  "messageDownloadingPhoto":"Đang tải ảnh xuống...",
+  "messageDownloadingPhoto": "Đang tải ảnh xuống...",
   "messageSavePhotoSuccess": "Đã lưu ảnh vào thư viện",
   "messageSavePhotoError": "Lỗi khi lưu ảnh",
   "commonMaybeLater": "Để sau",
@@ -1586,13 +1749,17 @@
   "chatGiphySticker": "Nhãn dán GIPHY",
   "chatGiphySearch": "Tìm kiếm sticker GIPHY...",
   "chatGiphyError": "Lỗi tải sticker GIPHY: {error}",
-  "communityRoadmap": "Bản đồ",
   "communityRoadmapNoPoints": "Chưa có địa điểm nào trên bản đồ",
   "communityRoadmapPoint": "Điểm đến",
-  "communityRoadmapViewFull": "Xem bản đồ lớn",
   "communityRoadmapNearby": "Địa điểm gần đây",
   "communityRoadmapPosts": "{count} bài viết",
-  "@communityRoadmapPosts": {"placeholders": {"count": {"type": "num"}}},
+  "@communityRoadmapPosts": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
   "locationSearchHint": "Tìm kiếm vị trí...",
   "locationNotFound": "Không tìm thấy vị trí",
   "locationSearchError": "Lỗi tìm kiếm vị trí (có thể do lỗi kết nối hoặc không tìm thấy)",
@@ -1620,7 +1787,6 @@
   "notificationTitleCommunityPostApproved": "Bài viết trong cộng đồng được phê duyệt",
   "notificationTitleCommunityPostRejected": "Bài viết trong cộng đồng bị từ chối",
   "notificationTitleCommunityPostPending": "Bài viết trong cộng đồng đang chờ duyệt",
-
   "authBannedTitle": "Tài Khoản Bị Khóa",
   "authBannedUntil": "Thời gian mở khóa dự kiến:",
   "authBannedReason": "Lý do khóa:",
@@ -1646,5 +1812,65 @@
     }
   },
   "authBannedTemporaryFallback": "Tài khoản của bạn tạm thời bị khóa",
-  "authBannedPermanentFallback": "Tài khoản của bạn đã bị khóa vĩnh viễn"
+  "authBannedPermanentFallback": "Tài khoản của bạn đã bị khóa vĩnh viễn",
+  "timeDayMonth": "{day} tháng {month}",
+  "@timeDayMonth": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "timeDayMonthYear": "{day}/{month}/{year}",
+  "@timeDayMonthYear": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "savedItemsPageTitle": "Đã lưu",
+  "savedItemsArchivedStoriesTitle": "Tin lưu trữ",
+  "savedItemsArchivedStoriesSubtitle": "Xem lại các story đã đăng",
+  "savedItemsOnlySupportPost": "Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu",
+  "savedItemsCannotOpenPost": "Không thể mở bài viết đã lưu",
+  "savedItemsUnsaveDialogTitle": "Bỏ lưu mục này?",
+  "savedItemsUnsaveDialogContent": "Mục này sẽ được xóa khỏi danh sách đã lưu.",
+  "savedItemsUnsaveSuccess": "Đã xóa khỏi danh sách đã lưu",
+  "savedItemsLoadErrorTitle": "Không thể tải danh sách đã lưu",
+  "savedItemsLoadErrorMessage": "Kiểm tra kết nối rồi thử lại.",
+  "savedItemsEmptyTitle": "Chưa có mục nào",
+  "savedItemsEmptyAllMessage": "Các bài viết bạn lưu sẽ xuất hiện ở đây.",
+  "savedItemsEmptyFilterMessage": "Không có mục phù hợp với bộ lọc này.",
+  "savedItemsLoadingMore": "Đang tải thêm...",
+  "savedItemsPullToLoad": "Kéo để tải thêm",
+  "savedItemsReleaseToLoad": "Thả để tải thêm",
+  "savedItemsNoMoreData": "Đã hiển thị hết",
+  "savedItemsLoadFailed": "Không tải được",
+  "savedItemsNoContent": "Không có nội dung",
+  "savedItemsUnknownAuthor": "Không xác định",
+  "savedItemsOptionsTooltip": "Tùy chọn",
+  "savedItemsViewDetails": "Xem chi tiết",
+  "savedItemsUnsave": "Bỏ lưu",
+  "savedItemsCategoryAll": "Tất cả",
+  "savedItemsCategoryPost": "Bài viết",
+  "savedItemsCategoryReel": "Thước phim",
+  "savedItemsCategoryComment": "Bình luận",
+  "storyDefaultTitle": "Tin {number}",
+  "@storyDefaultTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
 }

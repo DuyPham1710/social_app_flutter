@@ -556,6 +556,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
       replyTo: event.replyTo,
       metadata: event.metadata,
       storyId: event.storyId,
+      postId: event.postId,
     );
     // Note: Message will be added to list via message:new event from backend
   }

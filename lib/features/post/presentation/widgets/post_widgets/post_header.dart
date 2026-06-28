@@ -13,6 +13,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
+import 'package:social_app_fe/shared/widgets/custom_popup_menu_button.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 class PostHeader extends StatelessWidget {
@@ -20,6 +21,7 @@ class PostHeader extends StatelessWidget {
   final DateTime? createdAt;
   final VoidCallback? onReportTap;
   final VoidCallback? onOptionsTap;
+  final VoidCallback? onShareTap;
   final VoidCallback? onSaveTap;
   final bool? isSaved;
   final List<UserEntity>? taggedUsers;
@@ -34,6 +36,7 @@ class PostHeader extends StatelessWidget {
     this.createdAt,
     this.onReportTap,
     this.onOptionsTap,
+    this.onShareTap,
     this.onSaveTap,
     this.isSaved,
     this.taggedUsers,
@@ -145,29 +148,31 @@ class PostHeader extends StatelessWidget {
 
               if (isOwner) {
                 // Nếu là chủ sở hữu, hiển thị icon để mở options
-                return IconButton(
-                  icon: Icon(
-                    Icons.more_horiz,
-                    size: 20.rsp(context),
-                    color: AppColors.iconPrimary,
+                return InkWell(
+                  onTap: onOptionsTap,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.more_horiz,
+                      size: 20.rsp(context),
+                      color: AppColors.iconPrimary,
+                    ),
                   ),
-                  onPressed: onOptionsTap,
                 );
               } else {
-                // Nếu không phải chủ sở hữu, hiển thị menu report/share
-                return PopupMenuButton<String>(
+                return CustomPopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_horiz,
                     size: 20.rsp(context),
                     color: AppColors.iconPrimary,
                   ),
                   color: AppColors.background,
-                  surfaceTintColor: Colors.transparent,
                   onSelected: (value) async {
                     if (value == 'report') {
                       onReportTap?.call();
                     } else if (value == 'share') {
-                      // TODO: Thêm logic chia sẻ bài viết nếu cần
+                      onShareTap?.call();
                     } else if (value == 'save') {
                       onSaveTap?.call();
                     } else if (value == 'toggle_tag_visibility') {
@@ -179,7 +184,7 @@ class PostHeader extends StatelessWidget {
                       onRemoveTagTap?.call();
                     }
                   },
-                  itemBuilder: (context) =>
+                  itemBuilder: (popupContext) =>
                       _buildPopupMenuItems(context, currentUserId),
                 );
               }

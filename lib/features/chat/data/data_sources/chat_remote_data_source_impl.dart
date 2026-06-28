@@ -812,9 +812,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     String? replyTo,
     Map<String, dynamic>? metadata,
     String? storyId,
+    String? postId,
   }) {
     developer.log(
-      'Sending message to conversation: $conversationId, storyId: $storyId',
+      'Sending message to conversation: $conversationId, storyId: $storyId, postId: $postId',
       name: 'ChatDataSource',
     );
 
@@ -849,6 +850,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
     if (storyId != null && storyId.isNotEmpty) {
       messageData['storyId'] = storyId;
+    }
+
+    if (postId != null && postId.isNotEmpty) {
+      messageData['postId'] = postId;
     }
 
     _socketClient.emit('message:send', messageData);

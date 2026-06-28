@@ -202,7 +202,7 @@ class SavedArchivedStoriesPage extends StatelessWidget {
                                   child: Text(
                                     (story.title == null ||
                                             story.title!.trim().isEmpty)
-                                        ? 'Tin ${index + 1}'
+                                        ? context.l10n.storyDefaultTitle(index + 1)
                                         : story.title!,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,

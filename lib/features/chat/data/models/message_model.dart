@@ -1,5 +1,6 @@
 import 'package:social_app_fe/core/enums/emoji.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
+import 'package:social_app_fe/features/post/data/models/post_model.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
 import 'parent_message_model.dart';
@@ -203,6 +204,7 @@ class MessageModel {
   final bool isEdited;
   final MessageMetadataModel? metadata;
   final StoryReplyModel? story;
+  final PostModel? post;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -220,6 +222,7 @@ class MessageModel {
     this.isEdited = false,
     this.metadata,
     this.story,
+    this.post,
     required this.createdAt,
     this.updatedAt,
   });
@@ -307,6 +310,36 @@ class MessageModel {
       }
     }
 
+    // Parse post if present
+    PostModel? post;
+    if (json['post'] != null && json['post'] is Map) {
+      try {
+        final postMap = json['post'] is Map<String, dynamic>
+            ? json['post'] as Map<String, dynamic>
+            : Map<String, dynamic>.from(json['post'] as Map);
+            
+        // Map string array urls to PostUrlModel objects
+        if (postMap['urls'] is List) {
+          postMap['urls'] = (postMap['urls'] as List).map((item) {
+            if (item is Map) {
+              return item;
+            } else {
+              return {
+                '_id': item.toString(),
+                'url': item.toString(),
+                'order': 0,
+              };
+            }
+          }).toList();
+        }
+        
+        post = PostModel.fromJson(postMap);
+      } catch (e) {
+        print('Error parsing post share: $e');
+        post = null;
+      }
+    }
+
     return MessageModel(
       id: json['_id'] as String,
       conversationId: json['conversationId'] as String?,
@@ -333,6 +366,7 @@ class MessageModel {
       isEdited: json['isEdited'] as bool? ?? false,
       metadata: metadata,
       story: story,
+      post: post,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -354,6 +388,7 @@ class MessageModel {
     'isEdited': isEdited,
     'metadata': metadata?.toJson(),
     'story': story?.toJson(),
+    'post': post?.toJson(),
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt?.toIso8601String(),
   };
@@ -372,6 +407,7 @@ class MessageModel {
     isEdited: isEdited,
     metadata: metadata?.toEntity(),
     story: story?.toEntity(),
+    post: post,
     createdAt: createdAt,
     updatedAt: updatedAt,
   );

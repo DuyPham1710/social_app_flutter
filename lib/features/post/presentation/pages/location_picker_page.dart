@@ -406,7 +406,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
                         itemCount: _suggestions.length,
-                        separatorBuilder: (context, index) => Divider(height: 1, color: AppColors.textSecondary.withValues(alpha: 0.1)),
+                        separatorBuilder: (context, index) => Divider(height: 1, color: AppColors.divider),
                         itemBuilder: (context, index) {
                           final suggestion = _suggestions[index];
                           final displayName = suggestion['display_name'] as String? ?? '';

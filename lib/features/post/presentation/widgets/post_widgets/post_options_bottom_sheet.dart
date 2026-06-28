@@ -243,7 +243,7 @@ class _PostOptionsBottomSheetState extends State<PostOptionsBottomSheet> {
                 ),
               ),
 
-              const Divider(height: 1, thickness: 1),
+              Divider(height: 1, thickness: 1, color: AppColors.divider),
 
               if (widget.showOwnerActions) ...[
                 ListTile(

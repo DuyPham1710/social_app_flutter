@@ -14,6 +14,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
+import 'package:social_app_fe/shared/widgets/custom_popup_menu_button.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 /// Community Post Header
@@ -25,6 +26,7 @@ class CommunityPostHeader extends StatelessWidget {
   final DateTime? createdAt;
   final VoidCallback? onOptionsTap;
   final VoidCallback? onReportTap;
+  final VoidCallback? onShareTap;
   final VoidCallback? onSaveTap;
   final bool isSaved;
   final bool showCommunityInfo; // Ẩn info nhóm khi xem trong community detail
@@ -38,6 +40,7 @@ class CommunityPostHeader extends StatelessWidget {
     this.createdAt,
     this.onOptionsTap,
     this.onReportTap,
+    this.onShareTap,
     this.onSaveTap,
     this.isSaved = false,
     this.showCommunityInfo = true, // Default: hiển thị info nhóm
@@ -288,11 +291,11 @@ class CommunityPostHeader extends StatelessWidget {
                   final canReport =
                       onReportTap != null && !isOwner && !isCommunityAdmin;
 
-                  if (!canDelete && !canSave && !canReport) {
+                  if (!canDelete && !canSave && !canReport && onShareTap == null) {
                     return const SizedBox.shrink();
                   }
 
-                  return PopupMenuButton<String>(
+                  return CustomPopupMenuButton<String>(
                     color: AppColors.background,
                     onSelected: (value) {
                       if (value == 'delete') {
@@ -301,9 +304,26 @@ class CommunityPostHeader extends StatelessWidget {
                         onSaveTap?.call();
                       } else if (value == 'report') {
                         onReportTap?.call();
+                      } else if (value == 'share') {
+                        onShareTap?.call();
                       }
                     },
-                    itemBuilder: (BuildContext context) => [
+                    itemBuilder: (BuildContext popupContext) => [
+                      if (onShareTap != null)
+                        PopupMenuItem(
+                          value: 'share',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.share,
+                                size: 18.rsp(context),
+                                color: AppColors.iconPrimary,
+                              ),
+                              SizedBox(width: 8.rs(context)),
+                              Text(context.l10n.postShare),
+                            ],
+                          ),
+                        ),
                       if (canSave)
                         PopupMenuItem(
                           value: 'save',

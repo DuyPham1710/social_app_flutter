@@ -153,6 +153,12 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get sharedPostSent => 'Đã gửi';
+
+  @override
+  String get sharePostSend => 'Gửi';
+
+  @override
   String chatTextPreview(String prefix, String message, String time) {
     return '$prefix$message   •   $time';
   }
@@ -3590,4 +3596,104 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get authBannedPermanentFallback =>
       'Tài khoản của bạn đã bị khóa vĩnh viễn';
+
+  @override
+  String timeDayMonth(String day, String month) {
+    return '$day tháng $month';
+  }
+
+  @override
+  String timeDayMonthYear(String day, String month, String year) {
+    return '$day/$month/$year';
+  }
+
+  @override
+  String get savedItemsPageTitle => 'Đã lưu';
+
+  @override
+  String get savedItemsArchivedStoriesTitle => 'Tin lưu trữ';
+
+  @override
+  String get savedItemsArchivedStoriesSubtitle => 'Xem lại các story đã đăng';
+
+  @override
+  String get savedItemsOnlySupportPost =>
+      'Hiện chỉ hỗ trợ xem chi tiết bài viết đã lưu';
+
+  @override
+  String get savedItemsCannotOpenPost => 'Không thể mở bài viết đã lưu';
+
+  @override
+  String get savedItemsUnsaveDialogTitle => 'Bỏ lưu mục này?';
+
+  @override
+  String get savedItemsUnsaveDialogContent =>
+      'Mục này sẽ được xóa khỏi danh sách đã lưu.';
+
+  @override
+  String get savedItemsUnsaveSuccess => 'Đã xóa khỏi danh sách đã lưu';
+
+  @override
+  String get savedItemsLoadErrorTitle => 'Không thể tải danh sách đã lưu';
+
+  @override
+  String get savedItemsLoadErrorMessage => 'Kiểm tra kết nối rồi thử lại.';
+
+  @override
+  String get savedItemsEmptyTitle => 'Chưa có mục nào';
+
+  @override
+  String get savedItemsEmptyAllMessage =>
+      'Các bài viết bạn lưu sẽ xuất hiện ở đây.';
+
+  @override
+  String get savedItemsEmptyFilterMessage =>
+      'Không có mục phù hợp với bộ lọc này.';
+
+  @override
+  String get savedItemsLoadingMore => 'Đang tải thêm...';
+
+  @override
+  String get savedItemsPullToLoad => 'Kéo để tải thêm';
+
+  @override
+  String get savedItemsReleaseToLoad => 'Thả để tải thêm';
+
+  @override
+  String get savedItemsNoMoreData => 'Đã hiển thị hết';
+
+  @override
+  String get savedItemsLoadFailed => 'Không tải được';
+
+  @override
+  String get savedItemsNoContent => 'Không có nội dung';
+
+  @override
+  String get savedItemsUnknownAuthor => 'Không xác định';
+
+  @override
+  String get savedItemsOptionsTooltip => 'Tùy chọn';
+
+  @override
+  String get savedItemsViewDetails => 'Xem chi tiết';
+
+  @override
+  String get savedItemsUnsave => 'Bỏ lưu';
+
+  @override
+  String get savedItemsCategoryAll => 'Tất cả';
+
+  @override
+  String get savedItemsCategoryPost => 'Bài viết';
+
+  @override
+  String get savedItemsCategoryReel => 'Thước phim';
+
+  @override
+  String get savedItemsCategoryComment => 'Bình luận';
+
+  @override
+  String storyDefaultTitle(int number) {
+    return 'Tin $number';
+  }
 }

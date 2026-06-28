@@ -47,6 +47,7 @@ import '../widgets/face_detected_notification_item.dart';
 import '../widgets/tag_notification_item.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -105,12 +106,7 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   String _timeAgo(BuildContext context, DateTime time) {
-    final l10n = context.l10n;
-    final diff = DateTime.now().difference(time);
-    if (diff.inMinutes == 0) return l10n.postJustNow;
-    if (diff.inMinutes < 60) return l10n.timeMinutesAgo(diff.inMinutes);
-    if (diff.inHours < 24) return l10n.timeHoursAgo(diff.inHours);
-    return l10n.timeDaysAgo(diff.inDays);
+    return localizedPostTime(context.l10n, time);
   }
 
   void _markAsRead(String notificationId) {

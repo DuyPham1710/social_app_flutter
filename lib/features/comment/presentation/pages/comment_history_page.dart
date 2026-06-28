@@ -8,7 +8,7 @@ import 'package:social_app_fe/features/comment/presentation/bloc/comment_bloc.da
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_event.dart';
 import 'package:social_app_fe/features/comment/presentation/bloc/comment_state.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
 
 class CommentHistoryPage extends StatefulWidget {
   final String commentId;
@@ -308,9 +308,7 @@ class _CommentHistoryPageState extends State<CommentHistoryPage> {
                     Text(
                       context.l10n.commentEditVersion(
                         index + 1,
-                        historyItem.createdAt != null
-                            ? timeago.format(historyItem.createdAt!)
-                            : context.l10n.postUnknownTime,
+                        localizedPostTime(context.l10n, historyItem.createdAt),
                       ),
                       style: TextStyle(
                         fontSize: 12.rsp(context),

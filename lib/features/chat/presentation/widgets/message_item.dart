@@ -25,6 +25,11 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:social_app_fe/core/utils/responsive_helper.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
+import 'package:social_app_fe/features/post/domain/entities/post_entity.dart';
+import 'package:social_app_fe/features/post/domain/usecases/get_post_detail_usecase.dart';
+import 'package:social_app_fe/features/post/presentation/pages/post_detail_page.dart';
 
 class MessageItem extends StatelessWidget {
   final MessageEntity message;
@@ -153,6 +158,7 @@ class MessageItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isReplying = message.replyTo != null;
     final isStoryReply = message.story != null;
+    final isPostShare = message.post != null;
     final hasReactions = message.reactions.isNotEmpty;
     final isEdited = message.isEdited;
     final isDeleteforEveryone = message.deletedForEveryone;
@@ -212,6 +218,7 @@ class MessageItem extends StatelessWidget {
                     lastName,
                     isReplying,
                     isStoryReply,
+                    isPostShare,
                     isLocationMessage,
                     isHasMetaData,
                     isAudioAttachment,
@@ -226,6 +233,7 @@ class MessageItem extends StatelessWidget {
                     lastName,
                     isReplying,
                     isStoryReply,
+                    isPostShare,
                     isLocationMessage,
                     isHasMetaData,
                     isAudioAttachment,
@@ -252,6 +260,7 @@ class MessageItem extends StatelessWidget {
     String lastName,
     bool isReplying,
     bool isStoryReply,
+    bool isPostShare,
     bool isLocationMessage,
     bool isHasMetaData,
     bool isAudioAttachment,
@@ -279,6 +288,8 @@ class MessageItem extends StatelessWidget {
                   ? _buildReplyMessage(context)
                   : isStoryReply
                   ? _buildStoryReplyMessage(context)
+                  : isPostShare
+                  ? _buildPostShareMessage(context)
                   : isLocationMessage
                   ? _buildLocationMessage(context)
                   : isHasMetaData
@@ -760,6 +771,189 @@ class MessageItem extends StatelessWidget {
             SizedBox(height: 4.h),
         ],
       ),
+    );
+  }
+
+  Widget _buildPostShareMessage(BuildContext context) {
+    final postShare = message.post!;
+    final user = postShare.user;
+
+    return Column(
+      crossAxisAlignment:
+          fromMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Shared message text (if any)
+        if (message.text != null && message.text!.isNotEmpty)
+          Container(
+            margin: EdgeInsets.only(bottom: 4.h),
+            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
+            decoration: BoxDecoration(
+              color: fromMe
+                  ? AppColors.primary
+                  : AppColors.textSecondary.withOpacity(0.1),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.r),
+                topRight: Radius.circular(14.r),
+                bottomLeft: Radius.circular(fromMe ? 14.r : 0),
+                bottomRight: Radius.circular(fromMe ? 0 : 14.r),
+              ),
+            ),
+            child: Text(
+              message.text!,
+              style: TextStyle(
+                color: fromMe ? AppColors.background : AppColors.textPrimary,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+
+        // Shared Post UI
+        GestureDetector(
+          onTap: () async {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder:
+                  (_) =>  Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  ),
+            );
+
+            final getPostDetailUseCase = s1<GetPostDetailUsecase>();
+            final result = await getPostDetailUseCase(
+              params: GetPostDetailParams(postId: postShare.id),
+            );
+
+            if (!context.mounted) return;
+            Navigator.of(context).pop();
+
+            if (result is DataStateSuccess<PostEntity> && result.data != null) {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PostDetailPage(post: result.data!),
+                ),
+              );
+            } else {
+              showErrorSnackBar(context, 'Không thể mở bài viết');
+            }
+          },
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: (ResponsiveHelper.isWebOrDesktop ? 350.0 : 0.75.sw),
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: AppColors.textSecondary.withOpacity(0.2),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header: Avatar + User Info
+                Padding(
+                  padding: EdgeInsets.all(12.w),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16.r,
+                        backgroundColor: AppColors.textSecondary.withOpacity(0.1),
+                        backgroundImage: user.avatarUrl != null
+                            ? NetworkImage(user.avatarUrl!)
+                            : null,
+                        child: user.avatarUrl == null
+                            ? Icon(
+                                Icons.person,
+                                size: 18.r,
+                                color: AppColors.textSecondary,
+                              )
+                            : null,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user.fullName ?? user.username!,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              context.l10n.postLabel,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Caption
+                if (postShare.caption != null && postShare.caption!.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(left: 12.w, right: 12.w, bottom: 8.h),
+                    child: Text(
+                      postShare.caption!,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                // Media Image
+                if (postShare.urls.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(15.r),
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.network(
+                        postShare.urls.first.url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: AppColors.textSecondary.withOpacity(0.1),
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 40.sp,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(height: 4.h),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

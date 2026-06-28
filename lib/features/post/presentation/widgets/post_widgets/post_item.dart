@@ -24,6 +24,7 @@ import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/po
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/post_translatable_caption.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/report_post_bottom_sheet.dart';
 import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/save_post_bottom_sheet.dart';
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/share_post_bottom_sheet.dart';
 import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/features/save/domain/repository/save_repository.dart';
 import 'package:social_app_fe/core/resources/data_state.dart';
@@ -369,6 +370,9 @@ class _PostItemState extends State<PostItem> {
                     onOptionsTap: () {
                       _showCommunityPostOptions();
                     },
+                    onShareTap: () {
+                      SharePostBottomSheet.show(context, widget.post);
+                    },
                     onReportTap: () {
                       ReportPostBottomSheet.show(
                         context,
@@ -405,6 +409,9 @@ class _PostItemState extends State<PostItem> {
                   onRemoveTagTap: _handleRemoveTag,
                   onOptionsTap: () {
                     _showPostOptions();
+                  },
+                  onShareTap: () {
+                    SharePostBottomSheet.show(context, widget.post);
                   },
                   isSaved: _isSaved,
                   onReportTap: () {

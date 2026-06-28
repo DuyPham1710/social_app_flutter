@@ -12,6 +12,7 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_event.d
 import 'package:social_app_fe/features/profile/presentation/pages/other_profile_page.dart';
 import 'package:social_app_fe/features/profile/presentation/pages/profile_page.dart';
 import 'package:social_app_fe/features/post/presentation/utils/post_time_formatter.dart';
+import 'package:social_app_fe/shared/widgets/custom_popup_menu_button.dart';
 import 'package:social_app_fe/l10n/l10n.dart';
 
 /// Community Post Header Base
@@ -157,7 +158,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
                 return const SizedBox.shrink();
               }
 
-              return PopupMenuButton<String>(
+              return CustomPopupMenuButton<String>(
                 icon: Icon(Icons.more_horiz, size: 20.rsp(context)),
                 color: AppColors.background,
                 onSelected: (value) {
@@ -169,7 +170,7 @@ class CommunityPostHeaderBase extends StatelessWidget {
                     onOptionsTap?.call();
                   }
                 },
-                itemBuilder: (context) => [
+                itemBuilder: (popupContext) => [
                   if (canSave)
                     PopupMenuItem(
                       value: 'save',
