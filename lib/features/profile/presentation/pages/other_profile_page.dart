@@ -16,16 +16,32 @@ import '../bloc/other_profile_state.dart';
 import '../bloc/other_profile_event.dart';
 import '../widgets/report_user_bottom_sheet.dart';
 
-class OtherProfilePage extends StatefulWidget {
+import 'package:social_app_fe/core/di/injection.dart' as di;
+
+class OtherProfilePage extends StatelessWidget {
   final String userId;
 
   const OtherProfilePage({super.key, required this.userId});
 
   @override
-  State<OtherProfilePage> createState() => _OtherProfilePageState();
+  Widget build(BuildContext context) {
+    return BlocProvider<FriendProfileBloc>(
+      create: (_) => di.s1<FriendProfileBloc>(),
+      child: _OtherProfilePageView(userId: userId),
+    );
+  }
 }
 
-class _OtherProfilePageState extends State<OtherProfilePage> {
+class _OtherProfilePageView extends StatefulWidget {
+  final String userId;
+
+  const _OtherProfilePageView({super.key, required this.userId});
+
+  @override
+  State<_OtherProfilePageView> createState() => _OtherProfilePageViewState();
+}
+
+class _OtherProfilePageViewState extends State<_OtherProfilePageView> {
   final ScrollController _scrollController = ScrollController();
   static const Duration _fadeDuration = Duration(milliseconds: 260);
 
