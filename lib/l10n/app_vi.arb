@@ -1246,6 +1246,7 @@
   "commonLinkCopied": "Đã sao chép liên kết",
   "commonRemove": "Gỡ",
   "commonSeeMore": "Xem thêm",
+  "commonSeeLess": "Ẩn bớt",
   "commonSendWithCount": "Gửi ({count})",
   "@commonSendWithCount": {
     "placeholders": {

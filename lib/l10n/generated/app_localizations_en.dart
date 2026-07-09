@@ -2528,6 +2528,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonSeeMore => 'See more';
 
   @override
+  String get commonSeeLess => 'See less';
+
+  @override
   String commonSendWithCount(num count) {
     return 'Send ($count)';
   }

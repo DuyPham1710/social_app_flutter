@@ -4416,6 +4416,12 @@ abstract class AppLocalizations {
   /// **'Xem thêm'**
   String get commonSeeMore;
 
+  /// No description provided for @commonSeeLess.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ẩn bớt'**
+  String get commonSeeLess;
+
   /// No description provided for @commonSendWithCount.
   ///
   /// In vi, this message translates to:

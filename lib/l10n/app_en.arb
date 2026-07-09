@@ -1246,6 +1246,7 @@
   "commonLinkCopied": "Link copied",
   "commonRemove": "Remove",
   "commonSeeMore": "See more",
+  "commonSeeLess": "See less",
   "commonSendWithCount": "Send ({count})",
   "@commonSendWithCount": {
     "placeholders": {

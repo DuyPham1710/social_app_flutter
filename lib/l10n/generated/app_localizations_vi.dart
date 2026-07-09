@@ -2531,6 +2531,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commonSeeMore => 'Xem thêm';
 
   @override
+  String get commonSeeLess => 'Ẩn bớt';
+
+  @override
   String commonSendWithCount(num count) {
     return 'Gửi ($count)';
   }
