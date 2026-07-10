@@ -45,7 +45,7 @@ jobs:
       - name: Collect APK Information
         run: |
           VERSION="commonshub-v${GITHUB_RUN_NUMBER}"
-          BUILD_DATE=$(date '+%d/%m/%Y %H:%M')
+          BUILD_DATE=$(TZ='Asia/Ho_Chi_Minh' date '+%d/%m/%Y %H:%M')
           APK_SIZE=$(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)
           SHA256=$(sha256sum build/app/outputs/flutter-apk/app-release.apk | awk '{print $1}')
           COMMIT_MESSAGE=$(git log -1 --pretty=%s)
