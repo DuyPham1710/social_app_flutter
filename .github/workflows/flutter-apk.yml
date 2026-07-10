@@ -123,7 +123,12 @@ jobs:
                 json.dump(data,f,indent=2)
             EOF
 
+            echo "Setting permissions..."
+
             sudo chown -R www-data:www-data "$DOWNLOAD_DIR"
+
+            sudo find "$DOWNLOAD_DIR" -type d -exec chmod 755 {} \;
+
             sudo find "$DOWNLOAD_DIR" -type f -exec chmod 644 {} \;
 
-            echo "APK deployment completed."
+            echo "APK deployment completed successfully."

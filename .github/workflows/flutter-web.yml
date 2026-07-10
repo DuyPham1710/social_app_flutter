@@ -61,13 +61,29 @@ jobs:
 
             sudo mkdir -p ${{ secrets.EC2_WEB_DIR }}
 
-            sudo rm -rf ${{ secrets.EC2_WEB_DIR }}/*
+            echo "Cleaning old Flutter Web files..."
+
+            sudo find "${{ secrets.EC2_WEB_DIR }}" \
+                -mindepth 1 \
+                ! -name download \
+                ! -path "${{ secrets.EC2_WEB_DIR }}/download*" \
+                -exec rm -rf {} +
 
             sudo cp -r /tmp/commonshub-web/* \
             ${{ secrets.EC2_WEB_DIR }}/
 
             sudo chown -R www-data:www-data \
             ${{ secrets.EC2_WEB_DIR }}
+
+            sudo find \
+            ${{ secrets.EC2_WEB_DIR }} \
+            -type d \
+            -exec chmod 755 {} \;
+
+            sudo find \
+            ${{ secrets.EC2_WEB_DIR }} \
+            -type f \
+            -exec chmod 644 {} \;
 
             sudo find ${{ secrets.EC2_WEB_DIR }} -type d -exec chmod 755 {} \;
 
