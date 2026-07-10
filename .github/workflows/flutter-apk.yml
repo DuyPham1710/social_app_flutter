@@ -1,0 +1,95 @@
+name: Publish Flutter APK
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  publish-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.1"
+          channel: stable
+          cache: true
+
+      - name: Show Flutter Version
+        run: flutter --version
+
+      - name: Create production .env
+        run: |
+          cat > .env <<EOF
+          BASE_URL=${{ secrets.BASE_URL }}
+          OTP_DURATION=60
+          GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}
+          GOOGLE_SERVER_CLIENT_ID=${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
+          TRANSITION_TIME=400
+          CHAT_DEBOUNCE_TIME=4
+          CHAT_LOAD_LIMIT=25
+          TARGET_BARS=15
+          EOF
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      - name: Upload APK to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "build/app/outputs/flutter-apk/app-release.apk"
+          target: "/tmp/commonshub-apk"
+          strip_components: 4
+          rm: true
+
+      - name: Publish APK
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "Preparing download directory..."
+
+            sudo mkdir -p ${{ secrets.EC2_WEB_DIR }}/download
+            sudo mkdir -p ${{ secrets.EC2_WEB_DIR }}/download/archive
+
+            echo "Publishing archive APK..."
+
+            sudo cp \
+              /tmp/commonshub-apk/app-release.apk \
+              ${{ secrets.EC2_WEB_DIR }}/download/archive/commonshub-v${{ github.run_number }}.apk
+
+            echo "Updating latest APK..."
+
+            sudo cp \
+              /tmp/commonshub-apk/app-release.apk \
+              ${{ secrets.EC2_WEB_DIR }}/download/latest.apk
+
+            echo "Updating version information..."
+
+            echo "commonshub-v${{ github.run_number }}" | sudo tee \
+              ${{ secrets.EC2_WEB_DIR }}/download/latest-version.txt > /dev/null
+
+            sudo chown -R www-data:www-data \
+              ${{ secrets.EC2_WEB_DIR }}/download
+
+            sudo find \
+              ${{ secrets.EC2_WEB_DIR }}/download \
+              -type f \
+              -exec chmod 644 {} \;
+
+            echo "APK deployment completed successfully."

@@ -1,4 +1,4 @@
-name: Deploy Flutter Web to EC2
+name: Deploy Flutter Web
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  build-and-deploy:
+  deploy-web:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,12 +16,9 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.1'
+          flutter-version: "3.35.1"
           channel: stable
           cache: true
-
-      - name: Show Flutter version
-        run: flutter --version
 
       - name: Create production .env
         run: |
@@ -36,18 +33,13 @@ jobs:
           TARGET_BARS=15
           EOF
 
-      - name: Check generated .env
-        run: |
-          echo "Production .env created:"
-          cat .env
-
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Flutter Web
         run: flutter build web --release
 
-      - name: Upload Flutter Web to EC2 temp folder
+      - name: Upload Web
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -58,7 +50,7 @@ jobs:
           strip_components: 2
           rm: true
 
-      - name: Publish Flutter Web to Nginx folder
+      - name: Deploy Web
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -67,24 +59,20 @@ jobs:
           script: |
             set -e
 
-            echo "Preparing web directory..."
             sudo mkdir -p ${{ secrets.EC2_WEB_DIR }}
 
-            echo "Removing old web files..."
             sudo rm -rf ${{ secrets.EC2_WEB_DIR }}/*
 
-            echo "Copying new Flutter Web files..."
-            sudo cp -r /tmp/commonshub-web/* ${{ secrets.EC2_WEB_DIR }}/
+            sudo cp -r /tmp/commonshub-web/* \
+            ${{ secrets.EC2_WEB_DIR }}/
 
-            echo "Fixing permissions..."
-            sudo chown -R www-data:www-data ${{ secrets.EC2_WEB_DIR }}
+            sudo chown -R www-data:www-data \
+            ${{ secrets.EC2_WEB_DIR }}
+
             sudo find ${{ secrets.EC2_WEB_DIR }} -type d -exec chmod 755 {} \;
+
             sudo find ${{ secrets.EC2_WEB_DIR }} -type f -exec chmod 644 {} \;
 
-            echo "Testing Nginx..."
             sudo nginx -t
 
-            echo "Reloading Nginx..."
             sudo systemctl reload nginx
-
-            echo "Deploy completed successfully."
