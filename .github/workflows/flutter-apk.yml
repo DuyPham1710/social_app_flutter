@@ -20,7 +20,7 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Show Flutter Version
+      - name: Flutter Version
         run: flutter --version
 
       - name: Create production .env
@@ -39,10 +39,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Release APK
+      - name: Build APK
         run: flutter build apk --release
 
-      - name: Upload APK to EC2
+      - name: Collect APK Information
+        run: |
+          echo "VERSION=commonshub-v${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date '+%d/%m/%Y %H:%M')" >> $GITHUB_ENV
+          echo "APK_SIZE=$(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)" >> $GITHUB_ENV
+          echo "SHA256=$(sha256sum build/app/outputs/flutter-apk/app-release.apk | awk '{print $1}')" >> $GITHUB_ENV
+
+      - name: Upload APK
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -55,41 +62,68 @@ jobs:
 
       - name: Publish APK
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          VERSION: ${{ env.VERSION }}
+          BUILD_DATE: ${{ env.BUILD_DATE }}
+          APK_SIZE: ${{ env.APK_SIZE }}
+          SHA256: ${{ env.SHA256 }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: VERSION,BUILD_DATE,APK_SIZE,SHA256
           script: |
             set -e
 
-            echo "Preparing download directory..."
+            DOWNLOAD_DIR="${{ secrets.EC2_WEB_DIR }}/download"
+            ARCHIVE_DIR="$DOWNLOAD_DIR/archive"
 
-            sudo mkdir -p ${{ secrets.EC2_WEB_DIR }}/download
-            sudo mkdir -p ${{ secrets.EC2_WEB_DIR }}/download/archive
+            sudo mkdir -p "$DOWNLOAD_DIR"
+            sudo mkdir -p "$ARCHIVE_DIR"
 
-            echo "Publishing archive APK..."
+            ARCHIVE_FILE="${VERSION}.apk"
 
-            sudo cp \
-              /tmp/commonshub-apk/app-release.apk \
-              ${{ secrets.EC2_WEB_DIR }}/download/archive/commonshub-v${{ github.run_number }}.apk
+            sudo cp /tmp/commonshub-apk/app-release.apk "$DOWNLOAD_DIR/latest.apk"
 
-            echo "Updating latest APK..."
+            sudo cp /tmp/commonshub-apk/app-release.apk "$ARCHIVE_DIR/$ARCHIVE_FILE"
 
-            sudo cp \
-              /tmp/commonshub-apk/app-release.apk \
-              ${{ secrets.EC2_WEB_DIR }}/download/latest.apk
+            echo "$VERSION" | sudo tee "$DOWNLOAD_DIR/latest-version.txt" >/dev/null
+            echo "$BUILD_DATE" | sudo tee "$DOWNLOAD_DIR/latest-date.txt" >/dev/null
+            echo "$APK_SIZE" | sudo tee "$DOWNLOAD_DIR/latest-size.txt" >/dev/null
+            echo "$SHA256" | sudo tee "$DOWNLOAD_DIR/latest-sha256.txt" >/dev/null
 
-            echo "Updating version information..."
+            sudo python3 <<EOF
+            import json, os
 
-            echo "commonshub-v${{ github.run_number }}" | sudo tee \
-              ${{ secrets.EC2_WEB_DIR }}/download/latest-version.txt > /dev/null
+            file = "$DOWNLOAD_DIR/versions.json"
 
-            sudo chown -R www-data:www-data \
-              ${{ secrets.EC2_WEB_DIR }}/download
+            item = {
+                "version":"$VERSION",
+                "date":"$BUILD_DATE",
+                "size":"$APK_SIZE",
+                "file":"archive/$ARCHIVE_FILE"
+            }
 
-            sudo find \
-              ${{ secrets.EC2_WEB_DIR }}/download \
-              -type f \
-              -exec chmod 644 {} \;
+            if os.path.exists(file):
+                with open(file,"r") as f:
+                    try:
+                        data=json.load(f)
+                    except:
+                        data=[]
+            else:
+                data=[]
 
-            echo "APK deployment completed successfully."
+            data=[x for x in data if x["version"]!=item["version"]]
+
+            data.insert(0,item)
+
+            data=data[:10]
+
+            with open(file,"w") as f:
+                json.dump(data,f,indent=2)
+            EOF
+
+            sudo chown -R www-data:www-data "$DOWNLOAD_DIR"
+            sudo find "$DOWNLOAD_DIR" -type f -exec chmod 644 {} \;
+
+            echo "APK deployment completed."
