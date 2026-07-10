@@ -825,7 +825,7 @@
       }
     }
   },
-  "friendPeopleYouMayKnow": "Những người bạn có thể biết",
+  "friendPeopleYouMayKnow": "Gợi ý kết bạn",
   "friendReject": "Từ chối",
   "friendRemove": "Gỡ",
   "friendRequestAccepted": "Đã chấp nhận lời mời kết bạn",
@@ -1658,7 +1658,7 @@
   "chatSuggestions": "Gợi ý",
   "chatGroupName": "Tên nhóm",
   "chatCreateGroup": "Tạo nhóm chat",
-  "chatPeopleYouMayKnow": "Những người bạn có thể biết",
+  "chatPeopleYouMayKnow": "Gợi ý kết bạn",
   "chatNoFriendSuggestions": "Hiện chưa có gợi ý bạn bè",
   "chatDeleteMessageTitle": "Xóa tin nhắn?",
   "chatDeleteForEveryone": "Xóa đối với mọi người",

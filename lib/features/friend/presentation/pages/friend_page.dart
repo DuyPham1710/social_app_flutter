@@ -105,7 +105,7 @@ class _FriendPageState extends State<FriendPage>
 
                     SizedBox(height: 20.rsh(context)),
 
-                    // Những người bạn có thể biết
+                    // Gợi ý kết bạn
                     _buildSectionHeader(
                       title: context.l10n.friendPeopleYouMayKnow,
                     ),

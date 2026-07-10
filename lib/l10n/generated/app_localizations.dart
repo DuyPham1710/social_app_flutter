@@ -2979,7 +2979,7 @@ abstract class AppLocalizations {
   /// No description provided for @friendPeopleYouMayKnow.
   ///
   /// In vi, this message translates to:
-  /// **'Những người bạn có thể biết'**
+  /// **'Gợi ý kết bạn'**
   String get friendPeopleYouMayKnow;
 
   /// No description provided for @friendReject.
@@ -5637,7 +5637,7 @@ abstract class AppLocalizations {
   /// No description provided for @chatPeopleYouMayKnow.
   ///
   /// In vi, this message translates to:
-  /// **'Những người bạn có thể biết'**
+  /// **'Gợi ý kết bạn'**
   String get chatPeopleYouMayKnow;
 
   /// No description provided for @chatNoFriendSuggestions.

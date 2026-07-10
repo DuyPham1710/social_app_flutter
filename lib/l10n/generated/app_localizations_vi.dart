@@ -1668,7 +1668,7 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get friendPeopleYouMayKnow => 'Những người bạn có thể biết';
+  String get friendPeopleYouMayKnow => 'Gợi ý kết bạn';
 
   @override
   String get friendReject => 'Từ chối';
@@ -3247,7 +3247,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get chatCreateGroup => 'Tạo nhóm chat';
 
   @override
-  String get chatPeopleYouMayKnow => 'Những người bạn có thể biết';
+  String get chatPeopleYouMayKnow => 'Gợi ý kết bạn';
 
   @override
   String get chatNoFriendSuggestions => 'Hiện chưa có gợi ý bạn bè';

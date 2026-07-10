@@ -8,6 +8,7 @@ import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart
 import 'package:social_app_fe/features/friend/domain/entities/friend_request_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_suggestion_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/relationship_status_entity.dart';
+import 'package:social_app_fe/features/friend/domain/entities/activity_summary_entity.dart';
 import 'package:social_app_fe/features/friend/domain/repository/friend_repository.dart';
 
 class FriendRepositoryImpl implements FriendRepository {
@@ -314,6 +315,29 @@ class FriendRepositoryImpl implements FriendRepository {
       return DataStateSuccess(response);
     } catch (e) {
       return DataStateError(e as DioException);
+    }
+  }
+
+  @override
+  Future<DataState<ActivitySummaryEntity>> getFriendActivitiesSummary(
+    String targetUserId, {
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final Map<String, dynamic> queries = {};
+      if (startDate != null) queries['startDate'] = startDate;
+      if (endDate != null) queries['endDate'] = endDate;
+
+      final response = await friendService.getFriendActivitiesSummary(
+        targetUserId,
+        queries.isNotEmpty ? queries : null,
+      );
+      return DataStateSuccess(response);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    } catch (e) {
+      return DataStateError(DioException(requestOptions: RequestOptions(path: '')));
     }
   }
 }
