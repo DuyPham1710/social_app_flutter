@@ -255,6 +255,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageImageAttachment => '[Photo]';
 
   @override
+  String get messageSharedPostAttachment => '[Shared post]';
+
+  @override
   String get messageVideoAttachment => '[Video]';
 
   @override
@@ -2257,6 +2260,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get postNotFound => 'Post not found';
+
+  @override
+  String get postNoPermission => 'You do not have permission to view this post';
+
+  @override
+  String get sharedAPost => 'shared a post';
+
+  @override
+  String get tapToViewPost => 'Tap to view post';
 
   @override
   String get postOnlyMe => 'Only me';

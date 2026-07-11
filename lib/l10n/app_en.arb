@@ -151,6 +151,7 @@
   "messageLocation": "Location",
   "messageVoiceAttachment": "[Voice message]",
   "messageImageAttachment": "[Photo]",
+  "messageSharedPostAttachment": "[Shared post]",
   "messageVideoAttachment": "[Video]",
   "messageFileAttachment": "[File]",
   "messageGenericAttachment": "[Attachment]",
@@ -1115,6 +1116,9 @@
   "postNoComments": "No comments yet",
   "postNoReactions": "No reactions yet",
   "postNotFound": "Post not found",
+  "postNoPermission": "You do not have permission to view this post",
+  "sharedAPost": "shared a post",
+  "tapToViewPost": "Tap to view post",
   "postOnlyMe": "Only me",
   "postOtherPeople": "{count, plural, =1{1 other person} other{{count} other people}}",
   "@postOtherPeople": {

@@ -153,6 +153,7 @@
   "messageLocation": "Vị trí",
   "messageVoiceAttachment": "[Tin nhắn thoại]",
   "messageImageAttachment": "[Ảnh]",
+  "messageSharedPostAttachment": "[Chia sẻ]",
   "messageVideoAttachment": "[Video]",
   "messageFileAttachment": "[Tệp tin]",
   "messageGenericAttachment": "[Đính kèm]",
@@ -1115,6 +1116,9 @@
   "postNoComments": "Chưa có bình luận",
   "postNoReactions": "Chưa có lượt bày tỏ cảm xúc",
   "postNotFound": "Không tìm thấy bài viết",
+  "postNoPermission": "Bạn không có quyền xem bài viết này",
+  "sharedAPost": "đã chia sẻ một bài viết",
+  "tapToViewPost": "Nhấn để xem bài viết",
   "postOnlyMe": "Chỉ mình tôi",
   "postOtherPeople": "{count, plural, =1{1 người khác} other{{count} người khác}}",
   "@postOtherPeople": {

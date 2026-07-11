@@ -528,6 +528,12 @@ abstract class AppLocalizations {
   /// **'[Ảnh]'**
   String get messageImageAttachment;
 
+  /// No description provided for @messageSharedPostAttachment.
+  ///
+  /// In vi, this message translates to:
+  /// **'[Chia sẻ]'**
+  String get messageSharedPostAttachment;
+
   /// No description provided for @messageVideoAttachment.
   ///
   /// In vi, this message translates to:
@@ -3983,6 +3989,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Không tìm thấy bài viết'**
   String get postNotFound;
+
+  /// No description provided for @postNoPermission.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn không có quyền xem bài viết này'**
+  String get postNoPermission;
+
+  /// No description provided for @sharedAPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'đã chia sẻ một bài viết'**
+  String get sharedAPost;
+
+  /// No description provided for @tapToViewPost.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhấn để xem bài viết'**
+  String get tapToViewPost;
 
   /// No description provided for @postOnlyMe.
   ///

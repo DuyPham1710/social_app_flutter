@@ -257,6 +257,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get messageImageAttachment => '[Ảnh]';
 
   @override
+  String get messageSharedPostAttachment => '[Chia sẻ]';
+
+  @override
   String get messageVideoAttachment => '[Video]';
 
   @override
@@ -2260,6 +2263,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get postNotFound => 'Không tìm thấy bài viết';
+
+  @override
+  String get postNoPermission => 'Bạn không có quyền xem bài viết này';
+
+  @override
+  String get sharedAPost => 'đã chia sẻ một bài viết';
+
+  @override
+  String get tapToViewPost => 'Nhấn để xem bài viết';
 
   @override
   String get postOnlyMe => 'Chỉ mình tôi';

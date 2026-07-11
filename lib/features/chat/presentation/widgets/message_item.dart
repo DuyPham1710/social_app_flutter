@@ -836,7 +836,21 @@ class MessageItem extends StatelessWidget {
                 ),
               );
             } else {
-              showErrorSnackBar(context, 'Không thể mở bài viết');
+              String errorMsg = context.l10n.postNotFound;
+              if (result is DataStateError && result.error is DioException) {
+                final dioError = result.error as DioException;
+                if (dioError.response?.data != null && dioError.response?.data is Map) {
+                  final message = dioError.response?.data['message'];
+                  if (message == 'POST_NO_PERMISSION') {
+                    errorMsg = context.l10n.postNoPermission;
+                  } else if (message == 'POST_NOT_FOUND' || message == 'Post not found') {
+                    errorMsg = context.l10n.postNotFound;
+                  } else if (message != null) {
+                    errorMsg = message.toString();
+                  }
+                }
+              }
+              showErrorSnackBar(context, errorMsg);
             }
           },
           child: Container(
@@ -858,98 +872,53 @@ class MessageItem extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header: Avatar + User Info
-                Padding(
-                  padding: EdgeInsets.all(12.w),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16.r,
-                        backgroundColor: AppColors.textSecondary.withOpacity(0.1),
-                        backgroundImage: user.avatarUrl != null
-                            ? NetworkImage(user.avatarUrl!)
-                            : null,
-                        child: user.avatarUrl == null
-                            ? Icon(
-                                Icons.person,
-                                size: 18.r,
-                                color: AppColors.textSecondary,
-                              )
-                            : null,
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user.fullName ?? user.username!,
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              context.l10n.postLabel,
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
+            child: Padding(
+              padding: EdgeInsets.all(12.w),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.article_rounded,
+                      color: AppColors.primary,
+                      size: 24.sp,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          context.l10n.sharedAPost,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Caption
-                if (postShare.caption != null && postShare.caption!.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.only(left: 12.w, right: 12.w, bottom: 8.h),
-                    child: Text(
-                      postShare.caption!,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: AppColors.textPrimary,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-
-                // Media Image
-                if (postShare.urls.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(15.r),
-                    ),
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.network(
-                        postShare.urls.first.url,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: AppColors.textSecondary.withOpacity(0.1),
-                          child: Icon(
-                            Icons.broken_image,
-                            size: 40.sp,
-                            color: AppColors.textSecondary,
+                        SizedBox(height: 4.h),
+                        Text(
+                          context.l10n.tapToViewPost,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  )
-                else
-                  SizedBox(height: 4.h),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

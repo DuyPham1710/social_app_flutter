@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -1315,7 +1315,21 @@ class _NotificationPageState extends State<NotificationPage> {
           // Post doesn't exist or error loading
           Navigator.of(context).pop(); // Close loading page
 
-          showErrorSnackBar(context, context.l10n.postNotFound);
+          String errorMsg = context.l10n.postNotFound;
+          if (result is DataStateError && result.error is DioException) {
+            final dioError = result.error as DioException;
+            if (dioError.response?.data != null && dioError.response?.data is Map) {
+              final message = dioError.response?.data['message'];
+              if (message == 'POST_NO_PERMISSION') {
+                errorMsg = context.l10n.postNoPermission;
+              } else if (message == 'POST_NOT_FOUND' || message == 'Post not found') {
+                errorMsg = context.l10n.postNotFound;
+              } else if (message != null) {
+                errorMsg = message.toString();
+              }
+            }
+          }
+          showErrorSnackBar(context, errorMsg);
 
           // Delete the notification
           try {
