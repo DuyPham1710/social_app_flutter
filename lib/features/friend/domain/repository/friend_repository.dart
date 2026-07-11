@@ -3,6 +3,7 @@ import 'package:social_app_fe/features/friend/domain/entities/friend_entity.dart
 import 'package:social_app_fe/features/friend/domain/entities/friend_request_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/friend_suggestion_entity.dart';
 import 'package:social_app_fe/features/friend/domain/entities/relationship_status_entity.dart';
+import 'package:social_app_fe/features/friend/domain/entities/activity_summary_entity.dart';
 
 abstract class FriendRepository {
   // Gửi lời mời kết bạn
@@ -48,6 +49,13 @@ abstract class FriendRepository {
   Future<DataState<List<FriendSuggestionEntity>>> getFriendSuggestions({
     int page = 1,
     int limit = 10,
+  });
+
+  Future<DataState<ActivitySummaryEntity>> getFriendActivitiesSummary(
+    String targetUserId, {
+    String? startDate,
+    String? endDate,
+    String? language,
   });
 
   //Lấy list friend của 1 user

@@ -10,9 +10,54 @@ import 'package:social_app_fe/features/profile/presentation/bloc/profile_state.d
 import 'package:social_app_fe/l10n/l10n.dart';
 import 'package:social_app_fe/shared/helpers/show_dialog_success.dart';
 import 'package:social_app_fe/shared/helpers/show_error_snackBar.dart';
+import 'package:social_app_fe/core/di/injection.dart';
+import 'package:social_app_fe/features/profile/domain/repository/user_repository.dart';
+import 'package:social_app_fe/core/resources/data_state.dart';
 
-class PrivacySecurityPage extends StatelessWidget {
+class PrivacySecurityPage extends StatefulWidget {
   const PrivacySecurityPage({super.key});
+
+  @override
+  State<PrivacySecurityPage> createState() => _PrivacySecurityPageState();
+}
+
+class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
+  bool _notifyOnFaceDetected = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationSettings();
+  }
+
+  Future<void> _loadNotificationSettings() async {
+    final result = await s1<UserRepository>().getNotificationSettings();
+    if (mounted && result is DataStateSuccess) {
+      setState(() {
+        _notifyOnFaceDetected =
+            result.data?['notifyOnFaceDetected'] as bool? ?? true;
+      });
+    }
+  }
+
+  Future<void> _toggleFaceDetectedNotification(bool value) async {
+    setState(() {
+      _notifyOnFaceDetected = value;
+    });
+    final result = await s1<UserRepository>().updateNotificationSettings(
+      notifyOnFaceDetected: value,
+    );
+    if (mounted) {
+      if (result is DataStateSuccess) {
+        final newValue = result.data?['notifyOnFaceDetected'] as bool? ?? value;
+        setState(() => _notifyOnFaceDetected = newValue);
+      } else {
+        // Rollback on failure
+        setState(() => _notifyOnFaceDetected = !value);
+        showErrorSnackBar(context, context.l10n.notificationUpdateSettingsError);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +196,36 @@ class PrivacySecurityPage extends StatelessWidget {
                           ],
                         ),
                       ),
+
+                      SizedBox(height: 24.rsh(context)),
+
+                      Text(
+                        l10n.notificationSettingsTitle,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.rsp(context),
+                        ),
+                      ),
+
+                      SizedBox(height: 16.rsh(context)),
+
+                      Container(
+                        decoration: BoxDecoration(
+                          color: itemBgColor,
+                          borderRadius: BorderRadius.circular(16.rsr(context)),
+                          border: Border.all(color: AppColors.divider),
+                        ),
+                        child: _buildSwitchItem(
+                          context,
+                          icon: CupertinoIcons.bell_fill,
+                          iconColor: Colors.blue,
+                          title: l10n.notificationFaceDetectionTitle,
+                          subtitle: l10n.notificationFaceDetectionSubtitle,
+                          value: _notifyOnFaceDetected,
+                          onChanged: _toggleFaceDetectedNotification,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -212,6 +287,65 @@ class PrivacySecurityPage extends StatelessWidget {
               ),
             ),
             trailing,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwitchItem(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return InkWell(
+      onTap: () => onChanged(!value),
+      borderRadius: BorderRadius.circular(16.rsr(context)),
+      child: Padding(
+        padding: EdgeInsets.all(16.rs(context)),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.rs(context)),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 24.rsp(context)),
+            ),
+            SizedBox(width: 16.rs(context)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.rsp(context),
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 4.rsh(context)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13.rsp(context),
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: value,
+              activeColor: AppColors.primary,
+              onChanged: onChanged,
+            ),
           ],
         ),
       ),

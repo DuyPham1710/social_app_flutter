@@ -1671,7 +1671,7 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get friendPeopleYouMayKnow => 'Những người bạn có thể biết';
+  String get friendPeopleYouMayKnow => 'Gợi ý kết bạn';
 
   @override
   String get friendReject => 'Từ chối';
@@ -3262,7 +3262,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get chatCreateGroup => 'Tạo nhóm chat';
 
   @override
-  String get chatPeopleYouMayKnow => 'Những người bạn có thể biết';
+  String get chatPeopleYouMayKnow => 'Gợi ý kết bạn';
 
   @override
   String get chatNoFriendSuggestions => 'Hiện chưa có gợi ý bạn bè';
@@ -3711,4 +3711,76 @@ class AppLocalizationsVi extends AppLocalizations {
   String storyDefaultTitle(int number) {
     return 'Tin $number';
   }
+
+  @override
+  String aiSummaryTitle(String name) {
+    return 'Tóm Tắt Hoạt Động của $name';
+  }
+
+  @override
+  String aiSummarySubtitle(String name) {
+    return 'Bạn chưa kịp cập nhật tình hình của $name? Hãy để AI điểm nhanh các hoạt động của $name giúp bạn nhé!';
+  }
+
+  @override
+  String get aiSummaryStartButton => 'Bắt đầu tóm tắt';
+
+  @override
+  String aiSummaryPosts(int count) {
+    return '$count Bài viết';
+  }
+
+  @override
+  String aiSummaryComments(int count) {
+    return '$count Bình luận';
+  }
+
+  @override
+  String aiSummaryReacts(int count) {
+    return '$count Cảm xúc';
+  }
+
+  @override
+  String aiSummaryStories(int count) {
+    return '$count Story';
+  }
+
+  @override
+  String aiSummaryDateRange(String range) {
+    return 'Khoảng thời gian: $range';
+  }
+
+  @override
+  String get aiSummarySelectDateRange => 'Chọn khoảng thời gian';
+
+  @override
+  String get aiSummaryPast7Days => '7 ngày qua';
+
+  @override
+  String get aiSummaryPast30Days => '30 ngày qua';
+
+  @override
+  String get aiSummaryAllTime => 'Tất cả thời gian';
+
+  @override
+  String get aiSummaryCustomDate => 'Tùy chọn ngày...';
+
+  @override
+  String aiSummaryCustomDateRange(String startDate, String endDate) {
+    return 'Từ $startDate đến $endDate';
+  }
+
+  @override
+  String get notificationSettingsTitle => 'Cài đặt thông báo';
+
+  @override
+  String get notificationFaceDetectionTitle => 'Nhận diện khuôn mặt';
+
+  @override
+  String get notificationFaceDetectionSubtitle =>
+      'Nhận thông báo khi có người đăng ảnh có mặt bạn';
+
+  @override
+  String get notificationUpdateSettingsError =>
+      'Không thể cập nhật cài đặt thông báo';
 }

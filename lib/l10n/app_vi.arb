@@ -826,7 +826,7 @@
       }
     }
   },
-  "friendPeopleYouMayKnow": "Những người bạn có thể biết",
+  "friendPeopleYouMayKnow": "Gợi ý kết bạn",
   "friendReject": "Từ chối",
   "friendRemove": "Gỡ",
   "friendRequestAccepted": "Đã chấp nhận lời mời kết bạn",
@@ -1663,7 +1663,7 @@
   "chatSuggestions": "Gợi ý",
   "chatGroupName": "Tên nhóm",
   "chatCreateGroup": "Tạo nhóm chat",
-  "chatPeopleYouMayKnow": "Những người bạn có thể biết",
+  "chatPeopleYouMayKnow": "Gợi ý kết bạn",
   "chatNoFriendSuggestions": "Hiện chưa có gợi ý bạn bè",
   "chatDeleteMessageTitle": "Xóa tin nhắn?",
   "chatDeleteForEveryone": "Xóa đối với mọi người",
@@ -1877,5 +1877,82 @@
         "type": "int"
       }
     }
-  }
+  },
+  "aiSummaryTitle": "Tóm Tắt Hoạt Động của {name}",
+  "@aiSummaryTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSummarySubtitle": "Bạn chưa kịp cập nhật tình hình của {name}? Hãy để AI điểm nhanh các hoạt động của {name} giúp bạn nhé!",
+  "@aiSummarySubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSummaryStartButton": "Bắt đầu tóm tắt",
+  "aiSummaryPosts": "{count} Bài viết",
+  "@aiSummaryPosts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryComments": "{count} Bình luận",
+  "@aiSummaryComments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryReacts": "{count} Cảm xúc",
+  "@aiSummaryReacts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryStories": "{count} Story",
+  "@aiSummaryStories": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryDateRange": "Khoảng thời gian: {range}",
+  "@aiSummaryDateRange": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSummarySelectDateRange": "Chọn khoảng thời gian",
+  "aiSummaryPast7Days": "7 ngày qua",
+  "aiSummaryPast30Days": "30 ngày qua",
+  "aiSummaryAllTime": "Tất cả thời gian",
+  "aiSummaryCustomDate": "Tùy chọn ngày...",
+  "aiSummaryCustomDateRange": "Từ {startDate} đến {endDate}",
+  "@aiSummaryCustomDateRange": {
+    "placeholders": {
+      "startDate": {
+        "type": "String"
+      },
+      "endDate": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationSettingsTitle": "Cài đặt thông báo",
+  "notificationFaceDetectionTitle": "Nhận diện khuôn mặt",
+  "notificationFaceDetectionSubtitle": "Nhận thông báo khi có người đăng ảnh có mặt bạn",
+  "notificationUpdateSettingsError": "Không thể cập nhật cài đặt thông báo"
 }

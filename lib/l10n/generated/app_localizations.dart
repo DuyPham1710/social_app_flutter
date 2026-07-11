@@ -2985,7 +2985,7 @@ abstract class AppLocalizations {
   /// No description provided for @friendPeopleYouMayKnow.
   ///
   /// In vi, this message translates to:
-  /// **'Những người bạn có thể biết'**
+  /// **'Gợi ý kết bạn'**
   String get friendPeopleYouMayKnow;
 
   /// No description provided for @friendReject.
@@ -5667,7 +5667,7 @@ abstract class AppLocalizations {
   /// No description provided for @chatPeopleYouMayKnow.
   ///
   /// In vi, this message translates to:
-  /// **'Những người bạn có thể biết'**
+  /// **'Gợi ý kết bạn'**
   String get chatPeopleYouMayKnow;
 
   /// No description provided for @chatNoFriendSuggestions.
@@ -6479,6 +6479,114 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tin {number}'**
   String storyDefaultTitle(int number);
+
+  /// No description provided for @aiSummaryTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tóm Tắt Hoạt Động của {name}'**
+  String aiSummaryTitle(String name);
+
+  /// No description provided for @aiSummarySubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn chưa kịp cập nhật tình hình của {name}? Hãy để AI điểm nhanh các hoạt động của {name} giúp bạn nhé!'**
+  String aiSummarySubtitle(String name);
+
+  /// No description provided for @aiSummaryStartButton.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bắt đầu tóm tắt'**
+  String get aiSummaryStartButton;
+
+  /// No description provided for @aiSummaryPosts.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} Bài viết'**
+  String aiSummaryPosts(int count);
+
+  /// No description provided for @aiSummaryComments.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} Bình luận'**
+  String aiSummaryComments(int count);
+
+  /// No description provided for @aiSummaryReacts.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} Cảm xúc'**
+  String aiSummaryReacts(int count);
+
+  /// No description provided for @aiSummaryStories.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} Story'**
+  String aiSummaryStories(int count);
+
+  /// No description provided for @aiSummaryDateRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoảng thời gian: {range}'**
+  String aiSummaryDateRange(String range);
+
+  /// No description provided for @aiSummarySelectDateRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn khoảng thời gian'**
+  String get aiSummarySelectDateRange;
+
+  /// No description provided for @aiSummaryPast7Days.
+  ///
+  /// In vi, this message translates to:
+  /// **'7 ngày qua'**
+  String get aiSummaryPast7Days;
+
+  /// No description provided for @aiSummaryPast30Days.
+  ///
+  /// In vi, this message translates to:
+  /// **'30 ngày qua'**
+  String get aiSummaryPast30Days;
+
+  /// No description provided for @aiSummaryAllTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tất cả thời gian'**
+  String get aiSummaryAllTime;
+
+  /// No description provided for @aiSummaryCustomDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tùy chọn ngày...'**
+  String get aiSummaryCustomDate;
+
+  /// No description provided for @aiSummaryCustomDateRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'Từ {startDate} đến {endDate}'**
+  String aiSummaryCustomDateRange(String startDate, String endDate);
+
+  /// No description provided for @notificationSettingsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt thông báo'**
+  String get notificationSettingsTitle;
+
+  /// No description provided for @notificationFaceDetectionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận diện khuôn mặt'**
+  String get notificationFaceDetectionTitle;
+
+  /// No description provided for @notificationFaceDetectionSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận thông báo khi có người đăng ảnh có mặt bạn'**
+  String get notificationFaceDetectionSubtitle;
+
+  /// No description provided for @notificationUpdateSettingsError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể cập nhật cài đặt thông báo'**
+  String get notificationUpdateSettingsError;
 }
 
 class _AppLocalizationsDelegate

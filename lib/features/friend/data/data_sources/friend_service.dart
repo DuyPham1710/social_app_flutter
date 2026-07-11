@@ -3,6 +3,7 @@ import 'package:retrofit/retrofit.dart';
 import 'package:social_app_fe/features/friend/data/models/friend_model.dart';
 import 'package:social_app_fe/features/friend/data/models/friend_request_model.dart';
 import 'package:social_app_fe/features/friend/data/models/relationship_status_model.dart';
+import 'package:social_app_fe/features/friend/data/models/activity_summary_model.dart';
 
 part 'friend_service.g.dart';
 
@@ -81,5 +82,12 @@ abstract class FriendService {
   @GET('/friends/suggestions')
   Future<Map<String, dynamic>> getFriendSuggestions(
     @Queries() Map<String, dynamic> queries,
+  );
+
+  // Lấy tóm tắt hoạt động bằng AI
+  @GET('/friends/{targetUserId}/activities-summary')
+  Future<ActivitySummaryModel> getFriendActivitiesSummary(
+    @Path('targetUserId') String targetUserId,
+    @Queries() Map<String, dynamic>? queries,
   );
 }
