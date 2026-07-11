@@ -3744,4 +3744,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String aiSummaryCustomDateRange(String startDate, String endDate) {
     return 'From $startDate to $endDate';
   }
+
+  @override
+  String get notificationSettingsTitle => 'Notification Settings';
+
+  @override
+  String get notificationFaceDetectionTitle => 'Face Detection';
+
+  @override
+  String get notificationFaceDetectionSubtitle =>
+      'Get notified when someone posts a photo with your face';
+
+  @override
+  String get notificationUpdateSettingsError =>
+      'Failed to update notification settings';
 }

@@ -6539,6 +6539,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Từ {startDate} đến {endDate}'**
   String aiSummaryCustomDateRange(String startDate, String endDate);
+
+  /// No description provided for @notificationSettingsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt thông báo'**
+  String get notificationSettingsTitle;
+
+  /// No description provided for @notificationFaceDetectionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận diện khuôn mặt'**
+  String get notificationFaceDetectionTitle;
+
+  /// No description provided for @notificationFaceDetectionSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận thông báo khi có người đăng ảnh có mặt bạn'**
+  String get notificationFaceDetectionSubtitle;
+
+  /// No description provided for @notificationUpdateSettingsError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thể cập nhật cài đặt thông báo'**
+  String get notificationUpdateSettingsError;
 }
 
 class _AppLocalizationsDelegate

@@ -1946,5 +1946,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notificationSettingsTitle": "Notification Settings",
+  "notificationFaceDetectionTitle": "Face Detection",
+  "notificationFaceDetectionSubtitle": "Get notified when someone posts a photo with your face",
+  "notificationUpdateSettingsError": "Failed to update notification settings"
 }

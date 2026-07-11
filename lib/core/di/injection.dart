@@ -281,7 +281,9 @@ Future<void> initializeDependencies() async {
 
   // Usecases
   s1.registerLazySingleton<LoginUsecase>(() => LoginUsecase(s1()));
-  s1.registerLazySingleton<DeleteIncompleteRegistrationUsecase>(() => DeleteIncompleteRegistrationUsecase(s1()));
+  s1.registerLazySingleton<DeleteIncompleteRegistrationUsecase>(
+    () => DeleteIncompleteRegistrationUsecase(s1()),
+  );
   //s1.registerLazySingleton<CheckSavedUsecase>(() => CheckSavedUsecase(s1()));
   s1.registerLazySingleton<GetSavedItemsUsecase>(
     () => GetSavedItemsUsecase(s1()),
@@ -450,7 +452,9 @@ Future<void> initializeDependencies() async {
   );
 
   // Profile Repository
-  s1.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(s1()));
+  s1.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(s1(), s1<Dio>()),
+  );
 
   // Profile UseCase
   s1.registerLazySingleton<GetUserProfileUseCase>(

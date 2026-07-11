@@ -3757,4 +3757,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String aiSummaryCustomDateRange(String startDate, String endDate) {
     return 'Từ $startDate đến $endDate';
   }
+
+  @override
+  String get notificationSettingsTitle => 'Cài đặt thông báo';
+
+  @override
+  String get notificationFaceDetectionTitle => 'Nhận diện khuôn mặt';
+
+  @override
+  String get notificationFaceDetectionSubtitle =>
+      'Nhận thông báo khi có người đăng ảnh có mặt bạn';
+
+  @override
+  String get notificationUpdateSettingsError =>
+      'Không thể cập nhật cài đặt thông báo';
 }

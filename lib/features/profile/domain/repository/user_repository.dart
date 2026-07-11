@@ -11,4 +11,8 @@ abstract class UserRepository {
     required String reason,
     String? description,
   });
+  Future<DataState<Map<String, dynamic>>> getNotificationSettings();
+  Future<DataState<Map<String, dynamic>>> updateNotificationSettings({
+    bool? notifyOnFaceDetected,
+  });
 }

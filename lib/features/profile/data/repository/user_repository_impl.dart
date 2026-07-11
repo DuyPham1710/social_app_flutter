@@ -8,8 +8,9 @@ import 'package:social_app_fe/features/profile/domain/repository/user_repository
 
 class UserRepositoryImpl implements UserRepository {
   final UserRemoteDataSource _remoteDataSource;
+  final Dio _dio;
 
-  UserRepositoryImpl(this._remoteDataSource);
+  UserRepositoryImpl(this._remoteDataSource, this._dio);
 
   @override
   Future<DataState<UserModel>> getUserProfile() async {
@@ -74,9 +75,9 @@ class UserRepositoryImpl implements UserRepository {
 
       final userModel = await _remoteDataSource.updateUserProfile(
         fullName: params.fullName,
-        phoneNumber: null, 
-        dateOfBirth: null, 
-        gender: null, 
+        phoneNumber: null,
+        dateOfBirth: null,
+        gender: null,
         bio: params.bio,
         school: params.school,
         currentCity: params.currentCity,
@@ -102,14 +103,42 @@ class UserRepositoryImpl implements UserRepository {
     String? description,
   }) async {
     try {
-      await _remoteDataSource.reportUser(
-        reportedUserId,
-        {
-          'reason': reason,
-          if (description != null) 'description': description,
-        },
-      );
+      await _remoteDataSource.reportUser(reportedUserId, {
+        'reason': reason,
+        if (description != null) 'description': description,
+      });
       return const DataStateSuccess(null);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<Map<String, dynamic>>> getNotificationSettings() async {
+    try {
+      final response = await _dio.get('/user/notification-settings');
+      final data = response.data as Map<String, dynamic>;
+      return DataStateSuccess(data);
+    } on DioException catch (e) {
+      return DataStateError(e);
+    }
+  }
+
+  @override
+  Future<DataState<Map<String, dynamic>>> updateNotificationSettings({
+    bool? notifyOnFaceDetected,
+  }) async {
+    try {
+      final body = <String, dynamic>{};
+      if (notifyOnFaceDetected != null) {
+        body['notifyOnFaceDetected'] = notifyOnFaceDetected;
+      }
+      final response = await _dio.patch(
+        '/user/notification-settings',
+        data: body,
+      );
+      final data = response.data as Map<String, dynamic>;
+      return DataStateSuccess(data);
     } on DioException catch (e) {
       return DataStateError(e);
     }
