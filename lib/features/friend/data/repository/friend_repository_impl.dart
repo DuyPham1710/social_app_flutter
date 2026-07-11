@@ -323,11 +323,13 @@ class FriendRepositoryImpl implements FriendRepository {
     String targetUserId, {
     String? startDate,
     String? endDate,
+    String? language,
   }) async {
     try {
       final Map<String, dynamic> queries = {};
       if (startDate != null) queries['startDate'] = startDate;
       if (endDate != null) queries['endDate'] = endDate;
+      if (language != null) queries['language'] = language;
 
       final response = await friendService.getFriendActivitiesSummary(
         targetUserId,

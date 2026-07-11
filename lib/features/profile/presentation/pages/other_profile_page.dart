@@ -29,8 +29,12 @@ class OtherProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<FriendProfileBloc>(create: (_) => di.s1<FriendProfileBloc>()),
-        BlocProvider<FriendActivitySummaryCubit>(create: (_) => di.s1<FriendActivitySummaryCubit>()),
+        BlocProvider<FriendProfileBloc>(
+          create: (_) => di.s1<FriendProfileBloc>(),
+        ),
+        BlocProvider<FriendActivitySummaryCubit>(
+          create: (_) => di.s1<FriendActivitySummaryCubit>(),
+        ),
       ],
       child: _OtherProfilePageView(userId: userId),
     );
@@ -298,7 +302,11 @@ class _OtherProfilePageViewState extends State<_OtherProfilePageView> {
                           ),
                           //Divider(color: AppColors.divider),
                           if (state.relationship?.status == 'friends')
-                             FriendActivitySummaryWidget(targetUserId: user.userId),
+                            FriendActivitySummaryWidget(
+                              targetUserId: user.userId,
+                              targetUserName:
+                                  user.fullName ?? user.username ?? "user",
+                            ),
                           const SizedBox(height: 12),
                           _buildPostsSection(state, posts, commentCounts),
                         ]),

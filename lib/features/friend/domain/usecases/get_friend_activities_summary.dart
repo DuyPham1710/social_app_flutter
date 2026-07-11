@@ -21,6 +21,7 @@ class GetFriendActivitiesSummaryUseCase
       params!.targetUserId,
       startDate: params.startDate,
       endDate: params.endDate,
+      language: params.language,
     );
   }
 }
@@ -29,10 +30,12 @@ class GetFriendActivitiesSummaryParams {
   final String targetUserId;
   final String? startDate;
   final String? endDate;
+  final String? language;
 
   GetFriendActivitiesSummaryParams({
     required this.targetUserId,
     this.startDate,
     this.endDate,
+    this.language,
   });
 }

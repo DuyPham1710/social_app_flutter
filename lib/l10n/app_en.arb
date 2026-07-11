@@ -1872,5 +1872,78 @@
         "type": "int"
       }
     }
+  },
+  "aiSummaryTitle": "{name}'s Activity Summary",
+  "@aiSummaryTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSummarySubtitle": "Haven't caught up with {name}? Let AI quickly summarize {name}'s recent activities for you!",
+  "@aiSummarySubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSummaryStartButton": "Start summary",
+  "aiSummaryPosts": "{count} Posts",
+  "@aiSummaryPosts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryComments": "{count} Comments",
+  "@aiSummaryComments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryReacts": "{count} Reactions",
+  "@aiSummaryReacts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryStories": "{count} Stories",
+  "@aiSummaryStories": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSummaryDateRange": "Time range: {range}",
+  "@aiSummaryDateRange": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSummarySelectDateRange": "Select time range",
+  "aiSummaryPast7Days": "Past 7 days",
+  "aiSummaryPast30Days": "Past 30 days",
+  "aiSummaryAllTime": "All time",
+  "aiSummaryCustomDate": "Custom date...",
+  "aiSummaryCustomDateRange": "From {startDate} to {endDate}",
+  "@aiSummaryCustomDateRange": {
+    "placeholders": {
+      "startDate": {
+        "type": "String"
+      },
+      "endDate": {
+        "type": "String"
+      }
+    }
   }
 }

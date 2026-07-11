@@ -8,10 +8,16 @@ import 'package:social_app_fe/core/utils/responsive_helper.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_activity_summary_cubit.dart';
 import 'package:social_app_fe/features/friend/presentation/bloc/friend_activity_summary_state.dart';
 
+import 'package:social_app_fe/features/post/presentation/widgets/post_widgets/animated_post_border.dart';
+import 'package:social_app_fe/l10n/generated/app_localizations.dart';
 class FriendActivitySummaryWidget extends StatefulWidget {
   final String targetUserId;
-
-  const FriendActivitySummaryWidget({super.key, required this.targetUserId});
+  final String targetUserName;
+  const FriendActivitySummaryWidget({
+    super.key,
+    required this.targetUserId,
+    required this.targetUserName,
+  });
 
   @override
   State<FriendActivitySummaryWidget> createState() =>
@@ -26,86 +32,91 @@ class _FriendActivitySummaryWidgetState
   Widget build(BuildContext context) {
     return BlocBuilder<FriendActivitySummaryCubit, FriendActivitySummaryState>(
       builder: (context, state) {
-        return Container(
-          margin: EdgeInsets.symmetric(
+        return Padding(
+          padding: EdgeInsets.symmetric(
             horizontal: 16.rs(context),
             vertical: 12.rsh(context),
           ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFF6366F1).withValues(alpha: 0.15),
-                const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                const Color(0xFFD946EF).withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+          child: AnimatedPostBorder(
+            borderWidth: 1.5,
+            borderRadius: 16,
+            glowColor: AppColors.primary,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: AppColors.background.withValues(alpha: 0.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.background.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Padding(
-                padding: EdgeInsets.all(16.rs(context)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.rs(context)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.auto_awesome_rounded,
-                                color: Color(0xFF8B5CF6),
-                                size: 20,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.auto_awesome_rounded,
+                                    color: AppColors.iconPrimary,
+                                    size: 20,
+                                  ),
+                                ),
+                                SizedBox(width: 8.rs(context)),
+                                Text(
+                                  AppLocalizations.of(context).aiSummaryTitle(widget.targetUserName.trim().split(' ').last),
+                                  style: TextStyle(
+                                    fontSize: 16.rsp(context),
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 8.rs(context)),
-                            Text(
-                              'AI Tóm Tắt Hoạt Động',
-                              style: TextStyle(
-                                fontSize: 16.rsp(context),
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                                letterSpacing: 0.2,
+                            if (state is! FriendActivitySummaryInitial)
+                              GestureDetector(
+                                onTap: () => _showFilterOptions(context),
+                                child: Icon(
+                                  Icons.tune_rounded,
+                                  color: AppColors.textSecondary,
+                                  size: 20,
+                                ),
                               ),
-                            ),
                           ],
                         ),
-                        if (state is! FriendActivitySummaryInitial)
-                          GestureDetector(
-                            onTap: () => _showFilterOptions(context),
-                            child: Icon(
-                              Icons.tune_rounded,
-                              color: AppColors.textSecondary,
-                              size: 20,
-                            ),
+                        SizedBox(height: 6.rsh(context)),
+                        Text(
+                          AppLocalizations.of(context).aiSummarySubtitle(widget.targetUserName.trim().split(' ').last),
+                          style: TextStyle(
+                            fontSize: 13.rsp(context),
+                            color: AppColors.textSecondary,
+                            height: 1.4,
                           ),
+                        ),
+                        SizedBox(height: 12.rsh(context)),
+                        _buildContent(context, state),
                       ],
                     ),
-                    SizedBox(height: 12.rsh(context)),
-                    _buildContent(context, state),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -121,22 +132,23 @@ class _FriendActivitySummaryWidgetState
         child: ElevatedButton.icon(
           onPressed: () => _showFilterOptions(context),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: EdgeInsets.symmetric(
-              horizontal: 16.rs(context),
-              vertical: 10.rsh(context),
+              horizontal: 24.rs(context),
+              vertical: 12.rsh(context),
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(30),
             ),
-            elevation: 0,
+            elevation: 4,
+            shadowColor: AppColors.primary.withValues(alpha: 0.4),
           ),
-          icon: const Icon(Icons.analytics_rounded, size: 18),
+          icon: const Icon(Icons.auto_awesome_rounded, size: 20),
           label: Text(
-            'Xem tóm tắt hoạt động',
+            AppLocalizations.of(context).aiSummaryStartButton,
             style: TextStyle(
-              fontSize: 14.rsp(context),
+              fontSize: 15.rsp(context),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -182,28 +194,28 @@ class _FriendActivitySummaryWidgetState
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildStatBadge(
-                context,
-                '${state.summary.activities.postCount} Bài viết',
-              ),
-              _buildStatBadge(
-                context,
-                '${state.summary.activities.commentCount} Bình luận',
-              ),
-              _buildStatBadge(
-                context,
-                '${state.summary.activities.reactCount} Cảm xúc',
-              ),
-              _buildStatBadge(
-                context,
-                '${state.summary.activities.storyCount} Story',
-              ),
-            ],
-          ),
-          SizedBox(height: 12.rsh(context)),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     _buildStatBadge(
+          //       context,
+          //       AppLocalizations.of(context).aiSummaryPosts(state.summary.activities.postCount),
+          //     ),
+          //     _buildStatBadge(
+          //       context,
+          //       AppLocalizations.of(context).aiSummaryComments(state.summary.activities.commentCount),
+          //     ),
+          //     _buildStatBadge(
+          //       context,
+          //       AppLocalizations.of(context).aiSummaryReacts(state.summary.activities.reactCount),
+          //     ),
+          //     _buildStatBadge(
+          //       context,
+          //       AppLocalizations.of(context).aiSummaryStories(state.summary.activities.storyCount),
+          //     ),
+          //   ],
+          // ),
+          // SizedBox(height: 12.rsh(context)),
           Text(
             state.summary.summary,
             style: TextStyle(
@@ -217,7 +229,7 @@ class _FriendActivitySummaryWidgetState
             Padding(
               padding: EdgeInsets.only(top: 8.rsh(context)),
               child: Text(
-                'Khoảng thời gian: $_selectedOptionTitle',
+                AppLocalizations.of(context).aiSummaryDateRange(_selectedOptionTitle),
                 style: TextStyle(
                   fontSize: 12.rsp(context),
                   color: AppColors.textSecondary.withValues(alpha: 0.7),
@@ -284,7 +296,7 @@ class _FriendActivitySummaryWidgetState
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.rs(context)),
               child: Text(
-                'Chọn khoảng thời gian',
+                AppLocalizations.of(context).aiSummarySelectDateRange,
                 style: TextStyle(
                   fontSize: 18.rsp(context),
                   fontWeight: FontWeight.bold,
@@ -295,35 +307,35 @@ class _FriendActivitySummaryWidgetState
             SizedBox(height: 12.rsh(context)),
             _buildFilterOption(
               context,
-              title: '7 ngày qua',
+              title: AppLocalizations.of(context).aiSummaryPast7Days,
               icon: Icons.date_range_rounded,
               onTap: () {
                 final endDate = DateTime.now();
                 final startDate = endDate.subtract(const Duration(days: 7));
-                _applyFilter(context, '7 ngày qua', startDate, endDate);
+                _applyFilter(context, AppLocalizations.of(context).aiSummaryPast7Days, startDate, endDate);
               },
             ),
             _buildFilterOption(
               context,
-              title: '30 ngày qua',
+              title: AppLocalizations.of(context).aiSummaryPast30Days,
               icon: Icons.calendar_month_rounded,
               onTap: () {
                 final endDate = DateTime.now();
                 final startDate = endDate.subtract(const Duration(days: 30));
-                _applyFilter(context, '30 ngày qua', startDate, endDate);
+                _applyFilter(context, AppLocalizations.of(context).aiSummaryPast30Days, startDate, endDate);
               },
             ),
             _buildFilterOption(
               context,
-              title: 'Tất cả thời gian',
+              title: AppLocalizations.of(context).aiSummaryAllTime,
               icon: Icons.all_inclusive_rounded,
               onTap: () {
-                _applyFilter(context, 'Tất cả thời gian', null, null);
+                _applyFilter(context, AppLocalizations.of(context).aiSummaryAllTime, null, null);
               },
             ),
             _buildFilterOption(
               context,
-              title: 'Tùy chọn ngày...',
+              title: AppLocalizations.of(context).aiSummaryCustomDate,
               icon: Icons.edit_calendar_rounded,
               onTap: () async {
                 Navigator.pop(context); // close modal/dialog first
@@ -334,9 +346,10 @@ class _FriendActivitySummaryWidgetState
                   builder: (context, child) {
                     return Theme(
                       data: Theme.of(context).copyWith(
-                        colorScheme: Theme.of(context).colorScheme.copyWith(
-                              primary: const Color(0xFF8B5CF6),
-                            ),
+                        colorScheme: ColorScheme.fromSeed(
+                          seedColor: AppColors.primary,
+                          brightness: Theme.of(context).brightness,
+                        ),
                       ),
                       child: child!,
                     );
@@ -344,7 +357,7 @@ class _FriendActivitySummaryWidgetState
                 );
                 if (picked != null && context.mounted) {
                   final String title =
-                      'Từ ${picked.start.day}/${picked.start.month}/${picked.start.year} đến ${picked.end.day}/${picked.end.month}/${picked.end.year}';
+                      AppLocalizations.of(context).aiSummaryCustomDateRange('${picked.start.day}/${picked.start.month}/${picked.start.year}', '${picked.end.day}/${picked.end.month}/${picked.end.year}');
                   setState(() {
                     _selectedOptionTitle = title;
                   });
@@ -352,6 +365,7 @@ class _FriendActivitySummaryWidgetState
                     widget.targetUserId,
                     startDate: picked.start.toIso8601String(),
                     endDate: picked.end.toIso8601String(),
+                    language: AppLocalizations.of(context).localeName,
                   );
                 }
               },
@@ -366,6 +380,7 @@ class _FriendActivitySummaryWidgetState
         context: context,
         builder: (context) {
           return Dialog(
+            backgroundColor: AppColors.background,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -379,6 +394,7 @@ class _FriendActivitySummaryWidgetState
     } else {
       showModalBottomSheet(
         context: context,
+        backgroundColor: AppColors.background,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -397,10 +413,10 @@ class _FriendActivitySummaryWidgetState
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: const Color(0xFF8B5CF6)),
+        child: Icon(icon, color: AppColors.primary),
       ),
       title: Text(
         title,
@@ -428,6 +444,7 @@ class _FriendActivitySummaryWidgetState
       widget.targetUserId,
       startDate: startDate?.toIso8601String(),
       endDate: endDate?.toIso8601String(),
+      language: AppLocalizations.of(context).localeName,
     );
   }
 }

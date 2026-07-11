@@ -55,6 +55,7 @@ abstract class FriendRepository {
     String targetUserId, {
     String? startDate,
     String? endDate,
+    String? language,
   });
 
   //Lấy list friend của 1 user

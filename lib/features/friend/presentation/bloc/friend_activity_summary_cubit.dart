@@ -9,7 +9,7 @@ class FriendActivitySummaryCubit extends Cubit<FriendActivitySummaryState> {
   FriendActivitySummaryCubit(this._getFriendActivitiesSummaryUseCase)
       : super(FriendActivitySummaryInitial());
 
-  Future<void> loadSummary(String targetUserId, {String? startDate, String? endDate}) async {
+  Future<void> loadSummary(String targetUserId, {String? startDate, String? endDate, String? language}) async {
     emit(FriendActivitySummaryLoading());
     
     final result = await _getFriendActivitiesSummaryUseCase(
@@ -17,6 +17,7 @@ class FriendActivitySummaryCubit extends Cubit<FriendActivitySummaryState> {
         targetUserId: targetUserId,
         startDate: startDate,
         endDate: endDate,
+        language: language,
       ),
     );
 
