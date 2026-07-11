@@ -3686,4 +3686,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String storyDefaultTitle(int number) {
     return 'Story $number';
   }
+
+  @override
+  String aiSummaryTitle(String name) {
+    return '$name\'s Activity Summary';
+  }
+
+  @override
+  String aiSummarySubtitle(String name) {
+    return 'Haven\'t caught up with $name? Let AI quickly summarize $name\'s recent activities for you!';
+  }
+
+  @override
+  String get aiSummaryStartButton => 'Start summary';
+
+  @override
+  String aiSummaryPosts(int count) {
+    return '$count Posts';
+  }
+
+  @override
+  String aiSummaryComments(int count) {
+    return '$count Comments';
+  }
+
+  @override
+  String aiSummaryReacts(int count) {
+    return '$count Reactions';
+  }
+
+  @override
+  String aiSummaryStories(int count) {
+    return '$count Stories';
+  }
+
+  @override
+  String aiSummaryDateRange(String range) {
+    return 'Time range: $range';
+  }
+
+  @override
+  String get aiSummarySelectDateRange => 'Select time range';
+
+  @override
+  String get aiSummaryPast7Days => 'Past 7 days';
+
+  @override
+  String get aiSummaryPast30Days => 'Past 30 days';
+
+  @override
+  String get aiSummaryAllTime => 'All time';
+
+  @override
+  String get aiSummaryCustomDate => 'Custom date...';
+
+  @override
+  String aiSummaryCustomDateRange(String startDate, String endDate) {
+    return 'From $startDate to $endDate';
+  }
 }

@@ -6,11 +6,15 @@ import 'package:visibility_detector/visibility_detector.dart';
 class AnimatedPostBorder extends StatefulWidget {
   final Widget child;
   final double borderWidth;
+  final double? borderRadius;
+  final Color? glowColor;
 
   const AnimatedPostBorder({
     super.key,
     required this.child,
     this.borderWidth = 1.5,
+    this.borderRadius,
+    this.glowColor,
   });
 
   @override
@@ -41,7 +45,9 @@ class _AnimatedPostBorderState extends State<AnimatedPostBorder>
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final glowColor = isDarkMode ? Colors.white : Colors.black;
+    final defaultGlowColor = isDarkMode ? Colors.white : Colors.black;
+    final color = widget.glowColor ?? defaultGlowColor;
+    final radius = widget.borderRadius ?? 12.rsr(context);
 
     return VisibilityDetector(
       key: widget.key ?? ValueKey(widget.hashCode),
@@ -61,59 +67,97 @@ class _AnimatedPostBorderState extends State<AnimatedPostBorder>
       },
       child: Stack(
         children: [
-          // Nền phía sau (để che những chỗ không có gradient)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.divider.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(
-                  12.rsr(context) + widget.borderWidth,
-                ),
-              ),
-            ),
-          ),
-
-          // Gradient xoay vòng
-          if (_isVisible)
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(
-                  12.rsr(context) + widget.borderWidth,
-                ),
-                child: Transform.scale(
-                  scale: 2.0, // Phóng to để khi xoay không bị cắt góc
-                  child: RotationTransition(
-                    turns: _controller,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: SweepGradient(
-                          colors: [
-                            Colors.transparent,
-                            Colors.transparent,
-                            glowColor,
-                            glowColor,
-                            Colors.transparent,
-                            Colors.transparent,
-                          ],
-                          stops: const [0.0, 0.25, 0.45, 0.55, 0.75, 1.0],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-          // Nội dung chính
           Padding(
             padding: EdgeInsets.all(widget.borderWidth),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.rsr(context)),
+              borderRadius: BorderRadius.circular(radius),
               child: widget.child,
+            ),
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: _isVisible
+                  ? AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        return CustomPaint(
+                          painter: _AnimatedBorderPainter(
+                            animation: _controller,
+                            borderWidth: widget.borderWidth,
+                            borderRadius: radius,
+                            glowColor: color,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.divider.withValues(alpha: 0.3),
+                          width: widget.borderWidth,
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          radius + widget.borderWidth,
+                        ),
+                      ),
+                    ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _AnimatedBorderPainter extends CustomPainter {
+  final Animation<double> animation;
+  final double borderWidth;
+  final double borderRadius;
+  final Color glowColor;
+
+  _AnimatedBorderPainter({
+    required this.animation,
+    required this.borderWidth,
+    required this.borderRadius,
+    required this.glowColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final paintRect = rect.deflate(borderWidth / 2);
+    final rrect = RRect.fromRectAndRadius(
+      paintRect,
+      Radius.circular(borderRadius + borderWidth / 2),
+    );
+
+    final bgPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = AppColors.divider.withValues(alpha: 0.3);
+
+    canvas.drawRRect(rrect, bgPaint);
+
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..strokeCap = StrokeCap.round
+      ..shader = SweepGradient(
+        colors: [
+          Colors.transparent,
+          Colors.transparent,
+          glowColor,
+          glowColor,
+          Colors.transparent,
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.25, 0.45, 0.55, 0.75, 1.0],
+        transform: GradientRotation(animation.value * 2 * 3.141592653589793),
+      ).createShader(rect);
+
+    canvas.drawRRect(rrect, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _AnimatedBorderPainter oldDelegate) => true;
 }

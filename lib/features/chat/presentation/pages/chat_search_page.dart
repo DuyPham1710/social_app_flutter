@@ -44,7 +44,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
     _chatSearchBloc = s1<ChatSearchBloc>();
     _recentSearchService = s1<RecentSearchService>();
 
-    // Load friend suggestions cho section "Những người bạn có thể biết"
+    // Load friend suggestions cho section "Gợi ý kết bạn"
     _chatSearchBloc.add(const LoadFriendSuggestions(page: 1, limit: 4));
 
     // Load recent searches từ SharedPreferences

@@ -9,11 +9,14 @@ part of 'friend_service.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _FriendService implements FriendService {
-  _FriendService(this._dio, {this.baseUrl});
+  _FriendService(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
   String? baseUrl;
+
+  final ParseErrorLogger? errorLogger;
+
   @override
   Future<FriendRequestModel> sendFriendRequest(
     Map<String, dynamic> request,
@@ -38,6 +41,7 @@ class _FriendService implements FriendService {
     try {
       _value = FriendRequestModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -67,6 +71,7 @@ class _FriendService implements FriendService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -93,6 +98,7 @@ class _FriendService implements FriendService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -122,6 +128,7 @@ class _FriendService implements FriendService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -179,6 +186,7 @@ class _FriendService implements FriendService {
           .map((dynamic i) => FriendModel.fromJson(i as Map<String, dynamic>))
           .toList();
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -285,6 +293,7 @@ class _FriendService implements FriendService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -313,6 +322,7 @@ class _FriendService implements FriendService {
     try {
       _value = RelationshipStatusModel.fromJson(_result.data!);
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -343,6 +353,7 @@ class _FriendService implements FriendService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;
@@ -372,6 +383,39 @@ class _FriendService implements FriendService {
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ActivitySummaryModel> getFriendActivitiesSummary(
+    String targetUserId,
+    Map<String, dynamic>? queries,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.addAll(queries ?? <String, dynamic>{});
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ActivitySummaryModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/friends/${targetUserId}/activities-summary',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ActivitySummaryModel _value;
+    try {
+      _value = ActivitySummaryModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
       rethrow;
     }
     return _value;

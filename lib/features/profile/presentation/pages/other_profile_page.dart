@@ -15,6 +15,8 @@ import '../bloc/other_profile_bloc.dart';
 import '../bloc/other_profile_state.dart';
 import '../bloc/other_profile_event.dart';
 import '../widgets/report_user_bottom_sheet.dart';
+import 'package:social_app_fe/features/profile/presentation/widgets/friend_activity_summary_widget.dart';
+import 'package:social_app_fe/features/friend/presentation/bloc/friend_activity_summary_cubit.dart';
 
 import 'package:social_app_fe/core/di/injection.dart' as di;
 
@@ -25,8 +27,15 @@ class OtherProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<FriendProfileBloc>(
-      create: (_) => di.s1<FriendProfileBloc>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<FriendProfileBloc>(
+          create: (_) => di.s1<FriendProfileBloc>(),
+        ),
+        BlocProvider<FriendActivitySummaryCubit>(
+          create: (_) => di.s1<FriendActivitySummaryCubit>(),
+        ),
+      ],
       child: _OtherProfilePageView(userId: userId),
     );
   }
@@ -292,6 +301,12 @@ class _OtherProfilePageViewState extends State<_OtherProfilePageView> {
                             },
                           ),
                           //Divider(color: AppColors.divider),
+                          if (state.relationship?.status == 'friends')
+                            FriendActivitySummaryWidget(
+                              targetUserId: user.userId,
+                              targetUserName:
+                                  user.fullName ?? user.username ?? "user",
+                            ),
                           const SizedBox(height: 12),
                           _buildPostsSection(state, posts, commentCounts),
                         ]),
