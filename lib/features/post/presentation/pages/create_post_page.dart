@@ -14,9 +14,7 @@ import 'package:social_app_fe/core/di/injection.dart';
 import 'package:social_app_fe/core/enums/layout_type.dart';
 import 'package:social_app_fe/core/enums/privacy_type.dart';
 import 'package:social_app_fe/core/utils/privacy_util.dart';
-import 'package:social_app_fe/features/menu/presentation/bloc/menu_bloc.dart';
-import 'package:social_app_fe/features/menu/presentation/bloc/menu_event.dart';
-import 'package:social_app_fe/features/menu/presentation/bloc/menu_state.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
 import 'package:social_app_fe/features/post/domain/entities/create_post_entity.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_bloc.dart';
 import 'package:social_app_fe/features/post/presentation/bloc/post_event.dart';
@@ -145,7 +143,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   void initState() {
     super.initState();
-    context.read<MenuBloc>().add(LoadCurrentUserEvent());
+    // Ensure we have user data loaded (if not already)
+    TokenStorage.getUserData();
   }
 
   @override
@@ -652,22 +651,22 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
                   child: Column(
                     children: [
-                      BlocBuilder<MenuBloc, MenuState>(
-                        builder: (context, state) {
-                          if (state is MenuLoadingState) {
+                      ValueListenableBuilder<Map<String, dynamic>?>(
+                        valueListenable: TokenStorage.currentUserData,
+                        builder: (context, userData, child) {
+                          if (userData == null) {
                             return const Center(
                               child: CupertinoActivityIndicator(),
                             );
                           }
 
-                          if (state is MenuLoadedState) {
-                            return Row(
+                          return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 CircleAvatar(
                                   radius: 20.rsr(context),
                                   backgroundImage: NetworkImage(
-                                    state.user.avatarUrl ??
+                                    userData['avatarUrl'] as String? ??
                                         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrHT9KQ3vag-Gdd9sjA7pi6zl2f_ho4Gh7Vg&s',
                                   ),
                                 ),
@@ -701,7 +700,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                                     WrapCrossAlignment.center,
                                                 children: [
                                                   Text(
-                                                    state.user.fullName ??
+                                                    userData['fullName'] as String? ??
                                                         context
                                                             .l10n
                                                             .commonUnknown,
@@ -969,8 +968,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 ),
                               ],
                             );
-                          }
-                          return const SizedBox.shrink();
                         },
                       ),
 

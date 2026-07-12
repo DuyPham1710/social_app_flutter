@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenStorage {
   static const _accessTokenKey = 'accessToken';
   static const _refreshTokenKey = 'refreshToken';
   static const _userDataKey = 'userData';
+
+  /// Lắng nghe sự thay đổi của userData
+  static final ValueNotifier<Map<String, dynamic>?> currentUserData = ValueNotifier(null);
 
   /// Lưu token và user data sau khi login
   static Future<void> saveTokens({
@@ -18,6 +22,7 @@ class TokenStorage {
     
     if (userData != null) {
       await prefs.setString(_userDataKey, jsonEncode(userData));
+      currentUserData.value = userData;
     }
   }
 
@@ -25,6 +30,7 @@ class TokenStorage {
   static Future<void> saveUserData(Map<String, dynamic> userData) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userDataKey, jsonEncode(userData));
+    currentUserData.value = userData;
   }
 
   /// Lấy user data
@@ -32,7 +38,9 @@ class TokenStorage {
     final prefs = await SharedPreferences.getInstance();
     final userDataString = prefs.getString(_userDataKey);
     if (userDataString != null) {
-      return jsonDecode(userDataString) as Map<String, dynamic>;
+      final data = jsonDecode(userDataString) as Map<String, dynamic>;
+      currentUserData.value = data;
+      return data;
     }
     return null;
   }
@@ -55,5 +63,6 @@ class TokenStorage {
     await prefs.remove(_accessTokenKey);
     await prefs.remove(_refreshTokenKey);
     await prefs.remove(_userDataKey);
+    currentUserData.value = null;
   }
 }

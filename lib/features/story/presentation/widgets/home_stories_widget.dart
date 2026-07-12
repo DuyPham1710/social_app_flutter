@@ -157,8 +157,16 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
   }
 
   Widget _buildAddStory() {
-    return GestureDetector(
-      onTap: () {
+    return ValueListenableBuilder<Map<String, dynamic>?>(
+      valueListenable: TokenStorage.currentUserData,
+      builder: (context, userData, _) {
+        String? avatarUrl = _currentUserAvatar;
+        if (userData != null && userData['avatarUrl'] != null) {
+          avatarUrl = userData['avatarUrl'] as String;
+        }
+
+        return GestureDetector(
+          onTap: () {
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => const StoryCreatePage()));
@@ -177,10 +185,10 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
                   borderRadius: BorderRadius.circular(12.rsr(context)),
                   border: Border.all(color: AppColors.divider, width: 1),
                   image:
-                      _currentUserAvatar != null &&
-                          _currentUserAvatar!.isNotEmpty
+                      avatarUrl != null &&
+                          avatarUrl.isNotEmpty
                       ? DecorationImage(
-                          image: NetworkImage(_currentUserAvatar!),
+                          image: NetworkImage(avatarUrl),
                           fit: BoxFit.cover,
                         )
                       : null,
@@ -211,6 +219,8 @@ class _HomeStoriesWidgetState extends State<HomeStoriesWidget>
           ),
         ],
       ),
+    );
+      },
     );
   }
 

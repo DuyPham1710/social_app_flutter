@@ -95,17 +95,19 @@ class SentFriendRequestItem extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () => _navigateToProfile(context),
-                      child: Text(
-                        name,
-                        style: TextStyle(
-                          fontSize: 16.rsp(context),
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                    Flexible(
+                      child: GestureDetector(
+                        onTap: () => _navigateToProfile(context),
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 16.rsp(context),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Text(

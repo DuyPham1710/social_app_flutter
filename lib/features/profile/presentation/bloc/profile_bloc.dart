@@ -13,6 +13,8 @@ import 'package:social_app_fe/features/profile/domain/usecases/get_user_profile_
 
 import 'package:social_app_fe/features/auth/domain/usecases/delete_face_registration_usecase.dart';
 import 'package:social_app_fe/features/auth/data/models/user_model.dart';
+import 'package:social_app_fe/core/local/token_storage.dart';
+import 'package:social_app_fe/core/di/injection.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetUserProfileUseCase getUserProfileUseCase;
@@ -67,6 +69,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
       // 3. Xử lý kết quả
       if (result is DataStateSuccess && result.data != null) {
+        if (result.data is UserModel) {
+          final updatedUser = result.data as UserModel;
+          TokenStorage.saveUserData({
+            'id': updatedUser.userId,
+            'fullName': updatedUser.fullName,
+            'email': updatedUser.email,
+            'username': updatedUser.username,
+            'avatarUrl': updatedUser.avatarUrl,
+          });
+        }
+
         // Thành công: Cập nhật user mới vào state -> UI tự đổi
         emit(
           currentState.copyWith(

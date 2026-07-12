@@ -239,11 +239,20 @@ class _MainPageState extends State<MainPage> {
         // Side Navigation
         BlocBuilder<NotificationBloc, NotificationState>(
           builder: (context, notificationState) {
-            return SideNavigation(
-              currentIndex: _currentIndex,
-              onTabSelected: _onTabSelected,
-              unreadCount: notificationState.unread,
-              avt: _getAvtCurrent(),
+            return ValueListenableBuilder<Map<String, dynamic>?>(
+              valueListenable: TokenStorage.currentUserData,
+              builder: (context, userData, child) {
+                String avt = _getAvtCurrent();
+                if (userData != null && userData['avatarUrl'] != null) {
+                  avt = userData['avatarUrl'] as String;
+                }
+                return SideNavigation(
+                  currentIndex: _currentIndex,
+                  onTabSelected: _onTabSelected,
+                  unreadCount: notificationState.unread,
+                  avt: avt,
+                );
+              },
             );
           },
         ),
@@ -300,11 +309,20 @@ class _MainPageState extends State<MainPage> {
               physics: const NeverScrollableScrollPhysics(),
               child: BlocBuilder<NotificationBloc, NotificationState>(
                 builder: (context, notificationState) {
-                  return CustomBottomNavigation(
-                    currentIndex: _currentIndex,
-                    onTabSelected: _onTabSelected,
-                    unreadCount: notificationState.unread,
-                    avt: _getAvtCurrent(),
+                  return ValueListenableBuilder<Map<String, dynamic>?>(
+                    valueListenable: TokenStorage.currentUserData,
+                    builder: (context, userData, child) {
+                      String avt = _getAvtCurrent();
+                      if (userData != null && userData['avatarUrl'] != null) {
+                        avt = userData['avatarUrl'] as String;
+                      }
+                      return CustomBottomNavigation(
+                        currentIndex: _currentIndex,
+                        onTabSelected: _onTabSelected,
+                        unreadCount: notificationState.unread,
+                        avt: avt,
+                      );
+                    },
                   );
                 },
               ),

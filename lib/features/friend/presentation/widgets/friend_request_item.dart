@@ -98,17 +98,19 @@ class FriendRequestItem extends StatelessWidget {
                 // Tên người dùng và thời gian
                 Row(
                   children: [
-                    GestureDetector(
-                      onTap: () => _navigateToProfile(context),
-                      child: Text(
-                        name,
-                        style: TextStyle(
-                          fontSize: 16.rsp(context),
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                    Flexible(
+                      child: GestureDetector(
+                        onTap: () => _navigateToProfile(context),
+                        child: Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: 16.rsp(context),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     SizedBox(width: 8.rs(context)),
