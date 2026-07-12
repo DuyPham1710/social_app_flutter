@@ -119,7 +119,7 @@ class FriendRequestNotificationItem extends StatelessWidget {
                         recognizer: TapGestureRecognizer()..onTap = onUserTap,
                       ),
                       TextSpan(
-                        text: context.l10n.notificationFriendRequestMessage,
+                        text: " ${context.l10n.notificationFriendRequestMessage}",
                         style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
